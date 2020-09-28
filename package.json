@@ -1,0 +1,30 @@
+{
+  "name": "@aragon/eaglet",
+  "version": "1.0.0",
+  "description": "Optimistic DAOs",
+  "main": "index.js",
+  "repository": "https://github.com/aragon/eaglet",
+  "author": "Jorge Izquierdo <jorge@aragon.one>",
+  "license": "GPL-3.0",
+  "private": true,
+  "files": [
+    "/artifacts"
+  ],
+  "devDependencies": {
+    "@nomiclabs/buidler": "^1.4.7",
+    "@nomiclabs/buidler-ethers": "^2.0.0",
+    "@nomiclabs/buidler-waffle": "^2.0.0",
+    "chai": "^4.2.0",
+    "ethereum-waffle": "^3.0.0",
+    "ethers": "^5.0.0"
+  },
+  "dependencies": {
+    "erc3k": "^1.0.0-beta.4"
+  },
+  "scripts": {
+    "clean": "rm -rf artifacts",
+    "compile": "npx buidler compile --force",
+    "test": "npx buidler test",
+    "prepublishOnly": "yarn test && yarn clean && yarn compile"
+  }
+}
