@@ -24,7 +24,7 @@ contract MiniACL {
         require(
             roles[_role][msg.sender] ||  // sender authorized
             roles[_role][ANY_ADDR],      // or anyone allowed
-            "eaglet: bad auth"
+            "acl: auth"
         );
         _;
     }
@@ -38,18 +38,28 @@ contract MiniACL {
     }
 
     function _grant(bytes4 _role, address _who) internal {
+        require(!isFrozen(_role), "acl: frozen");
+        
         roles[_role][_who] = true;
         emit Granted(_role, msg.sender, _who);
     }
 
     function revoke(bytes4 _role, address _who) external auth(ROOT_ROLE) {
+        require(!isFrozen(_role), "acl: frozen");
+
         roles[_role][_who] = false;
         emit Revoked(_role, msg.sender, _who);
     }
 
     function freeze(bytes4 _role) external auth(ROOT_ROLE) {
+        require(!isFrozen(_role), "acl: frozen");
+
         roles[_role][FREEZE_ADDR] = true;
 
         emit Frozen(_role, msg.sender);
+    }
+
+    function isFrozen(bytes4 _role) public view returns (bool) {
+        return roles[_role][FREEZE_ADDR];
     }
 }

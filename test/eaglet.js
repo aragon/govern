@@ -1,14 +1,19 @@
 const { expect } = require("chai");
 
-describe("Greeter", function() {
-  it("Should return the new greeting once it's changed", async function() {
-    const Greeter = await ethers.getContractFactory("Greeter");
-    const greeter = await Greeter.deploy("Hello, world!");
-    
-    await greeter.deployed();
-    expect(await greeter.greet()).to.equal("Hello, world!");
+describe('Eaglet', function () {
+  let owner, notOwner
 
-    await greeter.setGreeting("Hola, mundo!");
-    expect(await greeter.greet()).to.equal("Hola, mundo!");
-  });
-});
+  beforeEach(async () => {
+    [owner, notOwner] = await ethers.getSigners()
+    const Eaglet = await ethers.getContractFactory('Eaglet')
+    eaglet = await Eaglet.deploy(owner)
+  })
+
+  it('owner can exec', async () => {
+    // await eaglet.exec([], { from: owner })
+  })
+
+  it('non-owner can exec', async () => {
+    // await eaglet.execute([], { from: notOwner })
+  })
+})
