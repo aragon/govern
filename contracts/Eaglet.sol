@@ -12,7 +12,7 @@ import "./lib/MiniACL.sol";
 contract Eaglet is ERC3000Data, MiniACL {
     bytes4 EXEC_ROLE = this.exec.selector;
 
-    constructor(IERC3000 _initialExecutor) MiniACL(address(_initialExecutor)) public {
+    constructor(IERC3000 _initialExecutor) MiniACL(address(this)) public {
         _grant(EXEC_ROLE, address(_initialExecutor));
     }
 
@@ -23,7 +23,7 @@ contract Eaglet is ERC3000Data, MiniACL {
             // todo: optimize with assembly
             (bool ok, bytes memory ret) = actions[i].to.call{value: actions[i].value}(actions[i].data);
             require(ok, "eaglet: call");
-            
+
             execResults[i] = ret;
         }
 
