@@ -68,7 +68,8 @@ contract OptimisticQueue is ERC3000, MiniACL {
         requireState(containerHash, ExecutionState.Scheduled);
 
         require(executionTime[containerHash] <= block.timestamp, "queue: wait more");
-        executionTime[containerHash] = encodeState(ExecutionState.Executed);
+        
+        _setState(containerHash, ExecutionState.Executed);
 
         execResults = _container.payload.executor.exec(_container.payload.actions);
         _releaseDeposit(_container.payload.submitter, _container.config.scheduleDeposit);
@@ -81,7 +82,7 @@ contract OptimisticQueue is ERC3000, MiniACL {
         bytes32 containerHash = getContainerHash(_payloadHash, getConfigHash(_config));
         requireState(containerHash, ExecutionState.Scheduled);
 
-        executionTime[containerHash] = encodeState(ExecutionState.Challenged);
+        _setState(containerHash, ExecutionState.Challenged);
 
         emit Challenged(containerHash, msg.sender, _reason, _config.challengeDeposit);
     }
@@ -90,7 +91,7 @@ contract OptimisticQueue is ERC3000, MiniACL {
         bytes32 containerHash = getContainerHash(_payloadHash, getConfigHash(_config));
         requireState(containerHash, ExecutionState.Scheduled);
 
-        executionTime[containerHash] = encodeState(ExecutionState.Cancelled);
+        _setState(containerHash, ExecutionState.Cancelled);
 
         emit Vetoed(containerHash, msg.sender, _reason, _config.vetoDeposit);
     }
@@ -101,6 +102,10 @@ contract OptimisticQueue is ERC3000, MiniACL {
         returns (bytes32)
     {
         return _setConfig(_config);
+    }
+
+    function _setState(bytes32 _containerHash, ExecutionState _state) internal {
+        executionTime[_containerHash] = encodeState(_state);
     }
 
     function _setConfig(ERC3000Data.Config memory _config) internal returns (bytes32) {
