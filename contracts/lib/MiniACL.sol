@@ -5,7 +5,7 @@
 pragma solidity 0.6.8;
 
 contract MiniACL {
-    bytes4 internal constant ROOT_ROLE =
+    bytes4 public constant ROOT_ROLE =
         this.grant.selector
         ^ this.revoke.selector
         ^ this.freeze.selector
@@ -39,6 +39,7 @@ contract MiniACL {
 
     function _grant(bytes4 _role, address _who) internal {
         require(!isFrozen(_role), "acl: frozen");
+        require(_who != FREEZE_ADDR, "acl: bad freeze");
         
         roles[_role][_who] = true;
         emit Granted(_role, msg.sender, _who);
