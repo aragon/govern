@@ -24,7 +24,7 @@ contract OptimisticQueue is ERC3000, MiniACL {
         delay = _delay;
     }
 
-    function schedule(uint256 _index, address _executor, Action[] memory _actions, bytes memory _proof)
+    function schedule(uint256 _index, IERC3000Executor _executor, ERC3000Data.Action[] memory _actions, bytes memory _proof)
         auth(this.schedule.selector)
         override public
         returns (bytes32 execHash)
@@ -35,12 +35,12 @@ contract OptimisticQueue is ERC3000, MiniACL {
         execHash = calcExecHash(_index, _executor, _actions);
 
         executionTime[execHash] = execTime;
-        Collateral memory noCollateral; // TODO: collateral
+        ERC3000Data.Collateral memory noCollateral; // TODO: collateral
 
         emit Scheduled(execHash, msg.sender, _executor, _actions, _proof, _index, execTime, noCollateral);
     }
     
-    function execute(uint256 _index, address _executor, Action[] memory _actions)
+    function execute(uint256 _index, IERC3000Executor _executor, ERC3000Data.Action[] memory _actions)
         auth(this.execute.selector)
         override public
         returns (bytes[] memory execResults)
@@ -50,7 +50,7 @@ contract OptimisticQueue is ERC3000, MiniACL {
         require(executionTime[execHash] <= block.timestamp, "queue: wait");
         executionTime[execHash] = EXECUTED;
 
-        execResults = Eaglet(_executor).exec(_actions); // TODO: move interface to standard?
+        execResults = _executor.exec(_actions);
         
         emit Executed(execHash, msg.sender, _executor, execResults, _index);
     }
@@ -58,20 +58,20 @@ contract OptimisticQueue is ERC3000, MiniACL {
 
     function challenge(bytes32 _actionHash, bytes memory _reason) auth(this.challenge.selector) override public {
         executionTime[_actionHash] = CHALLENGED;
-        Collateral memory noCollateral; // TODO: collateral
+        ERC3000Data.Collateral memory noCollateral; // TODO: collateral
 
         emit Challenged(_actionHash, msg.sender, _reason, noCollateral);
     }
 
     function veto(bytes32 _actionHash, bytes memory _reason) auth(this.veto.selector) override public {
         executionTime[_actionHash] = CANCELLED;
-        Collateral memory noCollateral; // TODO: collateral
+        ERC3000Data.Collateral memory noCollateral; // TODO: collateral
 
         emit Vetoed(_actionHash, msg.sender, _reason, noCollateral);
     }
 
-    function calcExecHash(uint256 _index, address _executor, Action[] memory _actions) internal view returns (bytes32) {
-        return keccak256(abi.encodePacked(address(this), _index, _executor, keccak256(abi.encode(_actions))));
+    function calcExecHash(uint256 _index, IERC3000Executor _executor, ERC3000Data.Action[] memory _actions) internal view returns (bytes32) {
+        return keccak256(abi.encodePacked(this, _index, _executor, keccak256(abi.encode(_actions))));
     }
 }
 

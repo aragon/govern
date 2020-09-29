@@ -6,19 +6,18 @@ pragma solidity 0.6.8;
 pragma experimental ABIEncoderV2;
 
 import "erc3k/contracts/IERC3000.sol";
+import "erc3k/contracts/ERC3000Executor.sol";
 
 import "./lib/MiniACL.sol";
 
-contract Eaglet is ERC3000Data, MiniACL {
+contract Eaglet is ERC3000Executor, MiniACL {
     bytes4 EXEC_ROLE = this.exec.selector;
 
     constructor(IERC3000 _initialExecutor) MiniACL(address(this)) public {
         _grant(EXEC_ROLE, address(_initialExecutor));
     }
 
-    event Executed(address indexed actor, Action[] actions, bytes[] execResults);
-
-    function exec(Action[] calldata actions) external auth(EXEC_ROLE) returns (bytes[] memory) {
+    function exec(ERC3000Data.Action[] memory actions) override public auth(EXEC_ROLE) returns (bytes[] memory) {
         bytes[] memory execResults = new bytes[](actions.length);
 
         for (uint256 i = 0; i < actions.length; i++) {
