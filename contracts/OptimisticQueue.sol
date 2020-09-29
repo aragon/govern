@@ -43,7 +43,7 @@ contract OptimisticQueue is ERC3000, MiniACL {
         require(_container.payload.nonce == index++, "queue: bad nonce");
         require(_container.payload.submitter == msg.sender, "queue: bad submitter");
         
-        bytes32 _configHash = keccak256(abi.encode(_container.config));
+        bytes32 _configHash = getConfigHash(_container.config);
         require(_configHash == configHash, "queue: bad config");
 
         uint256 execTime = block.timestamp + _container.config.executionDelay;
