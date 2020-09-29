@@ -4,3 +4,5 @@ yarn-error.log
 #Buidler files
 cache
 artifacts
+coverage
+coverage.json
