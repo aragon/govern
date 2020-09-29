@@ -1,6 +1,8 @@
 
 name: Coverage check
 
+# TODO: Send report to codecov.io
+
 on: push
 jobs:
   tests:
