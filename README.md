@@ -1,4 +1,4 @@
-# Eaglet 🐥
+# 🐥 Eaglet
 
 > Optimistic DAOs. Aragon's implementation of [ERC-3000](https://github.com/ethereum/EIPs/pull/3000), the standard for binding off-chain voting
 
