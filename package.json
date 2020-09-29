@@ -19,7 +19,7 @@
     "ethers": "^5.0.0"
   },
   "dependencies": {
-    "erc3k": "^1.0.0-beta.4"
+    "erc3k": "^1.0.0-beta.7"
   },
   "scripts": {
     "clean": "rm -rf artifacts",
