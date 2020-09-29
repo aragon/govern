@@ -13,12 +13,4 @@ describe('Optimistic Queue', function () {
     const OQ = await ethers.getContractFactory('OptimisticQueue')
     oq = await OQ.deploy(ownerAddr, DELAY)
   })
-
-  it('owner can exec', async () => {
-    // await eaglet.exec([], { from: owner })
-  })
-
-  it('non-owner can exec', async () => {
-    // await eaglet.execute([], { from: notOwner })
-  })
 })
