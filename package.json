@@ -10,21 +10,23 @@
     "/artifacts",
     "/contracts"
   ],
+  "dependencies": {
+    "erc3k": "^1.0.0-beta.10"
+  },
   "devDependencies": {
     "@nomiclabs/buidler": "^1.4.7",
     "@nomiclabs/buidler-ethers": "^2.0.0",
     "@nomiclabs/buidler-waffle": "^2.0.0",
     "chai": "^4.2.0",
     "ethereum-waffle": "^3.0.0",
-    "ethers": "^5.0.0"
-  },
-  "dependencies": {
-    "erc3k": "^1.0.0-beta.10"
+    "ethers": "^5.0.0",
+    "solidity-coverage": "^0.7.10"
   },
   "scripts": {
     "clean": "rm -rf artifacts",
+    "coverage": "buidler coverage --network coverage",
     "compile": "npx buidler compile --force",
     "test": "npx buidler test",
-    "prepublishOnly": "yarn clean && yarn compile"
+    "prepublishOnly": "yarn clean && yarn test && yarn compile"
   }
 }
