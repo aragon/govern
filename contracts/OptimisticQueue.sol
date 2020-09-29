@@ -7,10 +7,14 @@ pragma experimental ABIEncoderV2;
 
 import "erc3k/contracts/ERC3000.sol";
 
-import "./Eaglet.sol";
+import "./lib/SafeERC20.sol";
 import "./lib/MiniACL.sol";
 
+import "./Eaglet.sol";
+
 contract OptimisticQueue is ERC3000, MiniACL {
+    using SafeERC20 for ERC20;
+
     uint256 public index;
     bytes32 public configHash;
     mapping (bytes32 => uint256) public executionTime;
@@ -18,6 +22,8 @@ contract OptimisticQueue is ERC3000, MiniACL {
     uint256 internal constant EXECUTED =   uint256(-1);
     uint256 internal constant CANCELLED =  uint256(-2);
     uint256 internal constant CHALLENGED = uint256(-3);
+
+    address internal constant ETH = address(0);
 
     enum ExecutionState {
         None,
@@ -34,22 +40,25 @@ contract OptimisticQueue is ERC3000, MiniACL {
     function schedule(ERC3000Data.Container memory _container, bytes memory _proof)
         auth(this.schedule.selector)
         override public
-        returns (bytes32 execHash)
+        returns (bytes32 containerHash)
     {   
-        require(_container.nonce == index++, "queue: bad nonce");
+        require(_container.payload.nonce == index++, "queue: bad nonce");
+        require(_container.payload.submitter == msg.sender, "queue: bad submitter");
         
         bytes32 _configHash = keccak256(abi.encode(_container.config));
         require(_configHash == configHash, "queue: bad config");
 
         uint256 execTime = block.timestamp + _container.config.executionDelay;
-        execHash = getContainerHash(_container, _configHash);
-        requireState(execHash, ExecutionState.None);
+        containerHash = getContainerHash(getPayloadHash(_container.payload), _configHash);
+        requireState(containerHash, ExecutionState.None);
 
-        executionTime[execHash] = execTime;
+        executionTime[containerHash] = execTime;
 
         ERC3000Data.Collateral memory collateral = _container.config.scheduleDeposit;
+        _collectDeposit(msg.sender, collateral);
+        // TODO: pay court tx fee
 
-        emit Scheduled(execHash, msg.sender, _container.executor, _container.actions, _proof, _container.nonce, execTime, collateral);
+        emit Scheduled(containerHash, _container.payload, _proof, execTime, collateral);
     }
     
     function execute(ERC3000Data.Container memory _container)
@@ -63,14 +72,15 @@ contract OptimisticQueue is ERC3000, MiniACL {
         require(executionTime[containerHash] <= block.timestamp, "queue: wait more");
         executionTime[containerHash] = encodeState(ExecutionState.Executed);
 
-        execResults = _container.executor.exec(_container.actions);
+        execResults = _container.payload.executor.exec(_container.payload.actions);
+        _releaseDeposit(_container.payload.submitter, _container.config.scheduleDeposit);
         
-        emit Executed(containerHash, msg.sender, _container.executor, execResults, _container.nonce);
+        emit Executed(containerHash, msg.sender, execResults);
     }
     
 
-    function challenge(bytes32 _execHash, ERC3000Data.Config memory _config, bytes memory _reason) auth(this.challenge.selector) override public {
-        bytes32 containerHash = getContainerHash(_execHash, _config);
+    function challenge(bytes32 _payloadHash, ERC3000Data.Config memory _config, bytes memory _reason) auth(this.challenge.selector) override public {
+        bytes32 containerHash = getContainerHash(_payloadHash, getConfigHash(_config));
         requireState(containerHash, ExecutionState.Scheduled);
 
         executionTime[containerHash] = encodeState(ExecutionState.Challenged);
@@ -78,8 +88,8 @@ contract OptimisticQueue is ERC3000, MiniACL {
         emit Challenged(containerHash, msg.sender, _reason, _config.challengeDeposit);
     }
 
-    function veto(bytes32 _execHash, ERC3000Data.Config memory _config, bytes memory _reason) auth(this.veto.selector) override public {
-        bytes32 containerHash = getContainerHash(_execHash, _config);
+    function veto(bytes32 _payloadHash, ERC3000Data.Config memory _config, bytes memory _reason) auth(this.veto.selector) override public {
+        bytes32 containerHash = getContainerHash(_payloadHash, getConfigHash(_config));
         requireState(containerHash, ExecutionState.Scheduled);
 
         executionTime[containerHash] = encodeState(ExecutionState.Cancelled);
@@ -103,27 +113,40 @@ contract OptimisticQueue is ERC3000, MiniACL {
         return configHash;
     }
 
+    function _collectDeposit(address _from, ERC3000Data.Collateral memory _collateral) internal {
+        if (_collateral.token == ETH) {
+            require(msg.value == _collateral.amount, "queue: bad get eth");
+        } else {
+            ERC20 token = ERC20(_collateral.token);
+            require(token.safeTransferFrom(_from, msg.sender, _collateral.amount), "queue: bad get token");
+        }
+    }
+
+    function _releaseDeposit(address _to, ERC3000Data.Collateral memory _collateral) internal {
+        if (_collateral.token == ETH) {
+            address payable to = address(uint160(_to));
+            (bool ok,) = to.call{ value: _collateral.amount }("");
+            require(ok, "queue: bad send eth");
+        } else {
+            ERC20 token = ERC20(_collateral.token);
+            require(token.safeTransfer(_to, _collateral.amount), "queue: bad send token");
+        }
+    }
+
     function getContainerHash(ERC3000Data.Container memory _container) internal view returns (bytes32) {
-        return getContainerHash(_container, keccak256(abi.encode(_container.config)));
+        return getContainerHash(getPayloadHash(_container.payload), getConfigHash(_container.config));
+    } 
+
+    function getContainerHash(bytes32 _payloadHash, bytes32 _configHash) internal view returns (bytes32) {
+        return keccak256(abi.encodePacked(this, _payloadHash, _configHash));
     }
 
-    function getContainerHash(ERC3000Data.Container memory _container, bytes32 _configHash) internal view returns (bytes32) {
-        return getContainerHash(
-            getExecHash(_container.nonce, _container.executor, _container.actions),
-            _configHash
-        );
+    function getPayloadHash(ERC3000Data.Payload memory _payload) internal pure returns (bytes32) {
+        return keccak256(abi.encodePacked(_payload.nonce, _payload.submitter, _payload.executor, keccak256(abi.encode(_payload.actions))));
     }
 
-    function getContainerHash(bytes32 _execHash, ERC3000Data.Config memory _config) internal view returns (bytes32) {
-        return getContainerHash(_execHash, keccak256(abi.encode(_config)));
-    }
-
-    function getContainerHash(bytes32 _execHash, bytes32 _configHash) internal view returns (bytes32) {
-        return keccak256(abi.encodePacked(this, _execHash, _configHash));
-    }
-
-    function getExecHash(uint256 _nonce, IERC3000Executor _executor, ERC3000Data.Action[] memory _actions) internal pure returns (bytes32) {
-        return keccak256(abi.encodePacked(_nonce, _executor, keccak256(abi.encode(_actions))));
+    function getConfigHash(ERC3000Data.Config memory _config) internal pure returns (bytes32) {
+        return keccak256(abi.encode(_config));
     }
 
     function requireState(bytes32 _containerHash, ExecutionState _requiredState) internal view {
