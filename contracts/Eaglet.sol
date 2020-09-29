@@ -16,6 +16,8 @@ contract Eaglet is ERC3000Data, MiniACL {
         _grant(EXEC_ROLE, address(_initialExecutor));
     }
 
+    event Executed(address indexed actor, Action[] actions, bytes[] execResults);
+
     function exec(Action[] calldata actions) external auth(EXEC_ROLE) returns (bytes[] memory) {
         bytes[] memory execResults = new bytes[](actions.length);
 
@@ -27,6 +29,10 @@ contract Eaglet is ERC3000Data, MiniACL {
             execResults[i] = ret;
         }
 
+        emit Executed(msg.sender, actions, execResults);
+
         return execResults;
     }
+
+    // TODO: ERC-1271
 }

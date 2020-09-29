@@ -1,19 +1,34 @@
-const { expect } = require("chai");
+const { expect } = require("chai")
+
+const ERRORS = {
+  AUTH: 'acl: auth'
+}
+
+const EVENTS = {
+  EXECUTED: 'Executed'
+}
 
 describe('Eaglet', function () {
-  let owner, notOwner
+  let signers, owner, eaglet, eagletNotOwner
+
+  before(async () => {
+    signers = await ethers.getSigners()
+    owner = await signers[0].getAddress()
+  })
 
   beforeEach(async () => {
-    [owner, notOwner] = await ethers.getSigners()
     const Eaglet = await ethers.getContractFactory('Eaglet')
     eaglet = await Eaglet.deploy(owner)
+    eagletNotOwner = await eaglet.connect(signers[1])
   })
 
   it('owner can exec', async () => {
-    // await eaglet.exec([], { from: owner })
+    await expect(eaglet.exec([]))
+      .to.emit(eaglet, EVENTS.EXECUTED)
+      .withArgs(owner, [], [])
   })
 
-  it('non-owner can exec', async () => {
-    // await eaglet.execute([], { from: notOwner })
+  it('non-owner cannot exec', async () => {
+    await expect(eagletNotOwner.exec([])).to.be.revertedWith(ERRORS.AUTH)
   })
 })
