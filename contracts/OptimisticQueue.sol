@@ -10,8 +10,6 @@ import "erc3k/contracts/ERC3000.sol";
 import "./lib/SafeERC20.sol";
 import "./lib/MiniACL.sol";
 
-import "./Eaglet.sol";
-
 contract OptimisticQueue is ERC3000, MiniACL {
     using SafeERC20 for ERC20;
 
