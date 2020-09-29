@@ -104,7 +104,7 @@ contract OptimisticQueue is ERC3000, MiniACL {
     }
 
     function _setConfig(ERC3000Data.Config memory _config) internal returns (bytes32) {
-        configHash = keccak256(abi.encode(_config));
+        configHash = getConfigHash(_config);
 
         emit Configured(configHash, msg.sender, _config);
 
