@@ -25,8 +25,8 @@
   "scripts": {
     "clean": "rm -rf artifacts",
     "coverage": "buidler coverage --network coverage",
-    "compile": "npx buidler compile --force",
-    "test": "npx buidler test",
+    "compile": "buidler compile --force",
+    "test": "buidler test",
     "prepublishOnly": "yarn clean && yarn test && yarn compile"
   }
 }

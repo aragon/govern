@@ -65,8 +65,8 @@ describe('MiniACL', function () {
       beforeEach(async () => {
         await assertRole(true)
         await expect(freeze(acl))
-        .to.emit(acl, EVENTS.FROZEN)
-        .withArgs(ROLE, root)
+          .to.emit(acl, EVENTS.FROZEN)
+          .withArgs(ROLE, root)
       })
 
       it('role is granted to freeze addr', async () => {
