@@ -8,12 +8,13 @@ pragma experimental ABIEncoderV2;
 import "erc3k/contracts/ERC3000.sol";
 
 import "./lib/IArbitrable.sol";
+import "./lib/DepositLib.sol";
 import "./lib/MiniACL.sol";
 import "./lib/SafeERC20.sol";
 
 contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
-    using SafeERC20 for ERC20;
     using ERC3000Data for *;
+    using DepositLib for ERC3000Data.Collateral;
 
     struct Item {
         uint64 executionTime;
@@ -30,8 +31,6 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
     uint256 internal constant CANCELLED =  uint64(-2);
     uint256 internal constant APPROVED =   uint64(-3);
     uint256 internal constant CHALLENGED = uint64(-4);
-
-    address internal constant ETH = address(0);
 
     enum ExecutionState {
         None,
@@ -64,7 +63,7 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
         queue[containerHash].executionTime = uint64(execTime);
 
         ERC3000Data.Collateral memory collateral = _container.config.scheduleDeposit;
-        _collectDeposit(msg.sender, collateral);
+        collateral.collectFrom(msg.sender);
         // TODO: pay court tx fee
 
         emit Scheduled(containerHash, _container.payload, execTime, collateral);
@@ -83,7 +82,7 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
         _setState(containerHash, ExecutionState.Executed);
 
         execResults = _container.payload.executor.exec(_container.payload.actions);
-        _releaseDeposit(_container.payload.submitter, _container.config.scheduleDeposit);
+        _container.config.scheduleDeposit.releaseTo(_container.payload.submitter);
         
         emit Executed(containerHash, msg.sender, execResults);
     }
@@ -104,7 +103,7 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
         disputeItem[arbitrator][disputeId] = containerHash;
 
         ERC3000Data.Collateral memory collateral = _config.challengeDeposit;
-        _collectDeposit(msg.sender, collateral);
+        collateral.collectFrom(msg.sender);
 
         emit Challenged(containerHash, msg.sender, _reason, collateral);
     }
@@ -127,7 +126,7 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
     }
 
     // Arbitrable
-    function rule(uint256 _disputeId, uint256 _ruling) override external {
+    function rule(uint256 _disputeId, uint256) override external {
         bytes32 containerHash = disputeItem[IArbitrator(msg.sender)][_disputeId];
         requireState(containerHash, ExecutionState.Challenged);
 
@@ -155,26 +154,6 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
         emit Configured(configHash, msg.sender, _config);
 
         return configHash;
-    }
-
-    function _collectDeposit(address _from, ERC3000Data.Collateral memory _collateral) internal {
-        if (_collateral.token == ETH) {
-            require(msg.value == _collateral.amount, "queue: bad get eth");
-        } else {
-            ERC20 token = ERC20(_collateral.token);
-            require(token.safeTransferFrom(_from, msg.sender, _collateral.amount), "queue: bad get token");
-        }
-    }
-
-    function _releaseDeposit(address _to, ERC3000Data.Collateral memory _collateral) internal {
-        if (_collateral.token == ETH) {
-            address payable to = address(uint160(_to));
-            (bool ok,) = to.call{ value: _collateral.amount }("");
-            require(ok, "queue: bad send eth");
-        } else {
-            ERC20 token = ERC20(_collateral.token);
-            require(token.safeTransfer(_to, _collateral.amount), "queue: bad send token");
-        }
     }
 
     function requireState(bytes32 _containerHash, ExecutionState _requiredState) internal view {
