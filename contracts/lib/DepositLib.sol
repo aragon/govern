@@ -17,6 +17,8 @@ library DepositLib {
     event Released(address indexed token, address indexed to, uint256 amount);
 
     function collectFrom(ERC3000Data.Collateral memory _collateral, address _from) internal {
+        // TODO: if 0 return
+
         if (_collateral.token == ETH) {
             require(msg.value == _collateral.amount, "queue: bad get eth");
         } else {

@@ -11,10 +11,16 @@ import "erc3k/contracts/ERC3000Executor.sol";
 import "./lib/MiniACL.sol";
 
 contract Eaglet is ERC3000Executor, MiniACL {
-    bytes4 EXEC_ROLE = this.exec.selector;
+    bytes4 internal constant EXEC_ROLE = this.exec.selector;
+
+    event ETHDeposited(address indexed sender, uint256 value);
 
     constructor(IERC3000 _initialExecutor) MiniACL(address(this)) public {
         _grant(EXEC_ROLE, address(_initialExecutor));
+    }
+
+    fallback () external payable {
+        emit ETHDeposited(msg.sender, msg.value);
     }
 
     function exec(ERC3000Data.Action[] memory actions) override public auth(EXEC_ROLE) returns (bytes[] memory) {

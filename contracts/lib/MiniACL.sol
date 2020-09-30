@@ -11,7 +11,7 @@ contract MiniACL {
         ^ this.freeze.selector
     ;
 
-    address internal constant FREEZE_ADDR = address(1);
+    address internal constant FREEZE_FLAG = address(1);
     address internal constant ANY_ADDR = address(-1);
     
     mapping (bytes4 => mapping (address => bool)) public roles;
@@ -39,7 +39,7 @@ contract MiniACL {
 
     function _grant(bytes4 _role, address _who) internal {
         require(!isFrozen(_role), "acl: frozen");
-        require(_who != FREEZE_ADDR, "acl: bad freeze");
+        require(_who != FREEZE_FLAG, "acl: bad freeze");
         
         roles[_role][_who] = true;
         emit Granted(_role, msg.sender, _who);
@@ -55,12 +55,12 @@ contract MiniACL {
     function freeze(bytes4 _role) external auth(ROOT_ROLE) {
         require(!isFrozen(_role), "acl: frozen");
 
-        roles[_role][FREEZE_ADDR] = true;
+        roles[_role][FREEZE_FLAG] = true;
 
         emit Frozen(_role, msg.sender);
     }
 
     function isFrozen(bytes4 _role) public view returns (bool) {
-        return roles[_role][FREEZE_ADDR];
+        return roles[_role][FREEZE_FLAG];
     }
 }
