@@ -8,10 +8,24 @@ pragma experimental ABIEncoderV2;
 import "./Eaglet.sol";
 import "./OptimisticQueue.sol";
 
+contract OptimisticQueueFactory {
+    function newQueue(address _aclRoot, ERC3000Data.Config memory _config) public returns (OptimisticQueue queue) {
+        return new OptimisticQueue(_aclRoot, _config);
+    }
+}
+
 contract EagletFactory {
     address internal constant ANY_ADDR = address(-1);
 
-    function newDummyEaglet() external {
+    OptimisticQueueFactory public queueFactory;
+
+    event NewEaglet(Eaglet eaglet, OptimisticQueue queue);
+
+    constructor(OptimisticQueueFactory _queueFactory) public {
+        queueFactory = _queueFactory;
+    }
+
+    function newDummyEaglet() external returns (Eaglet eaglet, OptimisticQueue queue) {
         ERC3000Data.Collateral memory noCollateral;
         ERC3000Data.Config memory config = ERC3000Data.Config(
             0,
@@ -22,8 +36,8 @@ contract EagletFactory {
             ""
         );
 
-        OptimisticQueue queue = new OptimisticQueue(address(this), config);
-        Eaglet eaglet = new Eaglet(queue);
+        queue = queueFactory.newQueue(address(this), config);
+        eaglet = new Eaglet(queue);
 
         MiniACLData.BulkItem[] memory items = new MiniACLData.BulkItem[](6);
         items[0] = MiniACLData.BulkItem(MiniACLData.BulkOp.Grant, queue.schedule.selector, ANY_ADDR);
@@ -37,6 +51,4 @@ contract EagletFactory {
 
         emit NewEaglet(eaglet, queue);
     }
-
-    event NewEaglet(Eaglet eaglet, OptimisticQueue queue);
 }

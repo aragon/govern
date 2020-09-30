@@ -13,8 +13,11 @@ describe('EagletFactory', function () {
   })
 
   beforeEach(async () => {
+    const OptimisticQueueFactory = await ethers.getContractFactory('OptimisticQueueFactory')
     const EagletFactory = await ethers.getContractFactory('EagletFactory')
-    eagletFactory = await EagletFactory.deploy()
+
+    queueFactory = await OptimisticQueueFactory.deploy()
+    eagletFactory = await EagletFactory.deploy(queueFactory.address)
   })
 
   it.only('creates system', async () => {
