@@ -3,12 +3,14 @@
  */
 
 pragma solidity 0.6.8;
+pragma experimental ABIEncoderV2;
 
 contract MiniACL {
     bytes4 public constant ROOT_ROLE =
         this.grant.selector
         ^ this.revoke.selector
         ^ this.freeze.selector
+        ^ this.bulk.selector
     ;
 
     address internal constant FREEZE_FLAG = address(1);
@@ -19,6 +21,14 @@ contract MiniACL {
     event Granted(bytes4 indexed role, address indexed actor, address indexed who);
     event Revoked(bytes4 indexed role, address indexed actor, address indexed who);
     event Frozen(bytes4 indexed role, address indexed actor);
+
+    enum BulkOp { Grant, Revoke, Freeze }
+
+    struct BulkItem {
+        BulkOp op;
+        bytes4 role;
+        address who;
+    }
 
     modifier auth(bytes4 _role) {
         require(
@@ -37,6 +47,24 @@ contract MiniACL {
         _grant(_role, _who);
     }
 
+    function revoke(bytes4 _role, address _who) external auth(ROOT_ROLE) {
+        _revoke(_role, _who);
+    }
+
+    function freeze(bytes4 _role) external auth(ROOT_ROLE) {
+        _freeze(_role);
+    }
+
+    function bulk(BulkItem[] memory items) public auth(ROOT_ROLE) {
+        for (uint256 i = 0; i < items.length; i++) {
+            BulkItem memory item = items[i];
+
+            if (item.op == BulkOp.Grant) _grant(item.role, item.who);
+            else if (item.op == BulkOp.Revoke) _revoke(item.role, item.who);
+            else if (item.op == BulkOp.Freeze) _freeze(item.role);
+        }
+    }
+
     function _grant(bytes4 _role, address _who) internal {
         require(!isFrozen(_role), "acl: frozen");
         require(_who != FREEZE_FLAG, "acl: bad freeze");
@@ -45,14 +73,14 @@ contract MiniACL {
         emit Granted(_role, msg.sender, _who);
     }
 
-    function revoke(bytes4 _role, address _who) external auth(ROOT_ROLE) {
+    function _revoke(bytes4 _role, address _who) internal {
         require(!isFrozen(_role), "acl: frozen");
 
         roles[_role][_who] = false;
         emit Revoked(_role, msg.sender, _who);
     }
 
-    function freeze(bytes4 _role) external auth(ROOT_ROLE) {
+    function _freeze(bytes4 _role) internal {
         require(!isFrozen(_role), "acl: frozen");
 
         roles[_role][FREEZE_FLAG] = true;
