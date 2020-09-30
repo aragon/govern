@@ -20,7 +20,7 @@ describe('EagletFactory', function () {
     eagletFactory = await EagletFactory.deploy(queueFactory.address)
   })
 
-  it.only('creates system', async () => {
+  it('creates system', async () => {
     await expect(eagletFactory.newDummyEaglet())
       .to.emit(eagletFactory, EVENTS.NEW)
   })
