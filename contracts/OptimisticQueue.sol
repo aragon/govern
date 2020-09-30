@@ -7,19 +7,28 @@ pragma experimental ABIEncoderV2;
 
 import "erc3k/contracts/ERC3000.sol";
 
-import "./lib/SafeERC20.sol";
+import "./lib/IArbitrable.sol";
 import "./lib/MiniACL.sol";
+import "./lib/SafeERC20.sol";
 
-contract OptimisticQueue is ERC3000, MiniACL {
+contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
     using SafeERC20 for ERC20;
 
+    struct Item {
+        uint64 executionTime;
+        uint8 arbitratorRuling;
+        address challenger;
+    }
+
+    mapping (bytes32 => Item) queue;
+    mapping (IArbitrator => mapping (uint256 => bytes32)) disputeItem;
     uint256 public index;
     bytes32 public configHash;
-    mapping (bytes32 => uint256) public executionTime;
 
-    uint256 internal constant EXECUTED =   uint256(-1);
-    uint256 internal constant CANCELLED =  uint256(-2);
-    uint256 internal constant CHALLENGED = uint256(-3);
+    uint256 internal constant EXECUTED =   uint64(-1);
+    uint256 internal constant CANCELLED =  uint64(-2);
+    uint256 internal constant APPROVED =   uint64(-3);
+    uint256 internal constant CHALLENGED = uint64(-4);
 
     address internal constant ETH = address(0);
 
@@ -27,6 +36,7 @@ contract OptimisticQueue is ERC3000, MiniACL {
         None,
         Scheduled,
         Challenged,
+        Approved,
         Cancelled,
         Executed
     }
@@ -35,7 +45,7 @@ contract OptimisticQueue is ERC3000, MiniACL {
         _setConfig(_initialConfig);
     }
 
-    function schedule(ERC3000Data.Container memory _container, bytes memory _proof)
+    function schedule(ERC3000Data.Container memory _container)
         auth(this.schedule.selector)
         override public
         returns (bytes32 containerHash)
@@ -50,13 +60,13 @@ contract OptimisticQueue is ERC3000, MiniACL {
         containerHash = getContainerHash(getPayloadHash(_container.payload), _configHash);
         requireState(containerHash, ExecutionState.None);
 
-        executionTime[containerHash] = execTime;
+        queue[containerHash].executionTime = uint64(execTime);
 
         ERC3000Data.Collateral memory collateral = _container.config.scheduleDeposit;
         _collectDeposit(msg.sender, collateral);
         // TODO: pay court tx fee
 
-        emit Scheduled(containerHash, _container.payload, _proof, execTime, collateral);
+        emit Scheduled(containerHash, _container.payload, execTime, collateral);
     }
     
     function execute(ERC3000Data.Container memory _container)
@@ -67,7 +77,7 @@ contract OptimisticQueue is ERC3000, MiniACL {
         bytes32 containerHash = getContainerHash(_container);
         requireState(containerHash, ExecutionState.Scheduled);
 
-        require(executionTime[containerHash] <= block.timestamp, "queue: wait more");
+        require(queue[containerHash].executionTime <= uint64(block.timestamp), "queue: wait more");
         
         _setState(containerHash, ExecutionState.Executed);
 
@@ -83,8 +93,19 @@ contract OptimisticQueue is ERC3000, MiniACL {
         requireState(containerHash, ExecutionState.Scheduled);
 
         _setState(containerHash, ExecutionState.Challenged);
+        queue[containerHash].challenger = msg.sender;
+        
+        uint256 disputeId;
+        IArbitrator arbitrator;
 
-        emit Challenged(containerHash, msg.sender, _reason, _config.challengeDeposit);
+        // TODO: create dispute
+
+        disputeItem[arbitrator][disputeId] = containerHash;
+
+        ERC3000Data.Collateral memory collateral = _config.challengeDeposit;
+        _collectDeposit(msg.sender, collateral);
+
+        emit Challenged(containerHash, msg.sender, _reason, collateral);
     }
 
     function veto(bytes32 _payloadHash, ERC3000Data.Config memory _config, bytes memory _reason) auth(this.veto.selector) override public {
@@ -104,8 +125,27 @@ contract OptimisticQueue is ERC3000, MiniACL {
         return _setConfig(_config);
     }
 
+    // Arbitrable
+    function rule(uint256 _disputeId, uint256 _ruling) override external {
+        bytes32 containerHash = disputeItem[IArbitrator(msg.sender)][_disputeId];
+        requireState(containerHash, ExecutionState.Challenged);
+
+        /*
+        bool isApproved;
+        _setState();
+        */
+    }
+
+    function submitEvidence(uint256, bytes calldata, bool) override external {
+        revert("queue: evidence");
+    }
+
+    function supportsInterface(bytes4 _interfaceId) override public pure returns (bool) {
+        return _interfaceId == ARBITRABLE_INTERFACE_ID || super.supportsInterface(_interfaceId);
+    }
+
     function _setState(bytes32 _containerHash, ExecutionState _state) internal {
-        executionTime[_containerHash] = encodeState(_state);
+        queue[_containerHash].executionTime = encodeState(_state);
     }
 
     function _setConfig(ERC3000Data.Config memory _config) internal returns (bytes32) {
@@ -153,22 +193,24 @@ contract OptimisticQueue is ERC3000, MiniACL {
     }
 
     function requireState(bytes32 _containerHash, ExecutionState _requiredState) internal view {
-        require(decodeState(executionTime[_containerHash]) == _requiredState, "queue: bad state");
+        require(decodeState(queue[_containerHash].executionTime) == _requiredState, "queue: bad state");
     }
 
-    function decodeState(uint256 _execTime) internal pure returns (ExecutionState) {
+    function decodeState(uint64 _execTime) internal pure returns (ExecutionState) {
         if (_execTime == 0) return ExecutionState.None;
         if (_execTime < CHALLENGED) return ExecutionState.Scheduled;
         if (_execTime == CHALLENGED) return ExecutionState.Challenged;
+        if (_execTime == APPROVED) return ExecutionState.Approved;
         if (_execTime == CANCELLED) return ExecutionState.Cancelled;
         else return ExecutionState.Executed;
     }
 
-    function encodeState(ExecutionState _state) internal pure returns (uint256) {
+    function encodeState(ExecutionState _state) internal pure returns (uint64) {
         if (_state == ExecutionState.None) return 0;
-        if (_state == ExecutionState.Challenged) return CHALLENGED;
-        if (_state == ExecutionState.Cancelled) return CANCELLED;
-        if (_state == ExecutionState.Executed) return EXECUTED;
+        if (_state == ExecutionState.Challenged) return uint64(CHALLENGED);
+        if (_state == ExecutionState.Approved) return uint64(APPROVED);
+        if (_state == ExecutionState.Cancelled) return uint64(CANCELLED);
+        if (_state == ExecutionState.Executed) return uint64(EXECUTED);
         assert(false); // code should never try to encode a Scheduled state using this
     }
 }
