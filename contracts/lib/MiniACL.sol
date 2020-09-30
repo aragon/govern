@@ -5,6 +5,16 @@
 pragma solidity 0.6.8;
 pragma experimental ABIEncoderV2;
 
+library MiniACLData {
+    enum BulkOp { Grant, Revoke, Freeze }
+
+    struct BulkItem {
+        BulkOp op;
+        bytes4 role;
+        address who;
+    }
+}
+
 contract MiniACL {
     bytes4 public constant ROOT_ROLE =
         this.grant.selector
@@ -21,14 +31,6 @@ contract MiniACL {
     event Granted(bytes4 indexed role, address indexed actor, address indexed who);
     event Revoked(bytes4 indexed role, address indexed actor, address indexed who);
     event Frozen(bytes4 indexed role, address indexed actor);
-
-    enum BulkOp { Grant, Revoke, Freeze }
-
-    struct BulkItem {
-        BulkOp op;
-        bytes4 role;
-        address who;
-    }
 
     modifier auth(bytes4 _role) {
         require(
@@ -55,13 +57,13 @@ contract MiniACL {
         _freeze(_role);
     }
 
-    function bulk(BulkItem[] memory items) public auth(ROOT_ROLE) {
+    function bulk(MiniACLData.BulkItem[] memory items) public auth(ROOT_ROLE) {
         for (uint256 i = 0; i < items.length; i++) {
-            BulkItem memory item = items[i];
+            MiniACLData.BulkItem memory item = items[i];
 
-            if (item.op == BulkOp.Grant) _grant(item.role, item.who);
-            else if (item.op == BulkOp.Revoke) _revoke(item.role, item.who);
-            else if (item.op == BulkOp.Freeze) _freeze(item.role);
+            if (item.op == MiniACLData.BulkOp.Grant) _grant(item.role, item.who);
+            else if (item.op == MiniACLData.BulkOp.Revoke) _revoke(item.role, item.who);
+            else if (item.op == MiniACLData.BulkOp.Freeze) _freeze(item.role);
         }
     }
 
