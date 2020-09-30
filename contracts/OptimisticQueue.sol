@@ -13,6 +13,7 @@ import "./lib/SafeERC20.sol";
 
 contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
     using SafeERC20 for ERC20;
+    using ERC3000Data for *;
 
     struct Item {
         uint64 executionTime;
@@ -53,11 +54,11 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
         require(_container.payload.nonce == index++, "queue: bad nonce");
         require(_container.payload.submitter == msg.sender, "queue: bad submitter");
         
-        bytes32 _configHash = getConfigHash(_container.config);
+        bytes32 _configHash = _container.config.hash();
         require(_configHash == configHash, "queue: bad config");
 
         uint256 execTime = block.timestamp + _container.config.executionDelay;
-        containerHash = getContainerHash(getPayloadHash(_container.payload), _configHash);
+        containerHash = ERC3000Data.containerHash(_container.payload.hash(), _configHash);
         requireState(containerHash, ExecutionState.None);
 
         queue[containerHash].executionTime = uint64(execTime);
@@ -74,7 +75,7 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
         override public
         returns (bytes[] memory execResults)
     {   
-        bytes32 containerHash = getContainerHash(_container);
+        bytes32 containerHash = _container.hash();
         requireState(containerHash, ExecutionState.Scheduled);
 
         require(queue[containerHash].executionTime <= uint64(block.timestamp), "queue: wait more");
@@ -89,7 +90,7 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
     
 
     function challenge(bytes32 _payloadHash, ERC3000Data.Config memory _config, bytes memory _reason) auth(this.challenge.selector) override public {
-        bytes32 containerHash = getContainerHash(_payloadHash, getConfigHash(_config));
+        bytes32 containerHash = ERC3000Data.containerHash(_payloadHash, _config.hash());
         requireState(containerHash, ExecutionState.Scheduled);
 
         _setState(containerHash, ExecutionState.Challenged);
@@ -109,7 +110,7 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
     }
 
     function veto(bytes32 _payloadHash, ERC3000Data.Config memory _config, bytes memory _reason) auth(this.veto.selector) override public {
-        bytes32 containerHash = getContainerHash(_payloadHash, getConfigHash(_config));
+        bytes32 containerHash = ERC3000Data.containerHash(_payloadHash, _config.hash());
         requireState(containerHash, ExecutionState.Scheduled);
 
         _setState(containerHash, ExecutionState.Cancelled);
@@ -149,7 +150,7 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
     }
 
     function _setConfig(ERC3000Data.Config memory _config) internal returns (bytes32) {
-        configHash = getConfigHash(_config);
+        configHash = _config.hash();
 
         emit Configured(configHash, msg.sender, _config);
 
@@ -174,22 +175,6 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
             ERC20 token = ERC20(_collateral.token);
             require(token.safeTransfer(_to, _collateral.amount), "queue: bad send token");
         }
-    }
-
-    function getContainerHash(ERC3000Data.Container memory _container) internal view returns (bytes32) {
-        return getContainerHash(getPayloadHash(_container.payload), getConfigHash(_container.config));
-    } 
-
-    function getContainerHash(bytes32 _payloadHash, bytes32 _configHash) internal view returns (bytes32) {
-        return keccak256(abi.encodePacked(this, _payloadHash, _configHash));
-    }
-
-    function getPayloadHash(ERC3000Data.Payload memory _payload) internal pure returns (bytes32) {
-        return keccak256(abi.encodePacked(_payload.nonce, _payload.submitter, _payload.executor, keccak256(abi.encode(_payload.actions))));
-    }
-
-    function getConfigHash(ERC3000Data.Config memory _config) internal pure returns (bytes32) {
-        return keccak256(abi.encode(_config));
     }
 
     function requireState(bytes32 _containerHash, ExecutionState _requiredState) internal view {
