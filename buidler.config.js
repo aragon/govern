@@ -34,6 +34,10 @@ module.exports = {
   // This is a sample solc configuration that specifies which version of solc to use
   solc: {
     version: "0.6.8",
+    optimizer: {
+      enabled: true,
+      runs: 2000     // TODO: target average DAO use
+    }
   },
   etherscan: {
     apiKey: "",
