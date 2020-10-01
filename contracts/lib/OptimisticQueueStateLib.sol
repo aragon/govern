@@ -10,14 +10,13 @@ library OptimisticQueueStateLib {
         Scheduled,
         Challenged,
         Approved,
+        Rejected,
         Cancelled,
         Executed
     }
 
     struct Item {
         State state;
-        uint8 arbitratorRuling;
-        address challenger;
     }
 
     event TransitionedState(State from, State to);

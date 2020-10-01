@@ -10,6 +10,7 @@ import "./IArbitrator.sol";
 
 abstract contract IArbitrable {
     bytes4 internal constant ARBITRABLE_INTERFACE_ID = bytes4(0x88f3ee69);
+    uint256 internal constant ALLOW_RULING = 4;
 
     /**
     * @dev Emitted when an IArbitrable instance's dispute is ruled by an IArbitrator
