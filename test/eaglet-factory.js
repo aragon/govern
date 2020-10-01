@@ -20,11 +20,15 @@ describe('EagletFactory', function () {
     eagletFactory = await EagletFactory.deploy(queueFactory.address)
   })
 
-  it.only('creates system', async () => {
+  const GAS_TARGET = 4e6
+  it(`deploys DAO under ${GAS_TARGET} gas`, async () => {
     const tx = eagletFactory.newDummyEaglet()
     await expect(tx)
       .to.emit(eagletFactory, EVENTS.NEW)
 
-    console.log('gas', (await waffle.provider.getTransactionReceipt((await tx).hash)).gasUsed.toNumber())
+    const { hash } = await tx
+    const { gasUsed } = await waffle.provider.getTransactionReceipt(hash)
+
+    expect(gasUsed).to.be.lte(GAS_TARGET)
   })
 })
