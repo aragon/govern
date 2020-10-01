@@ -2956,10 +2956,10 @@ env-paths@^2.2.0:
   resolved "https://registry.yarnpkg.com/env-paths/-/env-paths-2.2.0.tgz#cdca557dc009152917d6166e2febe1f039685e43"
   integrity sha512-6u0VYSCo/OW6IoD5WCLLy9JUGARbamfSavcNXry/eu8aHVFei6CD3Sw+VGX5alea1i9pgPHW0mbu6Xj0uBh7gA==
 
-erc3k@^1.0.0-beta.10:
-  version "1.0.0-beta.10"
-  resolved "https://registry.yarnpkg.com/erc3k/-/erc3k-1.0.0-beta.10.tgz#08d6b685b9e25567f9c3d03bcb81d25b86cfb82a"
-  integrity sha512-HOWawnWhM1JmQLtwNioUuCxawes2hR35JE3SDR5ufnbvSNyDdBF3mSu4fIpYwq5AeRJAfftD24JwR/MA6RgLrg==
+erc3k@^1.0.0-beta.11:
+  version "1.0.0-beta.11"
+  resolved "https://registry.yarnpkg.com/erc3k/-/erc3k-1.0.0-beta.11.tgz#45392ec20571a2f08adc95df64307ed0ae9afe67"
+  integrity sha512-rjAHAvuUQHY9QUi3rdFKLYVUSX51OOvUUlSvZ+aWSFF/OQ8Yt8ARlhsSX/OVnDAalCkKTxGk7FnxIi5Wi1ZA4A==
 
 errno@~0.1.1:
   version "0.1.7"

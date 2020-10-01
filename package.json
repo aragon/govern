@@ -11,7 +11,7 @@
     "/contracts"
   ],
   "dependencies": {
-    "erc3k": "^1.0.0-beta.10"
+    "erc3k": "^1.0.0-beta.11"
   },
   "devDependencies": {
     "@nomiclabs/buidler": "^1.4.7",
