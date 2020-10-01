@@ -19,12 +19,13 @@ templates:
       language: wasm/assemblyscript
       entities:
         - Config
-        - Proposal
-        - Stake
-        - StakeHistory
+        - Collateral
       abis:
         - name: OptimisticQueue
           file: ./abis/OptimisticQueue.json
+      eventHandlers:
+        - event: Configured(indexed bytes32,indexed address,(uint256,(address,uint256),(address,uint256),(address,uint256),address,bytes))
+          handler: handleConfigured
       file: ./src/OptimisticQueue.ts
   - kind: ethereum/contract
     name: Eaglet

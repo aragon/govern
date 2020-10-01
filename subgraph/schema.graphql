@@ -15,5 +15,22 @@ type Eaglet @entity {
 type OptimisticQueue @entity {
   id: ID!
   address: Bytes!
+  config: Config!
 
+}
+
+type Config @entity {
+  id: ID!
+  executionDelay: BigInt!
+  scheduleDeposit: Collateral
+  challengeDeposit: Collateral
+  vetoDeposit: Collateral
+  resolver: Bytes!
+  rules: Bytes!
+}
+
+type Collateral @entity {
+  id: ID!
+  token: Bytes!
+  amount: BigInt!
 }
