@@ -6,6 +6,7 @@ pragma solidity 0.6.8;
 pragma experimental ABIEncoderV2;
 
 import "./Eaglet.sol";
+import "./EagletRegistry.sol";
 import "./OptimisticQueue.sol";
 
 contract OptimisticQueueFactory {
@@ -18,14 +19,16 @@ contract EagletFactory {
     address internal constant ANY_ADDR = address(-1);
 
     OptimisticQueueFactory public queueFactory;
+    EagletRegistry public registry;
 
     event NewEaglet(Eaglet eaglet, OptimisticQueue queue);
 
-    constructor(OptimisticQueueFactory _queueFactory) public {
+    constructor(OptimisticQueueFactory _queueFactory, EagletRegistry _registry) public {
         queueFactory = _queueFactory;
+        registry = _registry;
     }
 
-    function newDummyEaglet() external returns (Eaglet eaglet, OptimisticQueue queue) {
+    function newDummyEaglet(string calldata _name) external returns (Eaglet eaglet, OptimisticQueue queue) {
         ERC3000Data.Collateral memory noCollateral;
         ERC3000Data.Config memory config = ERC3000Data.Config(
             0,
@@ -48,6 +51,7 @@ contract EagletFactory {
         items[5] = MiniACLData.BulkItem(MiniACLData.BulkOp.Freeze, queue.ROOT_ROLE(), address(0));
 
         queue.bulk(items);
+        registry.register(eaglet, _name, "");
 
         emit NewEaglet(eaglet, queue);
     }
