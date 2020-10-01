@@ -1,0 +1,100 @@
+{
+  "network": "mainnet",
+  "dataSources": {
+    "Organizations": [],
+    "OrganizationFactories": [
+      {
+        "name": "DAOFactory@0.8.1",
+        "address": "0x7378ad1ba8f3c8e64bbb2a04473edd35846360f1",
+        "startBlock": 9428558
+      },
+      {
+        "name": "DAOFactory@0.8",
+        "address": "0xb9da44c051c6cc9e04b7e0f95e95d69c6a6d8031",
+        "startBlock": 8490795
+      },
+      {
+        "name": "DAOFactory@0.7",
+        "address": "0xc29f0599df12eb4cbe1a34354c4bac6d944071d1",
+        "startBlock": 7581829
+      },
+      {
+        "name": "DAOFactory@0.6",
+        "address": "0x595b34c93aa2c2ba0a38daeede629a0dfbdcc559",
+        "startBlock": 6592805
+      }
+    ],
+    "OrganizationTemplates": [
+      {
+        "name": "bare-template.aragonpm.eth@1.0.0",
+        "address": "0x772e046Dc341bc197c6Ef1EE083e1a1368d65646",
+        "startBlock": 8495662
+      },
+      {
+        "name": "company-template.aragonpm.eth@1.0.0",
+        "address": "0xd737632caC4d039C9B0EEcc94C12267407a271b5",
+        "startBlock": 8495687
+      },
+      {
+        "name": "company-board-template.aragonpm.eth@1.0.0",
+        "address": "0x4d1A892f42c947fa952b57bc6939b27A96215CfA",
+        "startBlock": 8495512
+      },
+      {
+        "name": "dandelion-org-template.aragonpm.eth@1.0.0",
+        "address": "0xbc2A863ef2B96d454aC7790D5A9E8cFfd8EccBa8",
+        "startBlock": 9438534
+      },
+      {
+        "name": "fundraising-multisig-template.aragonpm.eth@1.0.0",
+        "address": "0xd4bc1aFD46e744F1834cad01B2262d095DCB6C9B",
+        "startBlock": 9110213
+      },
+      {
+        "name": "membership-template.aragonpm.eth@1.0.0",
+        "address": "0x67430642C0c3B5E6538049B9E9eE719f2a4BeE7c",
+        "startBlock": 8495992
+      },
+      {
+        "name": "membership-template.aragonpm.eth@2.0.0",
+        "address": "0x67430642C0c3B5E6538049B9E9eE719f2a4BeE7c",
+        "startBlock": 8495992
+      },
+      {
+        "name": "reputation-template.aragonpm.eth@1.0.0",
+        "address": "0x3a06A6544e48708142508D9042f94DDdA769d04F",
+        "startBlock": 8495989
+      }
+    ],
+    "LegacyOrganizationTemplates": [
+      {
+        "name": "bare-kit.aragonpm.eth@1.0.0",
+        "address": "0xCd9D2a2c74E49CfAFB024006Be614B04c82D5273",
+        "startBlock": 7026150
+      },
+      {
+        "name": "democracy-kit@1.0.0",
+        "address": "0x705Cd9a00b87Bb019a87beEB9a50334219aC4444",
+        "startBlock": 6593257
+      },
+      {
+        "name": "democracy-kit@2.0.0",
+        "address": "0x7f3ed10366826a1227025445D4f4e3e14BBfc91d",
+        "startBlock": 7582081
+      },
+      {
+        "name": "multisig-kit.aragonpm.eth@1.0.0",
+        "address": "0x41bbaf498226b68415f1C78ED541c45A18fd7696",
+        "startBlock": 6593332
+      },
+      {
+        "name": "multisig-kit.aragonpm.eth@2.0.0",
+        "address": "0x87aa2980dde7d2D4e57191f16BB57cF80bf6E5A6",
+        "startBlock": 7582143
+      }
+    ],
+    "TokenFactories": [],
+    "Tokens": []
+  }
+}
+

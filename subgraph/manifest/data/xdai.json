@@ -1,0 +1,22 @@
+{
+  "network": "xdai",
+  "dataSources": {
+    "OrganizationFactories": [
+      {
+        "name": "DAOFactory@0.8.1",
+        "address": "0x4037f97fcc94287257e50bd14c7da9cb4df18250",
+        "startBlock": "10076184"
+      } 
+    ],
+    "OrganizationTemplates": [
+      {
+        "name": "karma-template.aragonpm.eth@1.0.0",
+        "address": "0x5c1ed258ad3716c5ec4c6818dc786a6f6b05a7f0",
+        "startBlock": "10543855"
+      } 
+    ],
+    "LegacyOrganizationTemplates": [],
+    "TokenFactories": [],
+    "Tokens": []
+  }
+}

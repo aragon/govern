@@ -1,0 +1,12 @@
+{
+  "network": "rinkeby",
+  "dataSources": {
+    "EagletFactory": [
+      {
+        "name": "EagletFactory",
+        "address": "0xCd2C5D214E84D9F5AAd0B919A2cC57BAd719c0Dc",
+        "startBlock": 7290330
+      }
+    ]
+  }
+}

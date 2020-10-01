@@ -1,8 +1,8 @@
-usePlugin("@nomiclabs/buidler-waffle")
-usePlugin('solidity-coverage')
+usePlugin("solidity-coverage");
+usePlugin("@nomiclabs/buidler-ethers");
+usePlugin("@nomiclabs/buidler-etherscan");
+usePlugin("@nomiclabs/buidler-waffle");
 
-// This is a sample Buidler task. To learn how to create your own go to
-// https://buidler.dev/guides/create-task.html
 task("accounts", "Prints the list of accounts", async () => {
   const accounts = await ethers.getSigners();
 
@@ -11,18 +11,44 @@ task("accounts", "Prints the list of accounts", async () => {
   }
 });
 
-// You have to export an object to set up your config
-// This object can have the following optional entries:
-// defaultNetwork, networks, solc, and paths.
-// Go to https://buidler.dev/config/ to learn more
+task("deploy", "Deploys an eaglet instance").setAction(
+  async (_, { ethers }) => {
+    const optimisticQueueFactory = await ethers.getContractFactory(
+      "OptimisticQueueFactory"
+    );
+    const eagletFactory = await ethers.getContractFactory("EagletFactory");
+
+    const queueFactoryTx = await optimisticQueueFactory.deploy();
+    console.log("queueFactory deployed: ", queueFactoryTx.address);
+
+    const eagletFactoryTx = await eagletFactory.deploy(queueFactoryTx.address);
+    console.log("eagletFactory deployed: ", eagletFactoryTx.address);
+
+    console.log("Done!");
+  }
+);
+
+const ETH_KEY = process.env.ETH_KEY;
+
 module.exports = {
   // This is a sample solc configuration that specifies which version of solc to use
   solc: {
     version: "0.6.8",
   },
+  etherscan: {
+    apiKey: "",
+  },
   networks: {
     coverage: {
-      url: 'http://localhost:8555'
-    }
+      url: "http://localhost:8555",
+    },
+    rinkeby: {
+      url: "https://rinkeby.eth.aragon.network",
+      accounts: ETH_KEY
+        ? ETH_KEY.split(",")
+        : [
+            "",
+          ],
+    },
   },
 };

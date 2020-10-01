@@ -1,0 +1,21 @@
+# DAOFactory
+- kind: ethereum/contract
+  name: {{ name }}
+  network: {{ network }}
+  source:
+    abi: EagletFactory
+    address: "{{address}}"
+    startBlock: {{startBlock}}
+  mapping:
+    kind: ethereum/events
+    apiVersion: 0.0.1
+    language: wasm/assemblyscript
+    entities:
+      - NoEnt
+    abis:
+      - name: EagletFactory
+        file: ./abis/EagletFactory.json
+    eventHandlers:
+      - event: NewEaglet(address,address)
+        handler: handleNewEaglet
+    file: ./src/aragon/mappings/EagletFactory.ts

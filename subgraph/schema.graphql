@@ -1,0 +1,19 @@
+type EagletFactory @entity {
+  id: ID!
+  address: Bytes!
+  eagletCount: Int!
+  eaglets: [Eaglet]!
+  queueCount: Int!
+  queues: [OptimisticQueue]!
+}
+
+type Eaglet @entity {
+  id: ID!
+  address: Bytes!
+}
+
+type OptimisticQueue @entity {
+  id: ID!
+  address: Bytes!
+
+}
