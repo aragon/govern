@@ -82,6 +82,9 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
             OptimisticQueueStateLib.State.Challenged
         );
         
+        ERC3000Data.Collateral memory collateral = _container.config.challengeDeposit;
+        collateral.collectFrom(msg.sender);
+        
         IArbitrator arbitrator = IArbitrator(_container.config.resolver);
         (address recipient, ERC20 feeToken, uint256 feeAmount) = arbitrator.getDisputeFees();
         require(feeToken.safeTransferFrom(msg.sender, address(this), feeAmount), "queue: bad fee pull");
@@ -94,9 +97,6 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
         arbitrator.closeEvidencePeriod(disputeId);
 
         disputeItemCache[arbitrator][disputeId] = containerHash;
-
-        ERC3000Data.Collateral memory collateral = _container.config.challengeDeposit;
-        collateral.collectFrom(msg.sender);
 
         emit Challenged(containerHash, msg.sender, _reason, disputeId, collateral);
     }
