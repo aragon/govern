@@ -7,17 +7,6 @@ type EagletFactory @entity {
   queues: [OptimisticQueue]!
 }
 
-type Eaglet @entity {
-  id: ID!
-  address: Bytes!
-}
-
-type OptimisticQueue @entity {
-  id: ID!
-  address: Bytes!
-  config: Config!
-
-}
 
 type Config @entity {
   id: ID!
@@ -27,6 +16,18 @@ type Config @entity {
   vetoDeposit: Collateral
   resolver: Bytes!
   rules: Bytes!
+}
+
+type Eaglet @entity {
+  id: ID!
+  address: Bytes!
+}
+
+type OptimisticQueue @entity {
+  id: ID!
+  address: Bytes!
+  config: Config
+
 }
 
 type Collateral @entity {

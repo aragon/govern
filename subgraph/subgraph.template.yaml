@@ -38,7 +38,7 @@ templates:
       language: wasm/assemblyscript
       entities:
         - Config
-        - Proposal
+        - Collateral
         - Stake
         - StakeHistory
       abis:
