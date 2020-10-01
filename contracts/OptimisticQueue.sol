@@ -20,7 +20,7 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
 
     mapping (bytes32 => OptimisticQueueStateLib.Item) public queue;
     mapping (IArbitrator => mapping (uint256 => bytes32)) public disputeItem;
-    uint256 public index;
+    uint256 public nonce;
     bytes32 public configHash;
 
     constructor(address _aclRoot, ERC3000Data.Config memory _initialConfig) MiniACL(_aclRoot) public {
@@ -32,15 +32,14 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
         override public
         returns (bytes32 containerHash)
     {   
-        require(_container.payload.nonce == index++, "queue: bad nonce");
-        require(_container.payload.submitter == msg.sender, "queue: bad submitter");
+        require(_container.payload.nonce == nonce++, "queue: bad nonce");
         
         bytes32 _configHash = _container.config.hash();
         require(_configHash == configHash, "queue: bad config");
         require(_container.payload.executionTime >= block.timestamp + _container.config.executionDelay, "queue: bad delay");
+        require(_container.payload.submitter == msg.sender, "queue: bad submitter");
 
         containerHash = ERC3000Data.containerHash(_container.payload.hash(), _configHash);
-        
         queue[containerHash].transitionState(OptimisticQueueStateLib.State.None, OptimisticQueueStateLib.State.Scheduled);
 
         ERC3000Data.Collateral memory collateral = _container.config.scheduleDeposit;
