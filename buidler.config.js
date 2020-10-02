@@ -1,7 +1,9 @@
-usePlugin("solidity-coverage");
-usePlugin("@nomiclabs/buidler-ethers");
-usePlugin("@nomiclabs/buidler-etherscan");
-usePlugin("@nomiclabs/buidler-waffle");
+usePlugin("solidity-coverage")
+usePlugin("@nomiclabs/buidler-ethers")
+usePlugin("@nomiclabs/buidler-etherscan")
+usePlugin("@nomiclabs/buidler-waffle")
+
+require('dotenv').config()
 
 task("accounts", "Prints the list of accounts", async () => {
   const accounts = await ethers.getSigners();
@@ -28,7 +30,17 @@ task("deploy", "Deploys an eaglet instance").setAction(
   }
 );
 
-const ETH_KEY = process.env.ETH_KEY;
+task("deploy-registry", "Deploys ERC3000Registry").setAction(
+  async (_, { ethers }) => {
+    const ERC3000Registry = await ethers.getContractFactory("ERC3000Registry");
+    const registry = await ERC3000Registry.deploy()
+
+    console.log("ERC3000Registry: ", registry.address);
+  }
+);
+
+const ETH_KEY = process.env.ETH_KEY
+const accounts = ETH_KEY ? ETH_KEY.split(",") : [""]
 
 module.exports = {
   // This is a sample solc configuration that specifies which version of solc to use
@@ -40,7 +52,7 @@ module.exports = {
     }
   },
   etherscan: {
-    apiKey: "",
+    apiKey: process.env.ETHERSCAN_KEY,
   },
   networks: {
     coverage: {
@@ -48,11 +60,7 @@ module.exports = {
     },
     rinkeby: {
       url: "https://rinkeby.eth.aragon.network",
-      accounts: ETH_KEY
-        ? ETH_KEY.split(",")
-        : [
-            "",
-          ],
+      accounts
     },
   },
 };
