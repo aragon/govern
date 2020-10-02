@@ -12,7 +12,6 @@ contract ERC3000Registry {
 
     mapping (string => bool) public nameUsed;
 
-    event NewFactory(address indexed factory);
     event Registered(ERC3000Executor indexed dao, ERC3000 queue, address indexed registrant, string name);
     event SetMetadata(ERC3000Executor indexed dao, bytes metadata);
 
