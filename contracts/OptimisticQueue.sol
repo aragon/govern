@@ -48,7 +48,7 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
         require(_container.payload.submitter == msg.sender, "queue: bad submitter");
 
         containerHash = ERC3000Data.containerHash(_container.payload.hash(), _configHash);
-        queue[containerHash].transitionState(
+        queue[containerHash].checkAndSetState(
             OptimisticQueueStateLib.State.None,
             OptimisticQueueStateLib.State.Scheduled
         );
@@ -71,7 +71,7 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
         require(uint64(block.timestamp) >= _container.payload.executionTime, "queue: wait more");
         
         bytes32 containerHash = _container.hash();
-        queue[containerHash].transitionState(
+        queue[containerHash].checkAndSetState(
             OptimisticQueueStateLib.State.Scheduled,
             OptimisticQueueStateLib.State.Executed
         );
@@ -84,7 +84,7 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
     function challenge(ERC3000Data.Container memory _container, bytes memory _reason) auth(this.challenge.selector) override public returns (uint256 disputeId) {
         bytes32 containerHash = _container.hash();
         challengerCache[containerHash] = msg.sender;
-        queue[containerHash].transitionState(
+        queue[containerHash].checkAndSetState(
             OptimisticQueueStateLib.State.Scheduled,
             OptimisticQueueStateLib.State.Challenged
         );
@@ -127,7 +127,7 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
 
     function veto(bytes32 _payloadHash, ERC3000Data.Config memory _config, bytes memory _reason) auth(this.veto.selector) override public {
         bytes32 containerHash = ERC3000Data.containerHash(_payloadHash, _config.hash());
-        queue[containerHash].transitionState(
+        queue[containerHash].checkAndSetState(
             OptimisticQueueStateLib.State.Scheduled,
             OptimisticQueueStateLib.State.Cancelled
         );
@@ -149,7 +149,7 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
 
     function executeApproved(ERC3000Data.Container memory _container) public returns (bytes[] memory execResults) {
         bytes32 containerHash = _container.hash();
-        queue[containerHash].transitionState(
+        queue[containerHash].checkAndSetState(
             OptimisticQueueStateLib.State.Approved,
             OptimisticQueueStateLib.State.Executed
         );
@@ -162,7 +162,7 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
 
     function settleRejection(ERC3000Data.Container memory _container) public {
         bytes32 containerHash = _container.hash();
-        queue[containerHash].transitionState(
+        queue[containerHash].checkAndSetState(
             OptimisticQueueStateLib.State.Rejected,
             OptimisticQueueStateLib.State.Cancelled
         );
@@ -177,11 +177,11 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
     function rule(uint256 _disputeId, uint256 _ruling) override external {
         IArbitrator arbitrator = IArbitrator(msg.sender);
         bytes32 containerHash = disputeItemCache[arbitrator][_disputeId];
-        queue[containerHash].transitionState(
+        queue[containerHash].checkAndSetState(
             OptimisticQueueStateLib.State.Challenged,
             _ruling == ALLOW_RULING ? OptimisticQueueStateLib.State.Approved : OptimisticQueueStateLib.State.Rejected
         );
-        disputeItemCache[IArbitrator(msg.sender)][_disputeId] = bytes32(0); // refund gas, no longer needed in state
+        disputeItemCache[arbitrator][_disputeId] = bytes32(0); // refund gas, no longer needed in state
 
         emit Ruled(arbitrator, _disputeId, _ruling);
     }
