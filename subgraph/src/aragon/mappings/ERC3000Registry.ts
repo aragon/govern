@@ -24,6 +24,7 @@ export function handleRegistered(event: RegisteredEvent): void {
   if (!queue) {
     queue = new OptimisticQueue(optimisticQueueId)
     queue.address = event.params.queue
+    queue.containers = []
   }
 
   queue.eaglet = eaglet.id

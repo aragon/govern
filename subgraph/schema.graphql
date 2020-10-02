@@ -8,6 +8,7 @@ type OptimisticQueue @entity {
   id: ID!
   address: Bytes!
   eaglet: Eaglet!
+  containers: [Container]!
   config: Config
 }
 
@@ -26,4 +27,34 @@ type Collateral @entity {
   id: ID!
   token: Bytes!
   amount: BigInt!
+}
+
+type Container @entity {
+  id: ID!
+  payload: Payload!
+  config: Config!
+  executionState: ExecutionState!
+}
+
+type Payload @entity {
+  id: ID!
+  nonce: BigInt!
+  submitter: Bytes!
+  executor: Eaglet!
+  actions: [Action]!
+  proof: Bytes!
+}
+
+type Action @entity {
+  id: ID!
+  to: Bytes!
+  value: BigInt!
+  data: Bytes!
+}
+
+enum ExecutionState {
+  Executed
+  Scheduled
+  Challenged
+  Disputed
 }

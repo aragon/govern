@@ -18,6 +18,8 @@ templates:
       apiVersion: 0.0.1
       language: wasm/assemblyscript
       entities:
+        - Container
+        - Payload
         - Config
         - Collateral
       abis:
@@ -26,6 +28,8 @@ templates:
       eventHandlers:
         - event: Configured(indexed bytes32,indexed address,(uint256,(address,uint256),(address,uint256),(address,uint256),address,bytes))
           handler: handleConfigured
+        - event: Scheduled(indexed bytes32,(uint256,uint256,address,address,tuple[],bytes),(address,uint256))
+          handler: handleScheduled
       file: ./src/OptimisticQueue.ts
   - kind: ethereum/contract
     name: Eaglet
