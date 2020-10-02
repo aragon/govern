@@ -1,0 +1,48 @@
+
+name: Test and deploy
+
+on: push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install node
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
+    - name: Run tests
+      run: yarn test
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    env:
+      CD: true
+      ETH_KEY: ${{ secrets.ETH_KEY }}
+      ETHERSCAN_KEY: ${{ secrets.ETHERSCAN_KEY }}
+      REGISTRY_RINKEBY: "0xdd29bBde232365F94091A293A32d2beaf2057Db8"
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install node
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
+    - name: Deploy Factory
+      run: yarn deploy-factory --network rinkeby
+    - name: Deploy Eaglet
+      run: yarn deploy-eaglet --network rinkeby > github-message
+    - name: Log
+      run: cat github-message
+    - name: Shill
+      uses: thollander/actions-comment-pull-request@1.0.0
+      if: github.event_name == 'pull_request'
+      with:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        script: |
+          if (!context.issue) return console.log('skip shill, maybe shill on discord')
+          const { issue: { number: issue_number }, repo: { owner, repo }  } = context;
+          github.issues.createComment({ issue_number, owner, repo, body: require('fs').readFileSync('github-message').toString().split('----')[1] });
