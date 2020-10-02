@@ -26,7 +26,7 @@ contract EagletFactory {
 
     event NewEaglet(Eaglet eaglet, OptimisticQueue queue, ERC3000Data.Config initialConfig);
 
-    constructor(OptimisticQueueFactory _queueFactory, ERC3000Registry _registry) public {
+    constructor(ERC3000Registry _registry, OptimisticQueueFactory _queueFactory) public {
         queueFactory = _queueFactory;
         registry = _registry;
     }
