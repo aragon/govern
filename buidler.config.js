@@ -23,7 +23,7 @@ task("accounts", "Prints the list of accounts", async () => {
 })
 
 const print = ({ address }, name) =>
-  console.log(`- ${name}: [${address}](https://rinkeby.etherscan.io/address/${address})`)
+  console.log(`- ${name}: [\`${address}\`](https://rinkeby.etherscan.io/address/${address})`)
 
 task("deploy-registry", "Deploys an ERC3000Registry instance").setAction(
   async (_, { ethers }) => {
@@ -78,9 +78,9 @@ task("deploy-eaglet", "Deploys an Eaglet from provided factory")
       .map(log => registryInterface.parseLog(log))
       .find(({ name }) => name === REGISTER_EVENT_NAME)
 
-    console.log(`A wild new Eaglet named *${name}* appeared 🐥`)
+    console.log(`----A wild new Eaglet named *${name}* appeared 🐥`)
     print({ address: dao }, 'Eaglet')
-    print({ address: queue }, 'OptimisticQueue')
+    print({ address: queue }, 'Queue')
   }
 )
 
