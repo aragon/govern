@@ -17,6 +17,7 @@ jobs:
       run: yarn test
   deploy:
     runs-on: ubuntu-latest
+    needs: tests
     steps:
     - uses: actions/checkout@v1
     - name: Install node
@@ -37,3 +38,11 @@ jobs:
         ETH_KEY: ${{ secrets.ETH_KEY }}
         ETHERSCAN_KEY: ${{ secrets.ETHERSCAN_KEY }}
         REGISTRY_RINKEBY: "0xdd29bBde232365F94091A293A32d2beaf2057Db8"
+    - name: Inform
+      uses: thollander/actions-comment-pull-request@1.0.0
+      if: github.event_name == 'pull_request'
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const { issue: { number: issue_number }, repo: { owner, repo }  } = context;
+          github.issues.createComment({ issue_number, owner, repo, body: 'Hello world ! 👋' });
