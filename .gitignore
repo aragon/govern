@@ -1,4 +1,5 @@
 .env
+eaglet-factory-rinkeby
 
 node_modules
 yarn-error.log
