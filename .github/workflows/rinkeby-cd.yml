@@ -46,3 +46,8 @@ jobs:
           if (!context.issue) return console.log('skip shill, maybe shill on discord')
           const { issue: { number: issue_number }, repo: { owner, repo }  } = context;
           github.issues.createComment({ issue_number, owner, repo, body: require('fs').readFileSync('github-message').toString().split('----')[1] });
+    - name: Comment PR
+        uses: thollander/actions-comment-pull-request@master
+        with:
+          message: 'Example of message !'
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
