@@ -174,7 +174,7 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
             OptimisticQueueStateLib.State.Challenged,
             _ruling == ALLOW_RULING ? OptimisticQueueStateLib.State.Approved : OptimisticQueueStateLib.State.Rejected
         );
-        disputeItemCache[IArbitrator(msg.sender)][_disputeId] = bytes32(0); // refund gas, no longer needed in state
+        disputeItemCache[arbitrator][_disputeId] = bytes32(0); // refund gas, no longer needed in state
 
         emit Ruled(arbitrator, _disputeId, _ruling);
     }
