@@ -30,7 +30,9 @@ describe('ERC3000 Registry', function () {
     await expect(tx).to.emit(registry, EVENTS.REGISTERED)
     await expect(tx).to.emit(registry, EVENTS.SET_METADATA)
 
-    const { gasUsed } = await tx.wait()
+    const { hash } = await tx
+    const { gasUsed } = await waffle.provider.getTransactionReceipt(hash)
+
     expect(gasUsed).to.be.lte(GAS_TARGET)
 
     console.log('gas used:', gasUsed.toNumber())
