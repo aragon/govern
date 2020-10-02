@@ -39,10 +39,10 @@ jobs:
       run: cat github-message
     - name: Shill
       uses: thollander/actions-comment-pull-request@1.0.0
-      if: github.event_name == 'push'
+      if: github.event_name == 'pull_request'
       with:
-        github-token: ${{ secrets.GH_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         script: |
           if (!context.issue) return console.log('skip shill, maybe shill on discord')
           const { issue: { number: issue_number }, repo: { owner, repo }  } = context;
-          github.issues.createComment({ issue_number, owner, repo, body: require('fs').readFileSync('github-message').toString() });
+          github.issues.createComment({ issue_number, owner, repo, body: require('fs').readFileSync('github-message').toString().split('----')[1] });
