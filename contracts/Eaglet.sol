@@ -19,7 +19,7 @@ contract Eaglet is ERC3000Executor, MiniACL {
         _grant(EXEC_ROLE, address(_initialExecutor));
     }
 
-    fallback () external payable {
+    receive () external payable {
         emit ETHDeposited(msg.sender, msg.value);
     }
 
