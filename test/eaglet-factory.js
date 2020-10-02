@@ -7,7 +7,7 @@ const EVENTS = {
 }
 
 describe('EagletFactory', function () {
-  let signers, owner, eagletFactory, eagletRegistry
+  let signers, owner, eagletFactory, ERC3000Registry
 
   before(async () => {
     signers = await ethers.getSigners()
@@ -16,12 +16,12 @@ describe('EagletFactory', function () {
 
   beforeEach(async () => {
     const OptimisticQueueFactory = await ethers.getContractFactory('OptimisticQueueFactory')
-    const EagletRegistry = await ethers.getContractFactory('EagletRegistry')
+    const ERC3000Registry = await ethers.getContractFactory('ERC3000Registry')
     const EagletFactory = await ethers.getContractFactory('EagletFactory')
 
     queueFactory = await OptimisticQueueFactory.deploy()
-    eagletRegistry = await EagletRegistry.deploy()
-    eagletFactory = await EagletFactory.deploy(queueFactory.address, eagletRegistry.address)
+    ERC3000Registry = await ERC3000Registry.deploy()
+    eagletFactory = await EagletFactory.deploy(queueFactory.address, ERC3000Registry.address)
   })
 
   const GAS_TARGET = !process.env.SOLIDITY_COVERAGE ? 4e6 : 20e6
@@ -29,8 +29,8 @@ describe('EagletFactory', function () {
     const tx = eagletFactory.newDummyEaglet('eagle')
 
     await expect(tx).to.emit(eagletFactory, EVENTS.NEW)
-    await expect(tx).to.emit(eagletRegistry, EVENTS.REGISTERED)
-    await expect(tx).to.emit(eagletRegistry, EVENTS.SET_METADATA)
+    await expect(tx).to.emit(ERC3000Registry, EVENTS.REGISTERED)
+    await expect(tx).to.emit(ERC3000Registry, EVENTS.SET_METADATA)
 
     const { hash } = await tx
     const { gasUsed } = await waffle.provider.getTransactionReceipt(hash)
