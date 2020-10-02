@@ -49,5 +49,5 @@ jobs:
     - name: Comment PR
         uses: thollander/actions-comment-pull-request@master
         with:
-          message: 'Example of message !'
+          message: 'Example of message!'
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
