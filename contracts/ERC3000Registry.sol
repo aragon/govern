@@ -19,7 +19,7 @@ contract ERC3000Registry {
     {
         require(!nameUsed[_name], "registry: name used");
         require(_queue.supportsInterface(ERC3000_INTERFACE_ID), "registry: bad interface queue");
-        
+
         // all will revert if `_dao` is not interface compliant in _setMetadata
         nameUsed[_name] = true;
 

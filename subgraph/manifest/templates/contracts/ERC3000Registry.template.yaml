@@ -1,9 +1,9 @@
-# DAOFactory
+# ERC3000Registry
 - kind: ethereum/contract
   name: {{ name }}
   network: {{ network }}
   source:
-    abi: EagletFactory
+    abi: ERC3000Registry
     address: "{{address}}"
     startBlock: {{startBlock}}
   mapping:
@@ -13,9 +13,9 @@
     entities:
       - NoEnt
     abis:
-      - name: EagletFactory
-        file: ./abis/EagletFactory.json
+      - name: ERC3000Registry
+        file: ./abis/ERC3000Registry.json
     eventHandlers:
-      - event: NewEaglet(address,address)
-        handler: handleNewEaglet
-    file: ./src/aragon/mappings/EagletFactory.ts
+      - event: Registered(indexed address,address,indexed address,string)
+        handler: handleRegistered
+    file: ./src/aragon/mappings/ERC3000Registry.ts

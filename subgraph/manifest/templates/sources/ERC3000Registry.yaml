@@ -1,0 +1,5 @@
+#Eaglet Registry
+{{#dataSources.ERC3000Registry}}
+  {{> ERC3000Registry.template.yaml}}
+{{/dataSources.ERC3000Registry}}
+# /Eaglet Registry

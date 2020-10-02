@@ -1,34 +1,26 @@
-type EagletFactory @entity {
-  id: ID!
-  address: Bytes!
-  eagletCount: Int!
-  eaglets: [Eaglet]!
-  queueCount: Int!
-  queues: [OptimisticQueue]!
-}
-
-
-type Config @entity {
-  id: ID!
-  executionDelay: BigInt!
-  scheduleDeposit: Collateral
-  challengeDeposit: Collateral
-  vetoDeposit: Collateral
-  resolver: Bytes!
-  rules: Bytes!
-}
-
 type Eaglet @entity {
   id: ID!
   address: Bytes!
+  queue: OptimisticQueue! @derivedFrom(field: "eaglet")
 }
 
 type OptimisticQueue @entity {
   id: ID!
   address: Bytes!
+  eaglet: Eaglet!
   config: Config
-
 }
+
+type Config @entity {
+  id: ID!
+  executionDelay: BigInt!
+  scheduleDeposit: Collateral!
+  challengeDeposit: Collateral!
+  vetoDeposit: Collateral!
+  resolver: Bytes!
+  rules: Bytes!
+}
+
 
 type Collateral @entity {
   id: ID!

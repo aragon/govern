@@ -3,6 +3,7 @@ const fs = require('fs')
 const KNOWN_ABIS = [
   'Eaglet.json',
   'EagletFactory.json',
+  'ERC3000Registry.json',
   'OptimisticQueue.json',
   'OptimisticQueueFactory.json',
 ]

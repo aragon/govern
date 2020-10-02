@@ -1,11 +1,11 @@
 {
   "network": "rinkeby",
   "dataSources": {
-    "EagletFactory": [
+    "ERC3000Registry": [
       {
-        "name": "EagletFactory",
-        "address": "0xCd2C5D214E84D9F5AAd0B919A2cC57BAd719c0Dc",
-        "startBlock": 7290330
+        "name": "ERC3000Registry",
+        "address": "0x303Fac53a3729bb9e525C87150824584057f2dD9",
+        "startBlock": 7300980
       }
     ]
   }

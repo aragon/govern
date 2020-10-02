@@ -1,5 +1,0 @@
-# Organization factories
-{{#dataSources.EagletFactory}}
-  {{> EagletFactory.template.yaml}}
-{{/dataSources.EagletFactory}}
-# /Organization factories

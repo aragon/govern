@@ -6,7 +6,7 @@ repository: https://github.com/aragon/connect
 schema:
   file: ./schema.graphql
 dataSources:
-{{> EagletFactory.yaml}}
+{{> ERC3000Registry.yaml}}
 templates:
   - kind: ethereum/contract
     name: OptimisticQueue

@@ -40,7 +40,7 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
         override
         auth(this.schedule.selector)
         returns (bytes32 containerHash)
-    {   
+    {
         require(_container.payload.nonce == ++nonce, "queue: bad nonce"); // prevent griefing by front-running
         bytes32 _configHash = _container.config.hash();
         require(_configHash == configHash, "queue: bad config");
@@ -67,9 +67,9 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
         override
         auth(this.execute.selector)
         returns (bytes[] memory execResults)
-    {   
+    {
         require(uint64(block.timestamp) >= _container.payload.executionTime, "queue: wait more");
-        
+
         bytes32 containerHash = _container.hash();
         queue[containerHash].checkAndSetState(
             OptimisticQueueStateLib.State.Scheduled,
@@ -77,7 +77,7 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
         );
 
         _container.config.scheduleDeposit.releaseTo(_container.payload.submitter);
-        
+
         return _execute(_container.payload, containerHash);
     }
 
@@ -88,10 +88,10 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
             OptimisticQueueStateLib.State.Scheduled,
             OptimisticQueueStateLib.State.Challenged
         );
-        
+
         ERC3000Data.Collateral memory collateral = _container.config.challengeDeposit;
         collateral.collectFrom(msg.sender);
-        
+
         IArbitrator arbitrator = IArbitrator(_container.config.resolver);
         (address recipient, ERC20 feeToken, uint256 feeAmount) = arbitrator.getDisputeFees();
         require(feeToken.safeTransferFrom(msg.sender, address(this), feeAmount), "queue: bad fee pull");
@@ -170,7 +170,7 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
         address challenger = challengerCache[containerHash];
         _container.config.scheduleDeposit.releaseTo(challenger);
         _container.config.challengeDeposit.releaseTo(challenger);
-        challengerCache[containerHash] = address(0); // refund gas, no longer needed in state        
+        challengerCache[containerHash] = address(0); // refund gas, no longer needed in state
     }
 
     // Arbitrable
