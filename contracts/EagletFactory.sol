@@ -21,7 +21,7 @@ contract EagletFactory {
     OptimisticQueueFactory public queueFactory;
     EagletRegistry public registry;
 
-    event NewEaglet(Eaglet eaglet, OptimisticQueue queue);
+    event NewEaglet(Eaglet eaglet, OptimisticQueue queue, ERC3000Data.Config initialConfig);
 
     constructor(OptimisticQueueFactory _queueFactory, EagletRegistry _registry) public {
         queueFactory = _queueFactory;
@@ -53,6 +53,6 @@ contract EagletFactory {
         queue.bulk(items);
         registry.register(eaglet, _name, "");
 
-        emit NewEaglet(eaglet, queue);
+        emit NewEaglet(eaglet, queue, config);
     }
 }
