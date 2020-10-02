@@ -30,9 +30,9 @@ jobs:
         ETH_KEY: ${{ secrets.ETH_KEY }}
         ETHERSCAN_KEY: ${{ secrets.ETHERSCAN_KEY }}
         REGISTRY_RINKEBY: "0xdd29bBde232365F94091A293A32d2beaf2057Db8"
-      run: yarn deploy-factory -- --network rinkeby
+      run: yarn deploy-factory --network rinkeby
     - name: Deploy Eaglet
-      run: yarn deploy-eaglet -- --network rinkeby
+      run: yarn deploy-eaglet --network rinkeby
       env:
         ETH_KEY: ${{ secrets.ETH_KEY }}
         ETHERSCAN_KEY: ${{ secrets.ETHERSCAN_KEY }}

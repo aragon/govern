@@ -102,6 +102,7 @@ module.exports = {
   networks: {
     coverage: {
       url: "http://localhost:8555",
+      allowUnlimitedContractSize: true
     },
     rinkeby: {
       url: "https://rinkeby.eth.aragon.network",
