@@ -35,7 +35,7 @@ task("deploy-registry", "Deploys ERC3000Registry").setAction(
     const ERC3000Registry = await ethers.getContractFactory("ERC3000Registry");
     const registry = await ERC3000Registry.deploy()
 
-    console.log("ERC3000Registry: ", registry.address);
+    console.log(`ERC3000Registry: ${registry.address} (https://rinkeby.etherscan.io/address/${registry.address})`);
   }
 );
 
