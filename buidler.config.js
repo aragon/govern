@@ -34,6 +34,8 @@ task("deploy-registry", "Deploys an ERC3000Registry instance").setAction(
 
 task("deploy-factory", "Deploys an EagletFactory instance").setAction(
   async (_, { ethers }) => {
+    console.log(process.env)
+    
     const OptimisticQueueFactory = await ethers.getContractFactory("OptimisticQueueFactory")
     const EagletFactory = await ethers.getContractFactory("EagletFactory")
 
