@@ -7,6 +7,8 @@ require('dotenv').config()
 const { readFileSync, writeFileSync } = require('fs')
 const { uniqueNamesGenerator, adjectives, colors, animals } = require('unique-names-generator')
 
+const { sendMessage: discordSend } = require('./lib/discord')(process.env.DISCORD_CHANNEL, process.env.DISCORD_TOKEN)
+
 const FACTORY_CACHE_NAME = 'eaglet-factory-rinkeby'
 const REGISTER_EVENT_NAME = 'Registered'
 const REGISTRY_EVENTS_ABI = [
@@ -22,8 +24,14 @@ task("accounts", "Prints the list of accounts", async () => {
   }
 })
 
-const print = ({ address }, name) =>
-  console.log(`- ${name}: [\`${address}\`](https://rinkeby.etherscan.io/address/${address})`)
+const format = ({ address }, name) =>
+  `- ${name}: [\`${address}\`](https://rinkeby.etherscan.io/address/${address})`
+
+const print = (contract, name) =>
+  console.log(format(contract, name))
+
+const discordPrint = (contract, name) =>
+  discordSend(format(contract, name))
 
 task("deploy-registry", "Deploys an ERC3000Registry instance").setAction(
   async (_, { ethers }) => {
@@ -81,6 +89,10 @@ task("deploy-eaglet", "Deploys an Eaglet from provided factory")
     console.log(`----A wild new Eaglet named *${name}* appeared 🐥`)
     print({ address: dao }, 'Eaglet')
     print({ address: queue }, 'Queue')
+
+    await discordSend(`A wild new Eaglet named *${name}* appeared 🐥`)
+    await discordPrint({ address: dao }, 'Eaglet')
+    await discordPrint({ address: queue }, 'Queue')
   }
 )
 
