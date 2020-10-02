@@ -20,7 +20,7 @@ describe('EagletFactory', function () {
     eagletFactory = await EagletFactory.deploy(queueFactory.address)
   })
 
-  const GAS_TARGET = 4e6
+  const GAS_TARGET = !process.env.SOLIDITY_COVERAGE ? 4e6 : 20e6
   it(`deploys DAO under ${GAS_TARGET} gas`, async () => {
     const tx = eagletFactory.newDummyEaglet()
     await expect(tx)
