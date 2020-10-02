@@ -15,8 +15,7 @@ contract ERC3000Registry {
     event Registered(ERC3000Executor indexed dao, ERC3000 queue, address indexed registrant, string name);
     event SetMetadata(ERC3000Executor indexed dao, bytes metadata);
 
-    function register(ERC3000Executor _dao, ERC3000 _queue, string calldata _name, bytes calldata _initialMetadata)
-        external
+    function register(ERC3000Executor _dao, ERC3000 _queue, string calldata _name, bytes calldata _initialMetadata) external
     {
         require(!nameUsed[_name], "registry: name used");
         require(_queue.supportsInterface(ERC3000_INTERFACE_ID), "registry: bad interface queue");
