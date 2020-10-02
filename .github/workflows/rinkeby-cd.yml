@@ -42,7 +42,7 @@ jobs:
       uses: thollander/actions-comment-pull-request@1.0.0
       if: github.event_name == 'pull_request'
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{ secrets.GH_TOKEN }}
         script: |
           const { issue: { number: issue_number }, repo: { owner, repo }  } = context;
-          github.issues.createComment({ issue_number, owner, repo, body: 'Hello world ! 👋' });
+          github.issues.createComment({ issue_number, owner, repo, body: 'Hello world! 👋' });
