@@ -1,5 +1,7 @@
 import {
+  Challenged as ChallengedEvent,
   Configured as ConfiguredEvent,
+  Executed as ExecutedEvent,
   Scheduled as ScheduledEvent,
 } from '../generated/templates/OptimisticQueue/OptimisticQueue'
 import {
@@ -53,6 +55,18 @@ export function handleConfigured(event: ConfiguredEvent): void {
   scheduleCollateral.save()
   challengeCollateral.save()
   vetoCollateral.save()
+}
+
+export function handleExecuted(event: ExecutedEvent): void {
+  const container = Container.load(event.params.containerHash.toHexString())
+  container.executionState = EXECUTED_TYPE
+  container.save()
+}
+
+export function handleChallenged(event: ChallengedEvent): void {
+  const container = Container.load(event.params.containerHash.toHexString())
+  container.executionState = CHALLENGED_TYPE
+  container.save()
 }
 
 export function handleScheduled(event: ScheduledEvent): void {

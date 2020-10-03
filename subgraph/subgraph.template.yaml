@@ -30,6 +30,10 @@ templates:
           handler: handleConfigured
         - event: Scheduled(indexed bytes32,(uint256,uint256,address,address,tuple[],bytes),(address,uint256))
           handler: handleScheduled
+        - event: Executed(indexed bytes32,indexed address,bytes[])
+          handler: handleExecuted
+        - event: Challenged(indexed bytes32,indexed address,bytes,uint256,(address,uint256))
+          handler: handleChallenged
       file: ./src/OptimisticQueue.ts
   - kind: ethereum/contract
     name: Eaglet
