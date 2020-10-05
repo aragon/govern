@@ -2,7 +2,9 @@ import {
   Challenged as ChallengedEvent,
   Configured as ConfiguredEvent,
   Executed as ExecutedEvent,
+  Resolved as ResolvedEvent,
   Scheduled as ScheduledEvent,
+  Vetoed as VetoedEvent,
 } from '../generated/templates/OptimisticQueue/OptimisticQueue'
 import {
   Action,
@@ -13,10 +15,18 @@ import {
   Payload,
 } from '../generated/schema'
 
+const APPROVED_TYPE = "Approved"
+const CANCELLED_TYPE = "Cancelled"
+const CHALLENGED_TYPE = "Challenged"
 const EXECUTED_TYPE = "Executed"
 const SCHEDULED_TYPE = "Scheduled"
-const CHALLENGED_TYPE = "Challenged"
-const DISPUTED_TYPE = "Disputed"
+const VETOED_TYPE = "Vetoed"
+
+export function handleChallenged(event: ChallengedEvent): void {
+  const container = Container.load(event.params.containerHash.toHexString())
+  container.executionState = CHALLENGED_TYPE
+  container.save()
+}
 
 export function handleConfigured(event: ConfiguredEvent): void {
   let queue = OptimisticQueue.load(event.address.toHexString())
@@ -63,9 +73,10 @@ export function handleExecuted(event: ExecutedEvent): void {
   container.save()
 }
 
-export function handleChallenged(event: ChallengedEvent): void {
+export function handleResolved(event: ResolvedEvent): void {
   const container = Container.load(event.params.containerHash.toHexString())
-  container.executionState = CHALLENGED_TYPE
+  const approved = event.params.approved
+  container.executionState = approved ? APPROVED_TYPE : CANCELLED_TYPE
   container.save()
 }
 
@@ -104,5 +115,12 @@ export function handleScheduled(event: ScheduledEvent): void {
   queue.containers.push(containerId)
 
   payload.save()
+  container.save()
+}
+
+export function handleVetoed(event: VetoedEvent): void {
+  const container = Container.load(event.params.containerHash.toHexString())
+  container.executionState = VETOED_TYPE
+  container.vetoReason = event.params.reason
   container.save()
 }

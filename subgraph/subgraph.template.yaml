@@ -34,6 +34,10 @@ templates:
           handler: handleExecuted
         - event: Challenged(indexed bytes32,indexed address,bytes,uint256,(address,uint256))
           handler: handleChallenged
+        - event: Vetoed(indexed bytes32,indexed address,bytes,(address,uint256))
+          handler: handleVetoed
+        - event: Resolved(indexed bytes32,indexed address,bool)
+          handler: handleResolved
       file: ./src/OptimisticQueue.ts
   - kind: ethereum/contract
     name: Eaglet
