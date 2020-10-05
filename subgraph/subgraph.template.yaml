@@ -28,6 +28,10 @@ templates:
       eventHandlers:
         - event: Configured(indexed bytes32,indexed address,(uint256,(address,uint256),(address,uint256),(address,uint256),address,bytes))
           handler: handleConfigured
+        - event: Frozen(indexed bytes4,indexed address)
+          handler: handleFrozen
+        - event: Granted(indexed bytes4,indexed address,indexed address)
+          handler: handleGranted
         - event: Scheduled(indexed bytes32,(uint256,uint256,address,address,tuple[],bytes),(address,uint256))
           handler: handleScheduled
         - event: Executed(indexed bytes32,indexed address,bytes[])
@@ -38,6 +42,8 @@ templates:
           handler: handleVetoed
         - event: Resolved(indexed bytes32,indexed address,bool)
           handler: handleResolved
+        - event: Revoked(indexed bytes4,indexed address,indexed address)
+          handler: handleRevoked
       file: ./src/OptimisticQueue.ts
   - kind: ethereum/contract
     name: Eaglet

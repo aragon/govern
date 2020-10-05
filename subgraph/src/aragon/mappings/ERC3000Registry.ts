@@ -20,11 +20,13 @@ export function handleRegistered(event: RegisteredEvent): void {
   if (!eaglet) {
     eaglet = new Eaglet(eagletId)
     eaglet.address = event.params.dao
+    eaglet.roles = []
   }
   if (!queue) {
     queue = new OptimisticQueue(optimisticQueueId)
     queue.address = event.params.queue
     queue.containers = []
+    queue.roles = []
   }
 
   queue.eaglet = eaglet.id
