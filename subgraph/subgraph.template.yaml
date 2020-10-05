@@ -47,8 +47,6 @@ templates:
       entities:
         - Config
         - Collateral
-        - Stake
-        - StakeHistory
       abis:
         - name: Eaglet
           file: ./abis/Eaglet.json
