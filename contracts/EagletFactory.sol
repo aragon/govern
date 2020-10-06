@@ -6,11 +6,14 @@ pragma solidity 0.6.8;
 pragma experimental ABIEncoderV2;
 
 import "./Eaglet.sol";
-import "./EagletRegistry.sol";
+import "./ERC3000Registry.sol";
 import "./OptimisticQueue.sol";
 
 contract OptimisticQueueFactory {
-    function newQueue(address _aclRoot, ERC3000Data.Config memory _config) public returns (OptimisticQueue queue) {
+    function newQueue(address _aclRoot, ERC3000Data.Config memory _config)
+        public
+        returns (OptimisticQueue queue)
+    {
         return new OptimisticQueue(_aclRoot, _config);
     }
 }
@@ -19,11 +22,9 @@ contract EagletFactory {
     address internal constant ANY_ADDR = address(-1);
 
     OptimisticQueueFactory public queueFactory;
-    EagletRegistry public registry;
+    ERC3000Registry public registry;
 
-    event NewEaglet(Eaglet eaglet, OptimisticQueue queue, ERC3000Data.Config initialConfig);
-
-    constructor(OptimisticQueueFactory _queueFactory, EagletRegistry _registry) public {
+    constructor(ERC3000Registry _registry, OptimisticQueueFactory _queueFactory) public {
         queueFactory = _queueFactory;
         registry = _registry;
     }
@@ -42,6 +43,8 @@ contract EagletFactory {
         queue = queueFactory.newQueue(address(this), config);
         eaglet = new Eaglet(queue);
 
+        registry.register(eaglet, queue, _name, "");
+
         MiniACLData.BulkItem[] memory items = new MiniACLData.BulkItem[](6);
         items[0] = MiniACLData.BulkItem(MiniACLData.BulkOp.Grant, queue.schedule.selector, ANY_ADDR);
         items[1] = MiniACLData.BulkItem(MiniACLData.BulkOp.Grant, queue.execute.selector, ANY_ADDR);
@@ -51,8 +54,5 @@ contract EagletFactory {
         items[5] = MiniACLData.BulkItem(MiniACLData.BulkOp.Freeze, queue.ROOT_ROLE(), address(0));
 
         queue.bulk(items);
-        registry.register(eaglet, _name, "");
-
-        emit NewEaglet(eaglet, queue, config);
     }
 }
