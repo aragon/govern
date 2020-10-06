@@ -100,7 +100,7 @@ export function handleFrozen(event: FrozenEvent): void {
 
 export function handleGranted(event: GrantedEvent): void {
   const queue = OptimisticQueue.load(event.address.toHexString())
-  // roleID = optimistic queue contract address + role itself,
+  // roleID = contract address + role itself,
   // which will be the function selector + who
   // This is equivalent to storing all roles in the contract, and looking up the corresponding
   // entry by mapping role => who
@@ -152,7 +152,7 @@ export function handleRevoked(event: RevokedEvent): void {
     role.who = event.params.who
   }
   role.revoked = true
-  // Check if role exists in queue roles array and if not,
+  // Check if role exists in roles array and if not,
   // push it
   const roles = queue.roles
   let id = 0
