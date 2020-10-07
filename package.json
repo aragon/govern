@@ -14,8 +14,8 @@
     "lerna": "^3.22.1"
   },
   "scripts": {
-    "test": "lerna run --scope=@aragon/govern-* --concurrency=1 --stream test",
-    "build": "lerna run --scope=@aragon/govern-* --concurrency=1 --stream compile",
+    "test": "lerna run --scope=@aragon/govern* --concurrency=1 --stream test",
+    "build": "lerna run --scope=@aragon/govern* --concurrency=1 --stream compile",
     "build:contracts": "lerna run --scope=@aragon/govern --concurrency=1 --stream compile",
     "sync-abis": "yarn build:contracts && node scripts/sync-abis.js"
   },
