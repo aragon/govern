@@ -1,3 +1,5 @@
+const createAction = require('./scripts/create-action')
+
 usePlugin("solidity-coverage")
 usePlugin("@nomiclabs/buidler-ethers")
 usePlugin("@nomiclabs/buidler-etherscan")
@@ -21,6 +23,8 @@ task("accounts", "Prints the list of accounts", async () => {
     console.log(await account.getAddress());
   }
 })
+
+task("create-action", async (_, { ethers }) => createAction(ethers))
 
 const print = ({ address }, name) =>
   console.log(`- ${name}: [\`${address}\`](https://rinkeby.etherscan.io/address/${address})`)
@@ -83,6 +87,7 @@ task("deploy-eaglet", "Deploys an Eaglet from provided factory")
     print({ address: queue }, 'Queue')
   }
 )
+
 
 const ETH_KEY = process.env.ETH_KEY
 const accounts = ETH_KEY ? ETH_KEY.split(",") : [""]
