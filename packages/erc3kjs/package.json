@@ -1,7 +1,11 @@
 {
   "name": "@aragon/erc3kjs",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Access and interact with Aragon Organizations and their apps.",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/cjs/index.d.ts",
+  "sideEffects": false,
   "keywords": [
     "ethereum",
     "javascript",
@@ -26,7 +30,6 @@
     "build:examples": "MODE=all ./scripts/rebuild-packages.sh",
     "status": "oao status",
     "publish-version": "./scripts/publish-version.sh",
-    "postinstall": "yarn build",
     "precommit": "yarn precise-commits"
   },
   "devDependencies": {
