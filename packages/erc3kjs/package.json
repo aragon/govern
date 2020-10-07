@@ -1,6 +1,6 @@
 {
   "name": "@aragon/erc3kjs",
-  "version": "0.1.2",
+  "version": "0.1.4",
   "description": "Access and interact with Aragon Organizations and their apps.",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -47,6 +47,8 @@
   },
   "dependencies": {
     "@urql/core": "^1.13.1",
+    "ethers": "^5.0.16",
+    "graphql": "^15.3.0",
     "isomorphic-unfetch": "^3.1.0"
   }
 }

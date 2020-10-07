@@ -1,3 +1,4 @@
+import { providers } from 'ethers'
 import fetch from 'isomorphic-unfetch'
 import {
   Client,
@@ -28,22 +29,29 @@ const POLL_INTERVAL_DEFAULT = 13 * 1000
 type GraphQLWrapperOptions = {
   pollInterval?: number
   verbose?: boolean
+  chainId: number
+}
+
+function getNodeByChainId(chainId: number) {
+  return chainId === 1 ? 'https://mainnet.eth.aragon.network/' : 'https://rinkeby.eth.aragon.network/'
 }
 
 export default class ERC3K {
   #client: Client
   #pollInterval: number
   #verbose: boolean
+  ethers: any
 
   constructor(
     subgraphUrl: string,
-    options: GraphQLWrapperOptions | boolean = {}
+    ethereum: any,
+    options: GraphQLWrapperOptions | boolean = { chainId: 4 }
   ) {
     if (typeof options === 'boolean') {
       console.warn(
         'GraphQLWrapper: please use `new GraphQLWrapper(url, { verbose })` rather than `new GraphQLWrapper(url, verbose)`.'
       )
-      options = { verbose: options }
+      options = { verbose: options, chainId: 4 }
     }
     options = options as GraphQLWrapperOptions
 
@@ -51,6 +59,8 @@ export default class ERC3K {
     this.#pollInterval = options.pollInterval ?? POLL_INTERVAL_DEFAULT
 
     this.#client = new Client({ maskTypename: true, url: subgraphUrl, fetch })
+
+    this.ethers = ethereum ? new providers.Web3Provider(ethereum) : new providers.JsonRpcProvider(getNodeByChainId(options.chainId))
   }
 
   async performQuery(
