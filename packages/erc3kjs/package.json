@@ -1,0 +1,52 @@
+{
+  "name": "@aragon/erc3k.js",
+  "version": "0.2.0",
+  "author": "Aragon Association <legal@aragon.org>",
+  "license": "MIT",
+  "main": "dist/cjs/index.js",
+  "module": "dist/index.js",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "yarn rollup --config",
+    "dev": "yarn rollup --config --watch",
+    "lint": "yarn eslint ./src",
+    "test": "yarn lint && jest",
+    "prepare": "rm -rf ./dist && yarn build",
+    "prepublishOnly": "git push && git push --tags"
+  },
+  "dependencies": {
+    "ethers": "^5.0.16",
+    "jsbi": "^3.1.1",
+    "node-fetch": "^2.6.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.8.3",
+    "@babel/core": "^7.8.3",
+    "@babel/plugin-proposal-class-properties": "^7.10.1",
+    "@babel/preset-env": "^7.8.3",
+    "@babel/preset-react": "^7.8.3",
+    "@rollup/plugin-commonjs": "^11.0.1",
+    "@rollup/plugin-json": "^4.0.1",
+    "@rollup/plugin-node-resolve": "^7.0.0",
+    "babel-eslint": "^10.0.3",
+    "babel-jest": "^26.0.1",
+    "builtin-modules": "^3.1.0",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.9.0",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.20.0",
+    "eslint-plugin-jest": "^23.13.2",
+    "eslint-plugin-node": "^11.0.0",
+    "eslint-plugin-prettier": "^3.1.2",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "jest": "^26.0.1",
+    "prettier": "^1.19.1",
+    "rollup": "^1.29.1",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-terser": "^5.2.0"
+  }
+}
