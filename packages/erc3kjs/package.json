@@ -30,9 +30,9 @@
     "precommit": "yarn precise-commits"
   },
   "devDependencies": {
+    "@types/jest": "^26.0.0",
     "@typescript-eslint/eslint-plugin": "^2.29.0",
     "@typescript-eslint/parser": "^2.29.0",
-    "@types/jest": "^26.0.0",
     "husky": "^4.2.5",
     "is-ci-cli": "^2.1.1",
     "jest": "^26.0.1",
