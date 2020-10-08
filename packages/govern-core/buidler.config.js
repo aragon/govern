@@ -1,11 +1,10 @@
-const createAction = require('./scripts/create-action')
-
 usePlugin("solidity-coverage")
 usePlugin("@nomiclabs/buidler-ethers")
 usePlugin("@nomiclabs/buidler-etherscan")
 usePlugin("@nomiclabs/buidler-waffle")
 
-require('dotenv').config()
+require('dotenv').config({ path: '../../.env' })
+
 const { readFileSync, writeFileSync } = require('fs')
 const { uniqueNamesGenerator, adjectives, colors, animals } = require('unique-names-generator')
 
@@ -24,10 +23,13 @@ task("accounts", "Prints the list of accounts", async () => {
   }
 })
 
-task("create-action", async (_, { ethers }) => createAction(ethers))
+const format = ({ address }, name) =>
+  `- ${name}: https://rinkeby.etherscan.io/address/${address})`
 
-const print = ({ address }, name) =>
-  console.log(`- ${name}: [\`${address}\`](https://rinkeby.etherscan.io/address/${address})`)
+const print = (contract, name) =>
+  console.log(format(contract, name))
+
+task("create-action", async (_, { ethers }) => createAction(ethers))
 
 task("deploy-registry", "Deploys an ERC3000Registry instance").setAction(
   async (_, { ethers }) => {
@@ -82,7 +84,7 @@ task("deploy-eaglet", "Deploys an Eaglet from provided factory")
       .map(log => registryInterface.parseLog(log))
       .find(({ name }) => name === REGISTER_EVENT_NAME)
 
-    console.log(`----A wild new Eaglet named *${name}* appeared 🐥`)
+    console.log(`--!--A wild new Eaglet named *${name}* appeared 🐥`)
     print({ address: dao }, 'Eaglet')
     print({ address: queue }, 'Queue')
   }
