@@ -1,6 +1,6 @@
 {
   "name": "@aragon/govern",
-  "version": "1.0.1-alpha.0",
+  "version": "1.0.0-beta.0",
   "description": "Optimistic DAOs",
   "main": "index.js",
   "repository": "https://github.com/aragon/govern",
@@ -13,13 +13,13 @@
   "dependencies": {
     "@nomiclabs/buidler-etherscan": "^2.1.0",
     "dotenv": "^8.2.0",
-    "erc3k": "^1.0.0-beta.11",
+    "erc3k": "^1.0.0-beta.0",
     "node-fetch": "^2.6.1",
     "unique-names-generator": "^4.3.1",
     "web3-eth-abi": "^1.3.0"
   },
   "devDependencies": {
-    "@aragon/govern-discord": "^1.0.0",
+    "@aragon/govern-discord": "^1.0.0-beta.0",
     "@nomiclabs/buidler": "^1.4.7",
     "@nomiclabs/buidler-ethers": "^2.0.0",
     "@nomiclabs/buidler-waffle": "^2.0.0",
@@ -37,6 +37,7 @@
     "deploy-govern": "buidler deploy-govern",
     "test": "buidler test",
     "sync-abis": "node scripts/sync-abis.js",
-    "prepublishOnly": "yarn clean && yarn test && yarn compile"
-  }
+    "prepublishOnly": "yarn test && yarn compile"
+  },
+  "gitHead": "aabbf6bd2dac11872ba9bb1f1dc8fffb6044aa7c"
 }

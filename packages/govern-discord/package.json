@@ -1,6 +1,6 @@
 {
   "name": "@aragon/govern-discord",
-  "version": "1.0.0",
+  "version": "1.0.0-beta.0",
   "description": "",
   "main": "server.js",
   "scripts": {
@@ -15,5 +15,6 @@
     "discord.js": "^12.3.1",
     "dotenv": "^8.2.0",
     "execa": "^4.0.3"
-  }
+  },
+  "gitHead": "aabbf6bd2dac11872ba9bb1f1dc8fffb6044aa7c"
 }

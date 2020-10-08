@@ -1,6 +1,6 @@
 {
   "name": "erc3k",
-  "version": "1.0.0-beta.11",
+  "version": "1.0.0-beta.0",
   "description": "ERC-3000 smart contract interfaces",
   "main": "index.js",
   "repository": "https://github.com/aragon/erc3k",
@@ -26,6 +26,7 @@
     "clean": "rm -rf artifacts",
     "compile": "npx buidler compile --force",
     "test": "npx buidler test",
-    "prepublishOnly": "yarn test && yarn clean && yarn compile"
-  }
+    "prepublishOnly": "yarn test && yarn compile"
+  },
+  "gitHead": "aabbf6bd2dac11872ba9bb1f1dc8fffb6044aa7c"
 }
