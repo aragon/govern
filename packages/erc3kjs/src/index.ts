@@ -1,46 +1,26 @@
 import { providers } from 'ethers'
 import fetch from 'isomorphic-unfetch'
-import {
-  Client,
-  GraphQLRequest,
-  createRequest as createRequestUrql,OperationContext, OperationResult
-} from '@urql/core'
+import { Client, OperationResult } from '@urql/core'
 import { DocumentNode } from 'graphql'
 import { ErrorConnection } from './errors'
 
 export type QueryResult = OperationResult<any>
-export type DataGql = any
-
-export type ParseFunction = (data: DataGql) => any
-
-// From https://github.com/FormidableLabs/urql/blob/ca68584a578b9f85d0b1448fc7a5fc9587f968de/packages/core/src/exchanges/subscription.ts#L39-L44
-export interface SubscriptionOperation {
-  query: string
-  variables?: object
-  key: string
-  context: OperationContext
-}
-
-
-// Average block time is about 13 seconds on the 2020-08-14
-// See https://etherscan.io/chart/blocktime
-const POLL_INTERVAL_DEFAULT = 13 * 1000
 
 type GraphQLWrapperOptions = {
-  pollInterval?: number
   verbose?: boolean
   chainId: number
 }
 
 function getNodeByChainId(chainId: number) {
-  return chainId === 1 ? 'https://mainnet.eth.aragon.network/' : 'https://rinkeby.eth.aragon.network/'
+  return chainId === 1
+    ? 'https://mainnet.eth.aragon.network/'
+    : 'https://rinkeby.eth.aragon.network/'
 }
 
 export default class ERC3K {
+  ethers: providers.JsonRpcProvider
   #client: Client
-  #pollInterval: number
   #verbose: boolean
-  ethers: any
 
   constructor(
     subgraphUrl: string,
@@ -56,11 +36,12 @@ export default class ERC3K {
     options = options as GraphQLWrapperOptions
 
     this.#verbose = options.verbose ?? false
-    this.#pollInterval = options.pollInterval ?? POLL_INTERVAL_DEFAULT
 
     this.#client = new Client({ maskTypename: true, url: subgraphUrl, fetch })
 
-    this.ethers = ethereum ? new providers.Web3Provider(ethereum) : new providers.JsonRpcProvider(getNodeByChainId(options.chainId))
+    this.ethers = ethereum
+      ? new providers.Web3Provider(ethereum)
+      : new providers.JsonRpcProvider(getNodeByChainId(options.chainId))
   }
 
   async performQuery(
@@ -102,5 +83,4 @@ export default class ERC3K {
     }
     return `${result.error.name}: ${result.error.message}\n\n`
   }
-
 }
