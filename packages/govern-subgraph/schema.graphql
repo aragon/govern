@@ -1,6 +1,7 @@
 type Eaglet @entity {
   id: ID!
   address: Bytes!
+  name: String!
   queue: OptimisticQueue! @derivedFrom(field: "eaglet")
   roles: [Role]!
 }
@@ -23,7 +24,6 @@ type Config @entity {
   resolver: Bytes!
   rules: Bytes!
 }
-
 
 type Collateral @entity {
   id: ID!

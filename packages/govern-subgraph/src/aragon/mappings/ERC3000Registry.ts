@@ -1,13 +1,10 @@
 import { Registered as RegisteredEvent } from '../../../generated/ERC3000Registry/ERC3000Registry'
 
-import {
-  Eaglet,
-  OptimisticQueue,
-} from '../../../generated/schema'
+import { Eaglet, OptimisticQueue } from '../../../generated/schema'
 
 import {
   Eaglet as EagletTemplate,
-  OptimisticQueue as QueueTemplate,
+  OptimisticQueue as QueueTemplate
 } from '../../../generated/templates'
 
 export function handleRegistered(event: RegisteredEvent): void {
@@ -20,6 +17,7 @@ export function handleRegistered(event: RegisteredEvent): void {
   if (!eaglet) {
     eaglet = new Eaglet(eagletId)
     eaglet.address = event.params.dao
+    eaglet.name = event.params.name
     eaglet.roles = []
   }
   if (!queue) {
@@ -37,4 +35,3 @@ export function handleRegistered(event: RegisteredEvent): void {
   EagletTemplate.create(event.params.dao)
   QueueTemplate.create(event.params.queue)
 }
-
