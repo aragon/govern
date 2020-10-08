@@ -4,8 +4,9 @@
 
 > Optimistic DAOs
 
-[![Actions Status](https://github.com/aragon/govern/workflows/CI/badge.svg)](https://github.com/aragon/govern/actions?query=workflow%3ACI) [![Actions Status](https://github.com/aragon/govern/workflows/CD/badge.svg)](https://github.com/aragon/govern/actions?query=workflow%3ACD)
- [![](https://img.shields.io/npm/v/@aragon/govern)](https://www.npmjs.com/package/@aragon/govern) [![](https://img.shields.io/badge/solidity-%3E%3D%200.6.8-lightgrey)](https://img.shields.io/badge/solidity-%3E%3D%200.6.8-lightgrey)
+[![](https://img.shields.io/badge/solidity-%3E%3D%200.6.8-lightgrey)](https://img.shields.io/badge/solidity-%3E%3D%200.6.8-lightgrey) [![Actions Status](https://github.com/aragon/govern/workflows/CI/badge.svg)](https://github.com/aragon/govern/actions?query=workflow%3ACI) [![Actions Status](https://github.com/aragon/govern/workflows/CD/badge.svg)](https://github.com/aragon/govern/actions?query=workflow%3ACD)
+ [![](https://img.shields.io/npm/v/@aragon/govern)](https://www.npmjs.com/package/@aragon/govern) [![codecov](https://codecov.io/gh/aragon/govern/branch/master/graph/badge.svg)](https://codecov.io/gh/aragon/govern)
+
 
 _ERC-3000 is still in draft phase and might change before the standard is finalized_
 
