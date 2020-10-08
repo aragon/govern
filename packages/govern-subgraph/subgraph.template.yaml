@@ -25,7 +25,7 @@ templates:
         - Role
       abis:
         - name: OptimisticQueue
-          file: ./abis/OptimisticQueue.json
+          file: ../govern-core/artifacts/OptimisticQueue.json
       eventHandlers:
         - event: Configured(indexed bytes32,indexed address,(uint256,(address,uint256),(address,uint256),(address,uint256),address,bytes))
           handler: handleConfigured
@@ -60,8 +60,13 @@ templates:
         - Collateral
         - Role
       abis:
+<<<<<<< HEAD
         - name: Govern
           file: ./abis/Govern.json
+=======
+        - name: Eaglet
+          file: ../govern-core/artifacts/Eaglet.json
+>>>>>>> monorepo
       eventHandlers:
         - event: Frozen(indexed bytes4,indexed address)
           handler: handleFrozen
