@@ -1,6 +1,6 @@
 {
   "name": "erc3k",
-  "version": "1.0.0-beta.11",
+  "version": "1.0.0-beta.0",
   "description": "ERC-3000 smart contract interfaces",
   "main": "index.js",
   "repository": "https://github.com/aragon/erc3k",

@@ -1,6 +1,6 @@
 {
   "name": "@aragon/erc3kjs",
-  "version": "0.1.4",
+  "version": "1.0.0-beta.0",
   "description": "Interact with ERC-3000 compatible DAOs",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",

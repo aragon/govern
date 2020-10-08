@@ -1,6 +1,6 @@
 {
   "name": "@aragon/govern-subgraph",
-  "version": "0.1.2",
+  "version": "1.0.0-beta.0",
   "scripts": {
     "codegen": "rm -rf generated; graph codegen",
     "build": "rm -rf build; graph build",
