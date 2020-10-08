@@ -1,5 +1,5 @@
 
-name: Test and deploy
+name: CD
 
 on: push
 jobs:
