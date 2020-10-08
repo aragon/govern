@@ -1,0 +1,41 @@
+{
+  "name": "@aragon/govern",
+  "version": "1.0.1-alpha.0",
+  "description": "Optimistic DAOs",
+  "main": "index.js",
+  "repository": "https://github.com/aragon/eaglet",
+  "author": "Jorge Izquierdo <jorge@aragon.one>",
+  "license": "GPL-3.0",
+  "files": [
+    "/artifacts",
+    "/contracts"
+  ],
+  "dependencies": {
+    "@nomiclabs/buidler-etherscan": "^2.1.0",
+    "dotenv": "^8.2.0",
+    "erc3k": "^1.0.0-beta.11",
+    "node-fetch": "^2.6.1",
+    "unique-names-generator": "^4.3.1",
+    "web3-eth-abi": "^1.3.0"
+  },
+  "devDependencies": {
+    "@nomiclabs/buidler": "^1.4.7",
+    "@nomiclabs/buidler-ethers": "^2.0.0",
+    "@nomiclabs/buidler-waffle": "^2.0.0",
+    "chai": "^4.2.0",
+    "ethereum-waffle": "^3.0.0",
+    "ethers": "^5.0.0",
+    "lerna": "^3.22.1",
+    "solidity-coverage": "^0.7.10"
+  },
+  "scripts": {
+    "clean": "rm -rf artifacts",
+    "coverage": "SOLIDITY_COVERAGE=true buidler coverage --network coverage",
+    "compile": "buidler compile --force",
+    "deploy-factory": "yarn compile && buidler deploy-factory",
+    "deploy-eaglet": "yarn compile && buidler deploy-eaglet",
+    "test": "buidler test",
+    "sync-abis": "node scripts/sync-abis.js",
+    "prepublishOnly": "yarn clean && yarn test && yarn compile"
+  }
+}
