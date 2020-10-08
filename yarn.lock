@@ -5442,11 +5442,6 @@ envinfo@^7.3.1:
   resolved "https://registry.yarnpkg.com/envinfo/-/envinfo-7.7.3.tgz#4b2d8622e3e7366afb8091b23ed95569ea0208cc"
   integrity sha512-46+j5QxbPWza0PB1i15nZx0xQ4I/EfQxg9J8Had3b408SV63nEtor2e+oiY63amTo9KTuh2a3XLObNwduxYwwA==
 
-erc3k@^1.0.0-beta.11:
-  version "1.0.0-beta.11"
-  resolved "https://registry.yarnpkg.com/erc3k/-/erc3k-1.0.0-beta.11.tgz#45392ec20571a2f08adc95df64307ed0ae9afe67"
-  integrity sha512-rjAHAvuUQHY9QUi3rdFKLYVUSX51OOvUUlSvZ+aWSFF/OQ8Yt8ARlhsSX/OVnDAalCkKTxGk7FnxIi5Wi1ZA4A==
-
 err-code@^1.0.0, err-code@^1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/err-code/-/err-code-1.1.2.tgz#06e0116d3028f6aef4806849eb0ea6a748ae6960"
