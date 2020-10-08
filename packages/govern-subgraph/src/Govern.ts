@@ -4,81 +4,81 @@ import {
   Frozen as FrozenEvent,
   Granted as GrantedEvent,
   Revoked as RevokedEvent,
-} from "../generated/templates/Eaglet/Eaglet";
+} from "../generated/templates/Govern/Govern";
 import {
   Action as ActionEntity,
-  Eaglet as EagletEntity,
+  Govern as GovernEntity,
   Execution as ExecutionEntity,
 } from "../generated/schema";
 import { frozenRoles, roleGranted, roleRevoked } from "./lib/MiniACL";
 
 export function handleExecuted(event: ExecutedEvent): void {
-  const eaglet = loadOrCreateEaglet(event.address);
+  const govern = loadOrCreateGovern(event.address);
 
   const execution = loadOrCreateExecution(event);
 
   createActions(event);
 
   // add the execution
-  const currentExecutions = eaglet.executions;
+  const currentExecutions = govern.executions;
   currentExecutions.push(execution.id);
-  eaglet.executions = currentExecutions;
+  govern.executions = currentExecutions;
 
   execution.save();
-  eaglet.save();
+  govern.save();
 }
 
 // MiniACL Events
 
 export function handleFrozen(event: FrozenEvent): void {
-  const eaglet = loadOrCreateEaglet(event.address);
+  const govern = loadOrCreateGovern(event.address);
 
-  const roles = eaglet.roles!
+  const roles = govern.roles!
 
   frozenRoles(roles, event.params.role);
 }
 
 export function handleGranted(event: GrantedEvent): void {
-  const eaglet = loadOrCreateEaglet(event.address);
+  const govern = loadOrCreateGovern(event.address);
 
   // contemplar el caso en que se crea un nueva cola
 
   const role = roleGranted(event.address, event.params.role, event.params.who);
 
   // add the role
-  const currentRoles = eaglet.roles;
+  const currentRoles = govern.roles;
   currentRoles.push(role.id);
-  eaglet.roles = currentRoles;
+  govern.roles = currentRoles;
 
-  eaglet.save();
+  govern.save();
 }
 
 export function handleRevoked(event: RevokedEvent): void {
-  const eaglet = loadOrCreateEaglet(event.address);
+  const govern = loadOrCreateGovern(event.address);
 
   const role = roleRevoked(event.address, event.params.role, event.params.who);
 
   // add the role
-  const currentRoles = eaglet.roles;
+  const currentRoles = govern.roles;
   currentRoles.push(role.id);
-  eaglet.roles = currentRoles;
+  govern.roles = currentRoles;
 
-  eaglet.save();
+  govern.save();
 }
 
 // Helpers
 
-export function loadOrCreateEaglet(entity: Address): EagletEntity {
-  const eagletId = entity.toHexString();
-  // Create eaglet
-  let eaglet = EagletEntity.load(eagletId);
-  if (eaglet === null) {
-    eaglet = new EagletEntity(eagletId);
-    eaglet.address = entity;
-    eaglet.executions = [];
-    eaglet.roles = [];
+export function loadOrCreateGovern(entity: Address): GovernEntity {
+  const governId = entity.toHexString();
+  // Create govern
+  let govern = GovernEntity.load(governId);
+  if (govern === null) {
+    govern = new GovernEntity(governId);
+    govern.address = entity;
+    govern.executions = [];
+    govern.roles = [];
   }
-  return eaglet!;
+  return govern!;
 }
 
 function buildId(event: ethereum.Event): string {

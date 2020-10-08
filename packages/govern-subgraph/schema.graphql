@@ -8,12 +8,12 @@ type ERC3000Registry @entity {
 type Entry @entity {
   id: ID!
   name: String!
-  dao: Eaglet!
+  dao: Govern!
   queue: OptimisticQueue!
   metadata: Bytes
 }
 
-type Eaglet @entity {
+type Govern @entity {
   id: ID!
   address: Bytes!
   executions: [Execution!]
@@ -70,7 +70,7 @@ type Item @entity {
   nonce: BigInt!
   executionTime: BigInt!
   submitter: Bytes!
-  executor: Eaglet!
+  executor: Govern!
   actions: [Action!] @derivedFrom(field: "item")
   proof: Bytes!
   collateral: Collateral!

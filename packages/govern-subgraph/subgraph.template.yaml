@@ -2,7 +2,7 @@
 # Instead, edit subgraph.template.yaml and run `yarn manifest-<network>-[staging]`
 specVersion: 0.0.2
 description: A template for Aragon subgraphs
-repository: https://github.com/aragon/eaglet
+repository: https://github.com/aragon/govern
 schema:
   file: ./schema.graphql
 dataSources:
@@ -66,13 +66,8 @@ templates:
         - Action
         - Role
       abis:
-<<<<<<< HEAD
         - name: Govern
-          file: ./abis/Govern.json
-=======
-        - name: Eaglet
-          file: ../govern-core/artifacts/Eaglet.json
->>>>>>> monorepo
+          file: ../govern-core/artifacts/Govern.json
       eventHandlers:
         - event: Executed(indexed address,tuple[],bytes[])
           handler: handleExecuted
