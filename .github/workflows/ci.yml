@@ -1,5 +1,5 @@
 
-name: Run coverage
+name: CI
 
 # TODO: Send report to codecov.io
 
