@@ -11,11 +11,13 @@
     apiVersion: 0.0.1
     language: wasm/assemblyscript
     entities:
-      - NoEnt
+      - Entry
     abis:
       - name: ERC3000Registry
         file: ../govern-core/artifacts/ERC3000Registry.json
     eventHandlers:
       - event: Registered(indexed address,address,indexed address,string)
         handler: handleRegistered
-    file: ./src/aragon/mappings/ERC3000Registry.ts
+      - event: SetMetadata(indexed address,bytes)
+        handler: handletSetMetadata
+    file: ./src/ERC3000Registry.ts
