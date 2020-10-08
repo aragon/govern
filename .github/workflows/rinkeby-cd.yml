@@ -33,8 +33,8 @@ jobs:
       run: yarn install --frozen-lockfile
     - name: Deploy Factory
       run: cd packages/govern-core && yarn deploy-factory --network rinkeby
-    - name: Deploy Eaglet
-      run: cd packages/govern-core && yarn deploy-eaglet --network rinkeby > github-message
+    - name: Deploy Govern
+      run: cd packages/govern-core && yarn deploy-govern --network rinkeby > github-message
     - name: Log
       run: cat packages/govern-core/github-message
     - name: Shill

@@ -13,7 +13,7 @@ const {
   animals,
 } = require('unique-names-generator')
 
-const FACTORY_CACHE_NAME = 'eaglet-factory-rinkeby'
+const FACTORY_CACHE_NAME = 'govern-factory-rinkeby'
 const REGISTER_EVENT_NAME = 'Registered'
 const REGISTRY_EVENTS_ABI = [
   'event Registered(address indexed dao, address queue, address indexed registrant, string name)',
@@ -42,31 +42,31 @@ task('deploy-registry', 'Deploys an ERC3000Registry instance').setAction(
   }
 )
 
-task('deploy-factory', 'Deploys an EagletFactory instance').setAction(
+task('deploy-factory', 'Deploys an GovernFactory instance').setAction(
   async (_, { ethers }) => {
     const OptimisticQueueFactory = await ethers.getContractFactory(
       'OptimisticQueueFactory'
     )
-    const EagletFactory = await ethers.getContractFactory('EagletFactory')
+    const GovernFactory = await ethers.getContractFactory('GovernFactory')
 
     const queueFactory = await OptimisticQueueFactory.deploy()
     print(queueFactory, 'OptimisticQueueFactory')
 
-    const eagletFactory = await EagletFactory.deploy(
+    const governFactory = await GovernFactory.deploy(
       process.env.REGISTRY_RINKEBY,
       queueFactory.address
     )
-    print(eagletFactory, 'EagletFactory')
+    print(governFactory, 'GovernFactory')
 
     if (process.env.CD) {
-      writeFileSync(FACTORY_CACHE_NAME, eagletFactory.address)
+      writeFileSync(FACTORY_CACHE_NAME, governFactory.address)
     }
   }
 )
 
-task('deploy-eaglet', 'Deploys an Eaglet from provided factory')
+task('deploy-govern', 'Deploys an Govern from provided factory')
   .addOptionalParam('factory', 'Factory address')
-  .addOptionalParam('useProxies', 'Whether to deploy eaglet with proxies')
+  .addOptionalParam('useProxies', 'Whether to deploy govern with proxies')
   .addOptionalParam('name', 'DAO name (must be unique at Registry level)')
   .setAction(async ({ factory: factoryAddr, useProxies, name }, { ethers }) => {
     factoryAddr =
@@ -89,11 +89,11 @@ task('deploy-eaglet', 'Deploys an Eaglet from provided factory')
 
     let registryInterface = new ethers.utils.Interface(REGISTRY_EVENTS_ABI)
 
-    const eagletFactory = await ethers.getContractAt(
-      'EagletFactory',
+    const governFactory = await ethers.getContractAt(
+      'GovernFactory',
       factoryAddr
     )
-    const tx = await eagletFactory.newDummyEaglet(name, {
+    const tx = await governFactory.newDummyGovern(name, {
       gasLimit: 3500000,
     })
 
@@ -106,8 +106,8 @@ task('deploy-eaglet', 'Deploys an Eaglet from provided factory')
       .map((log) => registryInterface.parseLog(log))
       .find(({ name }) => name === REGISTER_EVENT_NAME)
 
-    console.log(`----\nA wild new Eaglet named *${name}* appeared 🐥`)
-    print({ address: dao }, 'Eaglet')
+    console.log(`----\nA wild new Govern named *${name}* appeared 🐥`)
+    print({ address: dao }, 'Govern')
     print({ address: queue }, 'Queue')
   })
 

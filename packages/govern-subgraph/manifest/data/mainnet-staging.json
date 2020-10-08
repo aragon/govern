@@ -1,6 +1,6 @@
 {
   "network": "mainnet",
   "dataSources": {
-    "EagletFactory": []
+    "GovernFactory": []
   }
 }

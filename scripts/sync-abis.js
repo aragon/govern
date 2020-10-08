@@ -1,8 +1,8 @@
 const fs = require('fs')
 
 const KNOWN_ABIS = [
-  'Eaglet.json',
-  'EagletFactory.json',
+  'Govern.json',
+  'GovernFactory.json',
   'ERC3000Registry.json',
   'OptimisticQueue.json',
   'OptimisticQueueFactory.json',

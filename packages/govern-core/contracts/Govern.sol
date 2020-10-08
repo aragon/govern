@@ -10,7 +10,7 @@ import "erc3k/contracts/ERC3000Executor.sol";
 
 import "./lib/MiniACL.sol";
 
-contract Eaglet is ERC3000Executor, MiniACL {
+contract Govern is ERC3000Executor, MiniACL {
     bytes4 internal constant EXEC_ROLE = this.exec.selector;
 
     event ETHDeposited(address indexed sender, uint256 value);
@@ -29,7 +29,7 @@ contract Eaglet is ERC3000Executor, MiniACL {
         for (uint256 i = 0; i < actions.length; i++) {
             // todo: optimize with assembly
             (bool ok, bytes memory ret) = actions[i].to.call{value: actions[i].value}(actions[i].data);
-            require(ok, "eaglet: call");
+            require(ok, "govern: call");
 
             execResults[i] = ret;
         }

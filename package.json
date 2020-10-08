@@ -3,7 +3,7 @@
   "version": "1.0.0-alpha.1",
   "description": "Optimistic DAOs",
   "private": true,
-  "repository": "https://github.com/aragon/eaglet",
+  "repository": "https://github.com/aragon/govern",
   "author": "Aragon Association <legal@aragon.org>",
   "contributors": [
     "Jorge Izquierdo <jorge@aragon.one>",
