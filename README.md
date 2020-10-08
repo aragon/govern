@@ -1,4 +1,4 @@
-# 🐥 Govern <img align="right" src="../../raw/master/.github/govern.png" height="120px" />
+# 🦅 Aragon Govern
 
 > Optimistic DAOs
 

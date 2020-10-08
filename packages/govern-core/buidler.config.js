@@ -106,7 +106,7 @@ task('deploy-govern', 'Deploys an Govern from provided factory')
       .map((log) => registryInterface.parseLog(log))
       .find(({ name }) => name === REGISTER_EVENT_NAME)
 
-    console.log(`----\nA wild new Govern named *${name}* appeared 🐥`)
+    console.log(`----\nA wild new Govern named *${name}* appeared 🦅`)
     print({ address: dao }, 'Govern')
     print({ address: queue }, 'Queue')
   })
