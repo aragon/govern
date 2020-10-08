@@ -6,7 +6,7 @@ import { ErrorConnection } from './errors'
 
 export type QueryResult = OperationResult<any>
 
-type GraphQLWrapperOptions = {
+type ERC3KOptions = {
   verbose?: boolean
   chainId: number
 }
@@ -25,15 +25,15 @@ export default class ERC3K {
   constructor(
     subgraphUrl: string,
     ethereum: any,
-    options: GraphQLWrapperOptions | boolean = { chainId: 4 }
+    options: ERC3KOptions | boolean = { chainId: 4 }
   ) {
     if (typeof options === 'boolean') {
       console.warn(
-        'GraphQLWrapper: please use `new GraphQLWrapper(url, { verbose })` rather than `new GraphQLWrapper(url, verbose)`.'
+        'ERC3K: please use `new ERC3K(url, { verbose })` rather than `new ERC3K(url, verbose)`.'
       )
       options = { verbose: options, chainId: 4 }
     }
-    options = options as GraphQLWrapperOptions
+    options = options as ERC3KOptions
 
     this.#verbose = options.verbose ?? false
 
