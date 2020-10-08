@@ -9,32 +9,11 @@
     "Jorge Izquierdo <jorge@aragon.one>",
     "Enrique Ortiz <enrique@aragon.one>"
   ],
-<<<<<<< HEAD
-  "dependencies": {
-    "@nomiclabs/buidler-etherscan": "^2.1.0",
-    "discord.js": "^12.3.1",
-    "dotenv": "^8.2.0",
-    "erc3k": "^1.0.0-beta.11",
-    "execa": "^4.0.3",
-    "unique-names-generator": "^4.3.1"
-  },
-=======
   "license": "GPL-3.0",
->>>>>>> monorepo
   "devDependencies": {
     "lerna": "^3.22.1"
   },
   "scripts": {
-<<<<<<< HEAD
-    "clean": "rm -rf artifacts",
-    "coverage": "SOLIDITY_COVERAGE=true buidler coverage --network coverage",
-    "compile": "buidler compile --force",
-    "deploy-factory": "yarn compile && buidler deploy-factory",
-    "deploy-eaglet": "buidler deploy-eaglet",
-    "test": "buidler test",
-    "sync-abis": "node scripts/sync-abis.js",
-    "prepublishOnly": "yarn clean && yarn test && yarn compile"
-=======
     "test": "lerna run --concurrency=1 --stream test",
     "build": "lerna run --scope=@aragon/govern* --concurrency=1 --stream compile",
     "build:contracts": "lerna run --scope=@aragon/govern --concurrency=1 --stream compile",
@@ -51,6 +30,5 @@
       "**/@graphprotocol/graph-cli",
       "**/@graphprotocol/graph-cli/**"
     ]
->>>>>>> monorepo
   }
 }
