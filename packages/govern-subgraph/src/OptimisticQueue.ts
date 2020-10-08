@@ -22,7 +22,7 @@ import {
   OptimisticQueue as OptimisticQueueEntity,
   Veto as VetoEntity,
 } from "../generated/schema";
-import { frozenRoles, roleGranted, roleRevoked } from "./aragon/lib/MiniACL";
+import { frozenRoles, roleGranted, roleRevoked } from "./lib/MiniACL";
 
 const NONE_STATUS = "None";
 const APPROVED_STATUS = "Approved";

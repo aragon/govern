@@ -4,7 +4,7 @@ import {
   SetMetadata as SetMetadataEvent,
 } from "../generated/ERC3000Registry/ERC3000Registry";
 import {
-  Eaglet as EagletTemplate,
+  Govern as GovernTemplate,
   OptimisticQueue as QueueTemplate,
 } from "../generated/templates";
 import {
@@ -30,7 +30,7 @@ export function handleRegistered(event: RegisteredEvent): void {
   registry.save()
 
   // Create datasource templates
-  EagletTemplate.create(event.params.dao);
+  GovernTemplate.create(event.params.dao);
   QueueTemplate.create(event.params.queue);
 }
 
