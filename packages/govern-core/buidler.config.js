@@ -69,7 +69,10 @@ task('deploy-eaglet', 'Deploys an Eaglet from provided factory')
   .addOptionalParam('useProxies', 'Whether to deploy eaglet with proxies')
   .addOptionalParam('name', 'DAO name (must be unique at Registry level)')
   .setAction(async ({ factory: factoryAddr, useProxies, name }, { ethers }) => {
-    factoryAddr = factoryAddr || process.env.FACTORY_RINKEBY
+    factoryAddr =
+      factoryAddr ||
+      process.env.FACTORY_RINKEBY ||
+      readFileSync(FACTORY_CACHE_NAME).toString()
     name =
       name ||
       uniqueNamesGenerator({
