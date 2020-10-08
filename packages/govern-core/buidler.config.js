@@ -84,7 +84,7 @@ task("deploy-eaglet", "Deploys an Eaglet from provided factory")
       .map(log => registryInterface.parseLog(log))
       .find(({ name }) => name === REGISTER_EVENT_NAME)
 
-    console.log(`--!--A wild new Eaglet named *${name}* appeared 🐥`)
+    console.log(`----\nA wild new Eaglet named *${name}* appeared 🐥`)
     print({ address: dao }, 'Eaglet')
     print({ address: queue }, 'Queue')
   }

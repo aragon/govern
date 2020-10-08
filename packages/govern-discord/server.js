@@ -22,7 +22,7 @@ client.on('message', async (message) => {
     try {
       const { stdout, stderr } = await execa('yarn', script.split(' '))
       await message.reply('alright, I\'m done!')
-      await message.reply(stdout.split('--!--')[1])
+      await message.reply(stdout.split('----\n')[1])
     } catch (e) {
       await message.reply('something went wrong :(')
       // console.log(Object.keys(e), 'e', e.stderr, 'out', e.stdout, 'faaa', e.failed)
