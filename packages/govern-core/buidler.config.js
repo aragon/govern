@@ -80,6 +80,7 @@ task('deploy-govern', 'Deploys an Govern from provided factory')
         length: 2,
         separator: '-',
       })
+    name = process.env.CD ? `github-${name}` : name
 
     if (!factoryAddr) {
       return console.error(
