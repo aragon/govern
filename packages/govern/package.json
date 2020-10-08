@@ -33,7 +33,7 @@
     "coverage": "SOLIDITY_COVERAGE=true buidler coverage --network coverage",
     "compile": "buidler compile --force",
     "deploy-factory": "yarn compile && buidler deploy-factory",
-    "deploy-eaglet": "yarn compile && buidler deploy-eaglet",
+    "deploy-eaglet": "buidler deploy-eaglet",
     "test": "buidler test",
     "sync-abis": "node scripts/sync-abis.js",
     "prepublishOnly": "yarn clean && yarn test && yarn compile"
