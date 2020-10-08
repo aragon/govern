@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\"",
     "start": "node -r dotenv/config server.js dotenv_config_path=../../.env",
-    "new-dao": "cd ../govern-core && yarn deploy-eaglet --network rinkeby"
+    "new-dao": "cd ../govern-core && yarn deploy-govern --network rinkeby"
   },
   "keywords": [],
   "author": "",

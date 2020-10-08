@@ -8,8 +8,8 @@ const EVENTS = {
   EXECUTED: 'Executed'
 }
 
-describe('Eaglet', function () {
-  let signers, owner, eaglet, eagletNotOwner
+describe('Govern', function () {
+  let signers, owner, govern, governNotOwner
 
   before(async () => {
     signers = await ethers.getSigners()
@@ -17,18 +17,18 @@ describe('Eaglet', function () {
   })
 
   beforeEach(async () => {
-    const Eaglet = await ethers.getContractFactory('Eaglet')
-    eaglet = await Eaglet.deploy(owner)
-    eagletNotOwner = await eaglet.connect(signers[1])
+    const Govern = await ethers.getContractFactory('Govern')
+    govern = await Govern.deploy(owner)
+    governNotOwner = await govern.connect(signers[1])
   })
 
   it('owner can exec', async () => {
-    await expect(eaglet.exec([]))
-      .to.emit(eaglet, EVENTS.EXECUTED)
+    await expect(govern.exec([]))
+      .to.emit(govern, EVENTS.EXECUTED)
       .withArgs(owner, [], [])
   })
 
   it('non-owner cannot exec', async () => {
-    await expect(eagletNotOwner.exec([])).to.be.revertedWith(ERRORS.AUTH)
+    await expect(governNotOwner.exec([])).to.be.revertedWith(ERRORS.AUTH)
   })
 })

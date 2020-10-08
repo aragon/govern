@@ -3,18 +3,18 @@ import {
   Frozen as FrozenEvent,
   Granted as GrantedEvent,
   Revoked as RevokedEvent,
-} from '../generated/templates/Eaglet/Eaglet'
+} from '../generated/templates/Govern/Govern'
 import {
-  Eaglet,
+  Govern,
   Role
 } from '../generated/schema'
 
 const FREEZE_ADDR = '0x0000000000000000000000000000000000000001'
 
 export function handleFrozen(event: FrozenEvent): void {
-  const eaglet = Eaglet.load(event.address.toHexString())
+  const govern = Govern.load(event.address.toHexString())
   let id = 0
-  const roles = eaglet.roles
+  const roles = govern.roles
   for (id = 0; id < roles.length; id++) {
     const currentRole = roles[id]
     const funcSelector = currentRole.split('-')[1]
@@ -26,11 +26,11 @@ export function handleFrozen(event: FrozenEvent): void {
       break
     }
   }
-  eaglet.save()
+  govern.save()
 }
 
 export function handleRevoked(event: RevokedEvent): void {
-  let eaglet = Eaglet.load(event.address.toHexString())
+  let govern = Govern.load(event.address.toHexString())
   const roleId =
     event.address.toHexString() +
     '-' +
@@ -46,7 +46,7 @@ export function handleRevoked(event: RevokedEvent): void {
   role.revoked = true
   // Check if role exists in roles array and if not,
   // push it
-  const roles = eaglet.roles
+  const roles = govern.roles
   let id = 0
   let exists = false
   for(id = 0; id < roles.length; id++) {
@@ -58,14 +58,14 @@ export function handleRevoked(event: RevokedEvent): void {
 
   if (!exists) {
     roles.push(roleId)
-    eaglet.roles = roles
+    govern.roles = roles
   }
   role.save()
-  eaglet.save()
+  govern.save()
 }
 
 export function handleGranted(event: GrantedEvent): void {
-  const eaglet = Eaglet.load(event.address.toHexString())
+  const govern = Govern.load(event.address.toHexString())
   // roleID = contract address + role itself,
   // which will be the function selector + who
   // This is equivalent to storing all roles in the contract, and looking up the corresponding
@@ -87,11 +87,11 @@ export function handleGranted(event: GrantedEvent): void {
   role.role = event.params.role
   role.who = event.params.who
   role.revoked = false
-  const roles = eaglet.roles
+  const roles = govern.roles
   if (!exists) {
     roles.push(roleId)
   }
   role.save()
-  eaglet.roles = roles
-  eaglet.save()
+  govern.roles = roles
+  govern.save()
 }

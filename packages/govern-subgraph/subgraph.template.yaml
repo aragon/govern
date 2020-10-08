@@ -47,10 +47,10 @@ templates:
           handler: handleRevoked
       file: ./src/OptimisticQueue.ts
   - kind: ethereum/contract
-    name: Eaglet
+    name: Govern
     network: {{network}}
     source:
-      abi: Eaglet
+      abi: Govern
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.1
@@ -60,8 +60,13 @@ templates:
         - Collateral
         - Role
       abis:
+<<<<<<< HEAD
+        - name: Govern
+          file: ./abis/Govern.json
+=======
         - name: Eaglet
           file: ../govern-core/artifacts/Eaglet.json
+>>>>>>> monorepo
       eventHandlers:
         - event: Frozen(indexed bytes4,indexed address)
           handler: handleFrozen
@@ -69,4 +74,4 @@ templates:
           handler: handleGranted
         - event: Revoked(indexed bytes4,indexed address,indexed address)
           handler: handleRevoked
-      file: ./src/Eaglet.ts
+      file: ./src/Govern.ts

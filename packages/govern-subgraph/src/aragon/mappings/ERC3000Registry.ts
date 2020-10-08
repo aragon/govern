@@ -1,24 +1,24 @@
 import { Registered as RegisteredEvent } from '../../../generated/ERC3000Registry/ERC3000Registry'
 
-import { Eaglet, OptimisticQueue } from '../../../generated/schema'
+import { Govern, OptimisticQueue } from '../../../generated/schema'
 
 import {
-  Eaglet as EagletTemplate,
+  Govern as GovernTemplate,
   OptimisticQueue as QueueTemplate
 } from '../../../generated/templates'
 
 export function handleRegistered(event: RegisteredEvent): void {
-  const eagletId = event.params.dao.toHexString()
+  const governId = event.params.dao.toHexString()
   const optimisticQueueId = event.params.queue.toHexString()
 
-  let eaglet = Eaglet.load(eagletId)
+  let govern = Govern.load(governId)
   let queue = OptimisticQueue.load(optimisticQueueId)
 
-  if (!eaglet) {
-    eaglet = new Eaglet(eagletId)
-    eaglet.address = event.params.dao
-    eaglet.name = event.params.name
-    eaglet.roles = []
+  if (!govern) {
+    govern = new Govern(governId)
+    govern.address = event.params.dao
+    govern.name = event.params.name
+    govern.roles = []
   }
   if (!queue) {
     queue = new OptimisticQueue(optimisticQueueId)
@@ -27,11 +27,11 @@ export function handleRegistered(event: RegisteredEvent): void {
     queue.roles = []
   }
 
-  queue.eaglet = eaglet.id
+  queue.govern = govern.id
 
-  eaglet.save()
+  govern.save()
   queue.save()
 
-  EagletTemplate.create(event.params.dao)
+  GovernTemplate.create(event.params.dao)
   QueueTemplate.create(event.params.queue)
 }

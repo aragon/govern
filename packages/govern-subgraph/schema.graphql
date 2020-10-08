@@ -1,15 +1,15 @@
-type Eaglet @entity {
+type Govern @entity {
   id: ID!
   address: Bytes!
   name: String!
-  queue: OptimisticQueue! @derivedFrom(field: "eaglet")
+  queue: OptimisticQueue! @derivedFrom(field: "govern")
   roles: [Role]!
 }
 
 type OptimisticQueue @entity {
   id: ID!
   address: Bytes!
-  eaglet: Eaglet!
+  govern: Govern!
   containers: [Container]!
   config: Config
   roles: [Role]!
@@ -43,7 +43,7 @@ type Payload @entity {
   id: ID!
   nonce: BigInt!
   submitter: Bytes!
-  executor: Eaglet!
+  executor: Govern!
   actions: [Action]!
   proof: Bytes!
 }
