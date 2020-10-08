@@ -1,11 +1,12 @@
 {
-  "name": "bot",
+  "name": "@aragon/govern-discord",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node -r dotenv/config server.js dotenv_config_path=../../.env",
+    "new-dao": "cd ../govern-core && yarn deploy-eaglet --network rinkeby"
   },
   "keywords": [],
   "author": "",

@@ -1,15 +1,12 @@
-const createAction = require('./scripts/create-action')
-
 usePlugin("solidity-coverage")
 usePlugin("@nomiclabs/buidler-ethers")
 usePlugin("@nomiclabs/buidler-etherscan")
 usePlugin("@nomiclabs/buidler-waffle")
 
-require('dotenv').config()
+require('dotenv').config({ path: '../../.env' })
+
 const { readFileSync, writeFileSync } = require('fs')
 const { uniqueNamesGenerator, adjectives, colors, animals } = require('unique-names-generator')
-
-const { sendMessage: discordSend } = require('./lib/discord')(process.env.DISCORD_CHANNEL, process.env.DISCORD_TOKEN)
 
 const FACTORY_CACHE_NAME = 'eaglet-factory-rinkeby'
 const REGISTER_EVENT_NAME = 'Registered'
@@ -27,13 +24,10 @@ task("accounts", "Prints the list of accounts", async () => {
 })
 
 const format = ({ address }, name) =>
-  `- ${name}: [\`${address}\`](https://rinkeby.etherscan.io/address/${address})`
+  `- ${name}: https://rinkeby.etherscan.io/address/${address})`
 
 const print = (contract, name) =>
   console.log(format(contract, name))
-
-const discordPrint = (contract, name) =>
-  discordSend(format(contract, name))
 
 task("create-action", async (_, { ethers }) => createAction(ethers))
 
@@ -90,13 +84,9 @@ task("deploy-eaglet", "Deploys an Eaglet from provided factory")
       .map(log => registryInterface.parseLog(log))
       .find(({ name }) => name === REGISTER_EVENT_NAME)
 
-    console.log(`----A wild new Eaglet named *${name}* appeared 🐥`)
+    console.log(`--!--A wild new Eaglet named *${name}* appeared 🐥`)
     print({ address: dao }, 'Eaglet')
     print({ address: queue }, 'Queue')
-
-    await discordSend(`A wild new Eaglet named *${name}* appeared 🐥`)
-    await discordPrint({ address: dao }, 'Eaglet')
-    await discordPrint({ address: queue }, 'Queue')
   }
 )
 
