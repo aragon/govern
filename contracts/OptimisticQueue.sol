@@ -28,15 +28,19 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
     mapping (bytes32 => address) public challengerCache;
     mapping (IArbitrator => mapping (uint256 => bytes32)) public disputeItemCache;
 
-    constructor(address _aclRoot, ERC3000Data.Config memory _initialConfig) MiniACL(_aclRoot) public {
+    constructor(address _aclRoot, ERC3000Data.Config memory _initialConfig)
+        public
+        MiniACL(_aclRoot)
+    {
         _setConfig(_initialConfig);
     }
 
     function schedule(ERC3000Data.Container memory _container)
+        public
+        override
         auth(this.schedule.selector)
-        override public
         returns (bytes32 containerHash)
-    {   
+    {
         require(_container.payload.nonce == ++nonce, "queue: bad nonce"); // prevent griefing by front-running
         bytes32 _configHash = _container.config.hash();
         require(_configHash == configHash, "queue: bad config");
@@ -49,20 +53,23 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
             OptimisticQueueStateLib.State.Scheduled
         );
 
-        ERC3000Data.Collateral memory collateral = _container.config.scheduleDeposit;
+        ERC3000Data.Collateral memory collateral = _container
+            .config
+            .scheduleDeposit;
         collateral.collectFrom(msg.sender);
         // TODO: pay court tx fee
 
         emit Scheduled(containerHash, _container.payload, collateral);
     }
-    
+
     function execute(ERC3000Data.Container memory _container)
+        public
+        override
         auth(this.execute.selector)
-        override public
         returns (bytes[] memory execResults)
-    {   
+    {
         require(uint64(block.timestamp) >= _container.payload.executionTime, "queue: wait more");
-        
+
         bytes32 containerHash = _container.hash();
         queue[containerHash].checkAndSetState(
             OptimisticQueueStateLib.State.Scheduled,
@@ -70,7 +77,7 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
         );
 
         _container.config.scheduleDeposit.releaseTo(_container.payload.submitter);
-        
+
         return _execute(_container.payload, containerHash);
     }
 
@@ -81,10 +88,10 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
             OptimisticQueueStateLib.State.Scheduled,
             OptimisticQueueStateLib.State.Challenged
         );
-        
+
         ERC3000Data.Collateral memory collateral = _container.config.challengeDeposit;
         collateral.collectFrom(msg.sender);
-        
+
         IArbitrator arbitrator = IArbitrator(_container.config.resolver);
         (address recipient, ERC20 feeToken, uint256 feeAmount) = arbitrator.getDisputeFees();
         require(feeToken.safeTransferFrom(msg.sender, address(this), feeAmount), "queue: bad fee pull");
@@ -129,8 +136,9 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
     }
 
     function configure(ERC3000Data.Config memory _config)
+        public
+        override
         auth(this.configure.selector)
-        override public
         returns (bytes32)
     {
         return _setConfig(_config);
@@ -162,11 +170,10 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
         address challenger = challengerCache[containerHash];
         _container.config.scheduleDeposit.releaseTo(challenger);
         _container.config.challengeDeposit.releaseTo(challenger);
-        challengerCache[containerHash] = address(0); // refund gas, no longer needed in state        
+        challengerCache[containerHash] = address(0); // refund gas, no longer needed in state
     }
 
     // Arbitrable
-
     function rule(uint256 _disputeId, uint256 _ruling) override external {
         IArbitrator arbitrator = IArbitrator(msg.sender);
         bytes32 containerHash = disputeItemCache[arbitrator][_disputeId];
@@ -179,7 +186,11 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
         emit Ruled(arbitrator, _disputeId, _ruling);
     }
 
-    function submitEvidence(uint256, bytes calldata, bool) override external {
+    function submitEvidence(
+        uint256,
+        bytes calldata,
+        bool
+    ) external override {
         revert("queue: evidence");
     }
 
@@ -196,7 +207,10 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
         emit Executed(_containerHash, msg.sender, execResults);
     }
 
-    function _setConfig(ERC3000Data.Config memory _config) internal returns (bytes32) {
+    function _setConfig(ERC3000Data.Config memory _config)
+        internal
+        returns (bytes32)
+    {
         configHash = _config.hash();
 
         emit Configured(configHash, msg.sender, _config);

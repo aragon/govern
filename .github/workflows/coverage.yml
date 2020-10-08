@@ -5,7 +5,7 @@ name: Run coverage
 
 on: push
 jobs:
-  tests:
+  coverage:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
