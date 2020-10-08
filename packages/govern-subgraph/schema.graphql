@@ -1,0 +1,72 @@
+type Govern @entity {
+  id: ID!
+  address: Bytes!
+  name: String!
+  queue: OptimisticQueue! @derivedFrom(field: "govern")
+  roles: [Role]!
+}
+
+type OptimisticQueue @entity {
+  id: ID!
+  address: Bytes!
+  govern: Govern!
+  containers: [Container]!
+  config: Config
+  roles: [Role]!
+}
+
+type Config @entity {
+  id: ID!
+  executionDelay: BigInt!
+  scheduleDeposit: Collateral!
+  challengeDeposit: Collateral!
+  vetoDeposit: Collateral!
+  resolver: Bytes!
+  rules: Bytes!
+}
+
+type Collateral @entity {
+  id: ID!
+  token: Bytes!
+  amount: BigInt!
+}
+
+type Container @entity {
+  id: ID!
+  payload: Payload!
+  config: Config!
+  executionState: ExecutionState!
+  vetoReason: Bytes
+}
+
+type Payload @entity {
+  id: ID!
+  nonce: BigInt!
+  submitter: Bytes!
+  executor: Govern!
+  actions: [Action]!
+  proof: Bytes!
+}
+
+type Action @entity {
+  id: ID!
+  to: Bytes!
+  value: BigInt!
+  data: Bytes!
+}
+
+type Role @entity {
+  id: ID!
+  role: Bytes!
+  who: Bytes!
+  revoked: Boolean!
+}
+
+enum ExecutionState {
+  Approved
+  Cancelled
+  Challenged
+  Executed
+  Scheduled
+  Vetoed
+}

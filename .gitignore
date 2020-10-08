@@ -1,11 +1,3 @@
-.env
-eaglet-factory-rinkeby
-
 node_modules
-yarn-error.log
-
-#Buidler files
-cache
-artifacts
-coverage
-coverage.json
+.vscode
+.env
