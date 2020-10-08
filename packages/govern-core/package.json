@@ -37,6 +37,7 @@
     "deploy-govern": "buidler deploy-govern",
     "test": "buidler test",
     "sync-abis": "node scripts/sync-abis.js",
-    "prepublishOnly": "yarn clean && yarn test && yarn compile"
-  }
+    "prepublishOnly": "yarn test && yarn compile"
+  },
+  "gitHead": "aabbf6bd2dac11872ba9bb1f1dc8fffb6044aa7c"
 }
