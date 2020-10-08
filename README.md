@@ -1,10 +1,10 @@
 ![Aragon Govern header](../../raw/master/.github/govern.png)
 
-# 🦅 Aragon Govern
-
 > Optimistic DAOs
 
-[![](https://img.shields.io/npm/v/@aragon/govern)](https://www.npmjs.com/package/@aragon/govern) [![](https://img.shields.io/badge/solidity-%3E%3D%200.6.8-lightgrey)](https://img.shields.io/badge/solidity-%3E%3D%200.6.8-lightgrey) [![Actions Status](https://github.com/aragon/govern/workflows/CI/badge.svg)](https://github.com/aragon/govern/actions?query=workflow%3ACI) [![Actions Status](https://github.com/aragon/govern/workflows/CD/badge.svg)](https://github.com/aragon/govern/actions?query=workflow%3ACD)
+https://discord.gg/YC7bKb
+
+[![](https://img.shields.io/discord/672466989217873929?label=discord)](https://discord.gg/aKAKcf) [![](https://img.shields.io/npm/v/@aragon/govern)](https://www.npmjs.com/package/@aragon/govern) [![](https://img.shields.io/badge/solidity-%3E%3D%200.6.8-lightgrey)](https://img.shields.io/badge/solidity-%3E%3D%200.6.8-lightgrey) [![Actions Status](https://github.com/aragon/govern/workflows/CI/badge.svg)](https://github.com/aragon/govern/actions?query=workflow%3ACI) [![Actions Status](https://github.com/aragon/govern/workflows/CD/badge.svg)](https://github.com/aragon/govern/actions?query=workflow%3ACD)
   [![codecov](https://codecov.io/gh/aragon/govern/branch/master/graph/badge.svg)](https://codecov.io/gh/aragon/govern)
 
 
