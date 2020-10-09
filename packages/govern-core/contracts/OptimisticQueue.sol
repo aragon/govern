@@ -146,13 +146,13 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
      * @notice Apply arbitrator's ruling over a challenge once it has come to a final ruling
      * @param _container A ERC3000Data.Container struct holding both the paylaod being scheduled for execution and
        the current configuration of the system
-     * @param _resolverId disputeId in the arbitrator in which the dispute over the container was created
+     * @param _disputeId disputeId in the arbitrator in which the dispute over the container was created
      */
-    function resolve(ERC3000Data.Container memory _container, uint256 _resolverId) override public returns (bytes[] memory execResults) {
+    function resolve(ERC3000Data.Container memory _container, uint256 _disputeId) override public returns (bytes[] memory execResults) {
         bytes32 containerHash = _container.hash();
         if (queue[containerHash].state == OptimisticQueueStateLib.State.Challenged) {
             // will re-enter in `rule`, `rule` will perform state transition depending on ruling
-            IArbitrator(_container.config.resolver).executeRuling(_resolverId);
+            IArbitrator(_container.config.resolver).executeRuling(_disputeId);
         } // else continue, as we must 
 
         OptimisticQueueStateLib.State state = queue[containerHash].state;
