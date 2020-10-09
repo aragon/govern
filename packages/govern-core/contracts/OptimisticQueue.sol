@@ -2,8 +2,8 @@
  * SPDX-License-Identifier:    GPL-3.0
  */
 
-pragma solidity 0.6.8;
-pragma experimental ABIEncoderV2;
+pragma solidity 0.6.8; // TODO: reconsider compiler version before production release
+pragma experimental ABIEncoderV2; // required for passing structs in calldata (fairly secure at this point)
 
 import "erc3k/contracts/ERC3000.sol";
 
@@ -14,115 +14,157 @@ import "./lib/OptimisticQueueStateLib.sol";
 import "./lib/SafeERC20.sol";
 
 contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
+    // Syntax sugar to enable method-calling syntax on types
     using ERC3000Data for *;
     using DepositLib for ERC3000Data.Collateral;
     using OptimisticQueueStateLib for OptimisticQueueStateLib.Item;
     using SafeERC20 for ERC20;
 
     // Permanent state
-    bytes32 public configHash;
-    uint256 public nonce;
-    mapping (bytes32 => OptimisticQueueStateLib.Item) public queue;
+    bytes32 public configHash; // keccak256 hash of the current ERC3000Data.Config
+    uint256 public nonce; // number of scheduled payloads so far
+    mapping (bytes32 => OptimisticQueueStateLib.Item) public queue; // container hash -> execution state
 
     // Temporary state
-    mapping (bytes32 => address) public challengerCache;
-    mapping (IArbitrator => mapping (uint256 => bytes32)) public disputeItemCache;
+    mapping (bytes32 => address) public challengerCache; // container hash -> challenger addr (used after challenging and before resolution implementation)
+    mapping (IArbitrator => mapping (uint256 => bytes32)) public disputeItemCache; // arbitrator addr -> dispute id -> container hash (used between dispute creation and ruling)
 
+    /**
+     * @param _aclRoot account that will be given root permissions on ACL (commonly given to factory)
+     * @param _initialConfig initial configuration parameters
+     */
     constructor(address _aclRoot, ERC3000Data.Config memory _initialConfig)
         public
-        MiniACL(_aclRoot)
+        MiniACL(_aclRoot) // note that this contract directly derives from MiniACL (ACL is local to contract and not global to system in Govern)
     {
         _setConfig(_initialConfig);
     }
 
-    function schedule(ERC3000Data.Container memory _container)
+     /**
+     * @notice Schedules an action for execution, allowing for challenges and vetos on a defined time window. Pulls collateral from submitter into contract.
+     * @param _container A ERC3000Data.Container struct holding both the paylaod being scheduled for execution and
+       the current configuration of the system
+     */
+    function schedule(ERC3000Data.Container memory _container) // TO FIX: Container is in memory and function has to be public to avoid an unestrutable solidity crash
         public
         override
-        auth(this.schedule.selector)
+        auth(this.schedule.selector) // note that all functions in this contract are ACL protected (commonly some of them will be open for any addr to perform)
         returns (bytes32 containerHash)
-    {
-        require(_container.payload.nonce == ++nonce, "queue: bad nonce"); // prevent griefing by front-running
+    {   
+        // prevent griefing by front-running (the same container is sent by two different people and one must be challenged)
+        require(_container.payload.nonce == ++nonce, "queue: bad nonce");
+        // hash using ERC3000Data.hash(ERC3000Data.Config)
         bytes32 _configHash = _container.config.hash();
+        // ensure that the hash of the config passed in the container matches the current config (implicit agreement approval by scheduler)
         require(_configHash == configHash, "queue: bad config");
+        // ensure that the time delta to the execution timestamp provided in the payload is at least after the config's execution delay
         require(_container.payload.executionTime >= block.timestamp + _container.config.executionDelay, "queue: bad delay");
+        // ensure that the submitter of the payload is also the sender of this call
         require(_container.payload.submitter == msg.sender, "queue: bad submitter");
 
         containerHash = ERC3000Data.containerHash(_container.payload.hash(), _configHash);
         queue[containerHash].checkAndSetState(
-            OptimisticQueueStateLib.State.None,
-            OptimisticQueueStateLib.State.Scheduled
+            OptimisticQueueStateLib.State.None, // ensure that the state for this container is None
+            OptimisticQueueStateLib.State.Scheduled // and if so perform a state transition to Scheduled
         );
+        // we don't need to save any more state about the container in storage
+        // we just authenticate the hash and assign it a state, since all future
+        // actions regarding the container will need to provide it as a witness
+        // all witnesses are logged from this contract at least once, so the 
+        // trust assumption should be the same as storing all on-chain (move complexity to clients)
 
-        ERC3000Data.Collateral memory collateral = _container
-            .config
-            .scheduleDeposit;
-        collateral.collectFrom(msg.sender);
+        ERC3000Data.Collateral memory collateral = _container.config.scheduleDeposit;
+        collateral.collectFrom(_container.payload.submitter); // pull collateral from submitter (requires previous approval)
+
         // TODO: pay court tx fee
 
+        // emit an event to ensure data availability of all state that cannot be otherwise fetched (see how config isn't emitted since an observer should already have it)
         emit Scheduled(containerHash, _container.payload, collateral);
     }
 
+    /**
+     * @notice Executes an action after its execution delayed has passed and its state hasn't been altered by a challenge or veto
+     * @param _container A ERC3000Data.Container struct holding both the paylaod being scheduled for execution and
+       the current configuration of the system
+     */
     function execute(ERC3000Data.Container memory _container)
         public
         override
-        auth(this.execute.selector)
+        auth(this.execute.selector) // in most instances this will be open for any addr, but leaving configurable for flexibility
         returns (bytes[] memory execResults)
     {
+        // ensure enough time has passed
         require(uint64(block.timestamp) >= _container.payload.executionTime, "queue: wait more");
 
         bytes32 containerHash = _container.hash();
         queue[containerHash].checkAndSetState(
-            OptimisticQueueStateLib.State.Scheduled,
+            OptimisticQueueStateLib.State.Scheduled, // note that we will revert here if the container wasn't previously scheduled
             OptimisticQueueStateLib.State.Executed
         );
 
-        _container.config.scheduleDeposit.releaseTo(_container.payload.submitter);
+        _container.config.scheduleDeposit.releaseTo(_container.payload.submitter); // release collateral to executor
 
         return _execute(_container.payload, containerHash);
     }
 
+    /**
+     * @notice Challenge a container in case its scheduling is illegal as per Config.rules. Pulls collateral and dispute fees from sender into contract
+     * @param _container A ERC3000Data.Container struct holding both the paylaod being scheduled for execution and
+       the current configuration of the system
+     * @param _reason Hint for case reviewers as to why the scheduled container is illegal
+     */
     function challenge(ERC3000Data.Container memory _container, bytes memory _reason) auth(this.challenge.selector) override public returns (uint256 disputeId) {
         bytes32 containerHash = _container.hash();
-        challengerCache[containerHash] = msg.sender;
+        challengerCache[containerHash] = msg.sender; // cache challenger address while it is needed
         queue[containerHash].checkAndSetState(
             OptimisticQueueStateLib.State.Scheduled,
             OptimisticQueueStateLib.State.Challenged
         );
 
         ERC3000Data.Collateral memory collateral = _container.config.challengeDeposit;
-        collateral.collectFrom(msg.sender);
+        collateral.collectFrom(msg.sender); // pull challenge collateral from sender
 
+        // create dispute on arbitrator
         IArbitrator arbitrator = IArbitrator(_container.config.resolver);
         (address recipient, ERC20 feeToken, uint256 feeAmount) = arbitrator.getDisputeFees();
         require(feeToken.safeTransferFrom(msg.sender, address(this), feeAmount), "queue: bad fee pull");
         require(feeToken.safeApprove(recipient, feeAmount), "queue: bad approve");
-        disputeId = arbitrator.createDispute(2, abi.encode(_container));
+        disputeId = arbitrator.createDispute(2, abi.encode(_container)); // create dispute sending full container ABI encoded (could prob just send payload to save gas)
         require(feeToken.safeApprove(recipient, 0), "queue: bad reset"); // for security with non-compliant tokens (that fail on non-zero to non-zero approvals)
 
+        // submit both arguments as evidence and close evidence period. no more evidence can be submitted and a settlement can't happen (could happen off-protocol)
         emit EvidenceSubmitted(arbitrator, disputeId, _container.payload.submitter, _container.payload.proof, true);
         emit EvidenceSubmitted(arbitrator, disputeId, msg.sender, _reason, true);
         arbitrator.closeEvidencePeriod(disputeId);
 
-        disputeItemCache[arbitrator][disputeId] = containerHash;
+        disputeItemCache[arbitrator][disputeId] = containerHash; // cache a relation between disputeId and containerHash while needed
 
         emit Challenged(containerHash, msg.sender, _reason, disputeId, collateral);
     }
 
+    /**
+     * @notice Apply arbitrator's ruling over a challenge once it has come to a final ruling
+     * @param _container A ERC3000Data.Container struct holding both the paylaod being scheduled for execution and
+       the current configuration of the system
+     * @param _resolverId disputeId in the arbitrator in which the dispute over the container was created
+     */
     function resolve(ERC3000Data.Container memory _container, uint256 _resolverId) override public returns (bytes[] memory execResults) {
         bytes32 containerHash = _container.hash();
         if (queue[containerHash].state == OptimisticQueueStateLib.State.Challenged) {
             // will re-enter in `rule`, `rule` will perform state transition depending on ruling
             IArbitrator(_container.config.resolver).executeRuling(_resolverId);
-        }
+        } // else continue, as we must 
 
-        bool approved = queue[containerHash].state == OptimisticQueueStateLib.State.Approved;
-        if (approved) {
+        OptimisticQueueStateLib.State state = queue[containerHash].state;
+        if (state == OptimisticQueueStateLib.State.Approved) {
             execResults = executeApproved(_container);
-        } else {
+        } else if (state == OptimisticQueueStateLib.State.Rejected) {
             settleRejection(_container);
+        } else {
+            revert("queue: unresolved");
         }
 
-        emit Resolved(containerHash, msg.sender, approved);
+        emit Resolved(containerHash, msg.sender, state == OptimisticQueueStateLib.State.Approved);
     }
 
     function veto(bytes32 _payloadHash, ERC3000Data.Config memory _config, bytes memory _reason) auth(this.veto.selector) override public {
@@ -135,6 +177,11 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
         emit Vetoed(containerHash, msg.sender, _reason, _config.vetoDeposit);
     }
 
+    /**
+     * @notice Apply a new configuration for all *new* containers to be scheduled
+     * @param _config A ERC3000Data.Config struct holding all the new params that will control the queue
+     * @param _resolverId disputeId in the arbitrator in which the dispute over the container was created
+     */
     function configure(ERC3000Data.Config memory _config)
         public
         override
@@ -145,7 +192,7 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
     }
 
     // Finalization functions
-    // In the happy path, they are never externally called, but left public for security
+    // In the happy path, they are not externally called (triggered from resolve -> rule -> executeApproved | settleRejection), but left public for security
 
     function executeApproved(ERC3000Data.Container memory _container) public returns (bytes[] memory execResults) {
         bytes32 containerHash = _container.hash();
@@ -154,8 +201,11 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
             OptimisticQueueStateLib.State.Executed
         );
 
+        // release all collateral to submitter
         _container.config.scheduleDeposit.releaseTo(_container.payload.submitter);
         _container.config.challengeDeposit.releaseTo(_container.payload.submitter);
+
+        challengerCache[containerHash] = address(0); // release state, refund gas, no longer needed in state
 
         return _execute(_container.payload, containerHash);
     }
@@ -168,13 +218,17 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
         );
 
         address challenger = challengerCache[containerHash];
+
+        // release all collateral to challenger
         _container.config.scheduleDeposit.releaseTo(challenger);
         _container.config.challengeDeposit.releaseTo(challenger);
-        challengerCache[containerHash] = address(0); // refund gas, no longer needed in state
+        challengerCache[containerHash] = address(0); // release state, refund gas, no longer needed in state
     }
 
     // Arbitrable
+
     function rule(uint256 _disputeId, uint256 _ruling) override external {
+        // implicit check that msg.sender was actually arbitrating a dispute over this container
         IArbitrator arbitrator = IArbitrator(msg.sender);
         bytes32 containerHash = disputeItemCache[arbitrator][_disputeId];
         queue[containerHash].checkAndSetState(
