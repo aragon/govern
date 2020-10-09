@@ -180,7 +180,6 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
     /**
      * @notice Apply a new configuration for all *new* containers to be scheduled
      * @param _config A ERC3000Data.Config struct holding all the new params that will control the queue
-     * @param _resolverId disputeId in the arbitrator in which the dispute over the container was created
      */
     function configure(ERC3000Data.Config memory _config)
         public

@@ -11,9 +11,8 @@ import "./IERC3000Executor.sol";
 abstract contract IERC3000 {
     /**
      * @notice Schedules an action for execution, allowing for challenges and vetos on a defined time window
-     * @param container: A Container struct holding both the paylaod being scheduled for execution and
+     * @param container A Container struct holding both the paylaod being scheduled for execution and
        the current configuration of the system
-     * @return containerHash: keccak256 hash of Container struct
      */
     function schedule(ERC3000Data.Container memory container) virtual public returns (bytes32 containerHash);
     event Scheduled(bytes32 indexed containerHash, ERC3000Data.Payload payload, ERC3000Data.Collateral collateral);
