@@ -9,6 +9,7 @@ import "./IERC3000Executor.sol";
 
 library ERC3000Data {
     // TODO: come up with a non-shitty name
+    // Note: Maybe payload is a better fit for this while renaming the current "payload" struct to something else
     struct Container {
         Payload payload;
         Config config;
@@ -16,6 +17,7 @@ library ERC3000Data {
 
     struct Payload {
         uint256 nonce;
+        // Note: what could be a use case that would require an extra delay?
         uint256 executionTime;
         address submitter;
         IERC3000Executor executor;
@@ -31,9 +33,11 @@ library ERC3000Data {
 
     struct Config {
         uint256 executionDelay;
+        // Note: I'd call these variables "xCollateral" or rename the struct to "Deposit", I prefer the first option
         Collateral scheduleDeposit;
         Collateral challengeDeposit;
         Collateral vetoDeposit;
+        // Note: why not arbitrator?
         address resolver;
         bytes rules;
     }
@@ -44,6 +48,7 @@ library ERC3000Data {
     }
 
     function containerHash(bytes32 payloadHash, bytes32 configHash) internal view returns (bytes32) {
+        // Note: Split ERC name from version name
         return keccak256(abi.encodePacked("erc3k-v1", this, payloadHash, configHash));
     }
 
@@ -52,6 +57,7 @@ library ERC3000Data {
     }
 
     function hash(Payload memory payload) internal pure returns (bytes32) {
+        // Note: I'd try to follow the same order defined in the struct to be consistent
         return keccak256(
             abi.encodePacked(
                 payload.nonce,

@@ -8,6 +8,7 @@ const KNOWN_ABIS = [
   "OptimisticQueueFactory.json",
 ];
 
+// Note: Why not linking to exported ABIs instead?
 async function main() {
   KNOWN_ABIS.map((abiName) => {
     console.log(`Syncing ${abiName}`);

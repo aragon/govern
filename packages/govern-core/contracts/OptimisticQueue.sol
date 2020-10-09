@@ -13,6 +13,8 @@ import "./lib/MiniACL.sol";
 import "./lib/OptimisticQueueStateLib.sol";
 import "./lib/SafeERC20.sol";
 
+
+// Note: Not super fan of this name tbh
 contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
     using ERC3000Data for *;
     using DepositLib for ERC3000Data.Collateral;
@@ -22,12 +24,14 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
     // Permanent state
     bytes32 public configHash;
     uint256 public nonce;
+    // Note: this are actually queue items right?
     mapping (bytes32 => OptimisticQueueStateLib.Item) public queue;
 
     // Temporary state
     mapping (bytes32 => address) public challengerCache;
     mapping (IArbitrator => mapping (uint256 => bytes32)) public disputeItemCache;
 
+    // Note: Why not re-using the
     constructor(address _aclRoot, ERC3000Data.Config memory _initialConfig)
         public
         MiniACL(_aclRoot)
@@ -76,6 +80,7 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
             OptimisticQueueStateLib.State.Executed
         );
 
+        // Note: isn't this being release twice? (see executeApproved)
         _container.config.scheduleDeposit.releaseTo(_container.payload.submitter);
 
         return _execute(_container.payload, containerHash);
@@ -83,6 +88,7 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
 
     function challenge(ERC3000Data.Container memory _container, bytes memory _reason) auth(this.challenge.selector) override public returns (uint256 disputeId) {
         bytes32 containerHash = _container.hash();
+        // Note: Move this SSTORE bellow
         challengerCache[containerHash] = msg.sender;
         queue[containerHash].checkAndSetState(
             OptimisticQueueStateLib.State.Scheduled,
@@ -97,10 +103,12 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
         require(feeToken.safeTransferFrom(msg.sender, address(this), feeAmount), "queue: bad fee pull");
         require(feeToken.safeApprove(recipient, feeAmount), "queue: bad approve");
         disputeId = arbitrator.createDispute(2, abi.encode(_container));
+        // Note: This should be done before the initial approval
         require(feeToken.safeApprove(recipient, 0), "queue: bad reset"); // for security with non-compliant tokens (that fail on non-zero to non-zero approvals)
 
         emit EvidenceSubmitted(arbitrator, disputeId, _container.payload.submitter, _container.payload.proof, true);
         emit EvidenceSubmitted(arbitrator, disputeId, msg.sender, _reason, true);
+        // Note: This should be optional allowing to close it at a later point in time
         arbitrator.closeEvidencePeriod(disputeId);
 
         disputeItemCache[arbitrator][disputeId] = containerHash;
@@ -132,6 +140,7 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
             OptimisticQueueStateLib.State.Cancelled
         );
 
+        // Note: what happens with the collateral?
         emit Vetoed(containerHash, msg.sender, _reason, _config.vetoDeposit);
     }
 
@@ -154,6 +163,7 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
             OptimisticQueueStateLib.State.Executed
         );
 
+        // Note: make one single transfer
         _container.config.scheduleDeposit.releaseTo(_container.payload.submitter);
         _container.config.challengeDeposit.releaseTo(_container.payload.submitter);
 
@@ -168,6 +178,7 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
         );
 
         address challenger = challengerCache[containerHash];
+        // Note: make one single transfer
         _container.config.scheduleDeposit.releaseTo(challenger);
         _container.config.challengeDeposit.releaseTo(challenger);
         challengerCache[containerHash] = address(0); // refund gas, no longer needed in state
@@ -183,6 +194,8 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
         );
         disputeItemCache[arbitrator][_disputeId] = bytes32(0); // refund gas, no longer needed in state
 
+        // Note: why not settling
+
         emit Ruled(arbitrator, _disputeId, _ruling);
     }
 
@@ -191,6 +204,7 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
         bytes calldata,
         bool
     ) external override {
+        // Note: this will be implemented right?
         revert("queue: evidence");
     }
 
@@ -207,6 +221,7 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
         emit Executed(_containerHash, msg.sender, execResults);
     }
 
+    // Note: Rename to `_configure`
     function _setConfig(ERC3000Data.Config memory _config)
         internal
         returns (bytes32)

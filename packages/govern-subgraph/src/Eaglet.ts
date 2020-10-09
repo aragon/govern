@@ -15,6 +15,7 @@ export function handleFrozen(event: FrozenEvent): void {
   const govern = Govern.load(event.address.toHexString())
   let id = 0
   const roles = govern.roles
+  // Note: we may want to only flag this change and reduce it from the connector instead
   for (id = 0; id < roles.length; id++) {
     const currentRole = roles[id]
     const funcSelector = currentRole.split('-')[1]
@@ -44,6 +45,7 @@ export function handleRevoked(event: RevokedEvent): void {
     role.who = event.params.who
   }
   role.revoked = true
+  // Note: we can define a unique key for roles instead
   // Check if role exists in roles array and if not,
   // push it
   const roles = govern.roles

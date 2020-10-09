@@ -1,3 +1,4 @@
+# Note: In general I'd try to add double-links to avoid having to loop over children entities every time you want to look for one single entity
 type Govern @entity {
   id: ID!
   address: Bytes!
@@ -27,6 +28,7 @@ type Config @entity {
 
 type Collateral @entity {
   id: ID!
+  # Note: Let's define a token entity to hold its metadata as well
   token: Bytes!
   amount: BigInt!
 }

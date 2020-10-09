@@ -164,6 +164,7 @@ export function handleRevoked(event: RevokedEvent): void {
     }
   }
 
+  // Note: Same here, it is possible to identify these uniquely
   if (!exists) {
     roles.push(roleId)
     queue.roles = roles
@@ -173,6 +174,8 @@ export function handleRevoked(event: RevokedEvent): void {
 }
 
 export function handleScheduled(event: ScheduledEvent): void {
+  // Note: let's always use a findOrCreate logic instead, the graph presented
+  // issues tracking events in order, not kidding
   let queue = OptimisticQueue.load(event.address.toHexString())
   if (!queue) {
     throw new Error('Didnt find queue')

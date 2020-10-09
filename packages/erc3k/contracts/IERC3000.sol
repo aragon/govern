@@ -8,20 +8,25 @@ pragma experimental ABIEncoderV2;
 import "./ERC3000Data.sol";
 import "./IERC3000Executor.sol";
 
+// Note: why not defining functions as external?
 abstract contract IERC3000 {
     function schedule(ERC3000Data.Container memory container) virtual public returns (bytes32 actionHash);
+    // Note: why logging just the collateral? wouldn't be better to log a Config hash or identifier?
     event Scheduled(bytes32 indexed containerHash, ERC3000Data.Payload payload, ERC3000Data.Collateral collateral);
 
+    // Note: why enforcing this in the interface? it could be confused with the executor interface
     function execute(ERC3000Data.Container memory container) virtual public returns (bytes[] memory execResults);
     event Executed(bytes32 indexed containerHash, address indexed actor, bytes[] execResults);
 
     function challenge(ERC3000Data.Container memory container, bytes memory reason) virtual public returns (uint256 resolverId);
+    // Note: same here about the collateral vs config logging
     event Challenged(bytes32 indexed containerHash, address indexed actor, bytes reason, uint256 resolverId, ERC3000Data.Collateral collateral);
 
     function resolve(ERC3000Data.Container memory container, uint256 resolverId) virtual public returns (bytes[] memory execResults);
     event Resolved(bytes32 indexed containerHash, address indexed actor, bool approved);
 
     function veto(bytes32 payloadHash, ERC3000Data.Config memory config, bytes memory reason) virtual public;
+    // Note: same here about the collateral vs config logging
     event Vetoed(bytes32 indexed containerHash, address indexed actor, bytes reason, ERC3000Data.Collateral collateral);
 
     function configure(ERC3000Data.Config memory config) virtual public returns (bytes32 configHash);

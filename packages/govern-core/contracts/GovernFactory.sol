@@ -29,6 +29,7 @@ contract GovernFactory {
         registry = _registry;
     }
 
+    // Note: This will be moved somewhere else right?
     function newDummyGovern(string calldata _name) external returns (Govern govern, OptimisticQueue queue) {
         ERC3000Data.Collateral memory noCollateral;
         ERC3000Data.Config memory config = ERC3000Data.Config(

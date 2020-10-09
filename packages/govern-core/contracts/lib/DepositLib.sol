@@ -11,10 +11,12 @@ import "./SafeERC20.sol";
 library DepositLib {
     using SafeERC20 for ERC20;
 
+    // Note: why not lock/unlock? I think it's been widely adopted by the community
     event Collected(address indexed token, address indexed from, uint256 amount);
     event Released(address indexed token, address indexed to, uint256 amount);
 
     function collectFrom(ERC3000Data.Collateral memory _collateral, address _from) internal {
+        // Note: should this allow ETH deposits too?
         if (_collateral.amount > 0) {
             ERC20 token = ERC20(_collateral.token);
             require(token.safeTransferFrom(_from, msg.sender, _collateral.amount), "queue: bad get token");

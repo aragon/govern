@@ -6,8 +6,10 @@ pragma solidity 0.6.8;
 pragma experimental ABIEncoderV2;
 
 library MiniACLData {
+    // Note: Rename to op code
     enum BulkOp { Grant, Revoke, Freeze }
 
+    // Note: Rename to ACL action, change, or instruction
     struct BulkItem {
         BulkOp op;
         bytes4 role;
@@ -15,6 +17,7 @@ library MiniACLData {
     }
 }
 
+// Note: what about using simply "ACL"? let's try to forget about previous implementations
 contract MiniACL {
     bytes4 public constant ROOT_ROLE =
         this.grant.selector
@@ -33,6 +36,7 @@ contract MiniACL {
     event Frozen(bytes4 indexed role, address indexed actor);
 
     modifier auth(bytes4 _role) {
+        // Note: We can figure out a minimal ACL oracle interface
         require(
             roles[_role][msg.sender] ||  // sender authorized
             roles[_role][ANY_ADDR],      // or anyone allowed
@@ -53,6 +57,7 @@ contract MiniACL {
         _revoke(_role, _who);
     }
 
+    // Note: I'm a bit hesitant about this, if the root is trustless enough we should be able to get rid of this
     function freeze(bytes4 _role) external auth(ROOT_ROLE) {
         _freeze(_role);
     }
