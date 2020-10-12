@@ -1,0 +1,764 @@
+[
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "hasInitialized",
+    "outputs": [{ "name": "", "type": "bool" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [{ "name": "_beneficiary", "type": "address" }],
+    "name": "updateBeneficiary",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "PPM",
+    "outputs": [{ "name": "", "type": "uint32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "UPDATE_FORMULA_ROLE",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "name": "_seller", "type": "address" },
+      { "name": "_collateral", "type": "address" },
+      { "name": "_amount", "type": "uint256" }
+    ],
+    "name": "openSellOrder",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [{ "name": "", "type": "uint256" }],
+    "name": "metaBatches",
+    "outputs": [
+      { "name": "initialized", "type": "bool" },
+      { "name": "realSupply", "type": "uint256" },
+      { "name": "buyFeePct", "type": "uint256" },
+      { "name": "sellFeePct", "type": "uint256" },
+      { "name": "formula", "type": "address" }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [{ "name": "_script", "type": "bytes" }],
+    "name": "getEVMScriptExecutor",
+    "outputs": [{ "name": "", "type": "address" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "tokenManager",
+    "outputs": [{ "name": "", "type": "address" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "OPEN_BUY_ORDER_ROLE",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "UPDATE_COLLATERAL_TOKEN_ROLE",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "getRecoveryVault",
+    "outputs": [{ "name": "", "type": "address" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "beneficiary",
+    "outputs": [{ "name": "", "type": "address" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "name": "_buyer", "type": "address" },
+      { "name": "_collateral", "type": "address" },
+      { "name": "_value", "type": "uint256" }
+    ],
+    "name": "openBuyOrder",
+    "outputs": [],
+    "payable": true,
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "UPDATE_BENEFICIARY_ROLE",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "isOpen",
+    "outputs": [{ "name": "", "type": "bool" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [{ "name": "", "type": "address" }],
+    "name": "collateralsToBeClaimed",
+    "outputs": [{ "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "formula",
+    "outputs": [{ "name": "", "type": "address" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "name": "_seller", "type": "address" },
+      { "name": "_batchId", "type": "uint256" },
+      { "name": "_collateral", "type": "address" }
+    ],
+    "name": "claimSellOrder",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "ADD_COLLATERAL_TOKEN_ROLE",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "UPDATE_FEES_ROLE",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      { "name": "_batchId", "type": "uint256" },
+      { "name": "_collateral", "type": "address" }
+    ],
+    "name": "getBatch",
+    "outputs": [
+      { "name": "", "type": "bool" },
+      { "name": "", "type": "bool" },
+      { "name": "", "type": "uint256" },
+      { "name": "", "type": "uint256" },
+      { "name": "", "type": "uint32" },
+      { "name": "", "type": "uint256" },
+      { "name": "", "type": "uint256" },
+      { "name": "", "type": "uint256" },
+      { "name": "", "type": "uint256" },
+      { "name": "", "type": "uint256" }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "OPEN_ROLE",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "name": "_buyFeePct", "type": "uint256" },
+      { "name": "_sellFeePct", "type": "uint256" }
+    ],
+    "name": "updateFees",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "name": "_controller", "type": "address" },
+      { "name": "_tokenManager", "type": "address" },
+      { "name": "_formula", "type": "address" },
+      { "name": "_reserve", "type": "address" },
+      { "name": "_beneficiary", "type": "address" },
+      { "name": "_batchBlocks", "type": "uint256" },
+      { "name": "_buyFeePct", "type": "uint256" },
+      { "name": "_sellFeePct", "type": "uint256" }
+    ],
+    "name": "initialize",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "name": "_buyer", "type": "address" },
+      { "name": "_batchId", "type": "uint256" },
+      { "name": "_collateral", "type": "address" }
+    ],
+    "name": "claimBuyOrder",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "sellFeePct",
+    "outputs": [{ "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      { "name": "_supply", "type": "uint256" },
+      { "name": "_balance", "type": "uint256" },
+      { "name": "_reserveRatio", "type": "uint32" }
+    ],
+    "name": "getStaticPricePPM",
+    "outputs": [{ "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [{ "name": "token", "type": "address" }],
+    "name": "allowRecoverability",
+    "outputs": [{ "name": "", "type": "bool" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "appId",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "name": "_collateral", "type": "address" },
+      { "name": "_virtualSupply", "type": "uint256" },
+      { "name": "_virtualBalance", "type": "uint256" },
+      { "name": "_reserveRatio", "type": "uint32" },
+      { "name": "_slippage", "type": "uint256" }
+    ],
+    "name": "updateCollateralToken",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "getInitializationBlock",
+    "outputs": [{ "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "name": "_buyer", "type": "address" },
+      { "name": "_batchId", "type": "uint256" },
+      { "name": "_collateral", "type": "address" }
+    ],
+    "name": "claimCancelledBuyOrder",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [{ "name": "_collateral", "type": "address" }],
+    "name": "removeCollateralToken",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "tokensToBeMinted",
+    "outputs": [{ "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [{ "name": "_token", "type": "address" }],
+    "name": "transferToVault",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      { "name": "_sender", "type": "address" },
+      { "name": "_role", "type": "bytes32" },
+      { "name": "_params", "type": "uint256[]" }
+    ],
+    "name": "canPerform",
+    "outputs": [{ "name": "", "type": "bool" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "getEVMScriptRegistry",
+    "outputs": [{ "name": "", "type": "address" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "REMOVE_COLLATERAL_TOKEN_ROLE",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "batchBlocks",
+    "outputs": [{ "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "reserve",
+    "outputs": [{ "name": "", "type": "address" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "OPEN_SELL_ORDER_ROLE",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "kernel",
+    "outputs": [{ "name": "", "type": "address" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [{ "name": "_formula", "type": "address" }],
+    "name": "updateFormula",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "name": "_seller", "type": "address" },
+      { "name": "_batchId", "type": "uint256" },
+      { "name": "_collateral", "type": "address" }
+    ],
+    "name": "claimCancelledSellOrder",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "isPetrified",
+    "outputs": [{ "name": "", "type": "bool" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "getCurrentBatchId",
+    "outputs": [{ "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [{ "name": "", "type": "address" }],
+    "name": "collaterals",
+    "outputs": [
+      { "name": "whitelisted", "type": "bool" },
+      { "name": "virtualSupply", "type": "uint256" },
+      { "name": "virtualBalance", "type": "uint256" },
+      { "name": "reserveRatio", "type": "uint32" },
+      { "name": "slippage", "type": "uint256" }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [{ "name": "_collateral", "type": "address" }],
+    "name": "getCollateralToken",
+    "outputs": [
+      { "name": "", "type": "bool" },
+      { "name": "", "type": "uint256" },
+      { "name": "", "type": "uint256" },
+      { "name": "", "type": "uint32" },
+      { "name": "", "type": "uint256" }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "controller",
+    "outputs": [{ "name": "", "type": "address" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "buyFeePct",
+    "outputs": [{ "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "token",
+    "outputs": [{ "name": "", "type": "address" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "PCT_BASE",
+    "outputs": [{ "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [],
+    "name": "open",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "name": "_collateral", "type": "address" },
+      { "name": "_virtualSupply", "type": "uint256" },
+      { "name": "_virtualBalance", "type": "uint256" },
+      { "name": "_reserveRatio", "type": "uint32" },
+      { "name": "_slippage", "type": "uint256" }
+    ],
+    "name": "addCollateralToken",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": true, "name": "beneficiary", "type": "address" }],
+    "name": "UpdateBeneficiary",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": true, "name": "formula", "type": "address" }],
+    "name": "UpdateFormula",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": false, "name": "buyFeePct", "type": "uint256" },
+      { "indexed": false, "name": "sellFeePct", "type": "uint256" }
+    ],
+    "name": "UpdateFees",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "name": "id", "type": "uint256" },
+      { "indexed": false, "name": "supply", "type": "uint256" },
+      { "indexed": false, "name": "buyFeePct", "type": "uint256" },
+      { "indexed": false, "name": "sellFeePct", "type": "uint256" },
+      { "indexed": false, "name": "formula", "type": "address" }
+    ],
+    "name": "NewMetaBatch",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "name": "id", "type": "uint256" },
+      { "indexed": true, "name": "collateral", "type": "address" },
+      { "indexed": false, "name": "supply", "type": "uint256" },
+      { "indexed": false, "name": "balance", "type": "uint256" },
+      { "indexed": false, "name": "reserveRatio", "type": "uint32" },
+      { "indexed": false, "name": "slippage", "type": "uint256" }
+    ],
+    "name": "NewBatch",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "name": "id", "type": "uint256" },
+      { "indexed": true, "name": "collateral", "type": "address" }
+    ],
+    "name": "CancelBatch",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "name": "collateral", "type": "address" },
+      { "indexed": false, "name": "virtualSupply", "type": "uint256" },
+      { "indexed": false, "name": "virtualBalance", "type": "uint256" },
+      { "indexed": false, "name": "reserveRatio", "type": "uint32" },
+      { "indexed": false, "name": "slippage", "type": "uint256" }
+    ],
+    "name": "AddCollateralToken",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": true, "name": "collateral", "type": "address" }],
+    "name": "RemoveCollateralToken",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "name": "collateral", "type": "address" },
+      { "indexed": false, "name": "virtualSupply", "type": "uint256" },
+      { "indexed": false, "name": "virtualBalance", "type": "uint256" },
+      { "indexed": false, "name": "reserveRatio", "type": "uint32" },
+      { "indexed": false, "name": "slippage", "type": "uint256" }
+    ],
+    "name": "UpdateCollateralToken",
+    "type": "event"
+  },
+  { "anonymous": false, "inputs": [], "name": "Open", "type": "event" },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "name": "buyer", "type": "address" },
+      { "indexed": true, "name": "batchId", "type": "uint256" },
+      { "indexed": true, "name": "collateral", "type": "address" },
+      { "indexed": false, "name": "fee", "type": "uint256" },
+      { "indexed": false, "name": "value", "type": "uint256" }
+    ],
+    "name": "OpenBuyOrder",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "name": "seller", "type": "address" },
+      { "indexed": true, "name": "batchId", "type": "uint256" },
+      { "indexed": true, "name": "collateral", "type": "address" },
+      { "indexed": false, "name": "amount", "type": "uint256" }
+    ],
+    "name": "OpenSellOrder",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "name": "buyer", "type": "address" },
+      { "indexed": true, "name": "batchId", "type": "uint256" },
+      { "indexed": true, "name": "collateral", "type": "address" },
+      { "indexed": false, "name": "amount", "type": "uint256" }
+    ],
+    "name": "ClaimBuyOrder",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "name": "seller", "type": "address" },
+      { "indexed": true, "name": "batchId", "type": "uint256" },
+      { "indexed": true, "name": "collateral", "type": "address" },
+      { "indexed": false, "name": "fee", "type": "uint256" },
+      { "indexed": false, "name": "value", "type": "uint256" }
+    ],
+    "name": "ClaimSellOrder",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "name": "buyer", "type": "address" },
+      { "indexed": true, "name": "batchId", "type": "uint256" },
+      { "indexed": true, "name": "collateral", "type": "address" },
+      { "indexed": false, "name": "value", "type": "uint256" }
+    ],
+    "name": "ClaimCancelledBuyOrder",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "name": "seller", "type": "address" },
+      { "indexed": true, "name": "batchId", "type": "uint256" },
+      { "indexed": true, "name": "collateral", "type": "address" },
+      { "indexed": false, "name": "amount", "type": "uint256" }
+    ],
+    "name": "ClaimCancelledSellOrder",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "name": "batchId", "type": "uint256" },
+      { "indexed": true, "name": "collateral", "type": "address" },
+      { "indexed": false, "name": "totalBuySpend", "type": "uint256" },
+      { "indexed": false, "name": "totalBuyReturn", "type": "uint256" },
+      { "indexed": false, "name": "totalSellSpend", "type": "uint256" },
+      { "indexed": false, "name": "totalSellReturn", "type": "uint256" }
+    ],
+    "name": "UpdatePricing",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "name": "executor", "type": "address" },
+      { "indexed": false, "name": "script", "type": "bytes" },
+      { "indexed": false, "name": "input", "type": "bytes" },
+      { "indexed": false, "name": "returnData", "type": "bytes" }
+    ],
+    "name": "ScriptResult",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "name": "vault", "type": "address" },
+      { "indexed": true, "name": "token", "type": "address" },
+      { "indexed": false, "name": "amount", "type": "uint256" }
+    ],
+    "name": "RecoverToVault",
+    "type": "event"
+  }
+]
