@@ -73,8 +73,6 @@ export default function DaoView() {
     return <p>Error</p>
   }
 
-  console.log(data)
-
   return (
     <Switch>
       <Route exact path={path}>
