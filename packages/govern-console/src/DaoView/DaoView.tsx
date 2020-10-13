@@ -7,7 +7,6 @@ import {
 } from 'react-router-dom'
 import 'styled-components/macro'
 import { gql, useQuery } from '@apollo/client'
-import { useChainId } from '../Providers/ChainId'
 
 const DAO_QUERY = gql`
   query DAOQuery($id: String) {

@@ -3,11 +3,9 @@
   "homepage": "./",
   "version": "1.0.0-beta.0",
   "dependencies": {
-    "@1hive/connect-disputable-delay": "^0.1.4",
     "@apollo/client": "^3.2.3",
     "@apollo/react-hooks": "^3.1.5",
     "@aragon/connect-agreement": "^0.0.0-beta.14",
-    "@aragon/connect-react": "^0.7.0",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
