@@ -1,42 +1,85 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 import {
   Route,
   Switch,
-  useHistory,
   useRouteMatch,
   useParams,
 } from 'react-router-dom'
-import { App, Connect, useApps, useOrganization } from '@aragon/connect-react'
 import 'styled-components/macro'
-
-import AppsRouter from '../Apps/Apps'
-
+import { gql, useQuery } from '@apollo/client'
 import { useChainId } from '../Providers/ChainId'
 
-function DaoView() {
+const DAO_QUERY = gql`
+  query DAOQuery($id: String) {
+    eaglet(id: $id) {
+    address
+    name
+    queue {
+      address
+      containers {
+        id
+        executionState
+        vetoReason
+      }
+      config {
+        executionDelay
+        scheduleDeposit {
+          token
+          amount
+        }
+        challengeDeposit {
+          token
+          amount
+        }
+        vetoDeposit {
+          token
+          amount
+        }
+        resolver
+        rules
+      }
+      roles {
+        id
+        role
+        who
+        revoked
+      }
+    }
+    roles {
+      id
+      role
+      who
+      revoked
+    }
+  }
+}
+`
+
+
+export default function DaoView() {
+  const { daoAddress }: any = useParams()
   const { path } = useRouteMatch()
-  const [org, orgStatus] = useOrganization()
-
-  const [apps, appsStatus] = useApps()
-
-  const loading = orgStatus.loading || appsStatus.loading
-  const error = orgStatus.error || appsStatus.error
+  const { data, loading, error } = useQuery(DAO_QUERY, {
+    variables: {
+      id: daoAddress
+    }
+  })
 
   if (loading) {
-    return <p>Loading…</p>
+    return <p>Loading...</p>
   }
 
   if (error) {
-    return <p>Error: {error.message}</p>
+    console.log(error)
+    return <p>Error</p>
   }
+
+  console.log(data)
 
   return (
     <Switch>
       <Route exact path={path}>
-        <AppList apps={apps} />
-      </Route>
-      <Route path={`${path}/app/:appAddress`}>
-        <AppsRouter apps={apps} org={org!} />
+        <DaoInfo dao={data} />
       </Route>
       <Route>
         <h2>not found :(</h2>
@@ -45,85 +88,65 @@ function DaoView() {
   )
 }
 
-type AppListProps = {
-  apps: App[]
+type DaoInfoProps = {
+  dao: any
 }
 
-function AppList({ apps }: AppListProps) {
+function DaoInfo({ dao }: DaoInfoProps) {
   return (
+    <>
+    <h2 css={`
+      margin-top: ${2 * 8}px;
+    `}>Info for {dao.eaglet.name}</h2>
     <div
       css={`
         padding: 8px;
         margin-top: ${4 * 8}px;
         border: 1px solid whitesmoke;
+        h2 {
+          font-weight: bold;
+          font-size: 24px;
+        }
+        h3 {
+          font-weight: bold;
+          font-size: 18px;
+        }
+        p {
+          margin-bottom: 16px;
+          margin-top: 16px;
+        }
       `}
     >
-      <h2>Apps</h2>
-      <div
-        css={`
-          margin-top: 24px;
-          display: flex;
-          flex-direction: row;
-          flex-wrap: wrap;
-        `}
-      >
-        {apps.map(app => (
-          <AppCard app={app} key={app.address} />
-        ))}
-      </div>
+      <h2>Govern</h2>
+      <h3>Address</h3>
+      <p>{dao.eaglet.address}</p>
+      <h2>Optimistic Queue</h2>
+      <h3>Address</h3>
+      <p>{dao.eaglet.address}</p>
+      <h3>Config</h3>
+      <p>Execution delay: {dao.eaglet.queue.config.executionDelay}</p>
+      <p>Schedule collateral: </p>
+      <ul css={`
+        margin-left: 16px;
+      `}>
+        <li>Token: {dao.eaglet.queue.config.scheduleDeposit.token}</li>
+        <li>Amount: {dao.eaglet.queue.config.scheduleDeposit.amount}</li>
+      </ul>
+      <p>Challenge collateral: </p>
+      <ul css={`
+        margin-left: 16px;
+      `}>
+        <li>Token: {dao.eaglet.queue.config.challengeDeposit.token}</li>
+        <li>Amount: {dao.eaglet.queue.config.challengeDeposit.amount}</li>
+      </ul>
+      <p>Veto collateral: </p>
+      <ul css={`
+        margin-left: 16px;
+      `}>
+        <li>Token: {dao.eaglet.queue.config.vetoDeposit.token}</li>
+        <li>Amount: {dao.eaglet.queue.config.vetoDeposit.amount}</li>
+      </ul>
     </div>
-  )
-}
-
-type AppCardProps = {
-  app: App
-}
-
-function AppCard({ app }: AppCardProps) {
-  const history = useHistory()
-  const { url } = useRouteMatch()
-
-  const handleCardClick = useCallback(() => {
-    history.push(`${url}/app/${app.address}`)
-  }, [app, history, url])
-
-  return (
-    <button
-      type="button"
-      onClick={handleCardClick}
-      css={`
-        position: relative;
-        background: transparent;
-        width: 280px;
-        height: 320px;
-        border: 1px solid #00f400;
-        padding: 16px;
-        cursor: pointer;
-        &:not(:last-child) {
-          margin-right: 24px;
-          margin-bottom: 24px;
-        }
-        &:active {
-          top: 1px;
-        }
-      `}
-    >
-      {app.name}
-    </button>
-  )
-}
-
-export default function WrappedDaoView() {
-  const { daoAddress }: any = useParams()
-  const { chainId } = useChainId()
-
-  return (
-    <Connect
-      location={daoAddress}
-      connector="thegraph"
-      options={{ network: chainId }}
-    >
-      <DaoView />
-    </Connect>
+    </>
   )
 }

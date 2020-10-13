@@ -1,9 +1,21 @@
 import React from 'react'
 import { render } from 'react-dom'
 import { createGlobalStyle } from 'styled-components'
+import 'styled-components/macro'
+import {
+  ApolloClient,
+  InMemoryCache,
+  NormalizedCacheObject,
+  ApolloProvider
+} from '@apollo/client';
 import App from './App'
 import GeneralProvider from './Providers/GeneralProvider'
-import 'styled-components/macro'
+
+
+const client: ApolloClient<NormalizedCacheObject> = new ApolloClient({
+  uri: process.env.REACT_APP_SUBGRAPH_URL,
+  cache: new InMemoryCache()
+});
 
 const GlobalStyle = createGlobalStyle`
   *, *:before, *:after {
@@ -45,11 +57,14 @@ const GlobalStyle = createGlobalStyle`
 `
 
 render(
-  <GeneralProvider>
-    <React.StrictMode>
-      <GlobalStyle />
-      <App />
-    </React.StrictMode>
-  </GeneralProvider>,
+  <ApolloProvider client={client}>
+    <GeneralProvider>
+      <React.StrictMode>
+        <GlobalStyle />
+        <App />
+      </React.StrictMode>
+    </GeneralProvider>
+  </ApolloProvider>
+  ,
   document.getElementById('root'),
 )

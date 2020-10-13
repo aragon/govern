@@ -45,7 +45,7 @@ function Header() {
           text-decoration: underline;
         `}
       >
-        Aragon Console
+        Govern Console
       </h1>
       <label
         css={`
