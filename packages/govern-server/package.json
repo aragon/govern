@@ -1,0 +1,19 @@
+{
+  "name": "govern-server",
+  "version": "0.0.0",
+  "license": "GPL-3.0",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "node --loader ts-node/esm.mjs  src/index.ts"
+  },
+  "dependencies": {
+    "apollo-server": "^2.18.2",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "graphql": "^15.3.0",
+    "ts-node": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.8"
+  }
+}
