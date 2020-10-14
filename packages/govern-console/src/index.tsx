@@ -11,7 +11,6 @@ import {
 import App from './App'
 import GeneralProvider from './Providers/GeneralProvider'
 
-
 const client: ApolloClient<NormalizedCacheObject> = new ApolloClient({
   uri: process.env.REACT_APP_SUBGRAPH_URL,
   cache: new InMemoryCache()

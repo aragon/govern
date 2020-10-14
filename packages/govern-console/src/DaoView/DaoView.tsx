@@ -1,24 +1,35 @@
-import React from 'react'
+import React, { useCallback, useMemo } from 'react'
 import {
   Route,
   Switch,
+  useHistory,
   useRouteMatch,
   useParams,
 } from 'react-router-dom'
 import 'styled-components/macro'
 import { gql, useQuery } from '@apollo/client'
+import Button from '../components/Button'
+import NewAction from '../components/NewAction'
 
 const DAO_QUERY = gql`
-  query DAOQuery($id: String) {
-    eaglet(id: $id) {
-    address
-    name
+  query DAOQuery($name: String) {
+  optimisticGame(id: $name) {
+    executor {
+      address
+    }
     queue {
       address
-      containers {
+      executions {
         id
-        executionState
-        vetoReason
+        sender
+      }
+      queue {
+        id
+        status
+        nonce
+        executionTime
+        submitter
+        proof
       }
       config {
         executionDelay
@@ -37,30 +48,17 @@ const DAO_QUERY = gql`
         resolver
         rules
       }
-      roles {
-        id
-        role
-        who
-        revoked
-      }
-    }
-    roles {
-      id
-      role
-      who
-      revoked
     }
   }
 }
 `
-
 
 export default function DaoView() {
   const { daoAddress }: any = useParams()
   const { path } = useRouteMatch()
   const { data, loading, error } = useQuery(DAO_QUERY, {
     variables: {
-      id: daoAddress
+      name: daoAddress
     }
   })
 
@@ -73,10 +71,16 @@ export default function DaoView() {
     return <p>Error</p>
   }
 
+  console.log(data)
+
   return (
     <Switch>
       <Route exact path={path}>
-        <DaoInfo dao={data} />
+        <DaoInfo dao={data.optimisticGame} />
+        <Actions dao={data.optimisticGame} />
+      </Route>
+      <Route path={`${path}/new-action`}>
+        <NewAction config={data?.optimisticGame?.queue.config} />
       </Route>
       <Route>
         <h2>not found :(</h2>
@@ -90,11 +94,13 @@ type DaoInfoProps = {
 }
 
 function DaoInfo({ dao }: DaoInfoProps) {
+  const { daoAddress }: any = useParams()
+
   return (
     <>
     <h2 css={`
       margin-top: ${2 * 8}px;
-    `}>Info for {dao.eaglet.name}</h2>
+    `}>Info for {daoAddress}</h2>
     <div
       css={`
         padding: 8px;
@@ -116,34 +122,97 @@ function DaoInfo({ dao }: DaoInfoProps) {
     >
       <h2>Govern</h2>
       <h3>Address</h3>
-      <p>{dao.eaglet.address}</p>
+      <p>{dao.executor.address}</p>
       <h2>Optimistic Queue</h2>
       <h3>Address</h3>
-      <p>{dao.eaglet.address}</p>
+      <p>{dao.queue.address}</p>
       <h3>Config</h3>
-      <p>Execution delay: {dao.eaglet.queue.config.executionDelay}</p>
+      <p>Execution delay: {dao.queue.config.executionDelay}</p>
       <p>Schedule collateral: </p>
       <ul css={`
         margin-left: 16px;
       `}>
-        <li>Token: {dao.eaglet.queue.config.scheduleDeposit.token}</li>
-        <li>Amount: {dao.eaglet.queue.config.scheduleDeposit.amount}</li>
+        <li>Token: {dao.queue.config.scheduleDeposit.token}</li>
+        <li>Amount: {dao.queue.config.scheduleDeposit.amount}</li>
       </ul>
       <p>Challenge collateral: </p>
       <ul css={`
         margin-left: 16px;
       `}>
-        <li>Token: {dao.eaglet.queue.config.challengeDeposit.token}</li>
-        <li>Amount: {dao.eaglet.queue.config.challengeDeposit.amount}</li>
+        <li>Token: {dao.queue.config.challengeDeposit.token}</li>
+        <li>Amount: {dao.queue.config.challengeDeposit.amount}</li>
       </ul>
       <p>Veto collateral: </p>
       <ul css={`
         margin-left: 16px;
       `}>
-        <li>Token: {dao.eaglet.queue.config.vetoDeposit.token}</li>
-        <li>Amount: {dao.eaglet.queue.config.vetoDeposit.amount}</li>
+        <li>Token: {dao.queue.config.vetoDeposit.token}</li>
+        <li>Amount: {dao.queue.config.vetoDeposit.amount}</li>
       </ul>
     </div>
     </>
+  )
+}
+
+function Actions({ dao }: DaoInfoProps) {
+  const history = useHistory()
+  const { daoAddress }: any = useParams()
+
+  const handleNewAction = useCallback(() => {
+    history.push(`/${daoAddress}/new-action`)
+
+  }, [history])
+
+  const hasActions = useMemo(
+    () => dao.queue.queue.length > 0,
+    [dao]
+  )
+
+  return (
+    <div
+      css={`
+        padding: 8px;
+        margin-top: ${4 * 8}px;
+        border: 1px solid whitesmoke;
+        h2 {
+          font-weight: bold;
+          font-size: 24px;
+        }
+        h3 {
+          font-weight: bold;
+          font-size: 18px;
+        }
+        p {
+          margin-bottom: 16px;
+          margin-top: 16px;
+        }
+      `}
+    >
+      <h2>Actions</h2>
+      {hasActions ? dao.queue.queue.map(({ id }: { id: string }) => (
+        <ActionCard id={id} />
+      )) : 'No actions.'}
+      <Button onClick={handleNewAction}>New action</Button>
+    </div>
+  )
+}
+
+type ActionCardProps = {
+  id: string
+}
+
+function ActionCard({ id }: ActionCardProps) {
+  const history = useHistory()
+
+  const handleCardClick = useCallback(() => {
+    history.push(`/tools/${id}`)
+  }, [history, id])
+
+  return (
+    <Button
+      onClick={handleCardClick}
+    >
+      {id}
+    </Button>
   )
 }

@@ -10,15 +10,15 @@ const KNOWN_TOOLS = [
 ]
 
 export default function DaoSelector() {
-  const [daoAddress, setDaoAddress] = useState<string>('')
+  const [daoName, setDaoName] = useState<string>('')
   const history = useHistory()
 
   const handleChangeDaoAddress = useCallback(e => {
-    setDaoAddress(e.target.value)
+    setDaoName(e.target.value)
   }, [])
   const handleGoToDao = useCallback(() => {
-    history.push(`/${daoAddress}`)
-  }, [daoAddress, history])
+    history.push(`/${daoName}`)
+  }, [daoName, history])
 
   return (
     <>
@@ -35,7 +35,7 @@ export default function DaoSelector() {
             type="input"
             onChange={handleChangeDaoAddress}
             placeholder="0xbeef..."
-            value={daoAddress}
+            value={daoName}
             css={`
               margin-top: 12px;
               width: 100%;
@@ -45,7 +45,7 @@ export default function DaoSelector() {
         </label>
         <button
           onClick={handleGoToDao}
-          disabled={!daoAddress}
+          disabled={!daoName}
           css={`
             margin-top: 16px;
             font-family: 'Overpass Mono', monospace;
