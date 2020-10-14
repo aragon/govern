@@ -27,7 +27,7 @@ templates:
         - Role
       abis:
         - name: OptimisticQueue
-          file: ../govern-core/artifacts/OptimisticQueue.json
+          file: ../govern-core/abi/OptimisticQueue.json
       eventHandlers:
         - event: Configured(indexed bytes32,indexed address,(uint256,(address,uint256),(address,uint256),(address,uint256),address,bytes))
           handler: handleConfigured
@@ -67,7 +67,7 @@ templates:
         - Role
       abis:
         - name: Govern
-          file: ../govern-core/artifacts/Govern.json
+          file: ../govern-core/abi/Govern.json
       eventHandlers:
         - event: Executed(indexed address,tuple[],bytes[])
           handler: handleExecuted

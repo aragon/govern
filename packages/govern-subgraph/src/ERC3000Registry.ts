@@ -1,43 +1,44 @@
-import { Address } from "@graphprotocol/graph-ts";
+import { Address } from '@graphprotocol/graph-ts'
 import {
   Registered as RegisteredEvent,
-  SetMetadata as SetMetadataEvent,
-} from "../generated/ERC3000Registry/ERC3000Registry";
+  SetMetadata as SetMetadataEvent
+} from '../generated/ERC3000Registry/ERC3000Registry'
 import {
   Govern as GovernTemplate,
-  OptimisticQueue as QueueTemplate,
-} from "../generated/templates";
+  OptimisticQueue as QueueTemplate
+} from '../generated/templates'
 import {
   ERC3000Registry as ERC3000RegistryEntity,
-  Entry as EntryEntity
-} from "../generated/schema";
+  OptimisticGame as OptimisticGameEntity
+} from '../generated/schema'
 
 export function handleRegistered(event: RegisteredEvent): void {
   const registry = loadOrCreateRegistry(event.address)
 
-  const entry = new EntryEntity(event.params.name)
+  const game = new OptimisticGameEntity(event.params.name)
 
-  entry.name = event.params.name
-  entry.dao = event.params.dao.toHexString()
-  entry.queue = event.params.queue.toHexString()
+  game.name = event.params.name
+  game.executor = event.params.dao.toHexString()
+  game.queue = event.params.queue.toHexString()
 
-  // add entry to the registry
-  const currentEntries = registry.entries
-  currentEntries.push(entry.id)
-  registry.entries = currentEntries
+  // add game to the registry
+  const currentEntries = registry.games
+  currentEntries.push(game.id)
+  registry.games = currentEntries
 
-  entry.save()
+  registry.count += 1
+
+  game.save()
   registry.save()
 
   // Create datasource templates
-  GovernTemplate.create(event.params.dao);
-  QueueTemplate.create(event.params.queue);
+  GovernTemplate.create(event.params.dao)
+  QueueTemplate.create(event.params.queue)
 }
 
 export function handleSetMetadata(event: SetMetadataEvent): void {
-  // TODO:
+  // TODO: (Gabi) how we link the metadata with the Optimistic Game
 }
-
 
 export function loadOrCreateRegistry(
   registryAddress: Address
@@ -48,7 +49,7 @@ export function loadOrCreateRegistry(
     registry = new ERC3000RegistryEntity(registryId)
     registry.address = registryAddress
     registry.count = 0
-    registry.entries = []
+    registry.games = []
   }
   return registry!
 }

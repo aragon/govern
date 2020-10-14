@@ -2,13 +2,13 @@ type ERC3000Registry @entity {
   id: ID!
   address: Bytes!
   count: Int!
-  entries: [Entry!]
+  games: [OptimisticGame!]
 }
 
-type Entry @entity {
+type OptimisticGame @entity {
   id: ID!
   name: String!
-  dao: Govern!
+  executor: Govern!
   queue: OptimisticQueue!
   metadata: Bytes
 }
@@ -16,6 +16,7 @@ type Entry @entity {
 type Govern @entity {
   id: ID!
   address: Bytes!
+  games: [OptimisticGame!] @derivedFrom(field: "executor")
   executions: [Execution!]
   roles: [Role!]
 }
@@ -40,6 +41,7 @@ type OptimisticQueue @entity {
   id: ID!
   address: Bytes!
   config: Config
+  games: [OptimisticGame!] @derivedFrom(field: "queue")
   queue: [Item!]
   executions: [Execution!]
   challenges: [Challenge!] @derivedFrom(field: "queue")

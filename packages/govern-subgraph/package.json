@@ -10,12 +10,12 @@
     "manifest-rinkeby-staging": "env STAGING=true scripts/build-manifest.sh rinkeby",
     "manifest-xdai": "env scripts/build-manifest.sh xdai",
     "manifest-xdai-staging": "env STAGING=true scripts/build-manifest.sh xdai",
-    "deploy-mainnet": "scripts/deploy.sh 1hive conviction-voting mainnet",
-    "deploy-mainnet-staging": "env STAGING=true scripts/deploy.sh 1hive conviction-voting mainnet",
-    "deploy-rinkeby": "scripts/deploy.sh 1hive conviction-voting rinkeby",
-    "deploy-rinkeby-staging": "STAGING=true scripts/deploy.sh evalir eg rinkeby",
-    "deploy-xdai": "scripts/deploy.sh 1hive conviction-voting xdai",
-    "deploy-xdai-staging": "STAGING=true scripts/deploy.sh 1hive c-v xdai"
+    "deploy-mainnet": "scripts/deploy.sh aragon govern mainnet",
+    "deploy-mainnet-staging": "env STAGING=true scripts/deploy.sh aragon govern mainnet",
+    "deploy-rinkeby": "scripts/deploy.sh aragon govern rinkeby",
+    "deploy-rinkeby-staging": "STAGING=true scripts/deploy.sh aragon govern rinkeby",
+    "deploy-xdai": "scripts/deploy.sh aragon govern xdai",
+    "deploy-xdai-staging": "STAGING=true scripts/deploy.sh aragon govern xdai"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.18.0",
