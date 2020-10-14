@@ -1,4 +1,4 @@
-import { Address } from '@graphprotocol/graph-ts'
+import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import {
   Challenged as ChallengedEvent,
   Configured as ConfiguredEvent,
@@ -9,210 +9,311 @@ import {
   Revoked as RevokedEvent,
   Scheduled as ScheduledEvent,
   Vetoed as VetoedEvent,
-} from '../generated/templates/OptimisticQueue/OptimisticQueue'
+  Ruled as RuledEvent,
+  EvidenceSubmitted as EvidenceSubmittedEvent,
+  OptimisticQueue as OptimisticQueueContract,
+} from "../generated/templates/OptimisticQueue/OptimisticQueue";
 import {
-  Action,
-  Config,
-  Container,
-  Collateral,
-  OptimisticQueue,
-  Payload,
-  Role,
-} from '../generated/schema'
+  Config as ConfigEntity,
+  Challenge as ChallengeEntity,
+  Collateral as CollateralEntity,
+  Evidence as EvidenceEntity,
+  Item as ItemEntity,
+  OptimisticQueue as OptimisticQueueEntity,
+  Veto as VetoEntity,
+} from "../generated/schema";
+import { frozenRoles, roleGranted, roleRevoked } from "./lib/MiniACL";
 
-const APPROVED_TYPE = 'Approved'
-const CANCELLED_TYPE = 'Cancelled'
-const CHALLENGED_TYPE = 'Challenged'
-const EXECUTED_TYPE = 'Executed'
-const SCHEDULED_TYPE = 'Scheduled'
-const VETOED_TYPE = 'Vetoed'
+const NONE_STATUS = "None";
+const APPROVED_STATUS = "Approved";
+const CANCELLED_STATUS = "Cancelled";
+const CHALLENGED_STATUS = "Challenged";
+const EXECUTED_STATUS = "Executed";
+const REJECTED_STATUS = "Rejected";
+const SCHEDULED_STATUS = "Scheduled";
+const VETOED_STATUS = "Vetoed";
 
-const FREEZE_ADDR = '0x0000000000000000000000000000000000000001'
+const ALLOW_RULING = BigInt.fromI32(4);
 
-export function handleChallenged(event: ChallengedEvent): void {
-  const container = Container.load(event.params.containerHash.toHexString())
-  container.executionState = CHALLENGED_TYPE
-  container.save()
-}
+export function handleScheduled(event: ScheduledEvent): void {
+  const queue = loadOrCreateQueue(event.address);
 
-export function handleConfigured(event: ConfiguredEvent): void {
-  let queue = OptimisticQueue.load(event.address.toHexString())
-  // TODO: Can there be no queue? check event processing order
-  const config = new Config(event.address.toHexString())
+  const item = loadOrCreateItem(event.params.containerHash, event);
 
-  const scheduleCollateral = new Collateral(
-    event.transaction.hash.toHexString() + '1'
-  )
-  scheduleCollateral.token = event.params.config.scheduleDeposit.token
-  scheduleCollateral.amount = event.params.config.scheduleDeposit.amount
+  const scheduleDeposit = loadOrCreateCollateral(event, "1");
+  scheduleDeposit.token = event.params.collateral.token;
+  scheduleDeposit.amount = event.params.collateral.amount;
 
-  const challengeCollateral = new Collateral(
-    event.transaction.hash.toHexString() + '2'
-  )
-  challengeCollateral.token = event.params.config.challengeDeposit.token
-  challengeCollateral.amount = event.params.config.challengeDeposit.amount
+  item.status = SCHEDULED_STATUS;
+  item.nonce = event.params.payload.nonce;
+  item.executionTime = event.params.payload.executionTime;
+  item.submitter = event.params.payload.submitter;
+  item.executor = event.params.payload.executor.toHexString();
+  item.proof = event.params.payload.proof;
+  item.collateral = scheduleDeposit.id;
 
-  const vetoCollateral = new Collateral(
-    event.transaction.hash.toHexString() + '3'
-  )
-  vetoCollateral.token = event.params.config.vetoDeposit.token
-  vetoCollateral.amount = event.params.config.vetoDeposit.amount
+  // add the item
+  const currentItem = queue.queue;
+  currentItem.push(item.id);
+  queue.queue = currentItem;
 
-  config.executionDelay = event.params.config.executionDelay
-  config.scheduleDeposit = scheduleCollateral.id
-  config.challengeDeposit = challengeCollateral.id
-  config.vetoDeposit = vetoCollateral.id
-  config.resolver = event.params.config.resolver
-  config.rules = event.params.config.rules
-
-  queue.config = config.id
-
-  queue.save()
-  config.save()
-  scheduleCollateral.save()
-  challengeCollateral.save()
-  vetoCollateral.save()
+  item.save();
+  queue.save();
 }
 
 export function handleExecuted(event: ExecutedEvent): void {
-  const container = Container.load(event.params.containerHash.toHexString())
-  container.executionState = EXECUTED_TYPE
-  container.save()
+  // TODO: (Gabi) decide if we want to handle executinons here
+
+  const item = loadOrCreateItem(event.params.containerHash, event);
+
+  item.status = EXECUTED_STATUS;
+
+  item.save();
 }
 
-export function handleFrozen(event: FrozenEvent): void {
-  const queue = OptimisticQueue.load(event.address.toHexString())
-  let id = 0
-  const roles = queue.roles
-  for (id = 0; id < roles.length; id++) {
-    const currentRole = roles[id]
-    const funcSelector = currentRole.split('-')[1]
-    if (funcSelector === event.params.role.toHexString()) {
-      const role = Role.load(currentRole)
-      const freezeBytes = Address.fromString(FREEZE_ADDR)
-      role.who = freezeBytes
-      role.save()
-      break
-    }
-  }
-  queue.save()
-}
+export function handleChallenged(event: ChallengedEvent): void {
+  const item = loadOrCreateItem(event.params.containerHash, event);
 
-export function handleGranted(event: GrantedEvent): void {
-  const queue = OptimisticQueue.load(event.address.toHexString())
-  // roleID = contract address + role itself,
-  // which will be the function selector + who
-  // This is equivalent to storing all roles in the contract, and looking up the corresponding
-  // entry by mapping role => who
-  const roleId =
-    event.address.toHexString() +
-    '-' +
-    event.params.role.toHexString() +
-    '-' +
-    event.params.who.toHexString()
-  // We MUST first try to load this event because you can "grant" the role
-  // to the same addr many times, even if it has no effect.
-  let role = Role.load(roleId)
-  let exists = true
-  if (!role) {
-    exists = false
-    role = new Role(roleId)
-  }
-  role.role = event.params.role
-  role.who = event.params.who
-  role.revoked = false
-  const roles = queue.roles
-  if (!exists) {
-    roles.push(roleId)
-  }
-  role.save()
-  queue.roles = roles
-  queue.save()
+  item.status = CHALLENGED_STATUS;
+
+  const challenge = loadOrCreateChallenge(item.id, event);
+
+  const challengeDeposit = loadOrCreateCollateral(event, "2");
+  challengeDeposit.token = event.params.collateral.token;
+  challengeDeposit.amount = event.params.collateral.amount;
+
+  challenge.challenger = event.params.actor;
+  challenge.item = item.id;
+  challenge.arbitrator = loadOrCreateConfig(event.address).resolver;
+  challenge.disputeId = event.params.resolverId;
+  challenge.collateral = challengeDeposit.id;
+
+  item.save();
+  challenge.save();
 }
 
 export function handleResolved(event: ResolvedEvent): void {
-  const container = Container.load(event.params.containerHash.toHexString())
-  const approved = event.params.approved
-  container.executionState = approved ? APPROVED_TYPE : CANCELLED_TYPE
-  container.save()
-}
+  const item = loadOrCreateItem(event.params.containerHash, event);
+  const challenge = loadOrCreateChallenge(item.id, event);
 
-export function handleRevoked(event: RevokedEvent): void {
-  let queue = OptimisticQueue.load(event.address.toHexString())
-  const roleId =
-    event.address.toHexString() +
-    '-' +
-    event.params.role.toHexString() +
-    '-' +
-    event.params.who.toHexString()
-  let role = Role.load(roleId)
-  if (!role) {
-    role = new Role(roleId)
-    role.role = event.params.role
-    role.who = event.params.who
-  }
-  role.revoked = true
-  // Check if role exists in roles array and if not,
-  // push it
-  const roles = queue.roles
-  let id = 0
-  let exists = false
-  for(id = 0; id < roles.length; id++) {
-    const currentRole = roles[id]
-    if (currentRole === roleId) {
-      exists = true
-    }
-  }
+  item.status = event.params.approved ? EXECUTED_STATUS : CANCELLED_STATUS;
 
-  if (!exists) {
-    roles.push(roleId)
-    queue.roles = roles
-  }
-  role.save()
-  queue.save()
-}
+  challenge.approved = event.params.approved;
 
-export function handleScheduled(event: ScheduledEvent): void {
-  let queue = OptimisticQueue.load(event.address.toHexString())
-  if (!queue) {
-    throw new Error('Didnt find queue')
-  }
-  const containerId = event.params.containerHash.toHexString()
-  const payloadId = `${containerId}-payload`
-  const container = new Container(containerId)
-  const payload = new Payload(payloadId)
-
-  payload.nonce = event.params.payload.nonce
-  payload.submitter = event.params.payload.submitter
-  payload.executor = event.params.payload.executor.toHexString()
-  payload.proof = event.params.payload.proof
-  payload.actions = []
-
-  // This loop is probably going to be slow as hell, but there's not much to do here
-  const actions = event.params.payload.actions
-  for (let id = 0; id < actions.length; id++) {
-    const action = actions[id]
-    const queuedActionId = `${containerId}-action-${id}`
-    const queuedAction = new Action(queuedActionId)
-    queuedAction.to = action.to
-    queuedAction.value = action.value
-    queuedAction.data = action.data
-    queuedAction.save()
-    payload.actions.push(queuedActionId)
-  }
-
-  container.payload = payloadId
-  container.config = event.address.toHexString()
-  container.executionState = SCHEDULED_TYPE
-  queue.containers.push(containerId)
-
-  payload.save()
-  container.save()
+  item.save();
+  challenge.save();
 }
 
 export function handleVetoed(event: VetoedEvent): void {
-  const container = Container.load(event.params.containerHash.toHexString())
-  container.executionState = VETOED_TYPE
-  container.vetoReason = event.params.reason
-  container.save()
+  const item = loadOrCreateItem(event.params.containerHash, event);
+
+  item.status = VETOED_STATUS;
+
+  const veto = loadOrCreateVeto(item.id, event);
+
+  const vetoDeposit = loadOrCreateCollateral(event, "3");
+  vetoDeposit.token = event.params.collateral.token;
+  vetoDeposit.amount = event.params.collateral.amount;
+
+  veto.item = item.id;
+  veto.reason = event.params.reason;
+  veto.submitter = event.params.actor;
+  veto.collateral = vetoDeposit.id;
+
+  item.save();
+  veto.save();
+}
+
+export function handleConfigured(event: ConfiguredEvent): void {
+  const queue = loadOrCreateQueue(event.address);
+  const config = loadOrCreateConfig(event.address);
+
+  const scheduleDeposit = loadOrCreateCollateral(event, "1");
+  scheduleDeposit.token = event.params.config.scheduleDeposit.token;
+  scheduleDeposit.amount = event.params.config.scheduleDeposit.amount;
+
+  const challengeDeposit = loadOrCreateCollateral(event, "2");
+  challengeDeposit.token = event.params.config.challengeDeposit.token;
+  challengeDeposit.amount = event.params.config.challengeDeposit.amount;
+
+  const vetoDeposit = loadOrCreateCollateral(event, "3");
+  vetoDeposit.token = event.params.config.vetoDeposit.token;
+  vetoDeposit.amount = event.params.config.vetoDeposit.amount;
+
+  config.executionDelay = event.params.config.executionDelay;
+  config.scheduleDeposit = scheduleDeposit.id;
+  config.challengeDeposit = challengeDeposit.id;
+  config.vetoDeposit = vetoDeposit.id;
+  config.resolver = event.params.config.resolver;
+  config.rules = event.params.config.rules;
+
+  queue.config = config.id;
+
+  scheduleDeposit.save();
+  challengeDeposit.save();
+  vetoDeposit.save();
+  config.save();
+  queue.save();
+}
+
+// IArbitrable Events
+
+export function handleEvidenceSubmitted(event: EvidenceSubmittedEvent): void {
+  const optimisticQueue = OptimisticQueueContract.bind(event.address);
+
+  const containerHash = optimisticQueue.disputeItemCache(
+    event.params.arbitrator,
+    event.params.disputeId
+  );
+
+  const evidenceId = buildId(event);
+  const evidence = new EvidenceEntity(evidenceId);
+
+  evidence.challenge = containerHash.toHexString();
+  evidence.submitter = event.params.submitter;
+  evidence.data = event.params.evidence;
+  evidence.createdAt = event.block.timestamp;
+
+  evidence.save();
+}
+
+export function handleRuled(event: RuledEvent): void {
+  const optimisticQueue = OptimisticQueueContract.bind(event.address);
+
+  const containerHash = optimisticQueue.disputeItemCache(
+    event.params.arbitrator,
+    event.params.disputeId
+  );
+
+  const item = loadOrCreateItem(containerHash, event);
+  const challenge = loadOrCreateChallenge(item.id, event);
+
+  item.status =
+    event.params.ruling === ALLOW_RULING ? APPROVED_STATUS : REJECTED_STATUS;
+
+  challenge.ruling = event.params.ruling;
+
+  item.save();
+  challenge.save();
+}
+
+// MiniACL Events
+
+export function handleFrozen(event: FrozenEvent): void {
+  const queue = loadOrCreateQueue(event.address);
+
+  const roles = queue.roles!
+
+  frozenRoles(roles, event.params.role);
+}
+
+export function handleGranted(event: GrantedEvent): void {
+  const queue = loadOrCreateQueue(event.address);
+
+  const role = roleGranted(event.address, event.params.role, event.params.who);
+
+  // add the role
+  const currentRoles = queue.roles;
+  currentRoles.push(role.id);
+  queue.roles = currentRoles;
+
+  queue.save();
+}
+
+export function handleRevoked(event: RevokedEvent): void {
+  const queue = loadOrCreateQueue(event.address);
+
+  const role = roleRevoked(event.address, event.params.role, event.params.who);
+
+  // add the role
+  const currentRoles = queue.roles;
+  currentRoles.push(role.id);
+  queue.roles = currentRoles;
+
+  queue.save();
+}
+
+// Helpers
+
+export function loadOrCreateQueue(entity: Address): OptimisticQueueEntity {
+  const queueId = entity.toHexString();
+  // Create queue
+  let queue = OptimisticQueueEntity.load(queueId);
+  if (queue === null) {
+    queue = new OptimisticQueueEntity(queueId);
+    queue.address = entity;
+    queue.queue = [];
+    queue.executions = [];
+    queue.roles = [];
+  }
+  return queue!;
+}
+
+function loadOrCreateConfig(entity: Address): ConfigEntity {
+  const configId = entity.toHexString();
+  // Create config
+  let config = ConfigEntity.load(configId);
+  if (config === null) {
+    config = new ConfigEntity(configId);
+    config.queue = entity.toHexString();
+  }
+  return config!;
+}
+
+function loadOrCreateCollateral(
+  event: ethereum.Event,
+  index: String
+): CollateralEntity {
+  const collateralId = event.transaction.hash.toHexString() + index;
+  // Create collateral
+  let collateral = CollateralEntity.load(collateralId);
+  if (collateral === null) {
+    collateral = new CollateralEntity(collateralId);
+  }
+  return collateral!;
+}
+
+function loadOrCreateItem(
+  containerHash: Bytes,
+  event: ethereum.Event
+): ItemEntity {
+  const itemId = containerHash.toHexString();
+  // Create item
+  let item = ItemEntity.load(itemId);
+  if (item === null) {
+    item = new ItemEntity(itemId);
+    item.status = NONE_STATUS;
+    item.actions = [];
+    item.createdAt = event.block.timestamp;
+  }
+  return item!;
+}
+
+function loadOrCreateVeto(vetoId: string, event: ethereum.Event): VetoEntity {
+  // Create veto
+  let veto = VetoEntity.load(vetoId);
+  if (veto === null) {
+    veto = new VetoEntity(vetoId);
+    veto.queue = event.address.toHexString();
+    veto.createdAt = event.block.timestamp;
+  }
+  return veto!;
+}
+
+function loadOrCreateChallenge(
+  challengeId: string,
+  event: ethereum.Event
+): ChallengeEntity {
+  // Create challenge
+  let challenge = ChallengeEntity.load(challengeId);
+  if (challenge === null) {
+    challenge = new ChallengeEntity(challengeId);
+    challenge.queue = event.address.toHexString();
+    challenge.createdAt = event.block.timestamp;
+  }
+  return challenge!;
+}
+
+function buildId(event: ethereum.Event): string {
+  return event.transaction.hash.toHexString() + event.logIndex.toString();
 }
