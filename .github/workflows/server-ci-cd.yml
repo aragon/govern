@@ -5,14 +5,14 @@ on:
     - v*
 env:
   # This is a base repository and we use ${GITHUB_REF##*/} to set the version of the container
-  REPO: docker.pkg.github.com/aragon/govern/server
+  REPO: aragon/govern-server
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - run: docker login docker.pkg.github.com -u $GITHUB_ACTOR -p ${{secrets.GITHUB_TOKEN}}
+    - run: docker login -u ${{secrets.DOCKERHUB_USER}} -p ${{secrets.DOCKERHUB_TOKEN}}
     - run: .github/scripts/docker-build.sh $REPO ${GITHUB_SHA}
 
   release:
@@ -20,7 +20,7 @@ jobs:
     needs: build
     steps:
     - uses: actions/checkout@v2
-    - run: docker login docker.pkg.github.com -u $GITHUB_ACTOR -p ${{secrets.GITHUB_TOKEN}}
+    - run: docker login -u ${{secrets.DOCKERHUB_USER}} -p ${{secrets.DOCKERHUB_TOKEN}}
     - run: .github/scripts/docker-release.sh $REPO:${GITHUB_SHA} $REPO:${GITHUB_REF##*/}
     - run: .github/scripts/docker-release.sh $REPO:${GITHUB_SHA} $REPO:latest
 
