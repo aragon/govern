@@ -30,7 +30,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - run: .github/scripts/kubectl-config.sh ${{secrets.KUBE_CA}} ${{secrets.KUBE_SERVER}} ${{secrets.KUBE_TOKEN}}
-    - run: .github/scripts/kubectl-set-image.sh ipfs-pinner $REPO:${GITHUB_REF##*/}
-    - run: .github/scripts/kubectl-wait-ready.sh ipfs-pinner
+    - run: .github/scripts/kubectl-set-image.sh govern-server $REPO:${GITHUB_REF##*/}
+    - run: .github/scripts/kubectl-wait-ready.sh govern-server
     # wait 10 sec for k8s to reroute ingress and check the endpoint
     - run: sleep 10 && curl --fail https://govern.backend.aragon.org
