@@ -11,6 +11,7 @@ import {
   ERC3000Registry as ERC3000RegistryEntity,
   OptimisticGame as OptimisticGameEntity
 } from '../generated/schema'
+import { loadOrCreateGovern } from './Govern'
 
 export function handleRegistered(event: RegisteredEvent): void {
   const registry = loadOrCreateRegistry(event.address)
@@ -37,7 +38,10 @@ export function handleRegistered(event: RegisteredEvent): void {
 }
 
 export function handleSetMetadata(event: SetMetadataEvent): void {
-  // TODO: (Gabi) how we link the metadata with the Optimistic Game
+  const govern = loadOrCreateGovern(event.params.dao)
+  govern.metadata = event.params.metadata
+
+  govern.save()
 }
 
 export function loadOrCreateRegistry(

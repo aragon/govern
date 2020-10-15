@@ -10,12 +10,12 @@ type OptimisticGame @entity {
   name: String!
   executor: Govern!
   queue: OptimisticQueue!
-  metadata: Bytes
 }
 
 type Govern @entity {
   id: ID!
   address: Bytes!
+  metadata: Bytes
   games: [OptimisticGame!] @derivedFrom(field: "executor")
   executions: [Execution!]
   roles: [Role!]
@@ -24,6 +24,7 @@ type Govern @entity {
 type Execution @entity {
   id: ID!
   sender: Bytes!
+  queue: OptimisticQueue
   actions: [Action!] @derivedFrom(field: "execution")
   results: [Bytes!]
 }
@@ -43,7 +44,7 @@ type OptimisticQueue @entity {
   config: Config
   games: [OptimisticGame!] @derivedFrom(field: "queue")
   queue: [Item!]
-  executions: [Execution!]
+  executions: [Execution!] # TODO: @derivedFrom(field: "queue")
   challenges: [Challenge!] @derivedFrom(field: "queue")
   vetos: [Veto!] @derivedFrom(field: "queue")
   roles: [Role!]
@@ -62,8 +63,12 @@ type Config @entity {
 
 type Collateral @entity {
   id: ID!
-  token: Bytes!
+  token: ERC20!
   amount: BigInt!
+}
+
+type ERC20 @entity {
+  id: ID!
 }
 
 type Item @entity {
