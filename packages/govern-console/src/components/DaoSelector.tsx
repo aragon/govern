@@ -10,7 +10,7 @@ const KNOWN_TOOLS = [
 ]
 
 export default function DaoSelector() {
-  const [daoName, setDaoName] = useState<string>('')
+  const [daoName, setDaoName] = useState('')
   const history = useHistory()
 
   const handleChangeDaoAddress = useCallback(e => {

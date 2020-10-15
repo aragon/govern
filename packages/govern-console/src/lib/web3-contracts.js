@@ -21,7 +21,7 @@ export function useContract(address, abi, signer = true) {
     ethersProvider = new providers.Web3Provider(ethereum)
   }
 
-  if (!address || !EthersUtils.isAddress(address) || !ethersProvider) {
+  if (!address || !EthersUtils.isAddress(address) || !ethersProvider || !abi) {
     console.log(
       'alo',
       address,

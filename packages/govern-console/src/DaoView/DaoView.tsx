@@ -80,7 +80,11 @@ export default function DaoView() {
         <Actions dao={data.optimisticGame} />
       </Route>
       <Route path={`${path}/new-action`}>
-        <NewAction config={data?.optimisticGame?.queue.config} />
+        <NewAction
+          config={data.optimisticGame.queue.config}
+          executorAddress={data.optimisticGame.executor.address}
+          queueAddress={data.optimisticGame.queue.address}
+        />
       </Route>
       <Route>
         <h2>not found :(</h2>
@@ -161,7 +165,7 @@ function Actions({ dao }: DaoInfoProps) {
   const handleNewAction = useCallback(() => {
     history.push(`/${daoAddress}/new-action`)
 
-  }, [history])
+  }, [history, daoAddress])
 
   const hasActions = useMemo(
     () => dao.queue.queue.length > 0,
