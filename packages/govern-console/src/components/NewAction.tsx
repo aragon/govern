@@ -35,172 +35,6 @@ type AbiType = {
   type: string
 }
 
-const scheduleAbi = {
-  "inputs": [
-    {
-      "components": [
-        {
-          "components": [
-            {
-              "internalType": "uint256",
-              "name": "nonce",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "executionTime",
-              "type": "uint256"
-            },
-            {
-              "internalType": "address",
-              "name": "submitter",
-              "type": "address"
-            },
-            {
-              "internalType": "contract IERC3000Executor",
-              "name": "executor",
-              "type": "address"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "address",
-                  "name": "to",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "value",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "bytes",
-                  "name": "data",
-                  "type": "bytes"
-                }
-              ],
-              "internalType": "struct ERC3000Data.Action[]",
-              "name": "actions",
-              "type": "tuple[]"
-            },
-            {
-              "internalType": "bytes",
-              "name": "proof",
-              "type": "bytes"
-            }
-          ],
-          "internalType": "struct ERC3000Data.Payload",
-          "name": "payload",
-          "type": "tuple"
-        },
-        {
-          "components": [
-            {
-              "internalType": "uint256",
-              "name": "executionDelay",
-              "type": "uint256"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "address",
-                  "name": "token",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "amount",
-                  "type": "uint256"
-                }
-              ],
-              "internalType": "struct ERC3000Data.Collateral",
-              "name": "scheduleDeposit",
-              "type": "tuple"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "address",
-                  "name": "token",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "amount",
-                  "type": "uint256"
-                }
-              ],
-              "internalType": "struct ERC3000Data.Collateral",
-              "name": "challengeDeposit",
-              "type": "tuple"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "address",
-                  "name": "token",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "amount",
-                  "type": "uint256"
-                }
-              ],
-              "internalType": "struct ERC3000Data.Collateral",
-              "name": "vetoDeposit",
-              "type": "tuple"
-            },
-            {
-              "internalType": "address",
-              "name": "resolver",
-              "type": "address"
-            },
-            {
-              "internalType": "bytes",
-              "name": "rules",
-              "type": "bytes"
-            }
-          ],
-          "internalType": "struct ERC3000Data.Config",
-          "name": "config",
-          "type": "tuple"
-        }
-      ],
-      "internalType": "struct ERC3000Data.Container",
-      "name": "_container",
-      "type": "tuple"
-    }
-  ],
-  "name": "schedule"
-}
-// {
-//     payload: {
-//       nonce: "uint256",
-//       executionTime: "uint256",
-//       submitter: "address",
-//       executor: "address",
-//       actions: "tuple[]",
-//       proof: "bytes"
-//     },
-//     config: {
-//       executionDelay: "uint256",
-//       scheduleDeposit: {
-//         token: "address",
-//         amount: "uint256"
-//       },
-//       challengeDeposit: {
-//         token: "address",
-//         amount: "uint256"
-//       },
-//       vetoDeposit: {
-//         token: "address",
-//         amount: "uint256"
-//       },
-//       resolver: "address",
-//       rules: "bytes"
-//     }
-//   }
 function encodeSchedule(
   nonce: string,
   submitter: string,
@@ -208,6 +42,7 @@ function encodeSchedule(
   actions: any,
   config: any
 ): String {
+  const scheduleAbi = queueAbi.find((abiItem: any) => abiItem.type === 'function' && abiItem.name === 'schedule')
   // @ts-ignore
   return abiCoder.encodeParameter(scheduleAbi.inputs[0], {
     payload: {
@@ -391,7 +226,6 @@ function ContractCallHandler({
 
   const updateValue = useCallback(
     (name, updatedValue) => {
-      console.log(name, updatedValue)
       if (values) {
         setValues((elements: any) =>
           elements.map((element: any) =>
@@ -421,9 +255,9 @@ function ContractCallHandler({
           data: encodedFunctionCall
         }], config)
 
+        const root = await queueContract.ROOT_ROLE()
 
-        console.log(action)
-        const tx = await queueContract["schedule"](String(action), {
+        const tx = await queueContract["schedule"](action, {
           value: "0",
           gasLimit: "500000"
         })

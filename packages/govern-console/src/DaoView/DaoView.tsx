@@ -11,14 +11,26 @@ import { gql, useQuery } from '@apollo/client'
 import Button from '../components/Button'
 import NewAction from '../components/NewAction'
 
+const ANY_ADDRESS = '0xffffffffffffffffffffffffffffffffffffffff'
+
 const DAO_QUERY = gql`
   query DAOQuery($name: String) {
   optimisticGame(id: $name) {
     executor {
       address
+      roles {
+        selector
+        who
+        frozen
+      }
     }
     queue {
       address
+      roles {
+        selector
+        who
+        frozen
+      }
       executions {
         id
         sender
@@ -71,13 +83,12 @@ export default function DaoView() {
     return <p>Error</p>
   }
 
-  console.log(data)
-
   return (
     <Switch>
       <Route exact path={path}>
         <DaoInfo dao={data.optimisticGame} />
         <Actions dao={data.optimisticGame} />
+        <Permissions dao={data.optimisticGame} />
       </Route>
       <Route path={`${path}/new-action`}>
         <NewAction
@@ -198,6 +209,96 @@ function Actions({ dao }: DaoInfoProps) {
       )) : 'No actions.'}
       <Button onClick={handleNewAction}>New action</Button>
     </div>
+  )
+}
+
+type PermissionsProps = {
+  dao: any
+}
+
+const KNOWN_QUEUE_ROLES = new Map([
+  ['0x25ddcbe0', 'schedule'],
+  ['0xecb6cba6', 'execute'],
+  ['0x5decc190', 'challenge'],
+  ['0xaa455d9f', 'configure'],
+  ['0xa0e975cb', 'veto'],
+  ['0x586df604', 'ROOT_ROLE']
+])
+
+const KNOWN_GOVERN_ROLES = new Map([
+  ['0x5c3e9760', 'exec']
+])
+
+function Permissions({ dao }: PermissionsProps) {
+  const history = useHistory()
+  const { daoAddress }: any = useParams()
+
+  const handleNewAction = useCallback(() => {
+    history.push(`/${daoAddress}/new-action`)
+
+  }, [history, daoAddress])
+
+  return (
+    <>
+    <div
+      css={`
+        padding: 8px;
+        margin-top: ${4 * 8}px;
+        border: 1px solid whitesmoke;
+        h2 {
+          font-weight: bold;
+          font-size: 24px;
+        }
+        h3 {
+          font-weight: bold;
+          font-size: 18px;
+        }
+        p {
+          margin-bottom: 16px;
+          margin-top: 16px;
+        }
+      `}
+    >
+      <h2>Permissions for Govern</h2>
+      {dao.executor.roles.map((role: any) => {
+        return (
+          <div>
+            <h3>{KNOWN_GOVERN_ROLES.get(role.selector)} - {role.selector}</h3>
+            <p>Who has permission: {role.who === ANY_ADDRESS ? 'Anyone' : role.who}</p>
+          </div>
+        )
+      })}
+    </div>
+    <div
+      css={`
+        padding: 8px;
+        margin-top: ${4 * 8}px;
+        border: 1px solid whitesmoke;
+        h2 {
+          font-weight: bold;
+          font-size: 24px;
+        }
+        h3 {
+          font-weight: bold;
+          font-size: 18px;
+        }
+        p {
+          margin-bottom: 16px;
+          margin-top: 16px;
+        }
+      `}
+    >
+      <h2>Permissions for Optimistic Queue</h2>
+      {dao.queue.roles.map((role: any) => {
+        return (
+          <div>
+            <h3>{KNOWN_QUEUE_ROLES.get(role.selector)} - {role.selector}</h3>
+            <p>Who has permission: {role.who === ANY_ADDRESS ? 'Anyone' : role.who}</p>
+          </div>
+        )
+      })}
+      </div>
+      </>
   )
 }
 
