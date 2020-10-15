@@ -23,12 +23,22 @@
     "@nomiclabs/buidler": "^1.4.7",
     "@nomiclabs/buidler-ethers": "^2.0.0",
     "@nomiclabs/buidler-waffle": "^2.0.0",
+    "@typechain/ethers-v5": "^2.0.0",
+    "@types/chai": "^4.2.13",
+    "@types/mocha": "^8.0.3",
+    "@types/node": "^14.11.8",
     "buidler-extract": "^1.0.0",
+    "buidler-local-networks-config-plugin": "^0.0.1",
+    "buidler-typechain": "^0.2.1",
     "chai": "^4.2.0",
     "ethereum-waffle": "^3.0.0",
     "ethers": "^5.0.0",
     "lerna": "^3.22.1",
-    "solidity-coverage": "^0.7.10"
+    "solidity-coverage": "^0.7.10",
+    "ts-generator": "0.0.8",
+    "ts-node": "^9.0.0",
+    "typechain": "2.0.0",
+    "typescript": "^4.0.3"
   },
   "scripts": {
     "clean": "rm -rf artifacts",
@@ -36,6 +46,7 @@
     "compile": "buidler compile --force",
     "deploy-factory": "yarn compile && buidler deploy-factory",
     "deploy-govern": "buidler deploy-govern",
+    "build": "yarn abi:extract && typechain --target ethers-v5 --outDir typechain './abi/*.json'",
     "test": "buidler test",
     "prepublishOnly": "yarn test && yarn compile",
     "abi:extract": "buidler-extract --output abi/ --keys abi"
