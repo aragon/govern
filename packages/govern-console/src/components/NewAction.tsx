@@ -21,47 +21,6 @@ type AbiType = {
   type: string
 }
 
-function encodeSchedule(
-  nonce: string,
-  submitter: string,
-  executor: string,
-  actions: any,
-  config: any,
-  proof: string
-): String {
-  const scheduleAbi = queueAbi.find((abiItem: any) => abiItem.type === 'function' && abiItem.name === 'schedule')
-  const [scheduleInputs] = scheduleAbi!.inputs
-
-  // @ts-ignore
-  return abiCoder.encodeParameter(scheduleInputs, {
-    payload: {
-      nonce,
-      executionTime: config.executionDelay,
-      submitter,
-      executor,
-      actions,
-      proof: proof ? toHex(proof) : EMPTY_BYTES 
-    },
-    config: {
-      executionDelay: config.executionDelay,
-      scheduleDeposit: {
-        token: config.scheduleDeposit.token.id,
-        amount: config.scheduleDeposit.amount
-      },
-      challengeDeposit: {
-        token: config.challengeDeposit.token.id,
-        amount: config.challengeDeposit.amount
-      },
-      vetoDeposit: {
-        token: config.vetoDeposit.token.id,
-        amount: config.vetoDeposit.amount
-      },
-      resolver: config.resolver,
-      rules: config.rules
-    }
-  })
-}
-
 type NewActionProps = {
   config: any
   executorAddress: string
@@ -74,7 +33,6 @@ export default function NewAction({ config, executorAddress, queueAddress }: New
   const [contractAddress, setContractAddress] = useState('')
   const [proof, setProof] = useState('')
   const queueContract = useContract(queueAddress, queueAbi)
-  // @ts-ignore
 
   const handleParseAbi = useCallback(e => {
     e.preventDefault()
