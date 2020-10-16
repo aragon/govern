@@ -4,7 +4,8 @@
   "license": "GPL-3.0",
   "main": "src/index.ts",
   "scripts": {
-    "start": "node --loader ts-node/esm.mjs  src/index.ts"
+    "start": "ts-node src/index.ts",
+    "dev": "ts-node-dev src/index.ts"
   },
   "dependencies": {
     "@urql/core": "^1.13.1",
@@ -17,6 +18,7 @@
     "ts-node": "^9.0.0"
   },
   "devDependencies": {
-    "@types/express": "^4.17.8"
+    "@types/express": "^4.17.8",
+    "ts-node-dev": "^1.0.0-pre.65"
   }
 }
