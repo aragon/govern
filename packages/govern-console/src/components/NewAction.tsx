@@ -1,34 +1,19 @@
 import React, { useCallback, useState } from 'react'
 import 'styled-components/macro'
-import abiCoder from 'web3-eth-abi'
 import { useWallet } from 'use-wallet'
+import abiCoder from 'web3-eth-abi'
+import { toHex } from 'web3-utils'
 import { useContract } from '../lib/web3-contracts'
 import queueAbi from '../lib/abi/OptimisticQueue.json'
 
-type NewActionProps = {
-  config: any
-  executorAddress: string
-  queueAddress: string
-}
+const EMPTY_BYTES = '0x00'
 
 type Input = {
   name: string | undefined
   type: string | undefined
 }
 
-type ContractCallHandlerProps = {
-  constant: boolean
-  contractAddress: string
-  queueContract: any
-  name: string
-  inputs: Input[] | any[]
-  rawAbiItem: AbiType
-  executor: string
-  config: any
-}
-
 type AbiType = {
-  constant: boolean,
   inputs: Input
   payable: string,
   stateMutability: string,
@@ -40,18 +25,21 @@ function encodeSchedule(
   submitter: string,
   executor: string,
   actions: any,
-  config: any
+  config: any,
+  proof: string
 ): String {
   const scheduleAbi = queueAbi.find((abiItem: any) => abiItem.type === 'function' && abiItem.name === 'schedule')
+  const [scheduleInputs] = scheduleAbi!.inputs
+
   // @ts-ignore
-  return abiCoder.encodeParameter(scheduleAbi.inputs[0], {
+  return abiCoder.encodeParameter(scheduleInputs, {
     payload: {
       nonce,
       executionTime: config.executionDelay,
       submitter,
       executor,
       actions,
-      proof: '0x00'
+      proof: proof ?? EMPTY_BYTES 
     },
     config: {
       executionDelay: config.executionDelay,
@@ -73,10 +61,17 @@ function encodeSchedule(
   })
 }
 
+type NewActionProps = {
+  config: any
+  executorAddress: string
+  queueAddress: string
+}
+
 export default function NewAction({ config, executorAddress, queueAddress }: NewActionProps) {
   const [abi, setAbi] = useState('')
   const [parsedAbi, setParsedAbi] = useState([])
   const [contractAddress, setContractAddress] = useState('')
+  const [proof, setProof] = useState('')
   const queueContract = useContract(queueAddress, queueAbi)
   // @ts-ignore
 
@@ -126,7 +121,7 @@ export default function NewAction({ config, executorAddress, queueAddress }: New
           <input
             type="input"
             onChange={e => setAbi(e.target.value)}
-            placeholder="0xbeef..."
+            placeholder="[{}]"
             value={abi}
             css={`
               margin-top: 12px;
@@ -142,6 +137,20 @@ export default function NewAction({ config, executorAddress, queueAddress }: New
             onChange={e => setContractAddress(e.target.value)}
             placeholder="0xbeef..."
             value={contractAddress}
+            css={`
+              margin-top: 12px;
+              width: 100%;
+              color: black;
+            `}
+          />
+        </label>
+        <label>
+          Input action justification
+          <input
+            type="input"
+            onChange={e => setProof(e.target.value)}
+            placeholder="Qmw"
+            value={proof}
             css={`
               margin-top: 12px;
               width: 100%;
@@ -181,14 +190,14 @@ export default function NewAction({ config, executorAddress, queueAddress }: New
                   `}
                 >
                   <ContractCallHandler
-                    constant={abiItem.constant!}
-                    contractAddress={contractAddress}
-                    queueContract={queueContract}
-                    name={abiItem.name}
-                    inputs={abiItem.inputs}
-                    rawAbiItem={abiItem}
-                    executor={executorAddress}
                     config={config}
+                    contractAddress={contractAddress}
+                    executor={executorAddress}
+                    inputs={abiItem.inputs}
+                    name={abiItem.name}
+                    proof={proof}
+                    queueContract={queueContract}
+                    rawAbiItem={abiItem}
                   />
                 </div>
               ),
@@ -198,15 +207,26 @@ export default function NewAction({ config, executorAddress, queueAddress }: New
   )
 }
 
+type ContractCallHandlerProps = {
+  contractAddress: string
+  config: any
+  executor: string
+  inputs: Input[] | any[]
+  name: string
+  proof: string
+  queueContract: any
+  rawAbiItem: AbiType
+}
+
 function ContractCallHandler({
-  constant,
-  queueContract,
-  name,
-  inputs,
-  rawAbiItem,
-  executor,
+  config,
   contractAddress,
-  config
+  executor,
+  inputs,
+  name,
+  proof,
+  queueContract,
+  rawAbiItem,
 }: ContractCallHandlerProps) {
   const [result, setResult] = useState('')
   const [values, setValues] = useState(() => {
@@ -223,7 +243,7 @@ function ContractCallHandler({
   })
 
   const { account } = useWallet()
-
+  
   const updateValue = useCallback(
     (name, updatedValue) => {
       if (values) {
@@ -251,24 +271,19 @@ function ContractCallHandler({
         const nonce = await queueContract.nonce()
         const action = encodeSchedule(nonce, account!, executor, [{
           to: contractAddress,
-          value: "0x00",
+          value: EMPTY_BYTES,
           data: encodedFunctionCall
-        }], config)
+        }], config, proof)
 
-        const root = await queueContract.ROOT_ROLE()
+        const tx = await queueContract["schedule"](action)
 
-        const tx = await queueContract["schedule"](action, {
-          value: "0",
-          gasLimit: "500000"
-        })
-        console.log(tx)
         setResult(tx.hash)
 
       } catch (e) {
         console.error(e)
       }
     },
-    [account, config, executor, rawAbiItem, contractAddress, queueContract, values],
+    [account, config, contractAddress, executor, queueContract, rawAbiItem, values],
   )
 
   return (

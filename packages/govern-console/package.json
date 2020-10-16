@@ -31,7 +31,8 @@
     "styled-components": "^5.1.0",
     "typescript": "^4.0.3",
     "use-wallet": "^0.8.0",
-    "web3-eth-abi": "^1.3.0"
+    "web3-eth-abi": "^1.3.0",
+    "web3-utils": "^1.3.0"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -13,9 +13,22 @@ import NewAction from '../components/NewAction'
 
 const ANY_ADDRESS = '0xffffffffffffffffffffffffffffffffffffffff'
 
+const KNOWN_QUEUE_ROLES = new Map([
+  ['0x25ddcbe0', 'schedule'],
+  ['0xecb6cba6', 'execute'],
+  ['0x5decc190', 'challenge'],
+  ['0xaa455d9f', 'configure'],
+  ['0xa0e975cb', 'veto'],
+  ['0x586df604', 'ROOT_ROLE']
+])
+
+const KNOWN_GOVERN_ROLES = new Map([
+  ['0x5c3e9760', 'exec']
+])
+
 const DAO_QUERY = gql`
   query DAOQuery($name: String) {
-  optimisticGame(id: $name) {
+    optimisticGame(id: "bitconnectr") {
     executor {
       address
       roles {
@@ -46,15 +59,21 @@ const DAO_QUERY = gql`
       config {
         executionDelay
         scheduleDeposit {
-          token
+          token {
+            id
+          }
           amount
         }
         challengeDeposit {
-          token
+          token {
+            id
+          }
           amount
         }
         vetoDeposit {
-          token
+          token {
+            id
+          }
           amount
         }
         resolver
@@ -147,21 +166,21 @@ function DaoInfo({ dao }: DaoInfoProps) {
       <ul css={`
         margin-left: 16px;
       `}>
-        <li>Token: {dao.queue.config.scheduleDeposit.token}</li>
+        <li>Token: {dao.queue.config.scheduleDeposit.token.id}</li>
         <li>Amount: {dao.queue.config.scheduleDeposit.amount}</li>
       </ul>
       <p>Challenge collateral: </p>
       <ul css={`
         margin-left: 16px;
       `}>
-        <li>Token: {dao.queue.config.challengeDeposit.token}</li>
+        <li>Token: {dao.queue.config.challengeDeposit.token.id}</li>
         <li>Amount: {dao.queue.config.challengeDeposit.amount}</li>
       </ul>
       <p>Veto collateral: </p>
       <ul css={`
         margin-left: 16px;
       `}>
-        <li>Token: {dao.queue.config.vetoDeposit.token}</li>
+        <li>Token: {dao.queue.config.vetoDeposit.token.id}</li>
         <li>Amount: {dao.queue.config.vetoDeposit.amount}</li>
       </ul>
     </div>
@@ -205,7 +224,7 @@ function Actions({ dao }: DaoInfoProps) {
     >
       <h2>Actions</h2>
       {hasActions ? dao.queue.queue.map(({ id }: { id: string }) => (
-        <ActionCard id={id} />
+        <ActionCard id={id} key={id} />
       )) : 'No actions.'}
       <Button onClick={handleNewAction}>New action</Button>
     </div>
@@ -215,19 +234,6 @@ function Actions({ dao }: DaoInfoProps) {
 type PermissionsProps = {
   dao: any
 }
-
-const KNOWN_QUEUE_ROLES = new Map([
-  ['0x25ddcbe0', 'schedule'],
-  ['0xecb6cba6', 'execute'],
-  ['0x5decc190', 'challenge'],
-  ['0xaa455d9f', 'configure'],
-  ['0xa0e975cb', 'veto'],
-  ['0x586df604', 'ROOT_ROLE']
-])
-
-const KNOWN_GOVERN_ROLES = new Map([
-  ['0x5c3e9760', 'exec']
-])
 
 function Permissions({ dao }: PermissionsProps) {
   const history = useHistory()
@@ -262,7 +268,7 @@ function Permissions({ dao }: PermissionsProps) {
       <h2>Permissions for Govern</h2>
       {dao.executor.roles.map((role: any) => {
         return (
-          <div>
+          <div key={role.selector}>
             <h3>{KNOWN_GOVERN_ROLES.get(role.selector)} - {role.selector}</h3>
             <p>Who has permission: {role.who === ANY_ADDRESS ? 'Anyone' : role.who}</p>
           </div>
@@ -291,7 +297,7 @@ function Permissions({ dao }: PermissionsProps) {
       <h2>Permissions for Optimistic Queue</h2>
       {dao.queue.roles.map((role: any) => {
         return (
-          <div>
+          <div key={role.selector}>
             <h3>{KNOWN_QUEUE_ROLES.get(role.selector)} - {role.selector}</h3>
             <p>Who has permission: {role.who === ANY_ADDRESS ? 'Anyone' : role.who}</p>
           </div>

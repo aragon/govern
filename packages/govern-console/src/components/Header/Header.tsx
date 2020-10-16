@@ -78,7 +78,7 @@ function Header() {
       >
         {wallet.status === 'connected'
           ? shortenAddress(wallet.account!)
-          : 'Connect to web3'}
+          : 'Connect account'}
       </button>
     </header>
   )

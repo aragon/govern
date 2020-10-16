@@ -30,11 +30,11 @@ export default function DaoSelector() {
         `}
       >
         <label>
-          Enter DAO address
+          Enter DAO name
           <input
             type="input"
             onChange={handleChangeDaoAddress}
-            placeholder="0xbeef..."
+            placeholder="bitconnect"
             value={daoName}
             css={`
               margin-top: 12px;
