@@ -1,8 +1,9 @@
 import React, { useCallback, useState } from 'react'
-import 'styled-components/macro'
+import BN from 'bn.js'
 import { useWallet } from 'use-wallet'
 import abiCoder from 'web3-eth-abi'
 import { toHex } from 'web3-utils'
+import 'styled-components/macro'
 import { useContract } from '../lib/web3-contracts'
 import queueAbi from '../lib/abi/OptimisticQueue.json'
 
@@ -269,13 +270,42 @@ function ContractCallHandler({
         const encodedFunctionCall = abiCoder.encodeFunctionCall(rawAbiItem, functionValues)
 
         const nonce = await queueContract.nonce()
-        const action = encodeSchedule(nonce, account!, executor, [{
-          to: contractAddress,
-          value: EMPTY_BYTES,
-          data: encodedFunctionCall
-        }], config, proof)
+        const bnNonce = new BN(nonce.toString())
+        const newNonce = bnNonce.add(new BN('1'))
 
-        const tx = await queueContract["schedule"](action)
+        // Right now + 120 seconds into the future
+        const currentDate = Math.round(Date.now() / 1000) + 120
+
+        const tx = await queueContract["schedule"]({
+          payload: {
+            nonce: newNonce.toString(),
+            executionTime: currentDate,
+            submitter: account,
+            executor,
+            actions: [{ to: contractAddress, value: EMPTY_BYTES, data: encodedFunctionCall }],
+            proof: proof ? toHex(proof) : EMPTY_BYTES 
+          },
+          config: {
+            executionDelay: config.executionDelay,
+            scheduleDeposit: {
+              token: config.scheduleDeposit.token.id,
+              amount: config.scheduleDeposit.amount
+            },
+            challengeDeposit: {
+              token: config.challengeDeposit.token.id,
+              amount: config.challengeDeposit.amount
+            },
+            vetoDeposit: {
+              token: config.vetoDeposit.token.id,
+              amount: config.vetoDeposit.amount
+            },
+            resolver: config.resolver,
+            rules: config.rules
+          }
+        },
+          {
+          gasLimit: 500000
+        })
 
         setResult(tx.hash)
 
