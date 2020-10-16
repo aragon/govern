@@ -27,8 +27,7 @@ echo '> Deploying subgraph: '$FULLNAME
 if [ "$LOCAL" ]; then
     graph deploy $FULLNAME \
         --ipfs http://localhost:5001 \
-        --node http://localhost:8020 \
-        --access-token $GRAPHKEY
+        --node http://localhost:8020
 else
     graph deploy $FULLNAME \
         --ipfs https://api.thegraph.com/ipfs/ \

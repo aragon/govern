@@ -16,7 +16,8 @@
     "deploy-rinkeby-staging": "STAGING=true scripts/deploy.sh aragon govern rinkeby",
     "deploy-xdai": "scripts/deploy.sh aragon govern xdai",
     "deploy-xdai-staging": "STAGING=true scripts/deploy.sh aragon govern xdai",
-    "deploy-local": "LOCAL=true STAGING=true scripts/deploy.sh aragon govern rinkeby"
+    "deploy-local": "LOCAL=true scripts/deploy.sh aragon govern rinkeby",
+    "create-local": "graph create aragon/aragon-govern-rinkeby --node http://localhost:8020"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.18.0",
