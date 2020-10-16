@@ -21,8 +21,7 @@ services:
       ethereum: "mainnet:http://host.docker.internal:8545"
       RUST_LOG: info
   ipfs:
-    build:
-      context: docker/ipfs
+    image: ipfs/go-ipfs:v0.4.23
     ports:
       - "5001:5001"
     volumes:
