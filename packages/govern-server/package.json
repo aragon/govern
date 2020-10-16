@@ -14,7 +14,6 @@
     "ts-node": "^9.0.0"
   },
   "devDependencies": {
-    "@types/express": "^4.17.8",
-    "ipfs-swarm-key-gen": "^1.0.1"
+    "@types/express": "^4.17.8"
   }
 }

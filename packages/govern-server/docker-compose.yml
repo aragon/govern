@@ -18,7 +18,7 @@ services:
       postgres_pass: let-me-in
       postgres_db: graph-node
       ipfs: "ipfs:5001"
-      ethereum: "mainnet:http://host.docker.internal:8545"
+      ethereum: "rinkeby:http://host.docker.internal:8545"
       RUST_LOG: info
   ipfs:
     image: ipfs/go-ipfs:v0.4.23
@@ -41,3 +41,4 @@ services:
     image: trufflesuite/ganache-cli
     ports:
       - "8545:8545"
+    command: ["ganache-cli", "--fork", "https://rinkeby.eth.aragon.network"]
