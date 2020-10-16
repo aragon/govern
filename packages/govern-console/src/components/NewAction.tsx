@@ -39,20 +39,20 @@ function encodeSchedule(
       submitter,
       executor,
       actions,
-      proof: proof ?? EMPTY_BYTES 
+      proof: proof ? toHex(proof) : EMPTY_BYTES 
     },
     config: {
       executionDelay: config.executionDelay,
       scheduleDeposit: {
-        token: config.scheduleDeposit.token,
+        token: config.scheduleDeposit.token.id,
         amount: config.scheduleDeposit.amount
       },
       challengeDeposit: {
-        token: config.challengeDeposit.token,
+        token: config.challengeDeposit.token.id,
         amount: config.challengeDeposit.amount
       },
       vetoDeposit: {
-        token: config.vetoDeposit.token,
+        token: config.vetoDeposit.token.id,
         amount: config.vetoDeposit.amount
       },
       resolver: config.resolver,
