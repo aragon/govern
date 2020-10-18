@@ -9,13 +9,13 @@ import {
   Revoked as RevokedEvent,
   Scheduled as ScheduledEvent,
   Vetoed as VetoedEvent,
-} from '../generated/templates/OptimisticQueue/OptimisticQueue'
+} from '../generated/templates/GovernQueue/GovernQueue'
 import {
   Action,
   Config,
   Container,
   Collateral,
-  OptimisticQueue,
+  GovernQueue,
   Payload,
   Role,
 } from '../generated/schema'
@@ -36,7 +36,7 @@ export function handleChallenged(event: ChallengedEvent): void {
 }
 
 export function handleConfigured(event: ConfiguredEvent): void {
-  let queue = OptimisticQueue.load(event.address.toHexString())
+  let queue = GovernQueue.load(event.address.toHexString())
   // TODO: Can there be no queue? check event processing order
   const config = new Config(event.address.toHexString())
 
@@ -81,7 +81,7 @@ export function handleExecuted(event: ExecutedEvent): void {
 }
 
 export function handleFrozen(event: FrozenEvent): void {
-  const queue = OptimisticQueue.load(event.address.toHexString())
+  const queue = GovernQueue.load(event.address.toHexString())
   let id = 0
   const roles = queue.roles
   for (id = 0; id < roles.length; id++) {
@@ -99,7 +99,7 @@ export function handleFrozen(event: FrozenEvent): void {
 }
 
 export function handleGranted(event: GrantedEvent): void {
-  const queue = OptimisticQueue.load(event.address.toHexString())
+  const queue = GovernQueue.load(event.address.toHexString())
   // roleID = contract address + role itself,
   // which will be the function selector + who
   // This is equivalent to storing all roles in the contract, and looking up the corresponding
@@ -138,7 +138,7 @@ export function handleResolved(event: ResolvedEvent): void {
 }
 
 export function handleRevoked(event: RevokedEvent): void {
-  let queue = OptimisticQueue.load(event.address.toHexString())
+  let queue = GovernQueue.load(event.address.toHexString())
   const roleId =
     event.address.toHexString() +
     '-' +
@@ -173,7 +173,7 @@ export function handleRevoked(event: RevokedEvent): void {
 }
 
 export function handleScheduled(event: ScheduledEvent): void {
-  let queue = OptimisticQueue.load(event.address.toHexString())
+  let queue = GovernQueue.load(event.address.toHexString())
   if (!queue) {
     throw new Error('Didnt find queue')
   }

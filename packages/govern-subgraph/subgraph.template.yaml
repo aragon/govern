@@ -9,10 +9,10 @@ dataSources:
 {{> ERC3000Registry.yaml}}
 templates:
   - kind: ethereum/contract
-    name: OptimisticQueue
+    name: GovernQueue
     network: {{network}}
     source:
-      abi: OptimisticQueue
+      abi: GovernQueue
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.1
@@ -24,8 +24,8 @@ templates:
         - Collateral
         - Role
       abis:
-        - name: OptimisticQueue
-          file: ../govern-core/artifacts/OptimisticQueue.json
+        - name: GovernQueue
+          file: ../govern-core/artifacts/GovernQueue.json
       eventHandlers:
         - event: Configured(indexed bytes32,indexed address,(uint256,(address,uint256),(address,uint256),(address,uint256),address,bytes))
           handler: handleConfigured
@@ -45,7 +45,7 @@ templates:
           handler: handleResolved
         - event: Revoked(indexed bytes4,indexed address,indexed address)
           handler: handleRevoked
-      file: ./src/OptimisticQueue.ts
+      file: ./src/GovernQueue.ts
   - kind: ethereum/contract
     name: Govern
     network: {{network}}

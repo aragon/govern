@@ -2,11 +2,11 @@ type Govern @entity {
   id: ID!
   address: Bytes!
   name: String!
-  queue: OptimisticQueue! @derivedFrom(field: "govern")
+  queue: GovernQueue! @derivedFrom(field: "govern")
   roles: [Role]!
 }
 
-type OptimisticQueue @entity {
+type GovernQueue @entity {
   id: ID!
   address: Bytes!
   govern: Govern!

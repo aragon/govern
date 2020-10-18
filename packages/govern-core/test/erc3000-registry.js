@@ -14,11 +14,11 @@ describe('ERC3000 Registry', function () {
   })
 
   beforeEach(async () => {
-    const OptimisticQueueFactory = await ethers.getContractFactory('OptimisticQueueFactory')
+    const GovernQueueFactory = await ethers.getContractFactory('GovernQueueFactory')
     const ERC3000Registry = await ethers.getContractFactory('ERC3000Registry')
     const GovernFactory = await ethers.getContractFactory('GovernFactory')
 
-    queueFactory = await OptimisticQueueFactory.deploy()
+    queueFactory = await GovernQueueFactory.deploy()
     registry = await ERC3000Registry.deploy()
     governFactory = await GovernFactory.deploy(registry.address, queueFactory.address)
   })

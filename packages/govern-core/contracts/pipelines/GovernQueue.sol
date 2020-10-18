@@ -7,11 +7,39 @@ pragma experimental ABIEncoderV2; // required for passing structs in calldata (f
 
 import "erc3k/contracts/ERC3000.sol";
 
-import "./lib/IArbitrable.sol";
-import "./lib/DepositLib.sol";
-import "./lib/MiniACL.sol";
-import "./lib/GovernQueueStateLib.sol";
-import "./lib/SafeERC20.sol";
+import "@aragon/govern-contract-utils/protocol/IArbitrable.sol";
+import "@aragon/govern-contract-utils/deposits/DepositLib.sol";
+import "@aragon/govern-contract-utils/acl/MiniACL.sol";
+import "@aragon/govern-contract-utils/erc20/SafeERC20.sol";
+
+library GovernQueueStateLib {
+    enum State {
+        None,
+        Scheduled,
+        Challenged,
+        Approved,
+        Rejected,
+        Cancelled,
+        Executed
+    }
+
+    struct Item {
+        State state;
+    }
+
+    function checkState(Item storage _item, State _requiredState) internal view {
+        require(_item.state == _requiredState, "queue: bad state");
+    }
+
+    function setState(Item storage _item, State _state) internal {
+        _item.state = _state;
+    }
+
+    function checkAndSetState(Item storage _item, State _fromState, State _toState) internal {
+        checkState(_item, _fromState);
+        setState(_item, _toState);
+    }
+}
 
 contract GovernQueue is ERC3000, IArbitrable, MiniACL {
     // Syntax sugar to enable method-calling syntax on types
@@ -232,7 +260,7 @@ contract GovernQueue is ERC3000, IArbitrable, MiniACL {
         bytes32 containerHash = disputeItemCache[arbitrator][_disputeId];
         queue[containerHash].checkAndSetState(
             GovernQueueStateLib.State.Challenged,
-            _ruling == ALLOW_RULING ? GovernQueueStateLib.State.Approved : GovernQueueStateLib.State.Rejected
+            _ruling == ALLOW_RULING ? GovernQueueStateLib.State.Approved : FQueueStateLib.State.Rejected
         );
         disputeItemCache[arbitrator][_disputeId] = bytes32(0); // refund gas, no longer needed in state
 

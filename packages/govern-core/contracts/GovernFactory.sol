@@ -5,31 +5,32 @@
 pragma solidity 0.6.8;
 pragma experimental ABIEncoderV2;
 
-import "./Govern.sol";
-import "./ERC3000Registry.sol";
-import "./OptimisticQueue.sol";
+import "erc3k/contracts/ERC3000Registry.sol";
 
-contract OptimisticQueueFactory {
+import "./Govern.sol";
+import "./pipelines/GovernQueue.sol";
+
+contract GovernQueueFactory {
     function newQueue(address _aclRoot, ERC3000Data.Config memory _config)
         public
-        returns (OptimisticQueue queue)
+        returns (GovernQueue queue)
     {
-        return new OptimisticQueue(_aclRoot, _config);
+        return new GovernQueue(_aclRoot, _config);
     }
 }
 
 contract GovernFactory {
     address internal constant ANY_ADDR = address(-1);
 
-    OptimisticQueueFactory public queueFactory;
+    GovernQueueFactory public queueFactory;
     ERC3000Registry public registry;
 
-    constructor(ERC3000Registry _registry, OptimisticQueueFactory _queueFactory) public {
+    constructor(ERC3000Registry _registry, GovernQueueFactory _queueFactory) public {
         queueFactory = _queueFactory;
         registry = _registry;
     }
 
-    function newDummyGovern(string calldata _name) external returns (Govern govern, OptimisticQueue queue) {
+    function newDummyGovern(string calldata _name) external returns (Govern govern, GovernQueue queue) {
         ERC3000Data.Collateral memory noCollateral;
         ERC3000Data.Config memory config = ERC3000Data.Config(
             0,

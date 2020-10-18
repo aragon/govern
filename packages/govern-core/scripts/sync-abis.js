@@ -4,8 +4,8 @@ const KNOWN_ABIS = [
   "Govern.json",
   "GovernFactory.json",
   "ERC3000Registry.json",
-  "OptimisticQueue.json",
-  "OptimisticQueueFactory.json",
+  "GovernQueue.json",
+  "GovernQueueFactory.json",
 ];
 
 async function main() {
