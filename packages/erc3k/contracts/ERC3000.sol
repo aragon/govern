@@ -5,7 +5,7 @@
 pragma solidity ^0.6.8;
 pragma experimental ABIEncoderV2;
 
-import "@aragon/govern-contract-utils/erc165/ERC165.sol";
+import "@aragon/govern-contract-utils/contracts/erc165/ERC165.sol";
 
 import "./IERC3000.sol";
 
