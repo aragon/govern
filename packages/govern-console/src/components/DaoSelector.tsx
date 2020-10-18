@@ -34,7 +34,7 @@ export default function DaoSelector() {
           <input
             type="input"
             onChange={handleChangeDaoAddress}
-            placeholder="bitconnect"
+            placeholder="DAO Name"
             value={daoName}
             css={`
               margin-top: 12px;
