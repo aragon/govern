@@ -38,8 +38,8 @@ export const QUEUES = gql`
 `
 
 export const GAME = gql`
-  query OptimisticGame($game: String!) {
-    optimisticGame(id: $game) {
+  query OptimisticGame($name: String!) {
+    optimisticGame(id: $name) {
       ...Game_game
     }
   }

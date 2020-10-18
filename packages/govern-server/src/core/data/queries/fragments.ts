@@ -94,13 +94,21 @@ export const GOVERN_FRAGMENT = gql`
 `
 
 export const CONFIG_FRAGMENT = gql`
-  fragment Config_config on Configuration {
+  fragment Config_config on Config {
     id
-    queue
+    queue {
+      id
+    }
     executionDelay
-    scheduleDeposit
-    challengeDeposit
-    vetoDeposit
+    scheduleDeposit {
+      id
+    }
+    challengeDeposit {
+      id
+    }
+    vetoDeposit {
+      id
+    }
     resolver
     rules
   }
@@ -117,7 +125,7 @@ export const QUEUE_FRAGMENT = gql`
       id
     }
     queue {
-      ...Items_items
+      ...Item_item
     }
     executions {
       ...Execution_execution
@@ -129,6 +137,7 @@ export const QUEUE_FRAGMENT = gql`
   ${CONFIG_FRAGMENT}
   ${ROLE_FRAGMENT}
   ${EXECUTION_FRAGMENT}
+  ${ITEM_FRAGMENT}
 `
 
 export const GAME_FRAGMENT = gql`
