@@ -5,7 +5,7 @@
 pragma solidity 0.6.8;
 pragma experimental ABIEncoderV2;
 
-library MiniACLData {
+library ACLData {
     enum BulkOp { Grant, Revoke, Freeze }
 
     struct BulkItem {
@@ -15,7 +15,7 @@ library MiniACLData {
     }
 }
 
-contract MiniACL {
+contract ACL {
     bytes4 public constant ROOT_ROLE =
         this.grant.selector
         ^ this.revoke.selector
@@ -57,13 +57,13 @@ contract MiniACL {
         _freeze(_role);
     }
 
-    function bulk(MiniACLData.BulkItem[] memory items) public auth(ROOT_ROLE) {
+    function bulk(ACLData.BulkItem[] memory items) public auth(ROOT_ROLE) {
         for (uint256 i = 0; i < items.length; i++) {
-            MiniACLData.BulkItem memory item = items[i];
+            ACLData.BulkItem memory item = items[i];
 
-            if (item.op == MiniACLData.BulkOp.Grant) _grant(item.role, item.who);
-            else if (item.op == MiniACLData.BulkOp.Revoke) _revoke(item.role, item.who);
-            else if (item.op == MiniACLData.BulkOp.Freeze) _freeze(item.role);
+            if (item.op == ACLData.BulkOp.Grant) _grant(item.role, item.who);
+            else if (item.op == ACLData.BulkOp.Revoke) _revoke(item.role, item.who);
+            else if (item.op == ACLData.BulkOp.Freeze) _freeze(item.role);
         }
     }
 
