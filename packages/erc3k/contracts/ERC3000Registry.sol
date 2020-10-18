@@ -4,8 +4,8 @@
 
 pragma solidity 0.6.8;
 
-import "erc3k/contracts/ERC3000Executor.sol";
-import "erc3k/contracts/ERC3000.sol";
+import "./ERC3000.sol";
+import "./ERC3000Executor.sol";
 
 contract ERC3000Registry {
     bytes4 internal constant ERC3000_INTERFACE_ID = 0x9abf68a8;

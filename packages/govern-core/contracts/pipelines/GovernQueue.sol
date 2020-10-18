@@ -7,10 +7,10 @@ pragma experimental ABIEncoderV2; // required for passing structs in calldata (f
 
 import "erc3k/contracts/ERC3000.sol";
 
-import "@aragon/govern-contract-utils/protocol/IArbitrable.sol";
-import "@aragon/govern-contract-utils/deposits/DepositLib.sol";
-import "@aragon/govern-contract-utils/acl/MiniACL.sol";
-import "@aragon/govern-contract-utils/erc20/SafeERC20.sol";
+import "@aragon/govern-contract-utils/contracts/protocol/IArbitrable.sol";
+import "@aragon/govern-contract-utils/contracts/deposits/DepositLib.sol";
+import "@aragon/govern-contract-utils/contracts/acl/MiniACL.sol";
+import "@aragon/govern-contract-utils/contracts/erc20/SafeERC20.sol";
 
 library GovernQueueStateLib {
     enum State {
@@ -260,7 +260,7 @@ contract GovernQueue is ERC3000, IArbitrable, MiniACL {
         bytes32 containerHash = disputeItemCache[arbitrator][_disputeId];
         queue[containerHash].checkAndSetState(
             GovernQueueStateLib.State.Challenged,
-            _ruling == ALLOW_RULING ? GovernQueueStateLib.State.Approved : FQueueStateLib.State.Rejected
+            _ruling == ALLOW_RULING ? GovernQueueStateLib.State.Approved : GovernQueueStateLib.State.Rejected
         );
         disputeItemCache[arbitrator][_disputeId] = bytes32(0); // refund gas, no longer needed in state
 
