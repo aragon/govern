@@ -10,7 +10,7 @@ describe('Optimistic Queue', function () {
     ownerAddr = await owner.getAddress()
     notOwnerAddr = await notOwner.getAddress()
 
-    const OQ = await ethers.getContractFactory('OptimisticQueue')
+    const OQ = await ethers.getContractFactory('GovernQueue')
     oq = await OQ.deploy(ownerAddr, DELAY)
   })
 })

@@ -8,7 +8,7 @@ pragma experimental ABIEncoderV2;
 import "erc3k/contracts/IERC3000.sol";
 import "erc3k/contracts/ERC3000Executor.sol";
 
-import "./lib/MiniACL.sol";
+import "@aragon/govern-contract-utils/acl/MiniACL.sol";
 
 contract Govern is ERC3000Executor, MiniACL {
     bytes4 internal constant EXEC_ROLE = this.exec.selector;

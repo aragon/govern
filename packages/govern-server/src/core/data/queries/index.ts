@@ -20,8 +20,8 @@ export const DAOS = gql`
 `
 
 export const QUEUE = gql`
-  query OptimisticQueue($queue: String!) {
-    optimisticQueue(id: $queue) {
+  query GovernQueue($queue: String!) {
+    governQueue(id: $queue) {
       ...Queue_queue
     }
   }
@@ -29,8 +29,8 @@ export const QUEUE = gql`
 `
 
 export const QUEUES = gql`
-  query OptimisticQueue {
-    optimisticQueues {
+  query GovernQueue {
+    governQueues {
       ...Queue_queue
     }
   }

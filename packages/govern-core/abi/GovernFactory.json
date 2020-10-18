@@ -8,7 +8,7 @@
           "type": "address"
         },
         {
-          "internalType": "contract OptimisticQueueFactory",
+          "internalType": "contract GovernQueueFactory",
           "name": "_queueFactory",
           "type": "address"
         }
@@ -32,7 +32,7 @@
           "type": "address"
         },
         {
-          "internalType": "contract OptimisticQueue",
+          "internalType": "contract GovernQueue",
           "name": "queue",
           "type": "address"
         }
@@ -45,7 +45,7 @@
       "name": "queueFactory",
       "outputs": [
         {
-          "internalType": "contract OptimisticQueueFactory",
+          "internalType": "contract GovernQueueFactory",
           "name": "",
           "type": "address"
         }

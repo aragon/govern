@@ -84,7 +84,7 @@
       "name": "newQueue",
       "outputs": [
         {
-          "internalType": "contract OptimisticQueue",
+          "internalType": "contract GovernQueue",
           "name": "queue",
           "type": "address"
         }

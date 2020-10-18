@@ -6,7 +6,7 @@ import {
   Network,
   Networkish,
   OptimisticGameData,
-  OptimisticQueueData,
+  GovernQueueData,
   QueryResult,
 } from '../types'
 import * as queries from './queries'
@@ -89,18 +89,18 @@ class ConnectorTheGraph {
     )
   }
 
-  async queue(address: Address): Promise<OptimisticQueueData | null> {
-    return this.fetchResult<OptimisticQueueData | null>(
+  async queue(address: Address): Promise<GovernQueueData | null> {
+    return this.fetchResult<GovernQueueData | null>(
       [queries.QUEUE, { queue: address.toLowerCase() }],
-      (data) => data.optimisticQueue ?? null,
+      (data) => data.governQueue ?? null,
       `Unexpected result when fetching the queue ${address}.`
     )
   }
 
-  async queues(): Promise<OptimisticQueueData[]> {
-    return this.fetchResult<OptimisticQueueData[]>(
+  async queues(): Promise<GovernQueueData[]> {
+    return this.fetchResult<GovernQueueData[]>(
       [queries.QUEUES],
-      (data) => data.optimisticQueues ?? [],
+      (data) => data.governQueues ?? [],
       `Unexpected result when fetching the queue.`
     )
   }
