@@ -8,14 +8,14 @@ pragma experimental ABIEncoderV2;
 import "erc3k/contracts/IERC3000.sol";
 import "erc3k/contracts/ERC3000Executor.sol";
 
-import "@aragon/govern-contract-utils/contracts/acl/MiniACL.sol";
+import "@aragon/govern-contract-utils/contracts/acl/ACL.sol";
 
-contract Govern is ERC3000Executor, MiniACL {
+contract Govern is ERC3000Executor, ACL {
     bytes4 internal constant EXEC_ROLE = this.exec.selector;
 
     event ETHDeposited(address indexed sender, uint256 value);
 
-    constructor(IERC3000 _initialExecutor) MiniACL(address(this)) public {
+    constructor(IERC3000 _initialExecutor) ACL(address(this)) public {
         _grant(EXEC_ROLE, address(_initialExecutor));
     }
 
