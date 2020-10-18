@@ -136,6 +136,7 @@ export default gql`
 
   type Query {
     daos: [Dao!]!
-    dao: Dao!
+    dao(address: String!): Dao!
+    game(name: String!): OptimisticGame!
   }
 `
