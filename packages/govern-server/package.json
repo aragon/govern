@@ -4,7 +4,8 @@
   "license": "GPL-3.0",
   "main": "src/index.ts",
   "scripts": {
-    "start": "node --loader ts-node/esm.mjs  src/index.ts"
+    "start": "npm run start:containers && node --loader ts-node/esm.mjs  src/index.ts",
+    "start:containers": "docker-compose up -d"
   },
   "dependencies": {
     "apollo-server": "^2.18.2",
