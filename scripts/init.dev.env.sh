@@ -10,8 +10,8 @@ NC='\033[0m'
 # -----------------------------------
 
 cd ./packages/govern-core/
-npm run compile
-npm run abi:extract
+yarn compile
+yarn abi:extract
 
 if [ $? -ne 0 ]
 then
@@ -37,7 +37,7 @@ fi
 # ----------------------------------
 
 cd ../govern-server/
-npm run start:containers
+yarn start:containers
 
 if [ $? -ne 0 ]
 then
@@ -69,7 +69,7 @@ echo -e ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 # ---------------------
 
 cd ../govern-subgraph/
-npm run create-local
+yarn create-local
 
 if [ $? -ne 0 ]
 then
@@ -93,7 +93,7 @@ fi
 # -----------------------
 # Deploy subgraph locally
 # -----------------------
-npm run deploy-local
+yarn deploy-local
 
 if [ $? -ne 0 ]
 then
@@ -111,8 +111,8 @@ else
     echo "**                                                                              **"
     echo "**                    Govern: local dev env initialized                         **"
     echo "**                                                                              **"
-    echo "**      Execute from now on just 'npm run start:dev' in the root folder or      **"
-    echo "**           'npm run start:containers' in the 'govern-server' package.         **"
+    echo "**      Execute from now on just 'yarn start:dev' in the root folder or      **"
+    echo "**           'yarn start:containers' in the 'govern-server' package.         **"
     echo "**                                                                              **"
     echo -e ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>${NC}"
 fi
