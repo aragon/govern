@@ -27,7 +27,7 @@ contract Govern is ERC3000Executor, ACL {
         emit ETHDeposited(msg.sender, msg.value);
     }
 
-    function exec(ERC3000Data.Action[] memory actions, bytes32 allowFailuresMap, bytes32 memo) override public auth(EXEC_ROLE) returns (bytes[] memory) {
+    function exec(ERC3000Data.Action[] memory actions, bytes32 allowFailuresMap, bytes32 memo) override public auth(EXEC_ROLE) returns (bytes32, bytes[] memory) {
         require(actions.length <= MAX_ACTIONS, "govern: too many"); // need to limit since we use 256-bit bitmaps
         
         bytes[] memory execResults = new bytes[](actions.length);
@@ -44,7 +44,7 @@ contract Govern is ERC3000Executor, ACL {
 
         emit Executed(msg.sender, actions, memo, failureMap, execResults);
 
-        return execResults;
+        return (failureMap, execResults);
     }
 
     // TODO: ERC-1271
