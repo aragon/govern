@@ -16,3 +16,25 @@
 # function with its configuration as a parameter.
 /src/api-graphql
 ```
+
+## Docker container
+
+Build a docker container and expose server on http://localhost:3000:
+```
+docker build . -t govern-server
+docker run -it --rm -d -p 3000:3000 --name govern-server govern-server
+```
+
+Remove the container:
+``` 
+docker stop govern-server
+```
+
+## CI/CD
+
+Github Actions workflow `server-ci-cd.yml` builds and deploys a server container when creating `v*` tags in the `master` branch.
+
+Deployments can be triggered using lerna:
+```bash
+yarn lerna version [ major | minor | patch ]
+```
