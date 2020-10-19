@@ -28,7 +28,7 @@ export type DaoData = {
   id: string
   address: Address
   metadata: string
-  games: string[]
+  games: OptimisticGameData[]
   executions: ExecutionData[]
   roles: RoleData[]
 }

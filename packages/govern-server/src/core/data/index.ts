@@ -7,7 +7,6 @@ import {
   Networkish,
   OptimisticGameData,
   OptimisticQueueData,
-  QueryResult,
 } from '../types'
 import * as queries from './queries'
 import TheGraphWrapper from './TheGraphWrapper'
@@ -54,20 +53,20 @@ class ConnectorTheGraph {
     })
   }
 
-  private async fetchResult<T>(
+  private async fetchResult<ReturnType>(
     queryAndParams:
       | [any]
       | [
-          any, // TODO: find or define the type returned by gql()
+          any, // TODO: use the type returned by gql``
           { [key: string]: any }
         ],
-    callback: (data: { [key: string]: T }) => T,
+    callback: (data: unknown) => ReturnType,
     errorMessage: string
-  ) {
+  ): Promise<ReturnType> {
     const [query, params] = queryAndParams
     try {
       const result = await this.#gql.performQuery(query, params)
-      return callback(result.data) as T
+      return callback(result.data as unknown) as ReturnType
     } catch (err) {
       throw new ErrorUnexpectedResult(errorMessage)
     }
@@ -75,8 +74,8 @@ class ConnectorTheGraph {
 
   async dao(address: Address): Promise<DaoData | null> {
     return this.fetchResult<DaoData | null>(
-      [queries.DAO, { dao: address.toLowerCase() }],
-      (data) => data.govern ?? null,
+      [queries.DAO, { address: address.toLowerCase() }],
+      (data) => (data as { govern: DaoData }).govern ?? null,
       `Unexpected result when fetching the dao ${address}.`
     )
   }
@@ -84,7 +83,7 @@ class ConnectorTheGraph {
   async daos(): Promise<DaoData[]> {
     return this.fetchResult<DaoData[]>(
       [queries.DAOS],
-      (data) => data.governs ?? [],
+      (data) => (data as { governs: DaoData[] }).governs ?? [],
       `Unexpected result when fetching the daos.`
     )
   }
@@ -92,7 +91,9 @@ class ConnectorTheGraph {
   async queue(address: Address): Promise<OptimisticQueueData | null> {
     return this.fetchResult<OptimisticQueueData | null>(
       [queries.QUEUE, { queue: address.toLowerCase() }],
-      (data) => data.optimisticQueue ?? null,
+      (data) =>
+        (data as { optimisticQueue: OptimisticQueueData }).optimisticQueue ??
+        null,
       `Unexpected result when fetching the queue ${address}.`
     )
   }
@@ -100,7 +101,9 @@ class ConnectorTheGraph {
   async queues(): Promise<OptimisticQueueData[]> {
     return this.fetchResult<OptimisticQueueData[]>(
       [queries.QUEUES],
-      (data) => data.optimisticQueues ?? [],
+      (data) =>
+        (data as { optimisticQueues: OptimisticQueueData[] })
+          .optimisticQueues ?? [],
       `Unexpected result when fetching the queue.`
     )
   }
@@ -108,7 +111,8 @@ class ConnectorTheGraph {
   async game(name: string): Promise<OptimisticGameData | null> {
     return this.fetchResult<OptimisticGameData | null>(
       [queries.GAME, { name }],
-      (data) => data.optimisticGame ?? null,
+      (data) =>
+        (data as { optimisticGame: OptimisticGameData }).optimisticGame ?? null,
       `Unexpected result when fetching the game ${name}.`
     )
   }
@@ -116,16 +120,23 @@ class ConnectorTheGraph {
   async games(): Promise<OptimisticGameData[]> {
     return this.fetchResult<OptimisticGameData[]>(
       [queries.GAMES],
-      (data) => data.optimisticGames ?? [],
+      (data) =>
+        (data as { optimisticGames: OptimisticGameData[] }).optimisticGames ??
+        [],
       `Unexpected result when fetching the games.`
     )
   }
 
-  async queuesForDao(dao: Address): Promise<OptimisticGameData[]> {
-    return this.fetchResult<OptimisticGameData[]>(
-      [queries.QUEUES_BY_DAO, { dao }],
-      (data) => data.optimisticGame ?? [],
-      `Unexpected result when fetching the queues for dao ${dao}.`
+  async queuesForDao(address: Address): Promise<OptimisticQueueData[]> {
+    return this.fetchResult<OptimisticQueueData[]>(
+      [queries.QUEUES_BY_DAO, { address }],
+      (data) => {
+        const games = (data as { govern: DaoData })?.govern?.games ?? []
+        return games.reduce<OptimisticQueueData[]>((queues, game) => {
+          return game?.queue ? [...queues, game.queue] : queues
+        }, [])
+      },
+      `Unexpected result when fetching the queues for dao ${address}.`
     )
   }
 }

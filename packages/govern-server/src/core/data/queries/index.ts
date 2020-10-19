@@ -2,8 +2,8 @@ import gql from 'graphql-tag'
 import * as fragments from './fragments'
 
 export const DAO = gql`
-  query Govern($dao: String!) {
-    govern(id: $dao) {
+  query Govern($address: String!) {
+    govern(id: $address) {
       ...Govern_govern
     }
   }
@@ -56,13 +56,12 @@ export const GAMES = gql`
 `
 
 export const QUEUES_BY_DAO = gql`
-  query OptimisticGame($dao: String!) {
-    optimisticGames {
-      executor(where: { id: $dao }, orderBy: startDate, orderDirection: asc) {
-        id
-      }
-      queue {
-        ...Queue_queue
+  query Govern($address: String!) {
+    govern(id: $address) {
+      games {
+        queue {
+          ...Queue_queue
+        }
       }
     }
   }
