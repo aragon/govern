@@ -55,7 +55,7 @@ fi
 # Wait some seconds until containers are ready
 # --------------------------------------------
 echo "Waiting until containers are ready..."
-sleep 20
+sleep 35
 
 echo " "
 echo -e "${GREEN}>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
