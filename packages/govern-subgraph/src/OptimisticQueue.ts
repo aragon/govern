@@ -132,7 +132,9 @@ export function handleConfigured(event: ConfiguredEvent): void {
   scheduleDeposit.amount = event.params.config.scheduleDeposit.amount
 
   const challengeDeposit = loadOrCreateCollateral(event, '2')
-  challengeDeposit.token = buildERC20(event.params.config.challengeDeposit.token)
+  challengeDeposit.token = buildERC20(
+    event.params.config.challengeDeposit.token
+  )
   challengeDeposit.amount = event.params.config.challengeDeposit.amount
 
   const vetoDeposit = loadOrCreateCollateral(event, '3')
@@ -282,7 +284,6 @@ function loadOrCreateItem(
   if (item === null) {
     item = new ItemEntity(itemId)
     item.status = NONE_STATUS
-    item.actions = []
     item.createdAt = event.block.timestamp
   }
   return item!
