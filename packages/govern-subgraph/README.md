@@ -11,11 +11,11 @@ After installing the monorepo's dependencies, run:
 
 ## Networks and performance
 
-This subgraph can be used for Aragon Govern on mainnet, and all testnets. In order to run it for a testnet, the subgraph.yaml file will need to have the contract addresses changed to point to the correct address for each respective network. Aragon one will have a history of deployments that you'll be able to use for this, but you can also deploy it yourself using the tasks set up in the `govern-core` package.
+This subgraph can be used for Aragon Govern on mainnet, and all testnets. In order to run it for a testnet, the subgraph.yaml file will need to have the contract addresses changed to point to the correct address for each respective network. Aragon One will have a history of deployments that you'll be able to use for this, but you can also deploy it yourself using the tasks set up in the `govern-core` package.
 
 ## Subgraph architecture and structure
 
-Borrowing ideas from the original aragonOS subgraph, we took the approach of leveraging [data source templates](https://thegraph.com/docs/define-a-subgraph#data-source-templates) and mustache templates for dynamically generating different subgraph configurations for different networks. The `manifest` folder contains both the data needed for filling the addresses for these environments (located inside the `data`) folder, and the templates needed for auto-filling the actual structure for the yaml files that define the contract entities. These all get funneled into the `subgraph.template.yaml` file, which moustache will take as template, and create the actual `subgraph.yaml` file needed for deployment.
+Borrowing ideas from the original aragonOS subgraphs, we took the approach of leveraging [data source templates](https://thegraph.com/docs/define-a-subgraph#data-source-templates) and mustache templates for dynamically generating different subgraph configurations for different networks. The `manifest` folder contains both the data needed for filling the addresses for these environments (located inside the `data`) folder, and the templates needed for auto-filling the actual structure for the yaml files that define the contract entities. These all get funneled into the `subgraph.template.yaml` file, which moustache will take as template, and create the actual `subgraph.yaml` file needed for deployment.
 
 ## General information on Govern events and contracts
 
