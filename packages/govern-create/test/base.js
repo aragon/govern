@@ -6,7 +6,7 @@ const EVENTS = {
 }
 
 describe('ERC3000 Registry', function () {
-  let signers, owner, governFactory, registry
+  let signers, owner, governBaseFactory, registry
 
   before(async () => {
     signers = await ethers.getSigners()
@@ -16,16 +16,16 @@ describe('ERC3000 Registry', function () {
   beforeEach(async () => {
     const GovernQueueFactory = await ethers.getContractFactory('GovernQueueFactory')
     const ERC3000Registry = await ethers.getContractFactory('ERC3000Registry')
-    const GovernFactory = await ethers.getContractFactory('GovernFactory')
+    const GovernBaseFactory = await ethers.getContractFactory('GovernBaseFactory')
 
     queueFactory = await GovernQueueFactory.deploy()
     registry = await ERC3000Registry.deploy()
-    governFactory = await GovernFactory.deploy(registry.address, queueFactory.address)
+    governBaseFactory = await GovernBaseFactory.deploy(registry.address, queueFactory.address)
   })
 
   const GAS_TARGET = !process.env.SOLIDITY_COVERAGE ? 4e6 : 20e6
   it(`deploys DAO under ${GAS_TARGET} gas`, async () => {
-    const tx = governFactory.newDummyGovern('eagle')
+    const tx = governBaseFactory.newDummyGovern('eagle')
 
     await expect(tx).to.emit(registry, EVENTS.REGISTERED)
     await expect(tx).to.emit(registry, EVENTS.SET_METADATA)
