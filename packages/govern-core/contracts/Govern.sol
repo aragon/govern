@@ -37,8 +37,8 @@ contract Govern is ERC3000Executor, ACL {
             // TODO: optimize with assembly
             (bool ok, bytes memory ret) = actions[i].to.call{value: actions[i].value}(actions[i].data);
             require(ok || allowFailuresMap.get(i), "govern: call");
-
-            failureMap = ok ? failureMap : failureMap.flip(i); // if a call fails, flip that bit to signal failure
+            // if a call fails, flip that bit to signal failure
+            failureMap = ok ? failureMap : failureMap.flip(i);
             execResults[i] = ret;
         }
 
