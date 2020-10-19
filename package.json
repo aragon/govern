@@ -15,7 +15,7 @@
   },
   "scripts": {
     "test": "lerna run --parallel --stream --ignore @aragon/erc3kjs test",
-    "coverage": "lerna run --parallel --stream --ignore @aragon/erc3kjs coverage",
+    "coverage": "lerna run --concurrency 1 --stream --ignore @aragon/erc3kjs coverage",
     "build": "lerna run --scope=@aragon/govern* --concurrency=1 --stream compile",
     "build:contracts": "lerna run --scope=@aragon/govern --concurrency=1 --stream compile",
     "build:subgraph": "lerna run --scope=@aragon/govern-subgraph --concurrency=1 --stream build"
