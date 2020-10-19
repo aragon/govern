@@ -18,7 +18,7 @@ export function handleRegistered(event: RegisteredEvent): void {
   const game = new OptimisticGameEntity(event.params.name)
 
   game.name = event.params.name
-  game.executor = event.params.dao.toHexString()
+  game.executor = event.params.executor.toHexString()
   game.queue = event.params.queue.toHexString()
 
   // add game to the registry
@@ -32,7 +32,7 @@ export function handleRegistered(event: RegisteredEvent): void {
   registry.save()
 
   // Create datasource templates
-  GovernTemplate.create(event.params.dao)
+  GovernTemplate.create(event.params.executor)
   QueueTemplate.create(event.params.queue)
 }
 
