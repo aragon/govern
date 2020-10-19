@@ -41,7 +41,7 @@ export const COLLATERAL_FRAGMENT = gql`
 `
 
 export const ITEM_FRAGMENT = gql`
-  fragment Execution_execution on Execution {
+  fragment Item_item on Item {
     id
     status
     nonce
@@ -93,18 +93,39 @@ export const GOVERN_FRAGMENT = gql`
   ${EXECUTION_FRAGMENT}
 `
 
-export const QUEUE_FRAGMENT = gql`
-  fragment Govern_govern on OptimisticQueue {
+export const CONFIG_FRAGMENT = gql`
+  fragment Config_config on Config {
     id
-    address
-    config{
-      
-    }
-    games{
+    queue {
       id
     }
-    queue{
-      ...Items_items
+    executionDelay
+    scheduleDeposit {
+      id
+    }
+    challengeDeposit {
+      id
+    }
+    vetoDeposit {
+      id
+    }
+    resolver
+    rules
+  }
+`
+
+export const QUEUE_FRAGMENT = gql`
+  fragment Queue_queue on OptimisticQueue {
+    id
+    address
+    config {
+      ...Config_config
+    }
+    games {
+      id
+    }
+    queue {
+      ...Item_item
     }
     executions {
       ...Execution_execution
@@ -113,8 +134,10 @@ export const QUEUE_FRAGMENT = gql`
       ...Role_role
     }
   }
+  ${CONFIG_FRAGMENT}
   ${ROLE_FRAGMENT}
   ${EXECUTION_FRAGMENT}
+  ${ITEM_FRAGMENT}
 `
 
 export const GAME_FRAGMENT = gql`
