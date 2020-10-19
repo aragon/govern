@@ -17,7 +17,7 @@
     "ts-node": "^9.0.0"
   },
   "devDependencies": {
-    "@types/express": "^4.17.8",
-    "ts-node-dev": "^1.0.0-pre.65"
+    "typescript": "^3.8.3",
+    "@types/express": "^4.17.8"
   }
 }
