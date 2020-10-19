@@ -8,7 +8,7 @@ pragma experimental ABIEncoderV2;
 import "../ERC3000Executor.sol";
 
 contract ERC3000ExecutorMock is ERC3000Executor {
-    function exec(ERC3000Data.Action[] memory actions) override public returns (bytes[] memory) {
+    function exec(ERC3000Data.Action[] memory, bytes32, bytes32) override public returns (bytes[] memory) {
 
     }
 
