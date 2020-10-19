@@ -5,42 +5,20 @@ export default function resolvers(govern: GovernData): IResolvers {
   return {
     Query: {
       async dao(_, args) {
-        try {
-          const result = await govern.dao(args.address)
-          return result?.data?.govern || null
-        } catch (err) {
-          return null
-        }
+        return govern.dao(args.address)
       },
       async daos() {
-        try {
-          const result = await govern.daos()
-          return result?.data?.governs || []
-        } catch (err) {
-          return []
-        }
+        return govern.daos()
       },
       async game(_, args) {
-        try {
-          const result = await govern.game(args.name)
-          return result?.data?.game || null
-        } catch (err) {
-          return null
-        }
+        return govern.game(args.name)
       },
     },
     Dao: {
       async games(parent) {
-        try {
-          return await Promise.all(
-            parent.games.map(async ({ id }: { id: string }) => {
-              const game = await govern.game(id)
-              return game?.data?.optimisticGame
-            })
-          )
-        } catch (err) {
-          return []
-        }
+        return Promise.all(
+          parent.games.map(async ({ id }: { id: string }) => govern.game(id))
+        )
       },
     },
   }
