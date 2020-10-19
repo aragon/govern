@@ -1,18 +1,14 @@
 import React from 'react'
 import { HashRouter as Router, Route, Switch } from 'react-router-dom'
 import 'styled-components/macro'
-import DaoSelector from './components/DaoSelector'
-import TopHeader from './components/Header/Header'
-import DaoView from './DaoView/DaoView'
+import TopHeader from './Components/Header/Header'
+import DaoSelector from './pages/DaoSelector'
+import DaoView from './pages/DaoView'
 import ErcTool from './Tools/Erc'
 
 function App() {
   return (
-    <div
-      css={`
-        padding: 8px;
-      `}
-    >
+    <div>
       <TopHeader />
       <Router>
         <Switch>

@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import 'styled-components/macro'
+import Button from '../Components/Button'
 import ercAbi from '../lib/abi/erc20.json'
 import { useContract } from '../lib/web3-contracts'
 
@@ -15,23 +16,12 @@ export default function ErcTool() {
 
   return (
     <>
-      <button
+      <Button
         type="button"
         onClick={() => history.goBack()}
-        css={`
-          margin-top: 8px;
-          font-family: 'Overpass Mono', monospace;
-          font-size: 16px;
-          position: relative;
-          background: transparent;
-          color: white;
-          cursor: pointer;
-          border: 0px;
-          text-decoration: underline;
-        `}
       >
         Back
-      </button>
+      </Button>
       <div
         css={`
           padding: 8px;
@@ -120,7 +110,6 @@ function ContractCallHandler({
 
   const updateValue = useCallback(
     (name, updatedValue) => {
-      console.log(name, updatedValue)
       if (values) {
         setValues((elements: any) =>
           elements.map((element: any) =>
@@ -158,7 +147,7 @@ function ContractCallHandler({
         console.error(e)
       }
     },
-    [constant, ercContract, name, values],
+    [ercContract, constant, name, values],
   )
 
   return (

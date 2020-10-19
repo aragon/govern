@@ -1,14 +1,17 @@
 import React from 'react'
 import 'styled-components/macro'
 
-type ButtonProps = {
-    children: React.ReactNode
-    onClick: () => void
-}
-
-export default function Button({ children, onClick }: ButtonProps) {
+export default function Button({
+  children,
+  disabled = false,
+  onClick,
+  type,
+}: React.HTMLProps<HTMLButtonElement>) {
   return (
     <button
+      disabled={disabled}
+      //@ts-ignore
+      type={type!}
       onClick={onClick}
       css={`
         font-family: 'Overpass Mono', monospace;
@@ -19,14 +22,14 @@ export default function Button({ children, onClick }: ButtonProps) {
         cursor: pointer;
 
         &:hover {
-        background: rgba(255, 255, 255, 0.2);
+          background: rgba(255, 255, 255, 0.2);
         }
         &:active {
-        top: 1px;
+          top: 1px;
         }
       `}
     >
       {children}
     </button>
-    )
+  )
 }

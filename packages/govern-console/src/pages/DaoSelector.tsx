@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import 'styled-components/macro'
+import Button from '../Components/Button'
 
 const KNOWN_TOOLS = [
   {
@@ -43,25 +44,12 @@ export default function DaoSelector() {
             `}
           />
         </label>
-        <button
+        <Button
           onClick={handleGoToDao}
           disabled={!daoName}
-          css={`
-            margin-top: 16px;
-            font-family: 'Overpass Mono', monospace;
-            font-size: 12px;
-            position: relative;
-            background: transparent;
-            color: white;
-            cursor: pointer;
-
-            &:active {
-              top: 1px;
-            }
-          `}
         >
           Go to DAO
-        </button>
+        </Button>
       </form>
       <div
         css={`

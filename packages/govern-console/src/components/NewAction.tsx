@@ -4,6 +4,7 @@ import { useWallet } from 'use-wallet'
 import abiCoder from 'web3-eth-abi'
 import { toHex } from 'web3-utils'
 import 'styled-components/macro'
+import Button from '../Components/Button'
 import { useContract } from '../lib/web3-contracts'
 import queueAbi from '../lib/abi/OptimisticQueue.json'
 
@@ -16,8 +17,8 @@ type Input = {
 
 type AbiType = {
   inputs: Input
-  payable: string,
-  stateMutability: string,
+  payable: string
+  stateMutability: string
   type: string
 }
 
@@ -27,115 +28,113 @@ type NewActionProps = {
   queueAddress: string
 }
 
-export default function NewAction({ config, executorAddress, queueAddress }: NewActionProps) {
+export default function NewAction({
+  config,
+  executorAddress,
+  queueAddress,
+}: NewActionProps) {
   const [abi, setAbi] = useState('')
-  const [parsedAbi, setParsedAbi] = useState([])
   const [contractAddress, setContractAddress] = useState('')
+  const [parsedAbi, setParsedAbi] = useState([])
   const [proof, setProof] = useState('')
   const queueContract = useContract(queueAddress, queueAbi)
 
-  const handleParseAbi = useCallback(e => {
-    e.preventDefault()
-    try {
-      const parsedAbi = JSON.parse(abi)
-      setParsedAbi(parsedAbi)
-    } catch (err) {
-      console.error('there seems to be an error in the ABI.')
-    }
-  }, [abi])
-  
+  const handleParseAbi = useCallback(
+    e => {
+      e.preventDefault()
+      try {
+        const parsedAbi = JSON.parse(abi)
+        setParsedAbi(parsedAbi)
+      } catch (err) {
+        console.error('there seems to be an error in the ABI.')
+      }
+    },
+    [abi],
+  )
+
   return (
     <>
-    <h2 css={`
-      margin-top: ${2 * 8}px;
-    `}>New action</h2>
-    <div
-      css={`
-        padding: 8px;
-        margin-top: ${4 * 8}px;
-        border: 1px solid whitesmoke;
-        h2 {
-          font-weight: bold;
-          font-size: 24px;
-        }
-        h3 {
-          font-weight: bold;
-          font-size: 18px;
-        }
-        p {
-          margin-bottom: 16px;
-          margin-top: 16px;
-        }
-      `}
-    >
-      <form
+      <h2
         css={`
-          padding: 8px;
-          margin-top: ${4 * 8}px;
-          border: 1px solid whitesmoke;
+          margin-top: 16px;
         `}
       >
-        <label>
-          Input function ABI
-          <input
-            type="input"
-            onChange={e => setAbi(e.target.value)}
-            placeholder="[{}]"
-            value={abi}
-            css={`
-              margin-top: 12px;
-              width: 100%;
-              color: black;
-            `}
-          />
-        </label>
-        <label>
-          Input contract address
-          <input
-            type="input"
-            onChange={e => setContractAddress(e.target.value)}
-            placeholder="0xbeef..."
-            value={contractAddress}
-            css={`
-              margin-top: 12px;
-              width: 100%;
-              color: black;
-            `}
-          />
-        </label>
-        <label>
-          Input action justification
-          <input
-            type="input"
-            onChange={e => setProof(e.target.value)}
-            placeholder="Qmw"
-            value={proof}
-            css={`
-              margin-top: 12px;
-              width: 100%;
-              color: black;
-            `}
-          />
-        </label>
-        <button
-          onClick={handleParseAbi}
-          css={`
+        New action
+      </h2>
+      <div
+        css={`
+          padding: 8px;
+          margin-top: 32px;
+          border: 1px solid whitesmoke;
+          h2 {
+            font-weight: bold;
+            font-size: 24px;
+          }
+          h3 {
+            font-weight: bold;
+            font-size: 18px;
+          }
+          p {
+            margin-bottom: 16px;
             margin-top: 16px;
-            font-family: 'Overpass Mono', monospace;
-            font-size: 12px;
-            position: relative;
-            background: transparent;
-            color: white;
-            cursor: pointer;
-
-            &:active {
-              top: 1px;
-            }
+          }
+        `}
+      >
+        <form
+          css={`
+            padding: 8px;
+            margin-top: 32px;
+            border: 1px solid whitesmoke;
           `}
         >
-         Parse ABI 
-        </button>
-      </form>
+          <label>
+            Input function ABI
+            <input
+              type="input"
+              onChange={e => setAbi(e.target.value)}
+              placeholder="[{}]"
+              value={abi}
+              css={`
+                margin-top: 12px;
+                width: 100%;
+                color: black;
+              `}
+            />
+          </label>
+          <label>
+            Input contract address
+            <input
+              type="input"
+              onChange={e => setContractAddress(e.target.value)}
+              placeholder="0xbeef..."
+              value={contractAddress}
+              css={`
+                margin-top: 12px;
+                width: 100%;
+                color: black;
+              `}
+            />
+          </label>
+          <label>
+            Input action justification
+            <input
+              type="input"
+              onChange={e => setProof(e.target.value)}
+              placeholder="Qmw"
+              value={proof}
+              css={`
+                margin-top: 12px;
+                width: 100%;
+                color: black;
+              `}
+            />
+          </label>
+          <Button
+            onClick={handleParseAbi}
+          >
+            Parse ABI
+          </Button>
+        </form>
         {abi &&
           parsedAbi!.map(
             (abiItem: any) =>
@@ -161,7 +160,7 @@ export default function NewAction({ config, executorAddress, queueAddress }: New
                 </div>
               ),
           )}
-    </div>
+      </div>
     </>
   )
 }
@@ -202,7 +201,7 @@ function ContractCallHandler({
   })
 
   const { account } = useWallet()
-  
+
   const updateValue = useCallback(
     (name, updatedValue) => {
       if (values) {
@@ -225,53 +224,72 @@ function ContractCallHandler({
         const functionValues = values ? values.map((val: any) => val.value) : []
 
         // @ts-ignore
-        const encodedFunctionCall = abiCoder.encodeFunctionCall(rawAbiItem, functionValues)
+        const encodedFunctionCall = abiCoder.encodeFunctionCall(
+          rawAbiItem,
+          functionValues,
+        )
 
         const nonce = await queueContract.nonce()
         const bnNonce = new BN(nonce.toString())
         const newNonce = bnNonce.add(new BN('1'))
 
-        // Right now + 120 seconds into the future
+        // Right now + 120 seconds into the future (in the future, this should be configurable)
         const currentDate = Math.round(Date.now() / 1000) + 120
 
-        const tx = await queueContract["schedule"]({
-          payload: {
-            nonce: newNonce.toString(),
-            executionTime: currentDate,
-            submitter: account,
-            executor,
-            actions: [{ to: contractAddress, value: EMPTY_BYTES, data: encodedFunctionCall }],
-            proof: proof ? toHex(proof) : EMPTY_BYTES 
-          },
-          config: {
-            executionDelay: config.executionDelay,
-            scheduleDeposit: {
-              token: config.scheduleDeposit.token.id,
-              amount: config.scheduleDeposit.amount
-            },
-            challengeDeposit: {
-              token: config.challengeDeposit.token.id,
-              amount: config.challengeDeposit.amount
-            },
-            vetoDeposit: {
-              token: config.vetoDeposit.token.id,
-              amount: config.vetoDeposit.amount
-            },
-            resolver: config.resolver,
-            rules: config.rules
-          }
-        },
+        const tx = await queueContract['schedule'](
           {
-          gasLimit: 500000
-        })
+            payload: {
+              nonce: newNonce.toString(),
+              executionTime: currentDate,
+              submitter: account,
+              executor,
+              actions: [
+                {
+                  to: contractAddress,
+                  value: EMPTY_BYTES,
+                  data: encodedFunctionCall,
+                },
+              ],
+              proof: proof ? toHex(proof) : EMPTY_BYTES,
+            },
+            config: {
+              executionDelay: config.executionDelay,
+              scheduleDeposit: {
+                token: config.scheduleDeposit.token.id,
+                amount: config.scheduleDeposit.amount,
+              },
+              challengeDeposit: {
+                token: config.challengeDeposit.token.id,
+                amount: config.challengeDeposit.amount,
+              },
+              vetoDeposit: {
+                token: config.vetoDeposit.token.id,
+                amount: config.vetoDeposit.amount,
+              },
+              resolver: config.resolver,
+              rules: config.rules,
+            },
+          },
+          {
+            gasLimit: 500000,
+          },
+        )
 
         setResult(tx.hash)
-
       } catch (e) {
         console.error(e)
       }
     },
-    [account, config, contractAddress, executor, queueContract, rawAbiItem, values],
+    [
+      account,
+      config,
+      contractAddress,
+      executor,
+      proof,
+      queueContract,
+      rawAbiItem,
+      values,
+    ],
   )
 
   return (
@@ -298,26 +316,12 @@ function ContractCallHandler({
             </label>
           </div>
         ))}
-        <button
+        <Button
           type="submit"
           onClick={handleExecute}
-          css={`
-            max-width: 100px;
-            margin-top: 16px;
-            font-family: 'Overpass Mono', monospace;
-            font-size: 12px;
-            position: relative;
-            background: transparent;
-            color: white;
-            cursor: pointer;
-
-            &:active {
-              top: 1px;
-            }
-          `}
         >
           Execute
-        </button>
+        </Button>
         <span>Result: {result}</span>
       </form>
     </>
