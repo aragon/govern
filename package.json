@@ -20,7 +20,7 @@
     "build:contracts": "lerna run --scope=@aragon/govern --concurrency=1 --stream compile",
     "build:subgraph": "lerna run --scope=@aragon/govern-subgraph --concurrency=1 --stream build",
     "init:dev:env": "scripts/init.dev.env.sh",
-    "start:dev": "cd ./packages/govern-server/ && npm run start:containers"
+    "start:dev": "cd ./packages/govern-server/ && yarn start:containers"
   },
   "workspaces": {
     "packages": [

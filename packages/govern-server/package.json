@@ -4,7 +4,7 @@
   "license": "GPL-3.0",
   "main": "src/index.ts",
   "scripts": {
-    "start": "npm run start:containers && node --loader ts-node/esm.mjs  src/index.ts",
+    "start": "yarn start:containers && node --loader ts-node/esm.mjs  src/index.ts",
     "start:containers": "docker-compose up -d"
   },
   "dependencies": {
