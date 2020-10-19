@@ -13,7 +13,6 @@
     "/contracts"
   ],
   "license": "MIT",
-  "private": false,
   "devDependencies": {
     "@nomiclabs/buidler": "^1.4.7",
     "@nomiclabs/buidler-ethers": "^2.0.0",
