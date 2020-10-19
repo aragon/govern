@@ -18,7 +18,8 @@
     "coverage": "lerna run --parallel --stream --ignore @aragon/erc3kjs coverage",
     "build": "lerna run --scope=@aragon/govern* --concurrency=1 --stream compile",
     "build:contracts": "lerna run --scope=@aragon/govern --concurrency=1 --stream compile",
-    "build:subgraph": "lerna run --scope=@aragon/govern-subgraph --concurrency=1 --stream build"
+    "build:subgraph": "lerna run --scope=@aragon/govern-subgraph --concurrency=1 --stream build",
+    "deploy:subgraph:rinkeby": "lerna run --scope=@aragon/govern-subgraph --concurrency=1 --stream deploy-rinkeby"
   },
   "workspaces": {
     "packages": [
