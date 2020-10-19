@@ -1,6 +1,6 @@
 const { expect } = require('chai')
 
-describe.only('Bitmap', function () {
+describe('Bitmap', function () {
   let lib
 
   beforeEach(async () => {
@@ -14,7 +14,7 @@ describe.only('Bitmap', function () {
 
   it('randomly flip and check', async () => {
     let map = []
-    let bitmap = `0x${'00'.repeat(32)}`
+    let bitmap = await lib.empty()
 
     for (let i = 0; i < 256; i++) {
       const bit = Math.random() >= 0.5
