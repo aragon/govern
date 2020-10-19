@@ -25,9 +25,12 @@ templates:
         - Collateral
         - Evidence
         - Role
+        - ERC20
       abis:
         - name: OptimisticQueue
           file: ../govern-core/abi/OptimisticQueue.json
+        - name: ERC20
+          file: ../govern-core/abi/ERC20.json
       eventHandlers:
         - event: Configured(indexed bytes32,indexed address,(uint256,(address,uint256),(address,uint256),(address,uint256),address,bytes))
           handler: handleConfigured
