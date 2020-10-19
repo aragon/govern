@@ -22,6 +22,7 @@ export default gql`
     games: [OptimisticGame!]
     executions: [Execution!]
     roles: [Role!]
+    queues: [OptimisticQueue!]
   }
 
   type Execution {

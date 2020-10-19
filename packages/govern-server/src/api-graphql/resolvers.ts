@@ -20,6 +20,9 @@ export default function resolvers(govern: GovernData): IResolvers {
           parent.games.map(async ({ id }: { id: string }) => govern.game(id))
         )
       },
+      async queues(parent) {
+        return govern.queuesForDao(parent.address)
+      },
     },
   }
 }
