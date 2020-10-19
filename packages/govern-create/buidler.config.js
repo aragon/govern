@@ -29,7 +29,7 @@ task('accounts', 'Prints the list of accounts', async () => {
 })
 
 const format = ({ address }, name) =>
-  `- ${name}: https://rinkeby.etherscan.io/address/${address})`
+  `- ${name}: https://rinkeby.etherscan.io/address/${address}`
 
 const print = (contract, name) => console.log(format(contract, name))
 
@@ -44,22 +44,17 @@ task('deploy-registry', 'Deploys an ERC3000Registry instance').setAction(
 
 task('deploy-factory', 'Deploys an GovernBaseFactory instance').setAction(
   async (_, { ethers }) => {
-    const GovernQueueFactory = await ethers.getContractFactory(
-      'GovernQueueFactory'
-    )
+    const GovernQueueFactory = await ethers.getContractFactory('GovernQueueFactory')
     const GovernBaseFactory = await ethers.getContractFactory('GovernBaseFactory')
 
     const queueFactory = await GovernQueueFactory.deploy()
     print(queueFactory, 'GovernQueueFactory')
 
-    const GovernBaseFactory = await GovernBaseFactory.deploy(
-      process.env.REGISTRY_RINKEBY,
-      queueFactory.address
-    )
-    print(GovernBaseFactory, 'GovernBaseFactory')
+    const governBaseFactory = await GovernBaseFactory.deploy(process.env.REGISTRY_RINKEBY, queueFactory.address)
+    print(governBaseFactory, 'GovernBaseFactory')
 
     if (process.env.CD) {
-      writeFileSync(FACTORY_CACHE_NAME, GovernBaseFactory.address)
+      writeFileSync(FACTORY_CACHE_NAME, governBaseFactory.address)
     }
   }
 )

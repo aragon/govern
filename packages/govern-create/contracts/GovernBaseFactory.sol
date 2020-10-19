@@ -7,8 +7,8 @@ pragma experimental ABIEncoderV2;
 
 import "erc3k/contracts/ERC3000Registry.sol";
 
-import "@aragon/govern-core/contract/Govern.sol";
-import "@aragon/govern-core/contract/pipelines/GovernQueue.sol";
+import "@aragon/govern-core/contracts/Govern.sol";
+import "@aragon/govern-core/contracts/pipelines/GovernQueue.sol";
 
 contract GovernQueueFactory {
     function newQueue(address _aclRoot, ERC3000Data.Config memory _config)
