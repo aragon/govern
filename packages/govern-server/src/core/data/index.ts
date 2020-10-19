@@ -1,6 +1,14 @@
 import { ErrorInvalidNetwork, ErrorUnexpectedResult } from '../errors'
 import { toNetwork } from '../utils'
-import { Address, Network, Networkish, QueryResult } from '../types'
+import {
+  Address,
+  DaoData,
+  Network,
+  Networkish,
+  OptimisticGameData,
+  OptimisticQueueData,
+  QueryResult,
+} from '../types'
 import * as queries from './queries'
 import TheGraphWrapper from './TheGraphWrapper'
 
@@ -36,7 +44,8 @@ class ConnectorTheGraph {
 
     if (!orgSubgraphUrl) {
       throw new ErrorInvalidNetwork(
-        `The chainId ${this.network.chainId} is not supported by the TheGraph connector.`
+        `The chainId ${this.network.chainId} is not supported ` +
+          `by the TheGraph connector.`
       )
     }
 
@@ -45,82 +54,79 @@ class ConnectorTheGraph {
     })
   }
 
-  async dao(address: Address): Promise<QueryResult> {
+  private async fetchResult<T>(
+    queryAndParams:
+      | [any]
+      | [
+          any, // TODO: find or define the type returned by gql()
+          { [key: string]: any }
+        ],
+    callback: (data: { [key: string]: T }) => T,
+    errorMessage: string
+  ) {
+    const [query, params] = queryAndParams
     try {
-      return this.#gql.performQuery(queries.DAO, {
-        dao: address.toLowerCase(),
-      })
+      const result = await this.#gql.performQuery(query, params)
+      return callback(result.data) as T
     } catch (err) {
-      throw new ErrorUnexpectedResult(
-        `Unexpected result when fetching the dao ${address}.`
-      )
+      throw new ErrorUnexpectedResult(errorMessage)
     }
   }
 
-  async daos(): Promise<QueryResult> {
-    try {
-      return this.#gql.performQuery(queries.DAOS)
-    } catch (err) {
-      throw new ErrorUnexpectedResult(
-        `Unexpected result when fetching the daos.`
-      )
-    }
+  async dao(address: Address): Promise<DaoData | null> {
+    return this.fetchResult<DaoData | null>(
+      [queries.DAO, { dao: address.toLowerCase() }],
+      (data) => data.govern ?? null,
+      `Unexpected result when fetching the dao ${address}.`
+    )
   }
 
-  async queue(address: Address): Promise<QueryResult> {
-    try {
-      return this.#gql.performQuery(queries.QUEUE, {
-        queue: address.toLowerCase(),
-      })
-    } catch (err) {
-      throw new ErrorUnexpectedResult(
-        `Unexpected result when fetching the queue ${address}.`
-      )
-    }
+  async daos(): Promise<DaoData[]> {
+    return this.fetchResult<DaoData[]>(
+      [queries.DAOS],
+      (data) => data.governs ?? [],
+      `Unexpected result when fetching the daos.`
+    )
   }
 
-  async queues(): Promise<QueryResult> {
-    try {
-      return this.#gql.performQuery(queries.QUEUES)
-    } catch (err) {
-      throw new ErrorUnexpectedResult(
-        `Unexpected result when fetching the queue.`
-      )
-    }
+  async queue(address: Address): Promise<OptimisticQueueData | null> {
+    return this.fetchResult<OptimisticQueueData | null>(
+      [queries.QUEUE, { queue: address.toLowerCase() }],
+      (data) => data.optimisticQueue ?? null,
+      `Unexpected result when fetching the queue ${address}.`
+    )
   }
 
-  async game(name: string): Promise<QueryResult> {
-    try {
-      return this.#gql.performQuery(queries.GAME, {
-        name,
-      })
-    } catch (err) {
-      throw new ErrorUnexpectedResult(
-        `Unexpected result when fetching the game ${name}.`
-      )
-    }
+  async queues(): Promise<OptimisticQueueData[]> {
+    return this.fetchResult<OptimisticQueueData[]>(
+      [queries.QUEUES],
+      (data) => data.optimisticQueues ?? [],
+      `Unexpected result when fetching the queue.`
+    )
   }
 
-  async games(): Promise<QueryResult> {
-    try {
-      return this.#gql.performQuery(queries.GAMES)
-    } catch (err) {
-      throw new ErrorUnexpectedResult(
-        `Unexpected result when fetching the games.`
-      )
-    }
+  async game(name: string): Promise<OptimisticGameData | null> {
+    return this.fetchResult<OptimisticGameData | null>(
+      [queries.GAME, { name }],
+      (data) => data.optimisticGame ?? null,
+      `Unexpected result when fetching the game ${name}.`
+    )
   }
 
-  async queuesForDao(dao: Address): Promise<QueryResult> {
-    try {
-      return this.#gql.performQuery(queries.QUEUES_BY_DAO, {
-        dao: dao.toString(),
-      })
-    } catch (err) {
-      throw new ErrorUnexpectedResult(
-        `Unexpected result when fetching the queues for dao ${dao}.`
-      )
-    }
+  async games(): Promise<OptimisticGameData[]> {
+    return this.fetchResult<OptimisticGameData[]>(
+      [queries.GAMES],
+      (data) => data.optimisticGames ?? [],
+      `Unexpected result when fetching the games.`
+    )
+  }
+
+  async queuesForDao(dao: Address): Promise<OptimisticGameData[]> {
+    return this.fetchResult<OptimisticGameData[]>(
+      [queries.QUEUES_BY_DAO, { dao }],
+      (data) => data.optimisticGame ?? [],
+      `Unexpected result when fetching the queues for dao ${dao}.`
+    )
   }
 }
 
