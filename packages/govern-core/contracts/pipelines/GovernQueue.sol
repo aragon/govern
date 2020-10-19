@@ -176,7 +176,7 @@ contract GovernQueue is ERC3000, IArbitrable, ACL {
        the current configuration of the system
      * @param _disputeId disputeId in the arbitrator in which the dispute over the container was created
      */
-    function resolve(ERC3000Data.Container memory _container, uint256 _disputeId) override public returns (bytes[] memory execResults) {
+    function resolve(ERC3000Data.Container memory _container, uint256 _disputeId) override public returns (bytes32 failureMap, bytes[] memory execResults) {
         bytes32 containerHash = _container.hash();
         if (queue[containerHash].state == GovernQueueStateLib.State.Challenged) {
             // will re-enter in `rule`, `rule` will perform state transition depending on ruling
@@ -184,15 +184,16 @@ contract GovernQueue is ERC3000, IArbitrable, ACL {
         } // else continue, as we must 
 
         GovernQueueStateLib.State state = queue[containerHash].state;
-        if (state == GovernQueueStateLib.State.Approved) {
-            execResults = executeApproved(_container);
-        } else if (state == GovernQueueStateLib.State.Rejected) {
-            settleRejection(_container);
-        } else {
-            revert("queue: unresolved");
-        }
 
         emit Resolved(containerHash, msg.sender, state == GovernQueueStateLib.State.Approved);
+
+        if (state == GovernQueueStateLib.State.Approved) {
+            return executeApproved(_container);
+        }
+
+        require(state == GovernQueueStateLib.State.Rejected, "queue: unresolved");
+        settleRejection(_container);
+        return (bytes32(0), new bytes[](0));
     }
 
     function veto(bytes32 _payloadHash, ERC3000Data.Config memory _config, bytes memory _reason) auth(this.veto.selector) override public {
@@ -221,7 +222,7 @@ contract GovernQueue is ERC3000, IArbitrable, ACL {
     // Finalization functions
     // In the happy path, they are not externally called (triggered from resolve -> rule -> executeApproved | settleRejection), but left public for security
 
-    function executeApproved(ERC3000Data.Container memory _container) public returns (bytes[] memory execResults) {
+    function executeApproved(ERC3000Data.Container memory _container) public returns (bytes32 failureMap, bytes[] memory execResults) {
         bytes32 containerHash = _container.hash();
         queue[containerHash].checkAndSetState(
             GovernQueueStateLib.State.Approved,

@@ -41,7 +41,7 @@ abstract contract IERC3000 {
        the current configuration of the system
      * @param resolverId disputeId in the arbitrator in which the dispute over the container was created
      */
-    function resolve(ERC3000Data.Container memory container, uint256 resolverId) virtual public returns (bytes[] memory execResults);
+    function resolve(ERC3000Data.Container memory container, uint256 resolverId) virtual public returns (bytes32 failureMap, bytes[] memory execResults);
     event Resolved(bytes32 indexed containerHash, address indexed actor, bool approved);
 
     /**
