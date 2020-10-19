@@ -23,8 +23,8 @@ abstract contract IERC3000 {
        the current configuration of the system
      * should be a MUST payload.executor.exec(payload.actions)
      */
-    function execute(ERC3000Data.Container memory container) virtual public returns (bytes[] memory execResults);
-    event Executed(bytes32 indexed containerHash, address indexed actor, bytes[] execResults);
+    function execute(ERC3000Data.Container memory container) virtual public returns (bytes32 failureMap, bytes[] memory execResults);
+    event Executed(bytes32 indexed containerHash, address indexed actor);
 
     /**
      * @notice Challenge a container in case its scheduling is illegal as per Config.rules. Pulls collateral and dispute fees from sender into contract

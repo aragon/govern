@@ -119,7 +119,7 @@ contract GovernQueue is ERC3000, IArbitrable, ACL {
         public
         override
         auth(this.execute.selector) // in most instances this will be open for any addr, but leaving configurable for flexibility
-        returns (bytes[] memory execResults)
+        returns (bytes32 failureMap, bytes[] memory execResults)
     {
         // ensure enough time has passed
         require(uint64(block.timestamp) >= _container.payload.executionTime, "queue: wait more");
@@ -283,9 +283,9 @@ contract GovernQueue is ERC3000, IArbitrable, ACL {
 
     // Internal
 
-    function _execute(ERC3000Data.Payload memory _payload, bytes32 _containerHash) internal returns (bytes[] memory execResults) {
-        execResults = _payload.executor.exec(_payload.actions, _payload.allowFailuresMap, _containerHash);
-        emit Executed(_containerHash, msg.sender, execResults);
+    function _execute(ERC3000Data.Payload memory _payload, bytes32 _containerHash) internal returns (bytes32, bytes[] memory execResults) {
+        emit Executed(_containerHash, msg.sender);
+        return _payload.executor.exec(_payload.actions, _payload.allowFailuresMap, _containerHash);
     }
 
     function _setConfig(ERC3000Data.Config memory _config)
