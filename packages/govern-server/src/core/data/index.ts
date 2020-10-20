@@ -1,5 +1,5 @@
-import { ErrorInvalidNetwork, ErrorUnexpectedResult } from './errors'
-import { toNetwork } from './utils'
+import { ErrorInvalidNetwork, ErrorUnexpectedResult } from '../errors'
+import { toNetwork } from '../utils'
 import {
   Address,
   DaoData,
@@ -7,9 +7,9 @@ import {
   Networkish,
   OptimisticGameData,
   OptimisticQueueData,
-} from './types'
+} from '../types'
 import * as queries from './graphql'
-import TheGraphClient from './data/TheGraphClient'
+import TheGraphClient from './TheGraphClient'
 
 export type ConnectorTheGraphConfig = {
   network: Networkish
