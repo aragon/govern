@@ -7,10 +7,9 @@ import {
   Networkish,
   OptimisticGameData,
   OptimisticQueueData,
-  QueryResult,
 } from '../types'
-import * as queries from './queries'
-import TheGraphWrapper from './TheGraphWrapper'
+import * as queries from './graphql'
+import TheGraphClient from './TheGraphClient'
 
 export type ConnectorTheGraphConfig = {
   network: Networkish
@@ -18,21 +17,8 @@ export type ConnectorTheGraphConfig = {
   verbose?: boolean
 }
 
-function getSubgraphUrl(network: Network): string | null {
-  if (network.chainId === 1) {
-    return 'placeholder'
-  }
-  if (network.chainId === 4) {
-    return 'https://api.thegraph.com/subgraphs/name/0xgabi/aragon-govern-rinkeby-staging'
-  }
-  if (network.chainId === 100) {
-    return 'placeholder'
-  }
-  return null
-}
-
 class ConnectorTheGraph {
-  #gql: TheGraphWrapper
+  #gql: TheGraphClient
   readonly config: ConnectorTheGraphConfig
   readonly network: Network
 
@@ -40,18 +26,31 @@ class ConnectorTheGraph {
     this.config = config
     this.network = toNetwork(config.network)
 
-    const orgSubgraphUrl = config.subgraphUrl || getSubgraphUrl(this.network)
+    const subgraphUrl = config.subgraphUrl || this.getSubgraphUrl(this.network)
 
-    if (!orgSubgraphUrl) {
+    if (!subgraphUrl) {
       throw new ErrorInvalidNetwork(
         `The chainId ${this.network.chainId} is not supported ` +
           `by the TheGraph connector.`
       )
     }
 
-    this.#gql = new TheGraphWrapper(orgSubgraphUrl, {
+    this.#gql = new TheGraphClient(subgraphUrl, {
       verbose: config.verbose,
     })
+  }
+
+  private getSubgraphUrl(network: Network): string | null {
+    if (network.chainId === 1) {
+      return 'placeholder'
+    }
+    if (network.chainId === 4) {
+      return 'https://api.thegraph.com/subgraphs/name/0xgabi/aragon-govern-rinkeby-staging'
+    }
+    if (network.chainId === 100) {
+      return 'placeholder'
+    }
+    return null
   }
 
   private async fetchResult<T>(
