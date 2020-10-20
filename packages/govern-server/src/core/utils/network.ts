@@ -1,13 +1,21 @@
 import { ErrorInvalidNetwork } from '../errors'
-import { NETWORKS } from '../params'
+import * as config from '../config.json'
 import { Address, Network, Networkish } from '../types'
 
 export function networkFromChainId(chainId: number): Network | null {
-  return NETWORKS.find((network) => network.chainId === chainId) || null
+  return (
+    Object.values(config.networks).find(
+      (network: Network) => network.chainId === chainId
+    ) || null
+  )
 }
 
 export function networkFromName(name: string): Network | null {
-  return NETWORKS.find((network) => network.name === name) || null
+  return (
+    Object.values(config.networks).find(
+      (network: Network) => network.name === name
+    ) || null
+  )
 }
 
 function networkFromObject({
@@ -34,7 +42,9 @@ function networkFromObject({
       throw new ErrorInvalidNetwork(
         `Network: invalid name provided: ${name}. ` +
           `Please use provide a chainId or use one of the following names: ` +
-          NETWORKS.map((network) => network.chainId).join(', ') +
+          Object.values(config.networks)
+            .map((network) => network.chainId)
+            .join(', ') +
           `.`
       )
     }
@@ -50,7 +60,9 @@ function networkFromObject({
     throw new ErrorInvalidNetwork(
       `Network: invalid chainId provided: ${chainId}. ` +
         `Please use one of the following: ` +
-        NETWORKS.map((network) => network.chainId).join(', ') +
+        Object.values(config.networks)
+          .map((network) => network.chainId)
+          .join(', ') +
         `.`
     )
   }
