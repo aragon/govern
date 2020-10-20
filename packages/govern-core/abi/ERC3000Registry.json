@@ -6,7 +6,7 @@
         {
           "indexed": true,
           "internalType": "contract ERC3000Executor",
-          "name": "dao",
+          "name": "executor",
           "type": "address"
         },
         {
@@ -37,7 +37,7 @@
         {
           "indexed": true,
           "internalType": "contract ERC3000Executor",
-          "name": "dao",
+          "name": "executor",
           "type": "address"
         },
         {
@@ -73,7 +73,7 @@
       "inputs": [
         {
           "internalType": "contract ERC3000Executor",
-          "name": "_dao",
+          "name": "_executor",
           "type": "address"
         },
         {
