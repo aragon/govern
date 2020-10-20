@@ -41,7 +41,7 @@ if [[ -z "$SUBGRAPH_ID" ]]; then
   exit 1
 else
   echo "Deploying subgraph ${SUBGRAPH_ID} to Aragon infra..."
-  kubectl exec deploy/graph-shell -- create $FULLNAME
-  kubectl exec deploy/graph-shell -- deploy $FULLNAME $SUBGRAPH_ID graph_index_node_0
-  kubectl exec deploy/graph-shell -- reassign $FULLNAME $SUBGRAPH_ID graph_index_node_0
+  kubectl exec graph-shell-0 -- create $FULLNAME
+  kubectl exec graph-shell-0 -- deploy $FULLNAME $SUBGRAPH_ID graph_index_node_0
+  kubectl exec graph-shell-0 -- reassign $FULLNAME $SUBGRAPH_ID graph_index_node_0
 fi
