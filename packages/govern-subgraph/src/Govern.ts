@@ -93,6 +93,7 @@ function loadOrCreateExecution(event: ExecutedEvent): ExecutionEntity {
     execution = new ExecutionEntity(executionId);
     execution.sender = event.params.actor;
     execution.results = event.params.execResults;
+    // TODO: (Gabi) add queue relation
   }
   return execution!;
 }
