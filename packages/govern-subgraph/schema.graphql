@@ -17,15 +17,16 @@ type Govern @entity {
   id: ID!
   address: Bytes!
   metadata: Bytes
-  games: [OptimisticGame!] @derivedFrom(field: "executor")
   executions: [Execution!]
+  games: [OptimisticGame!] @derivedFrom(field: "executor")
   roles: [Role!]
 }
 
 type Execution @entity {
   id: ID!
-  sender: Bytes!
-  queue: GovernQueue
+  executor: Govern!
+  queue: GovernQueue!
+  failureMap: Bytes!
   actions: [Action!] @derivedFrom(field: "execution")
   results: [Bytes!]
 }
@@ -35,21 +36,19 @@ type Action @entity {
   to: Bytes!
   value: BigInt!
   data: Bytes!
-  item: Item!
-  execution: Execution
-  queue: GovernQueue!
-  roles: [Role]!
+  execution: Execution!
+  queueItem: QueueItem!
 }
 
 type GovernQueue @entity {
   id: ID!
   address: Bytes!
   config: Config
+  queued: [QueueItem!]
+  challenges: [Challenge!]
+  vetos: [Veto!]
+  executions: [Execution!] @derivedFrom(field: "queue")
   games: [OptimisticGame!] @derivedFrom(field: "queue")
-  queue: [Item!]
-  executions: [Execution!] # TODO: @derivedFrom(field: "queue")
-  challenges: [Challenge!] @derivedFrom(field: "queue")
-  vetos: [Veto!] @derivedFrom(field: "queue")
   roles: [Role!]
 }
 
@@ -72,18 +71,19 @@ type Collateral @entity {
 
 type ERC20 @entity {
   id: ID!
+  address: Bytes!
 }
 
-type Item @entity {
+type QueueItem @entity {
   id: ID!
   status: ItemStatus!
   nonce: BigInt!
   executionTime: BigInt!
   submitter: Bytes!
   executor: Govern!
-  actions: [Action!] @derivedFrom(field: "item")
   proof: Bytes!
   collateral: Collateral!
+  actions: [Action!] @derivedFrom(field: "queueItem")
   createdAt: BigInt!
 }
 
@@ -91,7 +91,6 @@ type Challenge @entity {
   id: ID!
   queue: GovernQueue!
   challenger: Bytes!
-  item: Item!
   arbitrator: Bytes!
   disputeId: BigInt!
   evidences: [Evidence!] @derivedFrom(field: "challenge")
@@ -112,7 +111,6 @@ type Evidence @entity {
 type Veto @entity {
   id: ID!
   queue: GovernQueue!
-  item: Item!
   reason: Bytes!
   submitter: Bytes!
   collateral: Collateral!

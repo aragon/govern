@@ -38,7 +38,7 @@ templates:
           handler: handleFrozen
         - event: Granted(indexed bytes4,indexed address,indexed address)
           handler: handleGranted
-        - event: Scheduled(indexed bytes32,(uint256,uint256,address,address,tuple[],bytes32,bytes),(address,uint256))
+        - event: Scheduled(indexed bytes32,(uint256,uint256,address,address,(address,uint256,bytes)[],bytes32,bytes),(address,uint256))
           handler: handleScheduled
         - event: Executed(indexed bytes32,indexed address)
           handler: handleExecuted
@@ -72,7 +72,7 @@ templates:
         - name: Govern
           file: ../govern-core/artifacts/Govern.json
       eventHandlers:
-        - event: Executed(indexed address,tuple[],bytes32,bytes32,bytes[])
+        - event: Executed(indexed address,(address,uint256,bytes)[],bytes32,bytes32,bytes[])
           handler: handleExecuted
         - event: Frozen(indexed bytes4,indexed address)
           handler: handleFrozen

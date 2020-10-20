@@ -5,7 +5,7 @@ import {
 } from '../generated/ERC3000Registry/ERC3000Registry'
 import {
   Govern as GovernTemplate,
-  GovernQueue as QueueTemplate
+  GovernQueue as GovernQueueTemplate
 } from '../generated/templates'
 import {
   ERC3000Registry as ERC3000RegistryEntity,
@@ -34,7 +34,7 @@ export function handleRegistered(event: RegisteredEvent): void {
 
   // Create datasource templates
   GovernTemplate.create(event.params.dao)
-  QueueTemplate.create(event.params.queue)
+  GovernQueueTemplate.create(event.params.queue)
 }
 
 export function handleSetMetadata(event: SetMetadataEvent): void {
