@@ -38,7 +38,7 @@ export function handleRegistered(event: RegisteredEvent): void {
 }
 
 export function handleSetMetadata(event: SetMetadataEvent): void {
-  const govern = loadOrCreateGovern(event.params.dao)
+  const govern = loadOrCreateGovern(event.params.executor)
   govern.metadata = event.params.metadata
 
   govern.save()
