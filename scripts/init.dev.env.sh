@@ -37,6 +37,11 @@ fi
 # ----------------------------------
 
 cd ../govern-server/
+
+if [[ "$(docker ps -a | grep graph)" ]]; then
+    yarn stop:containers
+fi
+
 yarn start:containers
 
 if [ $? -ne 0 ]
