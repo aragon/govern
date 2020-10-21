@@ -1,6 +1,6 @@
 const { expect } = require("chai");
 
-describe('Optimistic Queue', function () {
+describe('Govern Queue', function () {
   let oq, owner, notOwner, ownerAddr, notOwnerAddr
 
   const DELAY = 100
@@ -10,7 +10,7 @@ describe('Optimistic Queue', function () {
     ownerAddr = await owner.getAddress()
     notOwnerAddr = await notOwner.getAddress()
 
-    const OQ = await ethers.getContractFactory('OptimisticQueue')
+    const OQ = await ethers.getContractFactory('GovernQueue')
     oq = await OQ.deploy(ownerAddr, DELAY)
   })
 })

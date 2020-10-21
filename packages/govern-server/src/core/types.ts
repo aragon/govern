@@ -82,11 +82,11 @@ export type OptimisticGameData = {
   id: string
   name: string
   executor: DaoData
-  queue: OptimisticQueueData
+  queue: GovernQueueData
   metadata: string
 }
 
-export type OptimisticQueueData = {
+export type GovernQueueData = {
   id: string
   address: Address
   config: ConfigData
@@ -100,7 +100,7 @@ export type OptimisticQueueData = {
 
 export type ConfigData = {
   id: string
-  queue: OptimisticQueueData
+  queue: GovernQueueData
   executionDelay: string
   scheduleDeposit: CollateralData
   challengeDeposit: CollateralData
@@ -111,7 +111,7 @@ export type ConfigData = {
 
 export type VetoData = {
   id: string
-  queue: OptimisticQueueData
+  queue: GovernQueueData
   item: ItemData
   reason: string
   submitter: Address
@@ -121,7 +121,7 @@ export type VetoData = {
 
 export type ChallengeData = {
   id: string
-  queue: OptimisticQueueData
+  queue: GovernQueueData
   challenger: string
   item: ItemData
   arbitrator: string

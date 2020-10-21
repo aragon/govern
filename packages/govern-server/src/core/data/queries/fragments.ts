@@ -115,7 +115,7 @@ export const CONFIG_FRAGMENT = gql`
 `
 
 export const QUEUE_FRAGMENT = gql`
-  fragment Queue_queue on OptimisticQueue {
+  fragment Queue_queue on GovernQueue {
     id
     address
     config {
