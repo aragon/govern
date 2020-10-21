@@ -284,7 +284,7 @@ contract GovernQueue is ERC3000, IArbitrable, ACL {
 
     // Internal
 
-    function _execute(ERC3000Data.Payload memory _payload, bytes32 _containerHash) internal returns (bytes32, bytes[] memory execResults) {
+    function _execute(ERC3000Data.Payload memory _payload, bytes32 _containerHash) internal returns (bytes32, bytes[] memory) {
         emit Executed(_containerHash, msg.sender);
         return _payload.executor.exec(_payload.actions, _payload.allowFailuresMap, _containerHash);
     }

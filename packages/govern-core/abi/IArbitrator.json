@@ -1,0 +1,106 @@
+{
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_disputeId",
+          "type": "uint256"
+        }
+      ],
+      "name": "closeEvidencePeriod",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_possibleRulings",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_metadata",
+          "type": "bytes"
+        }
+      ],
+      "name": "createDispute",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_disputeId",
+          "type": "uint256"
+        }
+      ],
+      "name": "executeRuling",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getDisputeFees",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "recipient",
+          "type": "address"
+        },
+        {
+          "internalType": "contract ERC20",
+          "name": "feeToken",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "feeAmount",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_subscriber",
+          "type": "address"
+        }
+      ],
+      "name": "getSubscriptionFees",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "recipient",
+          "type": "address"
+        },
+        {
+          "internalType": "contract ERC20",
+          "name": "feeToken",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "feeAmount",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ]
+}
