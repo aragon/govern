@@ -2,10 +2,10 @@ const fs = require("fs");
 
 const KNOWN_ABIS = [
   "Govern.json",
-  "GovernFactory.json",
+  "GovernBaseFactory.json",
   "ERC3000Registry.json",
-  "OptimisticQueue.json",
-  "OptimisticQueueFactory.json",
+  "GovernQueue.json",
+  "GovernQueueFactory.json",
 ];
 
 async function main() {

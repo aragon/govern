@@ -11,11 +11,14 @@
     apiVersion: 0.0.1
     language: wasm/assemblyscript
     entities:
-      - NoEnt
+      - OptimisticGame
+      - Govern
     abis:
       - name: ERC3000Registry
-        file: ../govern-core/artifacts/ERC3000Registry.json
+        file: ../govern-core/abi/ERC3000Registry.json
     eventHandlers:
       - event: Registered(indexed address,address,indexed address,string)
         handler: handleRegistered
-    file: ./src/aragon/mappings/ERC3000Registry.ts
+      - event: SetMetadata(indexed address,bytes)
+        handler: handleSetMetadata
+    file: ./src/ERC3000Registry.ts
