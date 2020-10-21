@@ -55,7 +55,8 @@ fi
 # Wait some seconds until containers are ready
 # --------------------------------------------
 echo "Waiting until containers are ready..."
-sleep 35
+
+while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:8030)" != "200" ]]; do sleep 5; done
 
 echo " "
 echo -e "${GREEN}>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
