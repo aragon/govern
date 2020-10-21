@@ -53,91 +53,83 @@ class ConnectorTheGraph {
     })
   }
 
-  private async fetchResult<ReturnType>(
+  private async fetchResult<R>(
     queryAndParams:
       | [any]
       | [
           any, // TODO: use the type returned by gql``
           { [key: string]: any }
         ],
-    callback: (data: unknown) => ReturnType,
     errorMessage: string
-  ): Promise<ReturnType> {
+  ): Promise<R> {
     const [query, params] = queryAndParams
     try {
       const result = await this.#gql.performQuery(query, params)
-      return callback(result.data as unknown) as ReturnType
+      return result.data as R
     } catch (err) {
       throw new ErrorUnexpectedResult(errorMessage)
     }
   }
 
   async dao(address: Address): Promise<DaoData | null> {
-    return this.fetchResult<DaoData | null>(
+    const result = await this.fetchResult<{ govern: DaoData | null }>(
       [queries.DAO, { address: address.toLowerCase() }],
-      (data) => (data as { govern: DaoData }).govern ?? null,
       `Unexpected result when fetching the dao ${address}.`
     )
+    return result.govern ?? null
   }
 
   async daos(): Promise<DaoData[]> {
-    return this.fetchResult<DaoData[]>(
+    const result = await this.fetchResult<{ governs: DaoData[] }>(
       [queries.DAOS],
-      (data) => (data as { governs: DaoData[] }).governs ?? [],
       `Unexpected result when fetching the daos.`
     )
+    return result.governs ?? []
   }
 
   async queue(address: Address): Promise<OptimisticQueueData | null> {
-    return this.fetchResult<OptimisticQueueData | null>(
+    const result = await this.fetchResult<{
+      optimisticQueue: OptimisticQueueData | null
+    }>(
       [queries.QUEUE, { queue: address.toLowerCase() }],
-      (data) =>
-        (data as { optimisticQueue: OptimisticQueueData }).optimisticQueue ??
-        null,
       `Unexpected result when fetching the queue ${address}.`
     )
+    return result.optimisticQueue ?? null
   }
 
   async queues(): Promise<OptimisticQueueData[]> {
-    return this.fetchResult<OptimisticQueueData[]>(
-      [queries.QUEUES],
-      (data) =>
-        (data as { optimisticQueues: OptimisticQueueData[] })
-          .optimisticQueues ?? [],
-      `Unexpected result when fetching the queue.`
-    )
+    const result = await this.fetchResult<{
+      optimisticQueues: OptimisticQueueData[]
+    }>([queries.QUEUES], `Unexpected result when fetching the queue.`)
+    return result.optimisticQueues ?? []
   }
 
   async game(name: string): Promise<OptimisticGameData | null> {
-    return this.fetchResult<OptimisticGameData | null>(
+    const result = await this.fetchResult<{
+      optimisticGame: OptimisticGameData | null
+    }>(
       [queries.GAME, { name }],
-      (data) =>
-        (data as { optimisticGame: OptimisticGameData }).optimisticGame ?? null,
       `Unexpected result when fetching the game ${name}.`
     )
+    return result.optimisticGame ?? null
   }
 
   async games(): Promise<OptimisticGameData[]> {
-    return this.fetchResult<OptimisticGameData[]>(
-      [queries.GAMES],
-      (data) =>
-        (data as { optimisticGames: OptimisticGameData[] }).optimisticGames ??
-        [],
-      `Unexpected result when fetching the games.`
-    )
+    const result = await this.fetchResult<{
+      optimisticGames: OptimisticGameData[]
+    }>([queries.GAMES], `Unexpected result when fetching the games.`)
+    return result.optimisticGames ?? []
   }
 
   async queuesForDao(address: Address): Promise<OptimisticQueueData[]> {
-    return this.fetchResult<OptimisticQueueData[]>(
+    const result = await this.fetchResult<{ govern: DaoData }>(
       [queries.QUEUES_BY_DAO, { address }],
-      (data) => {
-        const games = (data as { govern: DaoData })?.govern?.games ?? []
-        return games.reduce<OptimisticQueueData[]>((queues, game) => {
-          return game?.queue ? [...queues, game.queue] : queues
-        }, [])
-      },
       `Unexpected result when fetching the queues for dao ${address}.`
     )
+    const games = result.govern?.games ?? []
+    return games.reduce<OptimisticQueueData[]>((queues, game) => {
+      return game?.queue ? [...queues, game.queue] : queues
+    }, [])
   }
 }
 
