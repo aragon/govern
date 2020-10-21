@@ -1,13 +1,14 @@
 import fetch from 'isomorphic-unfetch'
 import { Client } from '@urql/core'
 import { DocumentNode } from 'graphql'
+import ClientInterface from './lib/ClientInterface'
 
 /**
  * TODO: Use QueryResult type from govern-server/core
  *
  * @class GraphQLClient
  */
-export default class GraphQLClient {
+export default class GraphQLClient implements ClientInterface{
   /**
    * The urql/core Client object
    *
@@ -44,7 +45,7 @@ export default class GraphQLClient {
   /**
    * Executes the query against the connected Govern server
    *
-   * @method query
+   * @method request
    *
    * @param {DocumentNode} query
    * @param {Object} args
@@ -53,7 +54,7 @@ export default class GraphQLClient {
    *
    * @public
    */
-  public async query(query: DocumentNode, args: any = {}): Promise<any> {
+  public async request(query: DocumentNode, args: any = {}): Promise<any> {
     const result = await this.client.query(query, args).toPromise();
 
     if (result.error) { // TODO: Use errors from core

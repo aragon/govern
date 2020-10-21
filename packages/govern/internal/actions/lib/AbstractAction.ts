@@ -1,4 +1,5 @@
-import Client from '../../clients/Client'
+import { DocumentNode } from 'graphql'
+import GraphQLClient from '../../clients/GraphQLClient'
 import Configuration from '../../configuration/Configuration'
 
 /**
@@ -8,10 +9,11 @@ export default abstract class AbstractAction {
   /**
    * Contains the GraphQL query of the current action
    *
-   * @var gqlQuery
+   * @var {string} gqlQuery
+   *
    * @protected
    */
-  protected gqlQuery: string;
+  protected gqlQuery: DocumentNode
 
   /**
    * @param {any} parameters - The required parameters for this action
@@ -20,9 +22,11 @@ export default abstract class AbstractAction {
    *
    * @constructor
    */
-  constructor(protected parameters: any, protected configuration: Configuration, protected client: GraphQLClient) {}
+  constructor(protected parameters: any, protected configuration: Configuration, protected client: GraphQLClient) { }
 
   /**
+   * TODO: Add if to check in the future if REST is configured for this execution
+   *
    * Will execute the action and return the response from the Govern server.
    *
    * @method execute
@@ -31,5 +35,7 @@ export default abstract class AbstractAction {
    *
    * @public
    */
-  public abstract execute(): Promise<any>;
+  public execute(): Promise<any> {
+    return this.client.request(this.gqlQuery, this.parameters);
+  }
 }
