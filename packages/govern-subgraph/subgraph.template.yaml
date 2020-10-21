@@ -38,9 +38,9 @@ templates:
           handler: handleFrozen
         - event: Granted(indexed bytes4,indexed address,indexed address)
           handler: handleGranted
-        - event: Scheduled(indexed bytes32,(uint256,uint256,address,address,tuple[],bytes),(address,uint256))
+        - event: Scheduled(indexed bytes32,(uint256,uint256,address,address,tuple[],bytes32,bytes),(address,uint256))
           handler: handleScheduled
-        - event: Executed(indexed bytes32,indexed address,bytes[])
+        - event: Executed(indexed bytes32,indexed address)
           handler: handleExecuted
         - event: Challenged(indexed bytes32,indexed address,bytes,uint256,(address,uint256))
           handler: handleChallenged
@@ -50,7 +50,6 @@ templates:
           handler: handleResolved
         - event: Revoked(indexed bytes4,indexed address,indexed address)
           handler: handleRevoked
-      file: ./src/GovernQueue.ts
         - event: EvidenceSubmitted(indexed address,indexed uint256,indexed address,bytes,bool)
           handler: handleEvidenceSubmitted
         - event: Ruled(indexed address,indexed uint256,uint256)
