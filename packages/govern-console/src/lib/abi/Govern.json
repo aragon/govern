@@ -63,6 +63,18 @@
       },
       {
         "indexed": false,
+        "internalType": "bytes32",
+        "name": "memo",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "failureMap",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
         "internalType": "bytes[]",
         "name": "execResults",
         "type": "bytes[]"
@@ -158,7 +170,7 @@
       {
         "components": [
           {
-            "internalType": "enum MiniACLData.BulkOp",
+            "internalType": "enum ACLData.BulkOp",
             "name": "op",
             "type": "uint8"
           },
@@ -173,7 +185,7 @@
             "type": "address"
           }
         ],
-        "internalType": "struct MiniACLData.BulkItem[]",
+        "internalType": "struct ACLData.BulkItem[]",
         "name": "items",
         "type": "tuple[]"
       }
@@ -206,10 +218,25 @@
         "internalType": "struct ERC3000Data.Action[]",
         "name": "actions",
         "type": "tuple[]"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "allowFailuresMap",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "memo",
+        "type": "bytes32"
       }
     ],
     "name": "exec",
     "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      },
       {
         "internalType": "bytes[]",
         "name": "",

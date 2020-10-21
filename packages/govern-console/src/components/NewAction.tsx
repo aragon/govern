@@ -6,7 +6,7 @@ import { toHex } from 'web3-utils'
 import 'styled-components/macro'
 import Button from './Button'
 import { useContract } from '../lib/web3-contracts'
-import queueAbi from '../lib/abi/OptimisticQueue.json'
+import queueAbi from '../lib/abi/GovernQueue.json'
 
 const EMPTY_BYTES = '0x00'
 
