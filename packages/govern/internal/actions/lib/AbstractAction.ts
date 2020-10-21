@@ -21,7 +21,7 @@ export default abstract class AbstractAction {
    *
    * @constructor
    */
-  constructor(protected parameters: any, protected configuration: Configuration) { }
+  constructor(protected configuration: Configuration, protected parameters?: any) { }
 
   /**
    * TODO: Add if to check in the future if REST is configured for this execution
