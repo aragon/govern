@@ -22,15 +22,15 @@ import {
 =======
   Ruled as RuledEvent,
   EvidenceSubmitted as EvidenceSubmittedEvent,
-  OptimisticQueue as OptimisticQueueContract
-} from '../generated/templates/OptimisticQueue/OptimisticQueue'
+  GovernQueue as GovernQueueContract
+} from '../generated/templates/GovernQueue/GovernQueue'
 import {
   Config as ConfigEntity,
   Challenge as ChallengeEntity,
   Collateral as CollateralEntity,
   Evidence as EvidenceEntity,
   Item as ItemEntity,
-  OptimisticQueue as OptimisticQueueEntity,
+  GovernQueue as GovernQueueEntity,
   ERC20 as ERC20Entity,
   Veto as VetoEntity
 >>>>>>> master
@@ -178,9 +178,9 @@ export function handleConfigured(event: ConfiguredEvent): void {
 // IArbitrable Events
 
 export function handleEvidenceSubmitted(event: EvidenceSubmittedEvent): void {
-  const optimisticQueue = OptimisticQueueContract.bind(event.address)
+  const governQueue = GovernQueueContract.bind(event.address)
 
-  const containerHash = optimisticQueue.disputeItemCache(
+  const containerHash = governQueue.disputeItemCache(
     event.params.arbitrator,
     event.params.disputeId
   )
@@ -197,9 +197,9 @@ export function handleEvidenceSubmitted(event: EvidenceSubmittedEvent): void {
 }
 
 export function handleRuled(event: RuledEvent): void {
-  const optimisticQueue = OptimisticQueueContract.bind(event.address)
+  const governQueue = GovernQueueContract.bind(event.address)
 
-  const containerHash = optimisticQueue.disputeItemCache(
+  const containerHash = governQueue.disputeItemCache(
     event.params.arbitrator,
     event.params.disputeId
   )
@@ -318,12 +318,12 @@ export function handleRevoked(event: RevokedEvent): void {
 =======
 // Helpers
 
-export function loadOrCreateQueue(entity: Address): OptimisticQueueEntity {
+export function loadOrCreateQueue(entity: Address): GovernQueueEntity {
   const queueId = entity.toHexString()
   // Create queue
-  let queue = OptimisticQueueEntity.load(queueId)
+  let queue = GovernQueueEntity.load(queueId)
   if (queue === null) {
-    queue = new OptimisticQueueEntity(queueId)
+    queue = new GovernQueueEntity(queueId)
     queue.address = entity
     queue.queue = []
     queue.executions = []

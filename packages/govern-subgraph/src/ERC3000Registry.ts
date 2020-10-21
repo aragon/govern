@@ -5,7 +5,7 @@ import {
 } from '../generated/ERC3000Registry/ERC3000Registry'
 import {
   Govern as GovernTemplate,
-  OptimisticQueue as QueueTemplate
+  GovernQueue as QueueTemplate
 } from '../generated/templates'
 import {
   ERC3000Registry as ERC3000RegistryEntity,
