@@ -9,7 +9,7 @@ import {
   OptimisticQueueData,
 } from '../types'
 import * as queries from './queries'
-import TheGraphWrapper from './TheGraphWrapper'
+import GraphqlClient from './GraphqlClient'
 
 export type ConnectorTheGraphConfig = {
   network: Networkish
@@ -31,7 +31,7 @@ function getSubgraphUrl(network: Network): string | null {
 }
 
 class ConnectorTheGraph {
-  #gql: TheGraphWrapper
+  #gql: GraphqlClient
   readonly config: ConnectorTheGraphConfig
   readonly network: Network
 
@@ -48,7 +48,7 @@ class ConnectorTheGraph {
       )
     }
 
-    this.#gql = new TheGraphWrapper(orgSubgraphUrl, {
+    this.#gql = new GraphqlClient(orgSubgraphUrl, {
       verbose: config.verbose,
     })
   }
