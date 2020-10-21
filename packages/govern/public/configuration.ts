@@ -1,8 +1,19 @@
+import Configuration from '../internal/configuration/Configuration'
 
-const globalConfig = null;
+let globalConfig = null;
 
-export default function configuration() {
-
+/**
+ * Does set the global configuration for Govern
+ *
+ * @param {any} config
+ *
+ * @returns {void}
+ */
+export default function configuration(config: any): void {
+  globalConfig = new Configuration(config);
 }
 
-configuration.globalConfig = globalConfig;
+
+// TODO: declare type
+//@ts-ignore
+configuration.global = globalConfig;

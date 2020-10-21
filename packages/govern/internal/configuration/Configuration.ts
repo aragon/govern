@@ -1,3 +1,6 @@
+import ClientInterface from '../clients/lib/ClientInterface'
+import GraphQLClient from '../clients/GraphQLClient'
+
 /**
  * @class Configuration
  */
@@ -9,7 +12,10 @@ export default class Configuration {
    *
    * @private
    */
-  private config: any
+  private config: {
+    governURL: string;
+    client: ClientInterface
+  }
 
   /**
    * @param {Object} config
@@ -36,6 +42,7 @@ export default class Configuration {
       throw new Error('Missing Govern server URL!')
     }
 
-    this.config = config
+    this.config.governURL = config.governURL;
+    this.config.client = new GraphQLClient(this.config.governURL);
   }
 }
