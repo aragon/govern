@@ -1,5 +1,3 @@
-import { ErrorInvalidNetwork, ErrorUnexpectedResult } from '../errors'
-import { toNetwork } from '../utils'
 import {
   Address,
   DaoData,
@@ -7,8 +5,10 @@ import {
   Networkish,
   OptimisticGameData,
   OptimisticQueueData,
-} from '../types'
-import * as queries from './queries'
+} from './types'
+import { ErrorInvalidNetwork, ErrorUnexpectedResult } from './errors'
+import { toNetwork } from './utils'
+import * as queries from './thegraph-queries'
 import GraphqlClient from './GraphqlClient'
 
 export type ConnectorTheGraphConfig = {
@@ -30,7 +30,7 @@ function getSubgraphUrl(network: Network): string | null {
   return null
 }
 
-class ConnectorTheGraph {
+class GovernCore {
   #gql: GraphqlClient
   readonly config: ConnectorTheGraphConfig
   readonly network: Network
@@ -133,4 +133,4 @@ class ConnectorTheGraph {
   }
 }
 
-export default ConnectorTheGraph
+export default GovernCore

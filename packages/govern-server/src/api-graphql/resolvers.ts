@@ -1,7 +1,7 @@
 import { IResolvers } from 'apollo-server'
-import GovernData from '../core/data'
+import { GovernCore } from '../core'
 
-export default function resolvers(govern: GovernData): IResolvers {
+export default function resolvers(govern: GovernCore): IResolvers {
   return {
     Query: {
       async dao(_, args) {

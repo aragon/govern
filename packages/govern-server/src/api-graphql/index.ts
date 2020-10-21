@@ -1,10 +1,10 @@
 import { ApolloServer, gql } from 'apollo-server'
-import GovernData from '../core/data'
+import { GovernCore } from '../core'
 import resolvers from './resolvers'
 import typeDefs from './schema'
 
 type Configuration = {
-  govern: GovernData
+  govern: GovernCore
   httpPort: number
 }
 

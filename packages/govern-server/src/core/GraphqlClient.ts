@@ -1,8 +1,8 @@
 import fetch from 'isomorphic-unfetch'
 import { Client } from '@urql/core'
 import { DocumentNode } from 'graphql'
-import { ErrorConnection } from '../errors'
-import { QueryResult } from '../types'
+import { ErrorConnection } from './errors'
+import { QueryResult } from './types'
 
 type GraphqlClientOptions = {
   verbose?: boolean
