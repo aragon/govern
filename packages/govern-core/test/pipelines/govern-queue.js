@@ -1,6 +1,6 @@
 const { expect } = require("chai");
 
-describe('Optimistic Queue', function () {
+describe('Govern Queue', function () {
   let oq, owner, notOwner, ownerAddr, notOwnerAddr
 
   const DELAY = 100

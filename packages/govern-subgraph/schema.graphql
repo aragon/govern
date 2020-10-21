@@ -13,7 +13,7 @@ type OptimisticGame @entity {
   executor: Govern!
 }
 
-type Govern @entity {
+type GovernQueue @entity {
   id: ID!
   address: Bytes!
   metadata: Bytes
