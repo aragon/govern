@@ -4,7 +4,7 @@ import { useWallet } from 'use-wallet'
 import abiCoder from 'web3-eth-abi'
 import { toHex } from 'web3-utils'
 import 'styled-components/macro'
-import Button from '../components/Button'
+import Button from './Button'
 import { useContract } from '../lib/web3-contracts'
 import queueAbi from '../lib/abi/OptimisticQueue.json'
 
@@ -129,11 +129,7 @@ export default function NewAction({
               `}
             />
           </label>
-          <Button
-            onClick={handleParseAbi}
-          >
-            Parse ABI
-          </Button>
+          <Button onClick={handleParseAbi}>Parse ABI</Button>
         </form>
         {abi &&
           parsedAbi!.map(
@@ -316,10 +312,7 @@ function ContractCallHandler({
             </label>
           </div>
         ))}
-        <Button
-          type="submit"
-          onClick={handleExecute}
-        >
+        <Button type="submit" onClick={handleExecute}>
           Execute
         </Button>
         <span>Result: {result}</span>
