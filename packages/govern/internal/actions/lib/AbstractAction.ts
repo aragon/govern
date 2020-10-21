@@ -18,11 +18,10 @@ export default abstract class AbstractAction {
   /**
    * @param {any} parameters - The required parameters for this action
    * @param {Configuration} configuration - The current configuration to execute this action
-   * @param {GraphQLClient} client - The GraphQL client wrapper later also the REST client wrapper
    *
    * @constructor
    */
-  constructor(protected parameters: any, protected configuration: Configuration, protected client: GraphQLClient) { }
+  constructor(protected parameters: any, protected configuration: Configuration) { }
 
   /**
    * TODO: Add if to check in the future if REST is configured for this execution
@@ -36,6 +35,6 @@ export default abstract class AbstractAction {
    * @public
    */
   public execute(): Promise<any> {
-    return this.client.request(this.gqlQuery, this.parameters);
+    return this.configuration.client.request(this.gqlQuery, this.parameters);
   }
 }

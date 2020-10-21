@@ -57,6 +57,7 @@
   "dependencies": {
     "@urql/core": "^1.13.1",
     "graphql": "^15.3.0",
-    "isomorphic-unfetch": "^3.1.0"
+    "isomorphic-unfetch": "^3.1.0",
+    "graphql-tag": "^2.11.0"
   }
 }
