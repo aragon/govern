@@ -1,0 +1,70 @@
+{
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "contract ERC3000Registry",
+          "name": "_registry",
+          "type": "address"
+        },
+        {
+          "internalType": "contract OptimisticQueueFactory",
+          "name": "_queueFactory",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_name",
+          "type": "string"
+        }
+      ],
+      "name": "newDummyGovern",
+      "outputs": [
+        {
+          "internalType": "contract Govern",
+          "name": "govern",
+          "type": "address"
+        },
+        {
+          "internalType": "contract OptimisticQueue",
+          "name": "queue",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "queueFactory",
+      "outputs": [
+        {
+          "internalType": "contract OptimisticQueueFactory",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "registry",
+      "outputs": [
+        {
+          "internalType": "contract ERC3000Registry",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ]
+}

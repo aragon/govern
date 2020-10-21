@@ -2,7 +2,7 @@
 # Instead, edit subgraph.template.yaml and run `yarn manifest-<network>-[staging]`
 specVersion: 0.0.2
 description: A template for Aragon subgraphs
-repository: https://github.com/aragon/connect
+repository: https://github.com/aragon/govern
 schema:
   file: ./schema.graphql
 dataSources:
@@ -18,14 +18,24 @@ templates:
       apiVersion: 0.0.1
       language: wasm/assemblyscript
       entities:
-        - Container
-        - Payload
         - Config
+        - Item
+        - Challenge
+        - Veto
         - Collateral
+        - Evidence
         - Role
+        - ERC20
       abis:
+<<<<<<< HEAD
         - name: GovernQueue
           file: ../govern-core/artifacts/GovernQueue.json
+=======
+        - name: OptimisticQueue
+          file: ../govern-core/abi/OptimisticQueue.json
+        - name: ERC20
+          file: ../govern-core/abi/ERC20.json
+>>>>>>> master
       eventHandlers:
         - event: Configured(indexed bytes32,indexed address,(uint256,(address,uint256),(address,uint256),(address,uint256),address,bytes))
           handler: handleConfigured
@@ -45,7 +55,15 @@ templates:
           handler: handleResolved
         - event: Revoked(indexed bytes4,indexed address,indexed address)
           handler: handleRevoked
+<<<<<<< HEAD
       file: ./src/GovernQueue.ts
+=======
+        - event: EvidenceSubmitted(indexed address,indexed uint256,indexed address,bytes,bool)
+          handler: handleEvidenceSubmitted
+        - event: Ruled(indexed address,indexed uint256,uint256)
+          handler: handleRuled
+      file: ./src/OptimisticQueue.ts
+>>>>>>> master
   - kind: ethereum/contract
     name: Govern
     network: {{network}}
@@ -56,18 +74,15 @@ templates:
       apiVersion: 0.0.1
       language: wasm/assemblyscript
       entities:
-        - Config
-        - Collateral
+        - Execution
+        - Action
         - Role
       abis:
-<<<<<<< HEAD
         - name: Govern
-          file: ./abis/Govern.json
-=======
-        - name: Eaglet
-          file: ../govern-core/artifacts/Eaglet.json
->>>>>>> monorepo
+          file: ../govern-core/abi/Govern.json
       eventHandlers:
+        - event: Executed(indexed address,tuple[],bytes[])
+          handler: handleExecuted
         - event: Frozen(indexed bytes4,indexed address)
           handler: handleFrozen
         - event: Granted(indexed bytes4,indexed address,indexed address)

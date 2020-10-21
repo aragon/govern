@@ -1,22 +1,63 @@
+type ERC3000Registry @entity {
+  id: ID!
+  address: Bytes!
+  count: Int!
+  games: [OptimisticGame!]
+}
+
+type OptimisticGame @entity {
+  id: ID!
+  name: String!
+<<<<<<< HEAD
+  queue: GovernQueue! @derivedFrom(field: "govern")
+  roles: [Role]!
+=======
+  executor: Govern!
+  queue: OptimisticQueue!
+}
+
 type Govern @entity {
   id: ID!
   address: Bytes!
-  name: String!
-  queue: GovernQueue! @derivedFrom(field: "govern")
-  roles: [Role]!
+  metadata: Bytes
+  games: [OptimisticGame!] @derivedFrom(field: "executor")
+  executions: [Execution!]
+  roles: [Role!]
+}
+
+type Execution @entity {
+  id: ID!
+  sender: Bytes!
+  queue: OptimisticQueue
+  actions: [Action!] @derivedFrom(field: "execution")
+  results: [Bytes!]
+}
+
+type Action @entity {
+  id: ID!
+  to: Bytes!
+  value: BigInt!
+  data: Bytes!
+  item: Item!
+  execution: Execution
+>>>>>>> master
 }
 
 type GovernQueue @entity {
   id: ID!
   address: Bytes!
-  govern: Govern!
-  containers: [Container]!
   config: Config
-  roles: [Role]!
+  games: [OptimisticGame!] @derivedFrom(field: "queue")
+  queue: [Item!]
+  executions: [Execution!] # TODO: @derivedFrom(field: "queue")
+  challenges: [Challenge!] @derivedFrom(field: "queue")
+  vetos: [Veto!] @derivedFrom(field: "queue")
+  roles: [Role!]
 }
 
 type Config @entity {
   id: ID!
+  queue: OptimisticQueue!
   executionDelay: BigInt!
   scheduleDeposit: Collateral!
   challengeDeposit: Collateral!
@@ -27,46 +68,75 @@ type Config @entity {
 
 type Collateral @entity {
   id: ID!
-  token: Bytes!
+  token: ERC20!
   amount: BigInt!
 }
 
-type Container @entity {
+type ERC20 @entity {
   id: ID!
-  payload: Payload!
-  config: Config!
-  executionState: ExecutionState!
-  vetoReason: Bytes
 }
 
-type Payload @entity {
+type Item @entity {
   id: ID!
+  status: ItemStatus!
   nonce: BigInt!
+  executionTime: BigInt!
   submitter: Bytes!
   executor: Govern!
-  actions: [Action]!
+  actions: [Action!] @derivedFrom(field: "item")
   proof: Bytes!
+  collateral: Collateral!
+  createdAt: BigInt!
 }
 
-type Action @entity {
+type Challenge @entity {
   id: ID!
-  to: Bytes!
-  value: BigInt!
+  queue: OptimisticQueue!
+  challenger: Bytes!
+  item: Item!
+  arbitrator: Bytes!
+  disputeId: BigInt!
+  evidences: [Evidence!] @derivedFrom(field: "challenge")
+  collateral: Collateral!
+  ruling: BigInt
+  approved: Boolean
+  createdAt: BigInt!
+}
+
+type Evidence @entity {
+  id: ID!
+  challenge: Challenge!
   data: Bytes!
+  submitter: Bytes!
+  createdAt: BigInt!
+}
+
+type Veto @entity {
+  id: ID!
+  queue: OptimisticQueue!
+  item: Item!
+  reason: Bytes!
+  submitter: Bytes!
+  collateral: Collateral!
+  createdAt: BigInt!
 }
 
 type Role @entity {
   id: ID!
-  role: Bytes!
+  entity: Bytes!
+  selector: Bytes!
   who: Bytes!
-  revoked: Boolean!
+  granted: Boolean!
+  frozen: Boolean!
 }
 
-enum ExecutionState {
+enum ItemStatus {
+  None
   Approved
   Cancelled
   Challenged
   Executed
+  Rejected
   Scheduled
   Vetoed
 }
