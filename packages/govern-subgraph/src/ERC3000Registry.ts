@@ -19,7 +19,7 @@ export function handleRegistered(event: RegisteredEvent): void {
   const game = new OptimisticGameEntity(event.params.name)
 
   game.name = event.params.name
-  game.executor = event.params.executor.toHexString()
+  game.executor = event.params.dao.toHexString()
   game.queue = event.params.queue.toHexString()
 
   // add game to the registry
@@ -33,12 +33,12 @@ export function handleRegistered(event: RegisteredEvent): void {
   registry.save()
 
   // Create datasource templates
-  GovernTemplate.create(event.params.executor)
+  GovernTemplate.create(event.params.dao)
   QueueTemplate.create(event.params.queue)
 }
 
 export function handleSetMetadata(event: SetMetadataEvent): void {
-  const govern = loadOrCreateGovern(event.params.executor)
+  const govern = loadOrCreateGovern(event.params.dao)
   govern.metadata = event.params.metadata
 
   govern.save()
