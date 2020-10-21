@@ -44,9 +44,11 @@ const DAO_QUERY = gql`
         }
         executions {
           id
-          sender
+          queue {
+            address
+          }
         }
-        queue {
+        queued {
           id
           status
           nonce
@@ -207,7 +209,7 @@ function Actions({ dao }: DaoInfoProps) {
     history.push(`/${daoAddress}/new-action`)
   }, [history, daoAddress])
 
-  const hasActions = useMemo(() => dao.queue.queue.length > 0, [dao])
+  const hasActions = useMemo(() => dao.queue.queued.length > 0, [dao])
 
   return (
     <div
@@ -230,7 +232,7 @@ function Actions({ dao }: DaoInfoProps) {
     >
       <h2>Actions</h2>
       {hasActions
-        ? dao.queue.queue.map(({ id }: { id: string }) => (
+        ? dao.queue.queued.map(({ id }: { id: string }) => (
             <ActionCard id={id} key={id} />
           ))
         : 'No actions.'}
