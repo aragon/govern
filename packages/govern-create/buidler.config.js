@@ -44,13 +44,20 @@ task('deploy-registry', 'Deploys an ERC3000Registry instance').setAction(
 
 task('deploy-factory', 'Deploys an GovernBaseFactory instance').setAction(
   async (_, { ethers }) => {
-    const GovernQueueFactory = await ethers.getContractFactory('GovernQueueFactory')
-    const GovernBaseFactory = await ethers.getContractFactory('GovernBaseFactory')
+    const GovernQueueFactory = await ethers.getContractFactory(
+      'GovernQueueFactory'
+    )
+    const GovernBaseFactory = await ethers.getContractFactory(
+      'GovernBaseFactory'
+    )
 
     const queueFactory = await GovernQueueFactory.deploy()
     print(queueFactory, 'GovernQueueFactory')
 
-    const governBaseFactory = await GovernBaseFactory.deploy(process.env.REGISTRY_RINKEBY, queueFactory.address)
+    const governBaseFactory = await GovernBaseFactory.deploy(
+      process.env.REGISTRY_RINKEBY,
+      queueFactory.address
+    )
     print(governBaseFactory, 'GovernBaseFactory')
 
     if (process.env.CD) {
@@ -90,7 +97,7 @@ task('deploy-govern', 'Deploys an Govern from provided factory')
       factoryAddr
     )
     const tx = await GovernBaseFactory.newDummyGovern(name, {
-      gasLimit: 3500000,
+      gasLimit: 4000000,
     })
 
     const { events } = await tx.wait()
