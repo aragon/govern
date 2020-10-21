@@ -28,13 +28,9 @@ templates:
         - ERC20
       abis:
         - name: GovernQueue
-<<<<<<< HEAD
-          file: ../govern-core/artifacts/GovernQueue.json
-=======
           file: ../govern-core/abi/GovernQueue.json
         - name: ERC20
           file: ../govern-core/abi/ERC20.json
->>>>>>> master
       eventHandlers:
         - event: Configured(indexed bytes32,indexed address,(uint256,(address,uint256),(address,uint256),(address,uint256),address,bytes))
           handler: handleConfigured
@@ -55,14 +51,11 @@ templates:
         - event: Revoked(indexed bytes4,indexed address,indexed address)
           handler: handleRevoked
       file: ./src/GovernQueue.ts
-<<<<<<< HEAD
-=======
         - event: EvidenceSubmitted(indexed address,indexed uint256,indexed address,bytes,bool)
           handler: handleEvidenceSubmitted
         - event: Ruled(indexed address,indexed uint256,uint256)
           handler: handleRuled
       file: ./src/GovernQueue.ts
->>>>>>> master
   - kind: ethereum/contract
     name: Govern
     network: {{network}}
