@@ -5,7 +5,8 @@
   "main": "src/index.ts",
   "scripts": {
     "start": "yarn start:containers && node --loader ts-node/esm.mjs  src/index.ts",
-    "start:containers": "docker-compose up -d"
+    "start:containers": "docker-compose up -d",
+    "stop:containers": "docker-compose down"
   },
   "dependencies": {
     "@urql/core": "^1.13.1",
