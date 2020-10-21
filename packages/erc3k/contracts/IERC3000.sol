@@ -47,14 +47,14 @@ abstract contract IERC3000 {
     /**
      * @notice Apply arbitrator's ruling over a challenge once it has come to a final ruling
      * @param payloadHash Hash of the payload being vetoed
-     * @param config A ERC3000Data.Config struct holding the config attached to the payload being vetod
+     * @param config A ERC3000Data.Config struct holding the config attached to the payload being vetoed
      */
     function veto(bytes32 payloadHash, ERC3000Data.Config memory config, bytes memory reason) virtual public;
     event Vetoed(bytes32 indexed containerHash, address indexed actor, bytes reason, ERC3000Data.Collateral collateral);
 
     /**
      * @notice Apply a new configuration for all *new* containers to be scheduled
-     * @param config A ERC3000Data.Config struct holding all the new params that will control the queue
+     * @param config A ERC3000Data.Config struct holding all the new params that will control the system
      */
     function configure(ERC3000Data.Config memory config) virtual public returns (bytes32 configHash);
     event Configured(bytes32 indexed containerHash, address indexed actor, ERC3000Data.Config config);
