@@ -2,6 +2,10 @@ import Configuration from '../internal/configuration/Configuration'
 
 let globalConfig = null;
 
+export interface ConfigurationObject {
+  governURL: string
+}
+
 /**
  * Does set the global configuration for Govern
  *
