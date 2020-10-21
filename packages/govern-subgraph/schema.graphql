@@ -5,6 +5,14 @@ type ERC3000Registry @entity {
   games: [OptimisticGame!]
 }
 
+type OptimisticGame @entity {
+  id: ID!
+  name: String!
+  queue: GovernQueue!
+  roles: [Role]!
+  executor: Govern!
+}
+
 type Govern @entity {
   id: ID!
   address: Bytes!
@@ -12,14 +20,6 @@ type Govern @entity {
   games: [OptimisticGame!] @derivedFrom(field: "executor")
   executions: [Execution!]
   roles: [Role!]
-}
-
-type OptimisticGame @entity {
-  id: ID!
-  name: String!
-  queue: GovernQueue!
-  roles: [Role]!
-  executor: Govern!
 }
 
 type Execution @entity {
