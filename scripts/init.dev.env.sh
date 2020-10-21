@@ -42,8 +42,8 @@ if [[ -d "./dev-data" ]]; then
     rm -rf ./dev-data
 fi
 
-mkdir -p ./dev-data/postgres
-mkdir -p ./dev-data/ipfs
+mkdir ./dev-data/postgres
+mkdir ./dev-data/ipfs
 
 if [[ "$(docker ps -a | grep graph)" ]]; then
     yarn stop:containers
