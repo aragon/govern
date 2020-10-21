@@ -55,6 +55,8 @@
     "typescript-transform-paths": "^2.0.1"
   },
   "dependencies": {
-    "@urql/core": "^1.13.1"
+    "@urql/core": "^1.13.1",
+    "graphql": "^15.3.0",
+    "isomorphic-unfetch": "^3.1.0"
   }
 }

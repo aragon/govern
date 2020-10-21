@@ -1,4 +1,4 @@
-import Client from '../../graphql/Client'
+import Client from '../../clients/Client'
 import Configuration from '../../configuration/Configuration'
 
 /**
@@ -13,20 +13,21 @@ export default abstract class AbstractAction {
    */
   protected gqlQuery: string;
 
-
   /**
    * @param {any} parameters - The required parameters for this action
    * @param {Configuration} configuration - The current configuration to execute this action
-   * @param {Client} client - The GraphQL client wrapper later also the REST client wrapper
+   * @param {GraphQLClient} client - The GraphQL client wrapper later also the REST client wrapper
    *
    * @constructor
    */
-  constructor(protected parameters: any, protected configuration: Configuration, protected client: Client) {}
+  constructor(protected parameters: any, protected configuration: Configuration, protected client: GraphQLClient) {}
 
   /**
    * Will execute the action and return the response from the Govern server.
    *
    * @method execute
+   *
+   * @returns {Promise<any>}
    *
    * @public
    */
