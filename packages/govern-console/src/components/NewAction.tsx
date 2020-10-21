@@ -246,6 +246,7 @@ function ContractCallHandler({
                   data: encodedFunctionCall,
                 },
               ],
+              allowFailuresMap: '0x0000000000000000000000000000000000000000000000000000000000000000',
               proof: proof ? toHex(proof) : EMPTY_BYTES,
             },
             config: {
