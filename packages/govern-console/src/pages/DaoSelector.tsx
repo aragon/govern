@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import 'styled-components/macro'
-import Button from '../Components/Button'
+import Button from '../components/Button'
 
 const KNOWN_TOOLS = [
   {

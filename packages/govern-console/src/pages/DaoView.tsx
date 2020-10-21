@@ -8,8 +8,8 @@ import {
 } from 'react-router-dom'
 import 'styled-components/macro'
 import { gql, useQuery } from '@apollo/client'
-import Button from '../Components/Button'
-import NewAction from '../Components/NewAction'
+import Button from '../components/Button'
+import NewAction from '../components/NewAction'
 
 const ANY_ADDRESS = '0xffffffffffffffffffffffffffffffffffffffff'
 

@@ -4,7 +4,7 @@ import { useWallet } from 'use-wallet'
 import abiCoder from 'web3-eth-abi'
 import { toHex } from 'web3-utils'
 import 'styled-components/macro'
-import Button from '../Components/Button'
+import Button from '../components/Button'
 import { useContract } from '../lib/web3-contracts'
 import queueAbi from '../lib/abi/OptimisticQueue.json'
 

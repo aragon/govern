@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import 'styled-components/macro'
-import Button from '../Components/Button'
+import Button from '../components/Button'
 import ercAbi from '../lib/abi/erc20.json'
 import { useContract } from '../lib/web3-contracts'
 
