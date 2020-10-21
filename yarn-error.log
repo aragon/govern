@@ -1,0 +1,71 @@
+Arguments: 
+  /usr/local/Cellar/node@12/12.18.4/bin/node /usr/local/bin/yarn
+
+PATH: 
+  /usr/local/opt/node@12/bin:/usr/local/opt/node@8/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/Users/jorge/go/bin:/Users/jorge/.cargo/bin:/Users/jorge/go/bin:/Users/jorge/.cargo/bin
+
+Yarn version: 
+  1.22.4
+
+Node version: 
+  12.18.4
+
+Platform: 
+  darwin x64
+
+Trace: 
+  SyntaxError: /Users/jorge/aragon/govern/package.json: Unexpected token < in JSON at position 589
+      at JSON.parse (<anonymous>)
+      at /usr/local/lib/node_modules/yarn/lib/cli.js:1625:59
+      at Generator.next (<anonymous>)
+      at step (/usr/local/lib/node_modules/yarn/lib/cli.js:310:30)
+      at /usr/local/lib/node_modules/yarn/lib/cli.js:321:13
+
+npm manifest: 
+  {
+    "name": "@aragon/govern-monorepo",
+    "version": "1.0.0-beta.1",
+    "description": "Optimistic DAOs",
+    "private": true,
+    "repository": "https://github.com/aragon/govern",
+    "author": "Aragon Association <legal@aragon.org>",
+    "contributors": [
+      "Jorge Izquierdo <jorge@aragon.one>",
+      "Enrique Ortiz <enrique@aragon.one>"
+    ],
+    "license": "GPL-3.0",
+    "devDependencies": {
+      "lerna": "^3.22.1"
+    },
+    "scripts": {
+      "test": "lerna run --parallel --stream --ignore @aragon/erc3kjs test",
+      "coverage": "lerna run --concurrency 1 --stream --ignore @aragon/erc3kjs coverage",
+  <<<<<<< HEAD
+      "build": "lerna run --scope=@aragon/govern* --concurrency=1 --stream compile",
+      "build:contracts": "lerna run --scope=@aragon/govern --concurrency=1 --stream compile",
+      "build:subgraph": "lerna run --scope=@aragon/govern-subgraph --concurrency=1 --stream build"
+  =======
+      "build": "lerna run --scope=@aragon/govern* --stream compile",
+      "build:contracts": "lerna run --scope=@aragon/govern --parallel --stream compile",
+      "build:subgraph": "lerna run --scope=@aragon/govern-subgraph --parallel --stream build",
+      "deploy:subgraph:rinkeby": "lerna run --scope=@aragon/govern-subgraph --parallel --stream deploy-rinkeby"
+  >>>>>>> master
+    },
+    "workspaces": {
+      "packages": [
+        "packages/*"
+      ],
+      "nohoist": [
+        "**/@graphprotocol/graph-ts",
+        "**/@graphprotocol/graph-ts/**",
+        "**/@graphprotocol/graph-cli",
+        "**/@graphprotocol/graph-cli/**"
+      ]
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

@@ -1,0 +1,16 @@
+name: Subgraph CI/CD
+on:
+  push:
+    tags:
+    - v*
+env:
+  GRAPHKEY: ${{secrets.GRAPHKEY}}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - run: yarn
+    - run: .github/scripts/kubectl-config.sh ${{secrets.KUBE_CA}} ${{secrets.KUBE_SERVER}} ${{secrets.KUBE_TOKEN}}
+    - run: yarn deploy:subgraph:rinkeby

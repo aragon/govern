@@ -35,7 +35,7 @@ Tracked:
 Left out:
 - `ETHDeposited`
 
-#### OptimisticQueue.sol 
+#### GovernQueue.sol 
 
 Tracked:
 - `Configured`

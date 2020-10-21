@@ -8,6 +8,8 @@ const EVENTS = {
   EXECUTED: 'Executed'
 }
 
+const B32_ZERO = `0x${'00'.repeat(32)}`
+
 describe('Govern', function () {
   let signers, owner, govern, governNotOwner
 
@@ -23,12 +25,12 @@ describe('Govern', function () {
   })
 
   it('owner can exec', async () => {
-    await expect(govern.exec([]))
+    await expect(govern.exec([], B32_ZERO, B32_ZERO))
       .to.emit(govern, EVENTS.EXECUTED)
-      .withArgs(owner, [], [])
+      .withArgs(owner, [], B32_ZERO, B32_ZERO, [])
   })
 
   it('non-owner cannot exec', async () => {
-    await expect(governNotOwner.exec([])).to.be.revertedWith(ERRORS.AUTH)
+    await expect(governNotOwner.exec([], B32_ZERO, B32_ZERO)).to.be.revertedWith(ERRORS.AUTH)
   })
 })

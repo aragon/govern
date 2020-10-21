@@ -20,6 +20,7 @@ library ERC3000Data {
         address submitter;
         IERC3000Executor executor;
         Action[] actions;
+        bytes32 allowFailuresMap;
         bytes proof;
     }
 
