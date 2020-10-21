@@ -1,0 +1,19 @@
+{
+  "extends": "@ethereumjs/config-tsc",
+  "compilerOptions": {
+    "strictPropertyInitialization": false,
+    "outDir": "./dist",
+    "allowJs": true,
+    "lib": [
+      "dom"
+    ],
+    "baseUrl": "./",
+    "paths": {
+      "internal": ["internal/"]
+    }
+  },
+  "include": [
+    "./internal/**/*",
+    "./public/**/*"
+  ]
+}
