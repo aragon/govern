@@ -44,13 +44,13 @@ task('deploy-registry', 'Deploys an ERC3000Registry instance').setAction(
 
 task('deploy-factory', 'Deploys an GovernFactory instance').setAction(
   async (_, { ethers }) => {
-    const OptimisticQueueFactory = await ethers.getContractFactory(
-      'OptimisticQueueFactory'
+    const GovernQueueFactory = await ethers.getContractFactory(
+      'GovernQueueFactory'
     )
     const GovernFactory = await ethers.getContractFactory('GovernFactory')
 
-    const queueFactory = await OptimisticQueueFactory.deploy()
-    print(queueFactory, 'OptimisticQueueFactory')
+    const queueFactory = await GovernQueueFactory.deploy()
+    print(queueFactory, 'GovernQueueFactory')
 
     const governFactory = await GovernFactory.deploy(
       process.env.REGISTRY_RINKEBY,

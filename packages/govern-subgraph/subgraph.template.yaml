@@ -9,10 +9,10 @@ dataSources:
 {{> ERC3000Registry.yaml}}
 templates:
   - kind: ethereum/contract
-    name: OptimisticQueue
+    name: GovernQueue
     network: {{network}}
     source:
-      abi: OptimisticQueue
+      abi: GovernQueue
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.1
@@ -27,8 +27,8 @@ templates:
         - Role
         - ERC20
       abis:
-        - name: OptimisticQueue
-          file: ../govern-core/abi/OptimisticQueue.json
+        - name: GovernQueue
+          file: ../govern-core/abi/GovernQueue.json
         - name: ERC20
           file: ../govern-core/abi/ERC20.json
       eventHandlers:
@@ -54,7 +54,7 @@ templates:
           handler: handleEvidenceSubmitted
         - event: Ruled(indexed address,indexed uint256,uint256)
           handler: handleRuled
-      file: ./src/OptimisticQueue.ts
+      file: ./src/GovernQueue.ts
   - kind: ethereum/contract
     name: Govern
     network: {{network}}

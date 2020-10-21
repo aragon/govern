@@ -15,7 +15,7 @@ const EVENTS = {
 const ROLE = '0xabcdabcd'
 const FREEZE_ADDR = '0x0000000000000000000000000000000000000001'
 
-describe('MiniACL', function () {
+describe('ACL', function () {
   let signers, root, acl, aclNotRoot
 
   before(async () => {
@@ -25,8 +25,8 @@ describe('MiniACL', function () {
   })
 
   beforeEach(async () => {
-    const MiniACL = await ethers.getContractFactory('MiniACL')
-    acl = await MiniACL.deploy(root)
+    const ACL = await ethers.getContractFactory('ACL')
+    acl = await ACL.deploy(root)
     aclNotRoot = await acl.connect(signers[1])
     
   })

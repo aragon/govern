@@ -1,9 +1,9 @@
 {
-  "name": "erc3k",
+  "name": "@aragon/govern-contract-utils",
   "version": "1.0.0-beta.0",
-  "description": "ERC-3000 smart contract interfaces",
+  "description": "Contract utils used Govern smart contract packages",
   "main": "index.js",
-  "repository": "https://github.com/aragon/erc3k",
+  "repository": "https://github.com/aragon/govern",
   "author": "Aragon Association <legal@aragon.org>",
   "contributors": [
     "Jorge Izquierdo <jorge@aragon.one>"
@@ -13,10 +13,6 @@
     "/contracts"
   ],
   "license": "MIT",
-  "private": false,
-  "dependencies": {
-    "@aragon/govern-contract-utils": "^1.0.0-beta.0"
-  },
   "devDependencies": {
     "@nomiclabs/buidler": "^1.4.7",
     "@nomiclabs/buidler-ethers": "^2.0.0",
@@ -30,6 +26,5 @@
     "compile": "npx buidler compile --force",
     "test": "npx buidler test",
     "prepublishOnly": "yarn test && yarn compile"
-  },
-  "gitHead": "aabbf6bd2dac11872ba9bb1f1dc8fffb6044aa7c"
+  }
 }

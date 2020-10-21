@@ -6,7 +6,7 @@
 
 pragma solidity ^0.6.8;
 
-import "./SafeERC20.sol";
+import "../erc20/SafeERC20.sol";
 
 interface IArbitrator {
     /**

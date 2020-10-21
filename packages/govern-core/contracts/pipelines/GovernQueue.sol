@@ -7,23 +7,51 @@ pragma experimental ABIEncoderV2; // required for passing structs in calldata (f
 
 import "erc3k/contracts/ERC3000.sol";
 
-import "./lib/IArbitrable.sol";
-import "./lib/DepositLib.sol";
-import "./lib/MiniACL.sol";
-import "./lib/OptimisticQueueStateLib.sol";
-import "./lib/SafeERC20.sol";
+import "@aragon/govern-contract-utils/contracts/protocol/IArbitrable.sol";
+import "@aragon/govern-contract-utils/contracts/deposits/DepositLib.sol";
+import "@aragon/govern-contract-utils/contracts/acl/ACL.sol";
+import "@aragon/govern-contract-utils/contracts/erc20/SafeERC20.sol";
 
-contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
+library GovernQueueStateLib {
+    enum State {
+        None,
+        Scheduled,
+        Challenged,
+        Approved,
+        Rejected,
+        Cancelled,
+        Executed
+    }
+
+    struct Item {
+        State state;
+    }
+
+    function checkState(Item storage _item, State _requiredState) internal view {
+        require(_item.state == _requiredState, "queue: bad state");
+    }
+
+    function setState(Item storage _item, State _state) internal {
+        _item.state = _state;
+    }
+
+    function checkAndSetState(Item storage _item, State _fromState, State _toState) internal {
+        checkState(_item, _fromState);
+        setState(_item, _toState);
+    }
+}
+
+contract GovernQueue is ERC3000, IArbitrable, ACL {
     // Syntax sugar to enable method-calling syntax on types
     using ERC3000Data for *;
     using DepositLib for ERC3000Data.Collateral;
-    using OptimisticQueueStateLib for OptimisticQueueStateLib.Item;
+    using GovernQueueStateLib for GovernQueueStateLib.Item;
     using SafeERC20 for ERC20;
 
     // Permanent state
     bytes32 public configHash; // keccak256 hash of the current ERC3000Data.Config
     uint256 public nonce; // number of scheduled payloads so far
-    mapping (bytes32 => OptimisticQueueStateLib.Item) public queue; // container hash -> execution state
+    mapping (bytes32 => GovernQueueStateLib.Item) public queue; // container hash -> execution state
 
     // Temporary state
     mapping (bytes32 => address) public challengerCache; // container hash -> challenger addr (used after challenging and before resolution implementation)
@@ -35,7 +63,7 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
      */
     constructor(address _aclRoot, ERC3000Data.Config memory _initialConfig)
         public
-        MiniACL(_aclRoot) // note that this contract directly derives from MiniACL (ACL is local to contract and not global to system in Govern)
+        ACL(_aclRoot) // note that this contract directly derives from ACL (ACL is local to contract and not global to system in Govern)
     {
         _setConfig(_initialConfig);
     }
@@ -64,8 +92,8 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
 
         containerHash = ERC3000Data.containerHash(_container.payload.hash(), _configHash);
         queue[containerHash].checkAndSetState(
-            OptimisticQueueStateLib.State.None, // ensure that the state for this container is None
-            OptimisticQueueStateLib.State.Scheduled // and if so perform a state transition to Scheduled
+            GovernQueueStateLib.State.None, // ensure that the state for this container is None
+            GovernQueueStateLib.State.Scheduled // and if so perform a state transition to Scheduled
         );
         // we don't need to save any more state about the container in storage
         // we just authenticate the hash and assign it a state, since all future
@@ -98,8 +126,8 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
 
         bytes32 containerHash = _container.hash();
         queue[containerHash].checkAndSetState(
-            OptimisticQueueStateLib.State.Scheduled, // note that we will revert here if the container wasn't previously scheduled
-            OptimisticQueueStateLib.State.Executed
+            GovernQueueStateLib.State.Scheduled, // note that we will revert here if the container wasn't previously scheduled
+            GovernQueueStateLib.State.Executed
         );
 
         _container.config.scheduleDeposit.releaseTo(_container.payload.submitter); // release collateral to executor
@@ -117,8 +145,8 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
         bytes32 containerHash = _container.hash();
         challengerCache[containerHash] = msg.sender; // cache challenger address while it is needed
         queue[containerHash].checkAndSetState(
-            OptimisticQueueStateLib.State.Scheduled,
-            OptimisticQueueStateLib.State.Challenged
+            GovernQueueStateLib.State.Scheduled,
+            GovernQueueStateLib.State.Challenged
         );
 
         ERC3000Data.Collateral memory collateral = _container.config.challengeDeposit;
@@ -150,28 +178,28 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
      */
     function resolve(ERC3000Data.Container memory _container, uint256 _disputeId) override public returns (bytes[] memory execResults) {
         bytes32 containerHash = _container.hash();
-        if (queue[containerHash].state == OptimisticQueueStateLib.State.Challenged) {
+        if (queue[containerHash].state == GovernQueueStateLib.State.Challenged) {
             // will re-enter in `rule`, `rule` will perform state transition depending on ruling
             IArbitrator(_container.config.resolver).executeRuling(_disputeId);
         } // else continue, as we must 
 
-        OptimisticQueueStateLib.State state = queue[containerHash].state;
-        if (state == OptimisticQueueStateLib.State.Approved) {
+        GovernQueueStateLib.State state = queue[containerHash].state;
+        if (state == GovernQueueStateLib.State.Approved) {
             execResults = executeApproved(_container);
-        } else if (state == OptimisticQueueStateLib.State.Rejected) {
+        } else if (state == GovernQueueStateLib.State.Rejected) {
             settleRejection(_container);
         } else {
             revert("queue: unresolved");
         }
 
-        emit Resolved(containerHash, msg.sender, state == OptimisticQueueStateLib.State.Approved);
+        emit Resolved(containerHash, msg.sender, state == GovernQueueStateLib.State.Approved);
     }
 
     function veto(bytes32 _payloadHash, ERC3000Data.Config memory _config, bytes memory _reason) auth(this.veto.selector) override public {
         bytes32 containerHash = ERC3000Data.containerHash(_payloadHash, _config.hash());
         queue[containerHash].checkAndSetState(
-            OptimisticQueueStateLib.State.Scheduled,
-            OptimisticQueueStateLib.State.Cancelled
+            GovernQueueStateLib.State.Scheduled,
+            GovernQueueStateLib.State.Cancelled
         );
 
         emit Vetoed(containerHash, msg.sender, _reason, _config.vetoDeposit);
@@ -196,8 +224,8 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
     function executeApproved(ERC3000Data.Container memory _container) public returns (bytes[] memory execResults) {
         bytes32 containerHash = _container.hash();
         queue[containerHash].checkAndSetState(
-            OptimisticQueueStateLib.State.Approved,
-            OptimisticQueueStateLib.State.Executed
+            GovernQueueStateLib.State.Approved,
+            GovernQueueStateLib.State.Executed
         );
 
         // release all collateral to submitter
@@ -212,8 +240,8 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
     function settleRejection(ERC3000Data.Container memory _container) public {
         bytes32 containerHash = _container.hash();
         queue[containerHash].checkAndSetState(
-            OptimisticQueueStateLib.State.Rejected,
-            OptimisticQueueStateLib.State.Cancelled
+            GovernQueueStateLib.State.Rejected,
+            GovernQueueStateLib.State.Cancelled
         );
 
         address challenger = challengerCache[containerHash];
@@ -231,8 +259,8 @@ contract OptimisticQueue is ERC3000, IArbitrable, MiniACL {
         IArbitrator arbitrator = IArbitrator(msg.sender);
         bytes32 containerHash = disputeItemCache[arbitrator][_disputeId];
         queue[containerHash].checkAndSetState(
-            OptimisticQueueStateLib.State.Challenged,
-            _ruling == ALLOW_RULING ? OptimisticQueueStateLib.State.Approved : OptimisticQueueStateLib.State.Rejected
+            GovernQueueStateLib.State.Challenged,
+            _ruling == ALLOW_RULING ? GovernQueueStateLib.State.Approved : GovernQueueStateLib.State.Rejected
         );
         disputeItemCache[arbitrator][_disputeId] = bytes32(0); // refund gas, no longer needed in state
 
