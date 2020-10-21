@@ -8,9 +8,9 @@ type ERC3000Registry @entity {
 type OptimisticGame @entity {
   id: ID!
   name: String!
-<<<<<<< HEAD
+  queue: GovernQueue! @derivedFrom(field: "govern")
+  roles: [Role]!
   executor: Govern!
-  queue: GovernQueue!
 }
 
 type Govern @entity {
@@ -37,10 +37,8 @@ type Action @entity {
   data: Bytes!
   item: Item!
   execution: Execution
-=======
   queue: GovernQueue! @derivedFrom(field: "govern")
   roles: [Role]!
->>>>>>> Create govern-contract-utils package and rename to GovernQueue
 }
 
 type GovernQueue @entity {

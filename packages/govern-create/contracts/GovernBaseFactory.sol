@@ -7,8 +7,8 @@ pragma experimental ABIEncoderV2;
 
 import "erc3k/contracts/ERC3000Registry.sol";
 
-import "./Govern.sol";
-import "./pipelines/GovernQueue.sol";
+import "@aragon/govern-core/contracts/Govern.sol";
+import "@aragon/govern-core/contracts/pipelines/GovernQueue.sol";
 
 contract GovernQueueFactory {
     function newQueue(address _aclRoot, ERC3000Data.Config memory _config)
@@ -19,7 +19,7 @@ contract GovernQueueFactory {
     }
 }
 
-contract GovernFactory {
+contract GovernBaseFactory {
     address internal constant ANY_ADDR = address(-1);
 
     GovernQueueFactory public queueFactory;

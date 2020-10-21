@@ -6,11 +6,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\"",
     "start": "node -r dotenv/config server.js dotenv_config_path=../../.env",
-    "new-dao": "cd ../govern-core && yarn deploy-govern --network rinkeby"
+    "new-dao": "cd ../govern-create && yarn deploy-govern --network rinkeby"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "AGPL-3.0",
   "dependencies": {
     "discord.js": "^12.3.1",
     "dotenv": "^8.2.0",
