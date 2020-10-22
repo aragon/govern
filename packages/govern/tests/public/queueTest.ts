@@ -6,7 +6,7 @@ import queue from '../../public/queue'
 jest.mock('../../internal/actions/QueueAction')
 
 /**
- * queues test
+ * queue test
  */
 describe('queue Test', () => {
   const queueActionMock = QueueAction as jest.MockedClass<typeof QueueAction>
