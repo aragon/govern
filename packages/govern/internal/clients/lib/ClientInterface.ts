@@ -13,5 +13,5 @@ export default interface ClientInterface {
    *
    * @returns {any}
    */
-  request(query: any, args: any): any;
+  request(query: any, args: any): Promise<any>;
 }
