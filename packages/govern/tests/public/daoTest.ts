@@ -1,20 +1,23 @@
-import dao from '../../public/dao';
+import DAOAction from '../../internal/actions/DAOAction'
+import configuration from '../../public/configuration'
+import dao from '../../public/dao'
 
 // Mocks
-jest.mock('../../internal/actions/DAOAction');
+jest.mock('../../internal/actions/DAOAction')
 
 /**
  * dao test
  */
 describe('dao Test', () => {
-  let daoAction;
+  const daoActionMock = DAOAction as jest.MockedClass<typeof DAOAction>
 
-  beforeEach(() => {
-    new DAOAction();
-    daoAction = DAOAction.mock.instances[0];
-  });
+  it('dao test', async () => {
+    configuration.global = true;
 
-  it('dao test', () => {
-    dao('0x00');
-  });
-});
+    await dao('0x00')
+
+    expect(DAOAction).toHaveBeenNthCalledWith(1, configuration.global, { address: '0x00' })
+
+    expect(daoActionMock.mock.instances[0].execute).toHaveBeenCalledTimes(1)
+  })
+})

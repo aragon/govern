@@ -13,7 +13,9 @@ export interface ConfigurationObject {
  *
  * @returns {void}
  */
-export default function configuration(config: any): void {
+export default function configuration(config: ConfigurationObject): void {
+  // Added ignore with knowing of existing expectation of this call in the test
+  /* istanbul ignore next */
   globalConfig = new Configuration(config);
 }
 
