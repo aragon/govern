@@ -53,9 +53,11 @@ export default class Configuration {
    *
    * @var governURL
    *
+   * @returns {string}
+   *
    * @public
    */
-  get governURL() {
+  get governURL(): string {
     return this.config.governURL
   }
 
@@ -63,6 +65,8 @@ export default class Configuration {
    * Getter for client property
    *
    * @var client
+   *
+   * @returns {ClientInterface}
    *
    * @public
    */
