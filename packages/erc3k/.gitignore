@@ -3,5 +3,6 @@ yarn-error.log
 
 #Buidler files
 abi
-cache
 artifacts
+cache
+typechain

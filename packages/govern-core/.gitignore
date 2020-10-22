@@ -11,3 +11,4 @@ artifacts
 coverage
 coverage.json
 .coverage_*
+typechain
