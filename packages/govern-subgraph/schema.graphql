@@ -8,14 +8,15 @@ type ERC3000Registry @entity {
 type OptimisticGame @entity {
   id: ID!
   name: String!
+  queue: GovernQueue!
+  roles: [Role]!
   executor: Govern!
-  queue: OptimisticQueue!
-  metadata: Bytes
 }
 
 type Govern @entity {
   id: ID!
   address: Bytes!
+  metadata: Bytes
   games: [OptimisticGame!] @derivedFrom(field: "executor")
   executions: [Execution!]
   roles: [Role!]
@@ -24,6 +25,7 @@ type Govern @entity {
 type Execution @entity {
   id: ID!
   sender: Bytes!
+  queue: GovernQueue
   actions: [Action!] @derivedFrom(field: "execution")
   results: [Bytes!]
 }
@@ -35,15 +37,17 @@ type Action @entity {
   data: Bytes!
   item: Item!
   execution: Execution
+  queue: GovernQueue!
+  roles: [Role]!
 }
 
-type OptimisticQueue @entity {
+type GovernQueue @entity {
   id: ID!
   address: Bytes!
   config: Config
   games: [OptimisticGame!] @derivedFrom(field: "queue")
   queue: [Item!]
-  executions: [Execution!]
+  executions: [Execution!] # TODO: @derivedFrom(field: "queue")
   challenges: [Challenge!] @derivedFrom(field: "queue")
   vetos: [Veto!] @derivedFrom(field: "queue")
   roles: [Role!]
@@ -51,7 +55,7 @@ type OptimisticQueue @entity {
 
 type Config @entity {
   id: ID!
-  queue: OptimisticQueue!
+  queue: GovernQueue!
   executionDelay: BigInt!
   scheduleDeposit: Collateral!
   challengeDeposit: Collateral!
@@ -62,8 +66,12 @@ type Config @entity {
 
 type Collateral @entity {
   id: ID!
-  token: Bytes!
+  token: ERC20!
   amount: BigInt!
+}
+
+type ERC20 @entity {
+  id: ID!
 }
 
 type Item @entity {
@@ -81,7 +89,7 @@ type Item @entity {
 
 type Challenge @entity {
   id: ID!
-  queue: OptimisticQueue!
+  queue: GovernQueue!
   challenger: Bytes!
   item: Item!
   arbitrator: Bytes!
@@ -103,7 +111,7 @@ type Evidence @entity {
 
 type Veto @entity {
   id: ID!
-  queue: OptimisticQueue!
+  queue: GovernQueue!
   item: Item!
   reason: Bytes!
   submitter: Bytes!

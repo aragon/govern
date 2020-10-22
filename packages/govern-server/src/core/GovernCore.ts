@@ -4,7 +4,8 @@ import {
   Network,
   Networkish,
   OptimisticGameData,
-  OptimisticQueueData,
+  GovernQueueData,
+  GovernQueueData,
 } from './types'
 import { ErrorInvalidNetwork, ErrorUnexpectedResult } from './errors'
 import { toNetwork } from './utils'
@@ -87,9 +88,9 @@ class GovernCore {
     return result.governs ?? []
   }
 
-  async queue(address: Address): Promise<OptimisticQueueData | null> {
+  async queue(address: Address): Promise<GovernQueueData | null> {
     const result = await this.fetchResult<{
-      optimisticQueue: OptimisticQueueData | null
+      optimisticQueue: GovernQueueData | null
     }>(
       [queries.QUEUE, { queue: address.toLowerCase() }],
       `Unexpected result when fetching the queue ${address}.`
@@ -97,9 +98,9 @@ class GovernCore {
     return result.optimisticQueue ?? null
   }
 
-  async queues(): Promise<OptimisticQueueData[]> {
+  async queues(): Promise<GovernQueueData[]> {
     const result = await this.fetchResult<{
-      optimisticQueues: OptimisticQueueData[]
+      optimisticQueues: GovernQueueData[]
     }>([queries.QUEUES], `Unexpected result when fetching the queue.`)
     return result.optimisticQueues ?? []
   }
@@ -121,13 +122,13 @@ class GovernCore {
     return result.optimisticGames ?? []
   }
 
-  async queuesForDao(address: Address): Promise<OptimisticQueueData[]> {
+  async queuesForDao(address: Address): Promise<GovernQueueData[]> {
     const result = await this.fetchResult<{ govern: DaoData }>(
       [queries.QUEUES_BY_DAO, { address }],
       `Unexpected result when fetching the queues for dao ${address}.`
     )
     const games = result.govern?.games ?? []
-    return games.reduce<OptimisticQueueData[]>((queues, game) => {
+    return games.reduce<GovernQueueData[]>((queues, game) => {
       return game?.queue ? [...queues, game.queue] : queues
     }, [])
   }

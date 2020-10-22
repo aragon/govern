@@ -1245,7 +1245,7 @@
       "name": "queue",
       "outputs": [
         {
-          "internalType": "enum OptimisticQueueStateLib.State",
+          "internalType": "enum GovernQueueStateLib.State",
           "name": "state",
           "type": "uint8"
         }

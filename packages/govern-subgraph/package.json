@@ -1,21 +1,23 @@
 {
   "name": "@aragon/govern-subgraph",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.0-beta.1",
   "scripts": {
     "codegen": "rm -rf generated; graph codegen",
     "build": "rm -rf build; graph build",
     "manifest-mainnet": "scripts/build-manifest.sh mainnet",
-    "manifest-mainnet-staging": "env STAGING=true scripts/build-manifest.sh mainnet",
+    "manifest-mainnet-staging": "STAGING=true scripts/build-manifest.sh mainnet",
     "manifest-rinkeby": "scripts/build-manifest.sh rinkeby",
-    "manifest-rinkeby-staging": "env STAGING=true scripts/build-manifest.sh rinkeby",
-    "manifest-xdai": "env scripts/build-manifest.sh xdai",
-    "manifest-xdai-staging": "env STAGING=true scripts/build-manifest.sh xdai",
+    "manifest-rinkeby-staging": "STAGING=true scripts/build-manifest.sh rinkeby",
+    "manifest-xdai": "scripts/build-manifest.sh xdai",
+    "manifest-xdai-staging": "STAGING=true scripts/build-manifest.sh xdai",
     "deploy-mainnet": "scripts/deploy.sh aragon govern mainnet",
-    "deploy-mainnet-staging": "env STAGING=true scripts/deploy.sh aragon govern mainnet",
+    "deploy-mainnet-staging": "STAGING=true scripts/deploy.sh aragon govern mainnet",
     "deploy-rinkeby": "scripts/deploy.sh aragon govern rinkeby",
     "deploy-rinkeby-staging": "STAGING=true scripts/deploy.sh aragon govern rinkeby",
     "deploy-xdai": "scripts/deploy.sh aragon govern xdai",
-    "deploy-xdai-staging": "STAGING=true scripts/deploy.sh aragon govern xdai"
+    "deploy-xdai-staging": "STAGING=true scripts/deploy.sh aragon govern xdai",
+    "deploy-local": "LOCAL=true scripts/deploy.sh aragon govern rinkeby",
+    "create-local": "graph create aragon/aragon-govern-rinkeby --node http://localhost:8020"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.18.0",

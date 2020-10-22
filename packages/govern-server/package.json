@@ -3,8 +3,10 @@
   "version": "0.0.0",
   "license": "GPL-3.0",
   "scripts": {
-    "start": "ts-node src/index.ts",
-    "dev": "ts-node-dev src/index.ts"
+    "dev": "ts-node-dev src/index.ts",
+    "start": "yarn start:containers && node --loader ts-node/esm.mjs  src/index.ts",
+    "start:containers": "HOST_UID=$(id -u) HOST_GID=$(id -g) docker-compose up -d",
+    "stop:containers": "HOST_UID=$(id -u) HOST_GID=$(id -g) docker-compose down"
   },
   "dependencies": {
     "@urql/core": "^1.13.1",

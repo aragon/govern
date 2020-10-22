@@ -35,7 +35,6 @@
     "@typescript-eslint/parser": "^2.29.0",
     "husky": "^4.2.5",
     "is-ci-cli": "^2.1.1",
-    "jest": "^26.0.1",
     "oao": "^2.0.0",
     "precise-commits": "^1.0.2",
     "prettier": "^2.0.5",

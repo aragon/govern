@@ -34,6 +34,18 @@
         },
         {
           "indexed": false,
+          "internalType": "bytes32",
+          "name": "memo",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "failureMap",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
           "internalType": "bytes[]",
           "name": "execResults",
           "type": "bytes[]"
@@ -65,10 +77,25 @@
           "internalType": "struct ERC3000Data.Action[]",
           "name": "actions",
           "type": "tuple[]"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "allowFailuresMap",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "memo",
+          "type": "bytes32"
         }
       ],
       "name": "exec",
       "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "failureMap",
+          "type": "bytes32"
+        },
         {
           "internalType": "bytes[]",
           "name": "",

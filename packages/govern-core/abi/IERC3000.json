@@ -156,12 +156,6 @@
           "internalType": "address",
           "name": "actor",
           "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "bytes[]",
-          "name": "execResults",
-          "type": "bytes[]"
         }
       ],
       "name": "Executed",
@@ -244,6 +238,11 @@
               "internalType": "struct ERC3000Data.Action[]",
               "name": "actions",
               "type": "tuple[]"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "allowFailuresMap",
+              "type": "bytes32"
             },
             {
               "internalType": "bytes",
@@ -368,6 +367,11 @@
                   "internalType": "struct ERC3000Data.Action[]",
                   "name": "actions",
                   "type": "tuple[]"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "allowFailuresMap",
+                  "type": "bytes32"
                 },
                 {
                   "internalType": "bytes",
@@ -610,6 +614,11 @@
                   "type": "tuple[]"
                 },
                 {
+                  "internalType": "bytes32",
+                  "name": "allowFailuresMap",
+                  "type": "bytes32"
+                },
+                {
                   "internalType": "bytes",
                   "name": "proof",
                   "type": "bytes"
@@ -701,6 +710,11 @@
       "name": "execute",
       "outputs": [
         {
+          "internalType": "bytes32",
+          "name": "failureMap",
+          "type": "bytes32"
+        },
+        {
           "internalType": "bytes[]",
           "name": "execResults",
           "type": "bytes[]"
@@ -756,6 +770,11 @@
                   "internalType": "struct ERC3000Data.Action[]",
                   "name": "actions",
                   "type": "tuple[]"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "allowFailuresMap",
+                  "type": "bytes32"
                 },
                 {
                   "internalType": "bytes",
@@ -854,6 +873,11 @@
       "name": "resolve",
       "outputs": [
         {
+          "internalType": "bytes32",
+          "name": "failureMap",
+          "type": "bytes32"
+        },
+        {
           "internalType": "bytes[]",
           "name": "execResults",
           "type": "bytes[]"
@@ -909,6 +933,11 @@
                   "internalType": "struct ERC3000Data.Action[]",
                   "name": "actions",
                   "type": "tuple[]"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "allowFailuresMap",
+                  "type": "bytes32"
                 },
                 {
                   "internalType": "bytes",
@@ -1003,7 +1032,7 @@
       "outputs": [
         {
           "internalType": "bytes32",
-          "name": "actionHash",
+          "name": "containerHash",
           "type": "bytes32"
         }
       ],
