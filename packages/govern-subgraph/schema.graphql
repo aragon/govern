@@ -8,10 +8,7 @@ type ERC3000Registry @entity {
 type OptimisticGame @entity {
   id: ID!
   name: String!
-<<<<<<< HEAD
   queue: GovernQueue!
-=======
->>>>>>> 2da21a6... Subgraph: refactor entities and include review suggestions
   executor: Govern!
 }
 
