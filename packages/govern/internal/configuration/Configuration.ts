@@ -60,19 +60,6 @@ export default class Configuration {
   }
 
   /**
-   * Setter for governURL property
-   *
-   * @param {string} value
-   *
-   * @var governURL
-   *
-   * @public
-   */
-  set governURL(value: string) {
-    this.config.governURL = value
-  }
-
-  /**
    * Getter for client property
    *
    * @var client
@@ -81,18 +68,5 @@ export default class Configuration {
    */
   get client(): ClientInterface {
     return this.config.client;
-  }
-
-  /**
-   * Setter for the client property
-   *
-   * @param {ClientInterface} value
-   *
-   * @var client
-   *
-   * @public
-   */
-  set client(value: ClientInterface) {
-    this.config.client = value
   }
 }
