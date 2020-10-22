@@ -1,4 +1,4 @@
-import configuration from './configuration'
+import { getConfiguration } from './configure'
 import GamesAction from '../internal/actions/GamesAction'
 
 /**
@@ -7,5 +7,5 @@ import GamesAction from '../internal/actions/GamesAction'
  * @returns {Promise<any>}
  */
 export default function games(): Promise<any> {
-  return new GamesAction(configuration.global).execute()
+  return new GamesAction(getConfiguration()).execute()
 }

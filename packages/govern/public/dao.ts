@@ -1,4 +1,4 @@
-import configuration from './configuration'
+import { getConfiguration } from './configure'
 import DAOAction from '../internal/actions/DAOAction'
 
 /**
@@ -9,5 +9,5 @@ import DAOAction from '../internal/actions/DAOAction'
  * @returns {Promise<any>}
  */
 export default function dao(address: string): Promise<any> {
-  return new DAOAction(configuration.global, {address: address}).execute();
+  return new DAOAction(getConfiguration(), {address: address}).execute();
 }

@@ -1,4 +1,4 @@
-import configuration from './configuration'
+import { getConfiguration } from './configure'
 import QueuesForDaoAction from '../internal/actions/QueuesForDaoAction'
 
 /**
@@ -9,5 +9,5 @@ import QueuesForDaoAction from '../internal/actions/QueuesForDaoAction'
  * @returns {Promise<any>}
  */
 export default function queuesForDao(address: string): Promise<any> {
-  return new QueuesForDaoAction(configuration.global, {address: address}).execute();
+  return new QueuesForDaoAction(getConfiguration(), {address: address}).execute();
 }

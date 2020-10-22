@@ -1,4 +1,4 @@
-import configuration from './configuration'
+import { getConfiguration } from './configure'
 import DAOSAction from '../internal/actions/DAOSAction'
 
 /**
@@ -7,5 +7,5 @@ import DAOSAction from '../internal/actions/DAOSAction'
  * @returns {Promise<any>}
  */
 export default function daos(): Promise<any> {
-  return new DAOSAction(configuration.global).execute()
+  return new DAOSAction(getConfiguration()).execute()
 }

@@ -1,4 +1,4 @@
-import configuration from './configuration'
+import { getConfiguration } from './configure'
 import QueuesAction from '../internal/actions/QueuesAction'
 
 /**
@@ -7,5 +7,5 @@ import QueuesAction from '../internal/actions/QueuesAction'
  * @returns {Promise<any>}
  */
 export default function queues(): Promise<any> {
-  return new QueuesAction(configuration.global).execute();
+  return new QueuesAction(getConfiguration()).execute();
 }
