@@ -42,19 +42,21 @@ const DAO_QUERY = gql`
           who
           frozen
         }
-        executions {
+        executedPackets {
           id
           queue {
             address
           }
         }
-        queued {
+        scheduledPackets {
           id
-          status
-          nonce
-          executionTime
-          submitter
-          proof
+          packet {
+            status
+            nonce
+            executionTime
+            submitter
+            proof
+          }
         }
         config {
           executionDelay
@@ -209,7 +211,7 @@ function Actions({ dao }: DaoInfoProps) {
     history.push(`/${daoAddress}/new-action`)
   }, [history, daoAddress])
 
-  const hasActions = useMemo(() => dao.queue.queued.length > 0, [dao])
+  const hasActions = useMemo(() => dao.queue.scheduledPackets.length > 0, [dao])
 
   return (
     <div
@@ -232,7 +234,7 @@ function Actions({ dao }: DaoInfoProps) {
     >
       <h2>Actions</h2>
       {hasActions
-        ? dao.queue.queued.map(({ id }: { id: string }) => (
+        ? dao.queue.scheduledPackets.map(({ id }: { id: string }) => (
             <ActionCard id={id} key={id} />
           ))
         : 'No actions.'}
