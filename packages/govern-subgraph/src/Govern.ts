@@ -6,7 +6,6 @@ import {
   Revoked as RevokedEvent
 } from '../generated/templates/Govern/Govern'
 import {
-  Action as ActionEntity,
   Govern as GovernEntity,
   Execution as ExecutionEntity
 } from '../generated/schema'
@@ -17,7 +16,7 @@ export function handleExecuted(event: ExecutedEvent): void {
 
   const execution = loadOrCreateExecution(event)
 
-  createActions(event)
+  execution.results = event.params.execResults
 
   // add the execution
   const currentExecutions = govern.executions
@@ -81,40 +80,15 @@ export function loadOrCreateGovern(entity: Address): GovernEntity {
   return govern!
 }
 
-function buildExecutionId(event: ExecutedEvent): string {
-  return (
-    event.params.memo.toHexString() +
-    event.transaction.hash.toHexString() +
-    event.logIndex.toString()
-  )
-}
-
 function loadOrCreateExecution(event: ExecutedEvent): ExecutionEntity {
-  const executionId = buildExecutionId(event)
+  const executionId = event.params.memo.toHexString() // container hash
   // Create execution
   let execution = ExecutionEntity.load(executionId)
   if (execution === null) {
     execution = new ExecutionEntity(executionId)
-    execution.executor = event.address.toHexString()
     execution.queue = event.params.actor.toHexString()
-    execution.failureMap = event.params.failureMap
-    execution.results = event.params.execResults
+    execution.packet = executionId
+    execution.createdAt = event.block.timestamp
   }
   return execution!
-}
-
-function createActions(event: ExecutedEvent): void {
-  event.params.actions.forEach((actionData, index) => {
-    const executionId = buildExecutionId(event)
-    const actionId = executionId + '-action-' + index.toString()
-    const action = new ActionEntity(actionId)
-
-    action.to = actionData.to
-    action.value = actionData.value
-    action.data = actionData.data
-    action.execution = executionId
-    action.queueItem = event.params.memo.toHexString()
-
-    action.save()
-  })
 }
