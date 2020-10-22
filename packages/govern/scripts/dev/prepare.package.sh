@@ -30,7 +30,6 @@ cd ./package
 yarn build:prod
 
 # Remove not required files
-rm -rf ./index.js
 rm -rf ./tsconfig.prod.json
 
 # Move `dist` files to root folder and delete the `dist` folder
