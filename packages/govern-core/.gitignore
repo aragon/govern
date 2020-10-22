@@ -5,6 +5,7 @@ node_modules
 yarn-error.log
 
 #Buidler files
+abi
 cache
 artifacts
 coverage

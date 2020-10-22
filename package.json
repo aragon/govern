@@ -14,12 +14,13 @@
     "lerna": "^3.22.1"
   },
   "scripts": {
+    "clean": "lerna run --scope=@aragon/govern* --parallel --stream clean",
     "test": "lerna run --parallel --stream --ignore @aragon/erc3kjs test",
     "init:dev:env": "scripts/init.dev.env.sh",
     "start:dev": "cd ./packages/govern-server/ && yarn start:containers",
     "coverage": "lerna run --concurrency 1 --stream --ignore @aragon/erc3kjs coverage",
     "build": "lerna run --scope=@aragon/govern* --stream compile",
-    "build:contracts": "lerna run --scope=@aragon/govern --parallel --stream compile",
+    "build:contracts": "lerna run --scope=@aragon/govern* --parallel --stream compile",
     "build:subgraph": "lerna run --scope=@aragon/govern-subgraph --parallel --stream build",
     "deploy:subgraph:rinkeby": "lerna run --scope=@aragon/govern-subgraph --parallel --stream deploy-rinkeby"
   },
