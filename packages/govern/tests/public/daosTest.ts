@@ -1,5 +1,5 @@
 import DAOSAction from '../../internal/actions/DAOSAction'
-import configuration from '../../public/configuration'
+import { getConfiguration } from '../../public/configure'
 import daos from '../../public/daos'
 
 // Mocks
@@ -12,11 +12,9 @@ describe('daos Test', () => {
   const daosActionMock = DAOSAction as jest.MockedClass<typeof DAOSAction>
 
   it('daos test', async () => {
-    configuration.global = true;
-
     await daos()
 
-    expect(DAOSAction).toHaveBeenNthCalledWith(1, configuration.global)
+    expect(DAOSAction).toHaveBeenNthCalledWith(1, getConfiguration())
 
     expect(daosActionMock.mock.instances[0].execute).toHaveBeenCalledTimes(1)
   })
