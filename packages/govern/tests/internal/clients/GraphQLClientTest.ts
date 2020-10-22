@@ -8,7 +8,7 @@ jest.mock('@urql/core')
 jest.mock('isomorphic-unfetch')
 
 /**
- * GraphQLClientTest test
+ * GraphQLClient test
  */
 describe('GraphQLClientTest', () => {
   let client: GraphQLClient,

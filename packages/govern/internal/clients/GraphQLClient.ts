@@ -59,7 +59,7 @@ export default class GraphQLClient implements ClientInterface{
 
     if (result.error) { // TODO: Use errors from core
       throw new Error(
-        this.mapResponse(result) + this.mapError(result)
+        this.mapResponse(result) + this.mapError(result.error)
       );
     }
 
@@ -91,13 +91,13 @@ export default class GraphQLClient implements ClientInterface{
    *
    * @method mapError
    *
-   * @param {any} result
+   * @param {any} error
    *
    * @returns {string}
    *
    * @private
    */
-  private mapError(result: any): string {
-    return `${result.error.name}: ${result.error.message}\n\n`;
+  private mapError(error: any): string {
+    return `${error.name}: ${error.message}\n\n`;
   }
 }
