@@ -1,13 +1,23 @@
-import queue from '../../public/queue';
+import QueueAction from '../../internal/actions/QueueAction'
+import configuration from '../../public/configuration'
+import queue from '../../public/queue'
 
 // Mocks
-//jest.mock('');
+jest.mock('../../internal/actions/QueueAction')
 
 /**
- * queue test
+ * queues test
  */
 describe('queue Test', () => {
-  it('queue test', () => {
+  const queueActionMock = QueueAction as jest.MockedClass<typeof QueueAction>
 
-  });
-});
+  it('queue test', async () => {
+    configuration.global = true;
+
+    await queue('0x00')
+
+    expect(QueueAction).toHaveBeenNthCalledWith(1, configuration.global, { address: '0x00' })
+
+    expect(queueActionMock.mock.instances[0].execute).toHaveBeenCalledTimes(1)
+  })
+})
