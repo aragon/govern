@@ -1,4 +1,5 @@
-const config = {
+module.exports = {
+  preset: 'ts-jest',
   // notifyMode: 'success-change',
   collectCoverage: true,
   coverageDirectory: './coverage/',
@@ -18,6 +19,5 @@ const config = {
   coveragePathIgnorePatterns: [
     'node_modules',
     'dist',
-  ],
-  preset: 'ts-jest'
+  ]
 };

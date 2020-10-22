@@ -14,7 +14,7 @@ mocked(GraphQLClient, true)
  * configuration test
  */
 describe('configuration Test', () => {
-  let graphQLClientMock
+  let graphQLClientMock: GraphQLClient;
 
   beforeEach(() => {
     graphQLClientMock = new GraphQLClient('')

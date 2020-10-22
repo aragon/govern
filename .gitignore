@@ -2,3 +2,5 @@ node_modules
 .vscode
 .env
 .DS_Store
+./packages/govern/dist/
+./packages/govern/coverage/
