@@ -34,6 +34,7 @@ services:
       POSTGRES_USER: graph-node
       POSTGRES_PASSWORD: let-me-in
       POSTGRES_DB: graph-node
+    user: "${HOST_UID}:${HOST_GID}"
     volumes:
       - ./dev-data/postgres:/var/lib/postgresql/data
     command: ["postgres", "-cshared_preload_libraries=pg_stat_statements"]
