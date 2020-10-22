@@ -23,7 +23,13 @@ export default function configure(config: ConfigurationObject): void {
   defaultConfig = new Configuration(config)
 }
 
-export function getConfiguration() {
+/**
+ * Returns the default configuration of Govern or the one defined by the user.
+ * This function will be used in the public API layer to manage the injection of the configuration on action execution.
+ *
+ * @returns {Configuration}
+ */
+export function getConfiguration(): Configuration {
   if (defaultConfig !== null) {
     return defaultConfig
   }
