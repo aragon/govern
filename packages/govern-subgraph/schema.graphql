@@ -9,7 +9,6 @@ type OptimisticGame @entity {
   id: ID!
   name: String!
   queue: GovernQueue!
-  roles: [Role]!
   executor: Govern!
 }
 
