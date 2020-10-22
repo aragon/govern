@@ -42,8 +42,10 @@ export default class Configuration {
       throw new Error('Missing Govern server URL!')
     }
 
-    this.governURL = config.governURL
-    this.client = new GraphQLClient(this.config.governURL)
+    this.config = {
+      governURL: config.governURL,
+      client: new GraphQLClient(config.governURL)
+    };
   }
 
   /**
