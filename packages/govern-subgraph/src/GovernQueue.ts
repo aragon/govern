@@ -9,20 +9,9 @@ import {
   Revoked as RevokedEvent,
   Scheduled as ScheduledEvent,
   Vetoed as VetoedEvent,
-<<<<<<< HEAD
-} from '../generated/templates/GovernQueue/GovernQueue'
-import {
-  Action,
-  Config,
-  Container,
-  Collateral,
-  GovernQueue,
-  Payload,
-  Role,
-=======
   Ruled as RuledEvent,
   EvidenceSubmitted as EvidenceSubmittedEvent,
-  GovernQueue as GovernQueueContract
+  GovernQueue as GovernQueueContract,
 } from '../generated/templates/GovernQueue/GovernQueue'
 import {
   Config as ConfigEntity,
@@ -32,8 +21,7 @@ import {
   Item as ItemEntity,
   GovernQueue as GovernQueueEntity,
   ERC20 as ERC20Entity,
-  Veto as VetoEntity
->>>>>>> master
+  Veto as VetoEntity,
 } from '../generated/schema'
 import { frozenRoles, roleGranted, roleRevoked } from './lib/MiniACL'
 
@@ -136,14 +124,8 @@ export function handleVetoed(event: VetoedEvent): void {
 }
 
 export function handleConfigured(event: ConfiguredEvent): void {
-<<<<<<< HEAD
-  let queue = GovernQueue.load(event.address.toHexString())
-  // TODO: Can there be no queue? check event processing order
-  const config = new Config(event.address.toHexString())
-=======
   const queue = loadOrCreateQueue(event.address)
   const config = loadOrCreateConfig(event.address)
->>>>>>> master
 
   const scheduleDeposit = loadOrCreateCollateral(event, '1')
   scheduleDeposit.token = buildERC20(event.params.config.scheduleDeposit.token)
@@ -219,54 +201,6 @@ export function handleRuled(event: RuledEvent): void {
 // MiniACL Events
 
 export function handleFrozen(event: FrozenEvent): void {
-<<<<<<< HEAD
-  const queue = GovernQueue.load(event.address.toHexString())
-  let id = 0
-  const roles = queue.roles
-  for (id = 0; id < roles.length; id++) {
-    const currentRole = roles[id]
-    const funcSelector = currentRole.split('-')[1]
-    if (funcSelector === event.params.role.toHexString()) {
-      const role = Role.load(currentRole)
-      const freezeBytes = Address.fromString(FREEZE_ADDR)
-      role.who = freezeBytes
-      role.save()
-      break
-    }
-  }
-  queue.save()
-}
-
-export function handleGranted(event: GrantedEvent): void {
-  const queue = GovernQueue.load(event.address.toHexString())
-  // roleID = contract address + role itself,
-  // which will be the function selector + who
-  // This is equivalent to storing all roles in the contract, and looking up the corresponding
-  // entry by mapping role => who
-  const roleId =
-    event.address.toHexString() +
-    '-' +
-    event.params.role.toHexString() +
-    '-' +
-    event.params.who.toHexString()
-  // We MUST first try to load this event because you can "grant" the role
-  // to the same addr many times, even if it has no effect.
-  let role = Role.load(roleId)
-  let exists = true
-  if (!role) {
-    exists = false
-    role = new Role(roleId)
-  }
-  role.role = event.params.role
-  role.who = event.params.who
-  role.revoked = false
-  const roles = queue.roles
-  if (!exists) {
-    roles.push(roleId)
-  }
-  role.save()
-  queue.roles = roles
-=======
   const queue = loadOrCreateQueue(event.address)
 
   const roles = queue.roles!
@@ -284,7 +218,6 @@ export function handleGranted(event: GrantedEvent): void {
   currentRoles.push(role.id)
   queue.roles = currentRoles
 
->>>>>>> master
   queue.save()
 }
 
@@ -301,21 +234,6 @@ export function handleRevoked(event: RevokedEvent): void {
   queue.save()
 }
 
-<<<<<<< HEAD
-export function handleRevoked(event: RevokedEvent): void {
-  let queue = GovernQueue.load(event.address.toHexString())
-  const roleId =
-    event.address.toHexString() +
-    '-' +
-    event.params.role.toHexString() +
-    '-' +
-    event.params.who.toHexString()
-  let role = Role.load(roleId)
-  if (!role) {
-    role = new Role(roleId)
-    role.role = event.params.role
-    role.who = event.params.who
-=======
 // Helpers
 
 export function loadOrCreateQueue(entity: Address): GovernQueueEntity {
@@ -328,7 +246,6 @@ export function loadOrCreateQueue(entity: Address): GovernQueueEntity {
     queue.queue = []
     queue.executions = []
     queue.roles = []
->>>>>>> master
   }
   return queue!
 }
@@ -357,12 +274,6 @@ function loadOrCreateCollateral(
   return collateral!
 }
 
-<<<<<<< HEAD
-export function handleScheduled(event: ScheduledEvent): void {
-  let queue = GovernQueue.load(event.address.toHexString())
-  if (!queue) {
-    throw new Error('Didnt find queue')
-=======
 function loadOrCreateItem(
   containerHash: Bytes,
   event: ethereum.Event
@@ -374,7 +285,6 @@ function loadOrCreateItem(
     item = new ItemEntity(itemId)
     item.status = NONE_STATUS
     item.createdAt = event.block.timestamp
->>>>>>> master
   }
   return item!
 }

@@ -2,5 +2,6 @@ node_modules
 .vscode
 .env
 .DS_Store
-packages/govern-server/data
+/packages/govern-server/dev-data/
 .idea/
+yarn-error.log

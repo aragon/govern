@@ -8,12 +8,12 @@ type ERC3000Registry @entity {
 type OptimisticGame @entity {
   id: ID!
   name: String!
-  queue: GovernQueue! @derivedFrom(field: "govern")
+  queue: GovernQueue!
   roles: [Role]!
   executor: Govern!
 }
 
-type GovernQueue @entity {
+type Govern @entity {
   id: ID!
   address: Bytes!
   metadata: Bytes
@@ -37,7 +37,7 @@ type Action @entity {
   data: Bytes!
   item: Item!
   execution: Execution
-  queue: GovernQueue! @derivedFrom(field: "govern")
+  queue: GovernQueue!
   roles: [Role]!
 }
 
