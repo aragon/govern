@@ -42,6 +42,7 @@
     "clean": "rm -rf artifacts",
     "compile": "npx buidler compile --force",
     "test": "npx buidler test",
+    "coverage": "SOLIDITY_COVERAGE=true buidler coverage --network coverage",
     "abi:extract": "buidler-extract --output abi/ --keys abi",
     "prepublishOnly": "yarn test && yarn compile && yarn abi:extract -- --no-compile"
   },
