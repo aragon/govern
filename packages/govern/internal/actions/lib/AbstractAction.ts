@@ -21,7 +21,8 @@ export default abstract class AbstractAction {
    *
    * @constructor
    */
-  constructor(protected configuration: Configuration, protected parameters?: any) { }
+  constructor(protected configuration: Configuration, protected parameters?: any) {
+  }
 
   /**
    * TODO: Add if to check in the future if REST is configured for this execution
@@ -35,6 +36,6 @@ export default abstract class AbstractAction {
    * @public
    */
   public execute(): Promise<any> {
-    return this.configuration.client.request(this.gqlQuery, this.parameters);
+    return this.configuration.client.request(this.gqlQuery, this.parameters)
   }
 }

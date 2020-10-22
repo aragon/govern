@@ -7,5 +7,5 @@ import QueuesAction from '../internal/actions/QueuesAction'
  * @returns {Promise<any>}
  */
 export default function queues(): Promise<any> {
-  return new QueuesAction(getConfiguration()).execute();
+  return new QueuesAction(getConfiguration()).execute()
 }

@@ -33,7 +33,7 @@ describe('GraphQLClientTest', () => {
   it('calls request and returns the expected result', async () => {
     const nestedToPromise = {
       toPromise: jest.fn(async () => {
-        return {error: false}
+        return { error: false }
       })
     }
 
@@ -42,16 +42,16 @@ describe('GraphQLClientTest', () => {
 
       expect(args).toEqual(args)
 
-      return nestedToPromise;
+      return nestedToPromise
     })
 
     const result = await client.request(testQuery, { test: 'test' })
 
-    expect(result).toEqual({error: false})
+    expect(result).toEqual({ error: false })
 
-    expect(urqlClientMock.query).toHaveBeenCalledTimes(1);
+    expect(urqlClientMock.query).toHaveBeenCalledTimes(1)
 
-    expect(nestedToPromise.toPromise).toHaveBeenCalledTimes(1);
+    expect(nestedToPromise.toPromise).toHaveBeenCalledTimes(1)
   })
 
   it('calls request and throws the expected error', async () => {
@@ -85,7 +85,7 @@ describe('GraphQLClientTest', () => {
 
       expect(args).toEqual(args)
 
-      return nestedToPromise;
+      return nestedToPromise
     })
 
     await expect(client.request(testQuery, { test: 'test' })).rejects.toEqual(new Error(
@@ -98,10 +98,10 @@ describe('GraphQLClientTest', () => {
       'Returned data: "data"\n' +
       '\n' +
       'ERROR: MESSAGE\n\n'
-    ));
+    ))
 
-    expect(urqlClientMock.query).toHaveBeenCalledTimes(1);
+    expect(urqlClientMock.query).toHaveBeenCalledTimes(1)
 
-    expect(nestedToPromise.toPromise).toHaveBeenCalledTimes(1);
+    expect(nestedToPromise.toPromise).toHaveBeenCalledTimes(1)
   })
 })

@@ -45,7 +45,7 @@ export default class Configuration {
     this.config = {
       governURL: config.governURL,
       client: new GraphQLClient(config.governURL)
-    };
+    }
   }
 
   /**
@@ -67,6 +67,6 @@ export default class Configuration {
    * @public
    */
   get client(): ClientInterface {
-    return this.config.client;
+    return this.config.client
   }
 }

@@ -8,7 +8,7 @@ import ClientInterface from './lib/ClientInterface'
  *
  * @class GraphQLClient
  */
-export default class GraphQLClient implements ClientInterface{
+export default class GraphQLClient implements ClientInterface {
   /**
    * The urql/core Client object
    *
@@ -16,7 +16,7 @@ export default class GraphQLClient implements ClientInterface{
    *
    * @private
    */
-  private client: Client;
+  private client: Client
 
   /**
    * @param {string} governUrl
@@ -24,7 +24,7 @@ export default class GraphQLClient implements ClientInterface{
    * @constructor
    */
   constructor(private governUrl: string) {
-    this.connect();
+    this.connect()
   }
 
   /**
@@ -39,7 +39,7 @@ export default class GraphQLClient implements ClientInterface{
       maskTypename: true,
       url: this.governUrl,
       fetch
-    });
+    })
   }
 
   /**
@@ -55,15 +55,15 @@ export default class GraphQLClient implements ClientInterface{
    * @public
    */
   public async request(query: DocumentNode, args: any = {}): Promise<any> {
-    const result = await this.client.query(query, args).toPromise();
+    const result = await this.client.query(query, args).toPromise()
 
     if (result.error) { // TODO: Use errors from core
       throw new Error(
         this.mapResponse(result) + this.mapError(result.error)
-      );
+      )
     }
 
-    return result;
+    return result
   }
 
   /**
@@ -98,6 +98,6 @@ export default class GraphQLClient implements ClientInterface{
    * @private
    */
   private mapError(error: any): string {
-    return `${error.name}: ${error.message}\n\n`;
+    return `${error.name}: ${error.message}\n\n`
   }
 }

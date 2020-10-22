@@ -6,7 +6,7 @@ export interface ConfigurationObject {
 
 let defaultConfig: Configuration | null = null
 
-const governURL = 'https://govern.backend.aragon.org';
+const governURL = 'https://govern.backend.aragon.org'
 
 /**
  * Does set the global configuration for Govern
@@ -17,7 +17,7 @@ const governURL = 'https://govern.backend.aragon.org';
  */
 export default function configure(config: ConfigurationObject): void {
   if (!config.governURL) {
-    config.governURL = governURL;
+    config.governURL = governURL
   }
 
   defaultConfig = new Configuration(config)

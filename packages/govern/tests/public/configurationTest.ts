@@ -10,7 +10,7 @@ jest.mock('../../internal/clients/GraphQLClient')
  */
 describe('configure Test', () => {
   it('calls getConfiguration and returns the expected default config', () => {
-    const config = getConfiguration();
+    const config = getConfiguration()
 
     expect(config.governURL).toEqual('https://govern.backend.aragon.org')
 
@@ -22,7 +22,7 @@ describe('configure Test', () => {
   it('calls configure and defines the expected default config', () => {
     configure({ governURL: 'localhost' } as ConfigurationObject)
 
-    const config = getConfiguration();
+    const config = getConfiguration()
 
     expect(config.governURL).toEqual('localhost')
 
@@ -34,7 +34,7 @@ describe('configure Test', () => {
   it('calls configure without the governURL and defines the default aragon govern URL as expected', () => {
     configure({})
 
-    const config = getConfiguration();
+    const config = getConfiguration()
 
     expect(config.governURL).toEqual('https://govern.backend.aragon.org')
 
