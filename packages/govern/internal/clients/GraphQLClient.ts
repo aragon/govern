@@ -98,10 +98,6 @@ export default class GraphQLClient implements ClientInterface{
    * @private
    */
   private mapError(result: any): string {
-    if (!result.error) {
-      return '';
-    }
-
     return `${result.error.name}: ${result.error.message}\n\n`;
   }
 }
