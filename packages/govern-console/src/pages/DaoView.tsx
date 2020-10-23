@@ -42,13 +42,13 @@ const DAO_QUERY = gql`
           who
           frozen
         }
-        executedPackets {
+        executed {
           id
           queue {
             address
           }
         }
-        scheduledPackets {
+        scheduled {
           id
           packet {
             status
@@ -211,7 +211,7 @@ function Actions({ dao }: DaoInfoProps) {
     history.push(`/${daoAddress}/new-action`)
   }, [history, daoAddress])
 
-  const hasActions = useMemo(() => dao.queue.scheduledPackets.length > 0, [dao])
+  const hasActions = useMemo(() => dao.queue.scheduled.length > 0, [dao])
 
   return (
     <div
