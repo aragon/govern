@@ -5,7 +5,7 @@ export interface ConfigurationObject {
   governURL?: string
 }
 
-let defaultConfig: Configuration;
+let defaultConfig: Configuration
 const governURL = 'https://govern.backend.aragon.org'
 
 /**
@@ -93,8 +93,11 @@ export default class Configuration {
    * @public
    */
   static set(config?: ConfigurationObject): void {
-    if (!config?.governURL) {
-      // @ts-ignore
+    if (!config) {
+      config = {}
+    }
+
+    if (!config.governURL) {
       config.governURL = governURL
     }
 
@@ -115,7 +118,7 @@ export default class Configuration {
       return defaultConfig
     }
 
-    Configuration.set();
+    Configuration.set()
 
     return defaultConfig
   }

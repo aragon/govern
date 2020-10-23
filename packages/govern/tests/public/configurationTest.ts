@@ -4,6 +4,7 @@ import configure, { ConfigurationObject } from '../../public/configure'
 
 // Mocks
 jest.mock('../../internal/clients/graphql/GraphQLClient')
+jest.mock('graphql-tag')
 
 /**
  * configure test

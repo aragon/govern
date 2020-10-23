@@ -18,6 +18,8 @@ export default abstract class AbstractAction {
    * The current configuration to execute this action
    *
    * @var {Configuration} configuration
+   *
+   * @protected
    */
   protected configuration: Configuration
 
@@ -27,7 +29,7 @@ export default abstract class AbstractAction {
    * @constructor
    */
   constructor(protected parameters?: any) {
-    this.configuration = Configuration.get();
+    this.configuration = Configuration.get()
   }
 
   /**
