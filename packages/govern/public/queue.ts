@@ -8,5 +8,5 @@ import QueueAction from '../internal/actions/QueueAction'
  * @returns {Promise<any>}
  */
 export default function queue(id: string): Promise<any> {
-  return new QueueAction( { id: id}).execute()
+  return new QueueAction({ id: id }).execute()
 }

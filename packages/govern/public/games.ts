@@ -8,5 +8,5 @@ import GamesAction from '../internal/actions/GamesAction'
  * @returns {Promise<any>}
  */
 export default function games(address: string): Promise<any> {
-  return new GamesAction({address: address}).execute()
+  return new GamesAction({ address: address }).execute()
 }

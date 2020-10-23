@@ -5,7 +5,7 @@ export {ConfigurationObject} from '../internal/configuration/Configuration';
 /**
  * Does set the global configuration for Govern
  *
- * @param {any} config
+ * @param {ConfigurationObject} config
  *
  * @returns {void}
  */

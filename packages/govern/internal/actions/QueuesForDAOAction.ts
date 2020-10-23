@@ -3,6 +3,9 @@ import { DocumentNode } from 'graphql'
 import AbstractAction from './lib/AbstractAction'
 import queuesForDAO from '../clients/graphql/queries/queuesForDAO'
 
+/**
+ * @class QueuesForDAOAction
+ */
 export default class QueuesForDAOAction extends AbstractAction {
   /**
    * Contains the GraphQL query of the current action

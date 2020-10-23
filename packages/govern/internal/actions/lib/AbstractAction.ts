@@ -2,7 +2,7 @@ import { DocumentNode } from 'graphql'
 import Configuration from '../../configuration/Configuration'
 
 /**
- * @class AbstractAction
+ * @abstract AbstractAction
  */
 export default abstract class AbstractAction {
   /**
