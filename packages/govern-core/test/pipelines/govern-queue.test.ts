@@ -2,17 +2,34 @@ import { ethers } from '@nomiclabs/buidler'
 import { Signer } from 'ethers'
 import { GovernQueue, GovernQueueFactory } from '../../typechain'
 
+const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
+
 describe('Govern Queue', function () {
-  let owner: Signer, notOwner: Signer, ownerAddr, notOwnerAddr
+  let accounts: Signer[], owner: Signer, ownerAddr
   let gq: GovernQueue
 
-  // TODO: add initial configuration
-  const INIT_CONFIG: any = {}
+  const INIT_CONFIG = {
+    executionDelay: 0,
+    scheduleDeposit: {
+      token: ZERO_ADDR,
+      amount: 0,
+    },
+    challengeDeposit: {
+      token: ZERO_ADDR,
+      amount: 0,
+    },
+    vetoDeposit: {
+      token: ZERO_ADDR,
+      amount: 0,
+    },
+    resolver: ZERO_ADDR,
+    rules: '0x',
+  }
 
   beforeEach(async () => {
-    ;[owner, notOwner] = await ethers.getSigners()
+    accounts = await ethers.getSigners()
+    owner = accounts[0]
     ownerAddr = await owner.getAddress()
-    notOwnerAddr = await notOwner.getAddress()
 
     const GQ = (await ethers.getContractFactory(
       'GovernQueue'
