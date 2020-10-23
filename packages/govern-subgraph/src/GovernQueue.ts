@@ -64,9 +64,9 @@ export function handleScheduled(event: ScheduledEvent): void {
   schedule.createdAt = event.block.timestamp
 
   // add the packet
-  const scheduledPackets = queue.scheduledPackets
-  scheduledPackets.push(packet.id)
-  queue.scheduledPackets = scheduledPackets
+  const scheduled = queue.scheduled
+  scheduled.push(schedule.id)
+  queue.scheduled = scheduled
 
   packet.save()
   schedule.save()
@@ -104,9 +104,9 @@ export function handleChallenged(event: ChallengedEvent): void {
   challenge.createdAt = event.block.timestamp
 
   // add the challenged packet
-  const challengedPackets = queue.challengedPackets
-  challengedPackets.push(packet.id)
-  queue.challengedPackets = challengedPackets
+  const challenged = queue.challenged
+  challenged.push(challenge.id)
+  queue.challenged = challenged
 
   packet.save()
   challenge.save()
@@ -147,9 +147,9 @@ export function handleVetoed(event: VetoedEvent): void {
   veto.createdAt = event.block.timestamp
 
   // add the veto packet
-  const vetoedPackets = queue.vetoedPackets
-  vetoedPackets.push(packet.id)
-  queue.vetoedPackets = vetoedPackets
+  const vetoed = queue.vetoed
+  vetoed.push(veto.id)
+  queue.vetoed = vetoed
 
   packet.save()
   veto.save()
@@ -275,9 +275,9 @@ export function loadOrCreateQueue(entity: Address): GovernQueueEntity {
   if (queue === null) {
     queue = new GovernQueueEntity(queueId)
     queue.address = entity
-    queue.scheduledPackets = []
-    queue.challengedPackets = []
-    queue.vetoedPackets = []
+    queue.scheduled = []
+    queue.challenged = []
+    queue.vetoed = []
     queue.roles = []
   }
   return queue!
