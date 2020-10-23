@@ -19,7 +19,8 @@ templates:
       language: wasm/assemblyscript
       entities:
         - Config
-        - Item
+        - Payload
+        - Schedule
         - Challenge
         - Veto
         - Collateral
@@ -66,7 +67,6 @@ templates:
       language: wasm/assemblyscript
       entities:
         - Execution
-        - Action
         - Role
       abis:
         - name: Govern

@@ -11,7 +11,7 @@ import {
   Vetoed as VetoedEvent,
   Ruled as RuledEvent,
   EvidenceSubmitted as EvidenceSubmittedEvent,
-  GovernQueue as GovernQueueContract,
+  GovernQueue as GovernQueueContract
 } from '../generated/templates/GovernQueue/GovernQueue'
 import {
   Action as ActionEntity,
@@ -19,7 +19,7 @@ import {
   Challenge as ChallengeEntity,
   Collateral as CollateralEntity,
   Evidence as EvidenceEntity,
-  QueuePacket as QueuePacketEntity,
+  Payload as PayloadEntity,
   GovernQueue as GovernQueueEntity,
   ERC20 as ERC20Entity,
   Schedule as ScheduleEntity,
@@ -41,17 +41,17 @@ const ALLOW_RULING = BigInt.fromI32(4)
 export function handleScheduled(event: ScheduledEvent): void {
   const queue = loadOrCreateQueue(event.address)
 
-  const packet = loadOrCreateQueuePacket(event.params.containerHash, event)
+  const payload = loadOrCreateQueuePayload(event.params.containerHash, event)
 
   buildActions(event)
 
-  packet.status = SCHEDULED_STATUS
-  packet.nonce = event.params.payload.nonce
-  packet.executionTime = event.params.payload.executionTime
-  packet.submitter = event.params.payload.submitter
-  packet.executor = event.params.payload.executor.toHexString()
-  packet.allowFailuresMap = event.params.payload.allowFailuresMap
-  packet.proof = event.params.payload.proof
+  payload.status = SCHEDULED_STATUS
+  payload.nonce = event.params.payload.nonce
+  payload.executionTime = event.params.payload.executionTime
+  payload.submitter = event.params.payload.submitter
+  payload.executor = event.params.payload.executor.toHexString()
+  payload.allowFailuresMap = event.params.payload.allowFailuresMap
+  payload.proof = event.params.payload.proof
 
   const schedule = new ScheduleEntity(event.params.containerHash.toHexString())
 
@@ -59,34 +59,34 @@ export function handleScheduled(event: ScheduledEvent): void {
   scheduleDeposit.token = buildERC20(event.params.collateral.token)
   scheduleDeposit.amount = event.params.collateral.amount
 
-  schedule.packet = packet.id
+  schedule.payload = payload.id
   schedule.collateral = scheduleDeposit.id
   schedule.createdAt = event.block.timestamp
 
-  // add the packet
-  const scheduledPackets = queue.scheduledPackets
-  scheduledPackets.push(packet.id)
-  queue.scheduledPackets = scheduledPackets
+  // add the payload
+  const scheduled = queue.scheduled
+  scheduled.push(schedule.id)
+  queue.scheduled = scheduled
 
-  packet.save()
+  payload.save()
   schedule.save()
   queue.save()
 }
 
 export function handleExecuted(event: ExecutedEvent): void {
-  const packet = loadOrCreateQueuePacket(event.params.containerHash, event)
+  const payload = loadOrCreateQueuePayload(event.params.containerHash, event)
 
-  packet.status = EXECUTED_STATUS
+  payload.status = EXECUTED_STATUS
 
-  packet.save()
+  payload.save()
 }
 
 export function handleChallenged(event: ChallengedEvent): void {
   const queue = loadOrCreateQueue(event.address)
 
-  const packet = loadOrCreateQueuePacket(event.params.containerHash, event)
+  const payload = loadOrCreateQueuePayload(event.params.containerHash, event)
 
-  packet.status = CHALLENGED_STATUS
+  payload.status = CHALLENGED_STATUS
 
   const challenge = new ChallengeEntity(
     event.params.containerHash.toHexString()
@@ -96,43 +96,43 @@ export function handleChallenged(event: ChallengedEvent): void {
   challengeDeposit.token = buildERC20(event.params.collateral.token)
   challengeDeposit.amount = event.params.collateral.amount
 
-  challenge.packet = packet.id
+  challenge.payload = payload.id
   challenge.challenger = event.params.actor
   challenge.arbitrator = loadOrCreateConfig(event.address).resolver
   challenge.disputeId = event.params.resolverId
   challenge.collateral = challengeDeposit.id
   challenge.createdAt = event.block.timestamp
 
-  // add the challenged packet
-  const challengedPackets = queue.challengedPackets
-  challengedPackets.push(packet.id)
-  queue.challengedPackets = challengedPackets
+  // add the challenged payload
+  const challenged = queue.challenged
+  challenged.push(challenge.id)
+  queue.challenged = challenged
 
-  packet.save()
+  payload.save()
   challenge.save()
   queue.save()
 }
 
 export function handleResolved(event: ResolvedEvent): void {
-  const packet = loadOrCreateQueuePacket(event.params.containerHash, event)
+  const payload = loadOrCreateQueuePayload(event.params.containerHash, event)
   const challenge = ChallengeEntity.load(
     event.params.containerHash.toHexString()
   )
 
-  packet.status = event.params.approved ? EXECUTED_STATUS : CANCELLED_STATUS
+  payload.status = event.params.approved ? EXECUTED_STATUS : CANCELLED_STATUS
 
   challenge.approved = event.params.approved
 
-  packet.save()
+  payload.save()
   challenge.save()
 }
 
 export function handleVetoed(event: VetoedEvent): void {
   const queue = loadOrCreateQueue(event.address)
 
-  const packet = loadOrCreateQueuePacket(event.params.containerHash, event)
+  const payload = loadOrCreateQueuePayload(event.params.containerHash, event)
 
-  packet.status = VETOED_STATUS
+  payload.status = VETOED_STATUS
 
   const veto = new VetoEntity(event.params.containerHash.toHexString())
 
@@ -140,18 +140,18 @@ export function handleVetoed(event: VetoedEvent): void {
   vetoDeposit.token = buildERC20(event.params.collateral.token)
   vetoDeposit.amount = event.params.collateral.amount
 
-  veto.packet = packet.id
+  veto.payload = payload.id
   veto.reason = event.params.reason
   veto.submitter = event.params.actor
   veto.collateral = vetoDeposit.id
   veto.createdAt = event.block.timestamp
 
-  // add the veto packet
-  const vetoedPackets = queue.vetoedPackets
-  vetoedPackets.push(packet.id)
-  queue.vetoedPackets = vetoedPackets
+  // add the veto payload
+  const vetoed = queue.vetoed
+  vetoed.push(veto.id)
+  queue.vetoed = vetoed
 
-  packet.save()
+  payload.save()
   veto.save()
   queue.save()
 }
@@ -219,14 +219,14 @@ export function handleRuled(event: RuledEvent): void {
     event.params.disputeId
   )
 
-  const packet = loadOrCreateQueuePacket(containerHash, event)
+  const payload = loadOrCreateQueuePayload(containerHash, event)
   const challenge = ChallengeEntity.load(containerHash.toHexString())
 
-  packet.status =
+  payload.status =
     event.params.ruling === ALLOW_RULING ? APPROVED_STATUS : REJECTED_STATUS
   challenge.ruling = event.params.ruling
 
-  packet.save()
+  payload.save()
   challenge.save()
 }
 
@@ -275,9 +275,9 @@ export function loadOrCreateQueue(entity: Address): GovernQueueEntity {
   if (queue === null) {
     queue = new GovernQueueEntity(queueId)
     queue.address = entity
-    queue.scheduledPackets = []
-    queue.challengedPackets = []
-    queue.vetoedPackets = []
+    queue.scheduled = []
+    queue.challenged = []
+    queue.vetoed = []
     queue.roles = []
   }
   return queue!
@@ -294,19 +294,19 @@ function loadOrCreateConfig(entity: Address): ConfigEntity {
   return config!
 }
 
-function loadOrCreateQueuePacket(
+function loadOrCreateQueuePayload(
   containerHash: Bytes,
   event: ethereum.Event
-): QueuePacketEntity {
-  const PacketId = containerHash.toHexString()
-  // Create packet
-  let packet = QueuePacketEntity.load(PacketId)
-  if (packet === null) {
-    packet = new QueuePacketEntity(PacketId)
-    packet.queue = event.address.toHexString()
-    packet.status = NONE_STATUS
+): PayloadEntity {
+  const PayloadId = containerHash.toHexString()
+  // Create payload
+  let payload = PayloadEntity.load(PayloadId)
+  if (payload === null) {
+    payload = new PayloadEntity(PayloadId)
+    payload.queue = event.address.toHexString()
+    payload.status = NONE_STATUS
   }
-  return packet!
+  return payload!
 }
 
 function loadOrCreateCollateral(
@@ -352,7 +352,7 @@ function buildActions(event: ScheduledEvent): void {
     action.to = actionData.to
     action.value = actionData.value
     action.data = actionData.data
-    action.packet = event.params.containerHash.toHexString()
+    action.payload = event.params.containerHash.toHexString()
 
     action.save()
   })
