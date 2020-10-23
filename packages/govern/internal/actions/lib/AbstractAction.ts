@@ -24,12 +24,35 @@ export default abstract class AbstractAction {
   protected configuration: Configuration
 
   /**
+   * The required parameters for this action
+   *
+   * @param {any} parameters
+   *
+   * @protected
+   */
+  protected parameters?: any
+
+  /**
    * @param {any} parameters - The required parameters for this action
    *
    * @constructor
    */
-  constructor(protected parameters?: any) {
+  constructor(parameters?: any) {
     this.configuration = Configuration.get()
+    this.parameters = this.validateParameters(parameters)
+  }
+
+  /**
+   * Validates the given parameters
+   *
+   * @method validateParameters
+   *
+   * @param {any} parameters
+   *
+   * @returns {any}
+   */
+  protected validateParameters(parameters?: any): any {
+    return parameters;
   }
 
   /**

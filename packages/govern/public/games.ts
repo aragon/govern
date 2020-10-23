@@ -1,4 +1,3 @@
-import { isAddress } from '@ethersproject/address'
 import GamesAction from '../internal/actions/GamesAction'
 
 /**
@@ -9,9 +8,5 @@ import GamesAction from '../internal/actions/GamesAction'
  * @returns {Promise<any>}
  */
 export default function games(address: string): Promise<any> {
-  if (!isAddress(address)) {
-    throw new Error('Invalid Ethereum address passed!')
-  }
-
   return new GamesAction({address: address}).execute()
 }
