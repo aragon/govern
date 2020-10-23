@@ -41,7 +41,7 @@ const ALLOW_RULING = BigInt.fromI32(4)
 export function handleScheduled(event: ScheduledEvent): void {
   const queue = loadOrCreateQueue(event.address)
 
-  const payload = loadOrCreateQueuePayload(event.params.containerHash, event)
+  const payload = loadOrCreatePayload(event.params.containerHash, event)
 
   buildActions(event)
 
@@ -74,7 +74,7 @@ export function handleScheduled(event: ScheduledEvent): void {
 }
 
 export function handleExecuted(event: ExecutedEvent): void {
-  const payload = loadOrCreateQueuePayload(event.params.containerHash, event)
+  const payload = loadOrCreatePayload(event.params.containerHash, event)
 
   payload.status = EXECUTED_STATUS
 
@@ -84,7 +84,7 @@ export function handleExecuted(event: ExecutedEvent): void {
 export function handleChallenged(event: ChallengedEvent): void {
   const queue = loadOrCreateQueue(event.address)
 
-  const payload = loadOrCreateQueuePayload(event.params.containerHash, event)
+  const payload = loadOrCreatePayload(event.params.containerHash, event)
 
   payload.status = CHALLENGED_STATUS
 
@@ -114,7 +114,7 @@ export function handleChallenged(event: ChallengedEvent): void {
 }
 
 export function handleResolved(event: ResolvedEvent): void {
-  const payload = loadOrCreateQueuePayload(event.params.containerHash, event)
+  const payload = loadOrCreatePayload(event.params.containerHash, event)
   const challenge = ChallengeEntity.load(
     event.params.containerHash.toHexString()
   )
@@ -130,7 +130,7 @@ export function handleResolved(event: ResolvedEvent): void {
 export function handleVetoed(event: VetoedEvent): void {
   const queue = loadOrCreateQueue(event.address)
 
-  const payload = loadOrCreateQueuePayload(event.params.containerHash, event)
+  const payload = loadOrCreatePayload(event.params.containerHash, event)
 
   payload.status = VETOED_STATUS
 
@@ -219,7 +219,7 @@ export function handleRuled(event: RuledEvent): void {
     event.params.disputeId
   )
 
-  const payload = loadOrCreateQueuePayload(containerHash, event)
+  const payload = loadOrCreatePayload(containerHash, event)
   const challenge = ChallengeEntity.load(containerHash.toHexString())
 
   payload.status =
@@ -294,7 +294,7 @@ function loadOrCreateConfig(entity: Address): ConfigEntity {
   return config!
 }
 
-function loadOrCreateQueuePayload(
+function loadOrCreatePayload(
   containerHash: Bytes,
   event: ethereum.Event
 ): PayloadEntity {
@@ -320,20 +320,6 @@ function loadOrCreateCollateral(
     collateral = new CollateralEntity(collateralId)
   }
   return collateral!
-}
-
-function loadOrCreateChallenge(
-  containerHash: Bytes,
-  event: ethereum.Event
-): ChallengeEntity {
-  const challengeId = containerHash.toHexString()
-  // Create challenge
-  let challenge = ChallengeEntity.load(challengeId)
-  if (challenge === null) {
-    challenge = new ChallengeEntity(challengeId)
-    challenge.createdAt = event.block.timestamp
-  }
-  return challenge!
 }
 
 function buildId(event: ethereum.Event): string {
