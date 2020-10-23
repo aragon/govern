@@ -1,10 +1,14 @@
-const { expect } = require('chai')
+import { ethers } from '@nomiclabs/buidler'
+import { expect } from 'chai'
+import { Erc3000Mock, Erc3000MockFactory } from '../typechain'
 
-describe('ERC3000', function() {
-  let erc3k
+describe('ERC3000', function () {
+  let erc3k: Erc3000Mock
 
   beforeEach(async () => {
-    const ERC3000 = await ethers.getContractFactory('ERC3000Mock')
+    const ERC3000 = (await ethers.getContractFactory(
+      'ERC3000Mock'
+    )) as Erc3000MockFactory
     erc3k = await ERC3000.deploy()
   })
 
@@ -16,7 +20,9 @@ describe('ERC3000', function() {
     })
 
     it('supports ERC-3000', async () => {
-      expect(await erc3k.supportsInterface(await erc3k.interfaceID())).to.equal(true)
+      expect(await erc3k.supportsInterface(await erc3k.interfaceID())).to.equal(
+        true
+      )
     })
 
     it("doesn't support random interfaceID", async () => {

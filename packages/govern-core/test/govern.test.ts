@@ -1,17 +1,20 @@
-const { expect } = require("chai")
+import { ethers } from '@nomiclabs/buidler'
+import { expect } from 'chai'
+import { Signer } from 'ethers'
+import { Govern } from '../typechain'
 
 const ERRORS = {
-  AUTH: 'acl: auth'
+  AUTH: 'acl: auth',
 }
 
 const EVENTS = {
-  EXECUTED: 'Executed'
+  EXECUTED: 'Executed',
 }
 
 const B32_ZERO = `0x${'00'.repeat(32)}`
 
 describe('Govern', function () {
-  let signers, owner, govern, governNotOwner
+  let signers: Signer[], owner: string, govern: Govern, governNotOwner: Govern
 
   before(async () => {
     signers = await ethers.getSigners()
@@ -20,7 +23,7 @@ describe('Govern', function () {
 
   beforeEach(async () => {
     const Govern = await ethers.getContractFactory('Govern')
-    govern = await Govern.deploy(owner)
+    govern = (await Govern.deploy(owner)) as Govern
     governNotOwner = await govern.connect(signers[1])
   })
 
@@ -31,6 +34,8 @@ describe('Govern', function () {
   })
 
   it('non-owner cannot exec', async () => {
-    await expect(governNotOwner.exec([], B32_ZERO, B32_ZERO)).to.be.revertedWith(ERRORS.AUTH)
+    await expect(
+      governNotOwner.exec([], B32_ZERO, B32_ZERO)
+    ).to.be.revertedWith(ERRORS.AUTH)
   })
 })

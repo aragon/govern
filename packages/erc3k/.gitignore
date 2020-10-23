@@ -2,5 +2,7 @@ node_modules
 yarn-error.log
 
 #Buidler files
-cache
+abi
 artifacts
+cache
+typechain

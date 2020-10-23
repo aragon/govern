@@ -345,8 +345,9 @@ function buildActionId(containerHash: Bytes, index: number): string {
 }
 
 function buildActions(event: ScheduledEvent): void {
-  event.params.payload.actions.forEach((actionData, index) => {
-    const actionId = buildActionId(event.params.containerHash, index)
+  const actions = event.params.payload.actions
+  for (let id = 0; id < actions.length; id++) {
+    const actionId = buildActionId(event.params.containerHash, id)
     const action = new ActionEntity(actionId)
 
     action.to = actionData.to
@@ -355,7 +356,7 @@ function buildActions(event: ScheduledEvent): void {
     action.payload = event.params.containerHash.toHexString()
 
     action.save()
-  })
+  }
 }
 
 export function buildERC20(address: Address): string {
