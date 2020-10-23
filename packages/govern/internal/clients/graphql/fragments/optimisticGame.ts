@@ -6,9 +6,6 @@ const optimisticGame: DocumentNode = gql`
     fragment OptimisticGame_optimisticGame on OptimisticGame {
       id
       name
-      queue {
-        ...OptimisticQueue_optimisticQueue
-      }
       metadata
     }
     ${optimisticQueue}

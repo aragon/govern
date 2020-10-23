@@ -9,12 +9,6 @@ const action: DocumentNode = gql`
       to
       value
       data
-      item {
-        ...Item_item
-      }
-      execution {
-        ...Execution_execution
-      }
     }
     ${execution}
     ${item}
