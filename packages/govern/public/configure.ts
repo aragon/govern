@@ -24,6 +24,8 @@ export default function configure(config: ConfigurationObject): void {
 }
 
 /**
+ * TODO: Move this logic to internal/
+ *
  * Returns the default configuration of Govern or the one defined by the user.
  * This function will be used in the public API layer to manage the injection of the configuration on action execution.
  *
