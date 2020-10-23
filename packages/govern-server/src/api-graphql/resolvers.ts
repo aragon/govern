@@ -13,6 +13,9 @@ export default function resolvers(govern: GovernCore): IResolvers {
       async game(_, args) {
         return govern.game(args.name)
       },
+      async games(_, args) {
+        return govern.games()
+      },
     },
     Dao: {
       async games(parent) {
