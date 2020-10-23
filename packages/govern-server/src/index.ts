@@ -1,11 +1,17 @@
-import { graphqlHttpPort } from './env'
+import env from './env'
 import startGraphql from './api-graphql'
+import { GovernCore } from './core'
 
 async function main() {
-  const _graphqlHttpPort = graphqlHttpPort()
-  const { url } = await startGraphql({ httpPort: _graphqlHttpPort })
+  const govern = new GovernCore({ network: 4 })
+
+  const { url: graphqlUrl } = await startGraphql({
+    govern,
+    httpPort: env.graphqlHttpPort,
+  })
+
   console.log()
-  console.log(`GraphQL API listening on ${url}`)
+  console.log(`GraphQL API listening on ${graphqlUrl}`)
 }
 
 main()
