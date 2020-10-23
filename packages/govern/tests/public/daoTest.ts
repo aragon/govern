@@ -1,4 +1,4 @@
-import { getConfiguration } from '../../public/configure'
+import Configuration from '../../internal/configuration/Configuration'
 import DAOAction from '../../internal/actions/DAOAction'
 import dao from '../../public/dao'
 
@@ -14,7 +14,7 @@ describe('dao Test', () => {
   it('dao test', async () => {
     await dao('0x00')
 
-    expect(DAOAction).toHaveBeenNthCalledWith(1, getConfiguration(), { address: '0x00' })
+    expect(DAOAction).toHaveBeenNthCalledWith(1, Configuration.get(), { address: '0x00' })
 
     expect(daoActionMock.mock.instances[0].execute).toHaveBeenCalledTimes(1)
   })

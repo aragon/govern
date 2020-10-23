@@ -1,8 +1,9 @@
+import { DocumentNode } from 'graphql'
 import gql from 'graphql-tag'
 import item from './item'
 import execution from './execution'
 
-export default gql`
+const action: DocumentNode = gql`
     fragment Action_action on Action {
       id
       to
@@ -19,3 +20,4 @@ export default gql`
     ${item}
   `
 
+export default action

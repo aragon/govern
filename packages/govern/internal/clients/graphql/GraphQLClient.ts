@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-unfetch'
 import { Client } from '@urql/core'
-import { DocumentNode } from 'internal/clients/graphql'
+import { DocumentNode } from 'graphql'
 import ClientInterface from '../lib/ClientInterface'
 
 /**

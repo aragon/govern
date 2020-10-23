@@ -1,6 +1,7 @@
+import { DocumentNode } from 'graphql'
 import gql from 'graphql-tag'
 
-export default gql`
+const role: DocumentNode = gql`
     fragment Role_role on Role {
       id
       entity
@@ -10,3 +11,5 @@ export default gql`
       frozen
     }
   `
+
+export default role

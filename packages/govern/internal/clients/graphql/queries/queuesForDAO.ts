@@ -1,7 +1,8 @@
+import { DocumentNode } from 'graphql'
 import gql from 'graphql-tag'
 import optimisticQueue from '../fragments/optimisticQueue'
 
-export default gql`
+const queuesForDao: DocumentNode = gql`
     query QueuesForDao($address: String) {
       dao(address: $address) {
         id
@@ -12,3 +13,5 @@ export default gql`
     }
     ${optimisticQueue}
   `
+
+export default queuesForDao

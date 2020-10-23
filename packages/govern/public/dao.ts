@@ -1,5 +1,5 @@
-import { getConfiguration } from './configure'
 import DAOAction from '../internal/actions/DAOAction'
+import Configuration from '../internal/configuration/Configuration'
 
 /**
  * TODO: Define return type in promise
@@ -9,5 +9,5 @@ import DAOAction from '../internal/actions/DAOAction'
  * @returns {Promise<any>}
  */
 export default function dao(address: string): Promise<any> {
-  return new DAOAction(getConfiguration(), { address: address }).execute()
+  return new DAOAction(Configuration.get(), { address: address }).execute()
 }

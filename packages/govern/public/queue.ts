@@ -1,5 +1,5 @@
-import { getConfiguration } from './configure'
 import QueueAction from '../internal/actions/QueueAction'
+import Configuration from '../internal/configuration/Configuration'
 
 /**
  * TODO: Define return type in promise
@@ -9,5 +9,5 @@ import QueueAction from '../internal/actions/QueueAction'
  * @returns {Promise<any>}
  */
 export default function queue(id: string): Promise<any> {
-  return new QueueAction(getConfiguration(), { id: id}).execute()
+  return new QueueAction(Configuration.get(), { id: id}).execute()
 }

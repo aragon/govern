@@ -1,8 +1,9 @@
+import { DocumentNode } from 'graphql'
 import gql from 'graphql-tag'
 import collateral from './collateral'
 import action from './action'
 
-export default gql`
+const item: DocumentNode = gql`
     fragment Item_item on Item {
       id
       status
@@ -21,3 +22,5 @@ export default gql`
     ${action}
     ${collateral}
   `
+
+export default item

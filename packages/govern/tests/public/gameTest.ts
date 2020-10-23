@@ -1,4 +1,4 @@
-import { getConfiguration } from '../../public/configure'
+import Configuration from '../../internal/configuration/Configuration'
 import GameAction from '../../internal/actions/GameAction'
 import game from '../../public/game'
 
@@ -14,7 +14,7 @@ describe('game Test', () => {
   it('game test', async () => {
     await game('name')
 
-    expect(GameAction).toHaveBeenNthCalledWith(1, getConfiguration(), { name: 'name' })
+    expect(GameAction).toHaveBeenNthCalledWith(1, Configuration.get(), { name: 'name' })
 
     expect(gameActionMock.mock.instances[0].execute).toHaveBeenCalledTimes(1)
   })

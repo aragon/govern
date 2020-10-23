@@ -1,9 +1,10 @@
+import { DocumentNode } from 'graphql'
 import gql from 'graphql-tag'
 import optimisticQueue from '../fragments/optimisticQueue'
 import execution from '../fragments/execution'
 import role from '../fragments/role'
 
-export default gql`
+const daos: DocumentNode = gql`
     query DAOS {
       daos {
         id
@@ -23,3 +24,5 @@ export default gql`
     ${execution}
     ${role}
   `
+
+export default daos

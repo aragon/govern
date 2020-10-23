@@ -1,5 +1,5 @@
+import Configuration from '../../internal/configuration/Configuration'
 import DAOSAction from '../../internal/actions/DAOSAction'
-import { getConfiguration } from '../../public/configure'
 import daos from '../../public/daos'
 
 // Mocks
@@ -14,7 +14,7 @@ describe('daos Test', () => {
   it('daos test', async () => {
     await daos()
 
-    expect(DAOSAction).toHaveBeenNthCalledWith(1, getConfiguration())
+    expect(DAOSAction).toHaveBeenNthCalledWith(1, Configuration.get())
 
     expect(daosActionMock.mock.instances[0].execute).toHaveBeenCalledTimes(1)
   })

@@ -1,8 +1,9 @@
+import { DocumentNode } from 'graphql'
 import gql from 'graphql-tag'
 import collateral from './collateral'
 import item from './item'
 
-export default gql`
+const challenge: DocumentNode = gql`
     fragment Challenge_challenge on Challenge {
       id
       challenger
@@ -27,3 +28,6 @@ export default gql`
     ${collateral}
     ${item}
   `
+
+
+export default challenge

@@ -1,5 +1,5 @@
-import { getConfiguration } from './configure'
 import GameAction from '../internal/actions/GameAction'
+import Configuration from '../internal/configuration/Configuration'
 
 /**
  * TODO: Define return type in promise
@@ -9,5 +9,5 @@ import GameAction from '../internal/actions/GameAction'
  * @returns {Promise<any>}
  */
 export default function game(name: string): Promise<any> {
-  return new GameAction(getConfiguration(), { name: name }).execute()
+  return new GameAction(Configuration.get(), { name: name }).execute()
 }

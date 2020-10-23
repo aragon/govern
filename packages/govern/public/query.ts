@@ -1,5 +1,5 @@
 import { DocumentNode } from 'graphql'
-import { getConfiguration } from './configure'
+import Configuration from '../internal/configuration/Configuration'
 
 /**
  * TODO: Use QueryResult type from govern-server/core
@@ -12,5 +12,5 @@ import { getConfiguration } from './configure'
  * @returns Promise<any>
  */
 export async function query(query: DocumentNode, args: any = {}): Promise<any> {
-  return getConfiguration().client.request(query, args)
+  return Configuration.get().client.request(query, args)
 }

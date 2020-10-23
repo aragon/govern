@@ -1,6 +1,13 @@
 import ClientInterface from '../clients/lib/ClientInterface'
 import GraphQLClient from '../clients/graphql/GraphQLClient'
 
+export interface ConfigurationObject {
+  governURL?: string
+}
+
+let defaultConfig: Configuration;
+const governURL = 'https://govern.backend.aragon.org'
+
 /**
  * @class Configuration
  */
@@ -72,5 +79,44 @@ export default class Configuration {
    */
   get client(): ClientInterface {
     return this.config.client
+  }
+
+  /**
+   * Static setter/factory method of the Configuration class
+   *
+   * @method set
+   *
+   * @param {ConfigurationObject} config
+   *
+   * @returns {void}
+   *
+   * @public
+   */
+  static set(config?: ConfigurationObject): void {
+    if (!config?.governURL) {
+      // @ts-ignore
+      config.governURL = governURL
+    }
+
+    defaultConfig = new Configuration(config)
+  }
+
+  /**
+   * Static getter for the defaultConfig (used in the public API layer)
+   *
+   * @method get
+   *
+   * @returns {Configuration}
+   *
+   * @public
+   */
+  static get(): Configuration {
+    if (typeof defaultConfig !== 'undefined') {
+      return defaultConfig
+    }
+
+    Configuration.set();
+
+    return defaultConfig
   }
 }
