@@ -11,8 +11,10 @@ jest.mock('graphql-tag')
 describe('daos Test', () => {
   const daosActionMock = DAOSAction as jest.MockedClass<typeof DAOSAction>
 
-  it('daos test', async () => {
+  it('calls daos and returns as expected', async () => {
     await daos()
+
+    expect(DAOSAction).toHaveBeenCalledTimes(1)
 
     expect(daosActionMock.mock.instances[0].execute).toHaveBeenCalledTimes(1)
   })

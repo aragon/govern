@@ -11,7 +11,7 @@ jest.mock('graphql-tag')
 describe('queue Test', () => {
   const queueActionMock = QueueAction as jest.MockedClass<typeof QueueAction>
 
-  it('queue test', async () => {
+  it('calls queue and returns as expected', async () => {
     await queue('ID')
 
     expect(QueueAction).toHaveBeenNthCalledWith(1, { id: 'ID' })

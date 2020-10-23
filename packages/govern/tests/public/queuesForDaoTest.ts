@@ -11,7 +11,7 @@ jest.mock('graphql-tag')
 describe('queuesForDao Test', () => {
   const queuesForDaoActionMock = QueuesForDaoAction as jest.MockedClass<typeof QueuesForDaoAction>
 
-  it('queuesForDao test', async () => {
+  it('calls queuesForDao and returns as expected', async () => {
     await queuesForDao('0x00')
 
     expect(QueuesForDaoAction).toHaveBeenNthCalledWith(1, { address: '0x00' })

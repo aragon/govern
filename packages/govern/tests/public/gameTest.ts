@@ -11,7 +11,7 @@ jest.mock('graphql-tag')
 describe('game Test', () => {
   const gameActionMock = GameAction as jest.MockedClass<typeof GameAction>
 
-  it('game test', async () => {
+  it('calls game and returns as expected', async () => {
     await game('name')
 
     expect(GameAction).toHaveBeenNthCalledWith(1, { name: 'name' })
