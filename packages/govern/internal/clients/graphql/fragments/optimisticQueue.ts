@@ -26,9 +26,6 @@ const optimisticQueue: DocumentNode = gql`
         resolver
         rules
       }
-      games {
-        ...OptimisticGame_optimisticGame
-      }
       queue {
         ...Item_item
       }
