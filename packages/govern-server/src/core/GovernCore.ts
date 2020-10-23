@@ -20,13 +20,13 @@ export type ConnectorTheGraphConfig = {
 
 function getSubgraphUrl(network: Network): string | null {
   if (network.chainId === 1) {
-    return 'placeholder'
+    return null
   }
   if (network.chainId === 4) {
-    return 'https://api.thegraph.com/subgraphs/name/0xgabi/aragon-govern-rinkeby-staging'
+    return 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby'
   }
   if (network.chainId === 100) {
-    return 'placeholder'
+    return null
   }
   return null
 }
