@@ -1,5 +1,4 @@
 import { DocumentNode } from 'graphql'
-import GraphQLClient from '../../clients/graphql/GraphQLClient'
 import Configuration from '../../configuration/Configuration'
 
 /**
@@ -16,12 +15,19 @@ export default abstract class AbstractAction {
   protected gqlQuery: DocumentNode
 
   /**
+   * The current configuration to execute this action
+   *
+   * @var {Configuration} configuration
+   */
+  protected configuration: Configuration
+
+  /**
    * @param {any} parameters - The required parameters for this action
-   * @param {Configuration} configuration - The current configuration to execute this action
    *
    * @constructor
    */
-  constructor(protected configuration: Configuration, protected parameters?: any) {
+  constructor(protected parameters?: any) {
+    this.configuration = Configuration.get();
   }
 
   /**
