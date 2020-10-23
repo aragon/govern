@@ -4,10 +4,10 @@ import QueueAction from '../internal/actions/QueueAction'
 /**
  * TODO: Define return type in promise
  *
- * @param {string} address
+ * @param {string} id
  *
  * @returns {Promise<any>}
  */
-export default function queue(address: string): Promise<any> {
-  return new QueueAction(getConfiguration(), { address: address }).execute()
+export default function queue(id: string): Promise<any> {
+  return new QueueAction(getConfiguration(), { id: id}).execute()
 }

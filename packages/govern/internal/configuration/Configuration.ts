@@ -1,5 +1,5 @@
 import ClientInterface from '../clients/lib/ClientInterface'
-import GraphQLClient from '../clients/GraphQLClient'
+import GraphQLClient from '../clients/graphql/GraphQLClient'
 
 /**
  * @class Configuration

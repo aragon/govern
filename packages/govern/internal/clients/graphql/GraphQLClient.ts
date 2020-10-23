@@ -1,7 +1,7 @@
 import fetch from 'isomorphic-unfetch'
 import { Client } from '@urql/core'
-import { DocumentNode } from 'graphql'
-import ClientInterface from './lib/ClientInterface'
+import { DocumentNode } from 'internal/clients/graphql'
+import ClientInterface from '../lib/ClientInterface'
 
 /**
  * TODO: Use QueryResult type from govern-server/core

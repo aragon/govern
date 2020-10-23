@@ -1,7 +1,7 @@
 import { Client } from '@urql/core'
 import fetch from 'isomorphic-unfetch'
 import gql from 'graphql-tag'
-import GraphQLClient from '../../../internal/clients/GraphQLClient'
+import GraphQLClient from '../../../internal/clients/graphql/GraphQLClient'
 
 // Mocks
 jest.mock('@urql/core')

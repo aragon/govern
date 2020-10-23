@@ -1,4 +1,4 @@
-import GraphQLClient from '../../../internal/clients/GraphQLClient'
+import GraphQLClient from '../../../internal/clients/graphql/GraphQLClient'
 import Configuration from '../../../internal/configuration/Configuration'
 
 // Mocks

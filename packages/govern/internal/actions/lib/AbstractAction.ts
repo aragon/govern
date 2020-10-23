@@ -1,5 +1,5 @@
 import { DocumentNode } from 'graphql'
-import GraphQLClient from '../../clients/GraphQLClient'
+import GraphQLClient from '../../clients/graphql/GraphQLClient'
 import Configuration from '../../configuration/Configuration'
 
 /**
