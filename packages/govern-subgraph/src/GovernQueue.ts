@@ -332,13 +332,13 @@ function buildActionId(containerHash: Bytes, index: number): string {
 
 function buildActions(event: ScheduledEvent): void {
   const actions = event.params.payload.actions
-  for (let id = 0; id < actions.length; id++) {
-    const actionId = buildActionId(event.params.containerHash, id)
+  for (let index = 0; index < actions.length; index++) {
+    const actionId = buildActionId(event.params.containerHash, index)
     const action = new ActionEntity(actionId)
 
-    action.to = actionData.to
-    action.value = actionData.value
-    action.data = actionData.data
+    action.to = actions[index].to
+    action.value = actions[index].value
+    action.data = actions[index].data
     action.payload = event.params.containerHash.toHexString()
 
     action.save()
