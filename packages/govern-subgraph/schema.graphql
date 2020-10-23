@@ -34,10 +34,10 @@ type GovernQueue @entity {
   address: Bytes!
   config: Config
   games: [OptimisticGame!] @derivedFrom(field: "queue")
-  scheduledPackets: [Schedule!]
-  challengedPackets: [Challenge!]
-  vetoedPackets: [Veto!]
-  executedPackets: [Execution!] @derivedFrom(field: "queue")
+  scheduled: [Schedule!]
+  challenged: [Challenge!]
+  vetoed: [Veto!]
+  executed: [Execution!] @derivedFrom(field: "queue")
   roles: [Role!]
 }
 

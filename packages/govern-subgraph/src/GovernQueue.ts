@@ -11,7 +11,7 @@ import {
   Vetoed as VetoedEvent,
   Ruled as RuledEvent,
   EvidenceSubmitted as EvidenceSubmittedEvent,
-  GovernQueue as GovernQueueContract,
+  GovernQueue as GovernQueueContract
 } from '../generated/templates/GovernQueue/GovernQueue'
 import {
   Action as ActionEntity,
@@ -64,9 +64,9 @@ export function handleScheduled(event: ScheduledEvent): void {
   schedule.createdAt = event.block.timestamp
 
   // add the packet
-  const scheduledPackets = queue.scheduledPackets
-  scheduledPackets.push(packet.id)
-  queue.scheduledPackets = scheduledPackets
+  const scheduled = queue.scheduled
+  scheduled.push(schedule.id)
+  queue.scheduled = scheduled
 
   packet.save()
   schedule.save()
@@ -104,9 +104,9 @@ export function handleChallenged(event: ChallengedEvent): void {
   challenge.createdAt = event.block.timestamp
 
   // add the challenged packet
-  const challengedPackets = queue.challengedPackets
-  challengedPackets.push(packet.id)
-  queue.challengedPackets = challengedPackets
+  const challenged = queue.challenged
+  challenged.push(challenge.id)
+  queue.challenged = challenged
 
   packet.save()
   challenge.save()
@@ -147,9 +147,9 @@ export function handleVetoed(event: VetoedEvent): void {
   veto.createdAt = event.block.timestamp
 
   // add the veto packet
-  const vetoedPackets = queue.vetoedPackets
-  vetoedPackets.push(packet.id)
-  queue.vetoedPackets = vetoedPackets
+  const vetoed = queue.vetoed
+  vetoed.push(veto.id)
+  queue.vetoed = vetoed
 
   packet.save()
   veto.save()
@@ -275,9 +275,9 @@ export function loadOrCreateQueue(entity: Address): GovernQueueEntity {
   if (queue === null) {
     queue = new GovernQueueEntity(queueId)
     queue.address = entity
-    queue.scheduledPackets = []
-    queue.challengedPackets = []
-    queue.vetoedPackets = []
+    queue.scheduled = []
+    queue.challenged = []
+    queue.vetoed = []
     queue.roles = []
   }
   return queue!
@@ -345,17 +345,18 @@ function buildActionId(containerHash: Bytes, index: number): string {
 }
 
 function buildActions(event: ScheduledEvent): void {
-  event.params.payload.actions.forEach((actionData, index) => {
-    const actionId = buildActionId(event.params.containerHash, index)
+  const actions = event.params.payload.actions
+  for (let id = 0; id < actions.length; id++) {
+    const actionId = buildActionId(event.params.containerHash, id)
     const action = new ActionEntity(actionId)
 
-    action.to = actionData.to
-    action.value = actionData.value
-    action.data = actionData.data
+    action.to = actions[id].to
+    action.value = actions[id].value
+    action.data = actions[id].data
     action.packet = event.params.containerHash.toHexString()
 
     action.save()
-  })
+  }
 }
 
 export function buildERC20(address: Address): string {
