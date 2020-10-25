@@ -16,13 +16,14 @@ contract Govern is AdaptativeERC165, ERC3000Executor, ACL {
     using BitmapLib for bytes32;
 
     bytes4 internal constant EXEC_ROLE = this.exec.selector;
+    bytes4 internal constant REGISTER_ROLE = this.registerStandardAndCallback.selector;
     uint256 internal constant MAX_ACTIONS = 256;
 
     event ETHDeposited(address indexed sender, uint256 value);
 
     constructor(ERC3000 _initialExecutor) ACL(address(this)) public {
         _grant(EXEC_ROLE, address(_initialExecutor));
-        _grant(this.registerStandardAndCallback.selector, address(_initialExecutor));
+        _grant(REGISTER_ROLE, address(_initialExecutor));
         _registerStandard(ERC3000_EXEC_INTERFACE_ID);
     }
 
@@ -54,7 +55,7 @@ contract Govern is AdaptativeERC165, ERC3000Executor, ACL {
         return (failureMap, execResults);
     }
 
-    function registerStandardAndCallback(bytes4 _interfaceId, bytes4 _callbackSig, bytes4 _magicNumber) external auth(this.registerStandardAndCallback.selector) {
+    function registerStandardAndCallback(bytes4 _interfaceId, bytes4 _callbackSig, bytes4 _magicNumber) external auth(REGISTER_ROLE) {
         _registerStandardAndCallback(_interfaceId, _callbackSig, _magicNumber);
     }
 
