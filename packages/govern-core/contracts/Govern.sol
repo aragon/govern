@@ -22,6 +22,7 @@ contract Govern is AdaptativeERC165, ERC3000Executor, ACL {
 
     constructor(ERC3000 _initialExecutor) ACL(address(this)) public {
         _grant(EXEC_ROLE, address(_initialExecutor));
+        _grant(this.registerStandardAndCallback.selector, address(_initialExecutor));
         _registerStandard(ERC3000_EXEC_INTERFACE_ID);
     }
 
@@ -51,6 +52,10 @@ contract Govern is AdaptativeERC165, ERC3000Executor, ACL {
         emit Executed(msg.sender, actions, memo, failureMap, execResults);
 
         return (failureMap, execResults);
+    }
+
+    function registerStandardAndCallback(bytes4 _interfaceId, bytes4 _callbackSig, bytes4 _magicNumber) external auth(this.registerStandardAndCallback.selector) {
+        _registerStandardAndCallback(_interfaceId, _callbackSig, _magicNumber);
     }
 
     // TODO: ERC-1271
