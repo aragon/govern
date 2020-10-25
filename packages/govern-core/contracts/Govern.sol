@@ -5,13 +5,14 @@
 pragma solidity 0.6.8;
 pragma experimental ABIEncoderV2;
 
-import "erc3k/contracts/IERC3000.sol";
+import "erc3k/contracts/ERC3000.sol";
 import "erc3k/contracts/ERC3000Executor.sol";
 
 import "@aragon/govern-contract-utils/contracts/acl/ACL.sol";
+import "@aragon/govern-contract-utils/contracts/adaptative-erc165/AdaptativeERC165.sol";
 import "@aragon/govern-contract-utils/contracts/bitmaps/BitmapLib.sol";
 
-contract Govern is ERC3000Executor, ACL {
+contract Govern is AdaptativeERC165, ERC3000Executor, ACL {
     using BitmapLib for bytes32;
 
     bytes4 internal constant EXEC_ROLE = this.exec.selector;
@@ -19,12 +20,17 @@ contract Govern is ERC3000Executor, ACL {
 
     event ETHDeposited(address indexed sender, uint256 value);
 
-    constructor(IERC3000 _initialExecutor) ACL(address(this)) public {
+    constructor(ERC3000 _initialExecutor) ACL(address(this)) public {
         _grant(EXEC_ROLE, address(_initialExecutor));
+        _registerStandard(ERC3000_EXEC_INTERFACE_ID);
     }
 
     receive () external payable {
         emit ETHDeposited(msg.sender, msg.value);
+    }
+
+    fallback () external {
+        _handleCallback(msg.sig, msg.data);
     }
 
     function exec(ERC3000Data.Action[] memory actions, bytes32 allowFailuresMap, bytes32 memo) override public auth(EXEC_ROLE) returns (bytes32, bytes[] memory) {
