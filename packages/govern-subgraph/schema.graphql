@@ -8,8 +8,8 @@ type ERC3000Registry @entity {
 type OptimisticGame @entity {
   id: ID!
   name: String!
+  queue: GovernQueue!
   executor: Govern!
-  queue: OptimisticQueue!
 }
 
 type Govern @entity {
@@ -23,36 +23,27 @@ type Govern @entity {
 
 type Execution @entity {
   id: ID!
-  sender: Bytes!
-  queue: OptimisticQueue
-  actions: [Action!] @derivedFrom(field: "execution")
+  queue: GovernQueue!
+  packet: QueuePacket!
   results: [Bytes!]
+  createdAt: BigInt!
 }
 
-type Action @entity {
-  id: ID!
-  to: Bytes!
-  value: BigInt!
-  data: Bytes!
-  item: Item!
-  execution: Execution
-}
-
-type OptimisticQueue @entity {
+type GovernQueue @entity {
   id: ID!
   address: Bytes!
   config: Config
   games: [OptimisticGame!] @derivedFrom(field: "queue")
-  queue: [Item!]
-  executions: [Execution!] # TODO: @derivedFrom(field: "queue")
-  challenges: [Challenge!] @derivedFrom(field: "queue")
-  vetos: [Veto!] @derivedFrom(field: "queue")
+  scheduled: [Schedule!]
+  challenged: [Challenge!]
+  vetoed: [Veto!]
+  executed: [Execution!] @derivedFrom(field: "queue")
   roles: [Role!]
 }
 
 type Config @entity {
   id: ID!
-  queue: OptimisticQueue!
+  queue: GovernQueue!
   executionDelay: BigInt!
   scheduleDeposit: Collateral!
   challengeDeposit: Collateral!
@@ -69,26 +60,41 @@ type Collateral @entity {
 
 type ERC20 @entity {
   id: ID!
+  address: Bytes!
 }
 
-type Item @entity {
+type QueuePacket @entity {
   id: ID!
-  status: ItemStatus!
+  queue: GovernQueue!
+  status: PacketStatus!
   nonce: BigInt!
   executionTime: BigInt!
   submitter: Bytes!
   executor: Govern!
-  actions: [Action!] @derivedFrom(field: "item")
+  actions: [Action!] @derivedFrom(field: "packet")
+  allowFailuresMap: Bytes!
   proof: Bytes!
+}
+
+type Action @entity {
+  id: ID!
+  packet: QueuePacket!
+  to: Bytes!
+  value: BigInt!
+  data: Bytes!
+}
+
+type Schedule @entity {
+  id: ID!
+  packet: QueuePacket!
   collateral: Collateral!
   createdAt: BigInt!
 }
 
 type Challenge @entity {
   id: ID!
-  queue: OptimisticQueue!
+  packet: QueuePacket!
   challenger: Bytes!
-  item: Item!
   arbitrator: Bytes!
   disputeId: BigInt!
   evidences: [Evidence!] @derivedFrom(field: "challenge")
@@ -108,8 +114,7 @@ type Evidence @entity {
 
 type Veto @entity {
   id: ID!
-  queue: OptimisticQueue!
-  item: Item!
+  packet: QueuePacket!
   reason: Bytes!
   submitter: Bytes!
   collateral: Collateral!
@@ -125,7 +130,7 @@ type Role @entity {
   frozen: Boolean!
 }
 
-enum ItemStatus {
+enum PacketStatus {
   None
   Approved
   Cancelled

@@ -1,4 +1,4 @@
-node_modules
-.vscode
+node_modules/
+yarn-error.log
 .env
-.DS_Store
+/packages/govern-server/dev-data/

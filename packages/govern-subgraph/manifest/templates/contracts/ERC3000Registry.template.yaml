@@ -15,7 +15,7 @@
       - Govern
     abis:
       - name: ERC3000Registry
-        file: ../govern-core/abi/ERC3000Registry.json
+        file: ../erc3k/artifacts/ERC3000Registry.json
     eventHandlers:
       - event: Registered(indexed address,address,indexed address,string)
         handler: handleRegistered

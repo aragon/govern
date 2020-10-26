@@ -9,24 +9,42 @@
     "Jorge Izquierdo <jorge@aragon.one>"
   ],
   "files": [
+    "/abi",
     "/artifacts",
     "/contracts"
   ],
   "license": "MIT",
   "private": false,
+  "dependencies": {
+    "@aragon/govern-contract-utils": "^1.0.0-beta.0"
+  },
   "devDependencies": {
     "@nomiclabs/buidler": "^1.4.7",
     "@nomiclabs/buidler-ethers": "^2.0.0",
     "@nomiclabs/buidler-waffle": "^2.0.0",
+    "@typechain/ethers-v5": "^2.0.0",
+    "@types/chai": "^4.2.13",
+    "@types/mocha": "^8.0.3",
+    "@types/node": "^14.11.8",
+    "buidler-extract": "^1.0.0",
+    "buidler-typechain": "^0.2.1",
     "chai": "^4.2.0",
     "ethereum-waffle": "^3.0.0",
-    "ethers": "^5.0.0"
+    "ethers": "^5.0.0",
+    "solidity-coverage": "^0.7.10",
+    "ts-generator": "0.1.1",
+    "ts-node": "^9.0.0",
+    "typechain": "3.0.0",
+    "typescript": "^4.0.3"
   },
   "scripts": {
+    "build": "yarn compile && buidler typechain",
     "clean": "rm -rf artifacts",
-    "compile": "npx buidler compile --force",
-    "test": "npx buidler test",
-    "prepublishOnly": "yarn test && yarn compile"
+    "compile": "buidler compile --force",
+    "test": "yarn build && buidler test",
+    "coverage": "yarn build && SOLIDITY_COVERAGE=true buidler coverage --network coverage",
+    "abi:extract": "buidler-extract --output abi/ --keys abi",
+    "prepublishOnly": "yarn test && yarn compile && yarn abi:extract -- --no-compile"
   },
   "gitHead": "aabbf6bd2dac11872ba9bb1f1dc8fffb6044aa7c"
 }
