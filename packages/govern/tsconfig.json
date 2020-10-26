@@ -6,7 +6,10 @@
     "baseUrl": "./",
     "paths": {
       "internal": ["internal/"]
-    }
+    },
+    "types": [
+      "jest"
+    ]
   },
   "include": [
     "./internal/**/*",
