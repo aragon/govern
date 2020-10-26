@@ -25,7 +25,15 @@
   },
   "workspaces": {
     "packages": [
-      "packages/*"
+      "packages/erc3k",
+      "packages/erc3kjs",
+      "packages/govern-console",
+      "packages/govern-contract-utils",
+      "packages/govern-core",
+      "packages/govern-created",
+      "packages/govern-discord",
+      "packages/govern-server",
+      "packages/govern-subgraph"
     ],
     "nohoist": [
       "**/@graphprotocol/graph-ts",

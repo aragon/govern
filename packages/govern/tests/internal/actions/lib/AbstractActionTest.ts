@@ -3,7 +3,9 @@ import gql from 'graphql-tag'
 import GraphQLClient from '../../../../internal/clients/graphql/GraphQLClient'
 
 // Created to be able to test the abstract class AbstractAction
-class TestAction extends AbstractAction {
+interface Test { }
+
+class TestAction extends AbstractAction<Test> {
   protected gqlQuery = gql('query Test { name }')
 }
 
@@ -13,7 +15,7 @@ jest.mock('../../../../internal/clients/graphql/GraphQLClient')
  * AbstractAction test
  */
 describe('AbstractActionTest', () => {
-  let abstractAction: AbstractAction,
+  let abstractAction: AbstractAction<Test>,
     clientMock = GraphQLClient as jest.MockedClass<typeof GraphQLClient>,
     clientInstance: GraphQLClient
 
@@ -23,6 +25,7 @@ describe('AbstractActionTest', () => {
   })
 
   it('calls execute and returns the expected result', async () => {
+    //@ts-ignore
     clientInstance.request = jest.fn((gqlQuery, parameters) => {
       expect(gqlQuery).toEqual(gql('query Test { name }'))
 

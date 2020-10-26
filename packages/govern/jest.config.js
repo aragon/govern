@@ -1,6 +1,6 @@
 module.exports = {
   preset: 'ts-jest',
-  // notifyMode: 'success-change',
+  notifyMode: 'success-change',
   collectCoverage: true,
   coverageDirectory: './coverage/',
   coverageThreshold: {
@@ -10,7 +10,7 @@ module.exports = {
       statements: 80
     }
   },
-  // notify: true,
+  notify: true,
   clearMocks: true,
   resetMocks: true,
   resetModules: true,
