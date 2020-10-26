@@ -94,7 +94,7 @@ task('deploy-govern', 'Deploys an Govern from provided factory')
     let registryInterface = new ethers.utils.Interface(REGISTRY_EVENTS_ABI)
 
     const governBaseFactory = await ethers.getContractAt('GovernBaseFactory', factoryAddr)
-    const tx = await governBaseFactory.newDummyGovern(name, useProxies, { gasLimit: useProxies ? 7e5 : 5e6 })
+    const tx = await governBaseFactory.newDummyGovern(name, useProxies, { gasLimit: useProxies ? 7e5 : 7e6 })
 
     const { events } = await tx.wait()
 

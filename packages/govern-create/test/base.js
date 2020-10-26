@@ -46,7 +46,7 @@ describe('Govern Base Factory', function () {
     await deployDAO(false, GAS_TARGET)
   })
 
-  const GAS_TARGET_PROXY = !process.env.SOLIDITY_COVERAGE ? 5e5 : 2e6
+  const GAS_TARGET_PROXY = !process.env.SOLIDITY_COVERAGE ? 6e5 : 2e6
   it(`deploys DAO with proxies under ${GAS_TARGET_PROXY} gas`, async () => {
     await deployDAO(true, GAS_TARGET_PROXY)
   })
