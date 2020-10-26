@@ -19,7 +19,7 @@ contract GovernQueueFactory {
 
     function newQueue(address _aclRoot, ERC3000Data.Config memory _config, bytes32 _salt) public returns (GovernQueue queue) {
         if (_salt != bytes32(0)) {
-            return GovernQueue(base.clone2(_salt, abi.encodeWithSelector(queue.initialize.selector, this, _config)));
+            return GovernQueue(base.clone2(_salt, abi.encodeWithSelector(queue.initialize.selector, _aclRoot, _config)));
         } else {
             return new GovernQueue(_aclRoot, _config);
         }

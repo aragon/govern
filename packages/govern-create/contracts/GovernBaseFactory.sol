@@ -17,7 +17,8 @@ contract GovernBaseFactory {
     GovernQueueFactory public queueFactory;
     ERC3000Registry public registry;
 
-    constructor(ERC3000Registry _registry, GovernQueueFactory _queueFactory) public {
+    constructor(ERC3000Registry _registry, GovernFactory _governFactory, GovernQueueFactory _queueFactory) public {
+        governFactory = _governFactory;
         queueFactory = _queueFactory;
         registry = _registry;
     }
@@ -37,7 +38,7 @@ contract GovernBaseFactory {
         items[3] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.configure.selector, address(govern));
         items[4] = ACLData.BulkItem(ACLData.BulkOp.Revoke, queue.ROOT_ROLE(), address(this));
         items[5] = ACLData.BulkItem(ACLData.BulkOp.Freeze, queue.ROOT_ROLE(), address(0));
-
+        
         queue.bulk(items);
     }
 

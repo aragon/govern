@@ -44,18 +44,19 @@ task('deploy-registry', 'Deploys an ERC3000Registry instance').setAction(
 
 task('deploy-factory', 'Deploys an GovernBaseFactory instance').setAction(
   async (_, { ethers }) => {
-    const GovernQueueFactory = await ethers.getContractFactory(
-      'GovernQueueFactory'
-    )
-    const GovernBaseFactory = await ethers.getContractFactory(
-      'GovernBaseFactory'
-    )
+    const GovernFactory = await ethers.getContractFactory('GovernFactory')
+    const GovernQueueFactory = await ethers.getContractFactory('GovernQueueFactory')
+    const GovernBaseFactory = await ethers.getContractFactory('GovernBaseFactory')
+    
+    const governFactory = await GovernFactory.deploy()
+    print(governFactory, 'GovernFactory')
 
     const queueFactory = await GovernQueueFactory.deploy()
     print(queueFactory, 'GovernQueueFactory')
 
     const governBaseFactory = await GovernBaseFactory.deploy(
       process.env.REGISTRY_RINKEBY,
+      governFactory.address,
       queueFactory.address
     )
     print(governBaseFactory, 'GovernBaseFactory')
@@ -70,7 +71,7 @@ task('deploy-govern', 'Deploys an Govern from provided factory')
   .addOptionalParam('factory', 'Factory address')
   .addOptionalParam('useProxies', 'Whether to deploy govern with proxies')
   .addOptionalParam('name', 'DAO name (must be unique at Registry level)')
-  .setAction(async ({ factory: factoryAddr, useProxies, name }, { ethers }) => {
+  .setAction(async ({ factory: factoryAddr, useProxies = true, name }, { ethers }) => {
     factoryAddr =
       factoryAddr ||
       process.env.FACTORY_RINKEBY ||
@@ -92,13 +93,8 @@ task('deploy-govern', 'Deploys an Govern from provided factory')
 
     let registryInterface = new ethers.utils.Interface(REGISTRY_EVENTS_ABI)
 
-    const GovernBaseFactory = await ethers.getContractAt(
-      'GovernBaseFactory',
-      factoryAddr
-    )
-    const tx = await GovernBaseFactory.newDummyGovern(name, {
-      gasLimit: 4000000,
-    })
+    const governBaseFactory = await ethers.getContractAt('GovernBaseFactory', factoryAddr)
+    const tx = await governBaseFactory.newDummyGovern(name, useProxies, { gasLimit: useProxies ? 7e5 : 5e6 })
 
     const { events } = await tx.wait()
 
@@ -123,7 +119,7 @@ module.exports = {
     version: '0.6.8',
     optimizer: {
       enabled: true,
-      runs: 2000, // TODO: target average DAO use
+      runs: 20000, // TODO: target average DAO use
     },
   },
   etherscan: {
