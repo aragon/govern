@@ -1,7 +1,26 @@
 import { DocumentNode } from 'graphql'
 import gql from 'graphql-tag'
-import collateral from './collateral'
-import item from './item'
+import collateral, { Collateral } from './collateral'
+import item, { Item } from './item'
+import { Address } from '../../lib/types/Address'
+
+export interface Challenge {
+  id: string
+  challenger: Address
+  item: Item
+  arbitrator: Address
+  disputeId: string
+  evidences: {
+    id: string
+    data: string
+    submitter: Address
+    createdAt: string
+  }
+  collateral: Collateral
+  ruling: string
+  approved: boolean
+  createdAt: string
+}
 
 const challenge: DocumentNode = gql`
     fragment Challenge_challenge on Challenge {
@@ -21,9 +40,9 @@ const challenge: DocumentNode = gql`
       collateral {
         ...Collateral_collateral
       }
-      ruling: String
-      approved: Boolean
-      createdAt: String!
+      ruling
+      approved
+      createdAt
     }
     ${collateral}
     ${item}

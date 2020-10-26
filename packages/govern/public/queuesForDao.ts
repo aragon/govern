@@ -1,12 +1,14 @@
-import QueuesForDaoAction from '../internal/actions/QueuesForDaoAction'
+import { OptimisticQueue } from '../internal/clients/graphql/fragments/optimisticQueue'
+import { Address } from '../internal/clients/lib/types/Address'
+import QueuesForDaoAction  from '../internal/actions/QueuesForDaoAction'
 
 /**
- * TODO: Define return type in promise
+ * Returns all queues of a Dao.
  *
- * @param {string} address
+ * @param {Address} address
  *
- * @returns {Promise<any>}
+ * @returns {Promise<OptimisticQueue>}
  */
-export default function queuesForDao(address: string): Promise<any> {
+export default function queuesForDao(address: Address): Promise<OptimisticQueue[]> {
   return new QueuesForDaoAction({ address: address }).execute()
 }

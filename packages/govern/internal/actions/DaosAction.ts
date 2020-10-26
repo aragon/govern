@@ -1,11 +1,11 @@
 import { DocumentNode } from 'graphql'
 import AbstractAction from './lib/AbstractAction'
-import daos from '../clients/graphql/queries/daos'
+import daos, { Daos } from '../clients/graphql/queries/daos'
 
 /**
- * @class DAOSAction
+ * @class DaosAction
  */
-export default class DAOSAction extends AbstractAction {
+export default class DaosAction extends AbstractAction<Daos> {
   /**
    * Contains the GraphQL query of the current action
    *

@@ -1,12 +1,13 @@
-import { isAddress } from '@ethersproject/address'
 import { DocumentNode } from 'graphql'
 import AbstractAction from './lib/AbstractAction'
-import queuesForDAO from '../clients/graphql/queries/queuesForDAO'
+import { isAddress } from '@ethersproject/address'
+import { Address } from 'govern-server/src/core/types'
+import dao, { Dao } from '../clients/graphql/queries/dao'
 
 /**
- * @class QueuesForDAOAction
+ * @class DaoAction
  */
-export default class QueuesForDAOAction extends AbstractAction {
+export default class DaoAction extends AbstractAction<Dao> {
   /**
    * Contains the GraphQL query of the current action
    *
@@ -14,14 +15,14 @@ export default class QueuesForDAOAction extends AbstractAction {
    *
    * @protected
    */
-  protected gqlQuery: DocumentNode = queuesForDAO
+  protected gqlQuery: DocumentNode = dao
 
   /**
    * @param {Object} parameters
    *
    * @constructor
    */
-  constructor(parameters: { address: string }) {
+  constructor(parameters: { address: Address }) {
     super(parameters)
   }
 
@@ -34,7 +35,7 @@ export default class QueuesForDAOAction extends AbstractAction {
    *
    * @protected
    */
-  protected validateParameters(parameters?: any): { address: string } {
+  protected validateParameters(parameters?: any): { address: Address } {
     if (!isAddress(parameters.address)) {
       throw new Error('Invalid Ethereum address passed!')
     }

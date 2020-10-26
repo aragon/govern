@@ -1,12 +1,13 @@
-import QueueAction from '../internal/actions/QueueAction'
+import { OptimisticQueue } from '../internal/clients/graphql/fragments/optimisticQueue'
+import QueueAction  from '../internal/actions/QueueAction'
 
 /**
- * TODO: Define return type in promise
+ * Returns the OptimisticQueue object by the given ID.
  *
  * @param {string} id
  *
- * @returns {Promise<any>}
+ * @returns {Promise<OptimisticQueue>}
  */
-export default function queue(id: string): Promise<any> {
+export default function queue(id: string): Promise<OptimisticQueue> {
   return new QueueAction({ id: id }).execute()
 }

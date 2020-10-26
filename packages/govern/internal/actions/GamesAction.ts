@@ -1,12 +1,14 @@
 import { DocumentNode } from 'graphql'
+import { OptimisticGame } from '../clients/graphql/fragments/optimisticGame'
+import { Address } from 'govern-server/src/core/types'
+import { isAddress } from '@ethersproject/address'
 import AbstractAction from './lib/AbstractAction'
 import games from '../clients/graphql/queries/games'
-import { isAddress } from '@ethersproject/address'
 
 /**
  * @class GamesAction
  */
-export default class GamesAction extends AbstractAction {
+export default class GamesAction extends AbstractAction<OptimisticGame[]> {
   /**
    * Contains the GraphQL query of the current action
    *
@@ -22,7 +24,7 @@ export default class GamesAction extends AbstractAction {
    *
    * @constructor
    */
-  constructor(parameters: { address: string }) {
+  constructor(parameters: { address: Address }) {
     super(parameters)
   }
 
@@ -35,7 +37,7 @@ export default class GamesAction extends AbstractAction {
    *
    * @protected
    */
-  protected validateParameters(parameters?: any): { address: string } {
+  protected validateParameters(parameters?: any): { address: Address } {
     if (!isAddress(parameters.address)) {
       throw new Error('Invalid Ethereum address passed!')
     }

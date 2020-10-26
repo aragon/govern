@@ -1,20 +1,20 @@
-import DAOAction from '../../internal/actions/DAOAction'
+import DaoAction from '../../internal/actions/DAOAction'
 import dao from '../../public/dao'
 
 // Mocks
-jest.mock('../../internal/actions/DAOAction')
+jest.mock('../../internal/actions/DaoAction')
 jest.mock('graphql-tag')
 
 /**
  * dao test
  */
 describe('dao Test', () => {
-  const daoActionMock = DAOAction as jest.MockedClass<typeof DAOAction>
+  const daoActionMock = DaoAction as jest.MockedClass<typeof DaoAction>
 
   it('calls dao and executes as expected', async () => {
     await dao('0x00')
 
-    expect(DAOAction).toHaveBeenNthCalledWith(1, { address: '0x00' })
+    expect(DaoAction).toHaveBeenNthCalledWith(1, { address: '0x00' })
 
     expect(daoActionMock.mock.instances[0].execute).toHaveBeenCalledTimes(1)
   })

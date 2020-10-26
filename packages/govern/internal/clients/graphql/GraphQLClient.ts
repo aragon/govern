@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-unfetch'
-import { Client } from '@urql/core'
+import { Client, OperationResult } from '@urql/core'
 import { DocumentNode } from 'graphql'
 import ClientInterface from '../lib/ClientInterface'
 
@@ -54,7 +54,7 @@ export default class GraphQLClient implements ClientInterface {
    *
    * @public
    */
-  public async request(query: DocumentNode, args: any = {}): Promise<any> {
+  public async request(query: DocumentNode, args: any = {}): Promise<OperationResult> {
     const result = await this.client.query(query, args).toPromise()
 
     if (result.error) { // TODO: Use errors from core
@@ -97,7 +97,7 @@ export default class GraphQLClient implements ClientInterface {
    *
    * @private
    */
-  private mapError(error: any): string {
+  private mapError(error: Error): string {
     return `${error.name}: ${error.message}\n\n`
   }
 }

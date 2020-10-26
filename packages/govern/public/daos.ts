@@ -1,10 +1,11 @@
-import DAOSAction from '../internal/actions/DAOSAction'
+import { Daos } from '../internal/clients/graphql/queries/daos'
+import DaosAction  from '../internal/actions/DAOSAction'
 
 /**
- * TODO: Define return type in promise
+ * Returns all known Dao objects
  *
- * @returns {Promise<any>}
+ * @returns {Promise<Daos>}
  */
-export default function daos(): Promise<any> {
-  return new DAOSAction().execute()
+export default function daos(): Promise<Daos> {
+  return new DaosAction().execute()
 }

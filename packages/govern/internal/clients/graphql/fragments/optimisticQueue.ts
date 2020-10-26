@@ -1,11 +1,40 @@
 import { DocumentNode } from 'graphql'
 import gql from 'graphql-tag'
 import optimisticGame from './optimisticGame'
-import collateral from './collateral'
-import item from './item'
-import challenge from './challenge'
-import execution from './execution'
-import role from './role'
+import collateral, { Collateral } from './collateral'
+import item, { Item } from './item'
+import challenge, { Challenge } from './challenge'
+import execution, { Execution } from './execution'
+import role, { Role } from './role'
+import { Address } from '../../lib/types/Address'
+
+export interface Veto {
+  id: string
+  item: Item
+  reason: string
+  submitter: Address
+  collateral: Collateral
+  createdAt: string
+}
+
+export interface OptimisticQueue {
+  id: string
+  address: Address
+  config: {
+    id: string
+    executionDelay: string
+    scheduleDeposit: Collateral
+    challengeDeposit: Collateral
+    vetoDeposit: Collateral
+    resolver: Address
+    rules: string
+  }
+  queue: Item[]
+  executions: Execution[]
+  challenges: Challenge[]
+  vetos: Veto[]
+  roles: Role[]
+}
 
 const optimisticQueue: DocumentNode = gql`
     fragment OptimisticQueue_optimisticQueue on OptimisticQueue {

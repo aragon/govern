@@ -1,12 +1,14 @@
-import DAOAction from '../internal/actions/DAOAction'
+import { Address } from 'govern-server/src/core/types'
+import { Dao } from '../internal/clients/graphql/queries/dao'
+import DaoAction  from '../internal/actions/DAOAction'
 
 /**
- * TODO: Define return type in promise
+ * Returns a Dao object by the given name.
  *
- * @param {string} address
+ * @param {Address} address
  *
- * @returns {Promise<any>}
+ * @returns {Promise<Dao>}
  */
-export default function dao(address: string): Promise<any> {
-  return new DAOAction({ address: address }).execute()
+export default function dao(address: Address): Promise<Dao> {
+  return new DaoAction({ address: address }).execute()
 }
