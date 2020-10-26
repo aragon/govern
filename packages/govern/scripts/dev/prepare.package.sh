@@ -5,7 +5,7 @@
 # --------------------------------------------------------------------
 
 # Creates temporary package folder
-rm -rf ./package
+rm -r ./package
 mkdir package
 
 # Copy internal files to package
@@ -30,12 +30,13 @@ cd ./package
 yarn build:prod
 
 # Remove not required files
-rm -rf ./tsconfig.prod.json
+rm ./*.ts
+rm -r ./internal/*
+rm ./tsconfig.prod.json
 
 # Move `dist` files to root folder and delete the `dist` folder
 mv ./dist/package/* ./
 
-rm -rf ./dist
-
+rm -r ./dist
 
 echo -e "\033[0;32mPackage successfully prepared!\033[0m"

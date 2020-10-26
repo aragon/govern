@@ -9,6 +9,9 @@
     },
     "types": [
       "jest"
+    ],
+    "lib": [
+      "dom"
     ]
   },
   "include": [
