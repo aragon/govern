@@ -36,11 +36,11 @@
     "typescript": "^4.0.3"
   },
   "scripts": {
-    "build": "npm run compile && npx buidler typechain",
+    "build": "yarn compile && buidler typechain",
     "compile": "buidler compile --force",
     "clean": "rm -rf artifacts",
-    "test": "buidler test",
-    "coverage": "SOLIDITY_COVERAGE=true buidler coverage --network coverage",
+    "test": "yarn build && buidler test",
+    "coverage": "yarn build && SOLIDITY_COVERAGE=true buidler coverage --network coverage",
     "abi:extract": "buidler-extract --output abi/ --keys abi",
     "prepublishOnly": "yarn test && yarn compile && yarn abi:extract -- --no-compile"
   },
