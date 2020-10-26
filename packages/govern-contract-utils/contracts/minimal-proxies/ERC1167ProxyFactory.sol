@@ -17,6 +17,12 @@ library ERC1167ProxyFactory {
         require(cloneAddr != address(0), "proxy-factory: bad create");
     }
 
+    function clone(address _implementation, bytes memory _initData) internal returns (address cloneAddr) {
+        cloneAddr = clone(_implementation);
+        (bool ok, ) = cloneAddr.call(_initData);
+        require(ok, "proxy-factory: bad init");
+    }
+
     function clone2(address _implementation, bytes32 _salt) internal returns (address cloneAddr) {
         bytes memory code = generateCode(_implementation);
         
@@ -25,6 +31,12 @@ library ERC1167ProxyFactory {
         }
         
         require(cloneAddr != address(0), "proxy-factory: bad create2");
+    }
+
+    function clone2(address _implementation, bytes32 _salt, bytes memory _initData) internal returns (address cloneAddr) {
+        cloneAddr = clone2(_implementation, _salt);
+        (bool ok, ) = cloneAddr.call(_initData);
+        require(ok, "proxy-factory: bad init");
     }
 
     function generateCode(address _implementation) internal pure returns (bytes memory code) {

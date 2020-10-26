@@ -44,10 +44,10 @@ contract ACL is Initializable {
     }
     
     constructor(address _initialRoot) public {
-        initialize(_initialRoot);
+        _initializeACL(_initialRoot);
     }
 
-    function initialize(address _initialRoot) virtual public onlyInit("acl") {
+    function _initializeACL(address _initialRoot) internal onlyInit("acl") {
         _grant(ROOT_ROLE, _initialRoot);
     }
 
