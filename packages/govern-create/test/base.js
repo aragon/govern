@@ -41,7 +41,7 @@ describe('Govern Base Factory', function () {
     console.log('gas used:', gasUsed.toNumber())
   }
 
-  const GAS_TARGET = !process.env.SOLIDITY_COVERAGE ? 4e6 : 20e6
+  const GAS_TARGET = !process.env.SOLIDITY_COVERAGE ? 5e6 : 20e6
   it(`deploys DAO under ${GAS_TARGET} gas`, async () => {
     await deployDAO(false, GAS_TARGET)
   })
