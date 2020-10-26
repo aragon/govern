@@ -5,6 +5,7 @@
     "sourceRoot": "./",
     "outDir": "./dist",
     "baseUrl": "./",
+    "inlineSources": true,
     "paths": {
       "internal": ["./internal/"]
     },
