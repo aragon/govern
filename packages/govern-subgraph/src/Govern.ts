@@ -87,7 +87,7 @@ function loadOrCreateExecution(event: ExecutedEvent): ExecutionEntity {
   if (execution === null) {
     execution = new ExecutionEntity(executionId)
     execution.queue = event.params.actor.toHexString()
-    execution.payload = executionId
+    execution.container = event.params.memo.toHexString()
     execution.createdAt = event.block.timestamp
   }
   return execution!

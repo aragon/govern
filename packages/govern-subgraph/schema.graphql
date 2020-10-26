@@ -24,7 +24,7 @@ type Govern @entity {
 type Execution @entity {
   id: ID!
   queue: GovernQueue!
-  payload: Payload!
+  container: Container!
   results: [Bytes!]
   createdAt: BigInt!
 }
@@ -32,7 +32,7 @@ type Execution @entity {
 type GovernQueue @entity {
   id: ID!
   address: Bytes!
-  config: Config
+  configs: [Config!]
   games: [OptimisticGame!] @derivedFrom(field: "queue")
   scheduled: [Schedule!]
   challenged: [Challenge!]
@@ -54,19 +54,21 @@ type Config @entity {
 
 type Collateral @entity {
   id: ID!
-  token: ERC20!
+  token: Bytes!
   amount: BigInt!
 }
 
-type ERC20 @entity {
-  id: ID!
-  address: Bytes!
-}
-
-type Payload @entity {
+type Container @entity {
   id: ID!
   queue: GovernQueue!
-  status: Status!
+  state: ContainerState!
+  config: Config!
+  payload: ContainerPayload!
+}
+
+type ContainerPayload @entity {
+  id: ID!
+  container: Container! @derivedFrom(field: "payload")
   nonce: BigInt!
   executionTime: BigInt!
   submitter: Bytes!
@@ -78,7 +80,7 @@ type Payload @entity {
 
 type Action @entity {
   id: ID!
-  payload: Payload!
+  payload: ContainerPayload!
   to: Bytes!
   value: BigInt!
   data: Bytes!
@@ -86,14 +88,14 @@ type Action @entity {
 
 type Schedule @entity {
   id: ID!
-  payload: Payload!
+  container: Container!
   collateral: Collateral!
   createdAt: BigInt!
 }
 
 type Challenge @entity {
   id: ID!
-  payload: Payload!
+  container: Container!
   challenger: Bytes!
   arbitrator: Bytes!
   disputeId: BigInt!
@@ -114,7 +116,7 @@ type Evidence @entity {
 
 type Veto @entity {
   id: ID!
-  payload: Payload!
+  container: Container!
   reason: Bytes!
   submitter: Bytes!
   collateral: Collateral!
@@ -130,13 +132,12 @@ type Role @entity {
   frozen: Boolean!
 }
 
-enum Status {
+enum ContainerState {
   None
-  Approved
-  Cancelled
-  Challenged
-  Executed
-  Rejected
   Scheduled
-  Vetoed
+  Approved
+  Challenged
+  Rejected
+  Cancelled
+  Executed
 }
