@@ -4,7 +4,6 @@
     "strictPropertyInitialization": false,
     "sourceRoot": "./",
     "outDir": "./dist",
-    "allowJs": true,
     "baseUrl": "./",
     "paths": {
       "internal": ["./internal/"]
@@ -12,9 +11,6 @@
     "plugins": [
       { "transform": "typescript-transform-paths" },
       { "transform": "typescript-transform-paths", "afterDeclarations": true }
-    ],
-    "lib": [
-      "dom"
     ]
   },
   "include": [
