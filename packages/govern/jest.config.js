@@ -1,4 +1,5 @@
 module.exports = {
+  rootDir: './',
   preset: 'ts-jest',
   notifyMode: 'success-change',
   collectCoverage: true,
@@ -10,6 +11,9 @@ module.exports = {
       statements: 80
     }
   },
+  moduleNameMapper: {
+    '^internal/(.*)$': '<rootDir>/internal/$1'
+  },
   notify: true,
   clearMocks: true,
   resetMocks: true,
@@ -18,6 +22,6 @@ module.exports = {
   bail: true,
   coveragePathIgnorePatterns: [
     'node_modules',
-    'dist',
+    'dist'
   ]
-};
+}
