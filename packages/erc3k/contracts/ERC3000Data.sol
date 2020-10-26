@@ -5,7 +5,7 @@
 pragma solidity ^0.6.8;
 pragma experimental ABIEncoderV2;
 
-import "./IERC3000Executor.sol";
+import "./ERC3000Executor.sol";
 
 library ERC3000Data {
     // TODO: come up with a non-shitty name
@@ -18,7 +18,7 @@ library ERC3000Data {
         uint256 nonce;
         uint256 executionTime;
         address submitter;
-        IERC3000Executor executor;
+        ERC3000Executor executor;
         Action[] actions;
         bytes32 allowFailuresMap;
         bytes proof;
