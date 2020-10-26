@@ -5,6 +5,8 @@
 pragma solidity 0.6.8;
 pragma experimental ABIEncoderV2;
 
+import "../initializable/Initializable.sol";
+
 library ACLData {
     enum BulkOp { Grant, Revoke, Freeze }
 
@@ -15,7 +17,7 @@ library ACLData {
     }
 }
 
-contract ACL {
+contract ACL is Initializable {
     bytes4 public constant ROOT_ROLE =
         this.grant.selector
         ^ this.revoke.selector
@@ -42,6 +44,10 @@ contract ACL {
     }
     
     constructor(address _initialRoot) public {
+        initialize(_initialRoot);
+    }
+
+    function initialize(address _initialRoot) virtual public onlyInit("acl") {
         _grant(ROOT_ROLE, _initialRoot);
     }
 
