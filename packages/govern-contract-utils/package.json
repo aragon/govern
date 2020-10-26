@@ -22,6 +22,7 @@
     "ethers": "^5.0.0"
   },
   "scripts": {
+    "build": "yarn compile",
     "clean": "rm -rf artifacts",
     "compile": "npx buidler compile --force",
     "test": "npx buidler test",

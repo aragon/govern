@@ -28,13 +28,9 @@ templates:
         - ERC20
       abis:
         - name: GovernQueue
-<<<<<<< HEAD
           file: ../govern-core/artifacts/GovernQueue.json
-=======
-          file: ../govern-core/abi/GovernQueue.json
         - name: ERC20
-          file: ../govern-core/abi/ERC20.json
->>>>>>> master
+          file: ../govern-core/artifacts/ERC20.json
       eventHandlers:
         - event: Configured(indexed bytes32,indexed address,(uint256,(address,uint256),(address,uint256),(address,uint256),address,bytes))
           handler: handleConfigured
@@ -42,9 +38,9 @@ templates:
           handler: handleFrozen
         - event: Granted(indexed bytes4,indexed address,indexed address)
           handler: handleGranted
-        - event: Scheduled(indexed bytes32,(uint256,uint256,address,address,tuple[],bytes),(address,uint256))
+        - event: Scheduled(indexed bytes32,(uint256,uint256,address,address,(address,uint256,bytes)[],bytes32,bytes),(address,uint256))
           handler: handleScheduled
-        - event: Executed(indexed bytes32,indexed address,bytes[])
+        - event: Executed(indexed bytes32,indexed address)
           handler: handleExecuted
         - event: Challenged(indexed bytes32,indexed address,bytes,uint256,(address,uint256))
           handler: handleChallenged
@@ -54,15 +50,11 @@ templates:
           handler: handleResolved
         - event: Revoked(indexed bytes4,indexed address,indexed address)
           handler: handleRevoked
-      file: ./src/GovernQueue.ts
-<<<<<<< HEAD
-=======
         - event: EvidenceSubmitted(indexed address,indexed uint256,indexed address,bytes,bool)
           handler: handleEvidenceSubmitted
         - event: Ruled(indexed address,indexed uint256,uint256)
           handler: handleRuled
       file: ./src/GovernQueue.ts
->>>>>>> master
   - kind: ethereum/contract
     name: Govern
     network: {{network}}
@@ -78,9 +70,9 @@ templates:
         - Role
       abis:
         - name: Govern
-          file: ../govern-core/abi/Govern.json
+          file: ../govern-core/artifacts/Govern.json
       eventHandlers:
-        - event: Executed(indexed address,tuple[],bytes[])
+        - event: Executed(indexed address,(address,uint256,bytes)[],bytes32,bytes32,bytes[])
           handler: handleExecuted
         - event: Frozen(indexed bytes4,indexed address)
           handler: handleFrozen

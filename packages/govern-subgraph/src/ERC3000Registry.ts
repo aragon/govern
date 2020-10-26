@@ -5,7 +5,7 @@ import {
 } from '../generated/ERC3000Registry/ERC3000Registry'
 import {
   Govern as GovernTemplate,
-  GovernQueue as QueueTemplate
+  GovernQueue as GovernQueueTemplate
 } from '../generated/templates'
 import {
   ERC3000Registry as ERC3000RegistryEntity,
@@ -19,13 +19,13 @@ export function handleRegistered(event: RegisteredEvent): void {
   const game = new OptimisticGameEntity(event.params.name)
 
   game.name = event.params.name
-  game.executor = event.params.executor.toHexString()
+  game.executor = event.params.dao.toHexString()
   game.queue = event.params.queue.toHexString()
 
   // add game to the registry
-  const currentEntries = registry.games
-  currentEntries.push(game.id)
-  registry.games = currentEntries
+  const currentGames = registry.games
+  currentGames.push(game.id)
+  registry.games = currentGames
 
   registry.count += 1
 
@@ -33,12 +33,12 @@ export function handleRegistered(event: RegisteredEvent): void {
   registry.save()
 
   // Create datasource templates
-  GovernTemplate.create(event.params.executor)
-  QueueTemplate.create(event.params.queue)
+  GovernTemplate.create(event.params.dao)
+  GovernQueueTemplate.create(event.params.queue)
 }
 
 export function handleSetMetadata(event: SetMetadataEvent): void {
-  const govern = loadOrCreateGovern(event.params.executor)
+  const govern = loadOrCreateGovern(event.params.dao)
   govern.metadata = event.params.metadata
 
   govern.save()

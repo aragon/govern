@@ -2,9 +2,11 @@
   "name": "govern-server",
   "version": "0.0.0",
   "license": "GPL-3.0",
-  "main": "src/index.ts",
   "scripts": {
-    "start": "node --loader ts-node/esm.mjs  src/index.ts"
+    "dev": "ts-node-dev src/index.ts",
+    "start": "yarn start:containers && node --loader ts-node/esm.mjs  src/index.ts",
+    "start:containers": "HOST_UID=$(id -u) HOST_GID=$(id -g) docker-compose up -d",
+    "stop:containers": "HOST_UID=$(id -u) HOST_GID=$(id -g) docker-compose down"
   },
   "dependencies": {
     "@urql/core": "^1.13.1",
@@ -17,7 +19,8 @@
     "ts-node": "^9.0.0"
   },
   "devDependencies": {
-    "typescript": "^3.8.3",
-    "@types/express": "^4.17.8"
+    "@types/express": "^4.17.8",
+    "ts-node-dev": "^1.0.0",
+    "typescript": "^3.8.3"
   }
 }
