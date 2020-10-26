@@ -1,3 +1,4 @@
+import * as env from './config.json'
 import {
   Address,
   DaoData,
@@ -25,19 +26,6 @@ export type ConnectorTheGraphConfig = {
   verbose?: boolean
 }
 
-function getSubgraphUrl(network: Network): string | null {
-  if (network.chainId === 1) {
-    return null
-  }
-  if (network.chainId === 4) {
-    return 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby'
-  }
-  if (network.chainId === 100) {
-    return null
-  }
-  return null
-}
-
 class GovernCore {
   #gql: GraphqlClient
   readonly config: ConnectorTheGraphConfig
@@ -47,18 +35,31 @@ class GovernCore {
     this.config = config
     this.network = toNetwork(config.network)
 
-    const orgSubgraphUrl = config.subgraphUrl || getSubgraphUrl(this.network)
+    const subgraphUrl = config.subgraphUrl || this.getSubgraphUrl(this.network)
 
-    if (!orgSubgraphUrl) {
+    if (!subgraphUrl) {
       throw new ErrorInvalidNetwork(
         `The chainId ${this.network.chainId} is not supported ` +
           `by the TheGraph connector.`
       )
     }
 
-    this.#gql = new GraphqlClient(orgSubgraphUrl, {
+    this.#gql = new GraphqlClient(subgraphUrl, {
       verbose: config.verbose,
     })
+  }
+
+  private getSubgraphUrl(network: Network): string | null {
+    if (network.chainId === 1) {
+      return null
+    }
+    if (network.chainId === 4) {
+      return `https://api.thegraph.com/subgraphs/name/${env.subgraphAccount}/${env.rinkebySubgraphName}`
+    }
+    if (network.chainId === 100) {
+      return null
+    }
+    return null
   }
 
   private async fetchResult<R>(

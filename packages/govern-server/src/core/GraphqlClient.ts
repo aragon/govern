@@ -8,7 +8,7 @@ type GraphqlClientOptions = {
   verbose?: boolean
 }
 
-export default class GraphqlClient {
+class GraphqlClient {
   #client: Client
   #verbose: boolean
 
@@ -52,3 +52,5 @@ export default class GraphqlClient {
     return `${result.error.name}: ${result.error.message}\n\n`
   }
 }
+
+export default GraphqlClient
