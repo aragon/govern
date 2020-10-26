@@ -42,7 +42,6 @@ describe('Govern Queue', function () {
     const ERC165_INTERFACE_ID = '0x01ffc9a7'
     const ERC3000_INTERFACE_ID = '0x6d74ef88'
 
-    // TODO: Fix types @gabi
 
     it('supports ERC-165', async () => {
       expect(await gq.supportsInterface(ERC165_INTERFACE_ID)).to.equal(true)
