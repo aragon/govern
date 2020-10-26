@@ -1,7 +1,7 @@
 import { DocumentNode } from 'graphql'
 import { OptimisticGame } from '../clients/graphql/fragments/optimisticGame'
-import { Address } from 'govern-server/src/core/types'
 import { isAddress } from '@ethersproject/address'
+import { Address } from '../clients/lib/types/Address'
 import AbstractAction from './lib/AbstractAction'
 import games from '../clients/graphql/queries/games'
 

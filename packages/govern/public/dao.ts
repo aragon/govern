@@ -1,4 +1,4 @@
-import { Address } from 'govern-server/src/core/types'
+import { Address } from '../internal/clients/lib/types/Address'
 import { Dao } from '../internal/clients/graphql/queries/dao'
 import DaoAction  from '../internal/actions/DAOAction'
 
