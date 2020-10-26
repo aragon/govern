@@ -35,7 +35,7 @@ rm -r ./internal/*
 rm ./tsconfig.prod.json
 
 # Move `dist` files to root folder and delete the `dist` folder
-mv ./dist/package/* ./
+mv ./dist/* ./
 
 rm -r ./dist
 

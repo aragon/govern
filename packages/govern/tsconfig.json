@@ -5,8 +5,12 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "paths": {
-      "internal": ["internal/"]
+      "internal": ["./internal/"]
     },
+    "plugins": [
+      { "transform": "typescript-transform-paths" },
+      { "transform": "typescript-transform-paths", "afterDeclarations": true }
+    ],
     "types": [
       "jest"
     ],
