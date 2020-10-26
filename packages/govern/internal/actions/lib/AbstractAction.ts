@@ -8,7 +8,7 @@ export default abstract class AbstractAction<T> {
   /**
    * Contains the GraphQL query of the current action
    *
-   * @var {string} gqlQuery
+   * @var {DocumentNode} gqlQuery
    *
    * @protected
    */

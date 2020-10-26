@@ -11,14 +11,14 @@ export default class DaoAction extends AbstractAction<Dao> {
   /**
    * Contains the GraphQL query of the current action
    *
-   * @var {string} gqlQuery
+   * @var {DocumentNode} gqlQuery
    *
    * @protected
    */
   protected gqlQuery: DocumentNode = dao
 
   /**
-   * @param {Object} parameters
+   * @param {{address: Address}} parameters
    *
    * @constructor
    */
@@ -29,13 +29,13 @@ export default class DaoAction extends AbstractAction<Dao> {
   /**
    * Validates the given parameters
    *
-   * @param {Object} parameters
+   * @param {{address: Address}} parameters
    *
    * @method validateParameters
    *
    * @protected
    */
-  protected validateParameters(parameters?: any): { address: Address } {
+  protected validateParameters(parameters: {address: Address}): { address: Address } {
     if (!isAddress(parameters.address)) {
       throw new Error('Invalid Ethereum address passed!')
     }

@@ -9,7 +9,7 @@ export default class DaosAction extends AbstractAction<Daos> {
   /**
    * Contains the GraphQL query of the current action
    *
-   * @var {string} gqlQuery
+   * @var {DocumentNode} gqlQuery
    *
    * @protected
    */

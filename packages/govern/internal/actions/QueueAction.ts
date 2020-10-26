@@ -10,7 +10,7 @@ export default class QueueAction extends AbstractAction<OptimisticQueue> {
   /**
    * Contains the GraphQL query of the current action
    *
-   * @var {string} gqlQuery
+   * @var {DocumentNode} gqlQuery
    *
    * @protected
    */
