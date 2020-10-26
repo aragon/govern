@@ -1,5 +1,5 @@
-import { OptimisticQueue } from '../internal/clients/graphql/fragments/optimisticQueue'
-import QueueAction  from '../internal/actions/QueueAction'
+import { OptimisticQueue } from 'internal/clients/graphql/fragments/optimisticQueue'
+import QueueAction  from 'internal/actions/QueueAction'
 
 /**
  * Returns the OptimisticQueue object by the given ID.

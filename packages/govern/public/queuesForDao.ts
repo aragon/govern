@@ -1,6 +1,6 @@
-import { OptimisticQueue } from '../internal/clients/graphql/fragments/optimisticQueue'
-import { Address } from '../internal/clients/lib/types/Address'
-import QueuesForDaoAction  from '../internal/actions/QueuesForDaoAction'
+import { OptimisticQueue } from 'internal/clients/graphql/fragments/optimisticQueue'
+import { Address } from 'internal/clients/lib/types/Address'
+import QueuesForDaoAction  from 'internal/actions/QueuesForDaoAction'
 
 /**
  * Returns all queues of a Dao.
