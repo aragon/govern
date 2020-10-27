@@ -1,7 +1,8 @@
 usePlugin('solidity-coverage')
 usePlugin('@nomiclabs/buidler-ethers')
 usePlugin('@nomiclabs/buidler-etherscan')
-usePlugin('@nomiclabs/buidler-waffle')
+// usePlugin('@nomiclabs/buidler-waffle')
+usePlugin('@nomiclabs/buidler-truffle5')
 
 require('dotenv').config({ path: '../../.env' })
 
