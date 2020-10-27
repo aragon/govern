@@ -258,7 +258,6 @@ export function loadOrCreateQueue(entity: Address): GovernQueueEntity {
     queue.address = entity
     queue.config = ''
     queue.queued = []
-    queue.challenged = []
     queue.roles = []
   }
   return queue!

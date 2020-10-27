@@ -27,7 +27,6 @@ type GovernQueue @entity {
   config: Config!
   registryEntries: [RegistryEntry!]! @derivedFrom(field: "queue")
   queued: [Container!]!
-  challenged: [Challenge]!
   roles: [Role!]!
 }
 
