@@ -38,7 +38,6 @@ export default abstract class AbstractAction<T> {
    * @constructor
    */
   constructor(parameters?: any) {
-    console.log(this.gqlQuery);
     this.configuration = Configuration.get()
     this.parameters = this.validateParameters(parameters)
   }

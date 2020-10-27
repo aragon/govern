@@ -154,7 +154,7 @@ const query = await query(node, {...});
 
 ## Tree Shaking
 
-> To have the imports of Govern really tree shaken is it import to define explicit import paths e.g.:
+> To have the imports of Govern really tree shaken is it important to define explicit import paths e.g.:
 
 ```typescript 
 import { dao } from '@aragon/govern/dao'
