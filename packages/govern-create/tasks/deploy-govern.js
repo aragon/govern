@@ -15,7 +15,7 @@ const REGISTRY_EVENTS_ABI = [
 ]
 
 module.exports = async (
-  { factory: factoryAddr, useProxies, name },
+  { factory: factoryAddr, useProxies = true, name },
   { ethers }
 ) => {
   factoryAddr =
@@ -37,14 +37,14 @@ module.exports = async (
     )
   }
 
-  const registryInterface = new ethers.utils.Interface(REGISTRY_EVENTS_ABI)
+  let registryInterface = new ethers.utils.Interface(REGISTRY_EVENTS_ABI)
 
-  const GovernBaseFactory = await ethers.getContractAt(
+  const governBaseFactory = await ethers.getContractAt(
     'GovernBaseFactory',
     factoryAddr
   )
-  const tx = await GovernBaseFactory.newDummyGovern(name, {
-    gasLimit: 4000000,
+  const tx = await governBaseFactory.newDummyGovern(name, useProxies, {
+    gasLimit: useProxies ? 7e5 : 7e6,
   })
 
   const { events } = await tx.wait()

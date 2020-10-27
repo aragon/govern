@@ -37,7 +37,7 @@ module.exports = {
     version: '0.6.8',
     optimizer: {
       enabled: true,
-      runs: 2000, // TODO: target average DAO use
+      runs: 20000, // TODO: target average DAO use
     },
   },
   etherscan: {

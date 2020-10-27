@@ -9,9 +9,7 @@ import "@aragon/govern-contract-utils/contracts/erc165/ERC165.sol";
 import "./ERC3000.sol";
 import "./ERC3000Executor.sol";
 
-contract ERC3000Registry {
-    bytes4 internal constant ERC3000_INTERFACE_ID = 0x6d74ef88;
-
+contract ERC3000Registry is ERC3000Interface {
     mapping (string => bool) public nameUsed;
 
     event Registered(ERC3000Executor indexed dao, ERC3000 queue, address indexed registrant, string name);

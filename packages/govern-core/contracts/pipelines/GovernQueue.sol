@@ -66,6 +66,15 @@ contract GovernQueue is ERC3000, AdaptativeERC165, IArbitrable, ACL {
         public
         ACL(_aclRoot) // note that this contract directly derives from ACL (ACL is local to contract and not global to system in Govern)
     {
+        initialize(_aclRoot, _initialConfig);
+    }
+
+    function initialize(address _aclRoot, ERC3000Data.Config memory _initialConfig) public onlyInit("queue") {
+        // ACL might have been already initialized by the constructor
+        if (initBlocks["acl"] == 0) {
+            _initializeACL(_aclRoot);
+        }
+
         _setConfig(_initialConfig);
         _registerStandard(ARBITRABLE_INTERFACE_ID);
         _registerStandard(ERC3000_INTERFACE_ID);
