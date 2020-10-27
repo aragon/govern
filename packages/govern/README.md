@@ -150,3 +150,16 @@ const query = await query(node, {...});
 
 [Address]: https://github.com/aragon/govern/tree/master/packages/govern/internal/configuration/Configuration.ts#L4
 [ConfigurationObject]: https://github.com/aragon/govern/tree/master/packages/govern/internal/configuration/Configuration.ts#L4
+
+
+## Tree Shaking
+
+> To have the imports of Govern really tree shaken is it import to define explicit import paths e.g.:
+
+```typescript 
+import { dao } from '@aragon/govern/dao'
+
+// instead of
+
+import { dao } from '@aragon/govern'
+```
