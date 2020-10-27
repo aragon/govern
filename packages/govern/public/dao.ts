@@ -9,6 +9,6 @@ import DaoAction  from 'internal/actions/DAOAction'
  *
  * @returns {Promise<Dao>}
  */
-export default function dao(address: Address): Promise<Dao> {
+export function dao(address: Address): Promise<Dao> {
   return new DaoAction({ address: address }).execute()
 }

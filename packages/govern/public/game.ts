@@ -8,6 +8,6 @@ import GameAction from 'internal/actions/GameAction'
  *
  * @returns {Promise<OptimisticGame>}
  */
-export default function game(name: string): Promise<OptimisticGame> {
+export function game(name: string): Promise<OptimisticGame> {
   return new GameAction({ name: name }).execute()
 }

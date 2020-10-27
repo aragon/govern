@@ -1,5 +1,5 @@
 import QueuesForDaoAction from '../../internal/actions/QueuesForDaoAction'
-import queuesForDao from '../../public/queuesForDao'
+import { queuesForDao } from '../../public/queuesForDao'
 
 // Mocks
 jest.mock('../../internal/actions/QueuesForDaoAction')

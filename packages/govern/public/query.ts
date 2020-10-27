@@ -10,6 +10,6 @@ import Configuration from 'internal/configuration/Configuration'
  *
  * @returns Promise<OperationResult>
  */
-export async function query(query: DocumentNode, args: any = {}): Promise<OperationResult> {
+export function query(query: DocumentNode, args: any = {}): Promise<OperationResult> {
   return Configuration.get().client.request(query, args)
 }

@@ -1,6 +1,5 @@
 {
-  "name": "govern",
-  "namespace": "aragon",
+  "name": "@aragon/govern",
   "version": "1.0.0-alpha.0",
   "description": "Govern JS Client",
   "license": "GPL-3.0",
@@ -11,7 +10,8 @@
   "scripts": {
     "build": "ttsc -p ./tsconfig.json",
     "build:prod": "ttsc -p ./tsconfig.prod.json",
-    "publish:prepare": "./scripts/dev/prepare.package.sh",
+    "publish:prepare": "scripts/prepare.package.sh",
+    "publish": "scripts/publish.package.sh",
     "coverage": "ethereumjs-config-coverage",
     "coveralls": "ethereumjs-config-coveralls",
     "test": "jest"

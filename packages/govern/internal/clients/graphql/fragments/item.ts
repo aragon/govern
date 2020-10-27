@@ -24,7 +24,7 @@ const item: DocumentNode = gql`
       executionTime
       submitter
       actions {
-        ..Action_action
+        ...Action_action
       }
       proof
       collateral {

@@ -9,6 +9,6 @@ import QueuesForDaoAction  from 'internal/actions/QueuesForDaoAction'
  *
  * @returns {Promise<OptimisticQueue>}
  */
-export default function queuesForDao(address: Address): Promise<OptimisticQueue[]> {
+export function queuesForDao(address: Address): Promise<OptimisticQueue[]> {
   return new QueuesForDaoAction({ address: address }).execute()
 }

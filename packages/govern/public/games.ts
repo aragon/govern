@@ -9,6 +9,6 @@ import GamesAction from 'internal/actions/GamesAction'
  *
  * @returns {Promise<OptimisticGame[]>}
  */
-export default function games(address: Address): Promise<OptimisticGame[]> {
+export function games(address: Address): Promise<OptimisticGame[]> {
   return new GamesAction({ address: address }).execute()
 }

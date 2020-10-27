@@ -9,6 +9,6 @@ export {ConfigurationObject} from 'internal/configuration/Configuration';
  *
  * @returns {void}
  */
-export default function configure(config: ConfigurationObject): void {
+export function configure(config: ConfigurationObject): void {
   Configuration.set(config);
 }

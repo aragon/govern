@@ -1,5 +1,5 @@
 import QueueAction from '../../internal/actions/QueueAction'
-import queue from '../../public/queue'
+import { queue } from '../../public/queue'
 
 // Mocks
 jest.mock('../../internal/actions/QueueAction')

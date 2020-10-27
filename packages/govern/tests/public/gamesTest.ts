@@ -1,5 +1,5 @@
 import GamesAction from '../../internal/actions/GamesAction'
-import games from '../../public/games'
+import { games } from '../../public/games'
 
 // Mocks
 jest.mock('../../internal/actions/GamesAction')

@@ -8,6 +8,6 @@ import QueueAction  from 'internal/actions/QueueAction'
  *
  * @returns {Promise<OptimisticQueue>}
  */
-export default function queue(id: string): Promise<OptimisticQueue> {
+export function queue(id: string): Promise<OptimisticQueue> {
   return new QueueAction({ id: id }).execute()
 }

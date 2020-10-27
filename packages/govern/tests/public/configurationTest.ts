@@ -1,6 +1,6 @@
 import Configuration from '../../internal/configuration/Configuration'
 import GraphQLClient from '../../internal/clients/graphql/GraphQLClient'
-import configure, { ConfigurationObject } from '../../public/configure'
+import { ConfigurationObject, configure } from '../../public/configure'
 
 // Mocks
 jest.mock('../../internal/clients/graphql/GraphQLClient')

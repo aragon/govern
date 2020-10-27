@@ -6,6 +6,6 @@ import DaosAction  from 'internal/actions/DAOSAction'
  *
  * @returns {Promise<Daos>}
  */
-export default function daos(): Promise<Daos> {
+export function daos(): Promise<Daos> {
   return new DaosAction().execute()
 }
