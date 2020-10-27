@@ -11,7 +11,7 @@ import {
   Vetoed as VetoedEvent,
   Ruled as RuledEvent,
   EvidenceSubmitted as EvidenceSubmittedEvent,
-  GovernQueue as GovernQueueContract
+  GovernQueue as GovernQueueContract,
 } from '../generated/templates/GovernQueue/GovernQueue'
 import {
   Action as ActionEntity,
@@ -19,13 +19,13 @@ import {
   Collateral as CollateralEntity,
   Config as ConfigEntity,
   Container as ContainerEntity,
+  ContainerEvent as ContainerEventEntity,
   ContainerPayload as PayloadEntity,
   Evidence as EvidenceEntity,
   GovernQueue as GovernQueueEntity,
-  Schedule as ScheduleEntity,
-  Veto as VetoEntity
 } from '../generated/schema'
 import { frozenRoles, roleGranted, roleRevoked } from './lib/MiniACL'
+import { buildId, buildActionId } from './mapping-utils'
 
 const NONE_STATUS = 'None'
 const SCHEDULED_STATUS = 'Scheduled'
@@ -35,12 +35,24 @@ const REJECTED_STATUS = 'Rejected'
 const CANCELLED_STATUS = 'Cancelled'
 const EXECUTED_STATUS = 'Executed'
 
+const SCHEDULE_CONTAINER_EVENT = 'Schedule'
+const CHALLENGE_CONTAINER_EVENT = 'Challenge'
+const APPROVE_CONTAINER_EVENT = 'Approve'
+const REJECT_CONTAINER_EVENT = 'Reject'
+const CANCEL_CONTAINER_EVENT = 'Cancel'
+const EXECUTE_CONTAINER_EVENT = 'Execute'
+const VETO_CONTAINER_EVENT = 'Veto'
+const RULE_CONTAINER_EVENT = 'Rule'
+const EVIDENCE_SUBMISSION_CONTAINER_EVENT = 'EvidenceSubmission'
+
 const ALLOW_RULING = BigInt.fromI32(4)
 
 export function handleScheduled(event: ScheduledEvent): void {
   const queue = loadOrCreateQueue(event.address)
-
   const payload = loadOrCreatePayload(event.params.containerHash)
+  const container = loadOrCreateContainer(event.params.containerHash, event)
+  // Builds each of the actions bundled in the payload,
+  // and saves them to the DB.
   buildActions(event)
   payload.nonce = event.params.payload.nonce
   payload.executionTime = event.params.payload.executionTime
@@ -48,29 +60,36 @@ export function handleScheduled(event: ScheduledEvent): void {
   payload.executor = event.params.payload.executor.toHexString()
   payload.allowFailuresMap = event.params.payload.allowFailuresMap
   payload.proof = event.params.payload.proof
-
-  const container = loadOrCreateContainer(event.params.containerHash, event)
-  container.state = SCHEDULED_STATUS
   container.payload = payload.id
 
-  const schedule = new ScheduleEntity(event.params.containerHash.toHexString())
+  const amountOfEvents = container.history.length
+  const containerEvent = loadOrCreateContainerEvent(
+    event.params.containerHash,
+    amountOfEvents
+  )
+  const containerEventId = buildActionId(
+    event.params.containerHash,
+    amountOfEvents
+  )
+  containerEvent.createdAt = event.block.timestamp
+  containerEvent.type = SCHEDULE_CONTAINER_EVENT
+  containerEvent.data = []
+  container.history = [containerEventId]
 
-  const scheduleDeposit = loadOrCreateCollateral(event, '1')
-  scheduleDeposit.token = event.params.collateral.token
-  scheduleDeposit.amount = event.params.collateral.amount
+  container.state = SCHEDULED_STATUS
+  // This should always be possible, as a queue without a config
+  // should be impossible to get at this stage
+  container.config = queue.config
+  container.queue = queue.id
 
-  schedule.container = container.id
-  schedule.collateral = scheduleDeposit.id
-  schedule.createdAt = event.block.timestamp
+  // add the container to the queue
+  const scheduled = queue.queued
+  scheduled.push(container.id)
+  queue.queued = scheduled
 
-  // add the payload
-  const scheduled = queue.scheduled
-  scheduled.push(schedule.id)
-  queue.scheduled = scheduled
-
+  containerEvent.save()
   payload.save()
   container.save()
-  schedule.save()
   queue.save()
 }
 
@@ -97,10 +116,7 @@ export function handleChallenged(event: ChallengedEvent): void {
 
   challenge.container = container.id
   challenge.challenger = event.params.actor
-  challenge.arbitrator = loadOrCreateConfig(
-    event.address,
-    queue.configs.length
-  ).resolver
+  challenge.arbitrator = loadOrCreateConfig(event.address).resolver
   challenge.disputeId = event.params.resolverId
   challenge.collateral = challengeDeposit.id
   challenge.createdAt = event.block.timestamp
@@ -110,6 +126,25 @@ export function handleChallenged(event: ChallengedEvent): void {
   challenged.push(challenge.id)
   queue.challenged = challenged
 
+  // Record this event on the container
+  const amountOfEvents = container.history.length
+  const containerEvent = loadOrCreateContainerEvent(
+    event.params.containerHash,
+    amountOfEvents
+  )
+  const containerEventId = buildActionId(
+    event.params.containerHash,
+    amountOfEvents
+  )
+  containerEvent.type = CHALLENGE_CONTAINER_EVENT
+  containerEvent.createdAt = event.block.timestamp
+  containerEvent.data = [event.params.actor.toHexString()]
+  const containerEvents = container.history
+  containerEvents.push(containerEventId)
+  container.history = containerEvents
+
+  challengeDeposit.save()
+  containerEvent.save()
   container.save()
   challenge.save()
   queue.save()
@@ -133,32 +168,31 @@ export function handleVetoed(event: VetoedEvent): void {
 
   const container = loadOrCreateContainer(event.params.containerHash, event)
   container.state = CANCELLED_STATUS
+  const amountOfEvents = container.history.length
+  const containerEvent = loadOrCreateContainerEvent(
+    event.params.containerHash,
+    amountOfEvents
+  )
+  const containerEventId = buildActionId(
+    event.params.containerHash,
+    amountOfEvents
+  )
+  containerEvent.type = VETO_CONTAINER_EVENT
+  containerEvent.createdAt = event.block.timestamp
+  containerEvent.data = [event.params.reason.toHexString()]
 
-  const veto = new VetoEntity(event.params.containerHash.toHexString())
+  const containerEvents = container.history
+  containerEvents.push(containerEventId)
+  container.history = containerEvents
 
-  const vetoDeposit = loadOrCreateCollateral(event, '3')
-  vetoDeposit.token = event.params.collateral.token
-  vetoDeposit.amount = event.params.collateral.amount
-
-  veto.container = container.id
-  veto.reason = event.params.reason
-  veto.submitter = event.params.actor
-  veto.collateral = vetoDeposit.id
-  veto.createdAt = event.block.timestamp
-
-  // add the veto payload
-  const vetoed = queue.vetoed
-  vetoed.push(veto.id)
-  queue.vetoed = vetoed
-
+  containerEvent.save()
   container.save()
-  veto.save()
   queue.save()
 }
 
 export function handleConfigured(event: ConfiguredEvent): void {
   const queue = loadOrCreateQueue(event.address)
-  const config = loadOrCreateConfig(event.address, queue.configs.length)
+  const config = loadOrCreateConfig(event.address)
 
   const scheduleDeposit = loadOrCreateCollateral(event, '1')
   scheduleDeposit.token = event.params.config.scheduleDeposit.token
@@ -180,10 +214,7 @@ export function handleConfigured(event: ConfiguredEvent): void {
   config.resolver = event.params.config.resolver
   config.rules = event.params.config.rules
 
-  // add the config
-  const currentConfigs = queue.configs
-  currentConfigs.push(config.id)
-  queue.configs = currentConfigs
+  queue.config = event.address.toHexString()
 
   scheduleDeposit.save()
   challengeDeposit.save()
@@ -277,17 +308,16 @@ export function loadOrCreateQueue(entity: Address): GovernQueueEntity {
   if (queue === null) {
     queue = new GovernQueueEntity(queueId)
     queue.address = entity
-    queue.configs = []
-    queue.scheduled = []
+    queue.config = ''
+    queue.queued = []
     queue.challenged = []
-    queue.vetoed = []
     queue.roles = []
   }
   return queue!
 }
 
-function loadOrCreateConfig(queue: Address, index: number): ConfigEntity {
-  const configId = queue.toHexString() + '-config-' + index.toString()
+function loadOrCreateConfig(queue: Address): ConfigEntity {
+  const configId = queue.toHexString()
   // Create config
   let config = ConfigEntity.load(configId)
   if (config === null) {
@@ -308,6 +338,7 @@ function loadOrCreateContainer(
     container = new ContainerEntity(ContainerId)
     container.queue = event.address.toHexString()
     container.state = NONE_STATUS
+    container.history = []
   }
   return container!
 }
@@ -335,12 +366,17 @@ function loadOrCreateCollateral(
   return collateral!
 }
 
-function buildId(event: ethereum.Event): string {
-  return event.transaction.hash.toHexString() + event.logIndex.toString()
-}
+function loadOrCreateContainerEvent(
+  containerHash: Bytes,
+  amountOfEvents: number
+): ContainerEventEntity {
+  const eventId = buildActionId(containerHash, amountOfEvents)
+  let containerEvent = new ContainerEventEntity(eventId)
+  if (containerEvent === null) {
+    containerEvent = new ContainerEventEntity(eventId)
+  }
 
-function buildActionId(containerHash: Bytes, index: number): string {
-  return containerHash.toHexString() + index.toString()
+  return containerEvent!
 }
 
 function buildActions(event: ScheduledEvent): void {

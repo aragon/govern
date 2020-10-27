@@ -2,10 +2,10 @@ type ERC3000Registry @entity {
   id: ID!
   address: Bytes!
   count: Int!
-  games: [OptimisticGame!]
+  entries: [RegistryEntry!]
 }
 
-type OptimisticGame @entity {
+type RegistryEntry @entity {
   id: ID!
   name: String!
   queue: GovernQueue!
@@ -16,28 +16,18 @@ type Govern @entity {
   id: ID!
   address: Bytes!
   metadata: Bytes
-  games: [OptimisticGame!] @derivedFrom(field: "executor")
-  executions: [Execution!]
+  correspondingEntries: [RegistryEntry!] @derivedFrom(field: "executor")
+  containers: [Container]!
   roles: [Role!]
-}
-
-type Execution @entity {
-  id: ID!
-  queue: GovernQueue!
-  container: Container!
-  results: [Bytes!]
-  createdAt: BigInt!
 }
 
 type GovernQueue @entity {
   id: ID!
   address: Bytes!
-  configs: [Config!]
-  games: [OptimisticGame!] @derivedFrom(field: "queue")
-  scheduled: [Schedule!]
-  challenged: [Challenge!]
-  vetoed: [Veto!]
-  executed: [Execution!] @derivedFrom(field: "queue")
+  config: Config!
+  correspondingEntries: [RegistryEntry!] @derivedFrom(field: "queue")
+  queued: [Container!]
+  challenged: [Challenge]!
   roles: [Role!]
 }
 
@@ -52,18 +42,13 @@ type Config @entity {
   rules: Bytes!
 }
 
-type Collateral @entity {
-  id: ID!
-  token: Bytes!
-  amount: BigInt!
-}
-
 type Container @entity {
   id: ID!
   queue: GovernQueue!
   state: ContainerState!
   config: Config!
   payload: ContainerPayload!
+  history: [ContainerEvent]!
 }
 
 type ContainerPayload @entity {
@@ -78,6 +63,19 @@ type ContainerPayload @entity {
   proof: Bytes!
 }
 
+type ContainerEvent @entity {
+  id: ID!
+  type: ContainerEventType
+  createdAt: BigInt
+  data: [String]!
+}
+
+type Collateral @entity {
+  id: ID!
+  token: Bytes!
+  amount: BigInt!
+}
+
 type Action @entity {
   id: ID!
   payload: ContainerPayload!
@@ -86,13 +84,8 @@ type Action @entity {
   data: Bytes!
 }
 
-type Schedule @entity {
-  id: ID!
-  container: Container!
-  collateral: Collateral!
-  createdAt: BigInt!
-}
-
+# I honestly think this should not be here,
+# but we can handle this later.
 type Challenge @entity {
   id: ID!
   container: Container!
@@ -114,15 +107,6 @@ type Evidence @entity {
   createdAt: BigInt!
 }
 
-type Veto @entity {
-  id: ID!
-  container: Container!
-  reason: Bytes!
-  submitter: Bytes!
-  collateral: Collateral!
-  createdAt: BigInt!
-}
-
 type Role @entity {
   id: ID!
   entity: Bytes!
@@ -130,6 +114,19 @@ type Role @entity {
   who: Bytes!
   granted: Boolean!
   frozen: Boolean!
+}
+
+
+enum ContainerEventType {
+  Schedule,
+  Challenge,
+  Approve,
+  Reject,
+  Cancel,
+  Execute,
+  Veto,
+  Rule,
+  EvidenceSubmission
 }
 
 enum ContainerState {
@@ -141,3 +138,4 @@ enum ContainerState {
   Cancelled
   Executed
 }
+

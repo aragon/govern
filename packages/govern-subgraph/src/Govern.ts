@@ -7,23 +7,17 @@ import {
 } from '../generated/templates/Govern/Govern'
 import {
   Govern as GovernEntity,
-  Execution as ExecutionEntity
 } from '../generated/schema'
 import { frozenRoles, roleGranted, roleRevoked } from './lib/MiniACL'
 
 export function handleExecuted(event: ExecutedEvent): void {
   const govern = loadOrCreateGovern(event.address)
 
-  const execution = loadOrCreateExecution(event)
+  const currentContainers = govern.containers
 
-  execution.results = event.params.execResults
+  currentContainers.push(event.params.memo.toHexString())
+  govern.containers = currentContainers
 
-  // add the execution
-  const currentExecutions = govern.executions
-  currentExecutions.push(execution.id)
-  govern.executions = currentExecutions
-
-  execution.save()
   govern.save()
 }
 
@@ -74,21 +68,8 @@ export function loadOrCreateGovern(entity: Address): GovernEntity {
   if (govern === null) {
     govern = new GovernEntity(governId)
     govern.address = entity
-    govern.executions = []
     govern.roles = []
+    govern.containers = []
   }
   return govern!
-}
-
-function loadOrCreateExecution(event: ExecutedEvent): ExecutionEntity {
-  const executionId = event.params.memo.toHexString() // container hash
-  // Create execution
-  let execution = ExecutionEntity.load(executionId)
-  if (execution === null) {
-    execution = new ExecutionEntity(executionId)
-    execution.queue = event.params.actor.toHexString()
-    execution.container = event.params.memo.toHexString()
-    execution.createdAt = event.block.timestamp
-  }
-  return execution!
 }

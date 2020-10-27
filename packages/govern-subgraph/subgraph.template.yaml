@@ -22,11 +22,10 @@ templates:
         - Collateral
         - Config
         - Container
+        - ContainerEvent
         - Evidence
         - Payload
         - Role
-        - Schedule
-        - Veto
       abis:
         - name: GovernQueue
           file: ../govern-core/artifacts/GovernQueue.json
@@ -66,7 +65,8 @@ templates:
       apiVersion: 0.0.1
       language: wasm/assemblyscript
       entities:
-        - Execution
+        - Container
+        - ContainerEvent
         - Role
       abis:
         - name: Govern
