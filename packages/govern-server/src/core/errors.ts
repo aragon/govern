@@ -12,12 +12,12 @@ export class ErrorException extends Error {
 
     // We define these as non-enumarable to prevent them
     // from appearing with the error in the console.
-    this.defineNonEnumerable(this, 'name', name)
-    this.defineNonEnumerable(this, 'code', code)
+    this.defineNonEnumerable('name', name)
+    this.defineNonEnumerable('code', code)
   }
 
-  private defineNonEnumerable(instance: object, name: string, value: any) {
-    Object.defineProperty(instance, name, { value, enumerable: false })
+  private defineNonEnumerable(name: string, value: any) {
+    Object.defineProperty(this, name, { value, enumerable: false })
   }
 }
 

@@ -1,11 +1,12 @@
+import config from '../config'
 import { ErrorInvalidNetwork } from '../errors'
-import * as config from '../config.json'
 import { Address, Network as NetworkType, Networkish } from '../types'
 
 class Network {
   #chainId: number
   #ensAddress: Address
   #name: string
+  #subgraphId: string
 
   constructor({
     chainId,
@@ -25,7 +26,7 @@ class Network {
 
     // Handle the case of having a name but no chainId.
     if (name !== undefined && chainId === undefined) {
-      this.#chainId = this.networkFromName(name)?.chainId
+      this.#chainId = networkFromName(name)?.chainId
 
       if (chainId === undefined) {
         throw new ErrorInvalidNetwork(
@@ -41,7 +42,7 @@ class Network {
     // point we know that chainId cannot be undefined.
     this.#chainId = chainId as number
 
-    const chainIdNetwork = this.networkFromChainId(chainId)
+    const chainIdNetwork = networkFromChainId(chainId)
 
     if (!chainIdNetwork) {
       throw new ErrorInvalidNetwork(
@@ -54,6 +55,7 @@ class Network {
 
     this.#name = name ?? chainIdNetwork.name
     this.#ensAddress = ensAddress ?? chainIdNetwork.ensAddress
+    this.#subgraphId = chainIdNetwork.subgraphId
   }
 
   get chainId() {
@@ -68,22 +70,27 @@ class Network {
     return this.#name
   }
 
-  private networkFromChainId(chainId: number): NetworkType | null {
-    return (
-      config.networks.find((network: Network) => network.chainId === chainId) ||
-      null
-    )
-  }
-
-  private networkFromName(name: string): NetworkType | null {
-    return (
-      config.networks.find((network: NetworkType) => network.name === name) ||
-      null
-    )
+  get subgraphUrl() {
+    return `https://api.thegraph.com/subgraphs/name/${this.#subgraphId}`
   }
 }
 
-export function toNetwork(network: Networkish): NetworkType {
+function networkFromChainId(chainId: number): NetworkType | null {
+  return (
+    config.networks.find(
+      (network: NetworkType) => network.chainId === chainId
+    ) || null
+  )
+}
+
+function networkFromName(name: string): NetworkType | null {
+  return (
+    config.networks.find((network: NetworkType) => network.name === name) ||
+    null
+  )
+}
+
+export function toNetwork(network: Networkish): Network {
   if (!network) {
     throw new ErrorInvalidNetwork(`Network: incorrect value provided.`)
   }

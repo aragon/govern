@@ -1,14 +1,13 @@
-import * as env from './config.json'
 import {
   Address,
   DaoData,
-  Network,
   Networkish,
   OptimisticGameData,
   GovernQueueData,
 } from './types'
 import { ErrorInvalidNetwork, ErrorUnexpectedResult } from './errors'
 import { toNetwork } from './utils'
+import Network from './utils/network'
 import GraphqlClient from './GraphqlClient'
 import {
   QUERY_DAO,
@@ -35,7 +34,7 @@ class GovernCore {
     this.config = config
     this.network = toNetwork(config.network)
 
-    const subgraphUrl = config.subgraphUrl || this.getSubgraphUrl(this.network)
+    const subgraphUrl = config.subgraphUrl || this.network.subgraphUrl
 
     if (!subgraphUrl) {
       throw new ErrorInvalidNetwork(
@@ -47,19 +46,6 @@ class GovernCore {
     this.#gql = new GraphqlClient(subgraphUrl, {
       verbose: config.verbose,
     })
-  }
-
-  private getSubgraphUrl(network: Network): string | null {
-    if (network.chainId === 1) {
-      return null
-    }
-    if (network.chainId === 4) {
-      return `https://api.thegraph.com/subgraphs/name/${env.subgraphAccount}/${env.rinkebySubgraphName}`
-    }
-    if (network.chainId === 100) {
-      return null
-    }
-    return null
   }
 
   private async fetchResult<R>(
