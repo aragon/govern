@@ -27,13 +27,9 @@ const item: DocumentNode = gql`
         ...Action_action
       }
       proof
-      collateral {
-       ...Collateral_collateral
-      }
       createdAt
     }
     ${action}
-    ${collateral}
   `
 
 export default item

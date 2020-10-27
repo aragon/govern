@@ -1,6 +1,8 @@
 {
   "extends": "@ethereumjs/config-tsc",
   "compilerOptions": {
+    "module": "es6",
+    "target": "es2018",
     "strictPropertyInitialization": false,
     "outDir": "./dist",
     "baseUrl": "./",
@@ -16,7 +18,8 @@
       "jest"
     ],
     "lib": [
-      "dom"
+      "dom",
+      "es2018"
     ]
   },
   "include": [
