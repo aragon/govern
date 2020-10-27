@@ -11,7 +11,7 @@
     apiVersion: 0.0.1
     language: wasm/assemblyscript
     entities:
-      - OptimisticGame
+      - RegistryEntry
       - Govern
     abis:
       - name: ERC3000Registry

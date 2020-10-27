@@ -2,7 +2,7 @@ type ERC3000Registry @entity {
   id: ID!
   address: Bytes!
   count: Int!
-  entries: [RegistryEntry!]
+  entries: [RegistryEntry!]!
 }
 
 type RegistryEntry @entity {
@@ -16,19 +16,19 @@ type Govern @entity {
   id: ID!
   address: Bytes!
   metadata: Bytes
-  correspondingEntries: [RegistryEntry!] @derivedFrom(field: "executor")
+  registryEntries: [RegistryEntry!]! @derivedFrom(field: "executor")
   containers: [Container]!
-  roles: [Role!]
+  roles: [Role!]!
 }
 
 type GovernQueue @entity {
   id: ID!
   address: Bytes!
   config: Config!
-  correspondingEntries: [RegistryEntry!] @derivedFrom(field: "queue")
-  queued: [Container!]
+  registryEntries: [RegistryEntry!]! @derivedFrom(field: "queue")
+  queued: [Container!]!
   challenged: [Challenge]!
-  roles: [Role!]
+  roles: [Role!]!
 }
 
 type Config @entity {
@@ -44,7 +44,7 @@ type Config @entity {
 
 type Container @entity {
   id: ID!
-  queue: GovernQueue!
+  queue: GovernQueue! @derivedFrom(field: "queued")
   state: ContainerState!
   config: Config!
   payload: ContainerPayload!
@@ -58,7 +58,7 @@ type ContainerPayload @entity {
   executionTime: BigInt!
   submitter: Bytes!
   executor: Govern!
-  actions: [Action!] @derivedFrom(field: "payload")
+  actions: [Action!]! @derivedFrom(field: "payload")
   allowFailuresMap: Bytes!
   proof: Bytes!
 }
@@ -67,7 +67,7 @@ type ContainerEvent @entity {
   id: ID!
   type: ContainerEventType
   createdAt: BigInt
-  data: [String]!
+  data: [String!]!
 }
 
 type Collateral @entity {
@@ -84,29 +84,6 @@ type Action @entity {
   data: Bytes!
 }
 
-# I honestly think this should not be here,
-# but we can handle this later.
-type Challenge @entity {
-  id: ID!
-  container: Container!
-  challenger: Bytes!
-  arbitrator: Bytes!
-  disputeId: BigInt!
-  evidences: [Evidence!] @derivedFrom(field: "challenge")
-  collateral: Collateral!
-  ruling: BigInt
-  approved: Boolean
-  createdAt: BigInt!
-}
-
-type Evidence @entity {
-  id: ID!
-  challenge: Challenge!
-  data: Bytes!
-  submitter: Bytes!
-  createdAt: BigInt!
-}
-
 type Role @entity {
   id: ID!
   entity: Bytes!
@@ -116,17 +93,14 @@ type Role @entity {
   frozen: Boolean!
 }
 
-
 enum ContainerEventType {
-  Schedule,
-  Challenge,
-  Approve,
-  Reject,
-  Cancel,
-  Execute,
-  Veto,
-  Rule,
-  EvidenceSubmission
+  Challenge
+  Execute
+  Resolve
+  Rule
+  Schedule
+  SubmitEvidence
+  Veto
 }
 
 enum ContainerState {
@@ -138,4 +112,3 @@ enum ContainerState {
   Cancelled
   Executed
 }
-

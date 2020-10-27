@@ -5,17 +5,25 @@ import {
   Granted as GrantedEvent,
   Revoked as RevokedEvent
 } from '../generated/templates/Govern/Govern'
-import {
-  Govern as GovernEntity,
-} from '../generated/schema'
+import { Govern as GovernEntity } from '../generated/schema'
 import { frozenRoles, roleGranted, roleRevoked } from './lib/MiniACL'
+import { loadOrCreateContainer } from './GovernQueue'
+import { EXECUTE_CONTAINER_EVENT } from './utils/constants'
+import { handleContainerEvent } from './utils/events'
 
 export function handleExecuted(event: ExecutedEvent): void {
   const govern = loadOrCreateGovern(event.address)
+  const container = loadOrCreateContainer(event.params.memo)
+
+  handleContainerEvent(
+    container,
+    event.block.timestamp,
+    EXECUTE_CONTAINER_EVENT,
+    [event.params.execResults.toString()]
+  )
 
   const currentContainers = govern.containers
-
-  currentContainers.push(event.params.memo.toHexString())
+  currentContainers.push(container.id)
   govern.containers = currentContainers
 
   govern.save()

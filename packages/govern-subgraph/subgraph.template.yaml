@@ -18,12 +18,10 @@ templates:
       apiVersion: 0.0.1
       language: wasm/assemblyscript
       entities:
-        - Challenge
         - Collateral
         - Config
         - Container
         - ContainerEvent
-        - Evidence
         - Payload
         - Role
       abis:
