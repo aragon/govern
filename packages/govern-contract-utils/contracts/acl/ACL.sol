@@ -42,10 +42,16 @@ contract ACL is Initializable {
         );
         _;
     }
-    
-    constructor(address _initialRoot) public {
-        _initializeACL(_initialRoot);
+
+    modifier initACL(address _initialRoot) {
+        // ACL might have been already initialized by constructors
+        if (initBlocks["acl"] == 0) {
+            _initializeACL(address(this));
+        }
+        _;
     }
+
+    constructor(address _initialRoot) public initACL(_initialRoot) { }
 
     function _initializeACL(address _initialRoot) internal onlyInit("acl") {
         _grant(ROOT_ROLE, _initialRoot);
