@@ -1,3 +1,4 @@
+const { writeFileSync } = require('fs')
 const { print } = require('../lib/utils')
 
 const FACTORY_CACHE_NAME = 'govern-factory-rinkeby'
