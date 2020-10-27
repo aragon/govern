@@ -208,14 +208,13 @@ contract GovernQueue is ERC3000, AdaptativeERC165, IArbitrable, ACL {
         return (bytes32(0), new bytes[](0));
     }
 
-    function veto(bytes32 _payloadHash, ERC3000Data.Config memory _config, bytes memory _reason) auth(this.veto.selector) override public {
-        bytes32 containerHash = ERC3000Data.containerHash(_payloadHash, _config.hash());
-        queue[containerHash].checkAndSetState(
+    function veto(bytes32 _containerHash, bytes memory _reason) auth(this.veto.selector) override public {
+        queue[_containerHash].checkAndSetState(
             GovernQueueStateLib.State.Scheduled,
             GovernQueueStateLib.State.Cancelled
         );
 
-        emit Vetoed(containerHash, msg.sender, _reason, _config.vetoDeposit);
+        emit Vetoed(_containerHash, msg.sender, _reason);
     }
 
     /**
