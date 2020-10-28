@@ -93,11 +93,9 @@ export function handleChallenged(event: ChallengedEvent): void {
   container.state = CHALLENGED_STATUS
 
   let containerEvent = handleContainerEventChallenge(container, event)
+  containerEvent.resolver = ConfigEntity.load(queue.config).resolver
 
-  // TODO
-  // containerEvent.resolver = ConfigEntity.load(queue.config).resolver.toHex()
-  // containerEvent.save()
-
+  containerEvent.save()
   container.save()
   queue.save()
 }

@@ -106,9 +106,10 @@ type ContainerEventChallenge implements ContainerEvent @entity {
   id: ID!
   createdAt: BigInt!
   actor: Bytes!
-  reason: Bytes!
-  resolverId: BigInt!
   collateral: Collateral!
+  disputeId: BigInt!
+  reason: Bytes!
+  resolver: Bytes!
 }
 
 type ContainerEventExecute implements ContainerEvent @entity {

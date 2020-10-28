@@ -44,7 +44,7 @@ export function handleContainerEventChallenge(
 
   containerEvent.actor = ethereumEvent.params.actor
   containerEvent.reason = ethereumEvent.params.reason
-  containerEvent.resolverId = ethereumEvent.params.resolverId
+  containerEvent.disputeId = ethereumEvent.params.resolverId
 
   let collateral = new CollateralEntity(buildId(ethereumEvent))
   collateral.token = ethereumEvent.params.collateral.token
