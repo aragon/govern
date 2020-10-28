@@ -10,7 +10,7 @@ import "@aragon/govern-contract-utils/contracts/minimal-proxies/ERC1167ProxyFact
 
 contract GovernQueueFactory {
     using ERC1167ProxyFactory for address;
-    
+
     address public base;
 
     constructor() public {
@@ -29,7 +29,6 @@ contract GovernQueueFactory {
         ERC3000Data.Collateral memory noCollateral;
         ERC3000Data.Config memory config = ERC3000Data.Config(
             0,
-            noCollateral,
             noCollateral,
             noCollateral,
             address(0),
