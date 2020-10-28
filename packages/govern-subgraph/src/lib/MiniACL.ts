@@ -1,14 +1,14 @@
-import { Address, Bytes } from "@graphprotocol/graph-ts";
-import { Role as RoleEntity } from "../../generated/schema";
+import { Address, Bytes } from '@graphprotocol/graph-ts'
+import { Role as RoleEntity } from '../../generated/schema'
 
 export function frozenRoles(roles: string[], selector: Bytes): void {
   roles
-    .map<RoleEntity>((role) => RoleEntity.load(role)!)
-    .filter((role) => role.selector === selector)
-    .forEach((role) => {
-      role.frozen = true;
-      role.save();
-    });
+    .map<RoleEntity>(role => RoleEntity.load(role)!)
+    .filter(role => role.selector === selector)
+    .forEach(role => {
+      role.frozen = true
+      role.save()
+    })
 }
 
 export function roleGranted(
@@ -16,12 +16,12 @@ export function roleGranted(
   selector: Bytes,
   who: Address
 ): RoleEntity {
-  let role = loadOrCreateRole(entity, selector, who);
-  role.granted = true;
+  let role = loadOrCreateRole(entity, selector, who)
+  role.granted = true
 
-  role.save();
+  role.save()
 
-  return role;
+  return role
 }
 
 export function roleRevoked(
@@ -29,12 +29,12 @@ export function roleRevoked(
   selector: Bytes,
   who: Address
 ): RoleEntity {
-  let role = loadOrCreateRole(entity, selector, who);
-  role.granted = false;
+  let role = loadOrCreateRole(entity, selector, who)
+  role.granted = false
 
-  role.save();
+  role.save()
 
-  return role;
+  return role
 }
 
 function buildRoleId(entity: Address, selector: Bytes, who: Address): string {
@@ -43,12 +43,8 @@ function buildRoleId(entity: Address, selector: Bytes, who: Address): string {
   // This is equivalent to storing all roles in the contract, and looking up the corresponding
   // entry by mapping role => who
   return (
-    entity.toHexString() +
-    "-selector-" +
-    selector.toHexString() +
-    "-who-" +
-    who.toHexString()
-  );
+    entity.toHex() + '-selector-' + selector.toHex() + '-who-' + who.toHex()
+  )
 }
 
 function loadOrCreateRole(
@@ -56,16 +52,16 @@ function loadOrCreateRole(
   selector: Bytes,
   who: Address
 ): RoleEntity {
-  let roleId = buildRoleId(entity, selector, who);
+  let roleId = buildRoleId(entity, selector, who)
   // Create role
-  let role = RoleEntity.load(roleId);
+  let role = RoleEntity.load(roleId)
   if (role === null) {
-    role = new RoleEntity(roleId);
-    role.entity = entity;
-    role.selector = selector;
-    role.who = who;
-    role.granted = false;
-    role.frozen = false;
+    role = new RoleEntity(roleId)
+    role.entity = entity
+    role.selector = selector
+    role.who = who
+    role.granted = false
+    role.frozen = false
   }
-  return role!;
+  return role!
 }

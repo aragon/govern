@@ -9,7 +9,7 @@ import {
 } from '../generated/templates'
 import {
   ERC3000Registry as ERC3000RegistryEntity,
-  RegistryEntry as RegistryEntryEntity,
+  RegistryEntry as RegistryEntryEntity
 } from '../generated/schema'
 import { loadOrCreateGovern } from './Govern'
 
@@ -19,8 +19,8 @@ export function handleRegistered(event: RegisteredEvent): void {
   let registryEntry = new RegistryEntryEntity(event.params.name)
 
   registryEntry.name = event.params.name
-  registryEntry.executor = event.params.dao.toHexString()
-  registryEntry.queue = event.params.queue.toHexString()
+  registryEntry.executor = event.params.dao.toHex()
+  registryEntry.queue = event.params.queue.toHex()
 
   // add game to the registry
   let currentEntries = registry.entries
@@ -47,7 +47,7 @@ export function handleSetMetadata(event: SetMetadataEvent): void {
 export function loadOrCreateRegistry(
   registryAddress: Address
 ): ERC3000RegistryEntity {
-  let registryId = registryAddress.toHexString()
+  let registryId = registryAddress.toHex()
   let registry = ERC3000RegistryEntity.load(registryId)
   if (registry === null) {
     registry = new ERC3000RegistryEntity(registryId)

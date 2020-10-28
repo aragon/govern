@@ -26,7 +26,7 @@ type GovernQueue @entity {
   address: Bytes!
   config: Config!
   registryEntries: [RegistryEntry!]! @derivedFrom(field: "queue")
-  queued: [Container!]!
+  queued: [Container!]! @derivedFrom(field: "queue")
   roles: [Role!]!
 }
 
@@ -36,18 +36,17 @@ type Config @entity {
   executionDelay: BigInt!
   scheduleDeposit: Collateral!
   challengeDeposit: Collateral!
-  vetoDeposit: Collateral!
   resolver: Bytes!
   rules: Bytes!
 }
 
 type Container @entity {
   id: ID!
-  queue: GovernQueue! @derivedFrom(field: "queued")
+  queue: GovernQueue!
   state: ContainerState!
   config: Config!
   payload: ContainerPayload!
-  history: [ContainerEvent]!
+  history: [ContainerEvent!]! @derivedFrom(field: "container")
 }
 
 type ContainerPayload @entity {
@@ -99,11 +98,13 @@ enum ContainerState {
 
 interface ContainerEvent {
   id: ID!
+  container: Container!
   createdAt: BigInt!
 }
 
 type ContainerEventChallenge implements ContainerEvent @entity {
   id: ID!
+  container: Container!
   createdAt: BigInt!
   actor: Bytes!
   reason: Bytes!
@@ -113,30 +114,35 @@ type ContainerEventChallenge implements ContainerEvent @entity {
 
 type ContainerEventExecute implements ContainerEvent @entity {
   id: ID!
+  container: Container!
   createdAt: BigInt!
   execResults: [Bytes!]!
 }
 
 type ContainerEventResolve implements ContainerEvent @entity {
   id: ID!
+  container: Container!
   createdAt: BigInt!
   approved: Boolean!
 }
 
 type ContainerEventRule implements ContainerEvent @entity {
   id: ID!
+  container: Container!
   createdAt: BigInt!
   ruling: BigInt!
 }
 
 type ContainerEventSchedule implements ContainerEvent @entity {
   id: ID!
+  container: Container!
   createdAt: BigInt!
   collateral: Collateral!
 }
 
 type ContainerEventSubmitEvidence implements ContainerEvent @entity {
   id: ID!
+  container: Container!
   createdAt: BigInt!
   evidence: Bytes!
   submitter: Bytes!
@@ -145,6 +151,7 @@ type ContainerEventSubmitEvidence implements ContainerEvent @entity {
 
 type ContainerEventVeto implements ContainerEvent @entity {
   id: ID!
+  container: Container!
   createdAt: BigInt!
   reason: Bytes!
 }
