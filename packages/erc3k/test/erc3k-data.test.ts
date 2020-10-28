@@ -93,12 +93,12 @@ describe('ERC3000Data', function() {
     expect(await erc3kDataLib.testPayloadHash(container.payload))
       .to.be.equal(getPayloadHash())
   })
-  //
-  // it('calls testContainerHash and returns the expected hash', async () => {
-  //   await expect(erc3kDataLib.testContainerHash(container))
-  //     .to.be.equal(keccak256(defaultAbiCoder.encode(
-  //       ['string', 'address', 'bytes32', 'bytes32'],
-  //       ['erc3k-v1', erc3kDataLib.address, getPayloadHash(), getConfigHash()]
-  //     )))
-  // })
+
+  it('calls testContainerHash and returns the expected hash', async () => {
+    expect(await erc3kDataLib.testContainerHash(container))
+      .to.be.equal(keccak256(solidityPack(
+        ['string', 'address', 'bytes32', 'bytes32'],
+        ['erc3k-v1', erc3kDataLib.address, getPayloadHash(), getConfigHash()]
+      )))
+  })
 })
