@@ -2,10 +2,10 @@ type ERC3000Registry @entity {
   id: ID!
   address: Bytes!
   count: Int!
-  games: [OptimisticGame!]
+  entries: [RegistryEntry!]!
 }
 
-type OptimisticGame @entity {
+type RegistryEntry @entity {
   id: ID!
   name: String!
   queue: GovernQueue!
@@ -16,29 +16,18 @@ type Govern @entity {
   id: ID!
   address: Bytes!
   metadata: Bytes
-  games: [OptimisticGame!] @derivedFrom(field: "executor")
-  executions: [Execution!]
-  roles: [Role!]
-}
-
-type Execution @entity {
-  id: ID!
-  queue: GovernQueue!
-  packet: QueuePacket!
-  results: [Bytes!]
-  createdAt: BigInt!
+  registryEntries: [RegistryEntry!]! @derivedFrom(field: "executor")
+  containers: [Container]!
+  roles: [Role!]!
 }
 
 type GovernQueue @entity {
   id: ID!
   address: Bytes!
-  config: Config
-  games: [OptimisticGame!] @derivedFrom(field: "queue")
-  scheduled: [Schedule!]
-  challenged: [Challenge!]
-  vetoed: [Veto!]
-  executed: [Execution!] @derivedFrom(field: "queue")
-  roles: [Role!]
+  config: Config!
+  registryEntries: [RegistryEntry!]! @derivedFrom(field: "queue")
+  queued: [Container!]!
+  roles: [Role!]!
 }
 
 type Config @entity {
@@ -47,76 +36,51 @@ type Config @entity {
   executionDelay: BigInt!
   scheduleDeposit: Collateral!
   challengeDeposit: Collateral!
+  vetoDeposit: Collateral!
   resolver: Bytes!
   rules: Bytes!
 }
 
-type Collateral @entity {
+type Container @entity {
   id: ID!
-  token: ERC20!
-  amount: BigInt!
+  queue: GovernQueue! @derivedFrom(field: "queued")
+  state: ContainerState!
+  config: Config!
+  payload: ContainerPayload!
+  history: [ContainerEvent]!
 }
 
-type ERC20 @entity {
+type ContainerPayload @entity {
   id: ID!
-  address: Bytes!
-}
-
-type QueuePacket @entity {
-  id: ID!
-  queue: GovernQueue!
-  status: PacketStatus!
+  container: Container! @derivedFrom(field: "payload")
   nonce: BigInt!
   executionTime: BigInt!
   submitter: Bytes!
   executor: Govern!
-  actions: [Action!] @derivedFrom(field: "packet")
+  actions: [Action!]! @derivedFrom(field: "payload")
   allowFailuresMap: Bytes!
   proof: Bytes!
 }
 
+type ContainerEvent @entity {
+  id: ID!
+  type: ContainerEventType
+  createdAt: BigInt
+  data: [String!]!
+}
+
+type Collateral @entity {
+  id: ID!
+  token: Bytes!
+  amount: BigInt!
+}
+
 type Action @entity {
   id: ID!
-  packet: QueuePacket!
+  payload: ContainerPayload!
   to: Bytes!
   value: BigInt!
   data: Bytes!
-}
-
-type Schedule @entity {
-  id: ID!
-  packet: QueuePacket!
-  collateral: Collateral!
-  createdAt: BigInt!
-}
-
-type Challenge @entity {
-  id: ID!
-  packet: QueuePacket!
-  challenger: Bytes!
-  arbitrator: Bytes!
-  disputeId: BigInt!
-  evidences: [Evidence!] @derivedFrom(field: "challenge")
-  collateral: Collateral!
-  ruling: BigInt
-  approved: Boolean
-  createdAt: BigInt!
-}
-
-type Evidence @entity {
-  id: ID!
-  challenge: Challenge!
-  data: Bytes!
-  submitter: Bytes!
-  createdAt: BigInt!
-}
-
-type Veto @entity {
-  id: ID!
-  packet: QueuePacket!
-  reason: Bytes!
-  submitter: Bytes!
-  createdAt: BigInt!
 }
 
 type Role @entity {
@@ -128,13 +92,22 @@ type Role @entity {
   frozen: Boolean!
 }
 
-enum PacketStatus {
+enum ContainerEventType {
+  Challenge
+  Execute
+  Resolve
+  Rule
+  Schedule
+  SubmitEvidence
+  Veto
+}
+
+enum ContainerState {
   None
-  Approved
-  Cancelled
-  Challenged
-  Executed
-  Rejected
   Scheduled
-  Vetoed
+  Approved
+  Challenged
+  Rejected
+  Cancelled
+  Executed
 }

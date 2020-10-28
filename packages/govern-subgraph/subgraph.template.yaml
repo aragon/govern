@@ -18,14 +18,12 @@ templates:
       apiVersion: 0.0.1
       language: wasm/assemblyscript
       entities:
-        - Config
-        - Item
-        - Challenge
-        - Veto
         - Collateral
-        - Evidence
+        - Config
+        - Container
+        - ContainerEvent
+        - Payload
         - Role
-        - ERC20
       abis:
         - name: GovernQueue
           file: ../govern-core/artifacts/GovernQueue.json
@@ -65,8 +63,8 @@ templates:
       apiVersion: 0.0.1
       language: wasm/assemblyscript
       entities:
-        - Execution
-        - Action
+        - Container
+        - ContainerEvent
         - Role
       abis:
         - name: Govern
