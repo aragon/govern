@@ -22,7 +22,7 @@
 
 ## Aragon Govern
 
-Govern is Aragon's new Smart Contract system to manage unstoppable organizations on the blockchain in an efficient and decentralized manner.
+Govern is Aragon's new Smart Contract system to manage unstoppable organizations on the blockchain in an efficient and decentralized manner. It's architectured using ERC3000, the up and coming governance standard.
 
 #### 🚨 Security Review Status: pre-audit
 
