@@ -25,7 +25,7 @@ contract GovernBaseFactory {
 
     function newDummyGovern(string calldata _name, bool _useProxies) external returns (Govern govern, GovernQueue queue) {
         bytes32 salt = _useProxies ? keccak256(abi.encodePacked(_name)) : bytes32(0);
-        
+
         queue = queueFactory.newQueue(address(this), dummyConfig(), salt);
         govern = governFactory.newGovern(queue, salt);
 
@@ -38,7 +38,7 @@ contract GovernBaseFactory {
         items[3] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.configure.selector, address(govern));
         items[4] = ACLData.BulkItem(ACLData.BulkOp.Revoke, queue.ROOT_ROLE(), address(this));
         items[5] = ACLData.BulkItem(ACLData.BulkOp.Freeze, queue.ROOT_ROLE(), address(0));
-        
+
         queue.bulk(items);
     }
 
@@ -46,7 +46,6 @@ contract GovernBaseFactory {
         ERC3000Data.Collateral memory noCollateral;
         return ERC3000Data.Config(
             0,
-            noCollateral,
             noCollateral,
             noCollateral,
             address(0),
