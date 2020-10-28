@@ -62,6 +62,8 @@ describe('ERC3000 Registry', function() {
       .withArgs(erc3kExec.address, erc3k.address, current, 'MyName')
       .to.emit(erc3kRegistry, EVENTS.SET_METADATA)
       .withArgs(erc3kExec.address, '0x00')
+
+    expect(await erc3kRegistry.nameUsed('MyName')).to.equal(true)
   })
 
   it('calls register and reverts cause the name is already used', async () => {
@@ -80,6 +82,8 @@ describe('ERC3000 Registry', function() {
 
     await expect(erc3kRegistry.register(erc3kExec.address, erc3kBadInterface.address, 'MyName', '0x00'))
       .to.be.revertedWith(ERRORS.BAD_INTERFACE_QUEUE)
+
+    expect(await erc3kRegistry.nameUsed('MyName')).to.equal(false)
   })
 
   it('calls register and reverts cause the dao has a wrong interface', async () => {
@@ -91,5 +95,7 @@ describe('ERC3000 Registry', function() {
 
     await expect(erc3kRegistry.register(erc3kExecBadInterface.address, erc3k.address, 'MyName', '0x00'))
       .to.be.revertedWith(ERRORS.BAD_INTERFACE_DAO)
+
+    expect(await erc3kRegistry.nameUsed('MyName')).to.equal(false)
   })
 })
