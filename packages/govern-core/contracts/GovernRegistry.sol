@@ -8,12 +8,10 @@ import "@aragon/govern-contract-utils/contracts/erc165/ERC165.sol";
 
 import "erc3k/contracts/ERC3000.sol";
 import "erc3k/contracts/ERC3000Executor.sol";
+import "erc3k/contracts/ERC3000Registry.sol";
 
-contract ERC3000Registry is ERC3000Interface {
+contract GovernRegistry is ERC3000Registry {
     mapping (string => bool) public nameUsed;
-
-    event Registered(ERC3000Executor indexed dao, ERC3000 queue, address indexed registrant, string name);
-    event SetMetadata(ERC3000Executor indexed dao, bytes metadata);
 
     function register(ERC3000Executor _dao, ERC3000 _queue, string calldata _name, bytes calldata _initialMetadata) external
     {
