@@ -5,10 +5,10 @@
 pragma solidity ^0.6.8;
 pragma experimental ABIEncoderV2;
 
+import "@aragon/govern-contract-utils/contracts/erc165/ERC165.sol";
+
 import "./ERC3000Data.sol";
 import "./ERC3000Executor.sol";
-
-import "@aragon/govern-contract-utils/contracts/erc165/ERC165.sol";
 
 contract ERC3000Interface {
     bytes4 internal constant ERC3000_INTERFACE_ID =
@@ -21,7 +21,7 @@ contract ERC3000Interface {
     ;
 }
 
-abstract contract ERC3000 is ERC3000Interface {
+abstract contract ERC3000 is ERC3000Interface, ERC165 {
     /**
      * @notice Schedules an action for execution, allowing for challenges and vetos on a defined time window
      * @param container A Container struct holding both the payload being scheduled for execution and

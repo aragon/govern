@@ -23,4 +23,8 @@ contract ERC3000Mock is ERC3000 {
     function interfaceID() public pure returns (bytes4) {
         return ERC3000_INTERFACE_ID;
     }
+
+    function supportsInterface(bytes4 interfaceId) override public view returns (bool) {
+        return interfaceId == ERC3000_INTERFACE_ID;
+    }
 }

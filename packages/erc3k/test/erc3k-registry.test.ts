@@ -89,7 +89,7 @@ describe('ERC3000 Registry', function() {
 
     const erc3kExecBadInterface = await ERC3000ExecutorBadInterfaceMock.deploy()
 
-    await expect(erc3kRegistry.register(erc3kExec.address, erc3kExecBadInterface.address, 'MyName', '0x00'))
+    await expect(erc3kRegistry.register(erc3kExecBadInterface.address, erc3k.address, 'MyName', '0x00'))
       .to.be.revertedWith(ERRORS.BAD_INTERFACE_DAO)
   })
 })
