@@ -46,7 +46,7 @@ type Container @entity {
   state: ContainerState!
   config: Config!
   payload: ContainerPayload!
-  history: [ContainerEvent]! @derivedFrom(field: "container")
+  history: [ContainerEvent!]! @derivedFrom(field: "container")
 }
 
 type ContainerPayload @entity {
