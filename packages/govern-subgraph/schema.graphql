@@ -62,13 +62,6 @@ type ContainerPayload @entity {
   proof: Bytes!
 }
 
-type ContainerEvent @entity {
-  id: ID!
-  type: ContainerEventType
-  createdAt: BigInt
-  data: [String!]!
-}
-
 type Collateral @entity {
   id: ID!
   token: Bytes!
@@ -92,16 +85,6 @@ type Role @entity {
   frozen: Boolean!
 }
 
-enum ContainerEventType {
-  Challenge
-  Execute
-  Resolve
-  Rule
-  Schedule
-  SubmitEvidence
-  Veto
-}
-
 enum ContainerState {
   None
   Scheduled
@@ -110,4 +93,58 @@ enum ContainerState {
   Rejected
   Cancelled
   Executed
+}
+
+# Container events
+
+interface ContainerEvent {
+  id: ID!
+  createdAt: BigInt!
+}
+
+type ContainerEventChallenge implements ContainerEvent @entity {
+  id: ID!
+  createdAt: BigInt!
+  actor: Bytes!
+  reason: Bytes!
+  resolverId: BigInt!
+  collateral: Collateral!
+}
+
+type ContainerEventExecute implements ContainerEvent @entity {
+  id: ID!
+  createdAt: BigInt!
+  execResults: [Bytes!]!
+}
+
+type ContainerEventResolve implements ContainerEvent @entity {
+  id: ID!
+  createdAt: BigInt!
+  approved: Boolean!
+}
+
+type ContainerEventRule implements ContainerEvent @entity {
+  id: ID!
+  createdAt: BigInt!
+  ruling: BigInt!
+}
+
+type ContainerEventSchedule implements ContainerEvent @entity {
+  id: ID!
+  createdAt: BigInt!
+  collateral: Collateral!
+}
+
+type ContainerEventSubmitEvidence implements ContainerEvent @entity {
+  id: ID!
+  createdAt: BigInt!
+  evidence: Bytes!
+  submitter: Bytes!
+  finished: Boolean!
+}
+
+type ContainerEventVeto implements ContainerEvent @entity {
+  id: ID!
+  createdAt: BigInt!
+  reason: Bytes!
 }

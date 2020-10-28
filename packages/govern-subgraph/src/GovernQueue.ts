@@ -11,15 +11,21 @@ import {
   Vetoed as VetoedEvent,
   Ruled as RuledEvent,
   EvidenceSubmitted as EvidenceSubmittedEvent,
-  GovernQueue as GovernQueueContract
+  GovernQueue as GovernQueueContract,
 } from '../generated/templates/GovernQueue/GovernQueue'
 import {
   Action as ActionEntity,
   Collateral as CollateralEntity,
   Config as ConfigEntity,
   Container as ContainerEntity,
+  ContainerEventChallenge as ContainerEventChallengeEntity,
+  ContainerEventResolve as ContainerEventResolveEntity,
+  ContainerEventRule as ContainerEventRuleEntity,
+  ContainerEventSchedule as ContainerEventScheduleEntity,
+  ContainerEventSubmitEvidence as ContainerEventSubmitEvidenceEntity,
+  ContainerEventVeto as ContainerEventVetoEntity,
   ContainerPayload as PayloadEntity,
-  GovernQueue as GovernQueueEntity
+  GovernQueue as GovernQueueEntity,
 } from '../generated/schema'
 import { frozenRoles, roleGranted, roleRevoked } from './lib/MiniACL'
 import { buildId, buildIndexedId } from './utils/ids'
@@ -31,15 +37,16 @@ import {
   NONE_STATUS,
   REJECTED_STATUS,
   SCHEDULED_STATUS,
-  CHALLENGE_CONTAINER_EVENT,
-  SUBMIT_EVIDENCE_CONTAINER_EVENT,
-  RESOLVE_CONTAINER_EVENT,
-  RULE_CONTAINER_EVENT,
-  SCHEDULE_CONTAINER_EVENT,
-  VETO_CONTAINER_EVENT,
-  ALLOW_RULING
+  ALLOW_RULING,
 } from './utils/constants'
-import { handleContainerEvent } from './utils/events'
+import {
+  handleContainerEventChallenge,
+  handleContainerEventResolve,
+  handleContainerEventRule,
+  handleContainerEventSchedule,
+  handleContainerEventSubmitEvidence,
+  handleContainerEventVeto,
+} from './utils/events'
 
 export function handleScheduled(event: ScheduledEvent): void {
   const queue = loadOrCreateQueue(event.address)
@@ -61,15 +68,7 @@ export function handleScheduled(event: ScheduledEvent): void {
   // should be impossible to get at this stage
   container.config = queue.config
 
-  handleContainerEvent(
-    container,
-    event.block.timestamp,
-    SCHEDULE_CONTAINER_EVENT,
-    [
-      event.params.collateral.token.toHex(),
-      event.params.collateral.amount.toHex()
-    ]
-  )
+  handleContainerEventSchedule(container, event)
 
   // add the container to the queue
   const scheduled = queue.queued
@@ -93,19 +92,11 @@ export function handleChallenged(event: ChallengedEvent): void {
 
   container.state = CHALLENGED_STATUS
 
-  handleContainerEvent(
-    container,
-    event.block.timestamp,
-    CHALLENGE_CONTAINER_EVENT,
-    [
-      event.params.actor.toHex(),
-      event.params.reason.toHex(),
-      ConfigEntity.load(queue.config).resolver.toHex(),
-      event.params.resolverId.toHex(),
-      event.params.collateral.token.toHex(),
-      event.params.collateral.amount.toHex()
-    ]
-  )
+  let containerEvent = handleContainerEventChallenge(container, event)
+
+  // TODO
+  // containerEvent.resolver = ConfigEntity.load(queue.config).resolver.toHex()
+  // containerEvent.save()
 
   container.save()
   queue.save()
@@ -116,12 +107,7 @@ export function handleResolved(event: ResolvedEvent): void {
 
   container.state = event.params.approved ? EXECUTED_STATUS : CANCELLED_STATUS
 
-  handleContainerEvent(
-    container,
-    event.block.timestamp,
-    RESOLVE_CONTAINER_EVENT,
-    [event.params.approved ? 'approved' : 'cancelled']
-  )
+  handleContainerEventResolve(container, event)
 
   container.save()
 }
@@ -132,9 +118,7 @@ export function handleVetoed(event: VetoedEvent): void {
 
   container.state = CANCELLED_STATUS
 
-  handleContainerEvent(container, event.block.timestamp, VETO_CONTAINER_EVENT, [
-    event.params.reason.toHex()
-  ])
+  handleContainerEventVeto(container, event)
 
   container.save()
   queue.save()
@@ -185,12 +169,7 @@ export function handleEvidenceSubmitted(event: EvidenceSubmittedEvent): void {
   )
   const container = loadOrCreateContainer(containerHash)
 
-  handleContainerEvent(
-    container,
-    event.block.timestamp,
-    SUBMIT_EVIDENCE_CONTAINER_EVENT,
-    [event.params.submitter.toHex(), event.params.evidence.toHex()]
-  )
+  handleContainerEventSubmitEvidence(container, event)
 }
 
 export function handleRuled(event: RuledEvent): void {
@@ -204,9 +183,7 @@ export function handleRuled(event: RuledEvent): void {
   container.state =
     event.params.ruling === ALLOW_RULING ? APPROVED_STATUS : REJECTED_STATUS
 
-  handleContainerEvent(container, event.block.timestamp, RULE_CONTAINER_EVENT, [
-    event.params.ruling.toHex()
-  ])
+  handleContainerEventRule(container, event)
 
   container.save()
 }
