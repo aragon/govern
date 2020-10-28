@@ -1,9 +1,9 @@
 {
   "network": "rinkeby",
   "dataSources": {
-    "ERC3000Registry": [
+    "GovernRegistry": [
       {
-        "name": "ERC3000Registry",
+        "name": "GovernRegistry",
         "address": "0xE144219480F96b3e5fe91a5e24B9655BeeA5C537",
         "startBlock": 7445834
       }

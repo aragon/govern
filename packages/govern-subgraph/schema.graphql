@@ -1,4 +1,4 @@
-type ERC3000Registry @entity {
+type GovernRegistry @entity {
   id: ID!
   address: Bytes!
   count: Int!
