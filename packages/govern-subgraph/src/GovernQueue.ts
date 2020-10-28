@@ -55,12 +55,13 @@ export function handleScheduled(event: ScheduledEvent): void {
   payload.executor = event.params.payload.executor.toHex()
   payload.allowFailuresMap = event.params.payload.allowFailuresMap
   payload.proof = event.params.payload.proof
-  container.payload = payload.id
 
+  container.payload = payload.id
   container.state = SCHEDULED_STATUS
   // This should always be possible, as a queue without a config
   // should be impossible to get at this stage
   container.config = queue.config
+  container.queue = queue.id
 
   handleContainerEventSchedule(container, event)
 
@@ -226,7 +227,6 @@ export function loadOrCreateQueue(entity: Address): GovernQueueEntity {
     queue = new GovernQueueEntity(queueId)
     queue.address = entity
     queue.config = ''
-    queue.queued = []
     queue.roles = []
   }
   return queue!

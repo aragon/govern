@@ -26,7 +26,8 @@ function finalizeContainerEvent<T, U>(
   ethereumEvent: T
 ): U {
   containerEvent.createdAt = ethereumEvent.block.timestamp
-  container.history.push(containerEvent.id)
+  containerEvent.container = container.id
+
   container.save()
   containerEvent.save()
 

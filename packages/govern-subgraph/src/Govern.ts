@@ -5,10 +5,7 @@ import {
   Granted as GrantedEvent,
   Revoked as RevokedEvent
 } from '../generated/templates/Govern/Govern'
-import {
-  ContainerEventExecute as ContainerEventExecuteEntity,
-  Govern as GovernEntity
-} from '../generated/schema'
+import { Govern as GovernEntity } from '../generated/schema'
 import { frozenRoles, roleGranted, roleRevoked } from './lib/MiniACL'
 import { loadOrCreateContainer } from './GovernQueue'
 import { handleContainerEventExecute } from './utils/events'
