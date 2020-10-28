@@ -26,7 +26,7 @@ type GovernQueue @entity {
   address: Bytes!
   config: Config!
   registryEntries: [RegistryEntry!]! @derivedFrom(field: "queue")
-  queued: [Container!]!
+  queued: [Container!]! @derivedFrom(field: "queue")
   roles: [Role!]!
 }
 
@@ -36,18 +36,17 @@ type Config @entity {
   executionDelay: BigInt!
   scheduleDeposit: Collateral!
   challengeDeposit: Collateral!
-  vetoDeposit: Collateral!
   resolver: Bytes!
   rules: Bytes!
 }
 
 type Container @entity {
   id: ID!
-  queue: GovernQueue! @derivedFrom(field: "queued")
+  queue: GovernQueue!
   state: ContainerState!
   config: Config!
   payload: ContainerPayload!
-  history: [ContainerEvent]!
+  history: [ContainerEvent!]! @derivedFrom(field: "container")
 }
 
 type ContainerPayload @entity {
@@ -60,13 +59,6 @@ type ContainerPayload @entity {
   actions: [Action!]! @derivedFrom(field: "payload")
   allowFailuresMap: Bytes!
   proof: Bytes!
-}
-
-type ContainerEvent @entity {
-  id: ID!
-  type: ContainerEventType
-  createdAt: BigInt
-  data: [String!]!
 }
 
 type Collateral @entity {
@@ -92,16 +84,6 @@ type Role @entity {
   frozen: Boolean!
 }
 
-enum ContainerEventType {
-  Challenge
-  Execute
-  Resolve
-  Rule
-  Schedule
-  SubmitEvidence
-  Veto
-}
-
 enum ContainerState {
   None
   Scheduled
@@ -110,4 +92,67 @@ enum ContainerState {
   Rejected
   Cancelled
   Executed
+}
+
+# Container events
+
+interface ContainerEvent {
+  id: ID!
+  container: Container!
+  createdAt: BigInt!
+}
+
+type ContainerEventChallenge implements ContainerEvent @entity {
+  id: ID!
+  container: Container!
+  createdAt: BigInt!
+  actor: Bytes!
+  collateral: Collateral!
+  disputeId: BigInt!
+  reason: Bytes!
+  resolver: Bytes!
+}
+
+type ContainerEventExecute implements ContainerEvent @entity {
+  id: ID!
+  container: Container!
+  createdAt: BigInt!
+  execResults: [Bytes!]!
+}
+
+type ContainerEventResolve implements ContainerEvent @entity {
+  id: ID!
+  container: Container!
+  createdAt: BigInt!
+  approved: Boolean!
+}
+
+type ContainerEventRule implements ContainerEvent @entity {
+  id: ID!
+  container: Container!
+  createdAt: BigInt!
+  ruling: BigInt!
+}
+
+type ContainerEventSchedule implements ContainerEvent @entity {
+  id: ID!
+  container: Container!
+  createdAt: BigInt!
+  collateral: Collateral!
+}
+
+type ContainerEventSubmitEvidence implements ContainerEvent @entity {
+  id: ID!
+  container: Container!
+  createdAt: BigInt!
+  evidence: Bytes!
+  submitter: Bytes!
+  finished: Boolean!
+}
+
+type ContainerEventVeto implements ContainerEvent @entity {
+  id: ID!
+  container: Container!
+  createdAt: BigInt!
+  reason: Bytes!
 }

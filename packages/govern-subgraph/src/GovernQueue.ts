@@ -1,4 +1,4 @@
-import { Address, Bytes, ethereum } from '@graphprotocol/graph-ts'
+import { Address, Bytes } from '@graphprotocol/graph-ts'
 import {
   Challenged as ChallengedEvent,
   Configured as ConfiguredEvent,
@@ -31,48 +31,42 @@ import {
   NONE_STATUS,
   REJECTED_STATUS,
   SCHEDULED_STATUS,
-  CHALLENGE_CONTAINER_EVENT,
-  SUBMIT_EVIDENCE_CONTAINER_EVENT,
-  RESOLVE_CONTAINER_EVENT,
-  RULE_CONTAINER_EVENT,
-  SCHEDULE_CONTAINER_EVENT,
-  VETO_CONTAINER_EVENT,
   ALLOW_RULING
 } from './utils/constants'
-import { handleContainerEvent } from './utils/events'
+import {
+  handleContainerEventChallenge,
+  handleContainerEventResolve,
+  handleContainerEventRule,
+  handleContainerEventSchedule,
+  handleContainerEventSubmitEvidence,
+  handleContainerEventVeto
+} from './utils/events'
 
 export function handleScheduled(event: ScheduledEvent): void {
-  const queue = loadOrCreateQueue(event.address)
-  const payload = loadOrCreatePayload(event.params.containerHash)
-  const container = loadOrCreateContainer(event.params.containerHash)
+  let queue = loadOrCreateQueue(event.address)
+  let payload = loadOrCreatePayload(event.params.containerHash)
+  let container = loadOrCreateContainer(event.params.containerHash)
   // Builds each of the actions bundled in the payload,
   // and saves them to the DB.
   buildActions(event)
   payload.nonce = event.params.payload.nonce
   payload.executionTime = event.params.payload.executionTime
   payload.submitter = event.params.payload.submitter
-  payload.executor = event.params.payload.executor.toHexString()
+  payload.executor = event.params.payload.executor.toHex()
   payload.allowFailuresMap = event.params.payload.allowFailuresMap
   payload.proof = event.params.payload.proof
-  container.payload = payload.id
 
+  container.payload = payload.id
   container.state = SCHEDULED_STATUS
   // This should always be possible, as a queue without a config
   // should be impossible to get at this stage
   container.config = queue.config
+  container.queue = queue.id
 
-  handleContainerEvent(
-    container,
-    event.block.timestamp,
-    SCHEDULE_CONTAINER_EVENT,
-    [
-      event.params.collateral.token.toHex(),
-      event.params.collateral.amount.toHex()
-    ]
-  )
+  handleContainerEventSchedule(container, event)
 
   // add the container to the queue
-  const scheduled = queue.queued
+  let scheduled = queue.queued
   scheduled.push(container.id)
   queue.queued = scheduled
 
@@ -82,75 +76,62 @@ export function handleScheduled(event: ScheduledEvent): void {
 }
 
 export function handleExecuted(event: ExecutedEvent): void {
-  const container = loadOrCreateContainer(event.params.containerHash)
+  let container = loadOrCreateContainer(event.params.containerHash)
   container.state = EXECUTED_STATUS
   container.save()
 }
 
 export function handleChallenged(event: ChallengedEvent): void {
-  const queue = loadOrCreateQueue(event.address)
-  const container = loadOrCreateContainer(event.params.containerHash)
+  let queue = loadOrCreateQueue(event.address)
+  let container = loadOrCreateContainer(event.params.containerHash)
 
   container.state = CHALLENGED_STATUS
 
-  handleContainerEvent(
-    container,
-    event.block.timestamp,
-    CHALLENGE_CONTAINER_EVENT,
-    [
-      event.params.actor.toHex(),
-      event.params.reason.toHex(),
-      ConfigEntity.load(queue.config).resolver.toHex(),
-      event.params.resolverId.toHex(),
-      event.params.collateral.token.toHex(),
-      event.params.collateral.amount.toHex()
-    ]
-  )
+  let containerEvent = handleContainerEventChallenge(container, event)
+  containerEvent.resolver = ConfigEntity.load(queue.config).resolver
 
+  containerEvent.save()
   container.save()
   queue.save()
 }
 
 export function handleResolved(event: ResolvedEvent): void {
-  const container = loadOrCreateContainer(event.params.containerHash)
+  let container = loadOrCreateContainer(event.params.containerHash)
 
   container.state = event.params.approved ? EXECUTED_STATUS : CANCELLED_STATUS
 
-  handleContainerEvent(
-    container,
-    event.block.timestamp,
-    RESOLVE_CONTAINER_EVENT,
-    [event.params.approved ? 'approved' : 'cancelled']
-  )
+  handleContainerEventResolve(container, event)
 
   container.save()
 }
 
 export function handleVetoed(event: VetoedEvent): void {
-  const queue = loadOrCreateQueue(event.address)
-  const container = loadOrCreateContainer(event.params.containerHash)
+  let queue = loadOrCreateQueue(event.address)
+  let container = loadOrCreateContainer(event.params.containerHash)
 
   container.state = CANCELLED_STATUS
 
-  handleContainerEvent(container, event.block.timestamp, VETO_CONTAINER_EVENT, [
-    event.params.reason.toHex()
-  ])
+  handleContainerEventVeto(container, event)
 
   container.save()
   queue.save()
 }
 
 export function handleConfigured(event: ConfiguredEvent): void {
-  const queue = loadOrCreateQueue(event.address)
+  let queue = loadOrCreateQueue(event.address)
 
-  const configId = buildId(event)
-  const config = new ConfigEntity(configId)
+  let configId = buildId(event)
+  let config = new ConfigEntity(configId)
 
-  const scheduleDeposit = loadOrCreateCollateral(event, 1)
+  let scheduleDeposit = new CollateralEntity(
+    buildIndexedId(event.transaction.hash.toHex(), 1)
+  )
   scheduleDeposit.token = event.params.config.scheduleDeposit.token
   scheduleDeposit.amount = event.params.config.scheduleDeposit.amount
 
-  const challengeDeposit = loadOrCreateCollateral(event, 2)
+  let challengeDeposit = new CollateralEntity(
+    buildIndexedId(event.transaction.hash.toHex(), 2)
+  )
   challengeDeposit.token = event.params.config.challengeDeposit.token
   challengeDeposit.amount = event.params.config.challengeDeposit.amount
 
@@ -172,35 +153,28 @@ export function handleConfigured(event: ConfiguredEvent): void {
 // IArbitrable Events
 
 export function handleEvidenceSubmitted(event: EvidenceSubmittedEvent): void {
-  const governQueue = GovernQueueContract.bind(event.address)
-  const containerHash = governQueue.disputeItemCache(
+  let governQueue = GovernQueueContract.bind(event.address)
+  let containerHash = governQueue.disputeItemCache(
     event.params.arbitrator,
     event.params.disputeId
   )
-  const container = loadOrCreateContainer(containerHash)
+  let container = loadOrCreateContainer(containerHash)
 
-  handleContainerEvent(
-    container,
-    event.block.timestamp,
-    SUBMIT_EVIDENCE_CONTAINER_EVENT,
-    [event.params.submitter.toHex(), event.params.evidence.toHex()]
-  )
+  handleContainerEventSubmitEvidence(container, event)
 }
 
 export function handleRuled(event: RuledEvent): void {
-  const governQueue = GovernQueueContract.bind(event.address)
-  const containerHash = governQueue.disputeItemCache(
+  let governQueue = GovernQueueContract.bind(event.address)
+  let containerHash = governQueue.disputeItemCache(
     event.params.arbitrator,
     event.params.disputeId
   )
-  const container = loadOrCreateContainer(containerHash)
+  let container = loadOrCreateContainer(containerHash)
 
   container.state =
     event.params.ruling === ALLOW_RULING ? APPROVED_STATUS : REJECTED_STATUS
 
-  handleContainerEvent(container, event.block.timestamp, RULE_CONTAINER_EVENT, [
-    event.params.ruling.toHex()
-  ])
+  handleContainerEventRule(container, event)
 
   container.save()
 }
@@ -208,20 +182,20 @@ export function handleRuled(event: RuledEvent): void {
 // MiniACL Events
 
 export function handleFrozen(event: FrozenEvent): void {
-  const queue = loadOrCreateQueue(event.address)
+  let queue = loadOrCreateQueue(event.address)
 
-  const roles = queue.roles!
+  let roles = queue.roles!
 
   frozenRoles(roles, event.params.role)
 }
 
 export function handleGranted(event: GrantedEvent): void {
-  const queue = loadOrCreateQueue(event.address)
+  let queue = loadOrCreateQueue(event.address)
 
-  const role = roleGranted(event.address, event.params.role, event.params.who)
+  let role = roleGranted(event.address, event.params.role, event.params.who)
 
   // add the role
-  const currentRoles = queue.roles
+  let currentRoles = queue.roles
   currentRoles.push(role.id)
   queue.roles = currentRoles
 
@@ -229,12 +203,12 @@ export function handleGranted(event: GrantedEvent): void {
 }
 
 export function handleRevoked(event: RevokedEvent): void {
-  const queue = loadOrCreateQueue(event.address)
+  let queue = loadOrCreateQueue(event.address)
 
-  const role = roleRevoked(event.address, event.params.role, event.params.who)
+  let role = roleRevoked(event.address, event.params.role, event.params.who)
 
   // add the role
-  const currentRoles = queue.roles
+  let currentRoles = queue.roles
   currentRoles.push(role.id)
   queue.roles = currentRoles
 
@@ -244,21 +218,20 @@ export function handleRevoked(event: RevokedEvent): void {
 // Helpers
 
 export function loadOrCreateQueue(entity: Address): GovernQueueEntity {
-  const queueId = entity.toHexString()
+  let queueId = entity.toHex()
   // Create queue
   let queue = GovernQueueEntity.load(queueId)
   if (queue === null) {
     queue = new GovernQueueEntity(queueId)
     queue.address = entity
     queue.config = ''
-    queue.queued = []
     queue.roles = []
   }
   return queue!
 }
 
 export function loadOrCreateContainer(containerHash: Bytes): ContainerEntity {
-  const ContainerId = containerHash.toHexString()
+  let ContainerId = containerHash.toHex()
   // Create container
   let container = ContainerEntity.load(ContainerId)
   if (container === null) {
@@ -270,7 +243,7 @@ export function loadOrCreateContainer(containerHash: Bytes): ContainerEntity {
 }
 
 function loadOrCreatePayload(containerHash: Bytes): PayloadEntity {
-  const PayloadId = containerHash.toHexString()
+  let PayloadId = containerHash.toHex()
   // Create payload
   let payload = PayloadEntity.load(PayloadId)
   if (payload === null) {
@@ -279,35 +252,16 @@ function loadOrCreatePayload(containerHash: Bytes): PayloadEntity {
   return payload!
 }
 
-function loadOrCreateCollateral(
-  event: ethereum.Event,
-  index: number
-): CollateralEntity {
-  const collateralId = buildIndexedId(
-    event.transaction.hash.toHexString(),
-    index
-  )
-  // Create collateral
-  let collateral = CollateralEntity.load(collateralId)
-  if (collateral === null) {
-    collateral = new CollateralEntity(collateralId)
-  }
-  return collateral!
-}
-
 function buildActions(event: ScheduledEvent): void {
-  const actions = event.params.payload.actions
+  let actions = event.params.payload.actions
   for (let index = 0; index < actions.length; index++) {
-    const actionId = buildIndexedId(
-      event.params.containerHash.toHexString(),
-      index
-    )
-    const action = new ActionEntity(actionId)
+    let actionId = buildIndexedId(event.params.containerHash.toHex(), index)
+    let action = new ActionEntity(actionId)
 
     action.to = actions[index].to
     action.value = actions[index].value
     action.data = actions[index].data
-    action.payload = event.params.containerHash.toHexString()
+    action.payload = event.params.containerHash.toHex()
 
     action.save()
   }
