@@ -12,7 +12,7 @@ contract ERC3000ExecutorBadInterfaceMock is ERC3000Executor {
 
     }
 
-    function interfaceID() public pure returns (bytes4) {
-        return bytes4(0x75b24222);
+    function supportsInterface(bytes4 interfaceId) override public view returns (bool) {
+        return false;
     }
 }

@@ -20,7 +20,7 @@ contract ERC3000BadInterfaceMock is ERC3000 {
 
     function configure(ERC3000Data.Config memory) override public returns (bytes32) { }
 
-    function interfaceID() public pure returns (bytes4) {
-        return bytes4(0x75b24222);
+    function supportsInterface(bytes4 interfaceId) override public view returns (bool) {
+        return false;
     }
 }
