@@ -71,6 +71,8 @@ describe('ERC3000 Registry', function() {
 
     await expect(erc3kRegistry.register(erc3kExec.address, erc3k.address, 'MyName', '0x00'))
       .to.be.revertedWith(ERRORS.NAME_USED)
+
+    expect(await erc3kRegistry.nameUsed('MyName')).to.equal(true)
   })
 
   it('calls register and reverts cause the queue has a wrong interface', async () => {
