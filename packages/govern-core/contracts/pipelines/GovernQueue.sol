@@ -10,6 +10,7 @@ import "erc3k/contracts/ERC3000.sol";
 import "@aragon/govern-contract-utils/contracts/protocol/IArbitrable.sol";
 import "@aragon/govern-contract-utils/contracts/deposits/DepositLib.sol";
 import "@aragon/govern-contract-utils/contracts/acl/ACL.sol";
+import "@aragon/govern-contract-utils/contracts/adaptative-erc165/AdaptativeERC165.sol";
 import "@aragon/govern-contract-utils/contracts/erc20/SafeERC20.sol";
 
 library GovernQueueStateLib {
@@ -41,7 +42,7 @@ library GovernQueueStateLib {
     }
 }
 
-contract GovernQueue is ERC3000, IArbitrable, ACL {
+contract GovernQueue is ERC3000, AdaptativeERC165, IArbitrable, ACL {
     // Syntax sugar to enable method-calling syntax on types
     using ERC3000Data for *;
     using DepositLib for ERC3000Data.Collateral;
@@ -65,7 +66,18 @@ contract GovernQueue is ERC3000, IArbitrable, ACL {
         public
         ACL(_aclRoot) // note that this contract directly derives from ACL (ACL is local to contract and not global to system in Govern)
     {
+        initialize(_aclRoot, _initialConfig);
+    }
+
+    function initialize(address _aclRoot, ERC3000Data.Config memory _initialConfig) public onlyInit("queue") {
+        // ACL might have been already initialized by the constructor
+        if (initBlocks["acl"] == 0) {
+            _initializeACL(_aclRoot);
+        }
+
         _setConfig(_initialConfig);
+        _registerStandard(ARBITRABLE_INTERFACE_ID);
+        _registerStandard(ERC3000_INTERFACE_ID);
     }
 
      /**
@@ -274,12 +286,6 @@ contract GovernQueue is ERC3000, IArbitrable, ACL {
         bool
     ) external override {
         revert("queue: evidence");
-    }
-
-    // ERC-165
-
-    function supportsInterface(bytes4 _interfaceId) override public pure returns (bool) {
-        return _interfaceId == ARBITRABLE_INTERFACE_ID || super.supportsInterface(_interfaceId);
     }
 
     // Internal
