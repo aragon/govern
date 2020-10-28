@@ -1,4 +1,3 @@
-import { BigInt, ethereum } from '@graphprotocol/graph-ts'
 import {
   Collateral as CollateralEntity,
   Container as ContainerEntity,
@@ -8,7 +7,7 @@ import {
   ContainerEventRule as ContainerEventRuleEntity,
   ContainerEventSchedule as ContainerEventScheduleEntity,
   ContainerEventSubmitEvidence as ContainerEventSubmitEvidenceEntity,
-  ContainerEventVeto as ContainerEventVetoEntity,
+  ContainerEventVeto as ContainerEventVetoEntity
 } from '../../generated/schema'
 import { Executed as ExecutedEvent } from '../../generated/templates/Govern/Govern'
 import {
@@ -17,7 +16,7 @@ import {
   Ruled as RuledEvent,
   Scheduled as ScheduledEvent,
   EvidenceSubmitted as EvidenceSubmittedEvent,
-  Vetoed as VetoedEvent,
+  Vetoed as VetoedEvent
 } from '../../generated/templates/GovernQueue/GovernQueue'
 import { buildId, buildIndexedId } from './ids'
 

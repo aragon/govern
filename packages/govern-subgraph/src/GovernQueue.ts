@@ -1,4 +1,4 @@
-import { Address, Bytes, ethereum } from '@graphprotocol/graph-ts'
+import { Address, Bytes } from '@graphprotocol/graph-ts'
 import {
   Challenged as ChallengedEvent,
   Configured as ConfiguredEvent,
@@ -11,21 +11,15 @@ import {
   Vetoed as VetoedEvent,
   Ruled as RuledEvent,
   EvidenceSubmitted as EvidenceSubmittedEvent,
-  GovernQueue as GovernQueueContract,
+  GovernQueue as GovernQueueContract
 } from '../generated/templates/GovernQueue/GovernQueue'
 import {
   Action as ActionEntity,
   Collateral as CollateralEntity,
   Config as ConfigEntity,
   Container as ContainerEntity,
-  ContainerEventChallenge as ContainerEventChallengeEntity,
-  ContainerEventResolve as ContainerEventResolveEntity,
-  ContainerEventRule as ContainerEventRuleEntity,
-  ContainerEventSchedule as ContainerEventScheduleEntity,
-  ContainerEventSubmitEvidence as ContainerEventSubmitEvidenceEntity,
-  ContainerEventVeto as ContainerEventVetoEntity,
   ContainerPayload as PayloadEntity,
-  GovernQueue as GovernQueueEntity,
+  GovernQueue as GovernQueueEntity
 } from '../generated/schema'
 import { frozenRoles, roleGranted, roleRevoked } from './lib/MiniACL'
 import { buildId, buildIndexedId } from './utils/ids'
@@ -37,7 +31,7 @@ import {
   NONE_STATUS,
   REJECTED_STATUS,
   SCHEDULED_STATUS,
-  ALLOW_RULING,
+  ALLOW_RULING
 } from './utils/constants'
 import {
   handleContainerEventChallenge,
@@ -45,7 +39,7 @@ import {
   handleContainerEventRule,
   handleContainerEventSchedule,
   handleContainerEventSubmitEvidence,
-  handleContainerEventVeto,
+  handleContainerEventVeto
 } from './utils/events'
 
 export function handleScheduled(event: ScheduledEvent): void {
@@ -58,7 +52,7 @@ export function handleScheduled(event: ScheduledEvent): void {
   payload.nonce = event.params.payload.nonce
   payload.executionTime = event.params.payload.executionTime
   payload.submitter = event.params.payload.submitter
-  payload.executor = event.params.payload.executor.toHexString()
+  payload.executor = event.params.payload.executor.toHex()
   payload.allowFailuresMap = event.params.payload.allowFailuresMap
   payload.proof = event.params.payload.proof
   container.payload = payload.id
@@ -130,23 +124,22 @@ export function handleConfigured(event: ConfiguredEvent): void {
   let configId = buildId(event)
   let config = new ConfigEntity(configId)
 
-  let scheduleDeposit = loadOrCreateCollateral(event, 1)
+  let scheduleDeposit = new CollateralEntity(
+    buildIndexedId(event.transaction.hash.toHex(), 1)
+  )
   scheduleDeposit.token = event.params.config.scheduleDeposit.token
   scheduleDeposit.amount = event.params.config.scheduleDeposit.amount
 
-  let challengeDeposit = loadOrCreateCollateral(event, 2)
+  let challengeDeposit = new CollateralEntity(
+    buildIndexedId(event.transaction.hash.toHex(), 2)
+  )
   challengeDeposit.token = event.params.config.challengeDeposit.token
   challengeDeposit.amount = event.params.config.challengeDeposit.amount
-
-  let vetoDeposit = loadOrCreateCollateral(event, 3)
-  vetoDeposit.token = event.params.config.vetoDeposit.token
-  vetoDeposit.amount = event.params.config.vetoDeposit.amount
 
   config.queue = queue.id
   config.executionDelay = event.params.config.executionDelay
   config.scheduleDeposit = scheduleDeposit.id
   config.challengeDeposit = challengeDeposit.id
-  config.vetoDeposit = vetoDeposit.id
   config.resolver = event.params.config.resolver
   config.rules = event.params.config.rules
 
@@ -154,7 +147,6 @@ export function handleConfigured(event: ConfiguredEvent): void {
 
   scheduleDeposit.save()
   challengeDeposit.save()
-  vetoDeposit.save()
   config.save()
   queue.save()
 }
@@ -227,7 +219,7 @@ export function handleRevoked(event: RevokedEvent): void {
 // Helpers
 
 export function loadOrCreateQueue(entity: Address): GovernQueueEntity {
-  let queueId = entity.toHexString()
+  let queueId = entity.toHex()
   // Create queue
   let queue = GovernQueueEntity.load(queueId)
   if (queue === null) {
@@ -241,7 +233,7 @@ export function loadOrCreateQueue(entity: Address): GovernQueueEntity {
 }
 
 export function loadOrCreateContainer(containerHash: Bytes): ContainerEntity {
-  let ContainerId = containerHash.toHexString()
+  let ContainerId = containerHash.toHex()
   // Create container
   let container = ContainerEntity.load(ContainerId)
   if (container === null) {
@@ -253,7 +245,7 @@ export function loadOrCreateContainer(containerHash: Bytes): ContainerEntity {
 }
 
 function loadOrCreatePayload(containerHash: Bytes): PayloadEntity {
-  let PayloadId = containerHash.toHexString()
+  let PayloadId = containerHash.toHex()
   // Create payload
   let payload = PayloadEntity.load(PayloadId)
   if (payload === null) {
@@ -262,32 +254,16 @@ function loadOrCreatePayload(containerHash: Bytes): PayloadEntity {
   return payload!
 }
 
-function loadOrCreateCollateral(
-  event: ethereum.Event,
-  index: number
-): CollateralEntity {
-  let collateralId = buildIndexedId(event.transaction.hash.toHexString(), index)
-  // Create collateral
-  let collateral = CollateralEntity.load(collateralId)
-  if (collateral === null) {
-    collateral = new CollateralEntity(collateralId)
-  }
-  return collateral!
-}
-
 function buildActions(event: ScheduledEvent): void {
   let actions = event.params.payload.actions
   for (let index = 0; index < actions.length; index++) {
-    let actionId = buildIndexedId(
-      event.params.containerHash.toHexString(),
-      index
-    )
+    let actionId = buildIndexedId(event.params.containerHash.toHex(), index)
     let action = new ActionEntity(actionId)
 
     action.to = actions[index].to
     action.value = actions[index].value
     action.data = actions[index].data
-    action.payload = event.params.containerHash.toHexString()
+    action.payload = event.params.containerHash.toHex()
 
     action.save()
   }

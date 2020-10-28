@@ -3,11 +3,11 @@ import {
   Executed as ExecutedEvent,
   Frozen as FrozenEvent,
   Granted as GrantedEvent,
-  Revoked as RevokedEvent,
+  Revoked as RevokedEvent
 } from '../generated/templates/Govern/Govern'
 import {
   ContainerEventExecute as ContainerEventExecuteEntity,
-  Govern as GovernEntity,
+  Govern as GovernEntity
 } from '../generated/schema'
 import { frozenRoles, roleGranted, roleRevoked } from './lib/MiniACL'
 import { loadOrCreateContainer } from './GovernQueue'
@@ -67,7 +67,7 @@ export function handleRevoked(event: RevokedEvent): void {
 // Helpers
 
 export function loadOrCreateGovern(entity: Address): GovernEntity {
-  let governId = entity.toHexString()
+  let governId = entity.toHex()
   // Create govern
   let govern = GovernEntity.load(governId)
   if (govern === null) {

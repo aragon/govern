@@ -36,7 +36,6 @@ type Config @entity {
   executionDelay: BigInt!
   scheduleDeposit: Collateral!
   challengeDeposit: Collateral!
-  vetoDeposit: Collateral!
   resolver: Bytes!
   rules: Bytes!
 }
