@@ -10,7 +10,7 @@ import {
   Erc3000ExecutorMockFactory,
   Erc3000BadInterfaceMockFactory,
   Erc3000ExecutorBadInterfaceMockFactory
-} from '../typechain'
+} from 'erc3k/typechain'
 
 const ERRORS = {
   NAME_USED: 'registry: name used',
