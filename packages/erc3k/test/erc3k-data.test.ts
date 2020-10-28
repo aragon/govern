@@ -1,7 +1,7 @@
 import { ethers } from '@nomiclabs/buidler'
 import { expect } from 'chai'
 import { Erc3000DataLibTest, Erc3000DataLibTestFactory } from '../typechain'
-import { keccak256, defaultAbiCoder} from 'ethers/lib/utils'
+import { keccak256, defaultAbiCoder, solidityPack } from 'ethers/lib/utils'
 
 let deposit = {
     token: '0xb794f5ea0ba39494ce839613fffba74279579268',
@@ -32,7 +32,7 @@ let deposit = {
   }
 
 function getPayloadHash(): string {
-  return keccak256(defaultAbiCoder.encode(
+  return keccak256(solidityPack(
     ['uint256', 'uint256', 'address', 'address', 'bytes32', 'bytes32', 'bytes32'],
     [
       container.payload.nonce,
@@ -40,25 +40,31 @@ function getPayloadHash(): string {
       container.payload.submitter,
       container.payload.executor,
       keccak256(defaultAbiCoder.encode(
-        ['tuple(address to, uint256 value, bytes data)[]'],
-        container.payload.actions
+        [
+          'tuple(' +
+          'address to, ' +
+          'uint256 value, ' +
+          'bytes data' +
+          ')[]'
+        ],
+        [container.payload.actions]
       )),
       container.payload.allowFailuresMap,
       keccak256(container.payload.proof)
     ]
   ))
-
 }
 
 function getConfigHash(): string {
   return keccak256(defaultAbiCoder.encode(
     [
-      'tuple(uint256 executionDelay, ' +
-        'tuple(address token, uint256 amount) scheduleDeposit, ' +
-        'tuple(address token, uint256 amount) challengeDeposit, ' +
-        'tuple(address token, uint256 amount) vetoDeposit, ' +
-        'address resolver, ' +
-        'bytes rules'+
+      'tuple(' +
+      'uint256 executionDelay, ' +
+      'tuple(address token, uint256 amount) scheduleDeposit, ' +
+      'tuple(address token, uint256 amount) challengeDeposit, ' +
+      'tuple(address token, uint256 amount) vetoDeposit, ' +
+      'address resolver, ' +
+      'bytes rules' +
       ')'
     ],
     [
@@ -83,10 +89,10 @@ describe('ERC3000Data', function() {
       .to.be.equal(getConfigHash())
   })
 
-  // it('calls testPayloadHash and returns the expected hash', async () => {
-  //   await expect(erc3kDataLib.testPayloadHash(container.payload))
-  //     .to.be.equal(getPayloadHash())
-  // })
+  it('calls testPayloadHash and returns the expected hash', async () => {
+    expect(await erc3kDataLib.testPayloadHash(container.payload))
+      .to.be.equal(getPayloadHash())
+  })
   //
   // it('calls testContainerHash and returns the expected hash', async () => {
   //   await expect(erc3kDataLib.testContainerHash(container))
