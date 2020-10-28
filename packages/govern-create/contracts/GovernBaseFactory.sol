@@ -5,7 +5,7 @@
 pragma solidity 0.6.8;
 pragma experimental ABIEncoderV2;
 
-import "govern-core/contracts/GovernRegistry.sol";
+import "@aragon/govern-core/contracts/GovernRegistry.sol";
 
 import "./core-factories/GovernFactory.sol";
 import "./core-factories/GovernQueueFactory.sol";
