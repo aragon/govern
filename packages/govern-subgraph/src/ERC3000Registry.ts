@@ -9,27 +9,27 @@ import {
 } from '../generated/templates'
 import {
   ERC3000Registry as ERC3000RegistryEntity,
-  OptimisticGame as OptimisticGameEntity
+  RegistryEntry as RegistryEntryEntity
 } from '../generated/schema'
 import { loadOrCreateGovern } from './Govern'
 
 export function handleRegistered(event: RegisteredEvent): void {
-  const registry = loadOrCreateRegistry(event.address)
+  let registry = loadOrCreateRegistry(event.address)
 
-  const game = new OptimisticGameEntity(event.params.name)
+  let registryEntry = new RegistryEntryEntity(event.params.name)
 
-  game.name = event.params.name
-  game.executor = event.params.dao.toHexString()
-  game.queue = event.params.queue.toHexString()
+  registryEntry.name = event.params.name
+  registryEntry.executor = event.params.dao.toHex()
+  registryEntry.queue = event.params.queue.toHex()
 
   // add game to the registry
-  const currentGames = registry.games
-  currentGames.push(game.id)
-  registry.games = currentGames
+  let currentEntries = registry.entries
+  currentEntries.push(registryEntry.id)
+  registry.entries = currentEntries
 
   registry.count += 1
 
-  game.save()
+  registryEntry.save()
   registry.save()
 
   // Create datasource templates
@@ -38,7 +38,7 @@ export function handleRegistered(event: RegisteredEvent): void {
 }
 
 export function handleSetMetadata(event: SetMetadataEvent): void {
-  const govern = loadOrCreateGovern(event.params.dao)
+  let govern = loadOrCreateGovern(event.params.dao)
   govern.metadata = event.params.metadata
 
   govern.save()
@@ -47,13 +47,13 @@ export function handleSetMetadata(event: SetMetadataEvent): void {
 export function loadOrCreateRegistry(
   registryAddress: Address
 ): ERC3000RegistryEntity {
-  const registryId = registryAddress.toHexString()
+  let registryId = registryAddress.toHex()
   let registry = ERC3000RegistryEntity.load(registryId)
   if (registry === null) {
     registry = new ERC3000RegistryEntity(registryId)
     registry.address = registryAddress
     registry.count = 0
-    registry.games = []
+    registry.entries = []
   }
   return registry!
 }

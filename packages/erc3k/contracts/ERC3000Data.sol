@@ -35,7 +35,6 @@ library ERC3000Data {
         uint256 executionDelay;
         Collateral scheduleDeposit;
         Collateral challengeDeposit;
-        Collateral vetoDeposit;
         address resolver;
         bytes rules;
     }
