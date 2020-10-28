@@ -9,7 +9,7 @@ import "erc3k/contracts/ERC3000.sol";
 
 import "@aragon/govern-contract-utils/contracts/erc165/ERC165.sol";
 
-contract ERC3000BadInterfaceMock is ERC3000, ERC165 {
+contract ERC3000Mock is ERC3000, ERC165 {
     function schedule(ERC3000Data.Container memory) override public returns (bytes32) { }
 
     function execute(ERC3000Data.Container memory) override public returns (bytes32, bytes[] memory) { }
@@ -22,7 +22,11 @@ contract ERC3000BadInterfaceMock is ERC3000, ERC165 {
 
     function configure(ERC3000Data.Config memory) override public returns (bytes32) { }
 
+    function interfaceID() public pure returns (bytes4) {
+        return ERC3000_INTERFACE_ID;
+    }
+
     function supportsInterface(bytes4 interfaceId) override public view returns (bool) {
-        return false;
+        return interfaceId == ERC3000_INTERFACE_ID;
     }
 }

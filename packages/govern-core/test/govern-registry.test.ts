@@ -2,15 +2,15 @@ import { ethers } from '@nomiclabs/buidler'
 import { expect } from 'chai'
 import { Signer } from 'ethers'
 import {
-  Erc3000Registry,
-  Erc3000RegistryFactory,
+  GovernRegistry,
+  GovernRegistryFactory,
   Erc3000Mock,
   Erc3000MockFactory,
   Erc3000ExecutorMock,
   Erc3000ExecutorMockFactory,
   Erc3000BadInterfaceMockFactory,
   Erc3000ExecutorBadInterfaceMockFactory
-} from 'erc3k/typechain'
+} from '../typechain'
 
 const ERRORS = {
   NAME_USED: 'registry: name used',
@@ -23,8 +23,8 @@ const EVENTS = {
   SET_METADATA: 'SetMetadata'
 }
 
-describe('ERC3000 Registry', function() {
-  let erc3kRegistry: Erc3000Registry,
+describe('GovernRegistry', function() {
+  let governRegistry: GovernRegistry,
     erc3k: Erc3000Mock,
     erc3kExec: Erc3000ExecutorMock,
     signers: Signer[],
@@ -36,43 +36,43 @@ describe('ERC3000 Registry', function() {
   })
 
   beforeEach(async () => {
-    const Erc3000Mock = (await ethers.getContractFactory(
+    const ERC3000Mock = (await ethers.getContractFactory(
       'Erc3000Mock'
     )) as Erc3000MockFactory
 
-    const ERC3000Executor = (await ethers.getContractFactory(
+    const ERC3000ExecutorMock = (await ethers.getContractFactory(
       'ERC3000ExecutorMock'
     )) as Erc3000ExecutorMockFactory
 
-    const ERC3000Registry = (await ethers.getContractFactory(
-      'ERC3000Registry'
-    )) as Erc3000RegistryFactory
+    const GovernRegistry = (await ethers.getContractFactory(
+      'GovernRegistry'
+    )) as GovernRegistryFactory
 
-    erc3kExec = await ERC3000Executor.deploy()
+    erc3kExec = await ERC3000ExecutorMock.deploy()
 
-    erc3k = await Erc3000Mock.deploy()
+    erc3k = await ERC3000Mock.deploy()
 
-    erc3kRegistry = await ERC3000Registry.deploy()
-    erc3kRegistry = erc3kRegistry.connect(signers[0])
+    governRegistry = await GovernRegistry.deploy()
+    governRegistry = governRegistry.connect(signers[0])
   })
 
   it('calls register and is able the register the executor and queue', async () => {
-    await expect(erc3kRegistry.register(erc3kExec.address, erc3k.address, 'MyName', '0x00'))
-      .to.emit(erc3kRegistry, EVENTS.REGISTERED)
+    await expect(governRegistry.register(erc3kExec.address, erc3k.address, 'MyName', '0x00'))
+      .to.emit(governRegistry, EVENTS.REGISTERED)
       .withArgs(erc3kExec.address, erc3k.address, current, 'MyName')
-      .to.emit(erc3kRegistry, EVENTS.SET_METADATA)
+      .to.emit(governRegistry, EVENTS.SET_METADATA)
       .withArgs(erc3kExec.address, '0x00')
 
-    expect(await erc3kRegistry.nameUsed('MyName')).to.equal(true)
+    expect(await governRegistry.nameUsed('MyName')).to.equal(true)
   })
 
   it('calls register and reverts cause the name is already used', async () => {
-    erc3kRegistry.register(erc3kExec.address, erc3k.address, 'MyName', '0x00')
+    governRegistry.register(erc3kExec.address, erc3k.address, 'MyName', '0x00')
 
-    await expect(erc3kRegistry.register(erc3kExec.address, erc3k.address, 'MyName', '0x00'))
+    await expect(governRegistry.register(erc3kExec.address, erc3k.address, 'MyName', '0x00'))
       .to.be.revertedWith(ERRORS.NAME_USED)
 
-    expect(await erc3kRegistry.nameUsed('MyName')).to.equal(true)
+    expect(await governRegistry.nameUsed('MyName')).to.equal(true)
   })
 
   it('calls register and reverts cause the queue has a wrong interface', async () => {
@@ -82,10 +82,10 @@ describe('ERC3000 Registry', function() {
 
     const erc3kBadInterface = await ERC3000BadInterfaceMock.deploy()
 
-    await expect(erc3kRegistry.register(erc3kExec.address, erc3kBadInterface.address, 'MyName', '0x00'))
+    await expect(governRegistry.register(erc3kExec.address, erc3kBadInterface.address, 'MyName', '0x00'))
       .to.be.revertedWith(ERRORS.BAD_INTERFACE_QUEUE)
 
-    expect(await erc3kRegistry.nameUsed('MyName')).to.equal(false)
+    expect(await governRegistry.nameUsed('MyName')).to.equal(false)
   })
 
   it('calls register and reverts cause the dao has a wrong interface', async () => {
@@ -95,9 +95,9 @@ describe('ERC3000 Registry', function() {
 
     const erc3kExecBadInterface = await ERC3000ExecutorBadInterfaceMock.deploy()
 
-    await expect(erc3kRegistry.register(erc3kExecBadInterface.address, erc3k.address, 'MyName', '0x00'))
+    await expect(governRegistry.register(erc3kExecBadInterface.address, erc3k.address, 'MyName', '0x00'))
       .to.be.revertedWith(ERRORS.BAD_INTERFACE_DAO)
 
-    expect(await erc3kRegistry.nameUsed('MyName')).to.equal(false)
+    expect(await governRegistry.nameUsed('MyName')).to.equal(false)
   })
 })
