@@ -1,70 +1,93 @@
+import config from '../config'
 import { ErrorInvalidNetwork } from '../errors'
-import { NETWORKS } from '../params'
-import { Address, Network, Networkish } from '../types'
+import { Address, Network as NetworkType, Networkish } from '../types'
 
-export function networkFromChainId(chainId: number): Network | null {
-  return NETWORKS.find((network) => network.chainId === chainId) || null
-}
+class Network {
+  #chainId: number
+  #ensAddress: Address
+  #name: string
+  #subgraphId: string
 
-export function networkFromName(name: string): Network | null {
-  return NETWORKS.find((network) => network.name === name) || null
-}
-
-function networkFromObject({
-  chainId,
-  ensAddress,
-  name,
-}: {
-  chainId?: number
-  ensAddress?: Address
-  name?: string
-}): Network {
-  if (name === undefined && chainId === undefined) {
-    throw new ErrorInvalidNetwork(
-      `Network: no name or chainId passed. ` +
-        `Please provide at least one of these.`
-    )
-  }
-
-  // Handle the case of having a name but no chainId.
-  if (name !== undefined && chainId === undefined) {
-    chainId = networkFromName(name)?.chainId
-
-    if (chainId === undefined) {
+  constructor({
+    chainId,
+    ensAddress,
+    name,
+  }: {
+    chainId?: number
+    ensAddress?: Address
+    name?: string
+  }) {
+    if (name === undefined && chainId === undefined) {
       throw new ErrorInvalidNetwork(
-        `Network: invalid name provided: ${name}. ` +
-          `Please use provide a chainId or use one of the following names: ` +
-          NETWORKS.map((network) => network.chainId).join(', ') +
+        `Network: no name or chainId passed. ` +
+          `Please provide at least one of these.`
+      )
+    }
+
+    // Handle the case of having a name but no chainId.
+    if (name !== undefined && chainId === undefined) {
+      this.#chainId = networkFromName(name)?.chainId
+
+      if (chainId === undefined) {
+        throw new ErrorInvalidNetwork(
+          `Network: invalid name provided: ${name}. ` +
+            `Please use provide a chainId or use one of the following names: ` +
+            config.networks.map((network) => network.chainId).join(', ') +
+            `.`
+        )
+      }
+    }
+
+    // Just a little help for TypeScript, at this
+    // point we know that chainId cannot be undefined.
+    this.#chainId = chainId as number
+
+    const chainIdNetwork = networkFromChainId(chainId)
+
+    if (!chainIdNetwork) {
+      throw new ErrorInvalidNetwork(
+        `Network: invalid chainId provided: ${chainId}. ` +
+          `Please use one of the following: ` +
+          config.networks.map((network) => network.chainId).join(', ') +
           `.`
       )
     }
+
+    this.#name = name ?? chainIdNetwork.name
+    this.#ensAddress = ensAddress ?? chainIdNetwork.ensAddress
+    this.#subgraphId = chainIdNetwork.subgraphId
   }
 
-  // Just a little help for TypeScript, at this
-  // point we know that chainId cannot be undefined.
-  chainId = chainId as number
-
-  const chainIdNetwork = networkFromChainId(chainId)
-
-  if (!chainIdNetwork) {
-    throw new ErrorInvalidNetwork(
-      `Network: invalid chainId provided: ${chainId}. ` +
-        `Please use one of the following: ` +
-        NETWORKS.map((network) => network.chainId).join(', ') +
-        `.`
-    )
+  get chainId() {
+    return this.#chainId
   }
 
-  // We compare with undefined to accept empty strings.
-  if (name === undefined) {
-    name = chainIdNetwork.name
+  get ensAddress() {
+    return this.#ensAddress
   }
 
-  if (!ensAddress) {
-    ensAddress = chainIdNetwork.ensAddress
+  get name() {
+    return this.#name
   }
 
-  return { chainId, ensAddress, name }
+  get subgraphUrl() {
+    return `https://api.thegraph.com/subgraphs/name/${this.#subgraphId}`
+  }
+}
+
+function networkFromChainId(chainId: number): NetworkType | null {
+  return (
+    config.networks.find(
+      (network: NetworkType) => network.chainId === chainId
+    ) || null
+  )
+}
+
+function networkFromName(name: string): NetworkType | null {
+  return (
+    config.networks.find((network: NetworkType) => network.name === name) ||
+    null
+  )
 }
 
 export function toNetwork(network: Networkish): Network {
@@ -73,12 +96,14 @@ export function toNetwork(network: Networkish): Network {
   }
 
   if (typeof network === 'string') {
-    return networkFromObject({ name: network })
+    return new Network({ name: network })
   }
 
   if (typeof network === 'number') {
-    return networkFromObject({ chainId: network })
+    return new Network({ chainId: network })
   }
 
-  return networkFromObject(network)
+  return new Network(network)
 }
+
+export default Network

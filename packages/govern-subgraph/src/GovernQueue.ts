@@ -154,15 +154,10 @@ export function handleConfigured(event: ConfiguredEvent): void {
   challengeDeposit.token = event.params.config.challengeDeposit.token
   challengeDeposit.amount = event.params.config.challengeDeposit.amount
 
-  const vetoDeposit = loadOrCreateCollateral(event, 3)
-  vetoDeposit.token = event.params.config.vetoDeposit.token
-  vetoDeposit.amount = event.params.config.vetoDeposit.amount
-
   config.queue = queue.id
   config.executionDelay = event.params.config.executionDelay
   config.scheduleDeposit = scheduleDeposit.id
   config.challengeDeposit = challengeDeposit.id
-  config.vetoDeposit = vetoDeposit.id
   config.resolver = event.params.config.resolver
   config.rules = event.params.config.rules
 
@@ -170,7 +165,6 @@ export function handleConfigured(event: ConfiguredEvent): void {
 
   scheduleDeposit.save()
   challengeDeposit.save()
-  vetoDeposit.save()
   config.save()
   queue.save()
 }
