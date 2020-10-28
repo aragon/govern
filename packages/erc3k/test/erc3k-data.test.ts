@@ -1,7 +1,7 @@
 import { ethers } from '@nomiclabs/buidler'
 import { expect } from 'chai'
-import { keccak256, soliditySha3Raw } from 'web3-utils'
 import { Erc3000DataLibTest, Erc3000DataLibTestFactory } from '../typechain'
+import { solidityPack, keccak256 } from 'ethers/lib/utils'
 
 let deposit = {
     token: '0xb794f5ea0ba39494ce839613fffba74279579268',
@@ -32,19 +32,23 @@ let deposit = {
   }
 
 function getPayloadHash(): string {
-  return soliditySha3Raw(
-    container.payload.nonce,
-    container.payload.executionTime,
-    container.payload.submitter,
-    container.payload.executor,
-    soliditySha3Raw(container.payload.actions),
-    container.payload.allowFailuresMap,
-    keccak256(container.payload.proof)
+  return solidityPack(
+    [],
+    [
+      container.payload.nonce,
+      container.payload.executionTime,
+      container.payload.submitter,
+      container.payload.executor,
+      solidityPack([], container.payload.actions),
+      container.payload.allowFailuresMap,
+      keccak256(container.payload.proof)
+    ]
   )
+
 }
 
 function getConfigHash(): string {
-  return soliditySha3Raw(container.config)
+  return ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(['uint256', '', '', '', 'address'], [container.config]))
 }
 
 describe('ERC3000Data', function() {
@@ -59,7 +63,7 @@ describe('ERC3000Data', function() {
   })
 
   it('calls testConfigHash and returns the expected hash', async () => {
-    await expect(erc3kDataLib.testConfigHash(container.config))
+    expect(await erc3kDataLib.testConfigHash(container.config))
       .to.be.equal(getConfigHash())
   })
 
@@ -70,6 +74,9 @@ describe('ERC3000Data', function() {
 
   it('calls testContainerHash and returns the expected hash', async () => {
     await expect(erc3kDataLib.testContainerHash(container))
-      .to.be.equal(soliditySha3Raw('erc3k-v1', erc3kDataLib.address, getPayloadHash(), getConfigHash()))
+      .to.be.equal(solidityPack(
+        ['string', 'address', 'bytes32', 'bytes32'],
+        ['erc3k-v1', erc3kDataLib.address, getPayloadHash(), getConfigHash()]
+      ))
   })
 })
