@@ -49,9 +49,9 @@ import {
 } from './utils/events'
 
 export function handleScheduled(event: ScheduledEvent): void {
-  const queue = loadOrCreateQueue(event.address)
-  const payload = loadOrCreatePayload(event.params.containerHash)
-  const container = loadOrCreateContainer(event.params.containerHash)
+  let queue = loadOrCreateQueue(event.address)
+  let payload = loadOrCreatePayload(event.params.containerHash)
+  let container = loadOrCreateContainer(event.params.containerHash)
   // Builds each of the actions bundled in the payload,
   // and saves them to the DB.
   buildActions(event)
@@ -71,7 +71,7 @@ export function handleScheduled(event: ScheduledEvent): void {
   handleContainerEventSchedule(container, event)
 
   // add the container to the queue
-  const scheduled = queue.queued
+  let scheduled = queue.queued
   scheduled.push(container.id)
   queue.queued = scheduled
 
@@ -81,14 +81,14 @@ export function handleScheduled(event: ScheduledEvent): void {
 }
 
 export function handleExecuted(event: ExecutedEvent): void {
-  const container = loadOrCreateContainer(event.params.containerHash)
+  let container = loadOrCreateContainer(event.params.containerHash)
   container.state = EXECUTED_STATUS
   container.save()
 }
 
 export function handleChallenged(event: ChallengedEvent): void {
-  const queue = loadOrCreateQueue(event.address)
-  const container = loadOrCreateContainer(event.params.containerHash)
+  let queue = loadOrCreateQueue(event.address)
+  let container = loadOrCreateContainer(event.params.containerHash)
 
   container.state = CHALLENGED_STATUS
 
@@ -103,7 +103,7 @@ export function handleChallenged(event: ChallengedEvent): void {
 }
 
 export function handleResolved(event: ResolvedEvent): void {
-  const container = loadOrCreateContainer(event.params.containerHash)
+  let container = loadOrCreateContainer(event.params.containerHash)
 
   container.state = event.params.approved ? EXECUTED_STATUS : CANCELLED_STATUS
 
@@ -113,8 +113,8 @@ export function handleResolved(event: ResolvedEvent): void {
 }
 
 export function handleVetoed(event: VetoedEvent): void {
-  const queue = loadOrCreateQueue(event.address)
-  const container = loadOrCreateContainer(event.params.containerHash)
+  let queue = loadOrCreateQueue(event.address)
+  let container = loadOrCreateContainer(event.params.containerHash)
 
   container.state = CANCELLED_STATUS
 
@@ -125,20 +125,20 @@ export function handleVetoed(event: VetoedEvent): void {
 }
 
 export function handleConfigured(event: ConfiguredEvent): void {
-  const queue = loadOrCreateQueue(event.address)
+  let queue = loadOrCreateQueue(event.address)
 
-  const configId = buildId(event)
-  const config = new ConfigEntity(configId)
+  let configId = buildId(event)
+  let config = new ConfigEntity(configId)
 
-  const scheduleDeposit = loadOrCreateCollateral(event, 1)
+  let scheduleDeposit = loadOrCreateCollateral(event, 1)
   scheduleDeposit.token = event.params.config.scheduleDeposit.token
   scheduleDeposit.amount = event.params.config.scheduleDeposit.amount
 
-  const challengeDeposit = loadOrCreateCollateral(event, 2)
+  let challengeDeposit = loadOrCreateCollateral(event, 2)
   challengeDeposit.token = event.params.config.challengeDeposit.token
   challengeDeposit.amount = event.params.config.challengeDeposit.amount
 
-  const vetoDeposit = loadOrCreateCollateral(event, 3)
+  let vetoDeposit = loadOrCreateCollateral(event, 3)
   vetoDeposit.token = event.params.config.vetoDeposit.token
   vetoDeposit.amount = event.params.config.vetoDeposit.amount
 
@@ -162,23 +162,23 @@ export function handleConfigured(event: ConfiguredEvent): void {
 // IArbitrable Events
 
 export function handleEvidenceSubmitted(event: EvidenceSubmittedEvent): void {
-  const governQueue = GovernQueueContract.bind(event.address)
-  const containerHash = governQueue.disputeItemCache(
+  let governQueue = GovernQueueContract.bind(event.address)
+  let containerHash = governQueue.disputeItemCache(
     event.params.arbitrator,
     event.params.disputeId
   )
-  const container = loadOrCreateContainer(containerHash)
+  let container = loadOrCreateContainer(containerHash)
 
   handleContainerEventSubmitEvidence(container, event)
 }
 
 export function handleRuled(event: RuledEvent): void {
-  const governQueue = GovernQueueContract.bind(event.address)
-  const containerHash = governQueue.disputeItemCache(
+  let governQueue = GovernQueueContract.bind(event.address)
+  let containerHash = governQueue.disputeItemCache(
     event.params.arbitrator,
     event.params.disputeId
   )
-  const container = loadOrCreateContainer(containerHash)
+  let container = loadOrCreateContainer(containerHash)
 
   container.state =
     event.params.ruling === ALLOW_RULING ? APPROVED_STATUS : REJECTED_STATUS
@@ -191,20 +191,20 @@ export function handleRuled(event: RuledEvent): void {
 // MiniACL Events
 
 export function handleFrozen(event: FrozenEvent): void {
-  const queue = loadOrCreateQueue(event.address)
+  let queue = loadOrCreateQueue(event.address)
 
-  const roles = queue.roles!
+  let roles = queue.roles!
 
   frozenRoles(roles, event.params.role)
 }
 
 export function handleGranted(event: GrantedEvent): void {
-  const queue = loadOrCreateQueue(event.address)
+  let queue = loadOrCreateQueue(event.address)
 
-  const role = roleGranted(event.address, event.params.role, event.params.who)
+  let role = roleGranted(event.address, event.params.role, event.params.who)
 
   // add the role
-  const currentRoles = queue.roles
+  let currentRoles = queue.roles
   currentRoles.push(role.id)
   queue.roles = currentRoles
 
@@ -212,12 +212,12 @@ export function handleGranted(event: GrantedEvent): void {
 }
 
 export function handleRevoked(event: RevokedEvent): void {
-  const queue = loadOrCreateQueue(event.address)
+  let queue = loadOrCreateQueue(event.address)
 
-  const role = roleRevoked(event.address, event.params.role, event.params.who)
+  let role = roleRevoked(event.address, event.params.role, event.params.who)
 
   // add the role
-  const currentRoles = queue.roles
+  let currentRoles = queue.roles
   currentRoles.push(role.id)
   queue.roles = currentRoles
 
@@ -227,7 +227,7 @@ export function handleRevoked(event: RevokedEvent): void {
 // Helpers
 
 export function loadOrCreateQueue(entity: Address): GovernQueueEntity {
-  const queueId = entity.toHexString()
+  let queueId = entity.toHexString()
   // Create queue
   let queue = GovernQueueEntity.load(queueId)
   if (queue === null) {
@@ -241,7 +241,7 @@ export function loadOrCreateQueue(entity: Address): GovernQueueEntity {
 }
 
 export function loadOrCreateContainer(containerHash: Bytes): ContainerEntity {
-  const ContainerId = containerHash.toHexString()
+  let ContainerId = containerHash.toHexString()
   // Create container
   let container = ContainerEntity.load(ContainerId)
   if (container === null) {
@@ -253,7 +253,7 @@ export function loadOrCreateContainer(containerHash: Bytes): ContainerEntity {
 }
 
 function loadOrCreatePayload(containerHash: Bytes): PayloadEntity {
-  const PayloadId = containerHash.toHexString()
+  let PayloadId = containerHash.toHexString()
   // Create payload
   let payload = PayloadEntity.load(PayloadId)
   if (payload === null) {
@@ -266,10 +266,7 @@ function loadOrCreateCollateral(
   event: ethereum.Event,
   index: number
 ): CollateralEntity {
-  const collateralId = buildIndexedId(
-    event.transaction.hash.toHexString(),
-    index
-  )
+  let collateralId = buildIndexedId(event.transaction.hash.toHexString(), index)
   // Create collateral
   let collateral = CollateralEntity.load(collateralId)
   if (collateral === null) {
@@ -279,13 +276,13 @@ function loadOrCreateCollateral(
 }
 
 function buildActions(event: ScheduledEvent): void {
-  const actions = event.params.payload.actions
+  let actions = event.params.payload.actions
   for (let index = 0; index < actions.length; index++) {
-    const actionId = buildIndexedId(
+    let actionId = buildIndexedId(
       event.params.containerHash.toHexString(),
       index
     )
-    const action = new ActionEntity(actionId)
+    let action = new ActionEntity(actionId)
 
     action.to = actions[index].to
     action.value = actions[index].value

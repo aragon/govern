@@ -16,7 +16,7 @@ export function roleGranted(
   selector: Bytes,
   who: Address
 ): RoleEntity {
-  const role = loadOrCreateRole(entity, selector, who);
+  let role = loadOrCreateRole(entity, selector, who);
   role.granted = true;
 
   role.save();
@@ -29,7 +29,7 @@ export function roleRevoked(
   selector: Bytes,
   who: Address
 ): RoleEntity {
-  const role = loadOrCreateRole(entity, selector, who);
+  let role = loadOrCreateRole(entity, selector, who);
   role.granted = false;
 
   role.save();
@@ -56,7 +56,7 @@ function loadOrCreateRole(
   selector: Bytes,
   who: Address
 ): RoleEntity {
-  const roleId = buildRoleId(entity, selector, who);
+  let roleId = buildRoleId(entity, selector, who);
   // Create role
   let role = RoleEntity.load(roleId);
   if (role === null) {
