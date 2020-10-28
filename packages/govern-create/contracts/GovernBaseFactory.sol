@@ -5,7 +5,7 @@
 pragma solidity 0.6.8;
 pragma experimental ABIEncoderV2;
 
-import "erc3k/contracts/ERC3000Registry.sol";
+import "govern-core/contracts/GovernRegistry.sol";
 
 import "./core-factories/GovernFactory.sol";
 import "./core-factories/GovernQueueFactory.sol";
@@ -15,9 +15,9 @@ contract GovernBaseFactory {
 
     GovernFactory public governFactory;
     GovernQueueFactory public queueFactory;
-    ERC3000Registry public registry;
+    GovernRegistry public registry;
 
-    constructor(ERC3000Registry _registry, GovernFactory _governFactory, GovernQueueFactory _queueFactory) public {
+    constructor(GovernRegistry _registry, GovernFactory _governFactory, GovernQueueFactory _queueFactory) public {
         governFactory = _governFactory;
         queueFactory = _queueFactory;
         registry = _registry;
