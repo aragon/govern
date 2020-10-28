@@ -7,42 +7,27 @@ pragma experimental ABIEncoderV2;
 
 import "erc3k/contracts/ERC3000Registry.sol";
 
-import "@aragon/govern-core/contracts/Govern.sol";
-import "@aragon/govern-core/contracts/pipelines/GovernQueue.sol";
-
-contract GovernQueueFactory {
-    function newQueue(address _aclRoot, ERC3000Data.Config memory _config)
-        public
-        returns (GovernQueue queue)
-    {
-        return new GovernQueue(_aclRoot, _config);
-    }
-}
+import "./core-factories/GovernFactory.sol";
+import "./core-factories/GovernQueueFactory.sol";
 
 contract GovernBaseFactory {
     address internal constant ANY_ADDR = address(-1);
 
+    GovernFactory public governFactory;
     GovernQueueFactory public queueFactory;
     ERC3000Registry public registry;
 
-    constructor(ERC3000Registry _registry, GovernQueueFactory _queueFactory) public {
+    constructor(ERC3000Registry _registry, GovernFactory _governFactory, GovernQueueFactory _queueFactory) public {
+        governFactory = _governFactory;
         queueFactory = _queueFactory;
         registry = _registry;
     }
 
-    function newDummyGovern(string calldata _name) external returns (Govern govern, GovernQueue queue) {
-        ERC3000Data.Collateral memory noCollateral;
-        ERC3000Data.Config memory config = ERC3000Data.Config(
-            0,
-            noCollateral,
-            noCollateral,
-            noCollateral,
-            address(0),
-            ""
-        );
+    function newDummyGovern(string calldata _name, bool _useProxies) external returns (Govern govern, GovernQueue queue) {
+        bytes32 salt = _useProxies ? keccak256(abi.encodePacked(_name)) : bytes32(0);
 
-        queue = queueFactory.newQueue(address(this), config);
-        govern = new Govern(queue);
+        queue = queueFactory.newQueue(address(this), dummyConfig(), salt);
+        govern = governFactory.newGovern(queue, salt);
 
         registry.register(govern, queue, _name, "");
 
@@ -53,7 +38,18 @@ contract GovernBaseFactory {
         items[3] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.configure.selector, address(govern));
         items[4] = ACLData.BulkItem(ACLData.BulkOp.Revoke, queue.ROOT_ROLE(), address(this));
         items[5] = ACLData.BulkItem(ACLData.BulkOp.Freeze, queue.ROOT_ROLE(), address(0));
-
+        
         queue.bulk(items);
+    }
+
+    function dummyConfig() internal pure returns (ERC3000Data.Config memory) {
+        ERC3000Data.Collateral memory noCollateral;
+        return ERC3000Data.Config(
+            0,
+            noCollateral,
+            noCollateral,
+            address(0),
+            ""
+        );
     }
 }

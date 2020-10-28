@@ -427,7 +427,7 @@
             "type": "address"
           },
           {
-            "internalType": "contract IERC3000Executor",
+            "internalType": "contract ERC3000Executor",
             "name": "executor",
             "type": "address"
           },
@@ -599,7 +599,7 @@
                 "type": "address"
               },
               {
-                "internalType": "contract IERC3000Executor",
+                "internalType": "contract ERC3000Executor",
                 "name": "executor",
                 "type": "address"
               },
@@ -900,7 +900,7 @@
                 "type": "address"
               },
               {
-                "internalType": "contract IERC3000Executor",
+                "internalType": "contract ERC3000Executor",
                 "name": "executor",
                 "type": "address"
               },
@@ -1058,7 +1058,7 @@
                 "type": "address"
               },
               {
-                "internalType": "contract IERC3000Executor",
+                "internalType": "contract ERC3000Executor",
                 "name": "executor",
                 "type": "address"
               },
@@ -1298,7 +1298,7 @@
                 "type": "address"
               },
               {
-                "internalType": "contract IERC3000Executor",
+                "internalType": "contract ERC3000Executor",
                 "name": "executor",
                 "type": "address"
               },
@@ -1521,7 +1521,7 @@
                 "type": "address"
               },
               {
-                "internalType": "contract IERC3000Executor",
+                "internalType": "contract ERC3000Executor",
                 "name": "executor",
                 "type": "address"
               },
@@ -1674,7 +1674,7 @@
                 "type": "address"
               },
               {
-                "internalType": "contract IERC3000Executor",
+                "internalType": "contract ERC3000Executor",
                 "name": "executor",
                 "type": "address"
               },

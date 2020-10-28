@@ -8,7 +8,7 @@ type GraphqlClientOptions = {
   verbose?: boolean
 }
 
-export default class GraphqlClient {
+class GraphqlClient {
   #client: Client
   #verbose: boolean
 
@@ -23,37 +23,34 @@ export default class GraphqlClient {
   ): Promise<QueryResult> {
     const result = await this.#client.query(query, args).toPromise()
 
+    const resultMapped = this.mapQueryResult(result)
+
     if (this.#verbose) {
-      console.log(this.describeQueryResult(result))
+      console.log(resultMapped)
     }
 
     if (result.error) {
-      throw new ErrorConnection(
-        this.describeQueryResultError(result) + this.describeQueryResult(result)
-      )
+      throw new ErrorConnection(this.mapQueryResultError(result) + resultMapped)
     }
 
     return result
   }
 
-  private describeQueryResult(result: QueryResult): string {
-    const queryStr = result.operation.query.loc?.source.body
-    const dataStr = JSON.stringify(result.data, null, 2)
-    const argsStr = JSON.stringify(result.operation.variables, null, 2)
-    const url = result.operation.context.url
-
+  private mapQueryResult(result: QueryResult): string {
     return (
-      `Endpoint: ${url}\n\n` +
-      `Arguments: ${argsStr}\n\n` +
-      `Query: ${queryStr}\n\n` +
-      `Returned data: ${dataStr}\n\n`
+      `Endpoint: ${result.operation.context.url}\n\n` +
+      `Arguments: ${JSON.stringify(result.operation.variables, null, 2)}\n\n` +
+      `Query: ${result.operation.query.loc?.source.body}\n\n` +
+      `Returned data: ${JSON.stringify(result.data, null, 2)}\n\n`
     )
   }
 
-  private describeQueryResultError(result: QueryResult): string {
+  private mapQueryResultError(result: QueryResult): string {
     if (!result.error) {
       return ''
     }
     return `${result.error.name}: ${result.error.message}\n\n`
   }
 }
+
+export default GraphqlClient

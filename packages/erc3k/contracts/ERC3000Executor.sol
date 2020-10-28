@@ -5,14 +5,12 @@
 pragma solidity ^0.6.8;
 pragma experimental ABIEncoderV2;
 
-import "@aragon/govern-contract-utils/contracts/erc165/ERC165.sol";
+import "./ERC3000Data.sol";
 
-import "./IERC3000Executor.sol";
-
-abstract contract ERC3000Executor is IERC3000Executor, ERC165 {
+abstract contract ERC3000Executor {
     bytes4 internal constant ERC3000_EXEC_INTERFACE_ID = this.exec.selector;
 
-    function supportsInterface(bytes4 _interfaceId) override public pure returns (bool) {
-        return _interfaceId == ERC3000_EXEC_INTERFACE_ID || super.supportsInterface(_interfaceId);
-    }
+    function exec(ERC3000Data.Action[] memory actions, bytes32 allowFailuresMap, bytes32 memo) virtual public returns (bytes32 failureMap, bytes[] memory);
+
+    event Executed(address indexed actor, ERC3000Data.Action[] actions, bytes32 memo, bytes32 failureMap, bytes[] execResults);
 }

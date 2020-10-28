@@ -8,4 +8,4 @@ export const NONE_STATUS = 'None'
 export const REJECTED_STATUS = 'Rejected'
 export const SCHEDULED_STATUS = 'Scheduled'
 
-export const ALLOW_RULING = BigInt.fromI32(4)
+export let ALLOW_RULING = BigInt.fromI32(4)

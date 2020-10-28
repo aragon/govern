@@ -4,12 +4,12 @@
 
 pragma solidity 0.6.8;
 
+import "@aragon/govern-contract-utils/contracts/erc165/ERC165.sol";
+
 import "./ERC3000.sol";
 import "./ERC3000Executor.sol";
 
-contract ERC3000Registry {
-    bytes4 internal constant ERC3000_INTERFACE_ID = 0x6d74ef88;
-
+contract ERC3000Registry is ERC3000Interface {
     mapping (string => bool) public nameUsed;
 
     event Registered(ERC3000Executor indexed dao, ERC3000 queue, address indexed registrant, string name);
@@ -18,7 +18,7 @@ contract ERC3000Registry {
     function register(ERC3000Executor _dao, ERC3000 _queue, string calldata _name, bytes calldata _initialMetadata) external
     {
         require(!nameUsed[_name], "registry: name used");
-        require(_queue.supportsInterface(ERC3000_INTERFACE_ID), "registry: bad interface queue");
+        require(ERC165(address(_queue)).supportsInterface(ERC3000_INTERFACE_ID), "registry: bad interface queue");
 
         // all will revert if `_dao` is not interface compliant in _setMetadata
         nameUsed[_name] = true;
@@ -32,7 +32,7 @@ contract ERC3000Registry {
     }
 
     function _setMetadata(ERC3000Executor _dao, bytes memory _metadata) internal {
-        require(_dao.supportsInterface(_dao.exec.selector), "registry: bad interface dao");
+        require(ERC165(address(_dao)).supportsInterface(_dao.exec.selector), "registry: bad interface dao");
 
         emit SetMetadata(_dao, _metadata);
     }
