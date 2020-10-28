@@ -32,7 +32,7 @@ templates:
         - name: ERC20
           file: ../govern-core/artifacts/ERC20.json
       eventHandlers:
-        - event: Configured(indexed bytes32,indexed address,(uint256,(address,uint256),(address,uint256),(address,uint256),address,bytes))
+        - event: Configured(indexed bytes32,indexed address,(uint256,(address,uint256),(address,uint256),address,bytes))
           handler: handleConfigured
         - event: Frozen(indexed bytes4,indexed address)
           handler: handleFrozen
@@ -44,7 +44,7 @@ templates:
           handler: handleExecuted
         - event: Challenged(indexed bytes32,indexed address,bytes,uint256,(address,uint256))
           handler: handleChallenged
-        - event: Vetoed(indexed bytes32,indexed address,bytes,(address,uint256))
+        - event: Vetoed(indexed bytes32,indexed address,bytes)
           handler: handleVetoed
         - event: Resolved(indexed bytes32,indexed address,bool)
           handler: handleResolved

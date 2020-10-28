@@ -47,7 +47,6 @@ type Config @entity {
   executionDelay: BigInt!
   scheduleDeposit: Collateral!
   challengeDeposit: Collateral!
-  vetoDeposit: Collateral!
   resolver: Bytes!
   rules: Bytes!
 }
@@ -117,7 +116,6 @@ type Veto @entity {
   packet: QueuePacket!
   reason: Bytes!
   submitter: Bytes!
-  collateral: Collateral!
   createdAt: BigInt!
 }
 

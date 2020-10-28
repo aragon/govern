@@ -136,14 +136,9 @@ export function handleVetoed(event: VetoedEvent): void {
 
   const veto = new VetoEntity(event.params.containerHash.toHexString())
 
-  const vetoDeposit = loadOrCreateCollateral(event, '3')
-  vetoDeposit.token = buildERC20(event.params.collateral.token)
-  vetoDeposit.amount = event.params.collateral.amount
-
   veto.packet = packet.id
   veto.reason = event.params.reason
   veto.submitter = event.params.actor
-  veto.collateral = vetoDeposit.id
   veto.createdAt = event.block.timestamp
 
   // add the veto packet
@@ -170,14 +165,9 @@ export function handleConfigured(event: ConfiguredEvent): void {
   )
   challengeDeposit.amount = event.params.config.challengeDeposit.amount
 
-  const vetoDeposit = loadOrCreateCollateral(event, '3')
-  vetoDeposit.token = buildERC20(event.params.config.vetoDeposit.token)
-  vetoDeposit.amount = event.params.config.vetoDeposit.amount
-
   config.executionDelay = event.params.config.executionDelay
   config.scheduleDeposit = scheduleDeposit.id
   config.challengeDeposit = challengeDeposit.id
-  config.vetoDeposit = vetoDeposit.id
   config.resolver = event.params.config.resolver
   config.rules = event.params.config.rules
 
@@ -185,7 +175,6 @@ export function handleConfigured(event: ConfiguredEvent): void {
 
   scheduleDeposit.save()
   challengeDeposit.save()
-  vetoDeposit.save()
   config.save()
   queue.save()
 }
