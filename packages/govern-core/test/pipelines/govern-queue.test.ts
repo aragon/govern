@@ -38,80 +38,100 @@ describe('Govern Queue', function() {
     gq = (await GQ.deploy(ownerAddr, INIT_CONFIG)) as GovernQueue
   })
 
-  it('calls schedule and returns with the expected result', () => {
+  context('GovernQueue.schedule', () => {
+    it('returns with the expected result', () => {
 
+    })
+
+    it('errors with "queue: bad nonce"', () => {
+
+    })
+
+    it('errors with "queue: bad config"', () => {
+
+    })
+
+    it('errors with "queue: bad delay"', () => {
+
+    })
+
+    it('errors with "queue: bad submitter"', () => {
+
+    })
   })
 
-  it('calls schedule and errors with "queue: bad nonce"', () => {
+  context('GovernQueue.execute', () => {
+    it('returns with the expected result', () => {
 
+    })
+
+    it('errors with "queue: wait more"', () => {
+
+    })
   })
 
-  it('calls schedule and errors with "queue: bad config"', () => {
+  context('GovernQueue.challenge', () => {
+    it('returns with the expected result', () => {
 
+    })
+
+    it('errors with "queue: bad fee pull"', () => {
+
+    })
+
+    it('errors with "queue: bad approve"', () => {
+
+    })
+
+    it('errors with "queue: bad reset"', () => {
+
+    })
   })
 
-  it('calls schedule and errors with "queue: bad delay"', () => {
+  context('GovernQueue.resolve', () => {
+    it('returns with the expected result', () => {
 
+    })
+
+    it('errors with "queue: unresolved"', () => {
+
+    })
   })
 
-  it('calls schedule and errors with "queue: bad submitter"', () => {
+  context('GovernQueue.veto', () => {
+    it('runs as expected', () => {
 
+    })
   })
 
-  it('calls execute and returns with the expected result', () => {
+  context('GovernQueue.configure', () => {
+    it('returns with the expected result', () => {
 
+    })
   })
 
-  it('calls execute and errors with "queue: wait more"', () => {
+  context('GovernQueue.executeApprove', () => {
+    it('returns with the expected result', () => {
 
+    })
   })
 
-  it('calls challenge and returns with the expected result', () => {
+  context('GovernQueue.settleRejection', () => {
+    it('returns with the expected result', () => {
 
+    })
   })
 
-  it('calls challenge and errors with "queue: bad fee pull"', () => {
+  context('GovernQueue.rule', () => {
+    it('returns with the expected result', () => {
 
+    })
   })
 
-  it('calls challenge and errors with "queue: bad approve"', () => {
+  context('GovernQueue.submitEvidence', () => {
+    it('reverts as expected', () => {
 
-  })
-
-  it('calls challenge and errors with "queue: bad reset"', () => {
-
-  })
-
-  it('calls resolve and returns with the expected result', () => {
-
-  })
-
-  it('calls resolve and errors with "queue: unresolved"', () => {
-
-  })
-
-  it('calls veto and runs as expected', () => {
-
-  })
-
-  it('calls configure and returns with the expected result', () => {
-
-  })
-
-  it('calls executeApprove and returns with the expected result', () => {
-
-  })
-
-  it('calls settleRejection and returns with the expected result', () => {
-
-  })
-
-  it('calls rule and returns with the expected result', () => {
-
-  })
-
-  it('calls submitEvidence and reverts as expected', () => {
-
+    })
   })
 
   context('ERC-165', () => {
