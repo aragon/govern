@@ -98,19 +98,21 @@ describe('ERC3000Data', function () {
   })
 
   it('calls testConfigHash and returns the expected hash', async () => {
-    expect(await erc3kDataLib.testConfigHash(container.config)).to.be.equal(
-      getConfigHash()
-    )
+    expect(
+      await erc3kDataLib.testConfigHash(container.config)
+    ).to.be.equal(getConfigHash())
   })
 
   it('calls testPayloadHash and returns the expected hash', async () => {
-    expect(await erc3kDataLib.testPayloadHash(container.payload)).to.be.equal(
-      getPayloadHash()
-    )
+    expect(
+      await erc3kDataLib.testPayloadHash(container.payload)
+    ).to.be.equal(getPayloadHash())
   })
 
   it('calls testContainerHash and returns the expected hash', async () => {
-    expect(await erc3kDataLib.testContainerHash(container)).to.be.equal(
+    expect(
+      await erc3kDataLib.testContainerHash(container)
+    ).to.be.equal(
       keccak256(
         solidityPack(
           ['string', 'address', 'bytes32', 'bytes32'],
