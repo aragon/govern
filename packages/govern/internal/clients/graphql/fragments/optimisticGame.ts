@@ -1,5 +1,3 @@
-import { DocumentNode } from 'graphql'
-import gql from 'graphql-tag'
 import optimisticQueue, { OptimisticQueue } from './optimisticQueue'
 
 export interface OptimisticGame {
@@ -9,7 +7,7 @@ export interface OptimisticGame {
   metadata: string
 }
 
-const optimisticGame: DocumentNode = gql`
+const optimisticGame = `
     fragment OptimisticGame_optimisticGame on OptimisticGame {
       id
       name

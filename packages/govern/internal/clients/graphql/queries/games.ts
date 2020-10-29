@@ -1,8 +1,6 @@
-import { DocumentNode } from 'graphql'
-import gql from 'graphql-tag'
 import optimisticGame  from '../fragments/optimisticGame'
 
-const games: DocumentNode = gql`
+const games: string = `
     query Games($address: String) {
       dao(address: $address) {
         games() {

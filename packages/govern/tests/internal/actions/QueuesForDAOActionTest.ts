@@ -1,8 +1,5 @@
 import QueuesForDaoAction from '../../../internal/actions/QueuesForDAOAction'
 
-// Mocks
-jest.mock('graphql-tag');
-
 /**
  * QueuesForDaoAction test
  */

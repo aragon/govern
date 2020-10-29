@@ -1,8 +1,5 @@
 import QueueAction from '../../../internal/actions/QueueAction'
 
-// Mocks
-jest.mock('graphql-tag');
-
 /**
  * QueueAction test
  */

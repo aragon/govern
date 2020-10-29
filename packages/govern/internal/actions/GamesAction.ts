@@ -1,4 +1,3 @@
-import { DocumentNode } from 'graphql'
 import { OptimisticGame } from '../clients/graphql/fragments/optimisticGame'
 import { isAddress } from '@ethersproject/address'
 import { Address } from '../clients/lib/types/Address'
@@ -12,11 +11,11 @@ export default class GamesAction extends AbstractAction<OptimisticGame[]> {
   /**
    * Contains the GraphQL query of the current action
    *
-   * @var {DocumentNode} gqlQuery
+   * @var {string} gqlQuery
    *
    * @protected
    */
-  protected gqlQuery: DocumentNode = games
+  protected gqlQuery: string = games
 
 
   /**

@@ -3,7 +3,6 @@ import { queue } from '../../public/queue'
 
 // Mocks
 jest.mock('../../internal/actions/QueueAction')
-jest.mock('graphql-tag')
 
 /**
  * queue test

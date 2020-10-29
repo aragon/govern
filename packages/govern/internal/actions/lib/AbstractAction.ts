@@ -1,4 +1,3 @@
-import { DocumentNode } from 'graphql'
 import Configuration from '../../configuration/Configuration'
 
 /**
@@ -8,11 +7,11 @@ export default abstract class AbstractAction<T> {
   /**
    * Contains the GraphQL query of the current action
    *
-   * @var {DocumentNode} gqlQuery
+   * @var {string} gqlQuery
    *
    * @protected
    */
-  protected gqlQuery: DocumentNode
+  protected gqlQuery: string
 
   /**
    * The current configuration to execute this action

@@ -3,7 +3,6 @@ import { daos} from '../../public/daos'
 
 // Mocks
 jest.mock('../../internal/actions/DaosAction')
-jest.mock('graphql-tag')
 
 /**
  * daos test

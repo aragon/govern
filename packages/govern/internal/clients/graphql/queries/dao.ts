@@ -1,5 +1,3 @@
-import { DocumentNode } from 'graphql'
-import gql from 'graphql-tag'
 import optimisticQueue, { OptimisticQueue } from '../fragments/optimisticQueue'
 import execution, { Execution } from '../fragments/execution'
 import role, { Role } from '../fragments/role'
@@ -13,7 +11,7 @@ export interface Dao {
   queues: OptimisticQueue[]
 }
 
-const dao: DocumentNode = gql`
+const dao: string = `
     query DAO($address: String) {
       dao(address: $address) {
         id

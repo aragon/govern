@@ -1,8 +1,6 @@
-import { DocumentNode } from 'graphql'
-import gql from 'graphql-tag'
 import optimisticQueue  from '../fragments/optimisticQueue'
 
-const queuesForDao: DocumentNode = gql`
+const queuesForDao: string = `
     query QueuesForDao($address: String) {
       dao(address: $address) {
         queues() {

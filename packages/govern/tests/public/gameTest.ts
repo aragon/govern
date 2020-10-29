@@ -3,7 +3,6 @@ import { game } from '../../public/game'
 
 // Mocks
 jest.mock('../../internal/actions/GameAction')
-jest.mock('graphql-tag')
 
 /**
  * game test

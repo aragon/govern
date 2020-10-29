@@ -1,6 +1,5 @@
 import { isAddress } from '@ethersproject/address'
 import { OptimisticQueue } from '../clients/graphql/fragments/optimisticQueue'
-import { DocumentNode } from 'graphql'
 import { Address } from '../clients/lib/types/Address'
 import AbstractAction from './lib/AbstractAction'
 import queuesForDAO  from '../clients/graphql/queries/queuesForDAO'
@@ -12,11 +11,11 @@ export default class QueuesForDaoAction extends AbstractAction<OptimisticQueue[]
   /**
    * Contains the GraphQL query of the current action
    *
-   * @var {DocumentNode} gqlQuery
+   * @var {string} gqlQuery
    *
    * @protected
    */
-  protected gqlQuery: DocumentNode = queuesForDAO
+  protected gqlQuery: string = queuesForDAO
 
   /**
    * @param {{address: Address}} parameters

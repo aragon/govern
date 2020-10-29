@@ -1,5 +1,3 @@
-import { DocumentNode } from 'graphql'
-import gql from 'graphql-tag'
 import { Address } from '../../lib/types/Address'
 
 export interface Role {
@@ -11,7 +9,7 @@ export interface Role {
   frozen: boolean
 }
 
-const role: DocumentNode = gql`
+const role: string = `
     fragment Role_role on Role {
       id
       entity

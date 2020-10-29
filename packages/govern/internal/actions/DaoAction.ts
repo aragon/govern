@@ -1,4 +1,3 @@
-import { DocumentNode } from 'graphql'
 import AbstractAction from './lib/AbstractAction'
 import { isAddress } from '@ethersproject/address'
 import { Address } from '../clients/lib/types/Address'
@@ -11,11 +10,11 @@ export default class DaoAction extends AbstractAction<Dao> {
   /**
    * Contains the GraphQL query of the current action
    *
-   * @var {DocumentNode} gqlQuery
+   * @var {string} gqlQuery
    *
    * @protected
    */
-  protected gqlQuery: DocumentNode = dao
+  protected gqlQuery: string = dao
 
   /**
    * @param {{address: Address}} parameters

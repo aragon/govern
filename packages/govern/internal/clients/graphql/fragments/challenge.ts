@@ -1,5 +1,3 @@
-import { DocumentNode } from 'graphql'
-import gql from 'graphql-tag'
 import collateral, { Collateral } from './collateral'
 import item, { Item } from './item'
 import { Address } from '../../lib/types/Address'
@@ -22,7 +20,7 @@ export interface Challenge {
   createdAt: string
 }
 
-const challenge: DocumentNode = gql`
+const challenge: string = `
     fragment Challenge_challenge on Challenge {
       id
       challenger

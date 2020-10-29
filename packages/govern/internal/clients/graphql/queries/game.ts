@@ -1,8 +1,6 @@
-import { DocumentNode } from 'graphql'
-import gql from 'graphql-tag'
 import optimisticGame from '../fragments/optimisticGame'
 
-const game: DocumentNode = gql`
+const game: string = `
     query Game($name: String) {
       game(name: $name) {
         ...OptimisticGame_optimisticGame

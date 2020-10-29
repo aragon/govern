@@ -1,8 +1,5 @@
 import DaoAction from '../../../internal/actions/DAOAction'
 
-// Mocks
-jest.mock('graphql-tag');
-
 /**
  * DaoAction test
  */

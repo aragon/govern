@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-unfetch'
 import { Client, OperationResult } from '@urql/core'
-import { DocumentNode } from 'graphql'
+import gql from 'graphql-tag'
 import ClientInterface from '../lib/ClientInterface'
 
 /**
@@ -47,15 +47,15 @@ export default class GraphQLClient implements ClientInterface {
    *
    * @method request
    *
-   * @param {DocumentNode} query
+   * @param {string} query
    * @param {Object} args
    *
    * @returns {Promise<any>}
    *
    * @public
    */
-  public async request(query: DocumentNode, args: any = {}): Promise<OperationResult> {
-    const result = await this.client.query(query, args).toPromise()
+  public async request(query: string, args: any = {}): Promise<OperationResult> {
+    const result = await this.client.query(gql(query), args).toPromise()
 
     if (result.error) { // TODO: Use errors from core
       throw new Error(

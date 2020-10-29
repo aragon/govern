@@ -3,7 +3,6 @@ import { queuesForDao } from '../../public/queuesForDao'
 
 // Mocks
 jest.mock('../../internal/actions/QueuesForDaoAction')
-jest.mock('graphql-tag')
 
 /**
  * queuesForDao test

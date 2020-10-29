@@ -1,5 +1,3 @@
-import { DocumentNode } from 'graphql'
-import gql from 'graphql-tag'
 import { Address } from '../../lib/types/Address'
 
 export interface Action {
@@ -9,7 +7,7 @@ export interface Action {
   data: string
 }
 
-const action: DocumentNode = gql`
+const action: string = `
     fragment Action_action on Action {
       id
       to

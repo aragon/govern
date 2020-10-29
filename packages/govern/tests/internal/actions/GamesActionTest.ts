@@ -1,8 +1,5 @@
 import GamesAction from '../../../internal/actions/GamesAction'
 
-// Mocks
-jest.mock('graphql-tag');
-
 /**
  * GamesAction test
  */

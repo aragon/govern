@@ -1,7 +1,7 @@
 import { Client } from '@urql/core'
 import fetch from 'isomorphic-unfetch'
-import gql from 'graphql-tag'
 import GraphQLClient from '../../../internal/clients/graphql/GraphQLClient'
+import gql from 'graphql-tag'
 
 // Mocks
 jest.mock('@urql/core')
@@ -13,7 +13,7 @@ jest.mock('isomorphic-unfetch')
 describe('GraphQLClientTest', () => {
   let client: GraphQLClient,
     urqlClientMock: any,
-    testQuery = gql('query Test { name }')
+    testQuery = 'query Test { name }'
 
   const urqlClient = Client as jest.MockedClass<typeof Client>
 
@@ -38,7 +38,7 @@ describe('GraphQLClientTest', () => {
     }
 
     urqlClientMock.query = jest.fn((query, args) => {
-      expect(query).toEqual(testQuery)
+      expect(query).toEqual(gql(testQuery))
 
       expect(args).toEqual(args)
 
@@ -81,7 +81,7 @@ describe('GraphQLClientTest', () => {
     }
 
     urqlClientMock.query = jest.fn((query, args) => {
-      expect(query).toEqual(testQuery)
+      expect(query).toEqual(gql(testQuery))
 
       expect(args).toEqual(args)
 
