@@ -8,14 +8,10 @@ import {
   Erc3000MockFactory,
   Erc3000ExecutorMock,
   Erc3000ExecutorMockFactory,
-  Erc3000BadInterfaceMockFactory,
-  Erc3000ExecutorBadInterfaceMockFactory,
 } from '../typechain'
 
 const ERRORS = {
   NAME_USED: 'registry: name used',
-  BAD_INTERFACE_QUEUE: 'registry: bad interface queue',
-  BAD_INTERFACE_DAO: 'registry: bad interface dao',
 }
 
 const EVENTS = {
@@ -86,43 +82,5 @@ describe('GovernRegistry', function () {
     ).to.be.revertedWith(ERRORS.NAME_USED)
 
     expect(await governRegistry.nameUsed('MyName')).to.equal(true)
-  })
-
-  it('calls register and reverts cause the queue has a wrong interface', async () => {
-    const ERC3000BadInterfaceMock = (await ethers.getContractFactory(
-      'ERC3000BadInterfaceMock'
-    )) as Erc3000BadInterfaceMockFactory
-
-    const erc3kBadInterface = await ERC3000BadInterfaceMock.deploy()
-
-    await expect(
-      governRegistry.register(
-        erc3kExec.address,
-        erc3kBadInterface.address,
-        'MyName',
-        '0x00'
-      )
-    ).to.be.revertedWith(ERRORS.BAD_INTERFACE_QUEUE)
-
-    expect(await governRegistry.nameUsed('MyName')).to.equal(false)
-  })
-
-  it('calls register and reverts cause the dao has a wrong interface', async () => {
-    const ERC3000ExecutorBadInterfaceMock = (await ethers.getContractFactory(
-      'ERC3000ExecutorBadInterfaceMock'
-    )) as Erc3000ExecutorBadInterfaceMockFactory
-
-    const erc3kExecBadInterface = await ERC3000ExecutorBadInterfaceMock.deploy()
-
-    await expect(
-      governRegistry.register(
-        erc3kExecBadInterface.address,
-        erc3k.address,
-        'MyName',
-        '0x00'
-      )
-    ).to.be.revertedWith(ERRORS.BAD_INTERFACE_DAO)
-
-    expect(await governRegistry.nameUsed('MyName')).to.equal(false)
   })
 })
