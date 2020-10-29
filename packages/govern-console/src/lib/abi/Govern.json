@@ -2,7 +2,7 @@
   {
     "inputs": [
       {
-        "internalType": "contract IERC3000",
+        "internalType": "contract ERC3000",
         "name": "_initialExecutor",
         "type": "address"
       }

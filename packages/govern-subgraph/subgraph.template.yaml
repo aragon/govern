@@ -6,7 +6,7 @@ repository: https://github.com/aragon/govern
 schema:
   file: ./schema.graphql
 dataSources:
-{{> ERC3000Registry.yaml}}
+{{> GovernRegistry.yaml}}
 templates:
   - kind: ethereum/contract
     name: GovernQueue
@@ -18,21 +18,19 @@ templates:
       apiVersion: 0.0.1
       language: wasm/assemblyscript
       entities:
-        - Config
-        - Item
-        - Challenge
-        - Veto
         - Collateral
-        - Evidence
+        - Config
+        - Container
+        - ContainerEvent
+        - Payload
         - Role
-        - ERC20
       abis:
         - name: GovernQueue
           file: ../govern-core/artifacts/GovernQueue.json
         - name: ERC20
           file: ../govern-core/artifacts/ERC20.json
       eventHandlers:
-        - event: Configured(indexed bytes32,indexed address,(uint256,(address,uint256),(address,uint256),(address,uint256),address,bytes))
+        - event: Configured(indexed bytes32,indexed address,(uint256,(address,uint256),(address,uint256),address,bytes))
           handler: handleConfigured
         - event: Frozen(indexed bytes4,indexed address)
           handler: handleFrozen
@@ -44,7 +42,7 @@ templates:
           handler: handleExecuted
         - event: Challenged(indexed bytes32,indexed address,bytes,uint256,(address,uint256))
           handler: handleChallenged
-        - event: Vetoed(indexed bytes32,indexed address,bytes,(address,uint256))
+        - event: Vetoed(indexed bytes32,indexed address,bytes)
           handler: handleVetoed
         - event: Resolved(indexed bytes32,indexed address,bool)
           handler: handleResolved
@@ -65,8 +63,8 @@ templates:
       apiVersion: 0.0.1
       language: wasm/assemblyscript
       entities:
-        - Execution
-        - Action
+        - Container
+        - ContainerEvent
         - Role
       abis:
         - name: Govern

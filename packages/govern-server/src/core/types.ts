@@ -6,10 +6,16 @@ export type Network = {
   name: string
   chainId: number
   ensAddress: Address
+  subgraphId?: string
 }
 
 export type Networkish =
-  | { chainId?: number; ensAddress?: Address; name?: string }
+  | {
+      chainId?: number
+      ensAddress?: Address
+      name?: string
+      subgraphId?: string
+    }
   | string
   | number
 

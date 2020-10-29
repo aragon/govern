@@ -5,9 +5,10 @@
 ## Quick Start
 
 After installing the monorepo's dependencies, run:
+
 - `yarn manifest-<YOUR_DESIRED_NETWORK>` to generate the corresponding `subgraph.yaml` file for the network.
 - `yarn codegen` to generate the types needed for building the subgraph.
-- `yarn deploy-<YOUR_DESIRED_NETWORK> <THEGRAPH_USERNAME> <SUBGRAPH_NAME> <YOUR_DESIRED_NETWORK>` to build and deploy the subgraph to the desired network. Remember to set your $GRAPHKEY environment variable and check the needed arguments!
+- `yarn deploy-<YOUR_DESIRED_NETWORK> <THEGRAPH_USERNAME> <SUBGRAPH_NAME> <YOUR_DESIRED_NETWORK>` to build and deploy the subgraph to the desired network. Remember to set your \$GRAPHKEY environment variable and check the needed arguments!
 
 ## Networks and performance
 
@@ -19,7 +20,7 @@ Borrowing ideas from the original aragonOS subgraphs, we took the approach of le
 
 ## General information on Govern events and contracts
 
-Govern contracts are small and simple compared to aragonOS, meaning that indexing activity is much easier. However, if you deployed your Govern DAO using proxies, it means that you *must* try and index every instance of the upgraded contract. If you're using one of the official Aragon Govern Factories this shouldn't be an issue, but if you can't find your ugpradeable DAO, don't hesitate to get in touch so we can index it, or just fork the repo and add the contract instance.
+Govern contracts are small and simple compared to aragonOS, meaning that indexing activity is much easier. However, if you deployed your Govern DAO using proxies, it means that you _must_ try and index every instance of the upgraded contract. If you're using one of the official Aragon Govern Factories this shouldn't be an issue, but if you can't find your ugpradeable DAO, don't hesitate to get in touch so we can index it, or just fork the repo and add the contract instance.
 
 ## Information on Contracts being Ingested by the Subgraph
 
@@ -28,16 +29,18 @@ As of right now, all contract events are ingested by the Graph Node, but over ti
 #### Govern.sol
 
 Tracked:
+
 - `Executed`
 - `Frozen`
 - `Granted`
 - `Revoked`
-Left out:
+  Left out:
 - `ETHDeposited`
 
-#### GovernQueue.sol 
+#### GovernQueue.sol
 
 Tracked:
+
 - `Configured`
 - `Frozen`
 - `Granted`
@@ -49,11 +52,12 @@ Tracked:
 - `Revoked`
 - `EvidenceSubmitted`
 - `Ruled`
-Left out: None.
+  Left out: None.
 
-#### ERC3000Registry.sol
+#### GovernRegistry.sol
 
 Tracked:
+
 - `Registered`
 - `SetMetadata`
-Left out: None.
+  Left out: None.

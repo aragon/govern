@@ -15,7 +15,7 @@ echo 'Generating manifest from data file: '$DATA
 cat $DATA
 
 mustache \
-  -p manifest/templates/sources/ERC3000Registry.yaml \
-  -p manifest/templates/contracts/ERC3000Registry.template.yaml \
+  -p manifest/templates/sources/GovernRegistry.yaml \
+  -p manifest/templates/contracts/GovernRegistry.template.yaml \
   $DATA \
   subgraph.template.yaml > subgraph.yaml

@@ -14,6 +14,7 @@ library ERC3000Data {
         Config config;
     }
 
+    // WARN: Always remember to change the 'hash' function if modifying the struct
     struct Payload {
         uint256 nonce;
         uint256 executionTime;
@@ -34,7 +35,6 @@ library ERC3000Data {
         uint256 executionDelay;
         Collateral scheduleDeposit;
         Collateral challengeDeposit;
-        Collateral vetoDeposit;
         address resolver;
         bytes rules;
     }
@@ -56,9 +56,11 @@ library ERC3000Data {
         return keccak256(
             abi.encodePacked(
                 payload.nonce,
+                payload.executionTime,
                 payload.submitter,
                 payload.executor,
                 keccak256(abi.encode(payload.actions)),
+                payload.allowFailuresMap,
                 keccak256(payload.proof)
             )
         );
