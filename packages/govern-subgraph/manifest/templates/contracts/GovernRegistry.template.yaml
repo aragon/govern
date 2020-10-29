@@ -1,9 +1,9 @@
-# ERC3000Registry
+# GovernRegistry
 - kind: ethereum/contract
   name: {{ name }}
   network: {{ network }}
   source:
-    abi: ERC3000Registry
+    abi: GovernRegistry
     address: "{{address}}"
     startBlock: {{startBlock}}
   mapping:
@@ -14,11 +14,11 @@
       - RegistryEntry
       - Govern
     abis:
-      - name: ERC3000Registry
-        file: ../erc3k/artifacts/ERC3000Registry.json
+      - name: GovernRegistry
+        file: ../govern-core/artifacts/GovernRegistry.json
     eventHandlers:
       - event: Registered(indexed address,address,indexed address,string)
         handler: handleRegistered
       - event: SetMetadata(indexed address,bytes)
         handler: handleSetMetadata
-    file: ./src/ERC3000Registry.ts
+    file: ./src/GovernRegistry.ts

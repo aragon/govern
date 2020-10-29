@@ -1,5 +1,4 @@
 import { ethers } from '@nomiclabs/buidler'
-import { expect } from 'chai'
 import { Erc3000ExecutorMock, Erc3000ExecutorMockFactory } from '../typechain'
 
 describe('ERC3000 Executor', function () {

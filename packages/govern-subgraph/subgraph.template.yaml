@@ -6,7 +6,7 @@ repository: https://github.com/aragon/govern
 schema:
   file: ./schema.graphql
 dataSources:
-{{> ERC3000Registry.yaml}}
+{{> GovernRegistry.yaml}}
 templates:
   - kind: ethereum/contract
     name: GovernQueue

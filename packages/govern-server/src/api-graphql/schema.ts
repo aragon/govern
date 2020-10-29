@@ -1,7 +1,7 @@
 import { gql } from 'apollo-server'
 
 export default gql`
-  type ERC3000Registry {
+  type GovernRegistry {
     id: ID!
     address: String!
     count: Int!

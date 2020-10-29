@@ -1,11 +1,15 @@
 # Table of contents
 
-- [Aragon Govern](README.md)
+* [Aragon Govern](README.md)
 
-## Guides
+## High level overview <a id="guides"></a>
 
-- [Getting started](guides/getting-started.md)
+* [ERC3000](guides/erc3000.md)
+* [Govern Core concepts](guides/core-concepts.md)
 
-## Advanced
+## Developers
 
-## API Reference
+* [Getting started](developers/quick-start.md)
+* [Smart contracts breakdown](developers/getting-started.md)
+* [Historical deployments](developers/historical-deployments.md)
+

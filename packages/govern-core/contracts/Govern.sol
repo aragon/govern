@@ -5,14 +5,14 @@
 pragma solidity 0.6.8;
 pragma experimental ABIEncoderV2;
 
-import "erc3k/contracts/ERC3000.sol";
-import "erc3k/contracts/ERC3000Executor.sol";
+import "erc3k/contracts/IERC3000Executor.sol";
+import "erc3k/contracts/IERC3000.sol";
 
 import "@aragon/govern-contract-utils/contracts/acl/ACL.sol";
 import "@aragon/govern-contract-utils/contracts/adaptative-erc165/AdaptativeERC165.sol";
 import "@aragon/govern-contract-utils/contracts/bitmaps/BitmapLib.sol";
 
-contract Govern is AdaptativeERC165, ERC3000Executor, ACL {
+contract Govern is AdaptativeERC165, IERC3000Executor, ACL {
     using BitmapLib for bytes32;
 
     bytes4 internal constant EXEC_ROLE = this.exec.selector;

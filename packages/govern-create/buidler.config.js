@@ -14,7 +14,7 @@ task('accounts', 'Prints the list of accounts', getAccounts)
 
 task('create-action', async (_, { ethers }) => createAction(ethers))
 
-task('deploy-registry', 'Deploys an ERC3000Registry instance').setAction(
+task('deploy-registry', 'Deploys an GoverRegistry instance').setAction(
   deployRegistry
 )
 
