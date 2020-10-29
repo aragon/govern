@@ -6,7 +6,7 @@ Aragon Govern is **beta software.** We try our best to keep everything pristine,
 
 Welcome to Aragon Govern's documentation.
 
-Aragon Govern is software for creating and governing organizations such as clubs, companies, gaming guilds, cooperatives, nonprofits, open source projects, and any other type of organization you can imagine. It's Aragon's implementation of ERC-3000, the standard for binding off-chain voting.
+Aragon Govern is software for creating and governing organizations such as DeFi projects, open source projects, gaming guilds, cooperatives, nonprofits, clubs, companies, and any other type of organization you can imagine. It's Aragon's implementation of ERC-3000, the standard for binding off-chain voting.
 
 Along with off-chain voting solutions like [Snapshot](https://snapshot.page/#/) it allows you to _govern_ all parts of your project, even if not completely decentralized, in an easy manner. also allowing for flexibility and extensions when needed.
 

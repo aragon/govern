@@ -41,9 +41,9 @@ A book which keeps track of every DAO and its core relevant info, which will be 
 
 ### Govern.sol
 
-[🐣 ****Implementation](https://github.com/aragon/govern/blob/master/packages/govern-core/contracts/Govern.sol)
+[🐣 _\*\*_Implementation](https://github.com/aragon/govern/blob/master/packages/govern-core/contracts/Govern.sol)
 
-`Govern` is the DAO's executor _and_ vault of the organization. It will be responsible for executing the actions that have been scheduled through the queue and holding the organization's funds. While the smart contract is extremely simple \(&lt;80 LOC\), it can effectively call any external smart contract, which means it's basically a smart account which is governed by the DAO. 
+`Govern` is the DAO's executor _and_ vault of the organization. It will be responsible for executing the actions that have been scheduled through the queue and holding the organization's funds. While the smart contract is extremely simple \(&lt;80 LOC\), it can effectively call any external smart contract, which means it's basically a smart account which is governed by the DAO.
 
 ### GovernQueue.sol
 
