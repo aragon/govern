@@ -6,16 +6,15 @@ pragma solidity ^0.6.8;
 pragma experimental ABIEncoderV2;
 
 import "./ERC3000Data.sol";
-import "./ERC3000Executor.sol";
 
 contract ERC3000Interface {
     bytes4 internal constant ERC3000_INTERFACE_ID =
-        ERC3000(0).schedule.selector
-        ^ ERC3000(0).execute.selector
-        ^ ERC3000(0).challenge.selector
-        ^ ERC3000(0).resolve.selector
-        ^ ERC3000(0).veto.selector
-        ^ ERC3000(0).configure.selector
+        IERC3000(0).schedule.selector
+        ^ IERC3000(0).execute.selector
+        ^ IERC3000(0).challenge.selector
+        ^ IERC3000(0).resolve.selector
+        ^ IERC3000(0).veto.selector
+        ^ IERC3000(0).configure.selector
     ;
 }
 

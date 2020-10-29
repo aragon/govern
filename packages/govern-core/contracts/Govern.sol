@@ -6,6 +6,7 @@ pragma solidity 0.6.8;
 pragma experimental ABIEncoderV2;
 
 import "erc3k/contracts/IERC3000Executor.sol";
+import "erc3k/contracts/IERC3000.sol";
 
 import "@aragon/govern-contract-utils/contracts/acl/ACL.sol";
 import "@aragon/govern-contract-utils/contracts/adaptative-erc165/AdaptativeERC165.sol";

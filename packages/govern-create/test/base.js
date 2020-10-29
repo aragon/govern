@@ -20,10 +20,10 @@ describe('Govern Base Factory', function () {
     governFactory = await GovernFactory.deploy()
     queueFactory = await GovernQueueFactory.deploy()
 
-    const ERC3000Registry = await ethers.getContractFactory('ERC3000Registry')
+    const GovernRegistry = await ethers.getContractFactory('GovernRegistry')
     const GovernBaseFactory = await ethers.getContractFactory('GovernBaseFactory')
 
-    registry = await ERC3000Registry.deploy()
+    registry = await GovernRegistry.deploy()
     governBaseFactory = await GovernBaseFactory.deploy(registry.address, governFactory.address, queueFactory.address)
   })
 

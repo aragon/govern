@@ -9,7 +9,7 @@ import "./IERC3000Executor.sol";
 
 interface IERC3000Registry is ERC3000Interface {
     /**
-     * @notice Registers a IERC3000Executor and ERC3000 contract by a name and with his metadata
+     * @notice Registers a IERC3000Executor and IERC3000 contract by a name and with his metadata
      * @param executor IERC3000Executor contract
      * @param queue IERC3000 contract
      * @param name The name of this DAO

@@ -4,7 +4,7 @@
 
 pragma solidity 0.6.8;
 
-import "erc3k/contracts/ERC3000.sol";
+import "erc3k/contracts/IERC3000.sol";
 import "erc3k/contracts/IERC3000Executor.sol";
 import "erc3k/contracts/IERC3000Registry.sol";
 
@@ -24,7 +24,7 @@ contract GovernRegistry is IERC3000Registry {
     }
 
     function setMetadata(bytes memory _metadata) override public {
-        _setMetadata(ERC3000Executor(msg.sender), _metadata);
+        _setMetadata(IERC3000Executor(msg.sender), _metadata);
     }
 
     function _setMetadata(IERC3000Executor _executor, bytes memory _metadata) internal {
