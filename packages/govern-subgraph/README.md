@@ -108,6 +108,8 @@ Tracked:
 - `Frozen`
 - `Granted`
 - `Revoked`
+
+Left out:
 - `ETHDeposited`
 
 #### GovernQueue.sol
@@ -126,10 +128,14 @@ Tracked:
 - `EvidenceSubmitted`
 - `Ruled`
 
+Left out: None.
+
 #### GovernRegistry.sol
 
 Tracked:
 
 - `Registered`
 - `SetMetadata`
+
+Left out: None.
 
