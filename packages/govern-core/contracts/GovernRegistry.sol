@@ -11,27 +11,23 @@ import "erc3k/contracts/ERC3000Registry.sol";
 import "@aragon/govern-contract-utils/contracts/erc165/ERC165.sol";
 
 contract GovernRegistry is ERC3000Registry {
-    mapping (string => bool) public nameUsed;
+    mapping(string => bool) public nameUsed;
 
-    function register(ERC3000Executor _dao, ERC3000 _queue, string calldata _name, bytes calldata _initialMetadata) override external
+    function register(ERC3000Executor _executor, ERC3000 _queue, string calldata _name, bytes calldata _initialMetadata) override external
     {
         require(!nameUsed[_name], "registry: name used");
-        require(ERC165(address(_queue)).supportsInterface(ERC3000_INTERFACE_ID), "registry: bad interface queue");
 
-        // all will revert if `_dao` is not interface compliant in _setMetadata
         nameUsed[_name] = true;
 
-        emit Registered(_dao, _queue, msg.sender, _name);
-        _setMetadata(_dao, _initialMetadata);
+        emit Registered(_executor, _queue, msg.sender, _name);
+        _setMetadata(_executor, _initialMetadata);
     }
 
     function setMetadata(bytes memory _metadata) override public {
         _setMetadata(ERC3000Executor(msg.sender), _metadata);
     }
 
-    function _setMetadata(ERC3000Executor _dao, bytes memory _metadata) internal {
-        require(ERC165(address(_dao)).supportsInterface(_dao.exec.selector), "registry: bad interface dao");
-
-        emit SetMetadata(_dao, _metadata);
+    function _setMetadata(ERC3000Executor _executor, bytes memory _metadata) internal {
+        emit SetMetadata(_executor, _metadata);
     }
 }

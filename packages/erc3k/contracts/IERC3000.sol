@@ -19,11 +19,12 @@ contract ERC3000Interface {
     ;
 }
 
-abstract contract ERC3000 is ERC3000Interface {
+interface IERC3000 is ERC3000Interface {
     /**
      * @notice Schedules an action for execution, allowing for challenges and vetos on a defined time window
      * @param container A Container struct holding both the payload being scheduled for execution and
        the current configuration of the system
+     * @return containerHash
      */
     function schedule(ERC3000Data.Container memory container) virtual public returns (bytes32 containerHash);
     event Scheduled(bytes32 indexed containerHash, ERC3000Data.Payload payload, ERC3000Data.Collateral collateral);
@@ -33,6 +34,8 @@ abstract contract ERC3000 is ERC3000Interface {
      * @param container A ERC3000Data.Container struct holding both the paylaod being scheduled for execution and
        the current configuration of the system
      * MUST be an ERC3000Executor call: payload.executor.exec(payload.actions)
+     * @return failureMap
+     * @return execResults
      */
     function execute(ERC3000Data.Container memory container) virtual public returns (bytes32 failureMap, bytes[] memory execResults);
     event Executed(bytes32 indexed containerHash, address indexed actor);
@@ -42,6 +45,7 @@ abstract contract ERC3000 is ERC3000Interface {
      * @param container A ERC3000Data.Container struct holding both the payload being scheduled for execution and
        the current configuration of the system
      * @param reason Hint for case reviewers as to why the scheduled container is illegal
+     * @return resolverId
      */
     function challenge(ERC3000Data.Container memory container, bytes memory reason) virtual public returns (uint256 resolverId);
     event Challenged(bytes32 indexed containerHash, address indexed actor, bytes reason, uint256 resolverId, ERC3000Data.Collateral collateral);
@@ -51,6 +55,8 @@ abstract contract ERC3000 is ERC3000Interface {
      * @param container A ERC3000Data.Container struct holding both the payload being scheduled for execution and
        the current configuration of the system
      * @param resolverId disputeId in the arbitrator in which the dispute over the container was created
+     * @return failureMap
+     * @return execResults
      */
     function resolve(ERC3000Data.Container memory container, uint256 resolverId) virtual public returns (bytes32 failureMap, bytes[] memory execResults);
     event Resolved(bytes32 indexed containerHash, address indexed actor, bool approved);
@@ -66,6 +72,7 @@ abstract contract ERC3000 is ERC3000Interface {
     /**
      * @notice Apply a new configuration for all *new* containers to be scheduled
      * @param config A ERC3000Data.Config struct holding all the new params that will control the system
+     * @return configHash
      */
     function configure(ERC3000Data.Config memory config) virtual public returns (bytes32 configHash);
     event Configured(bytes32 indexed containerHash, address indexed actor, ERC3000Data.Config config);
