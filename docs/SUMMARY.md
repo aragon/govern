@@ -9,6 +9,7 @@
 
 ## Developers
 
-* [Quick start](developers/quick-start.md)
+* [Getting started](developers/quick-start.md)
 * [Smart contracts breakdown](developers/getting-started.md)
+* [Historical deployments](developers/historical-deployments.md)
 
