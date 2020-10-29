@@ -48,5 +48,4 @@ const challenge: DocumentNode = gql`
     ${item}
   `
 
-
 export default challenge
