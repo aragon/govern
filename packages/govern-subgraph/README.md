@@ -108,7 +108,9 @@ Tracked:
 - `Frozen`
 - `Granted`
 - `Revoked`
-  Left out:
+
+Left out:
+
 - `ETHDeposited`
 
 #### GovernQueue.sol
@@ -126,7 +128,8 @@ Tracked:
 - `Revoked`
 - `EvidenceSubmitted`
 - `Ruled`
-  Left out: None.
+
+Left out: None.
 
 #### ERC3000Registry.sol
 
@@ -134,4 +137,5 @@ Tracked:
 
 - `Registered`
 - `SetMetadata`
-  Left out: None.
+
+Left out: None.
