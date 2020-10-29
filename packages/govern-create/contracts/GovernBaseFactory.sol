@@ -5,7 +5,7 @@
 pragma solidity 0.6.8;
 pragma experimental ABIEncoderV2;
 
-import "erc3k/contracts/ERC3000Registry.sol";
+import "@aragon/govern-core/contracts/GovernRegistry.sol";
 
 import "./core-factories/GovernFactory.sol";
 import "./core-factories/GovernQueueFactory.sol";
@@ -15,9 +15,9 @@ contract GovernBaseFactory {
 
     GovernFactory public governFactory;
     GovernQueueFactory public queueFactory;
-    ERC3000Registry public registry;
+    GovernRegistry public registry;
 
-    constructor(ERC3000Registry _registry, GovernFactory _governFactory, GovernQueueFactory _queueFactory) public {
+    constructor(GovernRegistry _registry, GovernFactory _governFactory, GovernQueueFactory _queueFactory) public {
         governFactory = _governFactory;
         queueFactory = _queueFactory;
         registry = _registry;
@@ -25,7 +25,7 @@ contract GovernBaseFactory {
 
     function newDummyGovern(string calldata _name, bool _useProxies) external returns (Govern govern, GovernQueue queue) {
         bytes32 salt = _useProxies ? keccak256(abi.encodePacked(_name)) : bytes32(0);
-        
+
         queue = queueFactory.newQueue(address(this), dummyConfig(), salt);
         govern = governFactory.newGovern(queue, salt);
 
@@ -46,7 +46,6 @@ contract GovernBaseFactory {
         ERC3000Data.Collateral memory noCollateral;
         return ERC3000Data.Config(
             0,
-            noCollateral,
             noCollateral,
             noCollateral,
             address(0),

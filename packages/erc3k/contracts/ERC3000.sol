@@ -57,11 +57,10 @@ abstract contract ERC3000 is ERC3000Interface {
 
     /**
      * @notice Apply arbitrator's ruling over a challenge once it has come to a final ruling
-     * @param payloadHash Hash of the payload being vetoed
-     * @param config A ERC3000Data.Config struct holding the config attached to the payload being vetoed
+     * @param containerHash Hash of the container being vetoed
      */
-    function veto(bytes32 payloadHash, ERC3000Data.Config memory config, bytes memory reason) virtual public;
-    event Vetoed(bytes32 indexed containerHash, address indexed actor, bytes reason, ERC3000Data.Collateral collateral);
+    function veto(bytes32 containerHash, bytes memory reason) virtual public;
+    event Vetoed(bytes32 indexed containerHash, address indexed actor, bytes reason);
 
     /**
      * @notice Apply a new configuration for all *new* containers to be scheduled

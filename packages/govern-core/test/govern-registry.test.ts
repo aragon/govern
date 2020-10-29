@@ -9,21 +9,21 @@ import {
   Erc3000ExecutorMock,
   Erc3000ExecutorMockFactory,
   Erc3000BadInterfaceMockFactory,
-  Erc3000ExecutorBadInterfaceMockFactory
+  Erc3000ExecutorBadInterfaceMockFactory,
 } from '../typechain'
 
 const ERRORS = {
   NAME_USED: 'registry: name used',
   BAD_INTERFACE_QUEUE: 'registry: bad interface queue',
-  BAD_INTERFACE_DAO: 'registry: bad interface dao'
+  BAD_INTERFACE_DAO: 'registry: bad interface dao',
 }
 
 const EVENTS = {
   REGISTERED: 'Registered',
-  SET_METADATA: 'SetMetadata'
+  SET_METADATA: 'SetMetadata',
 }
 
-describe('GovernRegistry', function() {
+describe('GovernRegistry', function () {
   let governRegistry: GovernRegistry,
     erc3k: Erc3000Mock,
     erc3kExec: Erc3000ExecutorMock,
@@ -56,8 +56,15 @@ describe('GovernRegistry', function() {
     governRegistry = governRegistry.connect(signers[0])
   })
 
-  it('calls register and is able the register the executor and queue', async () => {
-    await expect(governRegistry.register(erc3kExec.address, erc3k.address, 'MyName', '0x00'))
+  it('calls register and is able to register the executor and queue', async () => {
+    await expect(
+      governRegistry.register(
+        erc3kExec.address,
+        erc3k.address,
+        'MyName',
+        '0x00'
+      )
+    )
       .to.emit(governRegistry, EVENTS.REGISTERED)
       .withArgs(erc3kExec.address, erc3k.address, current, 'MyName')
       .to.emit(governRegistry, EVENTS.SET_METADATA)
@@ -69,8 +76,14 @@ describe('GovernRegistry', function() {
   it('calls register and reverts cause the name is already used', async () => {
     governRegistry.register(erc3kExec.address, erc3k.address, 'MyName', '0x00')
 
-    await expect(governRegistry.register(erc3kExec.address, erc3k.address, 'MyName', '0x00'))
-      .to.be.revertedWith(ERRORS.NAME_USED)
+    await expect(
+      governRegistry.register(
+        erc3kExec.address,
+        erc3k.address,
+        'MyName',
+        '0x00'
+      )
+    ).to.be.revertedWith(ERRORS.NAME_USED)
 
     expect(await governRegistry.nameUsed('MyName')).to.equal(true)
   })
@@ -82,8 +95,14 @@ describe('GovernRegistry', function() {
 
     const erc3kBadInterface = await ERC3000BadInterfaceMock.deploy()
 
-    await expect(governRegistry.register(erc3kExec.address, erc3kBadInterface.address, 'MyName', '0x00'))
-      .to.be.revertedWith(ERRORS.BAD_INTERFACE_QUEUE)
+    await expect(
+      governRegistry.register(
+        erc3kExec.address,
+        erc3kBadInterface.address,
+        'MyName',
+        '0x00'
+      )
+    ).to.be.revertedWith(ERRORS.BAD_INTERFACE_QUEUE)
 
     expect(await governRegistry.nameUsed('MyName')).to.equal(false)
   })
@@ -95,8 +114,14 @@ describe('GovernRegistry', function() {
 
     const erc3kExecBadInterface = await ERC3000ExecutorBadInterfaceMock.deploy()
 
-    await expect(governRegistry.register(erc3kExecBadInterface.address, erc3k.address, 'MyName', '0x00'))
-      .to.be.revertedWith(ERRORS.BAD_INTERFACE_DAO)
+    await expect(
+      governRegistry.register(
+        erc3kExecBadInterface.address,
+        erc3k.address,
+        'MyName',
+        '0x00'
+      )
+    ).to.be.revertedWith(ERRORS.BAD_INTERFACE_DAO)
 
     expect(await governRegistry.nameUsed('MyName')).to.equal(false)
   })

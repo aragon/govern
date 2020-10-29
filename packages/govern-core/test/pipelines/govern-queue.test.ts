@@ -35,12 +35,12 @@ describe('Govern Queue', function () {
     const GQ = (await ethers.getContractFactory(
       'GovernQueue'
     )) as GovernQueueFactory
-    gq = await GQ.deploy(ownerAddr, INIT_CONFIG) as GovernQueue
+    gq = (await GQ.deploy(ownerAddr, INIT_CONFIG)) as GovernQueue
   })
 
   context('ERC-165', () => {
     const ERC165_INTERFACE_ID = '0x01ffc9a7'
-    const ERC3000_INTERFACE_ID = '0x6d74ef88'
+    const ERC3000_INTERFACE_ID = '0x45f1d4aa'
     it('supports ERC-165', async () => {
       expect(await gq.supportsInterface(ERC165_INTERFACE_ID)).to.equal(true)
     })
