@@ -7,7 +7,7 @@ pragma experimental ABIEncoderV2;
 
 import "./ERC3000Data.sol";
 
-interface IERC3000Executor {
+abstract contract IERC3000Executor {
     bytes4 internal constant ERC3000_EXEC_INTERFACE_ID = this.exec.selector;
 
     /**
@@ -18,6 +18,6 @@ interface IERC3000Executor {
      * @return failureMap
      * @return execResults
      */
-    function exec(ERC3000Data.Action[] memory actions, bytes32 allowFailuresMap, bytes32 memo) external public returns (bytes32 failureMap, bytes[] memory execResults);
+    function exec(ERC3000Data.Action[] memory actions, bytes32 allowFailuresMap, bytes32 memo) virtual public returns (bytes32 failureMap, bytes[] memory execResults);
     event Executed(address indexed actor, ERC3000Data.Action[] actions, bytes32 memo, bytes32 failureMap, bytes[] execResults);
 }

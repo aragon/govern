@@ -18,7 +18,7 @@ contract ERC3000Interface {
     ;
 }
 
-interface IERC3000 is ERC3000Interface {
+abstract contract IERC3000 is ERC3000Interface {
     /**
      * @notice Schedules an action for execution, allowing for challenges and vetos on a defined time window
      * @param container A Container struct holding both the payload being scheduled for execution and
