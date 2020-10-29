@@ -1,0 +1,5 @@
+#Govern Registry
+{{#dataSources.GovernRegistry}}
+  {{> GovernRegistry.template.yaml}}
+{{/dataSources.GovernRegistry}}
+# /Govern Registry

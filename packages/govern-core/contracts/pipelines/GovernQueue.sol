@@ -5,7 +5,7 @@
 pragma solidity 0.6.8; // TODO: reconsider compiler version before production release
 pragma experimental ABIEncoderV2; // required for passing structs in calldata (fairly secure at this point)
 
-import "erc3k/contracts/ERC3000.sol";
+import "erc3k/contracts/IERC3000.sol";
 
 import "@aragon/govern-contract-utils/contracts/protocol/IArbitrable.sol";
 import "@aragon/govern-contract-utils/contracts/deposits/DepositLib.sol";
@@ -42,7 +42,7 @@ library GovernQueueStateLib {
     }
 }
 
-contract GovernQueue is ERC3000, AdaptativeERC165, IArbitrable, ACL {
+contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
     // Syntax sugar to enable method-calling syntax on types
     using ERC3000Data for *;
     using DepositLib for ERC3000Data.Collateral;

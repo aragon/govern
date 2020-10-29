@@ -35,7 +35,7 @@ describe('Govern Queue', function () {
     const GQ = (await ethers.getContractFactory(
       'GovernQueue'
     )) as GovernQueueFactory
-    gq = await GQ.deploy(ownerAddr, INIT_CONFIG) as GovernQueue
+    gq = (await GQ.deploy(ownerAddr, INIT_CONFIG)) as GovernQueue
   })
 
   context('ERC-165', () => {

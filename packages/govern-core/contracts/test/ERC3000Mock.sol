@@ -5,9 +5,11 @@
 pragma solidity ^0.6.8;
 pragma experimental ABIEncoderV2;
 
-import "../IERC3000.sol";
+import "erc3k/contracts/IERC3000.sol";
 
-contract ERC3000Mock is IERC3000 {
+import "@aragon/govern-contract-utils/contracts/erc165/ERC165.sol";
+
+contract ERC3000Mock is IERC3000, ERC165 {
     function schedule(ERC3000Data.Container memory) override public returns (bytes32) { }
 
     function execute(ERC3000Data.Container memory) override public returns (bytes32, bytes[] memory) { }
@@ -22,5 +24,9 @@ contract ERC3000Mock is IERC3000 {
 
     function interfaceID() public pure returns (bytes4) {
         return ERC3000_INTERFACE_ID;
+    }
+
+    function supportsInterface(bytes4 interfaceId) override public view returns (bool) {
+        return interfaceId == ERC3000_INTERFACE_ID;
     }
 }

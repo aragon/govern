@@ -48,7 +48,9 @@ describe('Govern', function () {
     })
 
     it('supports ERC-3000 exec', async () => {
-      expect(await govern.supportsInterface(ERC3000_EXEC_INTERFACE_ID)).to.equal(true)
+      expect(
+        await govern.supportsInterface(ERC3000_EXEC_INTERFACE_ID)
+      ).to.equal(true)
     })
 
     it("doesn't support random interfaceID", async () => {

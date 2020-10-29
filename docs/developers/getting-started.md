@@ -14,7 +14,7 @@ ERC3000 specific contracts haven't been included here. To browse them, go to the
 
 ### GovernRegistry.sol
 
-[📜 Implementation](https://github.com/aragon/govern/blob/master/packages/erc3k/contracts/ERC3000Registry.sol)
+[📜 Implementation](https://github.com/aragon/govern/blob/master/packages/erc3k/contracts/IERC3000Registry.sol)
 
 The `ERC3000Registry` contract serves as the **central registry for all Govern DAOs**. Every DAO spawned through a properly-implemented `GovernFactory` will register the new DAO in the "official" registry. The registry takes care of doing these things:
 
