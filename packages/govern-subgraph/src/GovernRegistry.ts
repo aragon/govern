@@ -49,6 +49,7 @@ export function loadOrCreateRegistry(
 ): GovernRegistryEntity {
   let registryId = registryAddress.toHex()
   let registry = GovernRegistryEntity.load(registryId)
+
   if (registry === null) {
     registry = new GovernRegistryEntity(registryId)
     registry.address = registryAddress
