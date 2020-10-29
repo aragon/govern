@@ -6,3 +6,6 @@ abi
 artifacts
 cache
 typechain
+
+coverage/
+coverage.json
