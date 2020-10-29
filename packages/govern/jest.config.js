@@ -11,9 +11,6 @@ module.exports = {
       statements: 80
     }
   },
-  moduleNameMapper: {
-    '^internal/(.*)$': '<rootDir>/internal/$1'
-  },
   notify: true,
   clearMocks: true,
   resetMocks: true,

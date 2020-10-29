@@ -1,17 +1,19 @@
 {
   "extends": "@ethereumjs/config-tsc",
   "compilerOptions": {
+    "module": "es6",
+    "target": "es2018",
     "removeComments": true,
     "strictPropertyInitialization": false,
-    "outDir": "./dist",
+    "sourceRoot": "./",
+    "outDir": "./dist/esm",
     "baseUrl": "./",
     "inlineSources": true,
     "types": [
       "jest"
     ],
     "lib": [
-      "dom",
-      "es2018"
+      "dom"
     ]
   },
   "include": [

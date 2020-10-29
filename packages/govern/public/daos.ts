@@ -1,5 +1,5 @@
-import { Daos } from 'internal/clients/graphql/queries/daos'
-import DaosAction  from 'internal/actions/DAOSAction'
+import { Daos } from '../internal/clients/graphql/queries/daos'
+import DaosAction  from '../internal/actions/DAOSAction'
 
 /**
  * Returns all known Dao objects

@@ -1,6 +1,6 @@
-import { Address } from 'internal/clients/lib/types/Address'
-import { Dao } from 'internal/clients/graphql/queries/dao'
-import DaoAction  from 'internal/actions/DAOAction'
+import { Address } from '../internal/clients/lib/types/Address'
+import { Dao } from '../internal/clients/graphql/queries/dao'
+import DaoAction  from '../internal/actions/DAOAction'
 
 /**
  * Returns a Dao object by the given name.

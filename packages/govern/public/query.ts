@@ -1,6 +1,6 @@
 import { DocumentNode } from 'graphql'
 import { OperationResult } from '@urql/core'
-import Configuration from 'internal/configuration/Configuration'
+import Configuration from '../internal/configuration/Configuration'
 
 /**
  * Executes a custom GraphQL query against the govern server

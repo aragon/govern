@@ -1,5 +1,5 @@
-import { OptimisticGame } from 'internal/clients/graphql/fragments/optimisticGame'
-import GameAction from 'internal/actions/GameAction'
+import { OptimisticGame } from '../internal/clients/graphql/fragments/optimisticGame'
+import GameAction from '../internal/actions/GameAction'
 
 /**
  * Returns the OptimisticGame by the given name

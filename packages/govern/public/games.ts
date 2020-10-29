@@ -1,6 +1,6 @@
-import { OptimisticGame } from 'internal/clients/graphql/fragments/optimisticGame'
-import { Address } from 'internal/clients/lib/types/Address'
-import GamesAction from 'internal/actions/GamesAction'
+import { OptimisticGame } from '../internal/clients/graphql/fragments/optimisticGame'
+import { Address } from '../internal/clients/lib/types/Address'
+import GamesAction from '../internal/actions/GamesAction'
 
 /**
  * Returns all games by the given Dao address

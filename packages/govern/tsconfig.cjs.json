@@ -1,21 +1,12 @@
 {
   "extends": "@ethereumjs/config-tsc",
   "compilerOptions": {
-    "module": "es6",
-    "target": "es2018",
     "removeComments": true,
     "strictPropertyInitialization": false,
     "sourceRoot": "./",
-    "outDir": "./dist",
+    "outDir": "./dist/cjs",
     "baseUrl": "./",
     "inlineSources": true,
-    "paths": {
-      "internal": ["./internal/"]
-    },
-    "plugins": [
-      { "transform": "typescript-transform-paths" },
-      { "transform": "typescript-transform-paths", "afterDeclarations": true }
-    ],
     "types": [
       "jest"
     ],
@@ -24,6 +15,7 @@
     ]
   },
   "include": [
-    "./**/*"
+    "./internal/**/*",
+    "./public/**/*"
   ]
 }
