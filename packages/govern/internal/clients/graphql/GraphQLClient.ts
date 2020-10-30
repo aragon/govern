@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-unfetch'
-import { Client, OperationResult } from '@urql/core'
+import { Client } from '@urql/core'
 import gql from 'graphql-tag'
 import ClientInterface from '../lib/ClientInterface'
 
