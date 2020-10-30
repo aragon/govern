@@ -1,4 +1,4 @@
-import { ApolloServer, gql } from 'apollo-server'
+import { ApolloServer } from 'apollo-server'
 import { GovernCore } from '../core'
 import resolvers from './resolvers'
 import typeDefs from './schema'

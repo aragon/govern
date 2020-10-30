@@ -10,22 +10,22 @@ export default function resolvers(govern: GovernCore): IResolvers {
       async daos() {
         return govern.daos()
       },
-      async game(_, args) {
-        return govern.game(args.name)
+      async registryEntry(_, args) {
+        return govern.registryEntry(args.name)
       },
-      async games(_, args) {
-        return govern.games()
+      async registryEntries(_, args) {
+        return govern.registryEntries()
       },
     },
     Dao: {
-      async games(parent) {
+      async registryEntries(parent) {
         return Promise.all(
-          parent.games.map(async ({ id }: { id: string }) => govern.game(id))
+          parent.registryEntries.map(async ({ id }: { id: string }) =>
+            govern.registryEntry(id)
+          )
         )
       },
-      async queues(parent) {
-        return govern.queuesForDao(parent.address)
-      },
     },
+    // TODO: add queue resolver
   }
 }
