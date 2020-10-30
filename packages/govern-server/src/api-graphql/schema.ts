@@ -5,63 +5,63 @@ export default gql`
     id: ID!
     address: String!
     count: Int!
-    games: [OptimisticGame!]
+    entries: [RegistryEntry!]!
   }
 
-  type OptimisticGame {
+  type RegistryEntry {
     id: ID!
     name: String!
+    queue: GovernQueue!
     executor: Dao!
-    queue: OptimisticQueue!
-    metadata: String
   }
 
   type Dao {
     id: ID!
     address: String!
-    games: [OptimisticGame!]
-    executions: [Execution!]
-    roles: [Role!]
-    queues: [OptimisticQueue!]
+    metadata: String
+    registryEntries: [RegistryEntry!]!
+    containers: [Container]!
+    roles: [Role!]!
   }
 
-  type Execution {
-    id: ID!
-    sender: String!
-    actions: [Action!]
-    results: [String!]
-  }
-
-  type Action {
-    id: ID!
-    to: String!
-    value: String!
-    data: String!
-    item: Item!
-    execution: Execution
-  }
-
-  type OptimisticQueue {
+  type GovernQueue {
     id: ID!
     address: String!
-    config: Config
-    games: [OptimisticGame!]
-    queue: [Item!]
-    executions: [Execution!]
-    challenges: [Challenge!]
-    vetos: [Veto!]
-    roles: [Role!]
+    config: Config!
+    registryEntries: [RegistryEntry!]!
+    queued: [Container!]!
+    roles: [Role!]!
   }
 
   type Config {
     id: ID!
-    queue: OptimisticQueue!
+    queue: GovernQueue!
     executionDelay: String!
     scheduleDeposit: Collateral!
     challengeDeposit: Collateral!
-    vetoDeposit: Collateral!
     resolver: String!
     rules: String!
+  }
+
+  type Container {
+    id: ID!
+    queue: GovernQueue!
+    state: ContainerState!
+    config: Config!
+    payload: ContainerPayload!
+    history: [ContainerEvent!]!
+  }
+
+  type ContainerPayload {
+    id: ID!
+    container: Container!
+    nonce: String!
+    executionTime: String!
+    submitter: String!
+    executor: Dao!
+    actions: [Action!]!
+    allowFailuresMap: String!
+    proof: String!
   }
 
   type Collateral {
@@ -70,49 +70,12 @@ export default gql`
     amount: String!
   }
 
-  type Item {
+  type Action {
     id: ID!
-    status: ItemStatus!
-    nonce: String!
-    executionTime: String!
-    submitter: String!
-    executor: Dao!
-    actions: [Action!]
-    proof: String!
-    collateral: Collateral!
-    createdAt: String!
-  }
-
-  type Challenge {
-    id: ID!
-    queue: OptimisticQueue!
-    challenger: String!
-    item: Item!
-    arbitrator: String!
-    disputeId: String!
-    evidences: [Evidence!]
-    collateral: Collateral!
-    ruling: String
-    approved: Boolean
-    createdAt: String!
-  }
-
-  type Evidence {
-    id: ID!
-    challenge: Challenge!
+    payload: ContainerPayload!
+    to: String!
+    value: String!
     data: String!
-    submitter: String!
-    createdAt: String!
-  }
-
-  type Veto {
-    id: ID!
-    queue: OptimisticQueue!
-    item: Item!
-    reason: String!
-    submitter: String!
-    collateral: Collateral!
-    createdAt: String!
   }
 
   type Role {
@@ -124,21 +87,83 @@ export default gql`
     frozen: Boolean!
   }
 
-  enum ItemStatus {
+  enum ContainerState {
     None
-    Approved
-    Cancelled
-    Challenged
-    Executed
-    Rejected
     Scheduled
-    Vetoed
+    Approved
+    Challenged
+    Rejected
+    Cancelled
+    Executed
+  }
+
+  # Container events
+
+  interface ContainerEvent {
+    id: ID!
+    container: Container!
+    createdAt: String!
+  }
+
+  type ContainerEventChallenge implements ContainerEvent {
+    id: ID!
+    container: Container!
+    createdAt: String!
+    actor: String!
+    collateral: Collateral!
+    disputeId: String!
+    reason: String!
+    resolver: String!
+  }
+
+  type ContainerEventExecute implements ContainerEvent {
+    id: ID!
+    container: Container!
+    createdAt: String!
+    execResults: [String!]!
+  }
+
+  type ContainerEventResolve implements ContainerEvent {
+    id: ID!
+    container: Container!
+    createdAt: String!
+    approved: Boolean!
+  }
+
+  type ContainerEventRule implements ContainerEvent {
+    id: ID!
+    container: Container!
+    createdAt: String!
+    ruling: String!
+  }
+
+  type ContainerEventSchedule implements ContainerEvent {
+    id: ID!
+    container: Container!
+    createdAt: String!
+    collateral: Collateral!
+  }
+
+  type ContainerEventSubmitEvidence implements ContainerEvent {
+    id: ID!
+    container: Container!
+    createdAt: String!
+    evidence: String!
+    submitter: String!
+    finished: Boolean!
+  }
+
+  type ContainerEventVeto implements ContainerEvent {
+    id: ID!
+    container: Container!
+    createdAt: String!
+    reason: String!
   }
 
   type Query {
     daos: [Dao!]!
     dao(address: String!): Dao
-    game(name: String!): OptimisticGame
-    games: [OptimisticGame!]
+    registryEntry(name: String!): RegistryEntry
+    registryEntries: [RegistryEntry!]
   }
 `
