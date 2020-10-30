@@ -11,6 +11,7 @@
 
 * [Getting started](developers/getting-started.md)
 * [Smart contracts breakdown](developers/smart-contracts.md)
+* [Govern JS API](developers/govern-js.md)
 * [Govern Server API](developers/server-api.md)
 
 ## Internal
