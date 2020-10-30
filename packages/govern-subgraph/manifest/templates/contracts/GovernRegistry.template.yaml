@@ -1,7 +1,7 @@
 # GovernRegistry
 - kind: ethereum/contract
-  name: {{ name }}
-  network: {{ network }}
+  name: {{name}}
+  network: {{network}}
   source:
     abi: GovernRegistry
     address: "{{address}}"
@@ -15,7 +15,7 @@
       - Govern
     abis:
       - name: GovernRegistry
-        file: ./abi/GovernRegistry.json
+        file: ./node_modules/@aragon/govern-core/abi/GovernRegistry.json
     eventHandlers:
       - event: Registered(indexed address,address,indexed address,indexed address,string)
         handler: handleRegistered
