@@ -7,9 +7,10 @@ usePlugin('@nomiclabs/buidler-truffle5')
 require('dotenv').config({ path: '../../.env' })
 
 const getAccounts = require('./tasks/accounts')
+const deployFactory = require('./tasks/deploy-factory')
 
 task('accounts', 'Prints the list of accounts', getAccounts)
-
+task('deploy-factory', 'Deploys a GovernTokenFactory instance').setAction(deployFactory)
 task('create-action', async (_, { ethers }) => createAction(ethers))
 
 const ETH_KEY = process.env.ETH_KEY

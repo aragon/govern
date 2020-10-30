@@ -14,11 +14,11 @@ task('accounts', 'Prints the list of accounts', getAccounts)
 
 task('create-action', async (_, { ethers }) => createAction(ethers))
 
-task('deploy-registry', 'Deploys an GoverRegistry instance').setAction(
+task('deploy-registry', 'Deploys a GovernRegistry instance').setAction(
   deployRegistry
 )
 
-task('deploy-factory', 'Deploys an GovernBaseFactory instance').setAction(
+task('deploy-factory', 'Deploys a GovernBaseFactory instance').setAction(
   deployFactory
 )
 

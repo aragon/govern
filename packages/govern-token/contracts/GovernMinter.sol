@@ -32,6 +32,7 @@ contract GovernMinter is ACL {
     function initialize(GovernToken _token, address _initialMinter, MerkleDistributor _distributorBase) public initACL(_initialMinter) onlyInit("minter") {
         token = _token;
         distributorBase = address(_distributorBase);
+        _grant(MINT_ROLE, _initialMinter);
     }
 
     function mint(address _to, uint256 _amount, bytes calldata _context) external auth(MINT_ROLE) {
