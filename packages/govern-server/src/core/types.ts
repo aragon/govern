@@ -6,7 +6,7 @@ export type Network = {
   name: string
   chainId: number
   ensAddress: Address
-  subgraphId?: string
+  subgraphUrl: string
 }
 
 export type Networkish =
@@ -14,7 +14,7 @@ export type Networkish =
       chainId?: number
       ensAddress?: Address
       name?: string
-      subgraphId?: string
+      subgraphUrl?: string
     }
   | string
   | number
