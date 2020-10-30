@@ -1,6 +1,9 @@
 const { writeFileSync } = require('fs')
 const { print } = require('../lib/utils')
 
+const NETWORK = process.env.MAINNET ? 'mainnet' : 'rinkeby'
+const env = name => process.env[`${name}_${NETWORK}`.toUpperCase()]
+
 const FACTORY_CACHE_NAME = 'govern-factory-rinkeby'
 
 module.exports = async (_, { ethers }) => {
@@ -19,7 +22,7 @@ module.exports = async (_, { ethers }) => {
   print(tokenFactory, 'GovernTokenFactory')
 
   const governBaseFactory = await GovernBaseFactory.deploy(
-    process.env.REGISTRY_RINKEBY,
+    env('registry'),
     governFactory.address,
     queueFactory.address,
     tokenFactory.address

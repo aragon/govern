@@ -7,6 +7,9 @@ const {
 } = require('unique-names-generator')
 const { print } = require('../lib/utils')
 
+const NETWORK = process.env.MAINNET ? 'mainnet' : 'rinkeby'
+const env = name => process.env[`${name}_${NETWORK}`.toUpperCase()]
+
 const FACTORY_CACHE_NAME = 'govern-factory-rinkeby'
 const REGISTER_EVENT_NAME = 'Registered'
 const REGISTRY_EVENTS_ABI = [
@@ -27,7 +30,7 @@ module.exports = async (
 ) => {
   factoryAddr =
     factoryAddr ||
-    process.env.FACTORY_RINKEBY ||
+    env('factory') ||
     readFileSync(FACTORY_CACHE_NAME).toString()
   name =
     name ||
@@ -58,7 +61,7 @@ module.exports = async (
     useProxies,
     {
       gasLimit: useProxies ? 2e6 : 9e6,
-      gasPrice: 2e9
+      nonce: 5
     }
   )
 
@@ -67,7 +70,7 @@ module.exports = async (
   const {
     args: { dao, queue },
   } = events
-    .filter(({ address }) => address === process.env.REGISTRY_RINKEBY)
+    .filter(({ address }) => address === env('registry'))
     .map((log) => registryInterface.parseLog(log))
     .find(({ name }) => name === REGISTER_EVENT_NAME)
 

@@ -18,7 +18,6 @@ Compiled 32 contracts successfully
 ✨  Done in 7.80s.
 [~/a/g/p/govern-create] git:(deployment-preview) ✗ $ yarn buidler deploy-registry --network rinkeby
 yarn run v1.22.4
-$ /Users/jorge/aragon/govern/node_modules/.bin/buidler deploy-registry --network rinkeby
 - GovernRegistry: https://rinkeby.etherscan.io/address/0x0cd3621EC403F26ad9F79c3d77B1dda1f8474c6f
 ✨  Done in 2.65s.
 ```

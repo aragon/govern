@@ -52,5 +52,9 @@ module.exports = {
       url: 'https://rinkeby.eth.aragon.network',
       accounts,
     },
+    mainnet: {
+      url: 'https://mainnet.eth.aragon.network',
+      accounts,
+    },
   },
 }
