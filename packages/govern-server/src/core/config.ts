@@ -11,7 +11,7 @@ export const networks = [
     name: 'rinkeby',
     ensAddress: '0x98df287b6c145399aaa709692c8d308357bc085d',
     subgraphUrl:
-      'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby',
+      'https://graph.backend.aragon.org/subgraphs/name/aragon/aragon-govern-rinkeby',
   },
 
   // TODO: add xDai
