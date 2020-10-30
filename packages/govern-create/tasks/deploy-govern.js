@@ -10,7 +10,7 @@ const { print } = require('../lib/utils')
 const FACTORY_CACHE_NAME = 'govern-factory-rinkeby'
 const REGISTER_EVENT_NAME = 'Registered'
 const REGISTRY_EVENTS_ABI = [
-  'event Registered(address indexed dao, address queue, address indexed registrant, string name)',
+  'event Registered(address indexed dao, address queue, address indexed token, address indexed registrant, string name)',
   'event SetMetadata(address indexed dao, bytes metadata)',
 ]
 
@@ -58,6 +58,7 @@ module.exports = async (
     useProxies,
     {
       gasLimit: useProxies ? 2e6 : 9e6,
+      gasPrice: 2e9
     }
   )
 
