@@ -15,8 +15,12 @@
     "build:cjs": "tsc -p ./tsconfig.cjs.json",
     "dev:esm": "yarn build:esm --watch",
     "dev:cjs": "yarn build:cjs --watch",
-    "test": "jest"
+    "test": "jest",
+    "prepublishOnly": "yarn build"
   },
+  "files": [
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/aragon/govern.git"
