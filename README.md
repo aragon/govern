@@ -32,7 +32,7 @@ The code in this repository has **not** been audited.
 
 Read the documentation if you have any doubts about the high-level overview of Govern, or if you want to know more about how everything works under the hood.
 
-#### 👋 Get started contributing with a [good first issue](https://github.com/aragon/govern/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+#### 👋 Get started contributing with a [good first issue](https://github.com/aragon/govern/labels/good%20first%20issue%20%F0%9F%8C%9E)
 Don't be shy to contribute even the smallest tweak. Everyone will be especially nice and helpful to beginners to help you get started!
 
 ## Structure
@@ -55,11 +55,11 @@ To use Govern, feel free to deploy your own registries and factories, but using 
 
 #### Mainnet
 
-- 📜 ERC3000Registry: [`0xE144219480F96b3e5fe91a5e24B9655BeeA5C537`](https://etherscan.io/address/0xE144219480F96b3e5fe91a5e24B9655BeeA5C537)
+- 📜 ERC3000Registry: [`0x2A6D3c8c7567E47d93E94eDE89557A1E88DFC0cf`](https://etherscan.io/address/0x2A6D3c8c7567E47d93E94eDE89557A1E88DFC0cf)
 
 #### Rinkeby
 
-- 📜 ERC3000Registry: [`0xE144219480F96b3e5fe91a5e24B9655BeeA5C537`](https://rinkeby.etherscan.io/address/0xE144219480F96b3e5fe91a5e24B9655BeeA5C537)
+- 📜 ERC3000Registry: [`0x2A6D3c8c7567E47d93E94eDE89557A1E88DFC0cf`](https://rinkeby.etherscan.io/address/0x2A6D3c8c7567E47d93E94eDE89557A1E88DFC0cf)
 
 ## Help shape Aragon Govern
 - Discuss in [Aragon Forum](https://forum.aragon.org/tags/aragon-govern)

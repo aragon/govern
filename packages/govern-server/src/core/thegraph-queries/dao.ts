@@ -18,9 +18,12 @@ const GovernDaoBase = gql`
 `
 
 export const QUERY_DAO = gql`
-  query Govern($address: String!) {
-    govern(id: $address) {
-      ...GovernDaoBase
+  query RegistryEntry($name: String!) {
+    registryEntries(where: { name: $name }, first: 1) {
+      id
+      executor {
+        ...GovernDaoBase
+      }
     }
   }
   ${GovernDaoBase}

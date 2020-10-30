@@ -65,7 +65,7 @@ export default function NewAction({
         css={`
           padding: 8px;
           margin-top: 32px;
-          border: 1px solid whitesmoke;
+          border: 2px solid rgba(255, 255, 255, 0.2);
           h2 {
             font-weight: bold;
             font-size: 24px;
@@ -84,7 +84,7 @@ export default function NewAction({
           css={`
             padding: 8px;
             margin-top: 32px;
-            border: 1px solid whitesmoke;
+            border: 2px solid rgba(255, 255, 255, 0.2);
           `}
         >
           <label>
@@ -97,7 +97,10 @@ export default function NewAction({
               css={`
                 margin-top: 12px;
                 width: 100%;
-                color: black;
+                min-height: 43px;
+                background: black;
+                border: 2px solid white;
+                color: white;
               `}
             />
           </label>
@@ -111,7 +114,10 @@ export default function NewAction({
               css={`
                 margin-top: 12px;
                 width: 100%;
-                color: black;
+                min-height: 43px;
+                background: black;
+                border: 2px solid white;
+                color: white;
               `}
             />
           </label>
@@ -125,7 +131,10 @@ export default function NewAction({
               css={`
                 margin-top: 12px;
                 width: 100%;
-                color: black;
+                min-height: 43px;
+                background: black;
+                border: 2px solid white;
+                color: white;
               `}
             />
           </label>

@@ -137,7 +137,8 @@ function DaoInfo({ dao }: DaoInfoProps) {
       <div
         css={`
           margin-top: 32px;
-          border: 1px solid whitesmoke;
+          border: 2px solid rgba(255, 255, 255, 0.2);
+          padding: 8px;
           h2 {
             font-weight: bold;
             font-size: 24px;
@@ -197,7 +198,8 @@ function Actions({ dao }: DaoInfoProps) {
     <div
       css={`
         margin-top: 32px;
-        border: 1px solid whitesmoke;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        padding: 8px;
         h2 {
           font-weight: bold;
           font-size: 24px;
@@ -234,7 +236,8 @@ function Permissions({ dao }: PermissionsProps) {
         css={`
           width: 100%;
           margin-top: 32px;
-          border: 1px solid whitesmoke;
+          border: 2px solid rgba(255, 255, 255, 0.2);
+          padding: 8px;
           h2 {
             font-weight: bold;
             font-size: 24px;
@@ -267,7 +270,8 @@ function Permissions({ dao }: PermissionsProps) {
       <div
         css={`
           margin-top: 32px;
-          border: 1px solid whitesmoke;
+          border: 2px solid rgba(255, 255, 255, 0.2);
+          padding: 8px;
           h2 {
             font-weight: bold;
             font-size: 24px;

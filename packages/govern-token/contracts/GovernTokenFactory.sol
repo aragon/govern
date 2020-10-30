@@ -3,12 +3,13 @@
  */
 
 pragma solidity 0.6.8;
+pragma experimental ABIEncoderV2;
 
 import "@aragon/govern-contract-utils/contracts/minimal-proxies/ERC1167ProxyFactory.sol";
 
-import "../GovernToken.sol";
-import "../GovernMinter.sol";
-import "../MerkleDistributor.sol";
+import "./GovernToken.sol";
+import "./GovernMinter.sol";
+import "./MerkleDistributor.sol";
 
 contract GovernTokenFactory {
     using ERC1167ProxyFactory for address;
@@ -25,9 +26,11 @@ contract GovernTokenFactory {
 
     function newToken(
         address _initialMinter,
-        string memory _tokenName,
-        string memory _tokenSymbol,
+        string calldata _tokenName,
+        string calldata _tokenSymbol,
         uint8 _tokenDecimals,
+        address _mintAddr,
+        uint256 _mintAmount,
         bool _useProxies
     ) external returns (
         GovernToken token,
@@ -46,12 +49,25 @@ contract GovernTokenFactory {
             minter = GovernMinter(minterBase.clone(abi.encodeWithSelector(
                 minter.initialize.selector,
                 token,
-                address(_initialMinter),
+                address(this),
                 MerkleDistributor(distributorBase)
             )));
         }
 
         token.changeMinter(address(minter));
+        if (_mintAmount > 0) minter.mint(_mintAddr, _mintAmount, "initial mint");
+
+        bytes4 mintRole = minter.mint.selector ^ minter.merkleMint.selector;
+        bytes4 rootRole = minter.ROOT_ROLE();
+
+        ACLData.BulkItem[] memory items = new ACLData.BulkItem[](4);
+
+        items[0] = ACLData.BulkItem(ACLData.BulkOp.Grant, mintRole, _initialMinter);
+        items[1] = ACLData.BulkItem(ACLData.BulkOp.Grant, rootRole, _initialMinter);
+        items[2] = ACLData.BulkItem(ACLData.BulkOp.Revoke, mintRole, address(this));
+        items[3] = ACLData.BulkItem(ACLData.BulkOp.Revoke, rootRole, address(this));
+
+        minter.bulk(items);
 
         emit CreatedToken(token, minter);
     }
