@@ -8,7 +8,13 @@ import ErcTool from './Tools/Erc'
 
 function App() {
   return (
-    <div>
+    <div
+      css={`
+        max-width: 1440px;
+        padding: 8px;
+        margin: 0 auto;
+      `}
+    >
       <TopHeader />
       <Router>
         <Switch>

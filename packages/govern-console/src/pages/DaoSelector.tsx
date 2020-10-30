@@ -27,7 +27,7 @@ export default function DaoSelector() {
         css={`
           padding: 8px;
           margin-top: ${4 * 8}px;
-          border: 1px solid whitesmoke;
+          border: 2px solid rgba(255, 255, 255, 0.2);
         `}
       >
         <label>
@@ -39,8 +39,12 @@ export default function DaoSelector() {
             value={daoName}
             css={`
               margin-top: 12px;
+              margin-bottom: 8px;
               width: 100%;
-              color: black;
+              min-height: 43px;
+              background: black;
+              border: 2px solid white;
+              color: white;
             `}
           />
         </label>
@@ -55,7 +59,7 @@ export default function DaoSelector() {
         css={`
           padding: 8px;
           margin-top: ${4 * 8}px;
-          border: 1px solid whitesmoke;
+          border: 2px solid rgba(255, 255, 255, 0.2);
         `}
       >
         <h2>Tools</h2>
@@ -88,7 +92,9 @@ function ToolCard({ name, id }: ToolCardProps) {
         background: transparent;
         width: 280px;
         height: 320px;
-        border: 1px solid #00f400;
+        border: 2px solid transparent;
+        border-image: linear-gradient(to bottom right, #AD41BB 20%, #FF7D7D 100%);
+        border-image-slice: 1;
         padding: 16px;
         cursor: pointer;
         &:not(:last-child) {
