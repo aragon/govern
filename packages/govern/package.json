@@ -48,7 +48,6 @@
     "ts-jest": "^26.4.2"
   },
   "dependencies": {
-    "@ethersproject/address": "^5.0.5",
     "@urql/core": "^1.13.1",
     "graphql": "^15.3.0",
     "graphql-tag": "^2.11.0",

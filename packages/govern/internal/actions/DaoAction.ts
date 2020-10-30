@@ -1,6 +1,4 @@
 import AbstractAction from './lib/AbstractAction'
-import { isAddress } from '@ethersproject/address'
-import { Address } from '../clients/lib/types/Address'
 import dao, { Dao } from '../clients/graphql/queries/dao'
 
 /**
@@ -17,28 +15,11 @@ export default class DaoAction extends AbstractAction<Dao> {
   protected gqlQuery: string = dao
 
   /**
-   * @param {{address: Address}} parameters
+   * @param {{name: string}} parameters
    *
    * @constructor
    */
-  constructor(parameters: { address: Address }) {
+  constructor(parameters: { name: string }) {
     super(parameters)
-  }
-
-  /**
-   * Validates the given parameters
-   *
-   * @param {{address: Address}} parameters
-   *
-   * @method validateParameters
-   *
-   * @protected
-   */
-  protected validateParameters(parameters: {address: Address}): { address: Address } {
-    if (!isAddress(parameters.address)) {
-      throw new Error('Invalid Ethereum address passed!')
-    }
-
-    return super.validateParameters(parameters)
   }
 }
