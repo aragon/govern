@@ -42,12 +42,10 @@ export const QUERY_QUEUES = gql`
 `
 
 export const QUERY_QUEUES_BY_DAO = gql`
-  query Govern($address: String!) {
-    govern(id: $address) {
-      registryEntries {
-        queue {
-          ...QueueBase
-        }
+  query RegistryEntry($name: String!) {
+    registryEntries(where: { name: $name }, first: 1) {
+      queue {
+        ...QueueBase
       }
     }
   }

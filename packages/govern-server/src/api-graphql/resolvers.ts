@@ -5,7 +5,7 @@ export default function resolvers(govern: GovernCore): IResolvers {
   return {
     Query: {
       async dao(_, args) {
-        return govern.dao(args.address)
+        return govern.dao(args.name)
       },
       async daos() {
         return govern.daos()
@@ -34,7 +34,12 @@ export default function resolvers(govern: GovernCore): IResolvers {
         )
       },
       async queues(parent) {
-        return govern.queuesForDao(parent.address)
+        return govern.queuesForDao(parent.name)
+      },
+    },
+    RegistryEntry: {
+      async executor(parent) {
+        return govern.queuesForDao(parent.name)
       },
     },
   }
