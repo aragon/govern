@@ -57,6 +57,7 @@ describe('GovernRegistry', function () {
       governRegistry.register(
         erc3kExec.address,
         erc3k.address,
+        `0x${'00'.repeat(20)}`,
         'MyName',
         '0x00'
       )
@@ -70,12 +71,13 @@ describe('GovernRegistry', function () {
   })
 
   it('calls register and reverts cause the name is already used', async () => {
-    governRegistry.register(erc3kExec.address, erc3k.address, 'MyName', '0x00')
+    governRegistry.register(erc3kExec.address, erc3k.address, `0x${'00'.repeat(20)}`, 'MyName', '0x00')
 
     await expect(
       governRegistry.register(
         erc3kExec.address,
         erc3k.address,
+        `0x${'00'.repeat(20)}`,
         'MyName',
         '0x00'
       )
