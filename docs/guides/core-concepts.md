@@ -19,7 +19,7 @@ Govern's Action Queue is what most users will interact with directly—it holds 
 
 Through the Executor, Govern DAOs can also hold funds and interact with any arbitrary protocol. This makes it equivalent to **aragonOS's Agent** and **Moloch's Minion.** This allows for complex user flows such as a community deciding through a Snapshot vote to use pooled funds in the Executor to gain interest through lending protocols like Compound or AAVE and also fund a Balancer liquidity pool, all in one transaction.
 
-Learn more about the [smart contract system here](../developers/getting-started.md).
+Learn more about the [smart contract system here](../developers/smart-contracts.md).
 
 Govern will also have first class support with Snapshot, in which a space will be able to be configured so that every proposal can attach an on-chain action to the corresponding options to vote for. With these tools, we have everything we need to allow a project, to fully and progressively decentralize and take decisions over its future in a community-oriented manner.
 
