@@ -66,12 +66,14 @@ class GovernCore {
     }
   }
 
-  async dao(address: Address): Promise<DaoData | null> {
-    const result = await this.fetchResult<{ govern: DaoData | null }>(
-      [QUERY_DAO, { address: address.toLowerCase() }],
-      `Unexpected result when fetching the dao ${address}.`
+  async dao(name: string): Promise<DaoData | null> {
+    const result = await this.fetchResult<{
+      registryEntries: RegistryEntryData[] | null
+    }>(
+      [QUERY_DAO, { name }],
+      `Unexpected result when fetching the dao ${name}.`
     )
-    return result.govern ?? null
+    return result.registryEntries?.[0]?.executor ?? null
   }
 
   async daos(): Promise<DaoData[]> {
@@ -119,18 +121,15 @@ class GovernCore {
     return result.registryEntries ?? []
   }
 
-  async queuesForDao(address: Address): Promise<GovernQueueData[]> {
-    const result = await this.fetchResult<{ govern: DaoData }>(
-      [QUERY_QUEUES_BY_DAO, { address }],
-      `Unexpected result when fetching the queues for dao ${address}.`
+  async queuesForDao(name: string): Promise<GovernQueueData[]> {
+    const result = await this.fetchResult<{
+      registryEntries: RegistryEntryData[]
+    }>(
+      [QUERY_QUEUES_BY_DAO, { name }],
+      `Unexpected result when fetching the queues for dao ${name}.`
     )
-    const registryEntries = result.govern?.registryEntries ?? []
-    return registryEntries.reduce<GovernQueueData[]>(
-      (queues, registryEntry) => {
-        return registryEntry?.queue ? [...queues, registryEntry.queue] : queues
-      },
-      []
-    )
+    const queue = result.registryEntries?.[0]?.queue
+    return queue ? [queue] : []
   }
 }
 

@@ -22,6 +22,7 @@ export default gql`
     registryEntries: [RegistryEntry!]!
     containers: [Container]!
     roles: [Role!]!
+    queues: [GovernQueue]!
   }
 
   type GovernQueue {
@@ -162,7 +163,7 @@ export default gql`
 
   type Query {
     daos: [Dao!]!
-    dao(address: String!): Dao
+    dao(name: String!): Dao
     registryEntry(name: String!): RegistryEntry
     registryEntries: [RegistryEntry!]
   }
