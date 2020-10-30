@@ -5,9 +5,8 @@
     "target": "es2018",
     "removeComments": true,
     "strictPropertyInitialization": false,
-    "sourceRoot": "./",
     "outDir": "./dist/esm",
-    "baseUrl": "./",
+    "sourceRoot": "./",
     "inlineSources": true,
     "types": [
       "jest"
