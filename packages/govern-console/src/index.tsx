@@ -11,10 +11,15 @@ import {
 import App from './App'
 import GeneralProvider from './Providers/GeneralProvider'
 
-const client: ApolloClient<NormalizedCacheObject> = new ApolloClient({
-  uri: process.env.REACT_APP_SUBGRAPH_URL,
+export const rinkebyClient: ApolloClient<NormalizedCacheObject> = new ApolloClient({
+  uri: 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby',
   cache: new InMemoryCache()
 });
+
+export const mainnetClient: ApolloClient<NormalizedCacheObject> = new ApolloClient({
+  uri: 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby',
+  cache: new InMemoryCache()
+})
 
 const GlobalStyle = createGlobalStyle`
   *, *:before, *:after {
@@ -56,7 +61,7 @@ const GlobalStyle = createGlobalStyle`
 `
 
 render(
-  <ApolloProvider client={client}>
+  <ApolloProvider client={rinkebyClient}>
     <GeneralProvider>
       <React.StrictMode>
         <GlobalStyle />
