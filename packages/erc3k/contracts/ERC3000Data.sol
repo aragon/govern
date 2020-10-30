@@ -45,7 +45,12 @@ library ERC3000Data {
     }
 
     function containerHash(bytes32 payloadHash, bytes32 configHash) internal view returns (bytes32) {
-        return keccak256(abi.encodePacked("erc3k-v1", this, payloadHash, configHash));
+        uint chainId;
+        assembly {
+            chainId := chainid()
+        }
+
+        return keccak256(abi.encodePacked("erc3k-v1", this, chainId, payloadHash, configHash));
     }
 
     function hash(Container memory container) internal view returns (bytes32) {
