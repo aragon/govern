@@ -4,7 +4,8 @@
   "license": "GPL-3.0",
   "scripts": {
     "dev": "ts-node-dev src/index.ts",
-    "start": "yarn start:containers && node --loader ts-node/esm.mjs  src/index.ts",
+    "start": "yarn start:containers && yarn start:server",
+    "start:server": "node --loader ts-node/esm.mjs src/index.ts",
     "start:containers": "HOST_UID=$(id -u) HOST_GID=$(id -g) docker-compose up -d",
     "stop:containers": "HOST_UID=$(id -u) HOST_GID=$(id -g) docker-compose down"
   },
