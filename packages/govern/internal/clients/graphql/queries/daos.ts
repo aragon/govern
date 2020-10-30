@@ -1,60 +1,22 @@
+import { Dao } from './dao'
+import registryEntry from '../fragments/registry-entry'
+
+export interface Daos {
+  daos: Dao[]
+}
 
 const daos: string = `
    query DAOS {
       daos {
-          id
-          address
-          metadata
-          registryEntries {
-              id
-              name
-              queue {
-                  id
-                  address
-                  config {
-                      executionDelay
-                      scheduleDeposit {
-                          id
-                          token
-                          amount
-                      }
-                      challengeDeposit {
-                          id
-                          token
-                          amount
-                      }
-                      resolver 
-                      rules
-                  }
-                  queued {
-                      id
-                      state
-                      payload {
-                          id
-                          nonce
-                          executionTime
-                          submitter
-                          actions {
-                              id
-                              to
-                              value
-                              data
-                          }
-                          allowFailuresMap
-                          proof
-                      }
-                      history {
-                          id
-                      }
-                  }
-              }
-              executor {
-                  id
-                  address
-              }
-          }
+        id
+        address
+        metadata
+        registryEntries {
+            ...RegistryEntry_registryEntry
+        }
       }
    }
+   ${registryEntry}
 `
 
 export default daos

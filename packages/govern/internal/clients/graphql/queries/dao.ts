@@ -1,3 +1,10 @@
+import registryEntry, { RegistryEntry } from '../fragments/registry-entry'
+
+export interface Dao {
+  id: string,
+  metadata: string,
+  registryEntries: RegistryEntry[]
+}
 
 const dao: string = `
     query DAO($name: String) {
@@ -6,55 +13,11 @@ const dao: string = `
         address
         metadata
         registryEntries {
-            id
-            name
-            queue {
-                id
-                address
-                config {
-                    executionDelay
-                    scheduleDeposit {
-                        id
-                        token
-                        amount
-                    }
-                    challengeDeposit {
-                        id
-                        token
-                        amount
-                    }
-                    resolver 
-                    rules
-                }
-                queued {
-                    id
-                    state
-                    payload {
-                        id
-                        nonce
-                        executionTime
-                        submitter
-                        actions {
-                            id
-                            to
-                            value
-                            data
-                        }
-                        allowFailuresMap
-                        proof
-                    }
-                    history {
-                        id
-                    }
-                }
-            }
-            executor {
-                id
-                address
-            }
+            ...RegistryEntry_registryEntry
         }
       }
     }
+    ${registryEntry}
   `
 
 export default dao

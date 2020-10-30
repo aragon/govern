@@ -1,5 +1,7 @@
 import { Dao } from '../internal/clients/graphql/queries/dao'
-import DaoAction  from '../internal/actions/DAOAction'
+import DaoAction from '../internal/actions/DAOAction'
+
+export { Dao }
 
 /**
  * Returns a Dao object by the given name.
