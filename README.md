@@ -55,7 +55,7 @@ To use Govern, feel free to deploy your own registries and factories, but using 
 
 #### Mainnet
 
-- 📜 GovernRegistry: [``](https://etherscan.io/address/)
+- 📜 GovernRegistry: [`0x9dDC0BAB6aCCa5F374E2C21708b3107e5E973601`](https://etherscan.io/address/)
 - 🏭 GovernBaseFactory: [``](https://etherscan.io/address/)
 
 #### Rinkeby
