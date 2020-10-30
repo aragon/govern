@@ -15,8 +15,6 @@
     "build:cjs": "tsc -p ./tsconfig.cjs.json",
     "dev:esm": "yarn build:esm --watch",
     "dev:cjs": "yarn build:cjs --watch",
-    "coverage": "ethereumjs-config-coverage",
-    "coveralls": "ethereumjs-config-coveralls",
     "test": "jest"
   },
   "repository": {
