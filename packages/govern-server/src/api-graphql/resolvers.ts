@@ -25,7 +25,9 @@ export default function resolvers(govern: GovernCore): IResolvers {
           )
         )
       },
+      async queues(parent) {
+        return govern.queuesForDao(parent.address)
+      },
     },
-    // TODO: add queue resolver
   }
 }

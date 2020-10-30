@@ -22,6 +22,7 @@ export default gql`
     registryEntries: [RegistryEntry!]!
     containers: [Container]!
     roles: [Role!]!
+    queues: [GovernQueue]!
   }
 
   type GovernQueue {
