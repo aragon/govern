@@ -32,7 +32,7 @@ The code in this repository has **not** been audited.
 
 Read the documentation if you have any doubts about the high-level overview of Govern, or if you want to know more about how everything works under the hood.
 
-#### 👋 Get started contributing with a [good first issue](https://github.com/aragon/govern/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+#### 👋 Get started contributing with a [good first issue](https://github.com/aragon/govern/labels/good%20first%20issue%20%F0%9F%8C%9E)
 Don't be shy to contribute even the smallest tweak. Everyone will be especially nice and helpful to beginners to help you get started!
 
 ## Structure
