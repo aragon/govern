@@ -24,7 +24,7 @@ jobs:
       CD: true
       ETH_KEY: ${{ secrets.ETH_KEY }}
       ETHERSCAN_KEY: ${{ secrets.ETHERSCAN_KEY }}
-      REGISTRY_RINKEBY: "0x2A6D3c8c7567E47d93E94eDE89557A1E88DFC0cf"
+      REGISTRY_RINKEBY: "0x0cd3621EC403F26ad9F79c3d77B1dda1f8474c6f"
     steps:
     - uses: actions/checkout@v1
     - name: Install node

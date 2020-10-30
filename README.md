@@ -55,11 +55,11 @@ To use Govern, feel free to deploy your own registries and factories, but using 
 
 #### Mainnet
 
-- 📜 ERC3000Registry: [`0x2A6D3c8c7567E47d93E94eDE89557A1E88DFC0cf`](https://etherscan.io/address/0x2A6D3c8c7567E47d93E94eDE89557A1E88DFC0cf)
+- 📜 ERC3000Registry: [`0x0cd3621EC403F26ad9F79c3d77B1dda1f8474c6f`](https://etherscan.io/address/0x0cd3621EC403F26ad9F79c3d77B1dda1f8474c6f)
 
 #### Rinkeby
 
-- 📜 ERC3000Registry: [`0x2A6D3c8c7567E47d93E94eDE89557A1E88DFC0cf`](https://rinkeby.etherscan.io/address/0x2A6D3c8c7567E47d93E94eDE89557A1E88DFC0cf)
+- 📜 ERC3000Registry: [`0x0cd3621EC403F26ad9F79c3d77B1dda1f8474c6f`](https://rinkeby.etherscan.io/address/0x0cd3621EC403F26ad9F79c3d77B1dda1f8474c6f)
 
 ## Help shape Aragon Govern
 - Discuss in [Aragon Forum](https://forum.aragon.org/tags/aragon-govern)
