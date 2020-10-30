@@ -44,13 +44,13 @@ import { configure } from '@aragon/govern'
 configure({governURL: 'https://myOwnGovernServer.io'});
 ```
 
-### dao(address) ⇒ <code>Promise<Dao></code>
+### dao(name) ⇒ <code>Promise<Dao></code>
 
 Returns details about a DAO by his address.
 
 | Param  | Type                  | Description                               |
 | ------ | --------------------- | ----------------------------------------- |
-| address | <code>[Address][address]</code> | [Address][address] of the DAO  |
+| name   | <code>string</code>   | The name of the DAO                       |
 
 Example:
 ``` typescript 
@@ -71,20 +71,20 @@ import { daos } from '@aragon/govern'
 const response = await daos();
 ```
 
-### query(query) ⇒ <code>Promise<OperationResult></code>
+### query(query) ⇒ <code>Promise<object></code>
 
 Returns the desired data.
 
 | Param  | Type                      | Description                               |
 | ------ | ------------------------- | ----------------------------------------- |
-| query  | <code>DocumentNode</code> | GraphQL query                             |
-| args   | <code>object</code>       | [Address][address] of the DAO             |
+| query  | <code>string</code>       | GraphQL query                             |
+| args   | <code>object</code>       | Object with parameters                    |
 
 Example:
 ``` typescript 
 import { query } from '@aragon/govern'
 
-const query = await query(node, {...});
+const query = await query(myQuery, {...});
 ```
 
 [Address]: https://github.com/aragon/govern/tree/master/packages/govern/internal/configuration/Configuration.ts#L4

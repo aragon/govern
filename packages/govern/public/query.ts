@@ -1,4 +1,3 @@
-import { OperationResult } from '@urql/core'
 import Configuration from '../internal/configuration/Configuration'
 
 /**
@@ -7,8 +6,8 @@ import Configuration from '../internal/configuration/Configuration'
  * @param {string} query
  * @param {Object} args
  *
- * @returns Promise<OperationResult>
+ * @returns Promise<any> - Returns the data object or throws an error
  */
-export function query(query: string, args: any = {}): Promise<OperationResult> {
+export function query(query: string, args: any = {}): Promise<any> {
   return Configuration.get().client.request(query, args)
 }

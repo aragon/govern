@@ -50,11 +50,11 @@ export default class GraphQLClient implements ClientInterface {
    * @param {string} query
    * @param {Object} args
    *
-   * @returns {Promise<any>}
+   * @returns {Promise<any>} - Returns the data object or throws an error
    *
    * @public
    */
-  public async request(query: string, args: any = {}): Promise<OperationResult> {
+  public async request(query: string, args: any = {}): Promise<any> {
     const result = await this.client.query(gql(query), args).toPromise()
 
     if (result.error) { // TODO: Use errors from core
