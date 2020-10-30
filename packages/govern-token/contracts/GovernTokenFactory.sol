@@ -6,9 +6,9 @@ pragma solidity 0.6.8;
 
 import "@aragon/govern-contract-utils/contracts/minimal-proxies/ERC1167ProxyFactory.sol";
 
-import "../GovernToken.sol";
-import "../GovernMinter.sol";
-import "../MerkleDistributor.sol";
+import "./GovernToken.sol";
+import "./GovernMinter.sol";
+import "./MerkleDistributor.sol";
 
 contract GovernTokenFactory {
     using ERC1167ProxyFactory for address;
@@ -25,9 +25,11 @@ contract GovernTokenFactory {
 
     function newToken(
         address _initialMinter,
-        string memory _tokenName,
-        string memory _tokenSymbol,
+        string calldata _tokenName,
+        string calldata _tokenSymbol,
         uint8 _tokenDecimals,
+        address _mintAddr,
+        uint256 _mintAmount,
         bool _useProxies
     ) external returns (
         GovernToken token,
@@ -52,6 +54,7 @@ contract GovernTokenFactory {
         }
 
         token.changeMinter(address(minter));
+        if (_mintAmount > 0) minter.mint(_mintAddr, _mintAmount, "initial mint");
 
         emit CreatedToken(token, minter);
     }

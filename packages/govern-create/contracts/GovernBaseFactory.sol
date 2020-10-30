@@ -7,6 +7,9 @@ pragma experimental ABIEncoderV2;
 
 import "@aragon/govern-core/contracts/GovernRegistry.sol";
 
+import "@aragon/govern-token/contracts/GovernTokenFactory.sol";
+import "@aragon/govern-token/contracts/interfaces/IERC20.sol";
+
 import "./core-factories/GovernFactory.sol";
 import "./core-factories/GovernQueueFactory.sol";
 
@@ -15,21 +18,40 @@ contract GovernBaseFactory {
 
     GovernFactory public governFactory;
     GovernQueueFactory public queueFactory;
+    GovernTokenFactory public tokenFactory;
     GovernRegistry public registry;
 
-    constructor(GovernRegistry _registry, GovernFactory _governFactory, GovernQueueFactory _queueFactory) public {
+    constructor(
+        GovernRegistry _registry,
+        GovernFactory _governFactory,
+        GovernQueueFactory _queueFactory,
+        GovernTokenFactory _tokenFactory
+    ) public {
         governFactory = _governFactory;
         queueFactory = _queueFactory;
+        tokenFactory = _tokenFactory;
         registry = _registry;
     }
 
-    function newDummyGovern(string calldata _name, bool _useProxies) external returns (Govern govern, GovernQueue queue) {
+    function newDummyGovern(string calldata _name, IERC20 _token, bool _useProxies) external returns (Govern govern, GovernQueue queue) {
         bytes32 salt = _useProxies ? keccak256(abi.encodePacked(_name)) : bytes32(0);
 
         queue = queueFactory.newQueue(address(this), dummyConfig(), salt);
         govern = governFactory.newGovern(queue, salt);
 
-        registry.register(govern, queue, _name, "");
+        if (address(_token) == address(0)) {
+            (_token,) = tokenFactory.newToken(
+                address(govern),
+                _name,
+                _name,
+                18,
+                msg.sender,
+                1 * 10 ** 18,
+                _useProxies
+            );
+        }
+
+        registry.register(govern, queue, _token, _name, "");
 
         ACLData.BulkItem[] memory items = new ACLData.BulkItem[](6);
         items[0] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.schedule.selector, ANY_ADDR);
