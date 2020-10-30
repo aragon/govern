@@ -1,8 +1,4 @@
-# govern.js
-
-> The JavaScript client API for the Govern server
-
-## Usage
+# Govern.js API
 
 **Usage with default config**
 
@@ -25,23 +21,6 @@ configure({governURL: 'https://myOwnGovernServer.io'});
 const response = await dao('0x0...');
 
 console.log(response)
-```
-
-## Documentation
-
-### configure(config) ⇒ <code>void</code>
-
-Overwrites the default configuration of govern.
-
-| Param  | Type                                                    | Description                                          |
-| ------ | ------------------------------------------------------- | ---------------------------------------------------- |
-| config | <code>[ConfigurationObject][ConfigurationObject]</code> | Object with all [config options][ConfigurationObject]|
-
-Example:
-``` typescript 
-import { configure } from '@aragon/govern'
-
-configure({governURL: 'https://myOwnGovernServer.io'});
 ```
 
 ### dao(name) ⇒ <code>Promise<Dao></code>
@@ -85,6 +64,21 @@ Example:
 import { query } from '@aragon/govern'
 
 const query = await query(myQuery, {...});
+```
+
+### configure(config) ⇒ <code>void</code>
+
+Overwrites the default configuration of govern.
+
+| Param  | Type                                                    | Description                                          |
+| ------ | ------------------------------------------------------- | ---------------------------------------------------- |
+| config | <code>[ConfigurationObject][ConfigurationObject]</code> | Object with all [config options][ConfigurationObject]|
+
+Example:
+``` typescript 
+import { configure } from '@aragon/govern'
+
+configure({governURL: 'https://myOwnGovernServer.io'});
 ```
 
 [ConfigurationObject]: https://github.com/aragon/govern/tree/master/packages/govern/internal/configuration/Configuration.ts#L4
