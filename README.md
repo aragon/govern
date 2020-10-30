@@ -6,7 +6,7 @@
       Website
     </a>
     <span> | </span>
-    <a href="https://docs.aragon.org/aragon-govern/">
+    <a href="https://docs.aragon.org/govern/">
       Documentation
     </a>
     <span> | </span>
