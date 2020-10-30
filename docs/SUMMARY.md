@@ -9,9 +9,10 @@
 
 ## Developers
 
+* [Getting started](developers/getting-started.md)
+* [Smart contracts breakdown](developers/smart-contracts.md)
 * [Govern Server API](developers/server-api.md)
 
 ## Internal
 
-* [Historical deployments](internal/historical-deployments.md)
-
+* [Historical deployments](developers/historical-deployments.md)
