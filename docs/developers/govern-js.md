@@ -50,7 +50,7 @@ import { daos } from '@aragon/govern'
 const response = await daos();
 ```
 
-### query(query) ⇒ ``Promise<object>``
+### query(query, args) ⇒ ``Promise<object>``
 
 Returns the desired data.
 
