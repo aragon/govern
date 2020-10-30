@@ -19,7 +19,6 @@ const QueueBase = gql`
     }
     roles {
       id
-      entity
     }
   }
 `

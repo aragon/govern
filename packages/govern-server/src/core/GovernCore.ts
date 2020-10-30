@@ -84,19 +84,19 @@ class GovernCore {
 
   async queue(address: Address): Promise<GovernQueueData | null> {
     const result = await this.fetchResult<{
-      optimisticQueue: GovernQueueData | null
+      governQueue: GovernQueueData | null
     }>(
       [QUERY_QUEUE, { queue: address.toLowerCase() }],
       `Unexpected result when fetching the queue ${address}.`
     )
-    return result.optimisticQueue ?? null
+    return result.governQueue ?? null
   }
 
   async queues(): Promise<GovernQueueData[]> {
     const result = await this.fetchResult<{
-      optimisticQueues: GovernQueueData[]
+      governQueues: GovernQueueData[]
     }>([QUERY_QUEUES], `Unexpected result when fetching the queue.`)
-    return result.optimisticQueues ?? []
+    return result.governQueues ?? []
   }
 
   async registryEntry(name: string): Promise<RegistryEntryData | null> {
