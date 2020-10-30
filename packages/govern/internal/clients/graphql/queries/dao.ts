@@ -1,35 +1,60 @@
-import optimisticQueue, { OptimisticQueue } from '../fragments/optimisticQueue'
-import execution, { Execution } from '../fragments/execution'
-import role, { Role } from '../fragments/role'
-import { Address } from '../../lib/types/Address'
-
-export interface Dao {
-  id: string
-  address: Address
-  executons: Execution[]
-  roles: Role[]
-  queues: OptimisticQueue[]
-}
 
 const dao: string = `
-    query DAO($address: String) {
-      dao(address: $address) {
+    query DAO($name: String) {
+      dao(name: $name) {
         id
         address
-        executions {
-          ...Execution_execution
-        }
-        roles {
-          ...Role_role
-        }
-        queues {
-          ...OptimisticQueue_optimisticQueue
+        metadata
+        registryEntries {
+            id
+            name
+            queue {
+                id
+                address
+                config {
+                    executionDelay
+                    scheduleDeposit {
+                        id
+                        token
+                        amount
+                    }
+                    challengeDeposit {
+                        id
+                        token
+                        amount
+                    }
+                    resolver 
+                    rules
+                }
+                queued {
+                    id
+                    state
+                    payload {
+                        id
+                        nonce
+                        executionTime
+                        submitter
+                        actions {
+                            id
+                            to
+                            value
+                            data
+                        }
+                        allowFailuresMap
+                        proof
+                    }
+                    history {
+                        id
+                    }
+                }
+            }
+            executor {
+                id
+                address
+            }
         }
       }
     }
-    ${optimisticQueue}
-    ${execution}
-    ${role}
   `
 
 export default dao

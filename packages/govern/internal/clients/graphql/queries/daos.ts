@@ -1,31 +1,60 @@
-import { Dao } from './dao'
-import optimisticQueue from '../fragments/optimisticQueue'
-import execution from '../fragments/execution'
-import role from '../fragments/role'
-
-export interface Daos {
-  daos: Dao[]
-}
 
 const daos: string = `
-    query DAOS {
+   query DAOS {
       daos {
-        id
-        address
-        executions {
-          ...Execution_execution
-        }
-        roles {
-          ...Role_role
-        }
-        queues {
-          ...OptimisticQueue_optimisticQueue
-        }
+          id
+          address
+          metadata
+          registryEntries {
+              id
+              name
+              queue {
+                  id
+                  address
+                  config {
+                      executionDelay
+                      scheduleDeposit {
+                          id
+                          token
+                          amount
+                      }
+                      challengeDeposit {
+                          id
+                          token
+                          amount
+                      }
+                      resolver 
+                      rules
+                  }
+                  queued {
+                      id
+                      state
+                      payload {
+                          id
+                          nonce
+                          executionTime
+                          submitter
+                          actions {
+                              id
+                              to
+                              value
+                              data
+                          }
+                          allowFailuresMap
+                          proof
+                      }
+                      history {
+                          id
+                      }
+                  }
+              }
+              executor {
+                  id
+                  address
+              }
+          }
       }
-    }
-    ${optimisticQueue}
-    ${execution}
-    ${role}
-  `
+   }
+`
 
 export default daos
