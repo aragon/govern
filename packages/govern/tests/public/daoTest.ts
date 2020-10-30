@@ -11,9 +11,9 @@ describe('dao Test', () => {
   const daoActionMock = DaoAction as jest.MockedClass<typeof DaoAction>
 
   it('calls dao and executes as expected', async () => {
-    await dao('0x00')
+    await dao('myName')
 
-    expect(DaoAction).toHaveBeenNthCalledWith(1, { address: '0x00' })
+    expect(DaoAction).toHaveBeenNthCalledWith(1, { name: 'myName' })
 
     expect(daoActionMock.mock.instances[0].execute).toHaveBeenCalledTimes(1)
   })
