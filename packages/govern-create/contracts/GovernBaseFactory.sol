@@ -33,7 +33,13 @@ contract GovernBaseFactory {
         registry = _registry;
     }
 
-    function newDummyGovern(string calldata _name, IERC20 _token, bool _useProxies) external returns (Govern govern, GovernQueue queue) {
+    function newGovernWithoutConfig(
+        string calldata _name,
+        IERC20 _token,
+        string calldata _tokenName,
+        string calldata _tokenSymbol,
+        bool _useProxies
+    ) external returns (Govern govern, GovernQueue queue) {
         bytes32 salt = _useProxies ? keccak256(abi.encodePacked(_name)) : bytes32(0);
 
         queue = queueFactory.newQueue(address(this), dummyConfig(), salt);
@@ -42,9 +48,9 @@ contract GovernBaseFactory {
         if (address(_token) == address(0)) {
             (_token,) = tokenFactory.newToken(
                 address(govern),
-                _name,
-                _name,
-                18,
+                _tokenName,
+                _tokenSymbol,
+                18, // NOTE: hardcoding due to stack to deep issues
                 msg.sender,
                 1 * 10 ** 18,
                 _useProxies

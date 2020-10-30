@@ -19,8 +19,13 @@ library ERC1167ProxyFactory {
 
     function clone(address _implementation, bytes memory _initData) internal returns (address cloneAddr) {
         cloneAddr = clone(_implementation);
-        (bool ok, ) = cloneAddr.call(_initData);
-        require(ok, "proxy-factory: bad init");
+        (bool ok, bytes memory ret) = cloneAddr.call(_initData);
+
+        if (!ok) {
+            assembly {
+                return(add(ret, 0x20), mload(ret)) // fwd revert reason
+            }
+        }
     }
 
     function clone2(address _implementation, bytes32 _salt) internal returns (address cloneAddr) {
@@ -35,8 +40,13 @@ library ERC1167ProxyFactory {
 
     function clone2(address _implementation, bytes32 _salt, bytes memory _initData) internal returns (address cloneAddr) {
         cloneAddr = clone2(_implementation, _salt);
-        (bool ok, ) = cloneAddr.call(_initData);
-        require(ok, "proxy-factory: bad init");
+        (bool ok, bytes memory ret) = cloneAddr.call(_initData);
+
+        if (!ok) {
+            assembly {
+                return(add(ret, 0x20), mload(ret)) // fwd revert reason
+            }
+        }
     }
 
     function generateCode(address _implementation) internal pure returns (bytes memory code) {

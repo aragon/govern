@@ -15,7 +15,14 @@ const REGISTRY_EVENTS_ABI = [
 ]
 
 module.exports = async (
-  { factory: factoryAddr, useProxies = true, name },
+  {
+    factory: factoryAddr,
+    useProxies = true,
+    name,
+    token = `0x${'00'.repeat(20)}`,
+    tokenName = name,
+    tokenSymbol = 'GOV'
+  },
   { ethers }
 ) => {
   factoryAddr =
@@ -43,9 +50,16 @@ module.exports = async (
     'GovernBaseFactory',
     factoryAddr
   )
-  const tx = await governBaseFactory.newDummyGovern(name, useProxies, {
-    gasLimit: useProxies ? 7e5 : 7e6,
-  })
+  const tx = await governBaseFactory.newGovernWithoutConfig(
+    name,
+    token,
+    tokenName || name,
+    tokenSymbol,
+    useProxies,
+    {
+      gasLimit: useProxies ? 7e5 : 7e6,
+    }
+  )
 
   const { events } = await tx.wait()
 
