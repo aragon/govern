@@ -25,6 +25,7 @@
     "mustache": "^4.0.1"
   },
   "dependencies": {
+    "@aragon/govern-core": "^1.0.1-beta.0",
     "babel-polyfill": "^6.26.0",
     "babel-register": "^6.26.0"
   },
