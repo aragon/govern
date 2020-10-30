@@ -26,9 +26,7 @@ templates:
         - Role
       abis:
         - name: GovernQueue
-          file: ../govern-core/artifacts/GovernQueue.json
-        - name: ERC20
-          file: ../govern-core/artifacts/ERC20.json
+          file: ./abi/GovernQueue.json
       eventHandlers:
         - event: Configured(indexed bytes32,indexed address,(uint256,(address,uint256),(address,uint256),address,bytes))
           handler: handleConfigured
@@ -68,7 +66,7 @@ templates:
         - Role
       abis:
         - name: Govern
-          file: ../govern-core/artifacts/Govern.json
+          file: ./abi/Govern.json
       eventHandlers:
         - event: Executed(indexed address,(address,uint256,bytes)[],bytes32,bytes32,bytes[])
           handler: handleExecuted

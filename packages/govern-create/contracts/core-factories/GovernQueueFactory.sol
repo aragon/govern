@@ -25,7 +25,7 @@ contract GovernQueueFactory {
         }
     }
 
-    function setupBase() internal {
+    function setupBase() private {
         ERC3000Data.Collateral memory noCollateral;
         ERC3000Data.Config memory config = ERC3000Data.Config(
             0,

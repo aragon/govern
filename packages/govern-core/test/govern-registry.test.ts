@@ -33,7 +33,7 @@ describe('GovernRegistry', function () {
 
   beforeEach(async () => {
     const ERC3000Mock = (await ethers.getContractFactory(
-      'Erc3000Mock'
+      'ERC3000Mock'
     )) as Erc3000MockFactory
 
     const ERC3000ExecutorMock = (await ethers.getContractFactory(
