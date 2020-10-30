@@ -4,7 +4,7 @@ export const networks = [
     name: 'ethereum',
     ensAddress: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
     subgraphUrl:
-      'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-mainnet',
+      'https://graph.backend.aragon.org/subgraphs/name/aragon/aragon-govern-mainnet',
   },
   {
     chainId: 4,
