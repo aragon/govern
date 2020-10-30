@@ -46,7 +46,7 @@ contract ACL is Initializable {
     modifier initACL(address _initialRoot) {
         // ACL might have been already initialized by constructors
         if (initBlocks["acl"] == 0) {
-            _initializeACL(address(this));
+            _initializeACL(_initialRoot);
         }
         _;
     }
