@@ -25,8 +25,8 @@ contract GovernTokenFactory {
 
     function newToken(
         address _initialMinter,
-        string memory _tokenName,
-        string memory _tokenSymbol,
+        string calldata _tokenName,
+        string calldata _tokenSymbol,
         uint8 _tokenDecimals,
         bool _useProxies
     ) external returns (
