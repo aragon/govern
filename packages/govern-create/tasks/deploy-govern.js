@@ -57,7 +57,7 @@ module.exports = async (
     tokenSymbol,
     useProxies,
     {
-      gasLimit: useProxies ? 7e5 : 7e6,
+      gasLimit: useProxies ? 2e6 : 9e6,
     }
   )
 
