@@ -14,5 +14,5 @@ TBA.
 
 ### Contracts
 
-* ERC3000Registry: \`[`0x2A6D3c8c7567E47d93E94eDE89557A1E88DFC0cf`](https://rinkeby.etherscan.io/address/0x2A6D3c8c7567E47d93E94eDE89557A1E88DFC0cf)
+* ERC3000Registry: \`[`0x0cd3621EC403F26ad9F79c3d77B1dda1f8474c6f`](https://rinkeby.etherscan.io/address/0x0cd3621EC403F26ad9F79c3d77B1dda1f8474c6f)
 

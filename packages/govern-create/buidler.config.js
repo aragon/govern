@@ -50,6 +50,11 @@ module.exports = {
     },
     rinkeby: {
       url: 'https://rinkeby.eth.aragon.network',
+      gasPrice: 3e9,
+      accounts,
+    },
+    mainnet: {
+      url: 'https://mainnet.eth.aragon.network',
       accounts,
     },
   },
