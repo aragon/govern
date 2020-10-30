@@ -10,7 +10,7 @@ import "../ERC3000Data.sol";
 contract ERC3000DataLibTest {
     using ERC3000Data for *;
 
-    function testConfigHash(ERC3000Data.Config memory _initialConfig) public view returns (bytes32) {
+    function testConfigHash(ERC3000Data.Config memory _initialConfig) public pure returns (bytes32) {
         return _initialConfig.hash();
     }
 
@@ -18,7 +18,7 @@ contract ERC3000DataLibTest {
         return _container.hash();
     }
 
-    function testPayloadHash(ERC3000Data.Payload memory _payload) public view returns (bytes32) {
+    function testPayloadHash(ERC3000Data.Payload memory _payload) public pure returns (bytes32) {
         return _payload.hash();
     }
 }

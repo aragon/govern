@@ -16,6 +16,7 @@
   "private": false,
   "dependencies": {
     "@aragon/govern-core": "^1.0.0-beta.0",
+    "@aragon/govern-token": "^1.0.0-beta.0",
     "@nomiclabs/buidler-etherscan": "^2.1.0",
     "dotenv": "^8.2.0",
     "node-fetch": "^2.6.1",
