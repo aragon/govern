@@ -2,7 +2,7 @@
 
 ## How to query data
 
-Govern Server is exposing a GraphQL API that lets you fetch data related to your Govern DAOs. Have a look at [API.md](./API.md) for the list of types and queries you can use.
+Govern Server is exposing a GraphQL API that lets you fetch data related to your Govern DAOs. Have a look at the [Govern Server API documentation](https://docs.aragon.org/govern/developers/server-api) for the list of types and queries you can use.
 
 ## Directory structure
 

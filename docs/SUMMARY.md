@@ -11,5 +11,5 @@
 
 * [Getting started](developers/quick-start.md)
 * [Smart contracts breakdown](developers/getting-started.md)
+* [Govern Server API](developers/server-api.md)
 * [Historical deployments](developers/historical-deployments.md)
-

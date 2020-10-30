@@ -1,5 +1,7 @@
 # GraphQL API
 
+Govern Server is exposing a GraphQL API that lets you fetch data related to your Govern DAOs. Here is the complete list of queries and types that are available.
+
 ## Queries
 
 ### `dao(name: String!): Dao`
