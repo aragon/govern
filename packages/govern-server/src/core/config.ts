@@ -13,10 +13,6 @@ export const networks = [
     subgraphUrl:
       'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby',
   },
-  // {
-  //   chainId: 100,
-  //   name: 'xdai',
-  //   ensAddress: '0xaafca6b0c89521752e559650206d7c925fd0e530',
-  //   subgraphUrl: 'aragon/aragon-govern-mainnet',
-  // },
+
+  // TODO: add xDai
 ]
