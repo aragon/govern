@@ -1,6 +1,6 @@
 # Historical deployments
 
-Log of deployed govern relevant instances and related infra.
+Log of deployed govern relevant instances and related infrastructure.
 
 ## Mainnet
 

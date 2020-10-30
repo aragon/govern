@@ -18,7 +18,7 @@ ERC3000 specific contracts haven't been included here. To browse them, go to the
 
 The `ERC3000Registry` contract serves as the **central registry for all Govern DAOs**. Every DAO spawned through a properly-implemented `GovernFactory` will register the new DAO in the "official" registry. The registry takes care of doing these things:
 
-* keep track\* of every Govern &lt;&gt; GovernQueue pair assigning it a name on the blockchain. This means that instead of needing an ENS name, this is left to the user, as the name itself will be saved on the contract's storage.
+* Keep track\* of every `Govern` ⟷ `GovernQueue` pair assigning it a name on the blockchain. This means that instead of assigning an ENS name, this is left to the user, as the name itself will be saved in the contract's storage.
 * Setting metadata, which means you can include an IPFS CID to talk about your DAO, and include relevant links.
 
 **Think of it as...**
@@ -26,7 +26,7 @@ The `ERC3000Registry` contract serves as the **central registry for all Govern D
 A book which keeps track of every DAO and its core relevant info, which will be accessible through a subgraph.
 
 {% hint style="info" %}
-\*Due to the stateless nature of these contracts, it actually only emits an event, and registers the DAO name to the contract's storage so it cannot be overwritten. We rely on the subgraph to get this information.
+\* Due to the stateless nature of these contracts, it actually only emits an event, and registers the DAO name to the contract's storage so it cannot be overwritten. We rely on the subgraph to get this information.
 {% endhint %}
 
 ### GovernFactory.sol & GovernQueueFactory.sol
@@ -37,11 +37,11 @@ A book which keeps track of every DAO and its core relevant info, which will be 
 
 **Think of it as...**
 
-**templates**; these could be modified and extended to set up more specific permissions and change the collateral needed to execute actions. This would be easy to do even for solidity beginners, considering these contracts don't inherit from other ones, and all permissions are already laid out.
+**Templates**; these could be modified and extended to set up more specific permissions and change the collateral needed to execute actions. This would be easy to do even for solidity beginners, considering these contracts don't inherit from other ones, and all permissions are already laid out.
 
 ### Govern.sol
 
-[🐣 _\*\*_Implementation](https://github.com/aragon/govern/blob/master/packages/govern-core/contracts/Govern.sol)
+[🐣 Implementation](https://github.com/aragon/govern/blob/master/packages/govern-core/contracts/Govern.sol)
 
 `Govern` is the DAO's executor _and_ vault of the organization. It will be responsible for executing the actions that have been scheduled through the queue and holding the organization's funds. While the smart contract is extremely simple \(&lt;80 LOC\), it can effectively call any external smart contract, which means it's basically a smart account which is governed by the DAO.
 
@@ -51,7 +51,7 @@ A book which keeps track of every DAO and its core relevant info, which will be 
 
 `GovernQueue` is by far the most critical contract to understand, as it's the main point of interaction with the DAO and the Aragon Protocol. This is what most users will interact with directly—it holds the DAOs configuration parameters, and its where actors can schedule, execute, veto and challenge actions.
 
-* `GovernQueue` **can be configured**, meaning you can change these parameters:
+`GovernQueue` **can be configured**, meaning you can change these parameters:
 
 ```text
 struct Config {
@@ -83,7 +83,7 @@ Actions can be **vetoed**, which might be useful for projects which are venturin
 
 [🚦Reference implementation](https://github.com/aragon/govern/blob/master/packages/govern-contract-utils/contracts/acl/ACL.sol)
 
-The ACL from govern is a much leaner implementation of the original ACL from aragonOS, but still very powerful, having the ability to grant, revoke, and freeze roles. There are a couple of differences are:
+The ACL from govern is a much leaner implementation of the original ACL from aragonOS, but still very powerful, having the ability to grant, revoke, and freeze roles. There are a couple of differences:
 
 * Is devised to be as an **inheritable** contract. Instead of being a single contract that binds the whole organization together, **both `GovernQueue` and `Govern` have their own ACLs**.
 * It has a handy **bulk** function to set multiple permissions at once.
