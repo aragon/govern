@@ -1,4 +1,4 @@
-# GraphQL API
+# Govern Server API
 
 Govern Server is exposing a GraphQL API that lets you fetch data related to your Govern DAOs. Here is the complete list of queries and types that are available.
 
@@ -18,7 +18,7 @@ Use this query to get the list of DAOs.
 
 Represents the DAO registry. It contains `entries`, which have a name and contain a `queue` and an `executor`. A DAO is identified by its name.
 
-```gql
+```text
 type GovernRegistry {
   id: ID!
   address: String!
@@ -31,7 +31,7 @@ type GovernRegistry {
 
 A single registry entry. It has a `name`, a `queue` and an `executor`. A DAO is identified by its name.
 
-```gql
+```text
 type RegistryEntry {
   id: ID!
   name: String!
@@ -44,7 +44,7 @@ type RegistryEntry {
 
 A single DAO entry.
 
-```gql
+```text
 type Dao {
   id: ID!
   address: String!
@@ -58,9 +58,9 @@ type Dao {
 
 ### GovernQueue
 
-Represents an queue of scheduled actions (`Container`) and a configuration.
+Represents an queue of scheduled actions \(`Container`\) and a configuration.
 
-```gql
+```text
 type GovernQueue {
   id: ID!
   address: String!
@@ -75,7 +75,7 @@ type GovernQueue {
 
 The configuration of a `GovernQueue`.
 
-```gql
+```text
 type Config {
   id: ID!
   queue: GovernQueue!
@@ -91,7 +91,7 @@ type Config {
 
 A `Container` represents an action being scheduled for execution, inside a `GovernQueue`. It also contains the configuration at the time it was scheduled, and a history of past events.
 
-```gql
+```text
 type Container {
   id: ID!
   queue: GovernQueue!
@@ -106,7 +106,7 @@ type Container {
 
 The different states of a `Container`.
 
-```gql
+```text
 enum ContainerState {
   None
   Scheduled
@@ -122,7 +122,7 @@ enum ContainerState {
 
 A list of actual actions attached to a `Container`.
 
-```gql
+```text
 type ContainerPayload {
   id: ID!
   container: Container!
@@ -138,9 +138,9 @@ type ContainerPayload {
 
 ### Action
 
-Represents an independent action (transaction data) in a `ContainerPayload`.
+Represents an independent action \(transaction data\) in a `ContainerPayload`.
 
-```gql
+```text
 type Action {
   id: ID!
   payload: ContainerPayload!
@@ -156,23 +156,23 @@ Represents a collateral that gets attached to a `Container` when scheduling it a
 
 Scenario 1:
 
-- Bob submits an action to be executed, with a collateral attached to it.
-- The action passes and doesn’t get challenged.
-- The action gets executed and Bob receives its collateral back.
+* Bob submits an action to be executed, with a collateral attached to it.
+* The action passes and doesn’t get challenged.
+* The action gets executed and Bob receives its collateral back.
 
 Scenario 2:
 
-- Bob submits an action to be executed, with a collateral attached to it.
-- The action passes but gets challenged by Alice, with a collateral attached.
-- The arbitrator approves the action. Bob Receives both collaterals.
+* Bob submits an action to be executed, with a collateral attached to it.
+* The action passes but gets challenged by Alice, with a collateral attached.
+* The arbitrator approves the action. Bob Receives both collaterals.
 
 Scenario 3:
 
-- Bob submits an action to be executed, with a collateral attached to it.
-- The action passes but gets challenged by Alice, with a collateral attached.
-- The arbitrator rejects the action. Alice Receives both collaterals.
+* Bob submits an action to be executed, with a collateral attached to it.
+* The action passes but gets challenged by Alice, with a collateral attached.
+* The arbitrator rejects the action. Alice Receives both collaterals.
 
-```gql
+```text
 type Collateral {
   id: ID!
   token: String!
@@ -184,7 +184,7 @@ type Collateral {
 
 The roles defined on a given `GovernQueue`.
 
-```gql
+```text
 type Role {
   id: ID!
   entity: String!
@@ -199,7 +199,7 @@ type Role {
 
 A `Container` event representing an action being challenged.
 
-```gql
+```text
 type ContainerEventChallenge {
   id: ID!
   container: Container!
@@ -216,7 +216,7 @@ type ContainerEventChallenge {
 
 A `Container` event representing an action being executed.
 
-```gql
+```text
 type ContainerEventExecute {
   id: ID!
   container: Container!
@@ -229,7 +229,7 @@ type ContainerEventExecute {
 
 A `Container` event representing an action being resolved.
 
-```gql
+```text
 type ContainerEventResolve {
   id: ID!
   container: Container!
@@ -242,7 +242,7 @@ type ContainerEventResolve {
 
 A `Container` event representing an action being ruled.
 
-```gql
+```text
 type ContainerEventRule {
   id: ID!
   container: Container!
@@ -255,7 +255,7 @@ type ContainerEventRule {
 
 A `Container` event representing an action being scheduled.
 
-```gql
+```text
 type ContainerEventSchedule {
   id: ID!
   container: Container!
@@ -268,7 +268,7 @@ type ContainerEventSchedule {
 
 A `Container` event representing an evidence being submitted.
 
-```gql
+```text
 type ContainerEventSubmitEvidence {
   id: ID!
   container: Container!
@@ -283,7 +283,7 @@ type ContainerEventSubmitEvidence {
 
 A `Container` event representing an action being vetoed by the arbitrator.
 
-```gql
+```text
 type ContainerEventVeto {
   id: ID!
   container: Container!
@@ -291,3 +291,4 @@ type ContainerEventVeto {
   reason: String!
 }
 ```
+

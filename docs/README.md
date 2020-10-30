@@ -1,4 +1,4 @@
-# Aragon Govern
+# Introduction
 
 {% hint style="info" %}
 Aragon Govern is **beta software.** We try our best to keep everything pristine, but there might be still some dragons laying around 🐲. Help us shape the first official release by joining our [Discord](https://discord.gg/thyHMDt) community!
@@ -11,11 +11,7 @@ Aragon Govern is software for creating and governing organizations such as DeFi 
 Along with off-chain voting solutions like [Snapshot](https://snapshot.page/) it allows you to _govern_ all parts of your project, even if not completely decentralized, in an easy manner. also allowing for flexibility and extensions when needed.
 
 * The [**Overview**](guides/core-concepts.md) section provides more insight over Govern and all of its tooling.
-* The [**Developers**](developers/getting-started.md) section gives an overview of all the individual pieces of Govern.
+* The [**Developers**](https://github.com/aragon/govern/tree/d93b7e137ece393414f84f07dba629a5cdd7e91d/docs/developers/getting-started.md) section gives an overview of all the individual pieces of Govern.
 
 If you have any questions or you'd like to say hi, come join the community at [Discord](https://discord.com/invite/aragon)!
-
-
-
-
 
