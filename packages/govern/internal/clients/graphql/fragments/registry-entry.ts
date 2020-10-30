@@ -99,8 +99,6 @@ export interface RegistryEntry {
 }
 
 const registryEntry = `
-  union ContainerEvent = ContainerEventChallenge | ContainerEventExecute | ContainerEventResolve | ContainerEventRule | ContainerEventSchedule | ContainerEventSubmitEvidence | ContainerEventVeto
-
   fragment RegistryEntry_registryEntry on RegistryEntry {
     id
     name
