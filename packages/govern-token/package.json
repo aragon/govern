@@ -38,6 +38,8 @@
     "clean": "rm -rf artifacts",
     "coverage": "SOLIDITY_COVERAGE=true buidler coverage --network coverage",
     "compile": "buidler compile --force",
+    "deploy-factory": "buidler deploy-factory",
+    "deploy-token": "buidler deploy-token",
     "test": "yarn compile && buidler test",
     "prepublishOnly": "yarn test && yarn compile"
   }

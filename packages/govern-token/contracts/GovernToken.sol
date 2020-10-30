@@ -4,6 +4,8 @@
 
 pragma solidity ^0.6.8;
 
+import "@aragon/govern-contract-utils/contracts/initializable/Initializable.sol";
+
 import './interfaces/IERC20.sol';
 import './libraries/SafeMath.sol';
 
@@ -13,7 +15,7 @@ import './libraries/SafeMath.sol';
 //   - An exposed `mint()` with minting role
 //   - An exposed `burn()`
 //   - ERC-3009 (`transferWithAuthorization()`)
-contract GovernToken is IERC20 {
+contract GovernToken is IERC20, Initializable {
     using SafeMath for uint256;
 
     // bytes32 private constant EIP712DOMAIN_HASH = keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)")
@@ -50,6 +52,10 @@ contract GovernToken is IERC20 {
     }
 
     constructor(address _initialMinter, string memory _name, string memory _symbol, uint8 _decimals) public {
+        initialize(_initialMinter, _name, _symbol, _decimals);
+    }
+
+    function initialize(address _initialMinter, string memory _name, string memory _symbol, uint8 _decimals) public onlyInit("token") {
         _changeMinter(_initialMinter);
         name = _name;
         symbol = _symbol;

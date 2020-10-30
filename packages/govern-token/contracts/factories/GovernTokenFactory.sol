@@ -17,21 +17,75 @@ contract GovernTokenFactory {
     address public minterBase;
     address public distributorBase;
 
+    event CreatedToken(GovernToken token, GovernMinter minter);
+
     constructor() public {
         setupBases();
     }
 
-    function newToken() public returns (GovernToken token, GovernMinter minter) {
-        
+    function newToken(
+        address _initialMinter,
+        string memory _tokenName,
+        string memory _tokenSymbol,
+        uint8 _tokenDecimals,
+        bool _useProxies
+    ) public returns (
+        GovernToken token,
+        GovernMinter minter
+    ) {
+        if (!_useProxies) {
+            (token, minter) = _deployContracts(_initialMinter, _tokenName, _tokenSymbol, _tokenDecimals);
+        } else {
+            token = GovernToken(tokenBase.clone(abi.encodeWithSelector(
+                token.initialize.selector,
+                address(this),
+                _tokenName,
+                _tokenSymbol,
+                _tokenDecimals
+            ))); 
+            minter = GovernMinter(minterBase.clone(abi.encodeWithSelector(
+                minter.initialize.selector,
+                token,
+                address(_initialMinter),
+                MerkleDistributor(distributorBase)
+            )));
+        }
+
+        token.changeMinter(address(minter));
+
+        emit CreatedToken(token, minter);
     }
 
     function setupBases() private {
-        tokenBase = address(new GovernToken(address(this), "GovernToken base", "GTB", 0));
         distributorBase = address(new MerkleDistributor(ERC20(tokenBase), bytes32(0)));
-        minterBase = address(new GovernMinter(GovernToken(tokenBase), address(this), MerkleDistributor(distributorBase)));
         
-        GovernToken(tokenBase).changeMinter(minterBase);
-        GovernMinter(minterBase).mint(msg.sender, 1, "test mint");
-        GovernMinter(minterBase).merkleMint(bytes32(0), 1, "no tree", "test merkle mint");
+        (GovernToken token, GovernMinter minter) = _deployContracts(
+            address(this),
+            "GovernToken base",
+            "GTB",
+            0
+        );
+        token.changeMinter(address(minter));
+
+        // test the bases
+        minter.mint(msg.sender, 1, "test mint");
+        minter.merkleMint(bytes32(0), 1, "no tree", "test merkle mint");
+
+        // store bases
+        tokenBase = address(token);
+        minterBase = address(minter);
+    }
+
+    function _deployContracts(
+        address _initialMinter,
+        string memory _tokenName,
+        string memory _tokenSymbol,
+        uint8 _tokenDecimals
+    ) internal returns (
+        GovernToken token,
+        GovernMinter minter
+    ) {
+        token = new GovernToken(address(this), _tokenName, _tokenSymbol, _tokenDecimals);
+        minter = new GovernMinter(GovernToken(token), address(_initialMinter), MerkleDistributor(distributorBase));
     }
 }
