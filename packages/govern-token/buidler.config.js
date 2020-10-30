@@ -1,32 +1,28 @@
 usePlugin('solidity-coverage')
 usePlugin('@nomiclabs/buidler-ethers')
 usePlugin('@nomiclabs/buidler-etherscan')
-usePlugin('@nomiclabs/buidler-waffle')
+// usePlugin('@nomiclabs/buidler-waffle')
+usePlugin('@nomiclabs/buidler-truffle5')
 
 require('dotenv').config({ path: '../../.env' })
 
 const getAccounts = require('./tasks/accounts')
 const deployFactory = require('./tasks/deploy-factory')
-const deployGovern = require('./tasks/deploy-govern')
-const deployRegistry = require('./tasks/deploy-registry')
+const deployToken = require('./tasks/deploy-token')
 
 task('accounts', 'Prints the list of accounts', getAccounts)
+task('deploy-factory', 'Deploys a GovernTokenFactory instance').setAction(deployFactory)
+task('deploy-token', 'Uses factory to deploy a token and minter instances')
+  .addOptionalParam('factory', 'Factory address')
+  .addOptionalParam('useProxies', 'Whether to deploy token and minter with proxies')
+  .addOptionalParam('name', 'Token name')
+  .addOptionalParam('symbol', 'Token symbol')
+  .addOptionalParam('decimals', 'Token decimals')
+  .addOptionalParam('minter', 'Minter address')
+  .addOptionalParam('mintForCreator', 'Amount of token to mint for creator')
+  .setAction(deployToken)
 
 task('create-action', async (_, { ethers }) => createAction(ethers))
-
-task('deploy-registry', 'Deploys a GovernRegistry instance').setAction(
-  deployRegistry
-)
-
-task('deploy-factory', 'Deploys a GovernBaseFactory instance').setAction(
-  deployFactory
-)
-
-task('deploy-govern', 'Deploys an Govern from provided factory')
-  .addOptionalParam('factory', 'Factory address')
-  .addOptionalParam('useProxies', 'Whether to deploy govern with proxies')
-  .addOptionalParam('name', 'DAO name (must be unique at Registry level)')
-  .setAction(deployGovern)
 
 const ETH_KEY = process.env.ETH_KEY
 const accounts = ETH_KEY ? ETH_KEY.split(',') : ['']

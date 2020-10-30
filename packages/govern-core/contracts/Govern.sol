@@ -25,12 +25,7 @@ contract Govern is AdaptativeERC165, IERC3000Executor, ACL {
         initialize(_initialExecutor);
     }
 
-    function initialize(address _initialExecutor) public onlyInit("govern") {
-        // ACL might have been already initialized by the constructor
-        if (initBlocks["acl"] == 0) {
-            _initializeACL(address(this));
-        }
-
+    function initialize(address _initialExecutor) public initACL(_initialExecutor) onlyInit("govern") {
         _grant(EXEC_ROLE, address(_initialExecutor));
         _grant(REGISTER_ROLE, address(_initialExecutor));
         _registerStandard(ERC3000_EXEC_INTERFACE_ID);
