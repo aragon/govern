@@ -29,7 +29,7 @@ contract GovernTokenFactory {
         string memory _tokenSymbol,
         uint8 _tokenDecimals,
         bool _useProxies
-    ) public returns (
+    ) external returns (
         GovernToken token,
         GovernMinter minter
     ) {
