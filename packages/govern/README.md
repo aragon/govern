@@ -71,67 +71,6 @@ import { daos } from '@aragon/govern'
 const response = await daos();
 ```
 
-### game(name) ⇒ <code>Promise<OptimisticGame></code>
-
-Returns game details by his name.
-
-| Param  | Type                  | Description                               |
-| ------ | --------------------- | ----------------------------------------- |
-| name   | string                | The name of the game                      |
-
-
-Example:
-``` typescript 
-import { game } from '@aragon/govern'
-
-const response = await game('name');
-```
-
-### games(address) ⇒ <code>Promise<OptimisticGame[]></code>
-
-Returns all games of a DAO.
-
-| Param  | Type                  | Description                               |
-| ------ | --------------------- | ----------------------------------------- |
-| address | <code>[Address][address]</code> | [Address][address] of the DAO  |
-
-Example:
-``` typescript 
-import { games } from '@aragon/govern'
-
-const response = await games('0x0...');
-```
-
-### queue(id) ⇒ <code>Promise<OptimisticQueue></code>
-
-Returns a queue by his ID.
-
-| Param  | Type                  | Description                               |
-| ------ | --------------------- | ----------------------------------------- |
-| id     | string                | The if of the queue                       |
-
-Example:
-``` typescript 
-import { queue } from '@aragon/govern'
-
-const response = await queue('ID');
-```
-
-### queuesForDao(address) ⇒ <code>Promise<OptimisticQueue[]></code>
-
-Returns a queue by his ID.
-
-| Param  | Type                  | Description                               |
-| ------ | --------------------- | ----------------------------------------- |
-| address | <code>[Address][address]</code> | [Address][address] of the DAO  |
-
-Example:
-``` typescript 
-import { queuesForDao } from '@aragon/govern'
-
-const response = await queuesForDao('0x0...');
-```
-
 ### query(query) ⇒ <code>Promise<OperationResult></code>
 
 Returns the desired data.
