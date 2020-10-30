@@ -63,7 +63,7 @@ export default class GraphQLClient implements ClientInterface {
       )
     }
 
-    return result
+    return result.data
   }
 
   /**

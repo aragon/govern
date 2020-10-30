@@ -33,7 +33,7 @@ describe('GraphQLClientTest', () => {
   it('calls request and returns the expected result', async () => {
     const nestedToPromise = {
       toPromise: jest.fn(async () => {
-        return { error: false }
+        return { error: false, data: true }
       })
     }
 
@@ -47,7 +47,7 @@ describe('GraphQLClientTest', () => {
 
     const result = await client.request(testQuery, { test: 'test' })
 
-    expect(result).toEqual({ error: false })
+    expect(result).toEqual(true)
 
     expect(urqlClientMock.query).toHaveBeenCalledTimes(1)
 
