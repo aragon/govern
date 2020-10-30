@@ -99,6 +99,8 @@ export interface RegistryEntry {
 }
 
 const registryEntry = `
+  union ContainerEvent = ContainerEventChallenge | ContainerEventExecute | ContainerEventResolve | ContainerEventRule | ContainerEventSchedule | ContainerEventSubmitEvidence | ContainerEventVeto
+
   fragment RegistryEntry_registryEntry on RegistryEntry {
     id
     name
@@ -138,7 +140,51 @@ const registryEntry = `
                 proof
             }
             history {
-                id
+                ... on ContainerEventChallenge {
+                  id
+                  createdAt
+                  actor
+                  collateral
+                  disputeId
+                  reason
+                  resolver
+                }
+                ... on ContainerEventExecute {
+                  id
+                  createdAt
+                  execResults
+                }
+                ... on ContainerEventResolve {
+                  id
+                  createdAt
+                  approved                  
+                }
+                ... on ContainerEventRule {
+                  id
+                  createdAt
+                  ruling
+                }
+                ... on ContainerEventSchedule {
+                  id
+                  createdAt
+                  collateral {
+                    id
+                    token
+                    amount
+                  }
+                }
+                ... on ContainerEventSubmitEvidence {
+                  id
+                  createdAt
+                  evidence
+                  submitter
+                  finished
+                }
+                ... on ContainerEventVeto {
+                  id
+                  createdAt
+                  reason
+                }
             }
         }
     }
