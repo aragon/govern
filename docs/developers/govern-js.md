@@ -23,7 +23,7 @@ const response = await dao('0x0...');
 console.log(response)
 ```
 
-### dao(name) ⇒ <code>Promise<Dao></code>
+### dao(name) ⇒ ``Promise<Dao>``
 
 Returns details about a DAO by his address.
 
@@ -38,7 +38,7 @@ import { dao } from '@aragon/govern'
 const response = await dao('0x0...');
 ```
 
-### daos() ⇒ <code>Promise<Dao[]</code>
+### daos() ⇒ ``Promise<Dao[]>``
 
 Returns all DAOs.
 
@@ -50,7 +50,7 @@ import { daos } from '@aragon/govern'
 const response = await daos();
 ```
 
-### query(query) ⇒ <code>Promise<object></code>
+### query(query) ⇒ ``Promise<object>``
 
 Returns the desired data.
 
@@ -66,7 +66,7 @@ import { query } from '@aragon/govern'
 const query = await query(myQuery, {...});
 ```
 
-### configure(config) ⇒ <code>void</code>
+### configure(config) ⇒ ``void``
 
 Overwrites the default configuration of govern.
 
