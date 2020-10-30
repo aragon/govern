@@ -259,10 +259,6 @@ function ContractCallHandler({
                 token: config.challengeDeposit.token.id,
                 amount: config.challengeDeposit.amount,
               },
-              vetoDeposit: {
-                token: config.vetoDeposit.token.id,
-                amount: config.vetoDeposit.amount,
-              },
               resolver: config.resolver,
               rules: config.rules,
             },
