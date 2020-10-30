@@ -41,7 +41,7 @@ contract Govern is AdaptativeERC165, IERC3000Executor, ACL {
     }
 
     fallback () external {
-        _handleCallback(msg.sig, msg.data);
+        _handleCallback(msg.sig, msg.data); // WARN: does a low-level return, any code below would be unreacheable
     }
 
     function exec(ERC3000Data.Action[] memory actions, bytes32 allowFailuresMap, bytes32 memo) override public auth(EXEC_ROLE) returns (bytes32, bytes[] memory) {
