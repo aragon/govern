@@ -40,7 +40,7 @@ Don't be shy to contribute even the smallest tweak. Everyone will be especially 
 This repo uses Lerna and yarn workspaces to bootstrap itself, and is divided into multiple independent sub-packages:
 
 - [`erc3k`](packages/erc3k): Aragon's reference implementation of [ERC3000](https://eips.ethereum.org/EIPS/eip-3000), the up and coming governance standard.
-- [`Govern.js`](packages/erc3kjs): Govern's official JS wrapper for creating seamless DAO experiences.
+- [`Govern.js`](packages/govern): Govern's official JS wrapper for creating seamless DAO experiences.
 - [`Govern Console`](packages/govern-console): No-frills, forkable, extensible power user / developer UI tool for interacting with and visualizing low level information about Govern DAOs. Available on [console.aragon.org](https://console.aragon.org).
 - [`Govern Contract Utils`](packages/govern-contract-utils): Set of all libraries and utilities used by the core Govern contracts.
 - [`Govern Core`](packages/govern-core): The core set of Aragon Govern contracts.
