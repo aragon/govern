@@ -8,7 +8,7 @@ const {
 const { print } = require('../lib/utils')
 
 const NETWORK = process.env.MAINNET ? 'mainnet' : 'rinkeby'
-const env = name => process.env[`${name}_${NETWORK}`.toUpperCase()]
+const env = (name) => process.env[`${name}_${NETWORK}`.toUpperCase()]
 
 const FACTORY_CACHE_NAME = 'govern-factory-rinkeby'
 const REGISTER_EVENT_NAME = 'Registered'
@@ -24,14 +24,12 @@ module.exports = async (
     name,
     token = `0x${'00'.repeat(20)}`,
     tokenName = name,
-    tokenSymbol = 'GOV'
+    tokenSymbol = 'GOV',
   },
   { ethers }
 ) => {
   factoryAddr =
-    factoryAddr ||
-    env('factory') ||
-    readFileSync(FACTORY_CACHE_NAME).toString()
+    factoryAddr || env('factory') || readFileSync(FACTORY_CACHE_NAME).toString()
   name =
     name ||
     uniqueNamesGenerator({
@@ -61,7 +59,6 @@ module.exports = async (
     useProxies,
     {
       gasLimit: useProxies ? 2e6 : 9e6,
-      nonce: 5
     }
   )
 
