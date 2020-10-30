@@ -1,9 +1,11 @@
 import React, { useCallback, useEffect } from 'react'
 import { ChainUnsupportedError } from 'use-wallet'
 import 'styled-components/macro'
+import Button from '../Button'
 import { useChainId } from '../../Providers/ChainId'
 import { useWallet } from '../../Providers/Wallet'
 import { shortenAddress, getNetworkName } from '../../lib/web3-utils'
+import AragonSvg from '../../assets/aragon-metal.svg'
 
 function Header() {
   const { chainId, setChainId } = useChainId()
@@ -31,55 +33,73 @@ function Header() {
     <header
       css={`
         display: flex;
-        justify-content: center;
+        justify-content: space-between;
+
         width: 100%;
-        border: 1px solid whitesmoke;
+        border: 2px solid rgba(255, 255, 255, 0.2);
         padding: 8px;
       `}
     >
-      <h1
+      <div
         css={`
-          flex-grow: 1;
-          font-weight: bold;
-          font-size: 24px;
-          text-decoration: underline;
+          display: flex;
+          justify-content: center;
+          align-items: center;
         `}
       >
-        Govern Console
-      </h1>
-      <label
-        css={`
-          margin-right: 16px;
-        `}
-      >
-        Chain ID
-        <select value={chainId} onChange={handleChangeChain}>
-          <option value={1}>Mainnet</option>
-          <option value={4}>Rinkeby</option>
-        </select>
-      </label>
-      <button
-        onClick={handleWalletConnection}
-        css={`
-          font-family: 'Overpass Mono', monospace;
-          font-size: 12px;
-          position: relative;
-          background: transparent;
-          color: white;
-          cursor: pointer;
+        <img src={AragonSvg} width="36" />
+        <h1
+          css={`
+            flex-grow: 1;
+            font-size: 24px;
+            margin-left: 8px;
+          `}
+        >
+          Govern Console
+        </h1>
+      </div>
+      <div>
+        <label
+          css={`
+            margin-right: 16px;
+            margin-top: 8px;
+          `}
+        >
+          Chain ID
+          <select
+            value={chainId}
+            onChange={handleChangeChain}
+            css={`
+              color: black;
+            `}
+          >
+            <option value={1}>Mainnet</option>
+            <option value={4}>Rinkeby</option>
+          </select>
+        </label>
+        <Button
+          onClick={handleWalletConnection}
+          css={`
+            font-family: 'Overpass Mono', monospace;
+            font-size: 12px;
+            position: relative;
+            background: transparent;
+            color: white;
+            cursor: pointer;
 
-          &:hover {
-            background: rgba(255, 255, 255, 0.2);
-          }
-          &:active {
-            top: 1px;
-          }
-        `}
-      >
-        {wallet.status === 'connected'
-          ? shortenAddress(wallet.account!)
-          : 'Connect account'}
-      </button>
+            &:hover {
+              background: rgba(255, 255, 255, 0.2);
+            }
+            &:active {
+              top: 1px;
+            }
+          `}
+        >
+          {wallet.status === 'connected'
+            ? shortenAddress(wallet.account!)
+            : 'Connect account'}
+        </Button>
+      </div>
     </header>
   )
 }

@@ -174,26 +174,12 @@ function ContractCallHandler({
             </label>
           </div>
         ))}
-        <button
+        <Button
           type="submit"
           onClick={handleExecute}
-          css={`
-            max-width: 100px;
-            margin-top: 16px;
-            font-family: 'Overpass Mono', monospace;
-            font-size: 12px;
-            position: relative;
-            background: transparent;
-            color: white;
-            cursor: pointer;
-
-            &:active {
-              top: 1px;
-            }
-          `}
         >
           Execute
-        </button>
+        </Button>
         <span>Result: {result}</span>
       </form>
     </>
