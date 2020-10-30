@@ -16,19 +16,27 @@ describe('Govern Base Factory', function () {
   beforeEach(async () => {
     const GovernQueueFactory = await ethers.getContractFactory('GovernQueueFactory')
     const GovernFactory = await ethers.getContractFactory('GovernFactory')
+    const GovernTokenFactory = await ethers.getContractFactory('GovernTokenFactory')
 
     governFactory = await GovernFactory.deploy()
     queueFactory = await GovernQueueFactory.deploy()
+    tokenFactory = await GovernTokenFactory.deploy()
 
     const GovernRegistry = await ethers.getContractFactory('GovernRegistry')
     const GovernBaseFactory = await ethers.getContractFactory('GovernBaseFactory')
 
     registry = await GovernRegistry.deploy()
-    governBaseFactory = await GovernBaseFactory.deploy(registry.address, governFactory.address, queueFactory.address)
+    governBaseFactory = await GovernBaseFactory.deploy(registry.address, governFactory.address, queueFactory.address, tokenFactory.address)
   })
 
-  const deployDAO = async (useProxies, gasTarget) => {
-    const tx = governBaseFactory.newDummyGovern('eagle', useProxies)
+  const deployDAO = async (useProxies, gasTarget, deployToken = false) => {
+    const tx = governBaseFactory.newGovernWithoutConfig(
+      'eagle',
+      `0x${(deployToken ? '00' : '11').repeat(20)}`, // NOTE: zero addr deploys a token
+      'Eaglet Token',
+      'EAG',
+      useProxies
+    )
 
     await expect(tx).to.emit(registry, EVENTS.REGISTERED)
     await expect(tx).to.emit(registry, EVENTS.SET_METADATA)
@@ -50,4 +58,7 @@ describe('Govern Base Factory', function () {
   it(`deploys DAO with proxies under ${GAS_TARGET_PROXY} gas`, async () => {
     await deployDAO(true, GAS_TARGET_PROXY)
   })
+
+  // TODO: Implement tests
+  it('deploys DAO with token')
 })

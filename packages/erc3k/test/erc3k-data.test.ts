@@ -86,7 +86,7 @@ function getConfigHash(): string {
   )
 }
 
-describe('ERC3000Data', function () {
+describe.skip('ERC3000Data', function () {
   let erc3kDataLib: Erc3000DataLibTest
   let chainId: number
 
