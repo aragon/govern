@@ -5,10 +5,10 @@ const GovernDaoBase = gql`
     id
     address
     metadata
-    games {
+    registryEntries {
       id
     }
-    executions {
+    containers {
       id
     }
     roles {

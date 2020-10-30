@@ -7,23 +7,19 @@ const QueueBase = gql`
     config {
       id
     }
-    games {
+    registryEntries {
       id
     }
-    scheduledPackets {
+    queued {
       id
-    }
-    challengedPackets {
-      id
-    }
-    vetoedPackets {
-      id
-    }
-    executedPackets {
-      id
+      state
+      config {
+        id
+      }
     }
     roles {
       id
+      entity
     }
   }
 `
@@ -49,7 +45,7 @@ export const QUERY_QUEUES = gql`
 export const QUERY_QUEUES_BY_DAO = gql`
   query Govern($address: String!) {
     govern(id: $address) {
-      games {
+      registryEntries {
         queue {
           ...QueueBase
         }

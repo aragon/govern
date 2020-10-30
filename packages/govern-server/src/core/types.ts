@@ -30,12 +30,42 @@ export enum ItemStatus {
   Vetoed,
 }
 
+export enum ContainerState {
+  None,
+  Scheduled,
+  Approved,
+  Challenged,
+  Rejected,
+  Cancelled,
+  Executed,
+}
+
+export type ContainerData = {
+  id: string
+  queue: GovernQueueData
+  state: ContainerState
+  config: ConfigData
+  payload: ContainerPayload
+  history: ContainerEvent[]
+}
+
+export type ContainerPayload = {
+  id: string
+  container: ContainerData
+  nonce: BigInt
+  executionTime: BigInt
+  submitter: string
+  actions: ActionData[]
+  allowFailuresMap: string
+  proof: string
+}
+
 export type DaoData = {
   id: string
   address: Address
+  containers: ContainerData[]
   metadata: string
-  games: OptimisticGameData[]
-  executions: ExecutionData[]
+  registryEntries: RegistryEntryData[]
   roles: RoleData[]
 }
 
@@ -84,19 +114,18 @@ export type ItemData = {
   createdAt: string
 }
 
-export type OptimisticGameData = {
+export type RegistryEntryData = {
   id: string
   name: string
   executor: DaoData
   queue: GovernQueueData
-  metadata: string
 }
 
 export type GovernQueueData = {
   id: string
   address: Address
   config: ConfigData
-  games: OptimisticGameData
+  games: RegistryEntryData
   queue: ItemData[]
   executions: ExecutionData[]
   challenges: ChallengeData[]
@@ -148,3 +177,69 @@ export type EvidenceData = {
 }
 
 export type QueryResult = OperationResult<any>
+
+// Events
+
+export type ContainerEvent =
+  | ContainerEventChallenge
+  | ContainerEventExecute
+  | ContainerEventResolve
+  | ContainerEventRule
+  | ContainerEventSchedule
+  | ContainerEventSubmitEvidence
+  | ContainerEventVeto
+
+export type ContainerEventChallenge = {
+  id: string
+  container: ContainerData
+  createdAt: BigInt
+  actor: string
+  collateral: CollateralData
+  disputeId: BigInt
+  reason: string
+  resolver: string
+}
+
+export type ContainerEventExecute = {
+  id: string
+  container: ContainerData
+  createdAt: BigInt
+  execResults: string[]
+}
+
+export type ContainerEventResolve = {
+  id: string
+  container: ContainerData
+  createdAt: BigInt
+  approved: boolean
+}
+
+export type ContainerEventRule = {
+  id: string
+  container: ContainerData
+  createdAt: BigInt
+  ruling: BigInt
+}
+
+export type ContainerEventSchedule = {
+  id: string
+  container: ContainerData
+  createdAt: BigInt
+  collateral: CollateralData
+}
+
+export type ContainerEventSubmitEvidence = {
+  id: string
+  container: ContainerData
+  createdAt: BigInt
+  evidence: string
+  submitter: string
+  finished: boolean
+}
+
+export type ContainerEventVeto = {
+  id: string
+  container: ContainerData
+  createdAt: BigInt
+  reason: string
+}

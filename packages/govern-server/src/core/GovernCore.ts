@@ -2,7 +2,7 @@ import {
   Address,
   DaoData,
   Networkish,
-  OptimisticGameData,
+  RegistryEntryData,
   GovernQueueData,
 } from './types'
 import { ErrorInvalidNetwork, ErrorUnexpectedResult } from './errors'
@@ -12,8 +12,8 @@ import GraphqlClient from './GraphqlClient'
 import {
   QUERY_DAO,
   QUERY_DAOS,
-  QUERY_GAME,
-  QUERY_GAMES,
+  QUERY_REGISTRY_ENTRY,
+  QUERY_REGISTRY_ENTRIES,
   QUERY_QUEUE,
   QUERY_QUEUES,
   QUERY_QUEUES_BY_DAO,
@@ -99,21 +99,24 @@ class GovernCore {
     return result.optimisticQueues ?? []
   }
 
-  async game(name: string): Promise<OptimisticGameData | null> {
+  async registryEntry(name: string): Promise<RegistryEntryData | null> {
     const result = await this.fetchResult<{
-      optimisticGame: OptimisticGameData | null
+      registryEntry: RegistryEntryData | null
     }>(
-      [QUERY_GAME, { name }],
-      `Unexpected result when fetching the game ${name}.`
+      [QUERY_REGISTRY_ENTRY, { name }],
+      `Unexpected result when fetching the registry entry ${name}.`
     )
-    return result.optimisticGame ?? null
+    return result.registryEntry ?? null
   }
 
-  async games(): Promise<OptimisticGameData[]> {
+  async registryEntries(): Promise<RegistryEntryData[]> {
     const result = await this.fetchResult<{
-      optimisticGames: OptimisticGameData[]
-    }>([QUERY_GAMES], `Unexpected result when fetching the games.`)
-    return result.optimisticGames ?? []
+      registryEntries: RegistryEntryData[]
+    }>(
+      [QUERY_REGISTRY_ENTRIES],
+      `Unexpected result when fetching the registry entries.`
+    )
+    return result.registryEntries ?? []
   }
 
   async queuesForDao(address: Address): Promise<GovernQueueData[]> {
@@ -121,10 +124,13 @@ class GovernCore {
       [QUERY_QUEUES_BY_DAO, { address }],
       `Unexpected result when fetching the queues for dao ${address}.`
     )
-    const games = result.govern?.games ?? []
-    return games.reduce<GovernQueueData[]>((queues, game) => {
-      return game?.queue ? [...queues, game.queue] : queues
-    }, [])
+    const registryEntries = result.govern?.registryEntries ?? []
+    return registryEntries.reduce<GovernQueueData[]>(
+      (queues, registryEntry) => {
+        return registryEntry?.queue ? [...queues, registryEntry.queue] : queues
+      },
+      []
+    )
   }
 }
 

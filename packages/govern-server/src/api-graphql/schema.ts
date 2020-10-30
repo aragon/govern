@@ -5,21 +5,20 @@ export default gql`
     id: ID!
     address: String!
     count: Int!
-    games: [OptimisticGame!]
+    registryEntries: [RegistryEntry!]
   }
 
-  type OptimisticGame {
+  type RegistryEntry {
     id: ID!
     name: String!
     executor: Dao!
     queue: OptimisticQueue!
-    metadata: String
   }
 
   type Dao {
     id: ID!
     address: String!
-    games: [OptimisticGame!]
+    registryEntries: [RegistryEntry!]
     executions: [Execution!]
     roles: [Role!]
     queues: [OptimisticQueue!]
@@ -45,7 +44,7 @@ export default gql`
     id: ID!
     address: String!
     config: Config
-    games: [OptimisticGame!]
+    registryEntries: [RegistryEntry!]
     queue: [Item!]
     executions: [Execution!]
     challenges: [Challenge!]
@@ -138,7 +137,7 @@ export default gql`
   type Query {
     daos: [Dao!]!
     dao(address: String!): Dao
-    game(name: String!): OptimisticGame
-    games: [OptimisticGame!]
+    registryEntry(name: String!): RegistryEntry
+    registryEntries: [RegistryEntry!]
   }
 `
