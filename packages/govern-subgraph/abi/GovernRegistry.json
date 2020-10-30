@@ -17,6 +17,12 @@
         },
         {
           "indexed": true,
+          "internalType": "contract IERC20",
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "indexed": true,
           "internalType": "address",
           "name": "registrant",
           "type": "address"
@@ -79,6 +85,11 @@
         {
           "internalType": "contract IERC3000",
           "name": "_queue",
+          "type": "address"
+        },
+        {
+          "internalType": "contract IERC20",
+          "name": "_token",
           "type": "address"
         },
         {
