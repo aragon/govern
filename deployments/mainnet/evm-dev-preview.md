@@ -1,7 +1,7 @@
 # Developer Preview (EVM, Mainnet)
 
 ---
-- Deployer: @izqui ([`0x1111a5f9decc25927037de55d2013d7ad30f1af0`]https://etherscan.io/address/0x1111a5f9decc25927037de55d2013d7ad30f1af0)
+- Deployer: [@izqui](https://github.com/izqui) ([`0x1111a5f9decc25927037de55d2013d7ad30f1af0`](https://etherscan.io/address/0x1111a5f9decc25927037de55d2013d7ad30f1af0)
 - Commit hash: [`a26d0f07`](https://github.com/aragon/govern/commit/a26d0f073b70839f5182abbace2aef1dd1918b51)
 ---
 
