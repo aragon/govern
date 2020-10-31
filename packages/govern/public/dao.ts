@@ -1,5 +1,5 @@
 import { Dao } from '../internal/clients/graphql/queries/dao'
-import DaoAction from '../internal/actions/DAOAction'
+import DaoAction from '../internal/actions/DaoAction'
 
 export { Dao }
 
