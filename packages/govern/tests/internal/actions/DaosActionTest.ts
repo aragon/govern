@@ -1,4 +1,4 @@
-import DaosAction from '../../../internal/actions/DAOSAction'
+import DaosAction from '../../../internal/actions/DaosAction'
 
 /**
  * DaosAction test
