@@ -16,15 +16,15 @@ import { rinkebyClient, mainnetClient } from '../index'
 const ANY_ADDRESS = '0xffffffffffffffffffffffffffffffffffffffff'
 
 const KNOWN_QUEUE_ROLES = new Map([
-  ['0x25ddcbe0', 'schedule'],
-  ['0xecb6cba6', 'execute'],
-  ['0x5decc190', 'challenge'],
-  ['0xaa455d9f', 'configure'],
-  ['0xa0e975cb', 'veto'],
+  ['0x977d8964', 'schedule'],
+  ['0x3a139c71', 'execute'],
+  ['0x70576158', 'challenge'],
+  ['0x72896761', 'configure'],
+  ['0xc04c87b8', 'veto'],
   ['0x586df604', 'ROOT_ROLE'],
 ])
 
-const KNOWN_GOVERN_ROLES = new Map([['0x5c3e9760', 'exec']])
+const KNOWN_GOVERN_ROLES = new Map([['0xc2d85afc', 'exec']])
 
 const DAO_QUERY = gql`
   query DAOQuery($name: String) {
