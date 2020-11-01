@@ -1,4 +1,4 @@
-import DaoAction from '../../internal/actions/DAOAction'
+import DaoAction from '../../internal/actions/DaoAction'
 import { dao} from '../../public/dao'
 
 // Mocks
