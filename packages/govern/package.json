@@ -15,7 +15,7 @@
     "build:cjs": "tsc -p ./tsconfig.cjs.json",
     "dev:esm": "yarn build:esm --watch",
     "dev:cjs": "yarn build:cjs --watch",
-    "test": "jest",
+    "test": "jest && yarn e2e",
     "e2e": "./scripts/start.e2e.sh",
     "prepublishOnly": "yarn build"
   },
