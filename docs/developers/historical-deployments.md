@@ -2,17 +2,26 @@
 
 Log of deployed govern relevant instances and related infrastructure.
 
+**See [deployments in aragon/govern](https://github.com/aragon/govern/tree/master/deployments)**
+
 ## Mainnet
 
-TBA.
+### Subgraphs
+
+- Aragon Govern Mainnet: [https://thegraph.com/explorer/subgraph/aragon/aragon-govern-mainnet](https://thegraph.com/explorer/subgraph/aragon/aragon-govern-mainnet)
+
+### Contracts
+
+- 📜 GovernRegistry: [`0x9dDC0BAB6aCCa5F374E2C21708b3107e5E973601`](https://etherscan.io/address/0x9dDC0BAB6aCCa5F374E2C21708b3107e5E973601)
+- 🏭 GovernBaseFactory: [`0x3B02e7C7Af1be87BBEc071f5DFfcdD8613154bA9`](https://etherscan.io/address/0x3B02e7C7Af1be87BBEc071f5DFfcdD8613154bA9)
 
 ## Rinkeby
 
 ### Subgraphs
 
-* Aragon Govern Rinkeby: [https://thegraph.com/explorer/subgraph/aragon/aragon-govern-rinkeby](https://thegraph.com/explorer/subgraph/aragon/aragon-govern-rinkeby)
+- Aragon Govern Rinkeby: [https://thegraph.com/explorer/subgraph/aragon/aragon-govern-rinkeby](https://thegraph.com/explorer/subgraph/aragon/aragon-govern-rinkeby)
 
 ### Contracts
 
-* ERC3000Registry: \`[`0x0cd3621EC403F26ad9F79c3d77B1dda1f8474c6f`](https://rinkeby.etherscan.io/address/0x0cd3621EC403F26ad9F79c3d77B1dda1f8474c6f)
-
+- 📜 GovernRegistry: [`0x0cd3621EC403F26ad9F79c3d77B1dda1f8474c6f`](https://rinkeby.etherscan.io/address/0x0cd3621EC403F26ad9F79c3d77B1dda1f8474c6f)
+- 🏭 GovernBaseFactory: [`0x0cd3621EC403F26ad9F79c3d77B1dda1f8474c6f`](https://rinkeby.etherscan.io/address/0x0cd3621EC403F26ad9F79c3d77B1dda1f8474c6f)
