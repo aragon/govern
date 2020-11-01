@@ -16,6 +16,7 @@
     "dev:esm": "yarn build:esm --watch",
     "dev:cjs": "yarn build:cjs --watch",
     "test": "jest",
+    "e2e": "./scripts/start.e2e.sh",
     "prepublishOnly": "yarn build"
   },
   "files": [
