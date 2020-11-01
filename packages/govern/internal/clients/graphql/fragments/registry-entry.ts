@@ -78,7 +78,7 @@ export interface RegistryEntry {
       executionDelay: string
       scheduleDeposit: Collateral,
       challengeDeposit: Collateral,
-      resovler: string,
+      resolver: string,
       rules: string
     },
     queued: {
