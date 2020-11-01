@@ -26,7 +26,7 @@ abstract contract IERC3000 is ERC3000Interface {
      * @return containerHash
      */
     function schedule(ERC3000Data.Container memory container) virtual public returns (bytes32 containerHash);
-    event Scheduled(bytes32 indexed containerHash, ERC3000Data.Payload payload, ERC3000Data.Collateral collateral);
+    event Scheduled(bytes32 indexed containerHash, ERC3000Data.Payload payload);
 
     /**
      * @notice Executes an action after its execution delay has passed and its state hasn't been altered by a challenge or veto
