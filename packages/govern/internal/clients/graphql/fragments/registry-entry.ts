@@ -142,7 +142,11 @@ const registryEntry = `
                   id
                   createdAt
                   actor
-                  collateral
+                  collateral {
+                    id
+                    token
+                    amount
+                  }
                   disputeId
                   reason
                   resolver
