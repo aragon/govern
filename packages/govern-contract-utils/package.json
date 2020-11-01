@@ -14,18 +14,18 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "@nomiclabs/buidler": "^1.4.7",
-    "@nomiclabs/buidler-ethers": "^2.0.0",
-    "@nomiclabs/buidler-waffle": "^2.0.0",
+    "@nomiclabs/hardhat-ethers": "^2.0.0",
+    "@nomiclabs/hardhat-waffle": "^2.0.0",
     "chai": "^4.2.0",
     "ethereum-waffle": "^3.0.0",
-    "ethers": "^5.0.0"
+    "ethers": "^5.0.0",
+    "hardhat": "^2.0.2"
   },
   "scripts": {
     "build": "yarn compile",
     "clean": "rm -rf artifacts",
-    "compile": "npx buidler compile --force",
-    "test": "npx buidler test",
+    "compile": "npx hardhat compile --force",
+    "test": "npx hardhat test",
     "prepublishOnly": "yarn test && yarn compile"
   }
 }

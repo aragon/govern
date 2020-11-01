@@ -1,4 +1,4 @@
-usePlugin('@nomiclabs/buidler-waffle')
+require('@nomiclabs/hardhat-waffle')
 
 task('accounts', 'Prints the list of accounts', async () => {
   const accounts = await ethers.getSigners()
@@ -9,7 +9,7 @@ task('accounts', 'Prints the list of accounts', async () => {
 })
 
 module.exports = {
-  solc: {
+  solidity: {
     version: '0.6.8',
   },
 }
