@@ -16,7 +16,7 @@
     "dev:esm": "yarn build:esm --watch",
     "dev:cjs": "yarn build:cjs --watch",
     "test": "jest && yarn depcheck",
-    "depcheck": "dependency-check ./package.json --missing --verbose",
+    "depcheck": "yarn build && dependency-check ./package.json --missing --verbose",
     "prepublishOnly": "yarn build"
   },
   "files": [
