@@ -1,4 +1,4 @@
-import { configure, query } from '../../public'
+import { configure, query } from '@aragon/govern'
 
 /**
  * query e2e test

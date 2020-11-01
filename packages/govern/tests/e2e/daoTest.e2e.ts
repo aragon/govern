@@ -1,4 +1,4 @@
-import { configure, dao } from '../../public'
+import { configure, dao } from '@aragon/govern'
 
 /**
  * dao e2e test
