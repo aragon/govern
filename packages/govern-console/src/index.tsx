@@ -17,7 +17,7 @@ export const rinkebyClient: ApolloClient<NormalizedCacheObject> = new ApolloClie
 });
 
 export const mainnetClient: ApolloClient<NormalizedCacheObject> = new ApolloClient({
-  uri: 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby',
+  uri: 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-mainnet',
   cache: new InMemoryCache()
 })
 
