@@ -11,6 +11,6 @@ describe('[e2e] daos Test', () => {
   it('calls daos and returns as expected', async () => {
     const response = await daos()
 
-    expect(response.daos[0].address).toEqual('0x24319b199e9e3867ede90eaf0fad56168c54d077')
+    expect(response[0].address).toEqual('0x24319b199e9e3867ede90eaf0fad56168c54d077')
   })
 })
