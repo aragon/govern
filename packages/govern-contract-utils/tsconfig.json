@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "outDir": "dist"
+  },
+  "include": ["./test"],
+  "files": [
+    "./hardhat.config.ts",
+    "../../node_modules/@nomiclabs/hardhat-ethers/src/type-extensions.d.ts",
+    "../../node_modules/@nomiclabs/hardhat-waffle/src/type-extensions.d.ts",
+    "../../node_modules/@nomiclabs/hardhat-etherscan/src/type-extensions.d.ts",
+    "../../node_modules/hardhat-typechain/src/type-extensions.d.ts",
+    "../../node_modules/hardhat-local-networks-config-plugin/src/type-extensions.d.ts"
+  ]
+}
