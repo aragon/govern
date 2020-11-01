@@ -9,8 +9,8 @@ describe('[e2e] dao Test', () => {
   })
 
   it('calls dao and returns as expected', async () => {
-    const response = await dao("")
+    const response = await dao("M")
 
-    expect(response.dao.address).toEqual('0x24319b199e9e3867ede90eaf0fad56168c54d077')
+    expect(response.address).toEqual('0x24319b199e9e3867ede90eaf0fad56168c54d077')
   })
 })

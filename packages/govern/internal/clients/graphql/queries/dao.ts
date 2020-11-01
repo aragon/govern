@@ -8,7 +8,7 @@ export interface Dao {
 }
 
 const dao: string = `
-    query DAO($name: String) {
+    query DAO($name: String!) {
       dao(name: $name) {
         id
         address
