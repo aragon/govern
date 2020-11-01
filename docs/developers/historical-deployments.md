@@ -2,7 +2,7 @@
 
 Log of deployed govern relevant instances and related infrastructure.
 
-**See [deployments in aragon/govern](https://github.com/aragon/govern/tree/master/deployments)**
+**See [aragon/govern deployments](https://github.com/aragon/govern/tree/master/deployments)**
 
 ## Mainnet
 
