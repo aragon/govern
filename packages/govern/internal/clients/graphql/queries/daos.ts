@@ -1,9 +1,7 @@
 import { Dao } from './dao'
 import registryEntry from '../fragments/registry-entry'
 
-export interface Daos {
-  daos: Dao[]
-}
+export type Daos = Dao[]
 
 const daos: string = `
    query DAOS {

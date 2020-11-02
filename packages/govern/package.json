@@ -15,7 +15,8 @@
     "build:cjs": "tsc -p ./tsconfig.cjs.json",
     "dev:esm": "yarn build:esm --watch",
     "dev:cjs": "yarn build:cjs --watch",
-    "test": "jest && yarn depcheck",
+    "test": "jest && yarn e2e && yarn depcheck",
+    "e2e": "./scripts/start.e2e.sh",
     "depcheck": "yarn build && dependency-check ./package.json --missing --verbose",
     "prepublishOnly": "yarn build"
   },
