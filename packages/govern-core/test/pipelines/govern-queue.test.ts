@@ -80,8 +80,9 @@ describe('Govern Queue', function() {
 
   context('GovernQueue.schedule', () => {
     before(async () => {
-      const block = await ethers.getDefaultProvider().getBlock('latest')
-      container.payload.executionTime = block.timestamp
+      container.payload.executionTime = (
+        await ethers.getDefaultProvider().getBlock('latest')
+      ).timestamp
     })
 
     it('emits the expected events and adds the container to the queue', async () => {
@@ -129,8 +130,9 @@ describe('Govern Queue', function() {
 
   context('GovernQueue.execute', async () => {
     before(async () => {
-      const block = await ethers.getDefaultProvider().getBlock('latest')
-      container.payload.executionTime = block.timestamp
+      container.payload.executionTime = (
+        await ethers.getDefaultProvider().getBlock('latest')
+      ).timestamp
       container.payload.nonce = await gq.nonce()
       await gq.schedule(container)
     })
@@ -160,8 +162,9 @@ describe('Govern Queue', function() {
 
   context('GovernQueue.challenge', () => {
     before(async () => {
-      const block = await ethers.getDefaultProvider().getBlock('latest')
-      container.payload.executionTime = block.timestamp
+      container.payload.executionTime = (
+        await ethers.getDefaultProvider().getBlock('latest')
+      ).timestamp
     })
 
     it('executes as expected', async () => {
@@ -268,8 +271,9 @@ describe('Govern Queue', function() {
 
   context('GovernQueue.resolve', () => {
     before(async () => {
-      const block = await ethers.getDefaultProvider().getBlock('latest')
-      container.payload.executionTime = block.timestamp
+      container.payload.executionTime = (
+        await ethers.getDefaultProvider().getBlock('latest')
+      ).timestamp
     })
 
     it('emits resolved with approved true', async () => {
