@@ -7,21 +7,29 @@ const {
 } = require('unique-names-generator')
 const { print } = require('../lib/utils')
 
+const NETWORK = process.env.MAINNET ? 'mainnet' : 'rinkeby'
+const env = (name) => process.env[`${name}_${NETWORK}`.toUpperCase()]
+
 const FACTORY_CACHE_NAME = 'govern-factory-rinkeby'
 const REGISTER_EVENT_NAME = 'Registered'
 const REGISTRY_EVENTS_ABI = [
-  'event Registered(address indexed dao, address queue, address indexed registrant, string name)',
+  'event Registered(address indexed dao, address queue, address indexed token, address indexed registrant, string name)',
   'event SetMetadata(address indexed dao, bytes metadata)',
 ]
 
 module.exports = async (
-  { factory: factoryAddr, useProxies = true, name },
+  {
+    factory: factoryAddr,
+    useProxies = true,
+    name,
+    token = `0x${'00'.repeat(20)}`,
+    tokenName = name,
+    tokenSymbol = 'GOV',
+  },
   { ethers }
 ) => {
   factoryAddr =
-    factoryAddr ||
-    process.env.FACTORY_RINKEBY ||
-    readFileSync(FACTORY_CACHE_NAME).toString()
+    factoryAddr || env('factory') || readFileSync(FACTORY_CACHE_NAME).toString()
   name =
     name ||
     uniqueNamesGenerator({
@@ -43,16 +51,23 @@ module.exports = async (
     'GovernBaseFactory',
     factoryAddr
   )
-  const tx = await governBaseFactory.newDummyGovern(name, useProxies, {
-    gasLimit: useProxies ? 7e5 : 7e6,
-  })
+  const tx = await governBaseFactory.newGovernWithoutConfig(
+    name,
+    token,
+    tokenName || name,
+    tokenSymbol,
+    useProxies,
+    {
+      gasLimit: useProxies ? 2e6 : 9e6,
+    }
+  )
 
   const { events } = await tx.wait()
 
   const {
     args: { dao, queue },
   } = events
-    .filter(({ address }) => address === process.env.REGISTRY_RINKEBY)
+    .filter(({ address }) => address === env('registry'))
     .map((log) => registryInterface.parseLog(log))
     .find(({ name }) => name === REGISTER_EVENT_NAME)
 

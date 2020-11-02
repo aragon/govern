@@ -1,4 +1,10 @@
-const { expect } = require('chai')
+import { expect } from 'chai'
+import { ethers } from 'hardhat'
+import { Signer } from 'ethers'
+import {
+  Acl,
+  AclFactory
+} from '../typechain'
 
 const ERRORS = {
   AUTH: 'acl: auth',
@@ -16,7 +22,11 @@ const ROLE = '0xabcdabcd'
 const FREEZE_ADDR = '0x0000000000000000000000000000000000000001'
 
 describe('ACL', function () {
-  let signers, root, acl, aclNotRoot
+  let signers: Signer[]
+  let root: string
+  let notRoot: string
+  let acl: Acl
+  let aclNotRoot: Acl
 
   before(async () => {
     signers = await ethers.getSigners()
@@ -25,15 +35,14 @@ describe('ACL', function () {
   })
 
   beforeEach(async () => {
-    const ACL = await ethers.getContractFactory('ACL')
+    const ACL = (await ethers.getContractFactory('ACL')) as AclFactory
     acl = await ACL.deploy(root)
     aclNotRoot = await acl.connect(signers[1])
-    
   })
 
-  const grant = (inst, role = ROLE, who = notRoot) => inst.grant(role, who)
-  const revoke = (inst, role = ROLE, who = notRoot) => inst.revoke(role, who)
-  const freeze = (inst, role = ROLE) => inst.freeze(role)
+  const grant = (inst: Acl, role = ROLE, who = notRoot) => inst.grant(role, who)
+  const revoke = (inst: Acl, role = ROLE, who = notRoot) => inst.revoke(role, who)
+  const freeze = (inst: Acl, role = ROLE) => inst.freeze(role)
 
   const assertRole = async (shouldHaveRole = true, role = ROLE, who = notRoot) =>
     expect(await acl.roles(role, who)).to.equal(shouldHaveRole)
@@ -88,7 +97,7 @@ describe('ACL', function () {
   })
 
   context('granting root role', () => {
-    let ROOT_ROLE
+    let ROOT_ROLE: string
 
     beforeEach(async () => {
       ROOT_ROLE = await acl.ROOT_ROLE()

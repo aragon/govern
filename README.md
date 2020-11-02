@@ -6,7 +6,7 @@
       Website
     </a>
     <span> | </span>
-    <a href="https://docs.aragon.org/aragon-govern/">
+    <a href="https://docs.aragon.org/govern/">
       Documentation
     </a>
     <span> | </span>
@@ -32,7 +32,7 @@ The code in this repository has **not** been audited.
 
 Read the documentation if you have any doubts about the high-level overview of Govern, or if you want to know more about how everything works under the hood.
 
-#### 👋 Get started contributing with a [good first issue](https://github.com/aragon/govern/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+#### 👋 Get started contributing with a [good first issue](https://github.com/aragon/govern/labels/good%20first%20issue%20%F0%9F%8C%9E)
 Don't be shy to contribute even the smallest tweak. Everyone will be especially nice and helpful to beginners to help you get started!
 
 ## Structure
@@ -40,7 +40,7 @@ Don't be shy to contribute even the smallest tweak. Everyone will be especially 
 This repo uses Lerna and yarn workspaces to bootstrap itself, and is divided into multiple independent sub-packages:
 
 - [`erc3k`](packages/erc3k): Aragon's reference implementation of [ERC3000](https://eips.ethereum.org/EIPS/eip-3000), the up and coming governance standard.
-- [`Govern.js`](packages/erc3kjs): Govern's official JS wrapper for creating seamless DAO experiences.
+- [`Govern.js`](packages/govern): Govern's official JS wrapper for creating seamless DAO experiences.
 - [`Govern Console`](packages/govern-console): No-frills, forkable, extensible power user / developer UI tool for interacting with and visualizing low level information about Govern DAOs. Available on [console.aragon.org](https://console.aragon.org).
 - [`Govern Contract Utils`](packages/govern-contract-utils): Set of all libraries and utilities used by the core Govern contracts.
 - [`Govern Core`](packages/govern-core): The core set of Aragon Govern contracts.
@@ -55,11 +55,13 @@ To use Govern, feel free to deploy your own registries and factories, but using 
 
 #### Mainnet
 
-- 📜 ERC3000Registry: [`0xE144219480F96b3e5fe91a5e24B9655BeeA5C537`](https://etherscan.io/address/0xE144219480F96b3e5fe91a5e24B9655BeeA5C537)
+- 📜 GovernRegistry: [`0x9dDC0BAB6aCCa5F374E2C21708b3107e5E973601`](https://etherscan.io/address/0x9dDC0BAB6aCCa5F374E2C21708b3107e5E973601)
+- 🏭 GovernBaseFactory: [`0x3B02e7C7Af1be87BBEc071f5DFfcdD8613154bA9`](https://etherscan.io/address/0x3B02e7C7Af1be87BBEc071f5DFfcdD8613154bA9)
 
 #### Rinkeby
 
-- 📜 ERC3000Registry: [`0xE144219480F96b3e5fe91a5e24B9655BeeA5C537`](https://rinkeby.etherscan.io/address/0xE144219480F96b3e5fe91a5e24B9655BeeA5C537)
+- 📜 GovernRegistry: [`0x0cd3621EC403F26ad9F79c3d77B1dda1f8474c6f`](https://rinkeby.etherscan.io/address/0x0cd3621EC403F26ad9F79c3d77B1dda1f8474c6f)
+- 🏭 GovernBaseFactory: [`0x0cd3621EC403F26ad9F79c3d77B1dda1f8474c6f`](https://rinkeby.etherscan.io/address/0x0cd3621EC403F26ad9F79c3d77B1dda1f8474c6f)
 
 ## Help shape Aragon Govern
 - Discuss in [Aragon Forum](https://forum.aragon.org/tags/aragon-govern)

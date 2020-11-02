@@ -10,23 +10,26 @@ import 'styled-components/macro'
 import { gql, useQuery } from '@apollo/client'
 import Button from '../components/Button'
 import NewAction from '../components/NewAction'
+import { useChainId } from '../Providers/ChainId'
+import { rinkebyClient, mainnetClient } from '../index'
 
 const ANY_ADDRESS = '0xffffffffffffffffffffffffffffffffffffffff'
 
 const KNOWN_QUEUE_ROLES = new Map([
-  ['0x25ddcbe0', 'schedule'],
-  ['0xecb6cba6', 'execute'],
-  ['0x5decc190', 'challenge'],
-  ['0xaa455d9f', 'configure'],
-  ['0xa0e975cb', 'veto'],
+  ['0x977d8964', 'schedule'],
+  ['0x3a139c71', 'execute'],
+  ['0x70576158', 'challenge'],
+  ['0x72896761', 'configure'],
+  ['0xc04c87b8', 'veto'],
   ['0x586df604', 'ROOT_ROLE'],
 ])
 
-const KNOWN_GOVERN_ROLES = new Map([['0x5c3e9760', 'exec']])
+const KNOWN_GOVERN_ROLES = new Map([['0xc2d85afc', 'exec']])
 
 const DAO_QUERY = gql`
   query DAOQuery($name: String) {
-    optimisticGame(id: $name) {
+    registryEntry(id: $name) {
+      name
       executor {
         address
         roles {
@@ -42,16 +45,10 @@ const DAO_QUERY = gql`
           who
           frozen
         }
-        executed {
+        queued {
           id
-          queue {
-            address
-          }
-        }
-        scheduled {
-          id
-          packet {
-            status
+          state
+          payload {
             nonce
             executionTime
             submitter
@@ -61,21 +58,11 @@ const DAO_QUERY = gql`
         config {
           executionDelay
           scheduleDeposit {
-            token {
-              id
-            }
+            token
             amount
           }
           challengeDeposit {
-            token {
-              id
-            }
-            amount
-          }
-          vetoDeposit {
-            token {
-              id
-            }
+            token
             amount
           }
           resolver
@@ -87,12 +74,14 @@ const DAO_QUERY = gql`
 `
 
 export default function DaoView() {
+  const { chainId } = useChainId()
   const { daoAddress }: any = useParams()
   const { path } = useRouteMatch()
   const { data, loading, error } = useQuery(DAO_QUERY, {
     variables: {
       name: daoAddress,
     },
+    client: chainId === 4 ? rinkebyClient : mainnetClient,
   })
 
   if (loading) {
@@ -104,22 +93,22 @@ export default function DaoView() {
     return <p>Error</p>
   }
 
-  if (!data.optimisticGame) {
+  if (!data.registryEntry) {
     return <p>DAO not found.</p>
   }
 
   return (
     <Switch>
       <Route exact path={path}>
-        <DaoInfo dao={data.optimisticGame} />
-        <Actions dao={data.optimisticGame} />
-        <Permissions dao={data.optimisticGame} />
+        <DaoInfo dao={data.registryEntry} />
+        <Actions dao={data.registryEntry} />
+        <Permissions dao={data.registryEntry} />
       </Route>
       <Route path={`${path}/new-action`}>
         <NewAction
-          config={data.optimisticGame.queue.config}
-          executorAddress={data.optimisticGame.executor.address}
-          queueAddress={data.optimisticGame.queue.address}
+          config={data.registryEntry.queue.config}
+          executorAddress={data.registryEntry.executor.address}
+          queueAddress={data.registryEntry.queue.address}
         />
       </Route>
       <Route>
@@ -148,7 +137,8 @@ function DaoInfo({ dao }: DaoInfoProps) {
       <div
         css={`
           margin-top: 32px;
-          border: 1px solid whitesmoke;
+          border: 2px solid rgba(255, 255, 255, 0.2);
+          padding: 8px;
           h2 {
             font-weight: bold;
             font-size: 24px;
@@ -177,7 +167,7 @@ function DaoInfo({ dao }: DaoInfoProps) {
             margin-left: 16px;
           `}
         >
-          <li>Token: {dao.queue.config.scheduleDeposit.token.id}</li>
+          <li>Token: {dao.queue.config.scheduleDeposit.token}</li>
           <li>Amount: {dao.queue.config.scheduleDeposit.amount}</li>
         </ul>
         <p>Challenge collateral: </p>
@@ -186,17 +176,8 @@ function DaoInfo({ dao }: DaoInfoProps) {
             margin-left: 16px;
           `}
         >
-          <li>Token: {dao.queue.config.challengeDeposit.token.id}</li>
+          <li>Token: {dao.queue.config.challengeDeposit.token}</li>
           <li>Amount: {dao.queue.config.challengeDeposit.amount}</li>
-        </ul>
-        <p>Veto collateral: </p>
-        <ul
-          css={`
-            margin-left: 16px;
-          `}
-        >
-          <li>Token: {dao.queue.config.vetoDeposit.token.id}</li>
-          <li>Amount: {dao.queue.config.vetoDeposit.amount}</li>
         </ul>
       </div>
     </>
@@ -211,13 +192,14 @@ function Actions({ dao }: DaoInfoProps) {
     history.push(`/${daoAddress}/new-action`)
   }, [history, daoAddress])
 
-  const hasActions = useMemo(() => dao.queue.scheduled.length > 0, [dao])
+  const hasActions = useMemo(() => dao.queue.queued.length > 0, [dao])
 
   return (
     <div
       css={`
         margin-top: 32px;
-        border: 1px solid whitesmoke;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        padding: 8px;
         h2 {
           font-weight: bold;
           font-size: 24px;
@@ -234,7 +216,7 @@ function Actions({ dao }: DaoInfoProps) {
     >
       <h2>Actions</h2>
       {hasActions
-        ? dao.queue.scheduledPackets.map(({ id }: { id: string }) => (
+        ? dao.queue.queued.map(({ id }: { id: string }) => (
             <ActionCard id={id} key={id} />
           ))
         : 'No actions.'}
@@ -254,7 +236,8 @@ function Permissions({ dao }: PermissionsProps) {
         css={`
           width: 100%;
           margin-top: 32px;
-          border: 1px solid whitesmoke;
+          border: 2px solid rgba(255, 255, 255, 0.2);
+          padding: 8px;
           h2 {
             font-weight: bold;
             font-size: 24px;
@@ -287,7 +270,8 @@ function Permissions({ dao }: PermissionsProps) {
       <div
         css={`
           margin-top: 32px;
-          border: 1px solid whitesmoke;
+          border: 2px solid rgba(255, 255, 255, 0.2);
+          padding: 8px;
           h2 {
             font-weight: bold;
             font-size: 24px;
@@ -302,7 +286,7 @@ function Permissions({ dao }: PermissionsProps) {
           }
         `}
       >
-        <h2>Permissions for Optimistic Queue</h2>
+        <h2>Permissions for GovernQueue</h2>
         {dao.queue.roles.map((role: any) => {
           return (
             <div key={role.selector}>
@@ -332,5 +316,28 @@ function ActionCard({ id }: ActionCardProps) {
     history.push(`/tools/${id}`)
   }, [history, id])
 
-  return <Button onClick={handleCardClick}>{id}</Button>
+  return (
+    <button
+      type="button"
+      css={`
+        position: relative;
+        background: transparent;
+        width: 280px;
+        height: 320px;
+        border: 1px solid #00f400;
+        padding: 16px;
+        cursor: pointer;
+        &:not(:last-child) {
+          margin-right: 24px;
+          margin-bottom: 24px;
+        }
+        &:active {
+          top: 1px;
+        }
+      `}
+      onClick={handleCardClick}
+    >
+      {id}
+    </button>
+  )
 }

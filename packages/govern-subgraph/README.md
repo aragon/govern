@@ -4,11 +4,85 @@
 
 ## Quick Start
 
-After installing the monorepo's dependencies, run:
+Ensure the monorepo’s dependencies are installed:
 
-- `yarn manifest-<YOUR_DESIRED_NETWORK>` to generate the corresponding `subgraph.yaml` file for the network.
-- `yarn codegen` to generate the types needed for building the subgraph.
-- `yarn deploy-<YOUR_DESIRED_NETWORK> <THEGRAPH_USERNAME> <SUBGRAPH_NAME> <YOUR_DESIRED_NETWORK>` to build and deploy the subgraph to the desired network. Remember to set your \$GRAPHKEY environment variable and check the needed arguments!
+```console
+cd ../.. && yarn
+cd packages/govern-subgraph
+```
+
+Generate the `subgraph.yaml` file corresponding to your network:
+
+```console
+yarn manifest-<DESIRED_NETWORK>
+```
+
+Replacing `<DESIRED_NETWORK>` by one of the available networks (see package.json).
+
+Generate the types from the ABIs and the GraphQL schema:
+
+```console
+yarn codegen
+```
+
+The generated code is used by the subgraph mapping scripts. Compile the subgraph:
+
+```console
+yarn build
+```
+
+You are now ready to deploy the subgraph. This is the command to use:
+
+```console
+GRAPH_KEY=<GRAPH_KEY> yarn deploy-<DESIRED_NETWORK> <THEGRAPH_USERNAME> <SUBGRAPH_NAME> <DESIRED_NETWORK>
+```
+
+Replacing:
+
+- `<GRAPH_KEY>` by your The Graph key (this is only needed when deploying on The Graph).
+- `<THEGRAPH_USERNAME>` by the username used for your subgraph (usually your GitHub username).
+- `<SUBGRAPH_NAME>` by the name of the subgraph itself.
+- `<DESIRED_NETWORK>` by one of the available networks (see package.json).
+
+### Deploy the subgraph locally
+
+You have the option to deploy your subgraph locally, this is how you can do it.
+
+Clone the Graph node repository somewhere on your computer:
+
+```console
+git clone git@github.com:graphprotocol/graph-node.git
+```
+
+Edit the file `graph-node/docker/docker-compose.yml` to make the [`ethereum` field](https://github.com/graphprotocol/graph-node/blob/ce9aa01dcc18029122f1cf3e8f6941ffffd7653e/docker/docker-compose.yml#L20) point to the Ethereum node of your choice. Make sure this node is connected to the same Ethereum network than the one expected by your subgraph.
+
+Run the Graph node using docker-compose. It will start the Graph node itself, but also a PostgreSQL database and an IPFS, which are used by the Graph node.
+
+```console
+cd graph-node/docker
+docker-compose up
+```
+
+You are now ready to deploy your subgraph.
+
+Go back to the subgraph directory (`packages/govern-subgraph`), and create the subgraph on your local node:
+
+```console
+graph create aragon/aragon-govern-<DESIRED_NETWORK> \
+  --node http://localhost:8020
+```
+
+Then deploy it:
+
+```console
+graph deploy aragon/aragon-govern<DESIRED_NETWORK> \
+  --ipfs http://localhost:5001 \
+  --node http://localhost:8020
+```
+
+To stop the Graph node, go back to its directory and run `docker-compose down`. It will also create a `data` directory: remember to delete it if you want to start again.
+
+See [the Graph documentation](https://thegraph.com/docs/quick-start) for more details on how to run The Graph locally.
 
 ## Networks and performance
 
@@ -34,7 +108,8 @@ Tracked:
 - `Frozen`
 - `Granted`
 - `Revoked`
-  Left out:
+
+Left out:
 - `ETHDeposited`
 
 #### GovernQueue.sol
@@ -52,7 +127,8 @@ Tracked:
 - `Revoked`
 - `EvidenceSubmitted`
 - `Ruled`
-  Left out: None.
+
+Left out: None.
 
 #### GovernRegistry.sol
 
@@ -60,4 +136,6 @@ Tracked:
 
 - `Registered`
 - `SetMetadata`
-  Left out: None.
+
+Left out: None.
+

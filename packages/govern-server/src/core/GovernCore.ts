@@ -2,7 +2,7 @@ import {
   Address,
   DaoData,
   Networkish,
-  OptimisticGameData,
+  RegistryEntryData,
   GovernQueueData,
 } from './types'
 import { ErrorInvalidNetwork, ErrorUnexpectedResult } from './errors'
@@ -12,8 +12,8 @@ import GraphqlClient from './GraphqlClient'
 import {
   QUERY_DAO,
   QUERY_DAOS,
-  QUERY_GAME,
-  QUERY_GAMES,
+  QUERY_REGISTRY_ENTRY,
+  QUERY_REGISTRY_ENTRIES,
   QUERY_QUEUE,
   QUERY_QUEUES,
   QUERY_QUEUES_BY_DAO,
@@ -66,12 +66,14 @@ class GovernCore {
     }
   }
 
-  async dao(address: Address): Promise<DaoData | null> {
-    const result = await this.fetchResult<{ govern: DaoData | null }>(
-      [QUERY_DAO, { address: address.toLowerCase() }],
-      `Unexpected result when fetching the dao ${address}.`
+  async dao(name: string): Promise<DaoData | null> {
+    const result = await this.fetchResult<{
+      registryEntries: RegistryEntryData[] | null
+    }>(
+      [QUERY_DAO, { name }],
+      `Unexpected result when fetching the dao ${name}.`
     )
-    return result.govern ?? null
+    return result.registryEntries?.[0]?.executor ?? null
   }
 
   async daos(): Promise<DaoData[]> {
@@ -84,47 +86,50 @@ class GovernCore {
 
   async queue(address: Address): Promise<GovernQueueData | null> {
     const result = await this.fetchResult<{
-      optimisticQueue: GovernQueueData | null
+      governQueue: GovernQueueData | null
     }>(
       [QUERY_QUEUE, { queue: address.toLowerCase() }],
       `Unexpected result when fetching the queue ${address}.`
     )
-    return result.optimisticQueue ?? null
+    return result.governQueue ?? null
   }
 
   async queues(): Promise<GovernQueueData[]> {
     const result = await this.fetchResult<{
-      optimisticQueues: GovernQueueData[]
+      governQueues: GovernQueueData[]
     }>([QUERY_QUEUES], `Unexpected result when fetching the queue.`)
-    return result.optimisticQueues ?? []
+    return result.governQueues ?? []
   }
 
-  async game(name: string): Promise<OptimisticGameData | null> {
+  async registryEntry(name: string): Promise<RegistryEntryData | null> {
     const result = await this.fetchResult<{
-      optimisticGame: OptimisticGameData | null
+      registryEntry: RegistryEntryData | null
     }>(
-      [QUERY_GAME, { name }],
-      `Unexpected result when fetching the game ${name}.`
+      [QUERY_REGISTRY_ENTRY, { name }],
+      `Unexpected result when fetching the registry entry ${name}.`
     )
-    return result.optimisticGame ?? null
+    return result.registryEntry ?? null
   }
 
-  async games(): Promise<OptimisticGameData[]> {
+  async registryEntries(): Promise<RegistryEntryData[]> {
     const result = await this.fetchResult<{
-      optimisticGames: OptimisticGameData[]
-    }>([QUERY_GAMES], `Unexpected result when fetching the games.`)
-    return result.optimisticGames ?? []
+      registryEntries: RegistryEntryData[]
+    }>(
+      [QUERY_REGISTRY_ENTRIES],
+      `Unexpected result when fetching the registry entries.`
+    )
+    return result.registryEntries ?? []
   }
 
-  async queuesForDao(address: Address): Promise<GovernQueueData[]> {
-    const result = await this.fetchResult<{ govern: DaoData }>(
-      [QUERY_QUEUES_BY_DAO, { address }],
-      `Unexpected result when fetching the queues for dao ${address}.`
+  async queuesForDao(name: string): Promise<GovernQueueData[]> {
+    const result = await this.fetchResult<{
+      registryEntries: RegistryEntryData[]
+    }>(
+      [QUERY_QUEUES_BY_DAO, { name }],
+      `Unexpected result when fetching the queues for dao ${name}.`
     )
-    const games = result.govern?.games ?? []
-    return games.reduce<GovernQueueData[]>((queues, game) => {
-      return game?.queue ? [...queues, game.queue] : queues
-    }, [])
+    const queue = result.registryEntries?.[0]?.queue
+    return queue ? [queue] : []
   }
 }
 

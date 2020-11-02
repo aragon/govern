@@ -19,7 +19,7 @@ export function handleRegistered(event: RegisteredEvent): void {
   let registryEntry = new RegistryEntryEntity(event.params.name)
 
   registryEntry.name = event.params.name
-  registryEntry.executor = event.params.dao.toHex()
+  registryEntry.executor = event.params.executor.toHex()
   registryEntry.queue = event.params.queue.toHex()
 
   // add game to the registry
@@ -33,12 +33,12 @@ export function handleRegistered(event: RegisteredEvent): void {
   registry.save()
 
   // Create datasource templates
-  GovernTemplate.create(event.params.dao)
+  GovernTemplate.create(event.params.executor)
   GovernQueueTemplate.create(event.params.queue)
 }
 
 export function handleSetMetadata(event: SetMetadataEvent): void {
-  let govern = loadOrCreateGovern(event.params.dao)
+  let govern = loadOrCreateGovern(event.params.executor)
   govern.metadata = event.params.metadata
 
   govern.save()

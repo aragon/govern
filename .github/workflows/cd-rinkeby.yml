@@ -17,25 +17,25 @@ jobs:
       run: yarn build:contracts
     - name: Run tests
       run: yarn test
-  deploy:
-    runs-on: ubuntu-latest
-    needs: test
-    env:
-      CD: true
-      ETH_KEY: ${{ secrets.ETH_KEY }}
-      ETHERSCAN_KEY: ${{ secrets.ETHERSCAN_KEY }}
-      REGISTRY_RINKEBY: "0xE144219480F96b3e5fe91a5e24B9655BeeA5C537"
-    steps:
-    - uses: actions/checkout@v1
-    - name: Install node
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12
-    - name: Install dependencies
-      run: yarn install --frozen-lockfile
-    - name: Deploy Factory
-      run: cd packages/govern-create && yarn deploy-factory --network rinkeby
-    - name: Deploy Govern
-      run: cd packages/govern-create && yarn deploy-govern --network rinkeby > github-message
-    - name: Log
-      run: cat packages/govern-create/github-message
+  # deploy:
+  #  runs-on: ubuntu-latest
+  #  needs: test
+  #  env:
+  #    CD: true
+  #    ETH_KEY: ${{ secrets.ETH_KEY }}
+  #    ETHERSCAN_KEY: ${{ secrets.ETHERSCAN_KEY }}
+  #    REGISTRY_RINKEBY: "0x0cd3621EC403F26ad9F79c3d77B1dda1f8474c6f"
+  #  steps:
+  #  - uses: actions/checkout@v1
+  #  - name: Install node
+  #    uses: actions/setup-node@v1
+  #    with:
+  #      node-version: 12
+  #  - name: Install dependencies
+  #    run: yarn install --frozen-lockfile
+  #  - name: Deploy Factory
+  #    run: cd packages/govern-create && yarn deploy-factory --network rinkeby
+  #  - name: Deploy Govern
+  #    run: cd packages/govern-create && yarn deploy-govern --network rinkeby > github-message
+  #  - name: Log
+  #    run: cat packages/govern-create/github-message

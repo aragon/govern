@@ -1,6 +1,6 @@
 {
   "name": "@aragon/govern-core",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.1-beta.0",
   "description": "Optimistic DAOs",
   "main": "index.js",
   "repository": "https://github.com/aragon/govern",
@@ -12,8 +12,8 @@
     "/contracts"
   ],
   "dependencies": {
-    "@aragon/govern-contract-utils": "^1.0.0-beta.0",
-    "erc3k": "^1.0.0-beta.0"
+    "@aragon/govern-contract-utils": "^1.0.1-beta.0",
+    "erc3k": "^1.0.1-beta.0"
   },
   "devDependencies": {
     "@nomiclabs/buidler": "^1.4.7",

@@ -27,7 +27,7 @@ contract GovernFactory {
         }
     }
 
-    function setupBase() internal {
+    function setupBase() private {
         base = address(new Govern(address(2)));
     }
 }

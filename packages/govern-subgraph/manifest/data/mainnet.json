@@ -1,6 +1,12 @@
 {
   "network": "mainnet",
   "dataSources": {
-    "GovernBaseFactory": []
+    "GovernRegistry": [
+      {
+        "name": "GovernRegistry",
+        "address": "0x9dDC0BAB6aCCa5F374E2C21708b3107e5E973601",
+        "startBlock": 11158181
+      }
+    ]
   }
 }

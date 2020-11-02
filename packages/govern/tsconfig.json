@@ -1,0 +1,20 @@
+{
+  "extends": "@ethereumjs/config-tsc",
+  "compilerOptions": {
+    "removeComments": true,
+    "strictPropertyInitialization": false,
+    "outDir": "./dist",
+    "inlineSources": true,
+    "types": [
+      "jest"
+    ],
+    "lib": [
+      "dom",
+      "es2018"
+    ]
+  },
+  "include": [
+    "./internal/**/*",
+    "./public/**/*"
+  ]
+}

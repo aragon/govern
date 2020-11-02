@@ -48,23 +48,6 @@
             "type": "tuple"
           },
           {
-            "components": [
-              {
-                "internalType": "address",
-                "name": "token",
-                "type": "address"
-              },
-              {
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-              }
-            ],
-            "internalType": "struct ERC3000Data.Collateral",
-            "name": "vetoDeposit",
-            "type": "tuple"
-          },
-          {
             "internalType": "address",
             "name": "resolver",
             "type": "address"
@@ -189,23 +172,6 @@
             "type": "tuple"
           },
           {
-            "components": [
-              {
-                "internalType": "address",
-                "name": "token",
-                "type": "address"
-              },
-              {
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-              }
-            ],
-            "internalType": "struct ERC3000Data.Collateral",
-            "name": "vetoDeposit",
-            "type": "tuple"
-          },
-          {
             "internalType": "address",
             "name": "resolver",
             "type": "address"
@@ -323,6 +289,70 @@
       }
     ],
     "name": "Granted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "string",
+        "name": "key",
+        "type": "string"
+      }
+    ],
+    "name": "Initialized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes4",
+        "name": "sig",
+        "type": "bytes4"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "data",
+        "type": "bytes"
+      }
+    ],
+    "name": "ReceivedCallback",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes4",
+        "name": "sig",
+        "type": "bytes4"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes4",
+        "name": "magicNumber",
+        "type": "bytes4"
+      }
+    ],
+    "name": "RegisteredCallback",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes4",
+        "name": "interfaceId",
+        "type": "bytes4"
+      }
+    ],
+    "name": "RegisteredStandard",
     "type": "event"
   },
   {
@@ -511,24 +541,6 @@
         "internalType": "bytes",
         "name": "reason",
         "type": "bytes"
-      },
-      {
-        "components": [
-          {
-            "internalType": "address",
-            "name": "token",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "amount",
-            "type": "uint256"
-          }
-        ],
-        "indexed": false,
-        "internalType": "struct ERC3000Data.Collateral",
-        "name": "collateral",
-        "type": "tuple"
       }
     ],
     "name": "Vetoed",
@@ -682,23 +694,6 @@
                 "type": "tuple"
               },
               {
-                "components": [
-                  {
-                    "internalType": "address",
-                    "name": "token",
-                    "type": "address"
-                  },
-                  {
-                    "internalType": "uint256",
-                    "name": "amount",
-                    "type": "uint256"
-                  }
-                ],
-                "internalType": "struct ERC3000Data.Collateral",
-                "name": "vetoDeposit",
-                "type": "tuple"
-              },
-              {
                 "internalType": "address",
                 "name": "resolver",
                 "type": "address"
@@ -808,23 +803,6 @@
             ],
             "internalType": "struct ERC3000Data.Collateral",
             "name": "challengeDeposit",
-            "type": "tuple"
-          },
-          {
-            "components": [
-              {
-                "internalType": "address",
-                "name": "token",
-                "type": "address"
-              },
-              {
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-              }
-            ],
-            "internalType": "struct ERC3000Data.Collateral",
-            "name": "vetoDeposit",
             "type": "tuple"
           },
           {
@@ -983,23 +961,6 @@
                 "type": "tuple"
               },
               {
-                "components": [
-                  {
-                    "internalType": "address",
-                    "name": "token",
-                    "type": "address"
-                  },
-                  {
-                    "internalType": "uint256",
-                    "name": "amount",
-                    "type": "uint256"
-                  }
-                ],
-                "internalType": "struct ERC3000Data.Collateral",
-                "name": "vetoDeposit",
-                "type": "tuple"
-              },
-              {
                 "internalType": "address",
                 "name": "resolver",
                 "type": "address"
@@ -1141,23 +1102,6 @@
                 "type": "tuple"
               },
               {
-                "components": [
-                  {
-                    "internalType": "address",
-                    "name": "token",
-                    "type": "address"
-                  },
-                  {
-                    "internalType": "uint256",
-                    "name": "amount",
-                    "type": "uint256"
-                  }
-                ],
-                "internalType": "struct ERC3000Data.Collateral",
-                "name": "vetoDeposit",
-                "type": "tuple"
-              },
-              {
                 "internalType": "address",
                 "name": "resolver",
                 "type": "address"
@@ -1221,6 +1165,94 @@
       }
     ],
     "name": "grant",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "name": "initBlocks",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_aclRoot",
+        "type": "address"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "executionDelay",
+            "type": "uint256"
+          },
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+              },
+              {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct ERC3000Data.Collateral",
+            "name": "scheduleDeposit",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+              },
+              {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct ERC3000Data.Collateral",
+            "name": "challengeDeposit",
+            "type": "tuple"
+          },
+          {
+            "internalType": "address",
+            "name": "resolver",
+            "type": "address"
+          },
+          {
+            "internalType": "bytes",
+            "name": "rules",
+            "type": "bytes"
+          }
+        ],
+        "internalType": "struct ERC3000Data.Config",
+        "name": "_initialConfig",
+        "type": "tuple"
+      }
+    ],
+    "name": "initialize",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1378,23 +1410,6 @@
                 ],
                 "internalType": "struct ERC3000Data.Collateral",
                 "name": "challengeDeposit",
-                "type": "tuple"
-              },
-              {
-                "components": [
-                  {
-                    "internalType": "address",
-                    "name": "token",
-                    "type": "address"
-                  },
-                  {
-                    "internalType": "uint256",
-                    "name": "amount",
-                    "type": "uint256"
-                  }
-                ],
-                "internalType": "struct ERC3000Data.Collateral",
-                "name": "vetoDeposit",
                 "type": "tuple"
               },
               {
@@ -1604,23 +1619,6 @@
                 "type": "tuple"
               },
               {
-                "components": [
-                  {
-                    "internalType": "address",
-                    "name": "token",
-                    "type": "address"
-                  },
-                  {
-                    "internalType": "uint256",
-                    "name": "amount",
-                    "type": "uint256"
-                  }
-                ],
-                "internalType": "struct ERC3000Data.Collateral",
-                "name": "vetoDeposit",
-                "type": "tuple"
-              },
-              {
                 "internalType": "address",
                 "name": "resolver",
                 "type": "address"
@@ -1757,23 +1755,6 @@
                 "type": "tuple"
               },
               {
-                "components": [
-                  {
-                    "internalType": "address",
-                    "name": "token",
-                    "type": "address"
-                  },
-                  {
-                    "internalType": "uint256",
-                    "name": "amount",
-                    "type": "uint256"
-                  }
-                ],
-                "internalType": "struct ERC3000Data.Collateral",
-                "name": "vetoDeposit",
-                "type": "tuple"
-              },
-              {
                 "internalType": "address",
                 "name": "resolver",
                 "type": "address"
@@ -1838,88 +1819,15 @@
         "type": "bool"
       }
     ],
-    "stateMutability": "pure",
+    "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
       {
         "internalType": "bytes32",
-        "name": "_payloadHash",
+        "name": "_containerHash",
         "type": "bytes32"
-      },
-      {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "executionDelay",
-            "type": "uint256"
-          },
-          {
-            "components": [
-              {
-                "internalType": "address",
-                "name": "token",
-                "type": "address"
-              },
-              {
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-              }
-            ],
-            "internalType": "struct ERC3000Data.Collateral",
-            "name": "scheduleDeposit",
-            "type": "tuple"
-          },
-          {
-            "components": [
-              {
-                "internalType": "address",
-                "name": "token",
-                "type": "address"
-              },
-              {
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-              }
-            ],
-            "internalType": "struct ERC3000Data.Collateral",
-            "name": "challengeDeposit",
-            "type": "tuple"
-          },
-          {
-            "components": [
-              {
-                "internalType": "address",
-                "name": "token",
-                "type": "address"
-              },
-              {
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-              }
-            ],
-            "internalType": "struct ERC3000Data.Collateral",
-            "name": "vetoDeposit",
-            "type": "tuple"
-          },
-          {
-            "internalType": "address",
-            "name": "resolver",
-            "type": "address"
-          },
-          {
-            "internalType": "bytes",
-            "name": "rules",
-            "type": "bytes"
-          }
-        ],
-        "internalType": "struct ERC3000Data.Config",
-        "name": "_config",
-        "type": "tuple"
       },
       {
         "internalType": "bytes",

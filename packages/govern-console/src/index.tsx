@@ -11,10 +11,15 @@ import {
 import App from './App'
 import GeneralProvider from './Providers/GeneralProvider'
 
-const client: ApolloClient<NormalizedCacheObject> = new ApolloClient({
-  uri: process.env.REACT_APP_SUBGRAPH_URL,
+export const rinkebyClient: ApolloClient<NormalizedCacheObject> = new ApolloClient({
+  uri: 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby',
   cache: new InMemoryCache()
 });
+
+export const mainnetClient: ApolloClient<NormalizedCacheObject> = new ApolloClient({
+  uri: 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-mainnet',
+  cache: new InMemoryCache()
+})
 
 const GlobalStyle = createGlobalStyle`
   *, *:before, *:after {
@@ -29,9 +34,9 @@ const GlobalStyle = createGlobalStyle`
     height: 0;
     min-height: 100vh;
     width: 100vw;
-    background: #0e0e0e;
-    color: #00f400;
-    font-family: 'Manrope', Helvetica, sans-serif;
+    background: black;
+    color: white;
+    font-family: 'Roboto Mono', Helvetica, sans-serif;
   }
 
   body, ul, p, h1, h2, h3, h4, h5, h6 {
@@ -56,7 +61,7 @@ const GlobalStyle = createGlobalStyle`
 `
 
 render(
-  <ApolloProvider client={client}>
+  <ApolloProvider client={rinkebyClient}>
     <GeneralProvider>
       <React.StrictMode>
         <GlobalStyle />

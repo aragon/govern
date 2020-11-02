@@ -14,3 +14,4 @@ jobs:
     - run: yarn
     - run: .github/scripts/kubectl-config.sh ${{secrets.KUBE_CA}} ${{secrets.KUBE_SERVER}} ${{secrets.KUBE_TOKEN}}
     - run: yarn deploy:subgraph:rinkeby
+    - run: yarn deploy:subgraph:mainnet

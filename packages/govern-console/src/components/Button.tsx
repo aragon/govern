@@ -14,16 +14,18 @@ export default function Button({
       type={type!}
       onClick={onClick}
       css={`
-        font-family: 'Overpass Mono', monospace;
-        font-size: 12px;
+        font-family: 'Roboto Mono', monospace;
+        font-size: 18px;
         position: relative;
         background: transparent;
         color: white;
+        min-width: 136px;
+        min-height: 40px;
         cursor: pointer;
+        border: 2px solid transparent;
+        border-image: linear-gradient(to bottom right, #AD41BB 20%, #FF7D7D 100%);
+        border-image-slice: 1;
 
-        &:hover {
-          background: rgba(255, 255, 255, 0.2);
-        }
         &:active {
           top: 1px;
         }

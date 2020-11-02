@@ -1,6 +1,6 @@
 {
   "name": "@aragon/govern-subgraph",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.1-beta.0",
   "scripts": {
     "codegen": "rm -rf generated; graph codegen",
     "build": "rm -rf build; graph build",
@@ -25,6 +25,7 @@
     "mustache": "^4.0.1"
   },
   "dependencies": {
+    "@aragon/govern-core": "^1.0.1-beta.0",
     "babel-polyfill": "^6.26.0",
     "babel-register": "^6.26.0"
   },
