@@ -19,7 +19,7 @@ import {
   ArbitratorCallsRuleMock,
   ArbitratorCallsRuleMockFactory
 } from '../../typechain'
-import * as container from './container.json'
+import * as containerJson from './container.json'
 import { getConfigHash, getContainerHash } from './helpers'
 import { formatBytes32String } from 'ethers/lib/utils'
 
@@ -29,7 +29,8 @@ describe('Govern Queue', function() {
     owner: Signer,
     ownerAddr: string,
     chainId: number,
-    gq: GovernQueue
+    gq: GovernQueue,
+    container: any
 
   const EVENTS = {
     SCHEDULED: 'Scheduled',
@@ -57,7 +58,15 @@ describe('Govern Queue', function() {
     EVIDENCE: 'queue: evidence'
   }
 
+  before(() => {
+    // TODO: Deploy token for test cases
+    // containerJson.config.scheduleDeposit.token = 'tokenAddr'
+    // containerJson.config.challengeDeposit.token = 'tokenAddr'
+    // containerJson.config.vetoDeposit.token = 'tokenAddr'
+  })
+
   beforeEach(async () => {
+    container = JSON.parse(JSON.stringify(containerJson))
     accounts = await ethers.getSigners()
     owner = accounts[0]
     ownerAddr = await owner.getAddress()
@@ -70,7 +79,12 @@ describe('Govern Queue', function() {
   })
 
   context('GovernQueue.schedule', () => {
-    it('returns with the expected result', async () => {
+    before(async () => {
+      const block = await ethers.getDefaultProvider().getBlock('latest')
+      container.payload.executionTime = block.timestamp
+    })
+
+    it('emits the expected events and adds the container to the queue', async () => {
       const containerHash = getContainerHash(container, ownerAddr, chainId)
 
       await expect(gq.schedule(container))
@@ -89,19 +103,19 @@ describe('Govern Queue', function() {
     })
 
     it('reverts with "queue: bad nonce"', async () => {
-      container.payload.nonce = 0
+      container.payload.nonce = 100
 
       await expect(gq.schedule(container)).to.be.revertedWith(ERRORS.BAD_NONCE)
     })
 
     it('reverts with "queue: bad config"', async () => {
-      container.config.executionDelay = 0
+      container.config.executionDelay = 100
 
       await expect(gq.schedule(container)).to.be.revertedWith(ERRORS.BAD_CONFIG)
     })
 
     it('reverts with "queue: bad delay"', async () => {
-      container.config.executionDelay = 0
+      container.config.executionDelay = 10
 
       await expect(gq.schedule(container)).to.be.revertedWith(ERRORS.BAD_DELAY)
     })
@@ -113,8 +127,15 @@ describe('Govern Queue', function() {
     })
   })
 
-  context('GovernQueue.execute', () => {
-    it('returns with the expected result', async () => {
+  context('GovernQueue.execute', async () => {
+    before(async () => {
+      const block = await ethers.getDefaultProvider().getBlock('latest')
+      container.payload.executionTime = block.timestamp
+      container.payload.nonce = await gq.nonce()
+      await gq.schedule(container)
+    })
+
+    it('emits the expected events and updates the container state', async () => {
       const containerHash = getContainerHash(container, ownerAddr, chainId)
 
       await expect(gq.execute(container))
@@ -131,14 +152,23 @@ describe('Govern Queue', function() {
     })
 
     it('reverts with "queue: wait more"', async () => {
-      container.payload.executionTime = 0
+      container.payload.executionTime = container.payload.executionTime * 2
 
-      await expect(gq.schedule(container)).to.be.revertedWith(ERRORS.WAIT_MORE)
+      await expect(gq.execute(container)).to.be.revertedWith(ERRORS.WAIT_MORE)
     })
   })
 
   context('GovernQueue.challenge', () => {
-    it('returns with the expected result', async () => {
+    before(async () => {
+      const block = await ethers.getDefaultProvider().getBlock('latest')
+      container.payload.executionTime = block.timestamp
+    })
+
+    it('executes as expected', async () => {
+      container.payload.nonce = await gq.nonce()
+
+      await gq.schedule(container)
+
       const ArbitratorMock = (await ethers.getContractFactory(
         'ArbitratorMock'
       )) as ArbitratorMockFactory
@@ -147,7 +177,7 @@ describe('Govern Queue', function() {
       container.config.resolver = arbitratorMock.address
       const containerHash = getContainerHash(container, ownerAddr, chainId)
       const reasonAsBytes32 = formatBytes32String('NOPE!')
-      const disputeId = ''
+      const disputeId = container.payload.nonce
 
       await expect(gq.challenge(container, reasonAsBytes32))
         .to.emit(gq, EVENTS.LOCK).withArgs(
@@ -177,11 +207,19 @@ describe('Govern Queue', function() {
       expect(await gq.queue(containerHash))
         .to.equal({ state: 'Challenged' })
 
+      expect(await gq.challengerCache(containerHash))
+        .to.equal(ownerAddr)
+
       expect(await gq.disputeItemCache(container.config.resolver, disputeId))
         .to.equal(containerHash)
     })
 
     it('reverts with "queue: bad fee pull"', async () => {
+      container.payload.nonce = await gq.nonce()
+      container.payload.proof = '0x01'
+
+      await gq.schedule(container)
+
       const ArbitratorBadFeePullMock = (await ethers.getContractFactory(
         'ArbitratorBadFeePullMock'
       )) as ArbitratorBadFeePullMockFactory
@@ -194,6 +232,11 @@ describe('Govern Queue', function() {
     })
 
     it('reverts with "queue: bad approve"', async () => {
+      container.payload.nonce = await gq.nonce()
+      container.payload.proof = '0x02'
+
+      await gq.schedule(container)
+
       const ArbitratorBadApproveMock = (await ethers.getContractFactory(
         'ArbitratorBadApproveMock'
       )) as ArbitratorBadApproveMock
@@ -206,6 +249,11 @@ describe('Govern Queue', function() {
     })
 
     it('reverts with "queue: bad reset"', async () => {
+      container.payload.nonce = await gq.nonce()
+      container.payload.proof = '0x03'
+
+      await gq.schedule(container)
+
       const ArbitratorBadResetMock = (await ethers.getContractFactory(
         'ArbitratorBadResetMock'
       )) as ArbitratorBadResetMock
@@ -219,14 +267,17 @@ describe('Govern Queue', function() {
   })
 
   context('GovernQueue.resolve', () => {
+    before(async () => {
+      const block = await ethers.getDefaultProvider().getBlock('latest')
+      container.payload.executionTime = block.timestamp
+    })
+
     it('emits resolved with approved true', async () => {
-      // TODO: update & deepCopy container
+      container.payload.nonce = await gq.nonce()
       await gq.schedule(container)
 
       const containerHash = getContainerHash(container, ownerAddr, chainId)
-
-      // TODO: Generate disputeId
-      const disputeId = ''
+      const disputeId = container.payload.nonce
 
       await expect(gq.resolve(container, disputeId))
         .to.emit(gq, EVENTS.UNLOCK).withArgs(
@@ -246,13 +297,11 @@ describe('Govern Queue', function() {
     })
 
     it('emits resolved with approved false', async () => {
-      // TODO: update & deepCopy container
+      container.payload.nonce = await gq.nonce()
       await gq.schedule(container)
 
       const containerHash = getContainerHash(container, ownerAddr, chainId)
-
-      // TODO: Generate disputeId
-      const disputeId = ''
+      const disputeId = container.payload.nonce
 
       await expect(gq.resolve(container, disputeId))
         .to.emit(gq, EVENTS.UNLOCK).withArgs(
@@ -277,15 +326,15 @@ describe('Govern Queue', function() {
       )) as ArbitratorMockFactory
       const arbitratorMock = await ArbitratorMock.deploy()
 
-      // TODO: update & deepCopy container
+      container.config.resolver = arbitratorMock.address
+      container.payload.nonce = await gq.nonce()
+
+      await gq.configure(container.config)
       await gq.schedule(container)
       await gq.challenge(container, formatBytes32String('NOPE!'))
 
-      container.config.resolver = arbitratorMock.address
       const containerHash = getContainerHash(container, ownerAddr, chainId)
-
-      // TODO: Generate disputeId
-      const disputeId = ''
+      const disputeId = container.payload.nonce
 
       await expect(gq.resolve(container, disputeId))
         .to.emit(gq, EVENTS.UNLOCK).withArgs(
@@ -310,15 +359,14 @@ describe('Govern Queue', function() {
       const arbitratorRejectMock = await ArbitratorRejectMock.deploy()
 
       container.config.resolver = arbitratorRejectMock.address
+      container.payload.nonce = await gq.nonce()
 
-      // TODO: update & deepCopy container
+      await gq.configure(container.config)
       await gq.schedule(container)
       await gq.challenge(container, formatBytes32String('NOPE!'))
 
       const containerHash = getContainerHash(container, ownerAddr, chainId)
-
-      // TODO: Generate disputeId
-      const disputeId = ''
+      const disputeId = container.payload.nonce
 
       await expect(gq.resolve(container, disputeId))
         .to.emit(gq, EVENTS.UNLOCK).withArgs(
@@ -355,13 +403,13 @@ describe('Govern Queue', function() {
       const arbitratorNoStateChangeOnRejectMock = await ArbitratorNoStateChangeOnRejectMock.deploy()
 
       container.config.resolver = arbitratorNoStateChangeOnRejectMock.address
+      container.payload.nonce = await gq.nonce()
 
-      // TODO: update & deepCopy container
+      await gq.configure(container.config)
       await gq.schedule(container)
       await gq.challenge(container, formatBytes32String('NOPE!'))
 
-      // TODO: Generate disputeId
-      const disputeId = ''
+      const disputeId = container.payload.nonce
 
       await expect(gq.resolve(container, disputeId))
         .to.be.revertedWith(ERRORS.UNRESOLVED)
@@ -452,12 +500,11 @@ describe('Govern Queue', function() {
 
       container.config.resolver = arbitratorCallsRuleMock.address
 
-      // TODO: update & deepCopy container
+      await gq.configure(container.config)
       await gq.schedule(container)
       await gq.challenge(container, formatBytes32String('NOPE!'))
 
-      // TODO: Generate disputeId
-      const disputeId = ''
+      const disputeId = container.payload.nonce
 
       await expect(arbitratorCallsRuleMock.execRule(disputeId, 4))
         .to.emit(gq, EVENTS.RULED).withArgs(
@@ -467,7 +514,7 @@ describe('Govern Queue', function() {
         )
 
       expect(await gq.queue(getContainerHash(container, ownerAddr, chainId)))
-        .to.equal({state: 'Approved'})
+        .to.equal({ state: 'Approved' })
 
       expect(await gq.disputeItemCache(container.config.resolver, disputeId))
         .to.equal('0x0000000000000000000000000000000000000000')
@@ -481,12 +528,11 @@ describe('Govern Queue', function() {
 
       container.config.resolver = arbitratorCallsRuleMock.address
 
-      // TODO: update & deepCopy container
+      await gq.configure(container.config)
       await gq.schedule(container)
       await gq.challenge(container, formatBytes32String('NOPE!'))
 
-      // TODO: Generate disputeId
-      const disputeId = ''
+      const disputeId = container.payload.nonce
 
       await expect(arbitratorCallsRuleMock.execRule(disputeId, 0))
         .to.emit(gq, EVENTS.RULED).withArgs(
@@ -496,7 +542,7 @@ describe('Govern Queue', function() {
         )
 
       expect(await gq.queue(getContainerHash(container, ownerAddr, chainId)))
-        .to.equal({state: 'Rejected'})
+        .to.equal({ state: 'Rejected' })
 
       expect(await gq.disputeItemCache(container.config.resolver, disputeId))
         .to.equal('0x0000000000000000000000000000000000000000')

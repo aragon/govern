@@ -3,27 +3,27 @@
     "executionDelay": 0,
     "scheduleDeposit": {
       "token": "0x0000000000000000000000000000000000000000",
-      "amount": 0
+      "amount": 100
     },
     "challengeDeposit": {
       "token": "0x0000000000000000000000000000000000000000",
-      "amount": 0
+      "amount": 100
     },
     "vetoDeposit": {
       "token": "0x0000000000000000000000000000000000000000",
-      "amount": 0
+      "amount": 100
     },
     "resolver": "0x0000000000000000000000000000000000000000",
     "rules": "0x"
   },
   "payload": {
-    "nonce": 1,
+    "nonce": 0,
     "executionTime": 1000,
-    "submitter": "0xb794f5ea0ba39494ce839613fffba74279579268",
-    "executor": "0xb794f5ea0ba39494ce839613fffba74279579268",
+    "submitter": "0x0000000000000000000000000000000000000000",
+    "executor": "0x0000000000000000000000000000000000000000",
     "actions": [
       {
-        "to": "0xb794f5ea0ba39494ce839613fffba74279579268",
+        "to": "0x0000000000000000000000000000000000000000",
         "value": 1000,
         "data": "0x00"
       }
