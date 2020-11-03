@@ -1,6 +1,6 @@
 {
   "name": "@aragon/govern",
-  "version": "1.0.1-beta.2",
+  "version": "1.0.1-beta.3",
   "description": "Govern JS Client",
   "license": "GPL-3.0",
   "engines": {
