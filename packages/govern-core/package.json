@@ -41,6 +41,7 @@
     "compile": "buidler compile --force",
     "clean": "rm -rf artifacts",
     "test": "yarn build && buidler test",
+    "test:dev": "buidler test",
     "coverage": "yarn build && SOLIDITY_COVERAGE=true buidler coverage --network coverage",
     "abi:extract": "buidler-extract --output abi/ --keys abi",
     "prepublishOnly": "yarn test && yarn compile && yarn abi:extract -- --no-compile"

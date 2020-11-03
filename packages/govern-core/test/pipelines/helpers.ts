@@ -17,7 +17,7 @@ export function getPayloadHash(container: any): string {
         'address',
         'bytes32',
         'bytes32',
-        'bytes32',
+        'bytes32'
       ],
       [
         container.payload.nonce,
@@ -31,13 +31,13 @@ export function getPayloadHash(container: any): string {
               'address to, ' +
               'uint256 value, ' +
               'bytes data' +
-              ')[]',
+              ')[]'
             ],
             [container.payload.actions]
           )
         ),
         container.payload.allowFailuresMap,
-        keccak256(container.payload.proof),
+        keccak256(container.payload.proof)
       ]
     )
   )
@@ -60,7 +60,7 @@ export function getConfigHash(container: any): string {
         'tuple(address token, uint256 amount) challengeDeposit, ' +
         'address resolver, ' +
         'bytes rules' +
-        ')',
+        ')'
       ],
       [container.config]
     )
