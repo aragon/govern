@@ -24,58 +24,58 @@ jobs:
         path: |
           packages/*/cache
           packages/*/artifacts
-        key: yarn-${{ hashFiles('packages/**.sol') }}
-        restore-keys: yarn-${{ hashFiles('packages/**.sol') }}
+        key: contracts-${{ hashFiles('packages/**/*.sol') }}
+        restore-keys: contracts-${{ hashFiles('packages/**/*.sol') }}
 
     - name: Install dependencies
       run: yarn install --frozen-lockfile
 
     - name: Build contracts
-      run: yarn build:contracts
+      run: yarn compile:cached
 
-    - name: Run coverage
-      run: yarn coverage
+    # - name: Run coverage
+    #   run: yarn coverage
 
-    - name: Upload report
-      run: bash <(curl -s https://codecov.io/bash)
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    # - name: Upload report
+    #   run: bash <(curl -s https://codecov.io/bash)
+    #   env:
+    #     CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 
-  deploy-rinkeby:
-    runs-on: ubuntu-latest
-    needs: coverage
-    env:
-      CD: true
-      ETH_KEY: ${{ secrets.ETH_KEY }}
-      ETHERSCAN_KEY: ${{ secrets.ETHERSCAN_KEY }}
-      REGISTRY_RINKEBY: "0x0cd3621EC403F26ad9F79c3d77B1dda1f8474c6f"
-    steps:
-    - uses: actions/checkout@v1
+  # deploy-rinkeby:
+  #   runs-on: ubuntu-latest
+  #   needs: coverage
+  #   env:
+  #     CD: true
+  #     ETH_KEY: ${{ secrets.ETH_KEY }}
+  #     ETHERSCAN_KEY: ${{ secrets.ETHERSCAN_KEY }}
+  #     REGISTRY_RINKEBY: "0x0cd3621EC403F26ad9F79c3d77B1dda1f8474c6f"
+  #   steps:
+  #   - uses: actions/checkout@v1
 
-    - name: Install node
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12
+  #   - name: Install node
+  #     uses: actions/setup-node@v1
+  #     with:
+  #       node-version: 12
 
-    - name: Cache yarn modules
-      uses: actions/cache@v2
-      with:
-        path: '**/node_modules'
-        key: yarn-${{ hashFiles('yarn.lock') }}
-        restore-keys: yarn-${{ hashFiles('yarn.lock') }}
+  #   - name: Cache yarn modules
+  #     uses: actions/cache@v2
+  #     with:
+  #       path: '**/node_modules'
+  #       key: yarn-${{ hashFiles('yarn.lock') }}
+  #       restore-keys: yarn-${{ hashFiles('yarn.lock') }}
 
-    - name: Cache contracts
-      uses: actions/cache@v2
-      with:
-        path: |
-          packages/*/cache
-          packages/*/artifacts
-        key: yarn-${{ hashFiles('packages/**.sol') }}
-        restore-keys: yarn-${{ hashFiles('packages/**.sol') }}
+  #   - name: Cache contracts
+  #     uses: actions/cache@v2
+  #     with:
+  #       path: |
+  #         packages/*/cache
+  #         packages/*/artifacts
+  #       key: contracts-${{ hashFiles('packages/**/*.sol') }}
+  #       restore-keys: contracts-${{ hashFiles('packages/**/*.sol') }}
 
-    - name: Install dependencies
-      run: yarn install --frozen-lockfile
+  #   - name: Install dependencies
+  #     run: yarn install --frozen-lockfile
 
     # - name: Deploy Factory
     #   run: cd packages/govern-create && yarn deploy-factory --network rinkeby
