@@ -1,4 +1,4 @@
-export const container = {
+export const container: any = {
   'config': {
     'executionDelay': 0,
     'scheduleDeposit': {
