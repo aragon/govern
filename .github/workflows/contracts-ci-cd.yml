@@ -14,11 +14,9 @@ jobs:
     - name: Cache yarn modules
       uses: actions/cache@v2
       with:
-        path: ~/.cache/yarn/
+        path: '**/node_modules'
         key: yarn-${{ hashFiles('yarn.lock') }}
-        restore-keys: 
-          yarn-${{ hashFiles('yarn.lock') }}
-          yarn-
+        restore-keys: yarn-${{ hashFiles('yarn.lock') }}
 
     - name: Install dependencies
       run: yarn install --frozen-lockfile
@@ -54,11 +52,9 @@ jobs:
     - name: Cache yarn modules
       uses: actions/cache@v2
       with:
-        path: ~/.cache/yarn/
+        path: '**/node_modules'
         key: yarn-${{ hashFiles('yarn.lock') }}
-        restore-keys: |
-          yarn-${{ hashFiles('yarn.lock') }}
-          yarn-
+        restore-keys: yarn-${{ hashFiles('yarn.lock') }}
 
     - name: Install dependencies
       run: yarn install --frozen-lockfile
