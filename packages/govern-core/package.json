@@ -38,6 +38,7 @@
   "scripts": {
     "build": "yarn compile && buidler typechain",
     "compile": "buidler compile --force",
+    "compile:cached": "buidler compile",
     "clean": "rm -rf artifacts",
     "test": "yarn build && buidler test",
     "coverage": "yarn build && SOLIDITY_COVERAGE=true buidler coverage --network coverage",

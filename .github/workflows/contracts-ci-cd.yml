@@ -18,6 +18,15 @@ jobs:
         key: yarn-${{ hashFiles('yarn.lock') }}
         restore-keys: yarn-${{ hashFiles('yarn.lock') }}
 
+    - name: Cache contracts
+      uses: actions/cache@v2
+      with:
+        path: |
+          packages/*/cache
+          packages/*/artifacts
+        key: yarn-${{ hashFiles('packages/**.sol') }}
+        restore-keys: yarn-${{ hashFiles('packages/**.sol') }}
+
     - name: Install dependencies
       run: yarn install --frozen-lockfile
 
@@ -55,6 +64,15 @@ jobs:
         path: '**/node_modules'
         key: yarn-${{ hashFiles('yarn.lock') }}
         restore-keys: yarn-${{ hashFiles('yarn.lock') }}
+
+    - name: Cache contracts
+      uses: actions/cache@v2
+      with:
+        path: |
+          packages/*/cache
+          packages/*/artifacts
+        key: yarn-${{ hashFiles('packages/**.sol') }}
+        restore-keys: yarn-${{ hashFiles('packages/**.sol') }}
 
     - name: Install dependencies
       run: yarn install --frozen-lockfile

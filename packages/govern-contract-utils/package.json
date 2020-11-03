@@ -25,6 +25,7 @@
     "build": "yarn compile && hardhat typechain",
     "clean": "rm -rf artifacts",
     "compile": "npx hardhat compile --force",
+    "compile:cached": "npx hardhat compile",
     "test": "yarn build && npx hardhat test",
     "prepublishOnly": "yarn test && yarn compile"
   },
