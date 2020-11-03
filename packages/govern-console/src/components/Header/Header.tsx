@@ -47,7 +47,7 @@ function Header() {
           align-items: center;
         `}
       >
-        <img src={AragonSvg} width="36" />
+        <img src={AragonSvg} width="36" alt="Grey Eagle Aragon logo"/>
         <h1
           css={`
             flex-grow: 1;
