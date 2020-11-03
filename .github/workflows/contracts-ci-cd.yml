@@ -37,7 +37,7 @@ jobs:
 
   deploy-rinkeby:
     runs-on: ubuntu-latest
-    needs: test
+    needs: coverage
     env:
       CD: true
       ETH_KEY: ${{ secrets.ETH_KEY }}
