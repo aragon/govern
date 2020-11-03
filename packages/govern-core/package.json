@@ -16,6 +16,7 @@
     "erc3k": "^1.0.1-beta.0"
   },
   "devDependencies": {
+    "@aragon/govern-token": "^1.0.1-beta.0",
     "@nomiclabs/buidler": "^1.4.7",
     "@nomiclabs/buidler-ethers": "^2.0.0",
     "@nomiclabs/buidler-etherscan": "^2.1.0",

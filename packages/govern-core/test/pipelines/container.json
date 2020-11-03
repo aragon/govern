@@ -2,15 +2,15 @@
   "config": {
     "executionDelay": 0,
     "scheduleDeposit": {
-      "token": "0x0000000000000000000000000000000000000000",
+      "token": "",
       "amount": 100
     },
     "challengeDeposit": {
-      "token": "0x0000000000000000000000000000000000000000",
+      "token": "",
       "amount": 100
     },
     "vetoDeposit": {
-      "token": "0x0000000000000000000000000000000000000000",
+      "token": "",
       "amount": 100
     },
     "resolver": "0x0000000000000000000000000000000000000000",

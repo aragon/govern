@@ -4,6 +4,8 @@ import { Signer } from 'ethers'
 import {
   GovernQueue,
   GovernQueueFactory,
+  TestToken,
+  TestTokenFactory,
   ArbitratorMock,
   ArbitratorMockFactory,
   ArbitratorBadFeePullMock,
@@ -26,7 +28,6 @@ import { formatBytes32String } from 'ethers/lib/utils'
 // TODO: Create mock contract to check the return values of public methods
 describe('Govern Queue', function() {
   let accounts: Signer[],
-    owner: Signer,
     ownerAddr: string,
     chainId: number,
     gq: GovernQueue,
@@ -58,19 +59,23 @@ describe('Govern Queue', function() {
     EVIDENCE: 'queue: evidence'
   }
 
-  before(() => {
-    // TODO: Deploy token for test cases
-    // containerJson.config.scheduleDeposit.token = 'tokenAddr'
-    // containerJson.config.challengeDeposit.token = 'tokenAddr'
-    // containerJson.config.vetoDeposit.token = 'tokenAddr'
+  before(async () => {
+    accounts = await ethers.getSigners()
+    ownerAddr = await accounts[0].getAddress()
+    chainId = (await ethers.provider.getNetwork()).chainId
+
+    const TestToken = (await ethers.getContractFactory(
+      'TestToken'
+    )) as TestTokenFactory
+    const testToken = await TestToken.deploy(ownerAddr, 'TestToken', 'TT', 64)
+
+    containerJson.config.scheduleDeposit.token = testToken.address
+    containerJson.config.challengeDeposit.token = testToken.address
+    containerJson.config.vetoDeposit.token = testToken.address
   })
 
   beforeEach(async () => {
     container = JSON.parse(JSON.stringify(containerJson))
-    accounts = await ethers.getSigners()
-    owner = accounts[0]
-    ownerAddr = await owner.getAddress()
-    chainId = (await ethers.provider.getNetwork()).chainId
 
     const GQ = (await ethers.getContractFactory(
       'GovernQueue'
