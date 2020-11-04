@@ -19,6 +19,8 @@ const EVENTS = {
 }
 
 const ROLE = '0xabcdabcd'
+const NO_ROLE = '0x0000000000000000000000000000000000000000'
+const ALLOW_ROLE = '0x0000000000000000000000000000000000000002'
 const FREEZE_ADDR = '0x0000000000000000000000000000000000000001'
 
 describe('ACL', function () {
@@ -45,14 +47,14 @@ describe('ACL', function () {
   const freeze = (inst: Acl, role = ROLE) => inst.freeze(role)
 
   const assertRole = async (shouldHaveRole = true, role = ROLE, who = notRoot) =>
-    expect(await acl.roles(role, who)).to.equal(shouldHaveRole)
+    expect(await acl.roles(role, who)).to.equal(shouldHaveRole ? ALLOW_ROLE : NO_ROLE)
 
   context('granting', async () => {
     beforeEach('root grants', async () => {
       await assertRole(false)
       await expect(grant(acl))
         .to.emit(acl, EVENTS.GRANTED)
-        .withArgs(ROLE, root, notRoot)
+        .withArgs(ROLE, root, notRoot, ALLOW_ROLE)
     })
 
     it('role is granted', async () => {
@@ -79,7 +81,7 @@ describe('ACL', function () {
       })
 
       it('role is granted to freeze addr', async () => {
-        await assertRole(true, ROLE, FREEZE_ADDR)
+        expect(await acl.roles(ROLE, FREEZE_ADDR)).to.equal(FREEZE_ADDR)
       })
   
       it('cannot grant', async () => {
@@ -105,7 +107,7 @@ describe('ACL', function () {
       await assertRole(false, ROOT_ROLE, notRoot)
       await expect(grant(acl, ROOT_ROLE))
         .to.emit(acl, EVENTS.GRANTED)
-        .withArgs(ROOT_ROLE, root, notRoot)
+        .withArgs(ROOT_ROLE, root, notRoot, ALLOW_ROLE)
       await assertRole(true, ROOT_ROLE, notRoot)
     })
 
@@ -113,7 +115,7 @@ describe('ACL', function () {
       const someoneElse = await signers[2].getAddress()
       await expect(grant(aclNotRoot, ROOT_ROLE, someoneElse))
         .to.emit(acl, EVENTS.GRANTED)
-        .withArgs(ROOT_ROLE, notRoot, someoneElse)
+        .withArgs(ROOT_ROLE, notRoot, someoneElse, ALLOW_ROLE)
       await assertRole(true, ROOT_ROLE, someoneElse)
     })
 

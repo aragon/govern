@@ -7,6 +7,8 @@ pragma experimental ABIEncoderV2;
 
 import "../initializable/Initializable.sol";
 
+import "./IACLOracle.sol";
+
 library ACLData {
     enum BulkOp { Grant, Revoke, Freeze }
 
@@ -27,19 +29,18 @@ contract ACL is Initializable {
 
     address internal constant FREEZE_FLAG = address(1);
     address internal constant ANY_ADDR = address(-1);
-    
-    mapping (bytes4 => mapping (address => bool)) public roles;
 
-    event Granted(bytes4 indexed role, address indexed actor, address indexed who);
+    address internal constant UNSET_ROLE = address(0);
+    address internal constant ALLOW_FLAG = address(2);
+    
+    mapping (bytes4 => mapping (address => address)) public roles;
+
+    event Granted(bytes4 indexed role, address indexed actor, address indexed who, IACLOracle oracle);
     event Revoked(bytes4 indexed role, address indexed actor, address indexed who);
     event Frozen(bytes4 indexed role, address indexed actor);
 
     modifier auth(bytes4 _role) {
-        require(
-            roles[_role][msg.sender] ||  // sender authorized
-            roles[_role][ANY_ADDR],      // or anyone allowed
-            "acl: auth"
-        );
+        require(willPerform(_role, msg.sender, msg.data), "acl: auth");
         _;
     }
 
@@ -61,6 +62,10 @@ contract ACL is Initializable {
         _grant(_role, _who);
     }
 
+    function grantWithOracle(bytes4 _role, address _who, IACLOracle _oracle) external auth(ROOT_ROLE) {
+        _grant(_role, _who, _oracle);
+    }
+
     function revoke(bytes4 _role, address _who) external auth(ROOT_ROLE) {
         _revoke(_role, _who);
     }
@@ -79,30 +84,50 @@ contract ACL is Initializable {
         }
     }
 
+    function willPerform(bytes4 _role, address _sender, bytes memory _data) public returns (bool) {
+        address senderRole = roles[_role][msg.sender];
+        if (senderRole != UNSET_ROLE) {
+            if (senderRole == ALLOW_FLAG) return true;
+            if (IACLOracle(senderRole).willPerform(_role, _sender, _data)) return true;
+        }
+
+        address anyRole = roles[_role][ANY_ADDR];
+        if (anyRole != UNSET_ROLE) {
+            if (anyRole == ALLOW_FLAG) return true;
+            if (IACLOracle(anyRole).willPerform(_role, _sender, _data)) return true;
+        }
+
+        return false;
+    }
+
     function _grant(bytes4 _role, address _who) internal {
+        _grant(_role, _who, IACLOracle(ALLOW_FLAG));
+    }
+
+    function _grant(bytes4 _role, address _who, IACLOracle _oracle) internal {
         require(!isFrozen(_role), "acl: frozen");
         require(_who != FREEZE_FLAG, "acl: bad freeze");
         
-        roles[_role][_who] = true;
-        emit Granted(_role, msg.sender, _who);
+        roles[_role][_who] = address(_oracle);
+        emit Granted(_role, msg.sender, _who, _oracle);
     }
 
     function _revoke(bytes4 _role, address _who) internal {
         require(!isFrozen(_role), "acl: frozen");
 
-        roles[_role][_who] = false;
+        roles[_role][_who] = UNSET_ROLE;
         emit Revoked(_role, msg.sender, _who);
     }
 
     function _freeze(bytes4 _role) internal {
         require(!isFrozen(_role), "acl: frozen");
 
-        roles[_role][FREEZE_FLAG] = true;
+        roles[_role][FREEZE_FLAG] = FREEZE_FLAG;
 
         emit Frozen(_role, msg.sender);
     }
 
     function isFrozen(bytes4 _role) public view returns (bool) {
-        return roles[_role][FREEZE_FLAG];
+        return roles[_role][FREEZE_FLAG] == FREEZE_FLAG;
     }
 }
