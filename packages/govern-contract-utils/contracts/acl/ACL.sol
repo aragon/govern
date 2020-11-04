@@ -63,7 +63,7 @@ contract ACL is Initializable {
     }
 
     function grantWithOracle(bytes4 _role, address _who, IACLOracle _oracle) external auth(ROOT_ROLE) {
-        _grant(_role, _who, _oracle);
+        _grantWithOracle(_role, _who, _oracle);
     }
 
     function revoke(bytes4 _role, address _who) external auth(ROOT_ROLE) {
@@ -101,10 +101,10 @@ contract ACL is Initializable {
     }
 
     function _grant(bytes4 _role, address _who) internal {
-        _grant(_role, _who, IACLOracle(ALLOW_FLAG));
+        _grantWithOracle(_role, _who, IACLOracle(ALLOW_FLAG));
     }
 
-    function _grant(bytes4 _role, address _who, IACLOracle _oracle) internal {
+    function _grantWithOracle(bytes4 _role, address _who, IACLOracle _oracle) internal {
         require(!isFrozen(_role), "acl: frozen");
         require(_who != FREEZE_FLAG, "acl: bad freeze");
         
