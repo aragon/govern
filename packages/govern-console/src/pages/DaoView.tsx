@@ -9,6 +9,7 @@ import {
 import 'styled-components/macro'
 import { gql, useQuery } from '@apollo/client'
 import Button from '../components/Button'
+import Frame from '../components/Frame/Frame'
 import NewAction from '../components/NewAction'
 import { useChainId } from '../Providers/ChainId'
 import { rinkebyClient, mainnetClient } from '../index'
@@ -85,12 +86,12 @@ export default function DaoView() {
   })
 
   if (loading) {
-    return <p>Loading...</p>
+    return <p>Loading DAO data...</p>
   }
 
   if (error) {
     console.error(error)
-    return <p>Error</p>
+    return <p>Error fetching DAO data.</p>
   }
 
   if (!data.registryEntry) {
@@ -134,25 +135,7 @@ function DaoInfo({ dao }: DaoInfoProps) {
       >
         Info for {daoAddress}
       </h2>
-      <div
-        css={`
-          margin-top: 32px;
-          border: 2px solid rgba(255, 255, 255, 0.2);
-          padding: 8px;
-          h2 {
-            font-weight: bold;
-            font-size: 24px;
-          }
-          h3 {
-            font-weight: bold;
-            font-size: 18px;
-          }
-          p {
-            margin-bottom: 16px;
-            margin-top: 16px;
-          }
-        `}
-      >
+      <Frame>
         <h2>Govern Executor</h2>
         <h3>Address</h3>
         <p>{dao.executor.address}</p>
@@ -179,7 +162,7 @@ function DaoInfo({ dao }: DaoInfoProps) {
           <li>Token: {dao.queue.config.challengeDeposit.token}</li>
           <li>Amount: {dao.queue.config.challengeDeposit.amount}</li>
         </ul>
-      </div>
+      </Frame>
     </>
   )
 }
@@ -195,25 +178,7 @@ function Actions({ dao }: DaoInfoProps) {
   const hasActions = useMemo(() => dao.queue.queued.length > 0, [dao])
 
   return (
-    <div
-      css={`
-        margin-top: 32px;
-        border: 2px solid rgba(255, 255, 255, 0.2);
-        padding: 8px;
-        h2 {
-          font-weight: bold;
-          font-size: 24px;
-        }
-        h3 {
-          font-weight: bold;
-          font-size: 18px;
-        }
-        p {
-          margin-bottom: 16px;
-          margin-top: 16px;
-        }
-      `}
-    >
+    <Frame>
       <h2>Actions</h2>
       {hasActions
         ? dao.queue.queued.map(({ id }: { id: string }) => (
@@ -221,7 +186,7 @@ function Actions({ dao }: DaoInfoProps) {
           ))
         : 'No actions.'}
       <Button onClick={handleNewAction}>New action</Button>
-    </div>
+    </Frame>
   )
 }
 
@@ -232,26 +197,7 @@ type PermissionsProps = {
 function Permissions({ dao }: PermissionsProps) {
   return (
     <>
-      <div
-        css={`
-          width: 100%;
-          margin-top: 32px;
-          border: 2px solid rgba(255, 255, 255, 0.2);
-          padding: 8px;
-          h2 {
-            font-weight: bold;
-            font-size: 24px;
-          }
-          h3 {
-            font-weight: bold;
-            font-size: 18px;
-          }
-          p {
-            margin-bottom: 16px;
-            margin-top: 16px;
-          }
-        `}
-      >
+      <Frame>
         <h2>Permissions for Govern</h2>
         {dao.executor.roles.map((role: any) => {
           return (
@@ -266,26 +212,8 @@ function Permissions({ dao }: PermissionsProps) {
             </div>
           )
         })}
-      </div>
-      <div
-        css={`
-          margin-top: 32px;
-          border: 2px solid rgba(255, 255, 255, 0.2);
-          padding: 8px;
-          h2 {
-            font-weight: bold;
-            font-size: 24px;
-          }
-          h3 {
-            font-weight: bold;
-            font-size: 18px;
-          }
-          p {
-            margin-bottom: 16px;
-            margin-top: 16px;
-          }
-        `}
-      >
+      </Frame>
+      <Frame>
         <h2>Permissions for GovernQueue</h2>
         {dao.queue.roles.map((role: any) => {
           return (
@@ -300,7 +228,7 @@ function Permissions({ dao }: PermissionsProps) {
             </div>
           )
         })}
-      </div>
+      </Frame>
     </>
   )
 }
@@ -326,6 +254,7 @@ function ActionCard({ id }: ActionCardProps) {
         height: 320px;
         border: 1px solid #00f400;
         padding: 16px;
+        margin-right: 8px;
         cursor: pointer;
         &:not(:last-child) {
           margin-right: 24px;

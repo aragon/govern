@@ -5,10 +5,13 @@ import abiCoder from 'web3-eth-abi'
 import { toHex } from 'web3-utils'
 import 'styled-components/macro'
 import Button from './Button'
+import Frame from './Frame/Frame'
 import { useContract } from '../lib/web3-contracts'
 import queueAbi from '../lib/abi/GovernQueue.json'
 
 const EMPTY_BYTES = '0x00'
+const EMPTY_FAILURE_MAP =
+  '0x0000000000000000000000000000000000000000000000000000000000000000'
 
 type Input = {
   name: string | undefined
@@ -61,25 +64,7 @@ export default function NewAction({
       >
         New action
       </h2>
-      <div
-        css={`
-          padding: 8px;
-          margin-top: 32px;
-          border: 2px solid rgba(255, 255, 255, 0.2);
-          h2 {
-            font-weight: bold;
-            font-size: 24px;
-          }
-          h3 {
-            font-weight: bold;
-            font-size: 18px;
-          }
-          p {
-            margin-bottom: 16px;
-            margin-top: 16px;
-          }
-        `}
-      >
+      <Frame>
         <form
           css={`
             padding: 8px;
@@ -144,14 +129,7 @@ export default function NewAction({
           parsedAbi!.map(
             (abiItem: any) =>
               abiItem?.type === 'function' && (
-                <div
-                  key={abiItem.name}
-                  css={`
-                    padding: 8px;
-                    margin-top: 8px;
-                    border: 1px solid whitesmoke;
-                  `}
-                >
+                <Frame key={abiItem.name}>
                   <ContractCallHandler
                     config={config}
                     contractAddress={contractAddress}
@@ -162,10 +140,10 @@ export default function NewAction({
                     queueContract={queueContract}
                     rawAbiItem={abiItem}
                   />
-                </div>
+                </Frame>
               ),
           )}
-      </div>
+      </Frame>
     </>
   )
 }
@@ -238,44 +216,45 @@ function ContractCallHandler({
         const bnNonce = new BN(nonce.toString())
         const newNonce = bnNonce.add(new BN('1'))
 
-        // Right now + 120 seconds into the future (in the future, this should be configurable)
-        const currentDate = Math.round(Date.now() / 1000) + 120
+        // Current time + 30 secs buffer.
+        // This is necessary for DAOs with lower execution delays, in which
+        // the tx getting picked up by a later block can make the tx fail.
+        const currentDate =
+          Math.ceil(Date.now() / 1000) + Number(config.executionDelay) + 30
+        const container = {
+          payload: {
+            nonce: newNonce.toString(),
+            executionTime: currentDate,
+            submitter: account,
+            executor,
+            actions: [
+              {
+                to: contractAddress,
+                value: EMPTY_BYTES,
+                data: encodedFunctionCall,
+              },
+            ],
+            allowFailuresMap: EMPTY_FAILURE_MAP,
+            proof: proof ? toHex(proof) : EMPTY_BYTES,
+          },
+          config: {
+            executionDelay: config.executionDelay,
+            scheduleDeposit: {
+              token: config.scheduleDeposit.token,
+              amount: config.scheduleDeposit.amount,
+            },
+            challengeDeposit: {
+              token: config.challengeDeposit.token,
+              amount: config.challengeDeposit.amount,
+            },
+            resolver: config.resolver,
+            rules: config.rules,
+          },
+        }
 
-        const tx = await queueContract['schedule'](
-          {
-            payload: {
-              nonce: newNonce.toString(),
-              executionTime: currentDate,
-              submitter: account,
-              executor,
-              actions: [
-                {
-                  to: contractAddress,
-                  value: EMPTY_BYTES,
-                  data: encodedFunctionCall,
-                },
-              ],
-              allowFailuresMap: '0x0000000000000000000000000000000000000000000000000000000000000000',
-              proof: proof ? toHex(proof) : EMPTY_BYTES,
-            },
-            config: {
-              executionDelay: config.executionDelay,
-              scheduleDeposit: {
-                token: config.scheduleDeposit.token.id,
-                amount: config.scheduleDeposit.amount,
-              },
-              challengeDeposit: {
-                token: config.challengeDeposit.token.id,
-                amount: config.challengeDeposit.amount,
-              },
-              resolver: config.resolver,
-              rules: config.rules,
-            },
-          },
-          {
-            gasLimit: 500000,
-          },
-        )
+        const tx = await queueContract['schedule'](container, {
+          gasLimit: 500000,
+        })
 
         setResult(tx.hash)
       } catch (e) {
