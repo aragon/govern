@@ -26,17 +26,19 @@ jobs:
           packages/*/artifacts
           ~/.cache/buidler-nodejs/
           ~/.cache/hardhat-nodejs/
-        key: contracts-${{ hashFiles('packages/*/contracts/**/*.sol') }}-test
+        key: contracts-${{ hashFiles('packages/*/contracts/**/*.sol') }}-test2
 
-    - run: (shopt -s globstar && ls -l packages/govern-contract-utils/artifacts/**/*.json) || true
+    - run: (shopt -s globstar && ls -l ~/.cache/hardhat-nodejs/compilers/linux-amd64/) || true
+    - run: (shopt -s globstar && ls -l packages/govern-contract-utils/cache/**/*.json) || true
     - run: (shopt -s globstar && ls -l packages/govern-contract-utils/cache/**/*.json) || true
 
     - name: Install dependencies
       run: yarn install --frozen-lockfile
 
     - name: Build contracts
-      run: yarn workspace @aragon/govern-contract-utils compile:cached
+      run: yarn workspace @aragon/govern-contract-utils hardhat compile
 
+    - run: shopt -s globstar && ls -l ~/.cache/hardhat-nodejs/compilers/linux-amd64/
     - run: shopt -s globstar && ls -l packages/govern-contract-utils/artifacts/**/*.json
     - run: shopt -s globstar && ls -l packages/govern-contract-utils/cache/**/*.json
 
