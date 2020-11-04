@@ -24,6 +24,8 @@ jobs:
         path: |
           packages/*/cache
           packages/*/artifacts
+          ~/.cache/buidler-nodejs/
+          ~/.cache/hardhat-nodejs/
         key: contracts-${{ hashFiles('packages/*/contracts/**/*.sol') }}-test
 
     - run: (shopt -s globstar && ls -l packages/govern-contract-utils/artifacts/**/*.json) || true
