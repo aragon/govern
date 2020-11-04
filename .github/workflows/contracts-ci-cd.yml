@@ -25,7 +25,6 @@ jobs:
           packages/*/cache
           packages/*/artifacts
         key: contracts-${{ hashFiles('packages/*/contracts/**/*.sol') }}
-        restore-keys: contracts-${{ hashFiles('packages/*/contracts/**/*.sol') }}
 
     - run: ls -l packages/*/cache
     - run: ls -l packages/*/artifacts
@@ -66,7 +65,6 @@ jobs:
   #     with:
   #       path: '**/node_modules'
   #       key: yarn-${{ hashFiles('yarn.lock') }}
-  #       restore-keys: yarn-${{ hashFiles('yarn.lock') }}
 
   #   - name: Cache contracts
   #     uses: actions/cache@v2
