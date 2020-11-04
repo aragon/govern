@@ -9,6 +9,8 @@
 
 pragma solidity ^0.6.8;
 
+import "../address-utils/AddressUtils.sol";
+
 /**
  * @title ERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/20
@@ -43,14 +45,19 @@ abstract contract ERC20 {
 }
 
 library SafeERC20 {
+    using AddressUtils for address;
+
     string private constant ERROR_TOKEN_BALANCE_REVERTED = "SAFE_ERC_20_BALANCE_REVERTED";
     string private constant ERROR_TOKEN_ALLOWANCE_REVERTED = "SAFE_ERC_20_ALLOWANCE_REVERTED";
 
     function invokeAndCheckSuccess(address _addr, bytes memory _calldata)
         private
-        returns (bool)
+        returns (bool ret)
     {
-        bool ret;
+        if (!_addr.isContract()) {
+            return false;
+        }
+        
         assembly {
             let ptr := mload(0x40)    // free memory pointer
 
@@ -84,7 +91,6 @@ library SafeERC20 {
                 default { }
             }
         }
-        return ret;
     }
 
     function staticInvoke(address _addr, bytes memory _calldata)
