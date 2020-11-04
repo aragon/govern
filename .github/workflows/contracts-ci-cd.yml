@@ -24,8 +24,8 @@ jobs:
         path: |
           packages/*/cache
           packages/*/artifacts
-        key: contracts-${{ hashFiles('packages/**/*.sol') }}
-        restore-keys: contracts-${{ hashFiles('packages/**/*.sol') }}
+        key: contracts-${{ hashFiles('packages/*/contracts/**/*.sol') }}
+        restore-keys: contracts-${{ hashFiles('packages/*/contracts/**/*.sol') }}
 
     - name: Install dependencies
       run: yarn install --frozen-lockfile
@@ -71,17 +71,17 @@ jobs:
   #       path: |
   #         packages/*/cache
   #         packages/*/artifacts
-  #       key: contracts-${{ hashFiles('packages/**/*.sol') }}
-  #       restore-keys: contracts-${{ hashFiles('packages/**/*.sol') }}
+  #       key: contracts-${{ hashFiles('packages/*/contracts/**/*.sol') }}
+  #       restore-keys: contracts-${{ hashFiles('packages/*/contracts/**/*.sol') }}
 
   #   - name: Install dependencies
   #     run: yarn install --frozen-lockfile
 
-    # - name: Deploy Factory
-    #   run: cd packages/govern-create && yarn deploy-factory --network rinkeby
+  #   - name: Deploy Factory
+  #     run: cd packages/govern-create && yarn deploy-factory --network rinkeby
 
-    # - name: Deploy Govern
-    #   run: cd packages/govern-create && yarn deploy-govern --network rinkeby > github-message
+  #   - name: Deploy Govern
+  #     run: cd packages/govern-create && yarn deploy-govern --network rinkeby > github-message
 
-    # - name: Log
-    #   run: cat packages/govern-create/github-message
+  #   - name: Log
+  #     run: cat packages/govern-create/github-message
