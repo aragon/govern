@@ -26,14 +26,17 @@ jobs:
           packages/*/artifacts
         key: contracts-${{ hashFiles('packages/*/contracts/**/*.sol') }}
 
-    - run: ls -l packages/*/cache
-    - run: ls -l packages/*/artifacts
+    - run: ls -l packages/govern-contract-utils/artifacts/**/*.json
+    - run: ls -l packages/govern-contract-utils/cache/**/*.json
 
     - name: Install dependencies
       run: yarn install --frozen-lockfile
 
     - name: Build contracts
       run: yarn compile:cached
+
+    - run: ls -l packages/govern-contract-utils/artifacts/**/*.json
+    - run: ls -l packages/govern-contract-utils/cache/**/*.json
 
     # - name: Run coverage
     #   run: yarn coverage
