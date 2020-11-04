@@ -27,6 +27,9 @@ jobs:
         key: contracts-${{ hashFiles('packages/*/contracts/**/*.sol') }}
         restore-keys: contracts-${{ hashFiles('packages/*/contracts/**/*.sol') }}
 
+    - run: ll packages/*/cache
+    - run: ll packages/*/artifacts
+
     - name: Install dependencies
       run: yarn install --frozen-lockfile
 
