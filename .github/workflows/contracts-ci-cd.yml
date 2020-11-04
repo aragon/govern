@@ -26,8 +26,8 @@ jobs:
           packages/*/artifacts
         key: contracts-${{ hashFiles('packages/*/contracts/**/*.sol') }}-test
 
-    - run: shopt -s globstar && ls -l packages/govern-contract-utils/artifacts/**/*.json
-    - run: shopt -s globstar && ls -l packages/govern-contract-utils/cache/**/*.json
+    - run: (shopt -s globstar && ls -l packages/govern-contract-utils/artifacts/**/*.json) || true
+    - run: (shopt -s globstar && ls -l packages/govern-contract-utils/cache/**/*.json) || true
 
     - name: Install dependencies
       run: yarn install --frozen-lockfile
