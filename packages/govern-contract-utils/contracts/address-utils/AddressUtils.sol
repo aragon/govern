@@ -15,7 +15,7 @@ library AddressUtils {
 
     function isContract(address addr) internal view returns (bool result) {
         assembly {
-            result := extcodesize(addr)
+            result := not(iszero(extcodesize(addr)))
         }
     }
 }
