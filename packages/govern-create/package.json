@@ -15,8 +15,9 @@
   "license": "GPL-3.0",
   "private": false,
   "dependencies": {
-    "@aragon/govern-core": "^1.0.0-beta.0",
-    "@aragon/govern-token": "^1.0.0-beta.0"
+    "@aragon/govern-contract-utils": "^1.0.1-beta.0",
+    "@aragon/govern-core": "^1.0.1-beta.0",
+    "@aragon/govern-token": "^1.0.1-beta.0"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.0",
