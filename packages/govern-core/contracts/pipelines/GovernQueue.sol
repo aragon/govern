@@ -56,7 +56,7 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
 
     // Temporary state
     mapping (bytes32 => address) public challengerCache; // container hash -> challenger addr (used after challenging and before resolution implementation)
-    mapping (IArbitrator => mapping (uint256 => bytes32)) public disputeItemCache; // arbitrator addr -> dispute id -> container hash (used between dispute creation and ruling)
+    mapping (bytes32 => mapping (IArbitrator => uint256)) public disputeItemCache; // container hash -> arbitrator addr -> dispute id (used between challenge and resolve)
 
     /**
      * @param _aclRoot account that will be given root permissions on ACL (commonly given to factory)
@@ -71,8 +71,8 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
 
     function initialize(address _aclRoot, ERC3000Data.Config memory _initialConfig) public initACL(_aclRoot) onlyInit("queue") {
         _setConfig(_initialConfig);
-        _registerStandard(ARBITRABLE_INTERFACE_ID);
-        _registerStandard(ERC3000_INTERFACE_ID);
+        _registerStandard(type(IArbitrable).interfaceId);
+        _registerStandard(type(IERC3000).interfaceId);
     }
 
      /**
@@ -168,11 +168,11 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
         require(feeToken.safeApprove(recipient, 0), "queue: bad reset"); // for security with non-compliant tokens (that fail on non-zero to non-zero approvals)
 
         // submit both arguments as evidence and close evidence period. no more evidence can be submitted and a settlement can't happen (could happen off-protocol)
-        emit EvidenceSubmitted(arbitrator, disputeId, _container.payload.submitter, _container.payload.proof, true);
-        emit EvidenceSubmitted(arbitrator, disputeId, msg.sender, _reason, true);
+        arbitrator.submitEvidence(disputeId, _container.payload.submitter, _container.payload.proof);
+        arbitrator.submitEvidence(disputeId, msg.sender, _reason);
         arbitrator.closeEvidencePeriod(disputeId);
 
-        disputeItemCache[arbitrator][disputeId] = containerHash; // cache a relation between disputeId and containerHash while needed
+        disputeItemCache[containerHash][arbitrator] = disputeId; // cache a relation between disputeId and containerHash while needed
 
         emit Challenged(containerHash, msg.sender, _reason, disputeId, collateral);
     }
@@ -185,22 +185,31 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
      */
     function resolve(ERC3000Data.Container memory _container, uint256 _disputeId) override public returns (bytes32 failureMap, bytes[] memory execResults) {
         bytes32 containerHash = _container.hash();
-        if (queue[containerHash].state == GovernQueueStateLib.State.Challenged) {
-            // will re-enter in `rule`, `rule` will perform state transition depending on ruling
-            IArbitrator(_container.config.resolver).executeRuling(_disputeId);
-        } // else continue, as we must 
+        IArbitrator arbitrator = IArbitrator(_container.config.resolver);
 
-        GovernQueueStateLib.State state = queue[containerHash].state;
+        require(disputeItemCache[containerHash][arbitrator] == _disputeId, "queue: bad dispute id");
+        delete disputeItemCache[containerHash][arbitrator];
 
-        emit Resolved(containerHash, msg.sender, state == GovernQueueStateLib.State.Approved);
+        (address subject, uint256 ruling) = arbitrator.rule(_disputeId);
+        require(subject == address(this), "queue: not subject");
+        bool arbitratorApproved = ruling == ALLOW_RULING;
 
-        if (state == GovernQueueStateLib.State.Approved) {
+        GovernQueueStateLib.State newState = arbitratorApproved
+            ? GovernQueueStateLib.State.Approved
+            : GovernQueueStateLib.State.Rejected;
+        queue[containerHash].checkAndSetState(
+            GovernQueueStateLib.State.Challenged, // checks now that this container was indeed in Challenged state
+            newState
+        );
+
+        emit Resolved(containerHash, msg.sender, arbitratorApproved);
+        emit Ruled(arbitrator, _disputeId, ruling);
+
+        if (arbitratorApproved) {
             return executeApproved(_container);
+        } else {
+            return settleRejection(_container);
         }
-
-        require(state == GovernQueueStateLib.State.Rejected, "queue: unresolved");
-        settleRejection(_container);
-        return (bytes32(0), new bytes[](0));
     }
 
     function veto(bytes32 _containerHash, bytes memory _reason) auth(this.veto.selector) override public {
@@ -226,9 +235,8 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
     }
 
     // Finalization functions
-    // In the happy path, they are not externally called (triggered from resolve -> rule -> executeApproved | settleRejection), but left public for security
 
-    function executeApproved(ERC3000Data.Container memory _container) public returns (bytes32 failureMap, bytes[] memory execResults) {
+    function executeApproved(ERC3000Data.Container memory _container) internal returns (bytes32 failureMap, bytes[] memory execResults) {
         bytes32 containerHash = _container.hash();
         queue[containerHash].checkAndSetState(
             GovernQueueStateLib.State.Approved,
@@ -244,7 +252,7 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
         return _execute(_container.payload, containerHash);
     }
 
-    function settleRejection(ERC3000Data.Container memory _container) public {
+    function settleRejection(ERC3000Data.Container memory _container) internal returns (bytes32, bytes[] memory){
         bytes32 containerHash = _container.hash();
         queue[containerHash].checkAndSetState(
             GovernQueueStateLib.State.Rejected,
@@ -257,29 +265,8 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
         _container.config.scheduleDeposit.releaseTo(challenger);
         _container.config.challengeDeposit.releaseTo(challenger);
         challengerCache[containerHash] = address(0); // release state, refund gas, no longer needed in state
-    }
 
-    // Arbitrable
-
-    function rule(uint256 _disputeId, uint256 _ruling) override external {
-        // implicit check that msg.sender was actually arbitrating a dispute over this container
-        IArbitrator arbitrator = IArbitrator(msg.sender);
-        bytes32 containerHash = disputeItemCache[arbitrator][_disputeId];
-        queue[containerHash].checkAndSetState(
-            GovernQueueStateLib.State.Challenged,
-            _ruling == ALLOW_RULING ? GovernQueueStateLib.State.Approved : GovernQueueStateLib.State.Rejected
-        );
-        disputeItemCache[arbitrator][_disputeId] = bytes32(0); // refund gas, no longer needed in state
-
-        emit Ruled(arbitrator, _disputeId, _ruling);
-    }
-
-    function submitEvidence(
-        uint256,
-        bytes calldata,
-        bool
-    ) external override {
-        revert("queue: evidence");
+        // return zero values as nothing is executed on rejection
     }
 
     // Internal
