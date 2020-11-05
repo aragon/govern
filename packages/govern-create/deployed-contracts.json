@@ -1,7 +1,7 @@
 {
   "GovernRegistry": {
     "rinkeby": {
-      "address": "0xfc9776d0c22291D776F482870264CEAECF3aeFd7",
+      "address": "0xEa901324f1d0a0C97C3d09430201F12D2a99024b",
       "deployer": "0x1111a5F9DECc25927037dE55d2013D7aD30f1Af0"
     },
     "hardhat": {
@@ -11,7 +11,7 @@
   },
   "GovernBaseFactory": {
     "rinkeby": {
-      "address": "0xd594De6569c8D10A95aDcD597B61773b7f56329b",
+      "address": "0x1e83b4257E264200CEAE2369b5E9612d087f6f99",
       "deployer": "0x1111a5F9DECc25927037dE55d2013D7aD30f1Af0"
     },
     "hardhat": {

@@ -9,7 +9,7 @@ import "@aragon/govern-core/contracts/Govern.sol";
 import "@aragon/govern-contract-utils/contracts/minimal-proxies/ERC1167ProxyFactory.sol";
 import "@aragon/govern-contract-utils/contracts/address-utils/AddressUtils.sol";
 
-contract GovernFactory {
+contract FactoryGovern {
     using ERC1167ProxyFactory for address;
     using AddressUtils for address;
     

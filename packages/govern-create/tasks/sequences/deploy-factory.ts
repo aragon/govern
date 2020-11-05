@@ -2,9 +2,9 @@ import { task } from 'hardhat/config'
 import { getGovernRegistry, setBRE } from '../../helpers/helpers'
 import {
   deployGoverBaseFactory,
-  deployGoverDeployer,
-  deployGoverQueueDeployer,
-  deployGoverTokenDeployer,
+  deployGoverFactory,
+  deployGoverQueueFactory,
+  deployGoverTokenFactory,
 } from '../../helpers/delploys'
 import { Address, eContractid } from '../../helpers/types'
 import { registerContractInJsonDb } from '../../helpers/artifactsDb'
@@ -22,12 +22,12 @@ task('deploy-factory', 'Deploys an GovernBaseDeployer instance')
       setBRE(BRE)
       const currentNetwork = BRE.network.name
 
-      const governDeployer = await deployGoverDeployer(currentNetwork, verify)
-      const queueDeployer = await deployGoverQueueDeployer(
+      const factoryGovern = await deployGoverFactory(currentNetwork, verify)
+      const queueDeployer = await deployGoverQueueFactory(
         currentNetwork,
         verify
       )
-      const tokenDeployer = await deployGoverTokenDeployer(
+      const tokenDeployer = await deployGoverTokenFactory(
         currentNetwork,
         verify
       )
@@ -35,7 +35,7 @@ task('deploy-factory', 'Deploys an GovernBaseDeployer instance')
       const baseDeployer = await deployGoverBaseFactory(
         [
           registry ?? (await getGovernRegistry()).address,
-          governDeployer.address,
+          factoryGovern.address,
           queueDeployer.address,
           tokenDeployer.address,
         ],

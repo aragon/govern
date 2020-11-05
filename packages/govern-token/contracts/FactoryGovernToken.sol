@@ -11,7 +11,7 @@ import "./GovernToken.sol";
 import "./GovernMinter.sol";
 import "./MerkleDistributor.sol";
 
-contract GovernTokenFactory {
+contract FactoryGovernToken {
     using ERC1167ProxyFactory for address;
     
     address public tokenBase;

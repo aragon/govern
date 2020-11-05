@@ -1,9 +1,9 @@
 import {
-  GovernDeployer,
+  FactoryGovern,
+  FactoryGovernQueue,
+  FactoryGovernToken,
   GovernBaseFactory,
   GovernRegistry,
-  GovernQueueDeployer,
-  GovernTokenDeployer,
 } from '../typechain'
 import { verifyContract } from './etherscan-verification'
 import { deployContract } from './helpers'
@@ -30,13 +30,10 @@ export const deployGoverRegistry = async (
   return instance
 }
 
-export const deployGoverDeployer = async (
-  network: string,
-  verify?: boolean
-) => {
-  const id = eContractid.GovernDeployer
+export const deployGoverFactory = async (network: string, verify?: boolean) => {
+  const id = eContractid.FactoryGovern
 
-  const instance = await deployContract<GovernDeployer>(id, [])
+  const instance = await deployContract<FactoryGovern>(id, [])
   await instance.deployTransaction.wait()
 
   if (verify) {
@@ -50,13 +47,13 @@ export const deployGoverDeployer = async (
   return instance
 }
 
-export const deployGoverQueueDeployer = async (
+export const deployGoverQueueFactory = async (
   network: string,
   verify?: boolean
 ) => {
-  const id = eContractid.GovernQueueDeployer
+  const id = eContractid.FactoryGovernQueue
 
-  const instance = await deployContract<GovernQueueDeployer>(id, [])
+  const instance = await deployContract<FactoryGovernQueue>(id, [])
   await instance.deployTransaction.wait()
 
   if (verify) {
@@ -70,13 +67,13 @@ export const deployGoverQueueDeployer = async (
   return instance
 }
 
-export const deployGoverTokenDeployer = async (
+export const deployGoverTokenFactory = async (
   network: string,
   verify?: boolean
 ) => {
-  const id = eContractid.GovernTokenDeployer
+  const id = eContractid.FactoryGovernToken
 
-  const instance = await deployContract<GovernTokenDeployer>(id, [])
+  const instance = await deployContract<FactoryGovernToken>(id, [])
   await instance.deployTransaction.wait()
 
   if (verify) {
@@ -91,7 +88,7 @@ export const deployGoverTokenDeployer = async (
 }
 
 export const deployGoverBaseFactory = async (
-  [registry, governDeployer, queueDeployer, tokenDeployer]: [
+  [registry, factoryGovern, queueDeployer, tokenDeployer]: [
     string,
     string,
     string,
@@ -101,7 +98,7 @@ export const deployGoverBaseFactory = async (
   verify?: boolean
 ) => {
   const id = eContractid.GovernBaseFactory
-  const args = [registry, governDeployer, queueDeployer, tokenDeployer]
+  const args = [registry, factoryGovern, queueDeployer, tokenDeployer]
 
   const instance = await deployContract<GovernBaseFactory>(id, args)
   await instance.deployTransaction.wait()

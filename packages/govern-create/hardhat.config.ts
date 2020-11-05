@@ -25,7 +25,6 @@ const ETH_KEY = process.env.ETH_KEY
 const accounts = ETH_KEY ? ETH_KEY.split(',') : ['']
 
 const config: HardhatUserConfig = {
-  defaultNetwork: 'rinkeby',
   solidity: {
     version: '0.6.8',
     settings: {

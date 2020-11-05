@@ -8,7 +8,7 @@ pragma experimental ABIEncoderV2;
 import "@aragon/govern-core/contracts/pipelines/GovernQueue.sol";
 import "@aragon/govern-contract-utils/contracts/minimal-proxies/ERC1167ProxyFactory.sol";
 
-contract GovernQueueFactory {
+contract FactoryGovernQueue {
     using ERC1167ProxyFactory for address;
 
     address public base;

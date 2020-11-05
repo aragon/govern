@@ -7,25 +7,25 @@ pragma experimental ABIEncoderV2;
 
 import "@aragon/govern-core/contracts/GovernRegistry.sol";
 
-import "@aragon/govern-token/contracts/GovernTokenFactory.sol";
+import "@aragon/govern-token/contracts/FactoryGovernToken.sol";
 import "@aragon/govern-token/contracts/interfaces/IERC20.sol";
 
-import "./core-factories/GovernFactory.sol";
-import "./core-factories/GovernQueueFactory.sol";
+import "./core-factories/FactoryGovern.sol";
+import "./core-factories/FactoryGovernQueue.sol";
 
 contract GovernBaseFactory {
     address internal constant ANY_ADDR = address(-1);
 
-    GovernFactory public governFactory;
-    GovernQueueFactory public queueFactory;
-    GovernTokenFactory public tokenFactory;
+    FactoryGovern public governFactory;
+    FactoryGovernQueue public queueFactory;
+    FactoryGovernToken public tokenFactory;
     GovernRegistry public registry;
 
     constructor(
         GovernRegistry _registry,
-        GovernFactory _governFactory,
-        GovernQueueFactory _queueFactory,
-        GovernTokenFactory _tokenFactory
+        FactoryGovern _governFactory,
+        FactoryGovernQueue _queueFactory,
+        FactoryGovernToken _tokenFactory
     ) public {
         governFactory = _governFactory;
         queueFactory = _queueFactory;
