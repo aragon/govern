@@ -23,5 +23,5 @@ Log of deployed govern relevant instances and related infrastructure.
 
 ### Contracts
 
-- 📜 GovernRegistry: [`0x0cd3621EC403F26ad9F79c3d77B1dda1f8474c6f`](https://rinkeby.etherscan.io/address/0x0cd3621EC403F26ad9F79c3d77B1dda1f8474c6f)
-- 🏭 GovernBaseFactory: [`0x0cd3621EC403F26ad9F79c3d77B1dda1f8474c6f`](https://rinkeby.etherscan.io/address/0x0cd3621EC403F26ad9F79c3d77B1dda1f8474c6f)
+- 📜 GovernRegistry: [`0x0cd3621EC403F26ad9F79c3d77B1dda1f8474c6f`](https://rinkeby.etherscan.io/address/0x87eE5EA31dCf1f526f21Bb576131C37890AE65E0)
+- 🏭 GovernBaseFactory: [`0x0cd3621EC403F26ad9F79c3d77B1dda1f8474c6f`](https://rinkeby.etherscan.io/address/0x615e3d83B8e1403c39F98c7066faA1D9bBF9E867)
