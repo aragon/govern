@@ -35,6 +35,7 @@
     "clean": "rm -rf artifacts",
     "coverage": "SOLIDITY_COVERAGE=true buidler coverage --network coverage",
     "compile": "buidler compile --force",
+    "compile:cached": "buidler compile",
     "deploy-factory": "yarn compile && buidler deploy-factory",
     "deploy-govern": "buidler deploy-govern",
     "test": "buidler test",
