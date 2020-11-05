@@ -4,88 +4,88 @@ import 'styled-components/macro'
 import Frame from './Frame/Frame'
 
 type Collateral = {
-  token: String
-  amount: String
+  token: string
+  amount: string
 }
 
 type Config = {
-  executionDelay: String
+  executionDelay: string
   scheduleDeposit: Collateral
   challengeDeposit: Collateral
-  resolver: String
-  rules: String
+  resolver: string
+  rules: string
 }
 
 type Action = {
-  id: String
-  to: String
-  value: String
-  data: String
+  id: string
+  to: string
+  value: string
+  data: string
 }
 
 type Payload = {
-  id: String
-  nonce: String
-  executionTime: String
-  submitter: String
+  id: string
+  nonce: string
+  executionTime: string
+  submitter: string
   executor: any
-  actions: [Action]
-  proof: String
+  actions: Action[]
+  proof: string
 }
 
 type ContainerEventChallenge = {
-  id: String
+  id: string
   container: any
-  createdAt: String
-  actor: String
+  createdAt: string
+  actor: string
   collateral: Collateral
-  disputeId: String
-  reason: String
-  resolver: String
+  disputeId: string
+  reason: string
+  resolver: string
 }
 
 type ContainerEventExecute = {
-  id: String
+  id: string
   container: any
-  createdAt: String
-  execResults: [String]
+  createdAt: string
+  execResults: string[]
 }
 
 type ContainerEventResolve = {
-  id: String
+  id: string
   container: any
-  createdAt: String
+  createdAt: string
   approved: Boolean
 }
 
 type ContainerEventRule = {
-  id: String
+  id: string
   container: any
-  createdAt: String
-  ruling: String
+  createdAt: string
+  ruling: string
 }
 
 type ContainerEventSchedule = {
-  id: String
+  id: string
   container: any
-  createdAt: String
+  createdAt: string
   collateral: Collateral
 }
 
 type ContainerEventSubmitEvidence = {
-  id: String
+  id: string
   container: any
-  createdAt: String
-  evidence: String
-  submitter: String
+  createdAt: string
+  evidence: string
+  submitter: string
   finished: Boolean
 }
 
 type ContainerEventVeto = {
-  id: String
+  id: string
   container: any
-  created: String
-  reason: String
+  created: string
+  reason: string
 }
 
 type ContainerEvent =
@@ -98,23 +98,23 @@ type ContainerEvent =
   | ContainerEventVeto
 
 type Container = {
-  id: String
-  queue: String
-  state: String
+  id: string
+  queue: string
+  state: string
   config: Config
   payload: Payload
-  history: [ContainerEvent]
+  history: ContainerEvent[]
 }
 
 type ViewActionProps = {
-  containers: [Container]
+  containers: Container[]
 }
 
 export default function ViewAction({ containers }: ViewActionProps) {
   const { containerId }: any = useParams()
   const container = useMemo(() => {
     return containers.find(container => container.id === containerId)
-  }, [])
+  }, [containerId, containers])
   return container ? (
     <>
       <Frame>
@@ -141,11 +141,11 @@ export default function ViewAction({ containers }: ViewActionProps) {
             `}
           >
             {container.payload.actions.map((action: Action) => (
-              <>
+              <React.Fragment key={action.id}>
                 <li>to: {action.to}</li>
                 <li>value: {action.value}</li>
                 <li>data: {action.data}</li>
-              </>
+              </React.Fragment>
             ))}
           </ul>
         </p>
