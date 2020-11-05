@@ -1,0 +1,22 @@
+{
+  "GovernRegistry": {
+    "rinkeby": {
+      "address": "0xfc9776d0c22291D776F482870264CEAECF3aeFd7",
+      "deployer": "0x1111a5F9DECc25927037dE55d2013D7aD30f1Af0"
+    },
+    "hardhat": {
+      "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+    }
+  },
+  "GovernBaseFactory": {
+    "rinkeby": {
+      "address": "0xd594De6569c8D10A95aDcD597B61773b7f56329b",
+      "deployer": "0x1111a5F9DECc25927037dE55d2013D7aD30f1Af0"
+    },
+    "hardhat": {
+      "address": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
+      "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+    }
+  }
+}
