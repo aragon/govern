@@ -24,8 +24,9 @@
   "scripts": {
     "build": "yarn compile && hardhat typechain",
     "clean": "rm -rf artifacts",
-    "compile": "npx hardhat compile --force",
-    "test": "yarn build && npx hardhat test",
+    "compile": "yarn hardhat compile --force",
+    "compile:cached": "yarn hardhat compile",
+    "test": "yarn build && yarn hardhat test",
     "prepublishOnly": "yarn test && yarn compile"
   },
   "dependencies": {

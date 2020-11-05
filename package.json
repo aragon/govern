@@ -20,6 +20,7 @@
     "start:dev": "cd ./packages/govern-server/ && yarn start:containers",
     "coverage": "lerna run --concurrency 1 --stream --ignore @aragon/erc3kjs coverage",
     "build:contracts": "lerna run --scope=@aragon/govern-core --scope=erc3k --scope=@aragon/govern-contract-utils --scope=@aragon/govern-create --parallel --stream build",
+    "compile:cached": "lerna run --parallel --stream compile:cached",
     "build:subgraph": "lerna run --scope=@aragon/govern-subgraph --parallel --stream build",
     "deploy:subgraph:rinkeby": "lerna run --scope=@aragon/govern-subgraph --parallel --stream deploy-rinkeby",
     "deploy:subgraph:mainnet": "lerna run --scope=@aragon/govern-subgraph --parallel --stream deploy-mainnet"
