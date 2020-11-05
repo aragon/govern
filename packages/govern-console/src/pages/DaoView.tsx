@@ -11,6 +11,7 @@ import { gql, useQuery } from '@apollo/client'
 import Button from '../components/Button'
 import Frame from '../components/Frame/Frame'
 import NewAction from '../components/NewAction'
+import ViewAction from '../components/ViewAction'
 import { useChainId } from '../Providers/ChainId'
 import { rinkebyClient, mainnetClient } from '../index'
 
@@ -54,7 +55,14 @@ const DAO_QUERY = gql`
             executionTime
             submitter
             proof
+            actions {
+              id
+              to
+              value
+              data
+            }
           }
+          history {}
         }
         config {
           executionDelay
@@ -110,6 +118,11 @@ export default function DaoView() {
           config={data.registryEntry.queue.config}
           executorAddress={data.registryEntry.executor.address}
           queueAddress={data.registryEntry.queue.address}
+        />
+      </Route>
+      <Route path={`${path}/view-action/:containerId`}>
+        <ViewAction
+          containers={data.registryEntry.queue.queued}
         />
       </Route>
       <Route>
