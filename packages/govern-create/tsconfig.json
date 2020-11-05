@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "target": "es2018",
+    "strict": true,
+    "esModuleInterop": true,
+    "outDir": "dist"
+  },
+  "include": ["./helpers", "./tasks", "./test"],
+  "files": ["./hardhat.config.ts"]
+}
