@@ -62,8 +62,10 @@ export function handleScheduled(event: ScheduledEvent): void {
   // should be impossible to get at this stage
   container.config = queue.config
   container.queue = queue.id
+  let config = ConfigEntity.load(queue.config)
+  let scheduleDeposit = CollateralEntity.load(config.scheduleDeposit)
 
-  handleContainerEventSchedule(container, event)
+  handleContainerEventSchedule(container, event, scheduleDeposit as CollateralEntity)
 
   // add the container to the queue
   let scheduled = queue.queued

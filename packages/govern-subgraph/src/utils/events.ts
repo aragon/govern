@@ -110,15 +110,16 @@ export function handleContainerEventRule(
 
 export function handleContainerEventSchedule(
   container: ContainerEntity,
-  ethereumEvent: ScheduledEvent
+  ethereumEvent: ScheduledEvent,
+  scheduleDeposit: CollateralEntity
 ): ContainerEventScheduleEntity {
   let eventId = buildIndexedId(container.id, container.history.length)
 
   let containerEvent = new ContainerEventScheduleEntity(eventId)
 
   let collateral = new CollateralEntity(buildId(ethereumEvent))
-  collateral.token = ethereumEvent.params.collateral.token
-  collateral.amount = ethereumEvent.params.collateral.amount
+  collateral.token = scheduleDeposit.token
+  collateral.amount = scheduleDeposit.amount
   collateral.save()
 
   containerEvent.collateral = collateral.id
