@@ -7,9 +7,25 @@
 Ensure the monorepo’s dependencies are installed:
 
 ```console
-cd ../.. && yarn
-cd packages/govern-subgraph
+cd ../.. && yarn && cd packages/govern-subgraph
 ```
+
+## Build & deploy the subgraph
+
+You can build and deploy the subgraph using a single `yarn deploy-<network>` command:
+
+```console
+GRAPH_KEY=<GRAPH_KEY> yarn deploy-<DESIRED_NETWORK> <THEGRAPH_USERNAME> <SUBGRAPH_NAME> <DESIRED_NETWORK>
+```
+
+Replace the placeholders by the following:
+
+- `<GRAPH_KEY>`: The Graph key (this is only needed when deploying on The Graph).
+- `<THEGRAPH_USERNAME>`: username of your subgraph (usually your GitHub username).
+- `<SUBGRAPH_NAME>`: name of the subgraph.
+- `<DESIRED_NETWORK>`: one of the available networks (see package.json).
+
+## Build only
 
 Generate the `subgraph.yaml` file corresponding to your network:
 
@@ -19,30 +35,13 @@ yarn manifest-<DESIRED_NETWORK>
 
 Replacing `<DESIRED_NETWORK>` by one of the available networks (see package.json).
 
-Generate the types from the ABIs and the GraphQL schema:
-
-```console
-yarn codegen
-```
-
-The generated code is used by the subgraph mapping scripts. Compile the subgraph:
+You can now run the `build` command, which will generate the types and compile the subgraph:
 
 ```console
 yarn build
 ```
 
-You are now ready to deploy the subgraph. This is the command to use:
-
-```console
-GRAPH_KEY=<GRAPH_KEY> yarn deploy-<DESIRED_NETWORK> <THEGRAPH_USERNAME> <SUBGRAPH_NAME> <DESIRED_NETWORK>
-```
-
-Replacing:
-
-- `<GRAPH_KEY>` by your The Graph key (this is only needed when deploying on The Graph).
-- `<THEGRAPH_USERNAME>` by the username used for your subgraph (usually your GitHub username).
-- `<SUBGRAPH_NAME>` by the name of the subgraph itself.
-- `<DESIRED_NETWORK>` by one of the available networks (see package.json).
+You are now ready to deploy the subgraph using [the `graph deploy` command](https://thegraph.com/docs/deploy-a-subgraph).
 
 ### Deploy the subgraph locally
 
@@ -110,6 +109,7 @@ Tracked:
 - `Revoked`
 
 Left out:
+
 - `ETHDeposited`
 
 #### GovernQueue.sol
@@ -138,4 +138,3 @@ Tracked:
 - `SetMetadata`
 
 Left out: None.
-
