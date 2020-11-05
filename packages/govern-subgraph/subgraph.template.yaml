@@ -26,7 +26,7 @@ templates:
         - Role
       abis:
         - name: GovernQueue
-          file: ./node_modules/@aragon/govern-core/abi/GovernQueue.json
+          file: $GOVERN_CORE_MODULE/abi/GovernQueue.json
       eventHandlers:
         - event: Configured(indexed bytes32,indexed address,(uint256,(address,uint256),(address,uint256),address,bytes))
           handler: handleConfigured
@@ -66,7 +66,7 @@ templates:
         - Role
       abis:
         - name: Govern
-          file: ./node_modules/@aragon/govern-core/abi/Govern.json
+          file: $GOVERN_CORE_MODULE/abi/Govern.json
       eventHandlers:
         - event: Executed(indexed address,(address,uint256,bytes)[],bytes32,bytes32,bytes[])
           handler: handleExecuted
