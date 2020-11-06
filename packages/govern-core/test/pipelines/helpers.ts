@@ -86,7 +86,6 @@ export function getContainerHash(container: any, address: string, chainId: numbe
 }
 
 /**
- * TODO: Add types
  * Returns the ABI encoded container
  *
  * @param {Object} container
@@ -94,5 +93,39 @@ export function getContainerHash(container: any, address: string, chainId: numbe
  * @returns {string}
  */
 export function getEncodedContainer(container: any): string {
-  return defaultAbiCoder.encode([''], [container]);
+  return defaultAbiCoder.encode(
+    [
+      'tuple(' +
+        'tuple(' +
+          'uint256 nonce, ' +
+          'uint256 executionTime, ' +
+          'address submitter, ' +
+          'address executor, ' +
+          'tuple(' +
+            'address to, ' +
+            'uint256 value, ' +
+            'bytes data' +
+          ')[] actions, ' +
+          'bytes32 allowFailuresMap, ' +
+          'bytes proof' +
+        ')' +
+        'tuple(' +
+          'uint256 executionDelay, ' +
+          'tuple(' +
+            'address token, ' +
+            'uint256 amount' +
+          ') scheduleDeposit, ' +
+          'tuple(' +
+            'address token, ' +
+            'uint256 amount' +
+          ') challengeDeposit, ' +
+          'address resolver, ' +
+          'bytes rules' +
+        ')' +
+      ')'
+    ],
+    [
+      container
+    ]
+  );
 }
