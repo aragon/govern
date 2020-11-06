@@ -11,12 +11,8 @@ contract ArbitratorMock {
 
     ERC20 public token;
 
-    struct DisputeCreated {
-        uint256 possibleRulings;
-        bytes metadata;
-    }
-
-    DisputeCreated public disputeCreated;
+    uint256 public possibleRulings;
+    bytes public metadata;
     uint256 public evidencePeriodClosed;
     uint256 public rulingExecuted;
 
@@ -31,7 +27,8 @@ contract ArbitratorMock {
     * @return Dispute identification number
     */
     function createDispute(uint256 _possibleRulings, bytes calldata _metadata) external returns (uint256) {
-        disputeCreated = DisputeCreated(_possibleRulings, _metadata);
+        possibleRulings = _possibleRulings;
+        metadata = _metadata;
 
         return 1000;
     }

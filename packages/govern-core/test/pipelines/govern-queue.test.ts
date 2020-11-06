@@ -25,6 +25,7 @@ import {
 import { container as containerJson } from './container'
 import { getConfigHash, getContainerHash, getEncodedContainer, getPayloadHash } from './helpers'
 import { formatBytes32String, keccak256, toUtf8Bytes } from 'ethers/lib/utils'
+import { BigNumber } from 'ethers'
 
 // TODO: Create mock contract to check the return values of public methods
 describe('Govern Queue', function() {
@@ -244,63 +245,72 @@ describe('Govern Queue', function() {
     })
   })
 
-  // context('GovernQueue.challenge', () => {
-  //   before(async () => {
-  //     container = JSON.parse(JSON.stringify(containerJson))
-  //     container.payload.nonce = (await gq.nonce()).toNumber() + 1
-  //     container.payload.executionTime = (
-  //       await ethers.getDefaultProvider().getBlock('latest')
-  //     ).timestamp + 1000
-  //   })
-  //
-  //   it('executes as expected', async () => {
-  //     const ownerBalance = (await testToken.balanceOf(ownerAddr)).toNumber()
-  //
-  //     const ArbitratorMock = (await ethers.getContractFactory(
-  //       'ArbitratorMock'
-  //     )) as ArbitratorMockFactory
-  //     const arbitratorMock = await ArbitratorMock.deploy(testToken.address)
-  //
-  //     container.config.resolver = arbitratorMock.address
-  //
-  //     await gq.configure(container.config)
-  //
-  //     await testToken.approve(
-  //       gq.address,
-  //       container.config.challengeDeposit.amount
-  //     )
-  //
-  //     await gq.schedule(container)
-  //
-  //     const containerHash = getContainerHash(container, ownerAddr, chainId)
-  //     const reasonAsBytes32 = formatBytes32String('NOPE!')
-  //     const disputeId = 1000
-  //
-  //     await expect(gq.challenge(container, reasonAsBytes32))
-  //       .to.emit(gq, EVENTS.CHALLENGED)
-  //
-  //     expect(await gq.queue(containerHash))
-  //       .to.equal(STATE.CHALLENGED)
-  //
-  //     expect(await gq.challengerCache(containerHash))
-  //       .to.equal(ownerAddr)
-  //
-  //     expect(await gq.disputeItemCache(container.config.resolver, disputeId))
-  //       .to.equal(containerHash)
-  //
-  //     expect(
-  //       await testToken.balanceOf(ownerAddr)
-  //     ).to.equal(ownerBalance - container.config.challengeDeposit.amount)
-  //
-  //     expect(await arbitratorMock.disputeCreated())
-  //       .to.equal([2, getEncodedContainer(container)])
-  //
-  //     expect(await arbitratorMock.evidencePeriodClosed())
-  //       .to.equal(disputeId)
-  //
-  //     expect(await arbitratorMock.rulingExecuted())
-  //       .to.equal(disputeId)
-  //   })
+  context('GovernQueue.challenge', () => {
+    before(async () => {
+      container = JSON.parse(JSON.stringify(containerJson))
+      container.payload.nonce = (await gq.nonce()).toNumber() + 1
+      container.payload.executionTime = (
+        await ethers.getDefaultProvider().getBlock('latest')
+      ).timestamp + 1000
+    })
+
+    it('executes as expected', async () => {
+      const ownerBalance = (await testToken.balanceOf(ownerAddr)).toNumber()
+
+      const ArbitratorMock = (await ethers.getContractFactory(
+        'ArbitratorMock'
+      )) as ArbitratorMockFactory
+      const arbitratorMock = await ArbitratorMock.deploy(testToken.address)
+
+      container.config.resolver = arbitratorMock.address
+
+      await gq.configure(container.config)
+
+      const disputeFee = 1000
+      await testToken.approve(
+        gq.address,
+        container.config.scheduleDeposit.amount +
+        container.config.challengeDeposit.amount +
+        disputeFee
+      )
+
+      await gq.schedule(container)
+
+      const containerHash = getContainerHash(container, gq.address, chainId)
+      const disputeId = 1000
+
+      await expect(gq.challenge(container, formatBytes32String('NOPE!')))
+        .to.emit(gq, EVENTS.CHALLENGED)
+
+      expect(await gq.queue(containerHash))
+        .to.equal(STATE.CHALLENGED)
+
+      expect(await gq.challengerCache(containerHash))
+        .to.equal(ownerAddr)
+
+      expect(await gq.disputeItemCache(container.config.resolver, disputeId))
+        .to.equal(containerHash)
+
+      expect(
+        await testToken.balanceOf(ownerAddr)
+      ).to.equal(
+        ownerBalance -
+        (
+          container.config.challengeDeposit.amount +
+          container.config.challengeDeposit.amount +
+          disputeFee
+        )
+      )
+
+      expect(await arbitratorMock.possibleRulings())
+        .to.equal(2)
+
+      expect(await arbitratorMock.metadata())
+        .to.equal(getEncodedContainer(container))
+
+      expect(await arbitratorMock.evidencePeriodClosed())
+        .to.equal(disputeId)
+    })
 
     //   it('reverts with "queue: bad fee pull"', async () => {
     //     container.payload.nonce = await gq.nonce()
@@ -503,7 +513,7 @@ describe('Govern Queue', function() {
     //     await expect(gq.resolve(container, disputeId))
     //       .to.be.revertedWith(ERRORS.UNRESOLVED)
     //   })
-    // })
+    })
     //
     // context('GovernQueue.veto', () => {
     //   it('runs as expected', async () => {

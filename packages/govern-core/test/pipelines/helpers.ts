@@ -108,7 +108,7 @@ export function getEncodedContainer(container: any): string {
           ')[] actions, ' +
           'bytes32 allowFailuresMap, ' +
           'bytes proof' +
-        ')' +
+        ') payload, ' +
         'tuple(' +
           'uint256 executionDelay, ' +
           'tuple(' +
@@ -121,7 +121,7 @@ export function getEncodedContainer(container: any): string {
           ') challengeDeposit, ' +
           'address resolver, ' +
           'bytes rules' +
-        ')' +
+        ') config' +
       ')'
     ],
     [
