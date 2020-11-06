@@ -34,7 +34,7 @@ templates:
           handler: handleFrozen
         - event: Granted(indexed bytes4,indexed address,indexed address)
           handler: handleGranted
-        - event: Scheduled(indexed bytes32,(uint256,uint256,address,address,(address,uint256,bytes)[],bytes32,bytes),(address,uint256))
+        - event: Scheduled(indexed bytes32,(uint256,uint256,address,address,(address,uint256,bytes)[],bytes32,bytes))
           handler: handleScheduled
         - event: Executed(indexed bytes32,indexed address)
           handler: handleExecuted
