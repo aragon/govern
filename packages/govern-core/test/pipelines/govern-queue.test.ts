@@ -20,7 +20,7 @@ import {
   // ArbitratorCallsRuleMock,
   // ArbitratorCallsRuleMockFactory
 } from '../../typechain'
-import {container as containerJson} from './container'
+import { container as containerJson } from './container'
 import { getConfigHash, getContainerHash, getPayloadHash } from './helpers'
 import { formatBytes32String, keccak256, toUtf8Bytes } from 'ethers/lib/utils'
 import { BigNumber } from 'ethers'
@@ -69,7 +69,7 @@ describe('Govern Queue', function() {
     EXECUTED: 6
   }
 
-  const ownerTokenAmount = 1000000;
+  const ownerTokenAmount = 1000000
 
   before(async () => {
     chainId = (await ethers.provider.getNetwork()).chainId
@@ -143,7 +143,7 @@ describe('Govern Queue', function() {
         await testToken.balanceOf(ownerAddr)
       ).to.equal(ownerTokenAmount - container.config.scheduleDeposit.amount)
 
-      container.payload.nonce++;
+      container.payload.nonce++
     })
 
     it('reverts with "queue: bad config"', async () => {
@@ -179,7 +179,7 @@ describe('Govern Queue', function() {
     })
 
     it('reverts with "queue: bad nonce"', async () => {
-      container.payload.nonce = 0;
+      container.payload.nonce = 0
 
       await expect(
         gq.schedule(container)
@@ -187,37 +187,43 @@ describe('Govern Queue', function() {
     })
   })
 
-  // context('GovernQueue.execute', async () => {
-  //   before(async () => {
-  //     container.payload.executionTime = (
-  //       await ethers.getDefaultProvider().getBlock('latest')
-  //     ).timestamp
-  //     container.payload.nonce = await gq.nonce()
-  //     await gq.schedule(container)
-  //   })
-  //
-  //   it('emits the expected events and updates the container state', async () => {
-  //     const containerHash = getContainerHash(container, ownerAddr, chainId)
-  //
-  //     await expect(gq.execute(container))
-  //       .to.emit(gq, EVENTS.UNLOCK).withArgs(
-  //         container.config.scheduleDeposit.token,
-  //         ownerAddr,
-  //         container.config.scheduleDeposit.amount
-  //       ).to.emit(gq, EVENTS.EXECUTED).withArgs(
-  //         containerHash,
-  //         ownerAddr
-  //       )
-  //
-  //     expect(await gq.queue(containerHash)).to.equal({ state: 'Executed' })
-  //   })
-  //
-  //   it('reverts with "queue: wait more"', async () => {
-  //     container.payload.executionTime = container.payload.executionTime * 2
-  //
-  //     await expect(gq.execute(container)).to.be.revertedWith(ERRORS.WAIT_MORE)
-  //   })
-  // })
+  context('GovernQueue.execute', async () => {
+    before(async () => {
+      container = JSON.parse(JSON.stringify(containerJson))
+      container.payload.nonce++
+      container.payload.executionTime = (
+        await ethers.getDefaultProvider().getBlock('latest')
+      ).timestamp + 1000
+
+      await testToken.approve(gq.address, container.config.scheduleDeposit.amount)
+      await gq.schedule(container)
+    })
+
+    it('emits the expected events and updates the container state', async () => {
+      const containerHash = getContainerHash(container, ownerAddr, chainId)
+
+      // Wait to be able to call execute
+      setTimeout(async () => {
+        await expect(gq.execute(container))
+          .to.emit(gq, EVENTS.UNLOCK).withArgs(
+            container.config.scheduleDeposit.token,
+            ownerAddr,
+            container.config.scheduleDeposit.amount
+          ).to.emit(gq, EVENTS.EXECUTED).withArgs(
+            containerHash,
+            ownerAddr
+          )
+
+        expect(await gq.queue(containerHash)).to.equal({ state: 'Executed' })
+      }, 1000)
+    })
+
+    it('reverts with "queue: wait more"', async () => {
+      container.payload.executionTime = container.payload.executionTime * 2
+
+      await expect(gq.execute(container)).to.be.revertedWith(ERRORS.WAIT_MORE)
+    })
+  })
   //
   // context('GovernQueue.challenge', () => {
   //   before(async () => {
