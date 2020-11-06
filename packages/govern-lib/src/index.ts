@@ -1,1 +1,1 @@
-export { default as GovernCore } from './GovernCore'
+export { default as GovernLib } from './GovernLib'

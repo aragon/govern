@@ -18,18 +18,18 @@ import {
   QUERY_QUEUES_BY_DAO,
 } from './thegraph-queries'
 
-export type GovernCoreConfig = {
+export type GovernLibConfig = {
   network: Networkish
   subgraphUrl?: string
   verbose?: boolean
 }
 
-class GovernCore {
+class GovernLib {
   #gql: GraphqlClient
-  readonly config: GovernCoreConfig
+  readonly config: GovernLibConfig
   readonly networkContext: NetworkContext
 
-  constructor(config: GovernCoreConfig) {
+  constructor(config: GovernLibConfig) {
     this.config = config
     this.networkContext = NetworkContext.from(
       config.network,
@@ -133,4 +133,4 @@ class GovernCore {
   }
 }
 
-export default GovernCore
+export default GovernLib
