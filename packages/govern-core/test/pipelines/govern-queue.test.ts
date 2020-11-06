@@ -312,57 +312,58 @@ describe('Govern Queue', function() {
         .to.equal(disputeId)
     })
 
-    //   it('reverts with "queue: bad fee pull"', async () => {
-    //     container.payload.nonce = await gq.nonce()
-    //     container.payload.proof = '0x01'
+    // TODO: Implement further cases as soon as the latest challenging related changes are merged
+    // it('reverts with "queue: bad fee pull"', async () => {
+    //   container.payload.nonce = await gq.nonce()
+    //   container.payload.proof = '0x01'
     //
-    //     await gq.schedule(container)
+    //   await gq.schedule(container)
     //
-    //     const ArbitratorBadFeePullMock = (await ethers.getContractFactory(
-    //       'ArbitratorBadFeePullMock'
-    //     )) as ArbitratorBadFeePullMockFactory
-    //     const arbitratorBadFeePullMock = await ArbitratorBadFeePullMock.deploy()
+    //   const ArbitratorBadFeePullMock = (await ethers.getContractFactory(
+    //     'ArbitratorBadFeePullMock'
+    //   )) as ArbitratorBadFeePullMockFactory
+    //   const arbitratorBadFeePullMock = await ArbitratorBadFeePullMock.deploy()
     //
-    //     container.config.resolver = arbitratorBadFeePullMock.address
+    //   container.config.resolver = arbitratorBadFeePullMock.address
     //
-    //     await expect(gq.challenge(container, formatBytes32String('NOPE!')))
-    //       .to.be.revertedWith(ERRORS.BAD_FEE_PULL)
-    //   })
-    //
-    //   it('reverts with "queue: bad approve"', async () => {
-    //     container.payload.nonce = await gq.nonce()
-    //     container.payload.proof = '0x02'
-    //
-    //     await gq.schedule(container)
-    //
-    //     const ArbitratorBadApproveMock = (await ethers.getContractFactory(
-    //       'ArbitratorBadApproveMock'
-    //     )) as ArbitratorBadApproveMock
-    //     const arbitratorBadApproveMock = await ArbitratorBadApproveMock.deploy()
-    //
-    //     container.config.resolver = arbitratorBadApproveMock.address
-    //
-    //     await expect(gq.challenge(container, formatBytes32String('NOPE!')))
-    //       .to.be.revertedWith(ERRORS.BAD_APPROVE)
-    //   })
-    //
-    //   it('reverts with "queue: bad reset"', async () => {
-    //     container.payload.nonce = await gq.nonce()
-    //     container.payload.proof = '0x03'
-    //
-    //     await gq.schedule(container)
-    //
-    //     const ArbitratorBadResetMock = (await ethers.getContractFactory(
-    //       'ArbitratorBadResetMock'
-    //     )) as ArbitratorBadResetMock
-    //     const arbitratorBadResetMock = await ArbitratorBadResetMock.deploy()
-    //
-    //     container.config.resolver = arbitratorBadResetMock.address
-    //
-    //     await expect(gq.challenge(container, formatBytes32String('NOPE!')))
-    //       .to.be.revertedWith(ERRORS.BAD_RESET)
-    //   })
+    //   await expect(gq.challenge(container, formatBytes32String('NOPE!')))
+    //     .to.be.revertedWith(ERRORS.BAD_FEE_PULL)
     // })
+    //
+    // it('reverts with "queue: bad approve"', async () => {
+    //   container.payload.nonce = await gq.nonce()
+    //   container.payload.proof = '0x02'
+    //
+    //   await gq.schedule(container)
+    //
+    //   const ArbitratorBadApproveMock = (await ethers.getContractFactory(
+    //     'ArbitratorBadApproveMock'
+    //   )) as ArbitratorBadApproveMock
+    //   const arbitratorBadApproveMock = await ArbitratorBadApproveMock.deploy()
+    //
+    //   container.config.resolver = arbitratorBadApproveMock.address
+    //
+    //   await expect(gq.challenge(container, formatBytes32String('NOPE!')))
+    //     .to.be.revertedWith(ERRORS.BAD_APPROVE)
+    // })
+    //
+    // it('reverts with "queue: bad reset"', async () => {
+    //   container.payload.nonce = await gq.nonce()
+    //   container.payload.proof = '0x03'
+    //
+    //   await gq.schedule(container)
+    //
+    //   const ArbitratorBadResetMock = (await ethers.getContractFactory(
+    //     'ArbitratorBadResetMock'
+    //   )) as ArbitratorBadResetMock
+    //   const arbitratorBadResetMock = await ArbitratorBadResetMock.deploy()
+    //
+    //   container.config.resolver = arbitratorBadResetMock.address
+    //
+    //   await expect(gq.challenge(container, formatBytes32String('NOPE!')))
+    //     .to.be.revertedWith(ERRORS.BAD_RESET)
+    // })
+    })
     //
     // context('GovernQueue.resolve', () => {
     //   before(async () => {
@@ -513,7 +514,7 @@ describe('Govern Queue', function() {
     //     await expect(gq.resolve(container, disputeId))
     //       .to.be.revertedWith(ERRORS.UNRESOLVED)
     //   })
-    })
+    // })
     //
     // context('GovernQueue.veto', () => {
     //   it('runs as expected', async () => {
