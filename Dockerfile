@@ -6,7 +6,6 @@ WORKDIR /app
 # copy all package json files
 COPY ./package.json                                   /app/package.json
 COPY ./packages/erc3k/package.json                    /app/packages/erc3k/package.json
-COPY ./packages/erc3kjs/package.json                  /app/packages/erc3kjs/package.json
 COPY ./packages/govern/package.json                   /app/packages/govern/package.json
 COPY ./packages/govern-console/package.json           /app/packages/govern-console/package.json
 COPY ./packages/govern-contract-utils/package.json    /app/packages/govern-contract-utils/package.json
