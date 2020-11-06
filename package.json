@@ -15,10 +15,10 @@
   },
   "scripts": {
     "clean": "lerna run --scope=@aragon/govern* --parallel --stream clean",
-    "test": "lerna run --parallel --stream --ignore @aragon/erc3kjs test",
+    "test": "lerna run --parallel --stream test",
     "init:dev:env": "scripts/init.dev.env.sh",
     "start:dev": "cd ./packages/govern-server/ && yarn start:containers",
-    "coverage": "lerna run --concurrency 1 --stream --ignore @aragon/erc3kjs coverage",
+    "coverage": "lerna run --concurrency 1 --stream coverage",
     "build:contracts": "lerna run --scope=@aragon/govern-core --scope=erc3k --scope=@aragon/govern-contract-utils --scope=@aragon/govern-create --parallel --stream build",
     "compile:cached": "lerna run --parallel --stream compile:cached",
     "build:subgraph": "lerna run --scope=@aragon/govern-subgraph --parallel --stream build",
