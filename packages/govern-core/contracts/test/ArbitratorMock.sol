@@ -4,16 +4,21 @@
 
 pragma solidity ^0.6.8;
 
-import "../erc20/SafeERC20.sol";
+import "@aragon/govern-contract-utils/contracts/erc20/SafeERC20.sol";
 
 contract Arbitrator {
     using SafeERC20 for ERC20;
 
     ERC20 public feeToken;
 
-    event DisputeCreated(uint256 indexed possibleRulings, bytes indexed _metadata);
-    event EvidencePeriodClosed(uint256 indexed disputeId);
-    event RulingExecuted(uint256 indexed disputeId);
+    struct DisputeCreated {
+        uint256 possibleRulings;
+        bytes metadata;
+    }
+
+    DisputeCreated public disputeCreated;
+    uint256 public evidencePeriodClosed;
+    uint256 public rulingExecuted;
 
     constructor(ERC20 _feeToken) {
         feeToken = _feeToken;
@@ -26,7 +31,7 @@ contract Arbitrator {
     * @return Dispute identification number
     */
     function createDispute(uint256 _possibleRulings, bytes calldata _metadata) external returns (uint256) {
-        emit DisputeCreated(_possibleRulings, _metadata);
+        disputeCreated = DisputeCreated(_possibleRulings, _metadata);
 
         return 1000;
     }
@@ -36,7 +41,7 @@ contract Arbitrator {
     * @param _disputeId Identification number of the dispute to close its evidence submitting period
     */
     function closeEvidencePeriod(uint256 _disputeId) external {
-        emit EvidencePeriodClosed(_disputeId);
+        evidencePeriodClosed = _disputeId;
     }
 
 
@@ -45,7 +50,7 @@ contract Arbitrator {
     * @param _disputeId Identification number of the dispute to be executed
     */
     function executeRuling(uint256 _disputeId) external {
-        emit RulingExecuted(_disputeId);
+        rulingExecuted = _disputeId;
     }
 
     /**

@@ -84,3 +84,15 @@ export function getContainerHash(container: any, address: string, chainId: numbe
     )
   )
 }
+
+/**
+ * TODO: Add types
+ * Returns the ABI encoded container
+ *
+ * @param {Object} container
+ *
+ * @returns {string}
+ */
+export function getEncodedContainer(container: any): string {
+  return defaultAbiCoder.encode([''], [container]);
+}
