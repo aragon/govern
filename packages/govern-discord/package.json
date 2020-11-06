@@ -4,7 +4,6 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\"",
     "start": "node -r dotenv/config server.js dotenv_config_path=../../.env",
     "new-dao": "cd ../govern-create && yarn deploy-govern --network rinkeby"
   },
