@@ -209,7 +209,9 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
         uint256 _disputeId
     ) auth(this.veto.selector) override public {
         // TODO: Clear dispute
+
         bytes32 containerHash = _container.hash();
+        _container.payload.challengeDeposit.releaseTo(challengerCache[containerHash])
         challengerCache[containerHash] = address(0)
 
         _veto(
