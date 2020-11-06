@@ -1,8 +1,14 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import 'styled-components/macro'
+import Button from './Button'
 import Frame from './Frame/Frame'
+import { useContract } from '../lib/web3-contracts'
 import { shortenAddress } from '../lib/web3-utils'
+import queueAbi from '../lib/abi/GovernQueue.json'
+
+const EMPTY_FAILURE_MAP =
+  '0x0000000000000000000000000000000000000000000000000000000000000000'
 
 type Collateral = {
   token: string
@@ -107,22 +113,145 @@ type Container = {
   history: ContainerEvent[]
 }
 
-type ViewActionProps = {
+type ViewActionWrapperProps = {
   containers: Container[]
+  queueAddress: string
 }
 
-export default function ViewAction({ containers }: ViewActionProps) {
-  const { containerId }: any = useParams()
-  const container = useMemo(() => {
-    return containers.find(container => container.id === containerId)
-  }, [containerId, containers])
+type ViewActionProps = {
+  container: Container
+  queueAddress: string
+}
 
-  return container ? (
+function ViewAction({ container, queueAddress }: ViewActionProps) {
+  const queueContract = useContract(queueAddress, queueAbi)
+
+  const execute = useCallback(async () => {
+    const payloadActions = container.payload.actions.map((action: Action) => ({
+      to: action.to,
+      value: action.value,
+      data: action.data,
+    }))
+    const craftedContainer = {
+      payload: {
+        nonce: container.payload.nonce,
+        executionTime: container.payload.executionTime,
+        submitter: container.payload.submitter,
+        executor: container.payload.executor.address,
+        actions: payloadActions,
+        allowFailuresMap: EMPTY_FAILURE_MAP,
+        proof: container.payload.proof,
+      },
+      config: {
+        executionDelay: container.config.executionDelay,
+        scheduleDeposit: {
+          token: container.config.scheduleDeposit.token,
+          amount: container.config.scheduleDeposit.amount,
+        },
+        challengeDeposit: {
+          token: container.config.challengeDeposit.token,
+          amount: container.config.challengeDeposit.amount,
+        },
+        resolver: container.config.resolver,
+        rules: container.config.rules,
+      },
+    }
+
+    try {
+      const tx = await queueContract!['execute'](craftedContainer, {
+        gasLimit: 500000,
+      })
+      await tx.wait(1)
+    } catch (err) {
+      console.log(err)
+    }
+  }, [queueContract])
+
+  const veto = useCallback(async () => {
+    try {
+      const containerHash = container.id
+      const tx = await queueContract!['veto'](containerHash, '0x00', {
+        gasLimit: 500000,
+      })
+    } catch (err) {
+      console.log(err)
+    }
+  }, [container])
+
+  const challenge = useCallback(async () => {
+    const payloadActions = container.payload.actions.map((action: Action) => ({
+      to: action.to,
+      value: action.value,
+      data: action.data,
+    }))
+    const craftedContainer = {
+      payload: {
+        nonce: container.payload.nonce,
+        executionTime: container.payload.executionTime,
+        submitter: container.payload.submitter,
+        executor: container.payload.executor.address,
+        actions: payloadActions,
+        allowFailuresMap: EMPTY_FAILURE_MAP,
+        proof: container.payload.proof,
+      },
+      config: {
+        executionDelay: container.config.executionDelay,
+        scheduleDeposit: {
+          token: container.config.scheduleDeposit.token,
+          amount: container.config.scheduleDeposit.amount,
+        },
+        challengeDeposit: {
+          token: container.config.challengeDeposit.token,
+          amount: container.config.challengeDeposit.amount,
+        },
+        resolver: container.config.resolver,
+        rules: container.config.rules,
+      },
+    }
+    try {
+      const tx = await queueContract!['challenge'](craftedContainer, '0x00', {
+        gasLimit: 500000,
+      })
+      await tx.wait(1)
+    } catch (err) {
+      console.log(err)
+    }
+  }, [container, queueContract])
+
+  return (
     <>
       <Frame>
         <h2>Action {shortenAddress(container.id)}</h2>
         <h3>Status</h3>
         <p>{container.state}</p>
+      </Frame>
+
+      <Frame>
+        <h2>Available actions</h2>
+        <Button
+          onClick={execute}
+          css={`
+            margin-right: 16px;
+          `}
+        >
+          Execute
+        </Button>
+        <Button
+          onClick={veto}
+          css={`
+            margin-right: 16px;
+          `}
+        >
+          Veto
+        </Button>
+        <Button
+          onClick={challenge}
+          css={`
+            margin-right: 16px;
+          `}
+        >
+          Challenge
+        </Button>
       </Frame>
 
       <Frame>
@@ -169,7 +298,21 @@ export default function ViewAction({ containers }: ViewActionProps) {
         <p>{container.config.rules}</p>
       </Frame>
     </>
-  ) : (
-    <Frame>Container not found.</Frame>
   )
+}
+
+export default function ViewActionWrapper({
+  containers,
+  queueAddress,
+}: ViewActionWrapperProps) {
+  const { containerId }: any = useParams()
+  const container = useMemo(() => {
+    return containers.find(container => container.id === containerId)
+  }, [containerId, containers])
+
+  if (!container) {
+    return <Frame>Container not found.</Frame>
+  }
+
+  return <ViewAction container={container} queueAddress={queueAddress} />
 }

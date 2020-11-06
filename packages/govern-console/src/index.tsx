@@ -12,7 +12,7 @@ import App from './App'
 import GeneralProvider from './Providers/GeneralProvider'
 
 export const rinkebyClient: ApolloClient<NormalizedCacheObject> = new ApolloClient({
-  uri: 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby',
+  uri: 'https://api.thegraph.com/subgraphs/name/evalir/aragon-govern-rinkeby',
   cache: new InMemoryCache()
 });
 

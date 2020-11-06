@@ -62,6 +62,9 @@ const DAO_QUERY = gql`
               value
               data
             }
+            executor {
+              address
+            }
           }
           config {
             executionDelay
@@ -134,7 +137,10 @@ export default function DaoView() {
         />
       </Route>
       <Route path={`${path}/view-action/:containerId`}>
-        <ViewAction containers={data.registryEntry.queue.queued} />
+        <ViewAction
+          containers={data.registryEntry.queue.queued}
+          queueAddress={data.registryEntry.queue.address}
+        />
       </Route>
       <Route>
         <h2>Route not found :(</h2>

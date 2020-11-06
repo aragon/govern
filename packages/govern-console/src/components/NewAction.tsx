@@ -40,6 +40,9 @@ export default function NewAction({
   const [contractAddress, setContractAddress] = useState('')
   const [parsedAbi, setParsedAbi] = useState([])
   const [proof, setProof] = useState('')
+  const [executionResult, setExecutionResult] = useState('')
+  const [type, setType] = useState('')
+
   const queueContract = useContract(queueAddress, queueAbi)
 
   const handleParseAbi = useCallback(
@@ -55,6 +58,24 @@ export default function NewAction({
     [abi],
   )
 
+  const handleSetExecutionResult = useCallback(
+    (result, message) => {
+      if (result === 'confirmed') {
+        setType('green')
+        setExecutionResult(message)
+      }
+      if (result === 'info') {
+        setType('cyan')
+        setExecutionResult(message)
+      }
+      if (result === 'error') {
+        setType('red')
+        setExecutionResult(message)
+      }
+    },
+    [setExecutionResult, setType],
+  )
+
   return (
     <>
       <h2
@@ -65,6 +86,18 @@ export default function NewAction({
         New action
       </h2>
       <Frame>
+        {executionResult && (
+          <div
+            css={`
+              padding: 8px;
+              margin-top: 32px;
+              margin-bottom: 32px;
+              border: 1px solid ${type};
+            `}
+          >
+            {executionResult}
+          </div>
+        )}
         <form
           css={`
             padding: 8px;
@@ -134,6 +167,7 @@ export default function NewAction({
                     config={config}
                     contractAddress={contractAddress}
                     executor={executorAddress}
+                    handleSetExecutionResult={handleSetExecutionResult}
                     inputs={abiItem.inputs}
                     name={abiItem.name}
                     proof={proof}
@@ -152,6 +186,7 @@ type ContractCallHandlerProps = {
   contractAddress: string
   config: any
   executor: string
+  handleSetExecutionResult: (result: string, v: string) => void
   inputs: Input[] | any[]
   name: string
   proof: string
@@ -163,6 +198,7 @@ function ContractCallHandler({
   config,
   contractAddress,
   executor,
+  handleSetExecutionResult,
   inputs,
   name,
   proof,
@@ -252,13 +288,29 @@ function ContractCallHandler({
           },
         }
 
+        console.log(container)
+
         const tx = await queueContract['schedule'](container, {
           gasLimit: 500000,
         })
 
+        handleSetExecutionResult(
+          'info',
+          `Sending transaction.`,
+        )
+        await tx.wait(1)
+
         setResult(tx.hash)
+        handleSetExecutionResult(
+          'confirmed',
+          `Transaction sent successfully. hash: ${tx.hash}`,
+        )
       } catch (e) {
         console.error(e)
+        handleSetExecutionResult(
+          'error',
+          `There was an error with the transaction.`,
+        )
       }
     },
     [
