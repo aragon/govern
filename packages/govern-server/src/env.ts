@@ -8,7 +8,12 @@ function chainId(): number {
   return isNaN(chainId) ? 4 : chainId
 }
 
+function subgraphUrl(): string | undefined {
+  return (process.env.GVN_SUBGRAPH_URL as string) || undefined
+}
+
 export default {
   chainId: chainId(),
   graphqlHttpPort: graphqlHttpPort(),
+  subgraphUrl: subgraphUrl(),
 }

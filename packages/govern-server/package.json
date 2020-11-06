@@ -10,6 +10,7 @@
     "stop:containers": "HOST_UID=$(id -u) HOST_GID=$(id -g) docker-compose down"
   },
   "dependencies": {
+    "@aragon/govern-lib": "^1.0.0",
     "@urql/core": "^1.13.1",
     "apollo-server": "^2.18.2",
     "dotenv": "^8.2.0",

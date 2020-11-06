@@ -1,10 +1,10 @@
 import { ApolloServer } from 'apollo-server'
-import { GovernCore } from '../core'
+import { GovernLib } from '@aragon/govern-lib'
 import resolvers from './resolvers'
 import typeDefs from './schema'
 
 type Configuration = {
-  govern: GovernCore
+  govern: GovernLib
   httpPort: number
 }
 

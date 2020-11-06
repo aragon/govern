@@ -1,9 +1,12 @@
+import { GovernLib } from '@aragon/govern-lib'
 import env from './env'
 import startGraphql from './api-graphql'
-import { GovernCore } from './core'
 
 async function main() {
-  const govern = new GovernCore({ network: 1 })
+  const govern = new GovernLib({
+    network: { chainId: env.chainId },
+    subgraphUrl: env.subgraphUrl,
+  })
 
   const { url: graphqlUrl } = await startGraphql({
     govern,
