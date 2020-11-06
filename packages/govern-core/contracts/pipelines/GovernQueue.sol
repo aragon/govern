@@ -203,11 +203,50 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
         return (bytes32(0), new bytes[](0));
     }
 
-    function veto(bytes32 _containerHash, bytes memory _reason) auth(this.veto.selector) override public {
-        queue[_containerHash].checkAndSetState(
+    function veto(
+        ERC3000Data.Container memory _container,
+        bytes memory _reason,
+        uint256 _disputeId
+    ) auth(this.veto.selector) override public {
+        // TODO: Clear dispute
+        bytes32 containerHash = _container.hash();
+        challengerCache[containerHash] = address(0)
+
+        _veto(
+            containerHash,
+            _container.config_scheduleDeposit,
+            _container.payload.submitter,
+            GovernQueueStateLib.State.Challenged,
+            _reason
+        );
+    }
+
+    function veto(
+        ERC3000Data.Container memory _container,
+        bytes memory _reason
+    ) auth(this.veto.selector) override public {
+        _veto(
+            _container.hash(),
+            _container.config_scheduleDeposit,
+            _container.payload.submitter,
             GovernQueueStateLib.State.Scheduled,
+            _reason
+        );
+    }
+
+    function _veto(
+        bytes32 _containerHash,
+        ERC3000Data.Collateral _scheduleDeposit,
+        address submitter,
+        GovernQueueStateLib.State currentState,
+        bytes memory _reason
+    ) internal {
+        queue[containerHash].checkAndSetState(
+            currentState,
             GovernQueueStateLib.State.Cancelled
         );
+
+        scheduleDeposit.releaseTo(_submitter);
 
         emit Vetoed(_containerHash, msg.sender, _reason);
     }
