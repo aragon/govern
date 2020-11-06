@@ -67,11 +67,6 @@ export function handleScheduled(event: ScheduledEvent): void {
 
   handleContainerEventSchedule(container, event, scheduleDeposit as CollateralEntity)
 
-  // add the container to the queue
-  let scheduled = queue.queued
-  scheduled.push(container.id)
-  queue.queued = scheduled
-
   payload.save()
   container.save()
   queue.save()
