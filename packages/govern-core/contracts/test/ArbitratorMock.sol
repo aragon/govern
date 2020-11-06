@@ -6,10 +6,10 @@ pragma solidity ^0.6.8;
 
 import "@aragon/govern-contract-utils/contracts/erc20/SafeERC20.sol";
 
-contract Arbitrator {
+contract ArbitratorMock {
     using SafeERC20 for ERC20;
 
-    ERC20 public feeToken;
+    ERC20 public token;
 
     struct DisputeCreated {
         uint256 possibleRulings;
@@ -20,8 +20,8 @@ contract Arbitrator {
     uint256 public evidencePeriodClosed;
     uint256 public rulingExecuted;
 
-    constructor(ERC20 _feeToken) {
-        feeToken = _feeToken;
+    constructor(ERC20 _token) public {
+        token = _token;
     }
 
     /**
@@ -60,7 +60,7 @@ contract Arbitrator {
     * @return feeAmount Total amount of fees that must be allowed to the recipient
     */
     function getDisputeFees() external view returns (address recipient, ERC20 feeToken, uint256 feeAmount) {
-        return (address(this), feeToken, 1000);
+        return (address(this), token, 1000);
     }
 
 
@@ -72,6 +72,6 @@ contract Arbitrator {
     * @return feeAmount Total amount of fees that must be allowed to the recipient
     */
     function getSubscriptionFees(address _subscriber) external view returns (address recipient, ERC20 feeToken, uint256 feeAmount) {
-        return (address(this), feeToken, 1000);
+        return (address(this), token, 1000);
     }
 }

@@ -11,8 +11,16 @@ import "@aragon/govern-contract-utils/contracts/erc165/ERC165.sol";
 import "@aragon/govern-contract-utils/contracts/erc165/ERC165.sol";
 
 contract ERC3000ExecutorMock is IERC3000Executor, ERC165 {
-    function exec(ERC3000Data.Action[] memory, bytes32, bytes32) override public returns (bytes32, bytes[] memory) {
+    uint256 public passedActionsLength;
+    bytes32 public passedAllowFailuresMap;
+    bytes32 public passedContainerHash;
 
+    function exec(ERC3000Data.Action[] memory actions, bytes32 allowFailuresMap, bytes32 containerHash) override public returns (bytes32, bytes[] memory) {
+        passedActionsLength = actions.length;
+        passedAllowFailuresMap = allowFailuresMap;
+        passedContainerHash = containerHash;
+
+        return (bytes32(0), new bytes[](actions.length));
     }
 
     function interfaceID() public pure returns (bytes4) {
