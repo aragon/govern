@@ -32,7 +32,7 @@ templates:
           handler: handleConfigured
         - event: Frozen(indexed bytes4,indexed address)
           handler: handleFrozen
-        - event: Granted(indexed bytes4,indexed address,indexed address)
+        - event: Granted(indexed bytes4,indexed address,indexed address,address)
           handler: handleGranted
         - event: Scheduled(indexed bytes32,(uint256,uint256,address,address,(address,uint256,bytes)[],bytes32,bytes))
           handler: handleScheduled
@@ -72,7 +72,7 @@ templates:
           handler: handleExecuted
         - event: Frozen(indexed bytes4,indexed address)
           handler: handleFrozen
-        - event: Granted(indexed bytes4,indexed address,indexed address)
+        - event: Granted(indexed bytes4,indexed address,indexed address,address)
           handler: handleGranted
         - event: Revoked(indexed bytes4,indexed address,indexed address)
           handler: handleRevoked
