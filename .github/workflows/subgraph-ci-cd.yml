@@ -1,6 +1,8 @@
 name: Subgraph CI/CD
 on:
   push:
+    branches:
+    - master
     tags:
     - v*
 env:
@@ -11,7 +13,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - run: yarn
-    - run: .github/scripts/kubectl-config.sh ${{secrets.KUBE_CA}} ${{secrets.KUBE_SERVER}} ${{secrets.KUBE_TOKEN}}
-    - run: yarn deploy:subgraph:rinkeby
-    - run: yarn deploy:subgraph:mainnet
+
+    - name: Install node
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12
+
+    - name: Cache yarn modules
+      uses: actions/cache@v2
+      with:
+        path: '**/node_modules'
+        key: yarn-${{ hashFiles('yarn.lock') }}
+
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
+
+    - name: Configure k8s
+      run: .github/scripts/kubectl-config.sh ${{secrets.KUBE_CA}} ${{secrets.KUBE_SERVER}} ${{secrets.KUBE_TOKEN}}
+
+    - name: Deploy rinkeby
+      if: github.ref == 'refs/heads/master'
+      run: yarn deploy:subgraph:rinkeby
+
+    - name: Deploy mainnet
+      if: startsWith(github.ref, 'refs/tags/v')
+      run: yarn deploy:subgraph:mainnet
