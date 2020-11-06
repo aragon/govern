@@ -114,7 +114,7 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
         // TODO: pay court tx fee
 
         // emit an event to ensure data availability of all state that cannot be otherwise fetched (see how config isn't emitted since an observer should already have it)
-        emit Scheduled(containerHash, _container.payload, collateral);
+        emit Scheduled(containerHash, _container.payload);
     }
 
     /**

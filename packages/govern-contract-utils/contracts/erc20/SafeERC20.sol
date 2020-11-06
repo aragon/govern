@@ -9,6 +9,8 @@
 
 pragma solidity ^0.6.8;
 
+import "../address-utils/AddressUtils.sol";
+
 /**
  * @title ERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/20
@@ -43,14 +45,19 @@ abstract contract ERC20 {
 }
 
 library SafeERC20 {
+    using AddressUtils for address;
+
     string private constant ERROR_TOKEN_BALANCE_REVERTED = "SAFE_ERC_20_BALANCE_REVERTED";
     string private constant ERROR_TOKEN_ALLOWANCE_REVERTED = "SAFE_ERC_20_ALLOWANCE_REVERTED";
 
     function invokeAndCheckSuccess(address _addr, bytes memory _calldata)
         private
-        returns (bool)
+        returns (bool ret)
     {
-        bool ret;
+        if (!_addr.isContract()) {
+            return false;
+        }
+
         assembly {
             let ptr := mload(0x40)    // free memory pointer
 
@@ -84,33 +91,6 @@ library SafeERC20 {
                 default { }
             }
         }
-        return ret;
-    }
-
-    function staticInvoke(address _addr, bytes memory _calldata)
-        private
-        view
-        returns (bool, uint256)
-    {
-        bool success;
-        uint256 ret;
-        assembly {
-            let ptr := mload(0x40)    // free memory pointer
-
-            success := staticcall(
-                gas(),                // forward all gas
-                _addr,                // address
-                add(_calldata, 0x20), // calldata start
-                mload(_calldata),     // calldata length
-                ptr,                  // write output over free memory
-                0x20                  // uint256 return
-            )
-
-            if gt(success, 0) {
-                ret := mload(ptr)
-            }
-        }
-        return (success, ret);
     }
 
     /**
@@ -151,51 +131,5 @@ library SafeERC20 {
             _amount
         );
         return invokeAndCheckSuccess(address(_token), approveCallData);
-    }
-
-    /**
-    * @dev Static call into ERC20.balanceOf().
-    * Reverts if the call fails for some reason (should never fail).
-    */
-    function staticBalanceOf(ERC20 _token, address _owner) internal view returns (uint256) {
-        bytes memory balanceOfCallData = abi.encodeWithSelector(
-            _token.balanceOf.selector,
-            _owner
-        );
-
-        (bool success, uint256 tokenBalance) = staticInvoke(address(_token), balanceOfCallData);
-        require(success, ERROR_TOKEN_BALANCE_REVERTED);
-
-        return tokenBalance;
-    }
-
-    /**
-    * @dev Static call into ERC20.allowance().
-    * Reverts if the call fails for some reason (should never fail).
-    */
-    function staticAllowance(ERC20 _token, address _owner, address _spender) internal view returns (uint256) {
-        bytes memory allowanceCallData = abi.encodeWithSelector(
-            _token.allowance.selector,
-            _owner,
-            _spender
-        );
-
-        (bool success, uint256 allowance) = staticInvoke(address(_token), allowanceCallData);
-        require(success, ERROR_TOKEN_ALLOWANCE_REVERTED);
-
-        return allowance;
-    }
-
-    /**
-    * @dev Static call into ERC20.totalSupply().
-    * Reverts if the call fails for some reason (should never fail).
-    */
-    function staticTotalSupply(ERC20 _token) internal view returns (uint256) {
-        bytes memory totalSupplyCallData = abi.encodeWithSelector(_token.totalSupply.selector);
-
-        (bool success, uint256 totalSupply) = staticInvoke(address(_token), totalSupplyCallData);
-        require(success, ERROR_TOKEN_ALLOWANCE_REVERTED);
-
-        return totalSupply;
     }
 }

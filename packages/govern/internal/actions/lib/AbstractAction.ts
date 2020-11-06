@@ -3,7 +3,7 @@ import Configuration from '../../configuration/Configuration'
 /**
  * @abstract AbstractAction
  */
-export default abstract class AbstractAction<T> {
+export default abstract class AbstractAction {
   /**
    * Contains the GraphQL query of the current action
    *
@@ -65,7 +65,7 @@ export default abstract class AbstractAction<T> {
    *
    * @public
    */
-  public execute(): Promise<T> {
+  public execute(): Promise<any> {
     return this.configuration.client.request(this.gqlQuery, this.parameters)
   }
 }

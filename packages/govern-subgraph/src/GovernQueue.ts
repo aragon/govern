@@ -237,7 +237,6 @@ export function loadOrCreateContainer(containerHash: Bytes): ContainerEntity {
   if (container === null) {
     container = new ContainerEntity(ContainerId)
     container.state = NONE_STATUS
-    container.history = []
   }
   return container!
 }
