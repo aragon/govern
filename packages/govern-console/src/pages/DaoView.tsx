@@ -14,6 +14,7 @@ import NewAction from '../components/NewAction'
 import ViewAction from '../components/ViewAction'
 import { useChainId } from '../Providers/ChainId'
 import { rinkebyClient, mainnetClient } from '../index'
+import { shortenAddress } from '../lib/web3-utils.js'
 
 const ANY_ADDRESS = '0xffffffffffffffffffffffffffffffffffffffff'
 
@@ -62,7 +63,19 @@ const DAO_QUERY = gql`
               data
             }
           }
-          history {}
+          config {
+            executionDelay
+            scheduleDeposit {
+              token
+              amount
+            }
+            challengeDeposit {
+              token
+              amount
+            }
+            resolver
+            rules
+          }
         }
         config {
           executionDelay
@@ -121,9 +134,7 @@ export default function DaoView() {
         />
       </Route>
       <Route path={`${path}/view-action/:containerId`}>
-        <ViewAction
-          containers={data.registryEntry.queue.queued}
-        />
+        <ViewAction containers={data.registryEntry.queue.queued} />
       </Route>
       <Route>
         <h2>Route not found :(</h2>
@@ -198,7 +209,9 @@ function Actions({ dao }: DaoInfoProps) {
             <ActionCard id={id} key={id} />
           ))
         : 'No actions.'}
-      <Button onClick={handleNewAction}>New action</Button>
+      <div>
+        <Button onClick={handleNewAction}>New action</Button>
+      </div>
     </Frame>
   )
 }
@@ -252,9 +265,10 @@ type ActionCardProps = {
 
 function ActionCard({ id }: ActionCardProps) {
   const history = useHistory()
+  const { daoAddress }: any = useParams()
 
   const handleCardClick = useCallback(() => {
-    history.push(`/tools/${id}`)
+    history.push(`${daoAddress}/view-action/${id}`)
   }, [history, id])
 
   return (
@@ -265,7 +279,13 @@ function ActionCard({ id }: ActionCardProps) {
         background: transparent;
         width: 280px;
         height: 320px;
-        border: 1px solid #00f400;
+        border: 2px solid transparent;
+        border-image: linear-gradient(
+          to bottom right,
+          #ad41bb 20%,
+          #ff7d7d 100%
+        );
+        border-image-slice: 1;
         padding: 16px;
         margin-right: 8px;
         cursor: pointer;
@@ -279,7 +299,7 @@ function ActionCard({ id }: ActionCardProps) {
       `}
       onClick={handleCardClick}
     >
-      {id}
+      {shortenAddress(id)}
     </button>
   )
 }

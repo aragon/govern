@@ -2,6 +2,7 @@ import React, { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import 'styled-components/macro'
 import Frame from './Frame/Frame'
+import { shortenAddress } from '../lib/web3-utils'
 
 type Collateral = {
   token: string
@@ -115,10 +116,11 @@ export default function ViewAction({ containers }: ViewActionProps) {
   const container = useMemo(() => {
     return containers.find(container => container.id === containerId)
   }, [containerId, containers])
+
   return container ? (
     <>
       <Frame>
-        <h2>Action {container.id}</h2>
+        <h2>Action {shortenAddress(container.id)}</h2>
         <h3>Status</h3>
         <p>{container.state}</p>
       </Frame>
