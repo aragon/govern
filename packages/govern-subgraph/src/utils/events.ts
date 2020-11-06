@@ -113,7 +113,7 @@ export function handleContainerEventSchedule(
   ethereumEvent: ScheduledEvent,
   scheduleDeposit: CollateralEntity
 ): ContainerEventScheduleEntity {
-  let eventId = buildIndexedId(container.id, container.history.length)
+  let eventId = buildIndexedId(container.id, 0)
 
   let containerEvent = new ContainerEventScheduleEntity(eventId)
 
