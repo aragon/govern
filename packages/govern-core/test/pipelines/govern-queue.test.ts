@@ -122,7 +122,7 @@ describe('Govern Queue', function() {
   })
 
   context('GovernQueue.schedule', () => {
-    beforeEach(async () => {
+    before(async () => {
       container = JSON.parse(JSON.stringify(containerJson))
       container.payload.executionTime = (
         await ethers.provider.getBlock('latest')
@@ -142,6 +142,8 @@ describe('Govern Queue', function() {
       expect(
         await testToken.balanceOf(ownerAddr)
       ).to.equal(ownerTokenAmount - container.config.scheduleDeposit.amount)
+
+      container.payload.nonce++;
     })
 
     it('reverts with "queue: bad config"', async () => {
@@ -150,6 +152,8 @@ describe('Govern Queue', function() {
       await expect(
         gq.schedule(container)
       ).to.be.revertedWith(ERRORS.BAD_CONFIG)
+
+      container.config.executionDelay = 0
     })
 
     it('reverts with "queue: bad delay"', async () => {
@@ -158,6 +162,10 @@ describe('Govern Queue', function() {
       await expect(
         gq.schedule(container)
       ).to.be.revertedWith(ERRORS.BAD_DELAY)
+
+      container.payload.executionTime = (
+        await ethers.provider.getBlock('latest')
+      ).timestamp + 1000
     })
 
     it('reverts with "queue: bad submitter"', async () => {
@@ -166,9 +174,13 @@ describe('Govern Queue', function() {
       await expect(
         gq.schedule(container)
       ).to.be.revertedWith(ERRORS.BAD_SUBMITTER)
+
+      container.payload.submitter = ownerAddr
     })
 
     it('reverts with "queue: bad nonce"', async () => {
+      container.payload.nonce = 0;
+
       await expect(
         gq.schedule(container)
       ).to.be.revertedWith(ERRORS.BAD_NONCE)
