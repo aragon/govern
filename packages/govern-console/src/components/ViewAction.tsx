@@ -165,7 +165,7 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
     } catch (err) {
       console.log(err)
     }
-  }, [queueContract])
+  }, [queueContract, container])
 
   const veto = useCallback(async () => {
     try {
@@ -173,6 +173,7 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
       const tx = await queueContract!['veto'](containerHash, '0x00', {
         gasLimit: 500000,
       })
+      await tx.wait(1)
     } catch (err) {
       console.log(err)
     }
