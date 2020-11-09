@@ -1,7 +1,9 @@
 import env from '../environment'
 import { utils as EthersUtils } from 'ethers'
+
 export const DEFAULT_LOCAL_CHAIN = 'private'
 export const ETH_FAKE_ADDRESS = `0x${''.padEnd(40, '0')}`
+export const ETH_ANY_ADDRESS = '0xffffffffffffffffffffffffffffffffffffffff'
 
 const ETH_ADDRESS_SPLIT_REGEX = /(0x[a-fA-F0-9]{40}(?:\b|\.|,|\?|!|;))/g
 const ETH_ADDRESS_TEST_REGEX = /(0x[a-fA-F0-9]{40}(?:\b|\.|,|\?|!|;))/g
@@ -113,8 +115,9 @@ export function isLocalOrUnknownNetwork(chainId = env('CHAIN_ID')) {
 export function hexToAscii(hexx) {
   const hex = hexx.toString()
   let str = ''
-  for (let i = 0; i < hex.length && hex.substr(i, 2) !== '00'; i += 2)
+  for (let i = 0; i < hex.length && hex.substr(i, 2) !== '00'; i += 2) {
     str += String.fromCharCode(parseInt(hex.substr(i, 2), 16))
+  }
   return str
 }
 

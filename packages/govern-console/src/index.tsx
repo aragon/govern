@@ -4,22 +4,26 @@ import { createGlobalStyle } from 'styled-components'
 import 'styled-components/macro'
 import {
   ApolloClient,
+  ApolloProvider,
   InMemoryCache,
   NormalizedCacheObject,
-  ApolloProvider
-} from '@apollo/client';
+} from '@apollo/client'
 import App from './App'
 import GeneralProvider from './Providers/GeneralProvider'
 
-export const rinkebyClient: ApolloClient<NormalizedCacheObject> = new ApolloClient({
-  uri: 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby',
-  cache: new InMemoryCache()
-});
+export const rinkebyClient: ApolloClient<NormalizedCacheObject> = new ApolloClient(
+  {
+    uri: 'https://api.thegraph.com/subgraphs/name/evalir/aragon-govern-rinkeby',
+    cache: new InMemoryCache(),
+  },
+)
 
-export const mainnetClient: ApolloClient<NormalizedCacheObject> = new ApolloClient({
-  uri: 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-mainnet',
-  cache: new InMemoryCache()
-})
+export const mainnetClient: ApolloClient<NormalizedCacheObject> = new ApolloClient(
+  {
+    uri: 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-mainnet',
+    cache: new InMemoryCache(),
+  },
+)
 
 const GlobalStyle = createGlobalStyle`
   *, *:before, *:after {
@@ -68,7 +72,6 @@ render(
         <App />
       </React.StrictMode>
     </GeneralProvider>
-  </ApolloProvider>
-  ,
+  </ApolloProvider>,
   document.getElementById('root'),
 )
