@@ -62,10 +62,11 @@ abstract contract IERC3000 is ERC3000Interface {
 
     /**
      * @notice Apply arbitrator's ruling over a challenge once it has come to a final ruling
-     * @param containerHash Hash of the container being vetoed
+     * @param container A ERC3000Data.Container struct holding both the payload being scheduled for execution and
+       the current configuration of the system
      * @param reason Justification for the veto
      */
-    function veto(bytes32 containerHash, bytes memory reason) virtual public;
+    function veto(ERC3000Data.Container memory container, bytes memory reason) virtual public;
     event Vetoed(bytes32 indexed containerHash, address indexed actor, bytes reason);
 
     /**

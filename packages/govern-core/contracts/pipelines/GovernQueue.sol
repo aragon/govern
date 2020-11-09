@@ -85,7 +85,7 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
         override
         auth(this.schedule.selector) // note that all functions in this contract are ACL protected (commonly some of them will be open for any addr to perform)
         returns (bytes32 containerHash)
-    {   
+    {
         // prevent griefing by front-running (the same container is sent by two different people and one must be challenged)
         require(_container.payload.nonce == ++nonce, "queue: bad nonce");
         // hash using ERC3000Data.hash(ERC3000Data.Config)
@@ -105,7 +105,7 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
         // we don't need to save any more state about the container in storage
         // we just authenticate the hash and assign it a state, since all future
         // actions regarding the container will need to provide it as a witness
-        // all witnesses are logged from this contract at least once, so the 
+        // all witnesses are logged from this contract at least once, so the
         // trust assumption should be the same as storing all on-chain (move complexity to clients)
 
         ERC3000Data.Collateral memory collateral = _container.config.scheduleDeposit;
@@ -212,13 +212,31 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
         }
     }
 
-    function veto(bytes32 _containerHash, bytes memory _reason) auth(this.veto.selector) override public {
-        queue[_containerHash].checkAndSetState(
-            GovernQueueStateLib.State.Scheduled,
-            GovernQueueStateLib.State.Cancelled
-        );
+    function veto(ERC3000Data.Container memory _container, bytes memory _reason) auth(this.veto.selector) override public {
+        bytes32 containerHash = _container.hash();
+        GovernQueueStateLib.Item storage item = queue[containerHash];
 
-        emit Vetoed(_containerHash, msg.sender, _reason);
+        if (item.state == GovernQueueStateLib.State.Challenged) {
+            item.checkAndSetState(
+                GovernQueueStateLib.State.Challenged,
+                GovernQueueStateLib.State.Cancelled
+            );
+
+            _container.config.challengeDeposit.releaseTo(challengerCache[containerHash]);
+            challengerCache[containerHash] = address(0); // release state, refund gas, no longer needed in state
+            delete disputeItemCache[containerHash][IArbitrator(_container.config.resolver)];
+        } else {
+            // If the given container doesn't have the state Challenged
+            // has it to be the Scheduled state and otherwise should it throw as expected
+            item.checkAndSetState(
+                GovernQueueStateLib.State.Scheduled,
+                GovernQueueStateLib.State.Cancelled
+            );
+
+            _container.config.scheduleDeposit.releaseTo(_container.payload.submitter);
+        }
+
+        emit Vetoed(containerHash, msg.sender, _reason);
     }
 
     /**
