@@ -227,7 +227,7 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
 
             _container.config.challengeDeposit.releaseTo(challengerCache[containerHash]);
             challengerCache[containerHash] = address(0);
-            disputeItemCache[containerHash] = address(0);
+            delete disputeItemCache[containerHash][IArbitrator(_container.config.resolver)];
         } else {
             item.checkAndSetState(
                 GovernQueueStateLib.State.Scheduled,
