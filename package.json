@@ -14,16 +14,18 @@
     "lerna": "^3.22.1"
   },
   "scripts": {
-    "clean": "lerna run --scope=@aragon/govern* --parallel --stream clean",
-    "test": "lerna run --parallel --stream test",
+    "clean": "lerna run --scope=@aragon/govern* --stream clean",
+    "test": "lerna run --stream --concurrency 1 test",
+    "test:fast": "lerna run --stream test",
     "init:dev:env": "scripts/init.dev.env.sh",
     "start:dev": "cd ./packages/govern-server/ && yarn start:containers",
-    "coverage": "lerna run --concurrency 1 --stream coverage",
-    "build:contracts": "lerna run --scope=@aragon/govern-core --scope=erc3k --scope=@aragon/govern-contract-utils --scope=@aragon/govern-create --parallel --stream build",
-    "compile:cached": "lerna run --parallel --stream compile:cached",
-    "build:subgraph": "lerna run --scope=@aragon/govern-subgraph --parallel --stream build",
-    "deploy:subgraph:rinkeby": "lerna run --scope=@aragon/govern-subgraph --parallel --stream deploy-rinkeby",
-    "deploy:subgraph:mainnet": "lerna run --scope=@aragon/govern-subgraph --parallel --stream deploy-mainnet"
+    "start:server": "yarn workspace @aragon/govern-server start:server",
+    "coverage": "lerna run --stream --concurrency 1 coverage",
+    "build:contracts": "lerna run --scope=@aragon/govern-core --scope=erc3k --scope=@aragon/govern-contract-utils --scope=@aragon/govern-create --stream build",
+    "compile:cached": "lerna run --stream compile:cached",
+    "build:subgraph": "lerna run --scope=@aragon/govern-subgraph --stream build",
+    "deploy:subgraph:rinkeby": "lerna run --scope=@aragon/govern-subgraph --stream deploy-rinkeby",
+    "deploy:subgraph:mainnet": "lerna run --scope=@aragon/govern-subgraph --stream deploy-mainnet"
   },
   "workspaces": {
     "packages": [
