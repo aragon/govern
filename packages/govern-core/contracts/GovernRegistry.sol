@@ -13,19 +13,15 @@ import "@aragon/govern-contract-utils/contracts/erc165/ERC165.sol";
 contract GovernRegistry is IERC3000Registry {
     mapping(string => address) public owners;
 
-    modifier onlyOwner(string memory _name) {
-        require(owners[_name] == msg.sender, "registry: only owner");
-        _;
-    }
-
     function register(
         IERC3000Executor _executor,
         IERC3000 _queue,
         IERC20 _token,
         string calldata _name,
         bytes calldata _initialMetadata
-    ) override external onlyOwner(_name)
+    ) override external
     {
+        require(!owners[_name] || owners[_name] == msg.sender, "registry: only owner");
         owners[_name] = msg.sender;
 
         emit Registered(_executor, _queue, _token, msg.sender, _name);
@@ -40,7 +36,8 @@ contract GovernRegistry is IERC3000Registry {
         emit SetMetadata(_executor, _metadata);
     }
 
-    function setOwner(string calldata _name, address _newOwner) override external onlyOwner(_name) {
+    function setOwner(string calldata _name, address _newOwner) override external {
+        require(owners[_name] == msg.sender, "registry: only owner");
         owners[_name] = _newOwner;
 
         emit NewOwner(_name, _newOwner);
