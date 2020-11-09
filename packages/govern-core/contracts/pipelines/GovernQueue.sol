@@ -212,10 +212,7 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
         }
     }
 
-    function veto(
-        ERC3000Data.Container memory _container,
-        bytes memory _reason
-    ) auth(this.veto.selector) override public {
+    function veto(ERC3000Data.Container memory _container, bytes memory _reason) auth(this.veto.selector) override public {
         bytes32 containerHash = _container.hash();
         GovernQueueStateLib.Item storage item = queue[containerHash];
 
@@ -226,9 +223,11 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
             );
 
             _container.config.challengeDeposit.releaseTo(challengerCache[containerHash]);
-            challengerCache[containerHash] = address(0);
+            challengerCache[containerHash] = address(0); // release state, refund gas, no longer needed in state
             delete disputeItemCache[containerHash][IArbitrator(_container.config.resolver)];
         } else {
+            // If the given container doesn't have the state Challenged
+            // has it to be the Scheduled state and otherwise should it throw as expected
             item.checkAndSetState(
                 GovernQueueStateLib.State.Scheduled,
                 GovernQueueStateLib.State.Cancelled
