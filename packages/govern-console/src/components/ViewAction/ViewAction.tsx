@@ -1,11 +1,13 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useMemo, useCallback, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import 'styled-components/macro'
-import Button from './Button'
-import Frame from './Frame/Frame'
-import { useContract } from '../lib/web3-contracts'
-import { shortenAddress } from '../lib/web3-utils'
-import queueAbi from '../lib/abi/GovernQueue.json'
+import Button from '../Button'
+import Frame from '../Frame/Frame'
+import Info from '../Info/Info'
+import { useContract } from '../../lib/web3-contracts'
+import { shortenAddress } from '../../lib/web3-utils'
+import queueAbi from '../../lib/abi/GovernQueue.json'
+import { useWallet } from '../../Providers/Wallet'
 
 const EMPTY_FAILURE_MAP =
   '0x0000000000000000000000000000000000000000000000000000000000000000'
@@ -124,9 +126,27 @@ type ViewActionProps = {
 }
 
 function ViewAction({ container, queueAddress }: ViewActionProps) {
+  const { wallet } = useWallet()
+  const { status: accountStatus } = wallet
+  const [executionStatus, setExecutionStatus] = useState('')
+  const [statusType, setStatusType] = useState<
+    'error' | 'info' | 'success' | ''
+  >('')
   const queueContract = useContract(queueAddress, queueAbi)
 
+  const handleSetExecutionStatus = useCallback(
+    (result, message) => {
+      setStatusType(result)
+      setExecutionStatus(message)
+    },
+    [setExecutionStatus, setStatusType],
+  )
+
   const execute = useCallback(async () => {
+    if (accountStatus !== 'connected') {
+      alert('Executing actions requires a signer. Please connect your account.')
+      return
+    }
     const payloadActions = container.payload.actions.map((action: Action) => ({
       to: action.to,
       value: action.value,
@@ -158,33 +178,60 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
     }
 
     try {
-      const tx = await queueContract!['execute'](craftedContainer, {
+      const tx = await queueContract!.execute(craftedContainer, {
         gasLimit: 500000,
       })
+      handleSetExecutionStatus('info', `Sending transaction.`)
       await tx.wait(1)
+      handleSetExecutionStatus(
+        'success',
+        `Transaction sent successfully. hash: ${tx.hash}`,
+      )
     } catch (err) {
       console.log(err)
+      handleSetExecutionStatus(
+        'error',
+        `There was an error with the transaction.`,
+      )
     }
-  }, [queueContract, container])
+  }, [accountStatus, container, handleSetExecutionStatus, queueContract])
 
   const veto = useCallback(async () => {
+    if (accountStatus !== 'connected') {
+      alert('Executing actions requires a signer. Please connect your account.')
+      return
+    }
     try {
       const containerHash = container.id
-      const tx = await queueContract!['veto'](containerHash, '0x00', {
+      const tx = await queueContract!.veto(containerHash, '0x00', {
         gasLimit: 500000,
       })
+      handleSetExecutionStatus('info', `Sending transaction.`)
       await tx.wait(1)
+      handleSetExecutionStatus(
+        'success',
+        `Transaction sent successfully. hash: ${tx.hash}`,
+      )
     } catch (err) {
       console.log(err)
+      handleSetExecutionStatus(
+        'error',
+        `There was an error with the transaction.`,
+      )
     }
-  }, [container])
+  }, [accountStatus, container, handleSetExecutionStatus, queueContract])
 
   const challenge = useCallback(async () => {
+    if (accountStatus !== 'connected') {
+      alert('Executing actions requires a signer. Please connect your account.')
+      return
+    }
     const payloadActions = container.payload.actions.map((action: Action) => ({
       to: action.to,
       value: action.value,
       data: action.data,
     }))
+    // TODO: handle token approvals first
     const craftedContainer = {
       payload: {
         nonce: container.payload.nonce,
@@ -210,14 +257,23 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
       },
     }
     try {
-      const tx = await queueContract!['challenge'](craftedContainer, '0x00', {
+      const tx = await queueContract!.challenge(craftedContainer, '0x00', {
         gasLimit: 500000,
       })
+      handleSetExecutionStatus('info', `Sending transaction.`)
       await tx.wait(1)
+      handleSetExecutionStatus(
+        'success',
+        `Transaction sent successfully. hash: ${tx.hash}`,
+      )
     } catch (err) {
       console.log(err)
+      handleSetExecutionStatus(
+        'error',
+        `There was an error with the transaction.`,
+      )
     }
-  }, [container, queueContract])
+  }, [accountStatus, container, handleSetExecutionStatus, queueContract])
 
   return (
     <>
@@ -225,6 +281,7 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
         <h2>Action {shortenAddress(container.id)}</h2>
         <h3>Status</h3>
         <p>{container.state}</p>
+        {executionStatus && <Info mode={statusType}>{executionStatus}</Info>}
       </Frame>
 
       <Frame>
@@ -288,11 +345,11 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
         <h3>Execution Delay</h3>
         <p>{container.config.executionDelay}</p>
         <h3>Schedule deposit</h3>
-        <p>{container.config.scheduleDeposit.token}</p>
-        <p>{container.config.scheduleDeposit.amount}</p>
+        <p>Token: {container.config.scheduleDeposit.token}</p>
+        <p>Amount: {container.config.scheduleDeposit.amount}</p>
         <h3>Challenge deposit</h3>
-        <p>{container.config.challengeDeposit.token}</p>
-        <p>{container.config.challengeDeposit.amount}</p>
+        <p>Token: {container.config.challengeDeposit.token}</p>
+        <p>Amount: {container.config.challengeDeposit.amount}</p>
         <h3>Resolver</h3>
         <p>{container.config.resolver}</p>
         <h3>Rules</h3>

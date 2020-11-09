@@ -1,10 +1,8 @@
-// rinkeby
 const CHAIN_ID_DEFAULT = 4
 
 const ENV_VARS = {
   CHAIN_ID() {
-    // @ts-ignore
-    const chainId = parseInt(process.env.REACT_APP_CHAIN_ID)
+    const chainId = parseInt(process.env.REACT_APP_CHAIN_ID ?? '4')
     return isNaN(chainId) ? CHAIN_ID_DEFAULT : chainId
   },
   ENABLE_SENTRY() {

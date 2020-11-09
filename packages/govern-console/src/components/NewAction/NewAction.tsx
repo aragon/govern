@@ -4,10 +4,10 @@ import { useWallet } from 'use-wallet'
 import abiCoder from 'web3-eth-abi'
 import { toHex } from 'web3-utils'
 import 'styled-components/macro'
-import Button from './Button'
-import Frame from './Frame/Frame'
-import { useContract } from '../lib/web3-contracts'
-import queueAbi from '../lib/abi/GovernQueue.json'
+import Button from '../Button'
+import Frame from '../Frame/Frame'
+import { useContract } from '../../lib/web3-contracts'
+import queueAbi from '../../lib/abi/GovernQueue.json'
 
 const EMPTY_BYTES = '0x00'
 const EMPTY_FAILURE_MAP =
@@ -73,7 +73,7 @@ export default function NewAction({
         setExecutionResult(message)
       }
     },
-    [setExecutionResult, setType],
+    [setExecutionResult],
   )
 
   return (
@@ -252,6 +252,7 @@ function ContractCallHandler({
         const bnNonce = new BN(nonce.toString())
         const newNonce = bnNonce.add(new BN('1'))
 
+        // TODO: handle token approvals
         // Current time + 30 secs buffer.
         // This is necessary for DAOs with lower execution delays, in which
         // the tx getting picked up by a later block can make the tx fail.
@@ -288,16 +289,11 @@ function ContractCallHandler({
           },
         }
 
-        console.log(container)
-
-        const tx = await queueContract['schedule'](container, {
+        const tx = await queueContract.schedule(container, {
           gasLimit: 500000,
         })
 
-        handleSetExecutionResult(
-          'info',
-          `Sending transaction.`,
-        )
+        handleSetExecutionResult('info', `Sending transaction.`)
         await tx.wait(1)
 
         setResult(tx.hash)
@@ -318,8 +314,9 @@ function ContractCallHandler({
       config,
       contractAddress,
       executor,
-      proof,
+      handleSetExecutionResult,
       queueContract,
+      proof,
       rawAbiItem,
       values,
     ],

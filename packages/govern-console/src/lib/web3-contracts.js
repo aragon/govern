@@ -6,7 +6,7 @@ import {
   getDefaultProvider,
 } from 'ethers'
 import { useWallet } from 'use-wallet'
-import { getKnownContract } from './known-contracts.js'
+import { getKnownContract } from './known-contracts'
 import { useChainId } from '../Providers/ChainId'
 import { bigNum, getNetworkNode } from './web3-utils'
 
