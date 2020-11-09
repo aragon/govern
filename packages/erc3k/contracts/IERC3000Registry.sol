@@ -27,4 +27,12 @@ abstract contract IERC3000Registry is ERC3000Interface {
      */
     function setMetadata(bytes memory metadata) virtual public;
     event SetMetadata(IERC3000Executor indexed executor, bytes metadata);
+
+    /**
+    * @notice defines a new owner of a given name
+    * @param _name The name the new owner should get applied
+    * @param _newOwner The address of the new owner
+    */
+    function setOwner(string calldata _name, address _newOwner) virtual external;
+    event NewOwner(string indexed name, address newOwner);
 }
