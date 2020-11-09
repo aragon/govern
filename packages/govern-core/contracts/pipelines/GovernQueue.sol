@@ -217,7 +217,7 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
         bytes memory _reason
     ) auth(this.veto.selector) override public {
         bytes32 containerHash = _container.hash();
-        GovernQueueStateLib.Item item = queue[containerHash];
+        GovernQueueStateLib.Item storage item = queue[containerHash];
 
         if (item.state == GovernQueueStateLib.State.Challenged) {
             item.checkAndSetState(
@@ -225,19 +225,19 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
                 GovernQueueStateLib.State.Cancelled
             );
 
-            _config.challengeDeposit.releaseTo(challengerCache[containerHash]);
+            _container.config.challengeDeposit.releaseTo(challengerCache[containerHash]);
             challengerCache[containerHash] = address(0);
-            delete disputeItemCache[containerHash];
+            disputeItemCache[containerHash] = address(0);
         } else {
             item.checkAndSetState(
                 GovernQueueStateLib.State.Scheduled,
                 GovernQueueStateLib.State.Cancelled
             );
 
-            _config.scheduleDeposit.releaseTo(_container.payload.submitter);
+            _container.config.scheduleDeposit.releaseTo(_container.payload.submitter);
         }
 
-        emit Vetoed(_containerHash, msg.sender, _reason);
+        emit Vetoed(containerHash, msg.sender, _reason);
     }
 
     /**
