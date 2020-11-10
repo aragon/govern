@@ -1,6 +1,6 @@
 {
   "name": "@aragon/govern-contract-utils",
-  "version": "1.0.1-beta.0",
+  "version": "1.0.0-beta.12",
   "description": "Contract utils used Govern smart contract packages",
   "main": "index.js",
   "repository": "https://github.com/aragon/govern",
