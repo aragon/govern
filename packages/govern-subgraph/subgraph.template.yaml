@@ -26,15 +26,15 @@ templates:
         - Role
       abis:
         - name: GovernQueue
-          file: ./node_modules/@aragon/govern-core/abi/GovernQueue.json
+          file: $GOVERN_CORE_MODULE/abi/GovernQueue.json
       eventHandlers:
         - event: Configured(indexed bytes32,indexed address,(uint256,(address,uint256),(address,uint256),address,bytes))
           handler: handleConfigured
         - event: Frozen(indexed bytes4,indexed address)
           handler: handleFrozen
-        - event: Granted(indexed bytes4,indexed address,indexed address)
+        - event: Granted(indexed bytes4,indexed address,indexed address,address)
           handler: handleGranted
-        - event: Scheduled(indexed bytes32,(uint256,uint256,address,address,(address,uint256,bytes)[],bytes32,bytes),(address,uint256))
+        - event: Scheduled(indexed bytes32,(uint256,uint256,address,address,(address,uint256,bytes)[],bytes32,bytes))
           handler: handleScheduled
         - event: Executed(indexed bytes32,indexed address)
           handler: handleExecuted
@@ -66,13 +66,13 @@ templates:
         - Role
       abis:
         - name: Govern
-          file: ./node_modules/@aragon/govern-core/abi/Govern.json
+          file: $GOVERN_CORE_MODULE/abi/Govern.json
       eventHandlers:
         - event: Executed(indexed address,(address,uint256,bytes)[],bytes32,bytes32,bytes[])
           handler: handleExecuted
         - event: Frozen(indexed bytes4,indexed address)
           handler: handleFrozen
-        - event: Granted(indexed bytes4,indexed address,indexed address)
+        - event: Granted(indexed bytes4,indexed address,indexed address,address)
           handler: handleGranted
         - event: Revoked(indexed bytes4,indexed address,indexed address)
           handler: handleRevoked

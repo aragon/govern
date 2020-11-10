@@ -2,8 +2,7 @@
   "name": "@aragon/govern-subgraph",
   "version": "1.0.1-beta.0",
   "scripts": {
-    "codegen": "rm -rf generated; graph codegen",
-    "build": "rm -rf build; graph build",
+    "build": "scripts/build-subgraph.sh",
     "manifest-mainnet": "scripts/build-manifest.sh mainnet",
     "manifest-mainnet-staging": "STAGING=true scripts/build-manifest.sh mainnet",
     "manifest-rinkeby": "scripts/build-manifest.sh rinkeby",

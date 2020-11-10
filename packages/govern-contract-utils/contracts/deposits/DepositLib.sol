@@ -17,7 +17,7 @@ library DepositLib {
     function collectFrom(ERC3000Data.Collateral memory _collateral, address _from) internal {
         if (_collateral.amount > 0) {
             ERC20 token = ERC20(_collateral.token);
-            require(token.safeTransferFrom(_from, msg.sender, _collateral.amount), "queue: bad get token");
+            require(token.safeTransferFrom(_from, address(this), _collateral.amount), "queue: bad get token");
 
             emit Lock(_collateral.token, _from, _collateral.amount);
         }

@@ -62,13 +62,10 @@ export function handleScheduled(event: ScheduledEvent): void {
   // should be impossible to get at this stage
   container.config = queue.config
   container.queue = queue.id
+  let config = loadConfig(queue.config)
+  let scheduleDeposit = loadCollateral(config.scheduleDeposit)
 
-  handleContainerEventSchedule(container, event)
-
-  // add the container to the queue
-  let scheduled = queue.queued
-  scheduled.push(container.id)
-  queue.queued = scheduled
+  handleContainerEventSchedule(container, event, scheduleDeposit as CollateralEntity)
 
   payload.save()
   container.save()
@@ -251,6 +248,22 @@ function loadOrCreatePayload(containerHash: Bytes): PayloadEntity {
   return payload!
 }
 
+function loadConfig(configAddress: string): ConfigEntity {
+  let config = ConfigEntity.load(configAddress)
+  if (config === null) {
+    throw new Error('Config not found.')
+  }
+  return config!
+}
+
+function loadCollateral(collateralAddress: string): CollateralEntity {
+  let collateral = CollateralEntity.load(collateralAddress)
+  if (collateral === null) {
+    throw new Error('Collateral not found.')
+  }
+  return collateral!
+}
+
 function buildActions(event: ScheduledEvent): void {
   let actions = event.params.payload.actions
   for (let index = 0; index < actions.length; index++) {
@@ -265,3 +278,4 @@ function buildActions(event: ScheduledEvent): void {
     action.save()
   }
 }
+

@@ -42,6 +42,7 @@
     "build": "yarn compile && buidler typechain",
     "clean": "rm -rf artifacts",
     "compile": "buidler compile --force",
+    "compile:cached": "buidler compile",
     "test": "yarn build && buidler test",
     "coverage": "yarn build && SOLIDITY_COVERAGE=true buidler coverage --network coverage",
     "abi:extract": "buidler-extract --output abi/ --keys abi",

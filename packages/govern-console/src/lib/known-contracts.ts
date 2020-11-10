@@ -12,11 +12,12 @@ const KNOWN_CONTRACTS_BY_ENV = new Map([
 
 const ABIS = new Map([
   ['AGREEMENT', agreementAbi],
-  ['TOKEN', erc20Abi]
+  ['TOKEN', erc20Abi],
 ])
 
-export function getKnownContract(name) {
+export function getKnownContract(name: string): any {
   const knownContracts = KNOWN_CONTRACTS_BY_ENV.get('4') || {}
+  // @ts-ignore
   return [knownContracts[name] || null, ABIS.get(name) || []]
 }
 
