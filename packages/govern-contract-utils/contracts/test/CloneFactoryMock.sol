@@ -15,6 +15,9 @@ contract CloneFactoryMock {
     address public cloningContractWithInit;
     address public latestClonedContract;
 
+    bytes public generatedCode;
+    string public revertMessage;
+
     constructor() public {
         setupContracts();
     }
@@ -40,11 +43,11 @@ contract CloneFactoryMock {
         latestClonedContract = address(cloningContractWithInit.clone2(bytes32(0), bytes('INIT DATA')));
     }
 
-    function generateCode() public view returns (bytes memory data) {
-        return cloningContract.generateCode();
+    function generateCode() public {
+        generatedCode = cloningContract.generateCode();
     }
 
-    function getRevertMessage(bytes memory _data) public pure returns (string memory) {
-        return ERC1167ProxyFactory._getRevertMsg(_data);
+    function getRevertMessage(bytes memory _data) public {
+        revertMessage = ERC1167ProxyFactory._getRevertMsg(_data);
     }
 }
