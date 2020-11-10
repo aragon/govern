@@ -14,5 +14,5 @@ task('deploy-registry', 'Deploys an GoverRegistry instance')
 
     const governRegistry = await deployGoverRegistry(currentNetwork, verify)
 
-    await registerContractInJsonDb(GovernRegistry, governRegistry)
+    await registerContractInJsonDb(GovernRegistry, governRegistry.address)
   })

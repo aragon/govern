@@ -9,7 +9,13 @@ import { Contract, Signer } from 'ethers'
 import { promises } from 'fs'
 import { Address, eContractid } from './types'
 import { getDb } from './artifactsDb'
-import { GovernBaseFactory, GovernRegistry } from '../typechain'
+import {
+  GovernBaseFactory,
+  GovernFactory,
+  GovernQueueFactory,
+  GovernRegistry,
+  GovernTokenFactory,
+} from '../typechain'
 
 export const writeObjectToFile = async (path: string, obj: object) =>
   await promises.writeFile(path, JSON.stringify(obj))
@@ -52,6 +58,42 @@ export const getGovernRegistry = async () => {
   ).address
   return await getContract<GovernRegistry>(
     eContractid.GovernRegistry,
+    addressDeployed
+  )
+}
+
+export const getGovernQueueFactory = async () => {
+  const addressDeployed = (
+    await getDb()
+      .get(`${eContractid.GovernQueueFactory}.${HRE.network.name}`)
+      .value()
+  ).address
+  return await getContract<GovernQueueFactory>(
+    eContractid.GovernQueueFactory,
+    addressDeployed
+  )
+}
+
+export const getGovernFactory = async () => {
+  const addressDeployed = (
+    await getDb()
+      .get(`${eContractid.GovernFactory}.${HRE.network.name}`)
+      .value()
+  ).address
+  return await getContract<GovernFactory>(
+    eContractid.GovernFactory,
+    addressDeployed
+  )
+}
+
+export const getGovernTokenFactory = async () => {
+  const addressDeployed = (
+    await getDb()
+      .get(`${eContractid.GovernTokenFactory}.${HRE.network.name}`)
+      .value()
+  ).address
+  return await getContract<GovernTokenFactory>(
+    eContractid.GovernTokenFactory,
     addressDeployed
   )
 }

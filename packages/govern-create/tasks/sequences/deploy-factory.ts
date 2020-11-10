@@ -1,5 +1,5 @@
 import { task } from 'hardhat/config'
-import { getContract, getGovernRegistry, setHRE } from '../../helpers/helpers'
+import { getGovernRegistry, setHRE } from '../../helpers/helpers'
 import {
   deployGoverBaseFactory,
   deployGoverFactory,
@@ -9,7 +9,14 @@ import {
 import { Address, eContractid } from '../../helpers/types'
 import { registerContractInJsonDb } from '../../helpers/artifactsDb'
 
-const { Govern, GovernBase, GovernBaseFactory, Queue, QueueBase } = eContractid
+const {
+  GovernBase,
+  GovernBaseFactory,
+  GovernFactory,
+  GovernTokenFactory,
+  QueueBase,
+  GovernQueueFactory,
+} = eContractid
 
 task('deploy-factory', 'Deploys an GovernBaseFactory instance')
   .addOptionalParam('registry', 'GovernRegistry address')
@@ -40,14 +47,11 @@ task('deploy-factory', 'Deploys an GovernBaseFactory instance')
       const queueBase = await queueFactory.base()
       const governBase = await governFactory.base()
 
-      await registerContractInJsonDb(GovernBaseFactory, baseFactory)
-      await registerContractInJsonDb(
-        GovernBase,
-        await getContract(Queue, queueBase)
-      )
-      await registerContractInJsonDb(
-        QueueBase,
-        await getContract(Govern, governBase)
-      )
+      await registerContractInJsonDb(GovernQueueFactory, queueFactory.address)
+      await registerContractInJsonDb(QueueBase, governBase)
+      await registerContractInJsonDb(GovernFactory, governFactory.address)
+      await registerContractInJsonDb(GovernBase, queueBase)
+      await registerContractInJsonDb(GovernTokenFactory, tokenFactory.address)
+      await registerContractInJsonDb(GovernBaseFactory, baseFactory.address)
     }
   )
