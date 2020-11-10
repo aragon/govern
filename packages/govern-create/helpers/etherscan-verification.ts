@@ -1,7 +1,7 @@
 import { exit } from 'process'
 import fs from 'fs'
 import { file } from 'tmp-promise'
-import { BRE } from './helpers'
+import { HRE } from './helpers'
 import { logError, logInfo, logWarn } from './logger'
 
 export const SUPPORTED_ETHERSCAN_NETWORKS = ['main', 'rinkeby']
@@ -14,7 +14,7 @@ export const verifyContract = async (
   address: string,
   constructorArguments: any[]
 ) => {
-  const currentNetwork = BRE.network.name
+  const currentNetwork = HRE.network.name
 
   if (!process.env.ETHERSCAN_KEY) {
     throw Error('Missing process.env.ETHERSCAN_KEY.')
@@ -61,7 +61,7 @@ export const runTaskWithRetry = async (
 
   try {
     if (times) {
-      await BRE.run(task, params)
+      await HRE.run(task, params)
       cleanup()
     } else {
       cleanup()

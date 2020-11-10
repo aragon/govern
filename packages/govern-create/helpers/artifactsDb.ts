@@ -1,7 +1,7 @@
 import { Contract } from 'ethers'
 import low from 'lowdb'
 import FileSync from 'lowdb/adapters/FileSync'
-import { BRE } from './helpers'
+import { HRE } from './helpers'
 import { eContractid } from './types'
 
 const adapter = new FileSync('./deployed-contracts.json')
@@ -11,7 +11,7 @@ export const registerContractInJsonDb = async (
   contractId: eContractid,
   contractInstance: Contract
 ) => {
-  const currentNetwork = BRE.network.name
+  const currentNetwork = HRE.network.name
 
   await getDb()
     .set(`${contractId}.${currentNetwork}`, {

@@ -1,48 +1,53 @@
 import { task } from 'hardhat/config'
-import { getGovernRegistry, setBRE } from '../../helpers/helpers'
+import { getContract, getGovernRegistry, setHRE } from '../../helpers/helpers'
 import {
   deployGoverBaseFactory,
-  deployGoverDeployer,
-  deployGoverQueueDeployer,
-  deployGoverTokenDeployer,
+  deployGoverFactory,
+  deployGoverQueueFactory,
+  deployGoverTokenFactory,
 } from '../../helpers/delploys'
 import { Address, eContractid } from '../../helpers/types'
 import { registerContractInJsonDb } from '../../helpers/artifactsDb'
 
-const { GovernBaseFactory } = eContractid
+const { Govern, GovernBase, GovernBaseFactory, Queue, QueueBase } = eContractid
 
-task('deploy-factory', 'Deploys an GovernBaseDeployer instance')
+task('deploy-factory', 'Deploys an GovernBaseFactory instance')
   .addOptionalParam('registry', 'GovernRegistry address')
   .addFlag('verify', 'Verify the contracts via Etherscan API')
   .setAction(
     async (
       { registry, verify }: { registry: Address; verify: boolean },
-      BRE
+      HRE
     ) => {
-      setBRE(BRE)
-      const currentNetwork = BRE.network.name
+      setHRE(HRE)
+      const currentNetwork = HRE.network.name
 
-      const governDeployer = await deployGoverDeployer(currentNetwork, verify)
-      const queueDeployer = await deployGoverQueueDeployer(
-        currentNetwork,
-        verify
-      )
-      const tokenDeployer = await deployGoverTokenDeployer(
-        currentNetwork,
-        verify
-      )
+      const queueFactory = await deployGoverQueueFactory(currentNetwork, verify)
+      const governFactory = await deployGoverFactory(currentNetwork, verify)
+      const tokenFactory = await deployGoverTokenFactory(currentNetwork, verify)
 
-      const baseDeployer = await deployGoverBaseFactory(
+      const baseFactory = await deployGoverBaseFactory(
         [
           registry ?? (await getGovernRegistry()).address,
-          governDeployer.address,
-          queueDeployer.address,
-          tokenDeployer.address,
+          governFactory.address,
+          queueFactory.address,
+          tokenFactory.address,
         ],
         currentNetwork,
         verify
       )
 
-      await registerContractInJsonDb(GovernBaseFactory, baseDeployer)
+      const queueBase = await queueFactory.base()
+      const governBase = await governFactory.base()
+
+      await registerContractInJsonDb(GovernBaseFactory, baseFactory)
+      await registerContractInJsonDb(
+        GovernBase,
+        await getContract(Queue, queueBase)
+      )
+      await registerContractInJsonDb(
+        QueueBase,
+        await getContract(Govern, governBase)
+      )
     }
   )

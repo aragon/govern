@@ -5,15 +5,14 @@ import {
   getContract,
   getGovernBaseFactory,
   getGovernRegistry,
-  setBRE,
+  setHRE,
 } from '../../helpers/helpers'
 import { logDeploy, logInfo } from '../../helpers/logger'
 import { eContractid } from '../../helpers/types'
 import { GovernBaseFactory } from '../../typechain'
 
-const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
-const ZERO_BYTES =
-  '0x0000000000000000000000000000000000000000000000000000000000000000'
+const ZERO_ADDR = `0x${'00'.repeat(20)}`
+const NO_TOKEN = `0x${'00'.repeat(20)}`
 
 task('deploy-govern', 'Deploys a Govern instance')
   .addOptionalParam('factory', 'GovernBaseFactory address')
@@ -27,14 +26,14 @@ task('deploy-govern', 'Deploys a Govern instance')
         useProxies = true,
         name,
         verify,
-        token = `0x${'00'.repeat(20)}`,
+        token = NO_TOKEN,
         tokenName = name,
         tokenSymbol = 'GOV',
       },
-      BRE
+      HRE
     ) => {
-      setBRE(BRE)
-      const currentNetwork = BRE.network.name
+      setHRE(HRE)
+      const currentNetwork = HRE.network.name
 
       name = buildName(name)
 
@@ -65,29 +64,20 @@ task('deploy-govern', 'Deploys a Govern instance')
         .map((log) => registry.interface.parseLog(log))
         .find(({ name }) => name === 'Registered')
 
-      const queueAddress = args?.args[1]
-      const governAddress = args?.args[0]
+      const queueAddress = args?.args[1] as string
+      const governAddress = args?.args[0] as string
 
-      if (verify) {
-        const { keccak256, solidityPack } = BRE.ethers.utils
-
-        const salt = useProxies
-          ? keccak256(solidityPack(['string'], [name]))
-          : ZERO_BYTES
-
-        const config = {
+      if (verify && !useProxies) {
+        const dummyConfig = {
           executionDelay: '0',
-          scheduleDeposit: [ZERO_ADDR, '0'],
-          challengeDeposit: [ZERO_ADDR, '0'],
+          scheduleDeposit: [NO_TOKEN, '0'],
+          challengeDeposit: [NO_TOKEN, '0'],
           resolver: ZERO_ADDR,
           rules: '0x',
         }
 
-        const queueArgs = [baseFactory.address, config, salt]
-        const governArgs = [queueAddress, salt]
-
-        await verifyContract(queueAddress, queueArgs)
-        await verifyContract(governAddress, governArgs)
+        await verifyContract(queueAddress, [baseFactory.address, dummyConfig])
+        await verifyContract(governAddress, [queueAddress])
       }
 
       if (

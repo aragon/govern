@@ -15,24 +15,24 @@ export const writeObjectToFile = async (path: string, obj: object) =>
   await promises.writeFile(path, JSON.stringify(obj))
 
 // Hardhat Runtime Environment
-export let BRE: HardhatRuntimeEnvironment = {} as HardhatRuntimeEnvironment
-export const setBRE = (_BRE: HardhatRuntimeEnvironment) => {
-  BRE = _BRE
+export let HRE: HardhatRuntimeEnvironment = {} as HardhatRuntimeEnvironment
+export const setHRE = (_HRE: HardhatRuntimeEnvironment) => {
+  HRE = _HRE
 }
 
 export const getEthersSigners = async (): Promise<Signer[]> =>
-  await Promise.all(await BRE.ethers.getSigners())
+  await Promise.all(await HRE.ethers.getSigners())
 
 export const getEthersSignersAddresses = async (): Promise<Address[]> =>
   await Promise.all(
-    (await BRE.ethers.getSigners()).map((signer) => signer.getAddress())
+    (await HRE.ethers.getSigners()).map((signer) => signer.getAddress())
   )
 
 export const deployContract = async <ContractType extends Contract>(
   contractName: string,
   args: any[]
 ): Promise<ContractType> =>
-  (await (await BRE.ethers.getContractFactory(contractName)).deploy(
+  (await (await HRE.ethers.getContractFactory(contractName)).deploy(
     ...args
   )) as ContractType
 
@@ -40,14 +40,14 @@ export const getContract = async <ContractType extends Contract>(
   contractName: string,
   contractAddress: string
 ): Promise<ContractType> =>
-  (await (await BRE.ethers.getContractAt(contractName, contractAddress)).attach(
+  (await (await HRE.ethers.getContractAt(contractName, contractAddress)).attach(
     contractAddress
   )) as ContractType
 
 export const getGovernRegistry = async () => {
   const addressDeployed = (
     await getDb()
-      .get(`${eContractid.GovernRegistry}.${BRE.network.name}`)
+      .get(`${eContractid.GovernRegistry}.${HRE.network.name}`)
       .value()
   ).address
   return await getContract<GovernRegistry>(
@@ -59,7 +59,7 @@ export const getGovernRegistry = async () => {
 export const getGovernBaseFactory = async () => {
   const addressDeployed = (
     await getDb()
-      .get(`${eContractid.GovernBaseFactory}.${BRE.network.name}`)
+      .get(`${eContractid.GovernBaseFactory}.${HRE.network.name}`)
       .value()
   ).address
   return await getContract<GovernBaseFactory>(

@@ -7,11 +7,13 @@ export enum eEthereumNetwork {
 }
 
 export enum eContractid {
-  GovernRegistry = 'GovernRegistry',
-  GovernDeployer = 'GovernDeployer',
-  GovernQueueDeployer = 'GovernQueueDeployer',
-  GovernTokenDeployer = 'GovernTokenDeployer',
-  GovernBaseFactory = 'GovernBaseFactory',
   Govern = 'Govern',
+  GovernBase = 'GovernBase',
+  GovernBaseFactory = 'GovernBaseFactory',
+  GovernFactory = 'GovernFactory',
+  GovernQueueFactory = 'GovernQueueFactory',
+  GovernRegistry = 'GovernRegistry',
+  GovernTokenFactory = 'GovernTokenFactory',
   Queue = 'Queue',
+  QueueBase = 'QueueBase',
 }
