@@ -56,7 +56,7 @@ describe('Govern', function() {
   })
 
   it('registers a standard and calls fallback as expected', async () => {
-    const magicNumber = '0x00000000';
+    const magicNumber = '0x10000000'
     const callbackSig = hexDataSlice(id('callbackFunc()'), 0, 4)
 
     await expect(
@@ -71,15 +71,16 @@ describe('Govern', function() {
       .to.emit(govern, EVENTS.REGISTERED_CALLBACK)
       .withArgs(callbackSig, magicNumber)
 
-    await expect(signers[0].call(
+
+    await expect(signers[0].sendTransaction(
       {
-          to: govern.address,
-          data: callbackSig
-        }
+        to: govern.address,
+        data: callbackSig
+      }
       )
     )
-      .to.emit(govern, EVENTS.RECEIVED_CALLBACK)
-      .withArgs(callbackSig, '')
+    .to.emit(govern, EVENTS.RECEIVED_CALLBACK)
+    .withArgs(callbackSig, callbackSig)
   })
 
   context('ERC-165', () => {
