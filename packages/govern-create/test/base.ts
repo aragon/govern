@@ -3,7 +3,6 @@ import { expect } from 'chai'
 import {
   getEthersSignersAddresses,
   getGovernBaseFactory,
-  getGovernQueueFactory,
   getGovernRegistry,
 } from '../helpers/helpers'
 import { Address } from '../helpers/types'

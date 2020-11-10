@@ -6,13 +6,9 @@ import {
   GovernTokenFactory,
 } from '../typechain'
 import { verifyContract } from './etherscan-verification'
-import { deployContract } from './helpers'
+import { deployContract, NO_TOKEN, TWO_ADDRR, ZERO_ADDR } from './helpers'
 import { logDeploy } from './logger'
 import { eContractid } from './types'
-
-const ZERO_ADDR = `0x${'00'.repeat(20)}`
-const TWO_ADDRR = `0x${'00'.repeat(19)}02`
-const NO_TOKEN = `0x${'00'.repeat(20)}`
 
 export const deployGoverRegistry = async (
   network: string,

@@ -6,13 +6,12 @@ import {
   getGovernBaseFactory,
   getGovernRegistry,
   setHRE,
+  NO_TOKEN,
+  ZERO_ADDR,
 } from '../../helpers/helpers'
 import { logDeploy, logInfo } from '../../helpers/logger'
 import { eContractid } from '../../helpers/types'
 import { GovernBaseFactory } from '../../typechain'
-
-const ZERO_ADDR = `0x${'00'.repeat(20)}`
-const NO_TOKEN = `0x${'00'.repeat(20)}`
 
 task('deploy-govern', 'Deploys a Govern instance')
   .addOptionalParam('factory', 'GovernBaseFactory address')

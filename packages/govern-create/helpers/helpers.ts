@@ -26,6 +26,10 @@ export const setHRE = (_HRE: HardhatRuntimeEnvironment) => {
   HRE = _HRE
 }
 
+export const ZERO_ADDR = `0x${'00'.repeat(20)}`
+export const TWO_ADDRR = `0x${'00'.repeat(19)}02`
+export const NO_TOKEN = `0x${'00'.repeat(20)}`
+
 export const getEthersSigners = async (): Promise<Signer[]> =>
   await Promise.all(await HRE.ethers.getSigners())
 
