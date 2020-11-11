@@ -74,10 +74,13 @@ class NetworkContext implements Network {
       (this.chainId === -1 ? chainId : this.chainId) ?? -1
     )
 
-    if (!chainIdNetworkContext) {
+    // Unsupported chain IDs are accepted, but only if
+    // ensAddress and subgraphUrl are both provided.
+    if (!chainIdNetworkContext && !(ensAddress && subgraphUrl)) {
       throw new ErrorInvalidNetwork(
-        `Network: invalid chainId provided: ${chainId}. ` +
-          `Please use one of the following: ` +
+        `Network: unsupported chainId provided: ${chainId}. ` +
+          `Please also provide a subgraphUrl and an ensAddress, ` +
+          `or pick a chainId from this list: ` +
           [...networkContexts.keys()].join(', ') +
           `.`
       )
@@ -87,9 +90,11 @@ class NetworkContext implements Network {
       this.chainId = chainId as number
     }
 
-    this.name = name ?? chainIdNetworkContext.name
-    this.ensAddress = ensAddress ?? chainIdNetworkContext.ensAddress
-    this.subgraphUrl = subgraphUrl ?? chainIdNetworkContext.subgraphUrl
+    this.name = name ?? chainIdNetworkContext?.name ?? 'Unknown'
+    this.ensAddress = (ensAddress ??
+      chainIdNetworkContext?.ensAddress) as string
+    this.subgraphUrl = (subgraphUrl ??
+      chainIdNetworkContext?.subgraphUrl) as string
   }
 }
 
