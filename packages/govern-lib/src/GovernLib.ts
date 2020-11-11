@@ -38,7 +38,8 @@ class GovernLib {
 
     if (!this.networkContext.subgraphUrl) {
       throw new ErrorInvalidNetwork(
-        `A subgraphUrl couldn’t be found for the chain ID ${this.networkContext.chainId}. ` +
+        `A subgraphUrl couldn’t be found for the chain ID ` +
+          `${this.networkContext.chainId}. ` +
           `Please specify a subgraphUrl or use a supported chainId.`
       )
     }

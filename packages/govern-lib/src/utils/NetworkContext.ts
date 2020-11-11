@@ -62,7 +62,7 @@ class NetworkContext implements Network {
         throw new ErrorInvalidNetwork(
           `Network: invalid name provided: ${name}. ` +
             `Please use provide a chainId or use one of the following names: ` +
-            [...networkContexts.keys()].join(', ') +
+            [...networkContexts.values()].map((c) => c.name).join(', ') +
             `.`
         )
       }
