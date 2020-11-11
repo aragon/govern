@@ -4,7 +4,11 @@ import startGraphql from './api-graphql'
 
 async function main() {
   const govern = new GovernLib({
-    network: { chainId: env.chainId },
+    network: {
+      chainId: env.chainId,
+      ensAddress: env.ensAddress,
+      name: env.networkName,
+    },
     subgraphUrl: env.subgraphUrl,
   })
 

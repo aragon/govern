@@ -11,7 +11,7 @@
     "server:healthcheck": "npx wait-on http://localhost:3000/.well-known/apollo/server-health"
   },
   "dependencies": {
-    "@aragon/govern-lib": "^1.0.0",
+    "@aragon/govern-lib": "^1.0.0-beta.12",
     "@urql/core": "^1.13.1",
     "apollo-server": "^2.18.2",
     "dotenv": "^8.2.0",

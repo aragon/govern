@@ -4,19 +4,15 @@
 
 Govern Server is exposing a GraphQL API that lets you fetch data related to your Govern DAOs. Have a look at the [Govern Server API documentation](https://docs.aragon.org/govern/developers/server-api) for the list of types and queries you can use.
 
-## Directory structure
+## Environment variables
 
-```
-# The core server library, which will be in a separate package later.
-# We should keep in mind that this part will eventually run in the
-# browser, enabling the fully decentralized mode of Aragon Govern.
-/src/core
+Govern Server reads a number of variables from the environment:
 
-# API endpoints are prefixed by “api-”. We’ll only have a GraphQL API at first,
-# and a REST API will be added later. Each API server exposes a single start()
-# function with its configuration as a parameter.
-/src/api-graphql
-```
+- `GVN_CHAIN_ID`: the network Chain ID.
+- `GVN_ENS_ADDRESS`: the ENS address.
+- `GVN_NETWORK_NAME`: the network name.
+- `GVN_GRAPHQL_HTTP_PORT`: the GraphQL HTTP port to expose.
+- `GVN_SUBGRAPH_URL`: the subgraph URL to fetch data from.
 
 ## Docker container
 
