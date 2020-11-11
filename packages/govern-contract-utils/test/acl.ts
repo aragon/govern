@@ -142,4 +142,71 @@ describe('ACL', function () {
   it('root cannot freeze by granting', async () => {
     await expect(grant(acl, ROLE, FREEZE_ADDR)).to.be.revertedWith(ERRORS.BAD_FREEZE)
   })
+
+  context('ACL.bulk', () => {
+    it('Grant', async () => {
+      await expect(acl.bulk([
+        {
+          op: 0,
+          role: ROLE,
+          who: notRoot
+        }
+      ])).to.emit(acl, EVENTS.GRANTED)
+
+      await assertRole(true, ROLE, notRoot)
+    })
+
+    it('Revoke', async () => {
+      await expect(acl.bulk([
+        {
+          op: 1,
+          role: ROLE,
+          who: notRoot
+        }
+      ])).to.emit(acl, EVENTS.REVOKED)
+
+      await assertRole(false, ROLE, notRoot)
+    })
+
+    it('Freeze', async () => {
+      await expect(acl.bulk([
+        {
+          op: 2,
+          role: ROLE,
+          who: '0x0000000000000000000000000000000000000000'
+        }
+      ])).to.emit(acl, EVENTS.FROZEN)
+
+      expect(await acl.roles(ROLE, FREEZE_ADDR))
+        .to.equal(FREEZE_ADDR)
+    })
+
+    it("Grant, revoke, and freeze", async () => {
+      await expect(acl.bulk([
+        {
+          op: 0,
+          role: ROLE,
+          who: notRoot
+        },
+        {
+          op: 1,
+          role: ROLE,
+          who: notRoot
+        },
+        {
+          op: 2,
+          role: ROLE,
+          who: '0x0000000000000000000000000000000000000000'
+        }
+      ]))
+        .to.emit(acl, EVENTS.GRANTED)
+        .to.emit(acl, EVENTS.REVOKED)
+        .to.emit(acl, EVENTS.FROZEN)
+
+      await assertRole(false, ROLE, notRoot)
+
+      expect(await acl.roles(ROLE, FREEZE_ADDR))
+        .to.equal(FREEZE_ADDR)
+    })
+  })
 })
