@@ -1,11 +1,13 @@
 {
   "name": "@aragon/govern-lib",
-  "version": "1.0.0",
+  "version": "1.0.0-beta.12",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "module": "dist/govern-lib.esm.js",
   "license": "LGPL-3.0-or-later",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "start": "tsdx watch",
     "build": "tsdx build",
