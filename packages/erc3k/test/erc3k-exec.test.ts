@@ -1,5 +1,8 @@
 import { ethers } from '@nomiclabs/buidler'
-import { Erc3000ExecutorMock, Erc3000ExecutorMockFactory } from '../typechain'
+import {
+  Erc3000ExecutorMock,
+  Erc3000ExecutorMock__factory as Erc3000ExecutorMockFactory,
+} from '../typechain'
 
 describe('ERC3000 Executor', function () {
   let erc3kExec: Erc3000ExecutorMock
