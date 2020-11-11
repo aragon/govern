@@ -5,14 +5,16 @@ import { defaultAbiCoder } from 'ethers/lib/utils'
 import { generateCodeFromContract } from './helpers'
 import {
   CloneFactoryMockFactory,
-  CloneFactoryMock
+  CloneFactoryMock,
+  ClonedContract,
+  ClonedContractWithInit
 } from '../typechain'
-import {
-  ClonedContractAbi
-} from '../artifacts/contracts/test/ClonedContract.sol/ClonedContract.json'
-import {
-  ClonedContractWithInitAbi
-} from '../artifacts/contracts/test/ClonedContractWithInit.sol/ClonedContractWithInit.json'
+import
+  * as ClonedContractArtifact
+  from '../artifacts/contracts/test/ClonedContract.sol/ClonedContract.json'
+import
+  * as ClonedContractWithInitArtifact
+  from '../artifacts/contracts/test/ClonedContractWithInit.sol/ClonedContractWithInit.json'
 
 
 describe('ERC1167ProxyFactory', () => {
@@ -34,13 +36,13 @@ describe('ERC1167ProxyFactory', () => {
       await factory.clone()
 
       clonedContractAddress = await factory.latestClonedContract()
-      clonedContract = ethers.getContractAt(
+      clonedContract = (await ethers.getContractAt(
+        ClonedContractArtifact.abi,
         clonedContractAddress,
-        ClonedContractAbi,
         signers[0]
-      )
+      )) as ClonedContract
 
-      expect(await clonedContract.randomString())
+      expect(await clonedContract.getRandomString())
         .to.be.equal('NO INIT')
     })
 
@@ -48,11 +50,11 @@ describe('ERC1167ProxyFactory', () => {
       await factory.cloneWithInitData()
 
       clonedContractAddress = await factory.latestClonedContract()
-      clonedContract = ethers.getContractAt(
+      clonedContract = (await ethers.getContractAt(
+        ClonedContractWithInitArtifact.abi,
         clonedContractAddress,
-        ClonedContractWithInitAbi,
         signers[0]
-      )
+      )) as ClonedContractWithInit
 
       expect(await clonedContract.randomString())
         .to.be.equal('INIT DATA')
@@ -64,13 +66,13 @@ describe('ERC1167ProxyFactory', () => {
       await factory.clone2()
 
       clonedContractAddress = await factory.latestClonedContract()
-      clonedContract = ethers.getContractAt(
+      clonedContract = (await ethers.getContractAt(
+        ClonedContractArtifact.abi,
         clonedContractAddress,
-        ClonedContractAbi,
         signers[0]
-      )
+      )) as ClonedContract
 
-      expect(await clonedContract.randomString())
+      expect(await clonedContract.getRandomString())
         .to.be.equal('NO INIT')
     })
 
@@ -78,11 +80,11 @@ describe('ERC1167ProxyFactory', () => {
       await factory.clone2WithInitData()
 
       clonedContractAddress = await factory.latestClonedContract()
-      clonedContract = ethers.getContractAt(
+      clonedContract = (await ethers.getContractAt(
+        ClonedContractWithInitArtifact.abi,
         clonedContractAddress,
-        ClonedContractWithInitAbi,
         signers[0]
-      )
+      )) as ClonedContractWithInit
 
       expect(await clonedContract.randomString())
         .to.be.equal('INIT DATA')
@@ -94,7 +96,7 @@ describe('ERC1167ProxyFactory', () => {
       await factory.generateCode()
 
       expect(await factory.generatedCode())
-        .to.equal(generateCodeFromContract(ClonedContractAbi))
+        .to.equal('0x3d602d80600a3d3981f3363d3d373d3d3d363d739467a509da43cb50eb332187602534991be1fea45af43d82803e903d91602b57fd5bf3')
     })
 
     it('calls "_getRevertMsg" with a revert message', async () => {
@@ -103,7 +105,7 @@ describe('ERC1167ProxyFactory', () => {
         defaultAbiCoder.encode(
           ['string'],
           ['Revert Message']
-        )
+        ).substr(2)
       )
 
       expect(await factory.revertMessage()).to.equal('Revert Message')

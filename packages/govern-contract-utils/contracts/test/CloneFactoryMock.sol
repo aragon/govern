@@ -32,7 +32,14 @@ contract CloneFactoryMock {
     }
 
     function cloneWithInitData() public {
-        latestClonedContract = address(cloningContractWithInit.clone(bytes('INIT DATA')));
+        latestClonedContract = address(
+            cloningContractWithInit.clone(
+                abi.encodeWithSelector(
+                    ClonedContractWithInit.init.selector,
+                    bytes('INIT DATA')
+                )
+            )
+        );
     }
 
     function clone2() public {
@@ -40,7 +47,15 @@ contract CloneFactoryMock {
     }
 
     function clone2WithInitData() public {
-        latestClonedContract = address(cloningContractWithInit.clone2(bytes32(0), bytes('INIT DATA')));
+        latestClonedContract = address(
+            cloningContractWithInit.clone2(
+                bytes32(0x0100000000000000000000000000000000000000000000000000000000000000),
+                abi.encodeWithSelector(
+                    ClonedContractWithInit.init.selector,
+                    bytes('INIT DATA')
+                )
+            )
+        );
     }
 
     function generateCode() public {
