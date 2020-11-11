@@ -36,7 +36,7 @@ module.exports = {
   settings: {
     react: {
       pragma: 'React',
-      version: '16.6',
+      version: '16.13.1',
     },
     'import/parsers': {
       '@typescript-eslint/parser': ['.ts', '.tsx'],

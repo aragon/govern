@@ -48,10 +48,7 @@ export default function DaoSelector() {
             `}
           />
         </label>
-        <Button
-          onClick={handleGoToDao}
-          disabled={!daoName}
-        >
+        <Button onClick={handleGoToDao} disabled={!daoName}>
           Go to DAO
         </Button>
       </form>
@@ -93,7 +90,11 @@ function ToolCard({ name, id }: ToolCardProps) {
         width: 280px;
         height: 320px;
         border: 2px solid transparent;
-        border-image: linear-gradient(to bottom right, #AD41BB 20%, #FF7D7D 100%);
+        border-image: linear-gradient(
+          to bottom right,
+          #ad41bb 20%,
+          #ff7d7d 100%
+        );
         border-image-slice: 1;
         padding: 16px;
         cursor: pointer;
