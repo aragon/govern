@@ -49,6 +49,7 @@
     "clean": "rm -rf artifacts",
     "coverage": "SOLIDITY_COVERAGE=true hardhat coverage --network coverage",
     "compile": "hardhat compile --force",
+    "compile:cached": "hardhat compile",
     "deploy-govern": "hardhat deploy-govern --verify",
     "deploy-factory": "hardhat deploy-factory --verify",
     "deploy-registry": "hardhat deploy-registry --verify",
