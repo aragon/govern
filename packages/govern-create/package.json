@@ -47,7 +47,6 @@
   "scripts": {
     "build": "yarn compile",
     "clean": "rm -rf artifacts",
-    "coverage": "SOLIDITY_COVERAGE=true hardhat coverage --network coverage",
     "compile": "SKIP_TASKS=true hardhat compile --force",
     "compile:cached": "SKIP_TASKS=true hardhat compile",
     "deploy-govern": "hardhat deploy-govern --verify",
