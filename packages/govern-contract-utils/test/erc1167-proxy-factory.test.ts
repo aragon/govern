@@ -17,10 +17,10 @@ import {
 
 describe('ERC1167ProxyFactory', () => {
   let signers: Signer[],
-      owner: string,
-      factory: CloneFactoryMock,
-      clonedContractAddress: string,
-      clonedContract: any;
+    owner: string,
+    factory: CloneFactoryMock,
+    clonedContractAddress: string,
+    clonedContract: any
 
   before(async () => {
     signers = await ethers.getSigners()
@@ -33,7 +33,7 @@ describe('ERC1167ProxyFactory', () => {
     it('clone without constructor parameters', async () => {
       await factory.clone()
 
-      clonedContractAddress = await factory.latestClonedContract();
+      clonedContractAddress = await factory.latestClonedContract()
       clonedContract = ethers.getContractAt(
         clonedContractAddress,
         ClonedContractAbi,
@@ -47,7 +47,7 @@ describe('ERC1167ProxyFactory', () => {
     it('clone with constructor parameters', async () => {
       await factory.cloneWithInitData()
 
-      clonedContractAddress = await factory.latestClonedContract();
+      clonedContractAddress = await factory.latestClonedContract()
       clonedContract = ethers.getContractAt(
         clonedContractAddress,
         ClonedContractWithInitAbi,
@@ -63,7 +63,7 @@ describe('ERC1167ProxyFactory', () => {
     it('clone without constructor parameters', async () => {
       await factory.clone2()
 
-      clonedContractAddress = await factory.latestClonedContract();
+      clonedContractAddress = await factory.latestClonedContract()
       clonedContract = ethers.getContractAt(
         clonedContractAddress,
         ClonedContractAbi,
@@ -77,7 +77,7 @@ describe('ERC1167ProxyFactory', () => {
     it('clone with constructor parameters', async () => {
       await factory.clone2WithInitData()
 
-      clonedContractAddress = await factory.latestClonedContract();
+      clonedContractAddress = await factory.latestClonedContract()
       clonedContract = ethers.getContractAt(
         clonedContractAddress,
         ClonedContractWithInitAbi,
@@ -98,12 +98,6 @@ describe('ERC1167ProxyFactory', () => {
     })
 
     it('calls "_getRevertMsg" with a revert message', async () => {
-      await factory.getRevertMessage('0x08c379a0')
-
-      expect(await factory.revertMessage()).to.equal('');
-    })
-
-    it('calls "_getRevertMsg" without a revert message', async () => {
       await factory.getRevertMessage(
         '0x08c379a0' +
         defaultAbiCoder.encode(
@@ -112,7 +106,13 @@ describe('ERC1167ProxyFactory', () => {
         )
       )
 
-      expect(await factory.revertMessage()).to.equal('Revert Message');
+      expect(await factory.revertMessage()).to.equal('Revert Message')
+    })
+
+    it('calls "_getRevertMsg" without a revert message', async () => {
+      await factory.getRevertMessage('0x08c379a0')
+
+      expect(await factory.revertMessage()).to.equal('')
     })
   })
 })
