@@ -1,7 +1,10 @@
 import { ethers } from '@nomiclabs/buidler'
 import { expect } from 'chai'
 import { keccak256, defaultAbiCoder, solidityPack } from 'ethers/lib/utils'
-import { Erc3000DataLibTest, Erc3000DataLibTestFactory } from '../typechain'
+import {
+  Erc3000DataLibTest,
+  Erc3000DataLibTest__factory as Erc3000DataLibTestFactory,
+} from '../typechain'
 
 let deposit = {
     token: '0xb794f5ea0ba39494ce839613fffba74279579268',
@@ -100,25 +103,29 @@ describe.skip('ERC3000Data', function () {
   })
 
   it('calls testConfigHash and returns the expected hash', async () => {
-    expect(
-      await erc3kDataLib.testConfigHash(container.config)
-    ).to.be.equal(getConfigHash())
+    expect(await erc3kDataLib.testConfigHash(container.config)).to.be.equal(
+      getConfigHash()
+    )
   })
 
   it('calls testPayloadHash and returns the expected hash', async () => {
-    expect(
-      await erc3kDataLib.testPayloadHash(container.payload)
-    ).to.be.equal(getPayloadHash())
+    expect(await erc3kDataLib.testPayloadHash(container.payload)).to.be.equal(
+      getPayloadHash()
+    )
   })
 
   it('calls testContainerHash and returns the expected hash', async () => {
-    expect(
-      await erc3kDataLib.testContainerHash(container)
-    ).to.be.equal(
+    expect(await erc3kDataLib.testContainerHash(container)).to.be.equal(
       keccak256(
         solidityPack(
           ['string', 'address', 'uint', 'bytes32', 'bytes32'],
-          ['erc3k-v1', erc3kDataLib.address, chainId, getPayloadHash(), getConfigHash()]
+          [
+            'erc3k-v1',
+            erc3kDataLib.address,
+            chainId,
+            getPayloadHash(),
+            getConfigHash(),
+          ]
         )
       )
     )
