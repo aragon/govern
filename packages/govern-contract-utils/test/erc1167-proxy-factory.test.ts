@@ -105,7 +105,7 @@ describe('ERC1167ProxyFactory', () => {
 
     it('calls "_getRevertMsg" without a revert message', async () => {
       await factory.getRevertMessage(
-        '08c379a0' +
+        '0x08c379a0' +
         defaultAbiCoder.encode(
           ['string'],
           ['Revert Message']
