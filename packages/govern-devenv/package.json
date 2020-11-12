@@ -1,0 +1,9 @@
+{
+  "name": "@aragon/govern-devenv",
+  "version": "1.0.1-beta.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "mkdir -p dev-data && HOST_UID=$(id -u) HOST_GID=$(id -g) docker-compose up --build"
+  }
+}
