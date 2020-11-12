@@ -2,7 +2,7 @@ import React, { createContext, useContext, useMemo } from 'react'
 import { providers as EthersProviders } from 'ethers'
 import { UseWalletProvider, useWallet, Wallet } from 'use-wallet'
 import { useChainId } from './ChainId'
-import { getUseWalletConnectors } from '../lib/web3-utils'
+import { getNetworkNode, getUseWalletConnectors } from '../lib/web3-utils'
 
 type WalletAugmentedContextProps = {
   wallet: Wallet<any>
@@ -11,7 +11,7 @@ type WalletAugmentedContextProps = {
 
 const WalletAugmentedContext = createContext<WalletAugmentedContextProps>(null)
 
-function useWalletAugmented() {
+export function useWalletAugmented() {
   const walletContext = useContext(WalletAugmentedContext)
   if (!walletContext) {
     throw new Error(
@@ -30,10 +30,14 @@ type WalletAugmentedProps = {
 function WalletAugmented({ children }: WalletAugmentedProps) {
   const wallet: Wallet<any> = useWallet()
   const { ethereum } = wallet
+  const { chainId } = useChainId()
 
   const ethers = useMemo(
-    () => (ethereum ? new EthersProviders.Web3Provider(ethereum) : null),
-    [ethereum],
+    () =>
+      ethereum
+        ? new EthersProviders.Web3Provider(ethereum)
+        : new EthersProviders.JsonRpcProvider(getNetworkNode(chainId)),
+    [chainId, ethereum],
   )
 
   const contextValue = useMemo(() => ({ wallet, ethers }), [wallet, ethers])

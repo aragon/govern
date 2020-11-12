@@ -31,12 +31,16 @@ function detectAndComposeLinkType(
   chainId: number,
   type: string,
 ): string[] {
-  if (isAddress(hash)) {
-    return [composeEtherscanLink(hash, chainId, type), 'ethereum']
-  }
+  try {
+    if (isAddress(hash)) {
+      return [composeEtherscanLink(hash, chainId, type), 'ethereum']
+    }
 
-  if (isCid(hexToUtf8(hash))) {
-    return [composeIpfsLink(hexToUtf8(hash)), 'ipfs']
+    if (isCid(hexToUtf8(hash))) {
+      return [composeIpfsLink(hexToUtf8(hash)), 'ipfs']
+    }
+  } catch (err) {
+    return ['', '']
   }
 
   return ['', '']
@@ -46,12 +50,17 @@ function formatAddress(
   address: string,
   { shorten }: { shorten: boolean },
 ): string {
-  if (isAddress(address)) {
-    return shorten ? shortenAddress(address) : address
-  }
+  try {
+    if (isAddress(address)) {
+      return shorten ? shortenAddress(address) : address
+    }
 
-  if (isCid(hexToUtf8(address))) {
-    return hexToUtf8(address)
+    if (isCid(hexToUtf8(address))) {
+      return hexToUtf8(address)
+    }
+  } catch (err) {
+    // Won't be a valid string anyway, so we return it
+    return address
   }
 
   // In this case, it's possible that it's really just plain text, so we decode it anyways.

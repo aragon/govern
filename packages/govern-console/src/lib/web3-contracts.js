@@ -22,13 +22,6 @@ export function useContract(address, abi, signer = true) {
   }
 
   if (!address || !EthersUtils.isAddress(address) || !ethersProvider || !abi) {
-    console.log(
-      'alo',
-      address,
-      EthersUtils.isAddress(address),
-      ethersProvider,
-      ethereum,
-    )
     return null
   }
 
@@ -128,64 +121,4 @@ export function useTokenBalance(symbol, address = '') {
   }, [account, address, tokenContract, updateBalance])
 
   return balance
-}
-
-export function useSignAgreement(agreementAddress) {
-  const { account } = useWallet()
-  const agreement = useContractWithKnownAbi('AGREEMENT', agreementAddress)
-  return useCallback(async () => {
-    try {
-      if (!agreement) {
-        return
-      }
-      const { mustSign } = await agreement.getSigner(account)
-      if (mustSign) {
-        const currentSettingId = await agreement.getCurrentSettingId()
-        const tx = await agreement.sign(currentSettingId)
-        await tx.wait()
-        return 'success'
-      } else {
-        return 'already-signed'
-      }
-    } catch (e) {
-      console.error(e)
-      return 'error'
-    }
-  }, [account, agreement])
-}
-
-export function useAgreementSettings(agreementAddress) {
-  const [settings, setSettings] = useState(null)
-  const agreement = useContractWithKnownAbi('AGREEMENT', agreementAddress)
-
-  useEffect(() => {
-    async function getAgreementSettings() {
-      if (!agreement) {
-        return
-      }
-      try {
-        const currentSettingId = await agreement.getCurrentSettingId()
-        const [
-          arbitrator,
-          cashier,
-          title,
-          content,
-        ] = await agreement.getSetting(currentSettingId)
-        const utfContent = EthersUtils.toUtf8String(content)
-        const [, ipfsCid] = utfContent.split(':')
-        setSettings({
-          arbitrator,
-          cashier,
-          title,
-          content: ipfsCid,
-        })
-      } catch (e) {
-        console.error(e)
-      }
-    }
-
-    getAgreementSettings()
-  }, [agreement])
-
-  return settings
 }
