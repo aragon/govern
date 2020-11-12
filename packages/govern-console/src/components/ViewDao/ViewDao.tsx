@@ -35,10 +35,14 @@ export default function ViewDao({ dao }: ViewDaoProps) {
       <Frame>
         <h2>Govern Executor</h2>
         <h3>Address</h3>
-        <p>{dao.executor.address}</p>
+        <p>
+          <Entity address={dao.executor.address} type="address" />
+        </p>
         <h2>Govern Queue</h2>
         <h3>Address</h3>
-        <p>{dao.queue.address}</p>
+        <p>
+          <Entity address={dao.queue.address} type="address" />
+        </p>
         <h3>Config</h3>
         <p>Execution delay: {dao.queue.config.executionDelay}</p>
         <p>Schedule collateral: </p>
@@ -109,7 +113,14 @@ export default function ViewDao({ dao }: ViewDaoProps) {
                   <td>
                     {KNOWN_GOVERN_ROLES.get(role.selector)} - {role.selector}
                   </td>
-                  <td>{role.who === ETH_ANY_ADDRESS ? 'Anyone' : role.who}</td>
+                  <td>
+                    <Entity
+                      address={
+                        role.who === ETH_ANY_ADDRESS ? 'Anyone' : role.who
+                      }
+                      type="address"
+                    />
+                  </td>
                 </tr>
               )
             })}

@@ -1,5 +1,7 @@
 import React from 'react'
 import 'styled-components/macro'
+import { cid as isCid } from 'is-ipfs'
+import { hexToUtf8, isAddress } from 'web3-utils'
 import { useChainId } from '../../Providers/ChainId'
 import { shortenAddress } from '../../lib/web3-utils'
 import { RINKEBY } from '../../lib/known-chains'
@@ -20,19 +22,54 @@ function composeEtherscanLink(
   }etherscan.io/${type}/${address}`
 }
 
+function composeIpfsLink(cid: string): string {
+  return `https://ipfs.fleek.co/ipfs/${cid}`
+}
+
+function detectAndComposeLinkType(
+  hash: string,
+  chainId: number,
+  type: string,
+): string[] {
+  if (isAddress(hash)) {
+    return [composeEtherscanLink(hash, chainId, type), 'ethereum']
+  }
+
+  if (isCid(hexToUtf8(hash))) {
+    return [composeIpfsLink(hexToUtf8(hash)), 'ipfs']
+  }
+
+  return ['', '']
+}
+
+function formatAddress(
+  address: string,
+  { shorten }: { shorten: boolean },
+): string {
+  if (isAddress(address)) {
+    return shorten ? shortenAddress(address) : address
+  }
+
+  if (isCid(hexToUtf8(address))) {
+    return hexToUtf8(address)
+  }
+
+  // In this case, it's possible that it's really just plain text, so we decode it anyways.
+  return hexToUtf8(address)
+}
+
 export default function Entity({
   address,
   shorten = false,
   type,
 }: EntityProps) {
   const { chainId } = useChainId()
-  return (
-    <a
-      href={composeEtherscanLink(address, chainId, type)}
-      rel="noopener noreferrer"
-      target="_blank"
-    >
-      {shorten ? shortenAddress(address) : address}
+  const [url] = detectAndComposeLinkType(address, chainId, type)
+  return url ? (
+    <a href={url} rel="noopener noreferrer" target="_blank">
+      {formatAddress(address, { shorten })}
     </a>
+  ) : (
+    <span>{address}</span>
   )
 }

@@ -4,6 +4,7 @@ import { utils as EthersUtils } from 'ethers'
 export const DEFAULT_LOCAL_CHAIN = 'private'
 export const ETH_FAKE_ADDRESS = `0x${''.padEnd(40, '0')}`
 export const ETH_ANY_ADDRESS = '0xffffffffffffffffffffffffffffffffffffffff'
+export const ETH_EMPTY_HEX = '0x'
 
 const ETH_ADDRESS_SPLIT_REGEX = /(0x[a-fA-F0-9]{40}(?:\b|\.|,|\?|!|;))/g
 const ETH_ADDRESS_TEST_REGEX = /(0x[a-fA-F0-9]{40}(?:\b|\.|,|\?|!|;))/g
