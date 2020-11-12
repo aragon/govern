@@ -2,7 +2,6 @@ import { expect } from 'chai'
 import { ethers } from 'hardhat'
 import { Signer } from 'ethers'
 import { defaultAbiCoder } from 'ethers/lib/utils'
-import { generateCodeFromContract } from './helpers'
 import {
   CloneFactoryMockFactory,
   CloneFactoryMock,
