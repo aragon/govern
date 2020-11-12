@@ -126,6 +126,7 @@ type ViewActionProps = {
 }
 
 function ViewAction({ container, queueAddress }: ViewActionProps) {
+  console.log(container)
   const { wallet } = useWallet()
   const { status: accountStatus } = wallet
   const [executionStatus, setExecutionStatus] = useState('')
@@ -284,34 +285,35 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
         {executionStatus && <Info mode={statusType}>{executionStatus}</Info>}
       </Frame>
 
-      <Frame>
-        <h2>Available actions</h2>
-        <Button
-          onClick={execute}
-          css={`
-            margin-right: 16px;
-          `}
-        >
-          Execute
-        </Button>
-        <Button
-          onClick={veto}
-          css={`
-            margin-right: 16px;
-          `}
-        >
-          Veto
-        </Button>
-        <Button
-          onClick={challenge}
-          css={`
-            margin-right: 16px;
-          `}
-        >
-          Challenge
-        </Button>
-      </Frame>
-
+      {container.state !== 'Executed' && (
+        <Frame>
+          <h2>Available actions</h2>
+          <Button
+            onClick={execute}
+            css={`
+              margin-right: 16px;
+            `}
+          >
+            Execute
+          </Button>
+          <Button
+            onClick={veto}
+            css={`
+              margin-right: 16px;
+            `}
+          >
+            Veto
+          </Button>
+          <Button
+            onClick={challenge}
+            css={`
+              margin-right: 16px;
+            `}
+          >
+            Challenge
+          </Button>
+        </Frame>
+      )}
       <Frame>
         <h2>Action Payload</h2>
         <h3>Nonce</h3>

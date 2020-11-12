@@ -1,10 +1,14 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 import 'styled-components/macro'
 import Button from '../Button'
+import Entity from '../Entity/Entity'
+import FilteredActions from '../FilteredActions/FilteredActions'
 import Frame from '../Frame/Frame'
 import { KNOWN_GOVERN_ROLES, KNOWN_QUEUE_ROLES } from '../../lib/known-roles'
-import { shortenAddress, ETH_ANY_ADDRESS } from '../../lib/web3-utils'
+import { ETH_ANY_ADDRESS } from '../../lib/web3-utils'
+
+const ACTIONS_PER_PAGE = 8
 
 type ViewDaoProps = {
   dao: any
@@ -18,16 +22,15 @@ export default function ViewDao({ dao }: ViewDaoProps) {
     history.push(`/${daoAddress}/new-action`)
   }, [history, daoAddress])
 
-  const hasActions = useMemo(() => dao.queue.queued.length > 0, [dao])
-
   return (
     <>
       <h2
         css={`
           margin-top: 16px;
+          font-size: 24px;
         `}
       >
-        Info for {daoAddress}
+        {daoAddress} Overview
       </h2>
       <Frame>
         <h2>Govern Executor</h2>
@@ -44,7 +47,13 @@ export default function ViewDao({ dao }: ViewDaoProps) {
             margin-left: 16px;
           `}
         >
-          <li>Token: {dao.queue.config.scheduleDeposit.token}</li>
+          <li>
+            Token:
+            <Entity
+              address={dao.queue.config.scheduleDeposit.token}
+              type="address"
+            />
+          </li>
           <li>Amount: {dao.queue.config.scheduleDeposit.amount}</li>
         </ul>
         <p>Challenge collateral: </p>
@@ -53,20 +62,31 @@ export default function ViewDao({ dao }: ViewDaoProps) {
             margin-left: 16px;
           `}
         >
-          <li>Token: {dao.queue.config.challengeDeposit.token}</li>
+          <li>
+            Token:
+            <Entity
+              address={dao.queue.config.challengeDeposit.token}
+              type="address"
+            />
+          </li>
           <li>Amount: {dao.queue.config.challengeDeposit.amount}</li>
         </ul>
       </Frame>
       <Frame>
-        <h2>Actions</h2>
-        {hasActions
-          ? dao.queue.queued.map(({ id }: { id: string }) => (
-              <ActionCard id={id} key={id} />
-            ))
-          : 'No actions.'}
         <div>
-          <Button onClick={handleNewAction}>New action</Button>
+          <h2>Actions</h2>
+          <div
+            css={`
+              margin-bottom: 16px;
+            `}
+          >
+            <Button onClick={handleNewAction}>New action</Button>
+          </div>
         </div>
+        <FilteredActions
+          actions={dao.queue.queued}
+          actionsPerPage={ACTIONS_PER_PAGE}
+        />
       </Frame>
       <Frame>
         <h2>Permissions for Govern</h2>
@@ -101,50 +121,5 @@ export default function ViewDao({ dao }: ViewDaoProps) {
         })}
       </Frame>
     </>
-  )
-}
-
-type ActionCardProps = {
-  id: string
-}
-
-function ActionCard({ id }: ActionCardProps) {
-  const history = useHistory()
-  const { daoAddress }: any = useParams()
-
-  const handleCardClick = useCallback(() => {
-    history.push(`${daoAddress}/view-action/${id}`)
-  }, [daoAddress, history, id])
-
-  return (
-    <button
-      type="button"
-      css={`
-        position: relative;
-        background: transparent;
-        width: 280px;
-        height: 320px;
-        border: 2px solid transparent;
-        border-image: linear-gradient(
-          to bottom right,
-          #ad41bb 20%,
-          #ff7d7d 100%
-        );
-        border-image-slice: 1;
-        padding: 16px;
-        margin-right: 8px;
-        cursor: pointer;
-        &:not(:last-child) {
-          margin-right: 24px;
-          margin-bottom: 24px;
-        }
-        &:active {
-          top: 1px;
-        }
-      `}
-      onClick={handleCardClick}
-    >
-      {shortenAddress(id)}
-    </button>
   )
 }
