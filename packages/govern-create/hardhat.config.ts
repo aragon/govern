@@ -3,7 +3,6 @@ import '@nomiclabs/hardhat-ethers'
 import '@nomiclabs/hardhat-etherscan'
 import '@nomiclabs/hardhat-waffle'
 import 'hardhat-typechain'
-import 'solidity-coverage'
 import dotenv from 'dotenv'
 import path from 'path'
 import fs from 'fs'
@@ -21,8 +20,8 @@ if (!process.env.SKIP_TASKS) {
 
 const HARDFORK = 'istanbul'
 const ETHERSCAN_KEY = process.env.ETHERSCAN_KEY || ''
-const ETH_KEY = process.env.ETH_KEY
-const accounts = ETH_KEY ? ETH_KEY.split(',') : ['']
+const ETH_KEY = process.env.ETH_KEYETH
+const accounts = ETH_KEY ? ETH_KEY.split(',') : []
 
 const config: HardhatUserConfig = {
   solidity: {

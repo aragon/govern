@@ -1,6 +1,6 @@
 {
   "name": "erc3k",
-  "version": "1.0.1-beta.0",
+  "version": "1.0.0-beta.12",
   "description": "ERC-3000 smart contract interfaces",
   "main": "index.js",
   "repository": "https://github.com/aragon/erc3k",
@@ -16,14 +16,14 @@
   "license": "MIT",
   "private": false,
   "dependencies": {
-    "@aragon/govern-contract-utils": "^1.0.1-beta.0",
-    "@aragon/govern-token": "^1.0.1-beta.0"
+    "@aragon/govern-contract-utils": "^1.0.0-beta.12",
+    "@aragon/govern-token": "^1.0.0-beta.12"
   },
   "devDependencies": {
     "@nomiclabs/buidler": "^1.4.7",
     "@nomiclabs/buidler-ethers": "^2.0.0",
     "@nomiclabs/buidler-waffle": "^2.0.0",
-    "@typechain/ethers-v5": "^2.0.0",
+    "@typechain/ethers-v5": "^4.0.0",
     "@types/chai": "^4.2.13",
     "@types/mocha": "^8.0.3",
     "@types/node": "^14.11.8",

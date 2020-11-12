@@ -3,11 +3,11 @@ import { expect } from 'chai'
 import { Signer } from 'ethers'
 import {
   GovernRegistry,
-  GovernRegistryFactory,
+  GovernRegistry__factory as GovernRegistryFactory,
   Erc3000Mock,
-  Erc3000MockFactory,
+  Erc3000Mock__factory as Erc3000MockFactory,
   Erc3000ExecutorMock,
-  Erc3000ExecutorMockFactory,
+  Erc3000ExecutorMock__factory as Erc3000ExecutorMockFactory,
 } from '../typechain'
 
 const ERRORS = {
@@ -55,7 +55,6 @@ describe('GovernRegistry', function () {
   })
 
   it('calls register and is able to register the executor and queue', async () => {
-
     await expect(
       governRegistry.register(
         erc3kExec.address,
@@ -74,7 +73,13 @@ describe('GovernRegistry', function () {
   })
 
   it('calls register and reverts cause the name is already used', async () => {
-    governRegistry.register(erc3kExec.address, erc3k.address, `0x${'00'.repeat(20)}`, 'MyName', '0x00')
+    governRegistry.register(
+      erc3kExec.address,
+      erc3k.address,
+      `0x${'00'.repeat(20)}`,
+      'MyName',
+      '0x00'
+    )
 
     await expect(
       governRegistry.register(

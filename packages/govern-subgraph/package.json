@@ -1,6 +1,6 @@
 {
   "name": "@aragon/govern-subgraph",
-  "version": "1.0.1-beta.0",
+  "version": "1.0.0-beta.12",
   "scripts": {
     "build": "scripts/build-subgraph.sh",
     "manifest-mainnet": "scripts/build-manifest.sh mainnet",
@@ -24,7 +24,7 @@
     "mustache": "^4.0.1"
   },
   "dependencies": {
-    "@aragon/govern-core": "^1.0.1-beta.0",
+    "@aragon/govern-core": "^1.0.0-beta.12",
     "babel-polyfill": "^6.26.0",
     "babel-register": "^6.26.0"
   },
