@@ -126,7 +126,6 @@ type ViewActionProps = {
 }
 
 function ViewAction({ container, queueAddress }: ViewActionProps) {
-  console.log(container)
   const { wallet } = useWallet()
   const { status: accountStatus } = wallet
   const [executionStatus, setExecutionStatus] = useState('')
