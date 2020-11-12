@@ -37,7 +37,6 @@ const GlobalStyle = createGlobalStyle`
   body {
     height: 0;
     min-height: 100vh;
-    width: 100vw;
     background: black;
     color: white;
     font-family: 'Roboto Mono', Helvetica, sans-serif;

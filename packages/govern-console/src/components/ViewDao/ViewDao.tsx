@@ -90,35 +90,59 @@ export default function ViewDao({ dao }: ViewDaoProps) {
       </Frame>
       <Frame>
         <h2>Permissions for Govern</h2>
-        {dao.executor.roles.map((role: any) => {
-          return (
-            <div key={role.selector}>
-              <h3>
-                {KNOWN_GOVERN_ROLES.get(role.selector)} - {role.selector}
-              </h3>
-              <p>
-                Who has permission:{' '}
-                {role.who === ETH_ANY_ADDRESS ? 'Anyone' : role.who}
-              </p>
-            </div>
-          )
-        })}
+        <table
+          css={`
+            width: 100%;
+            text-align: left;
+          `}
+        >
+          <thead>
+            <tr>
+              <th>Role (function)</th>
+              <th>Assigned to entity</th>
+            </tr>
+          </thead>
+          <tbody>
+            {dao.executor.roles.map((role: any, idx: number) => {
+              return (
+                <tr key={idx}>
+                  <td>
+                    {KNOWN_GOVERN_ROLES.get(role.selector)} - {role.selector}
+                  </td>
+                  <td>{role.who === ETH_ANY_ADDRESS ? 'Anyone' : role.who}</td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
       </Frame>
       <Frame>
         <h2>Permissions for GovernQueue</h2>
-        {dao.queue.roles.map((role: any) => {
-          return (
-            <div key={role.selector}>
-              <h3>
-                {KNOWN_QUEUE_ROLES.get(role.selector)} - {role.selector}
-              </h3>
-              <p>
-                Who has permission:{' '}
-                {role.who === ETH_ANY_ADDRESS ? 'Anyone' : role.who}
-              </p>
-            </div>
-          )
-        })}
+        <table
+          css={`
+            width: 100%;
+            text-align: left;
+          `}
+        >
+          <thead>
+            <tr>
+              <th>Role (function)</th>
+              <th>Assigned to entity</th>
+            </tr>
+          </thead>
+          <tbody>
+            {dao.queue.roles.map((role: any, idx: number) => {
+              return (
+                <tr key={idx}>
+                  <td>
+                    {KNOWN_QUEUE_ROLES.get(role.selector)} - {role.selector}
+                  </td>
+                  <td>{role.who === ETH_ANY_ADDRESS ? 'Anyone' : role.who}</td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
       </Frame>
     </>
   )
