@@ -8,12 +8,6 @@ import {
   ClonedContract,
   ClonedContractWithInit
 } from '../typechain'
-import
-  * as ClonedContractArtifact
-  from '../artifacts/contracts/test/ClonedContract.sol/ClonedContract.json'
-import
-  * as ClonedContractWithInitArtifact
-  from '../artifacts/contracts/test/ClonedContractWithInit.sol/ClonedContractWithInit.json'
 
 
 describe('ERC1167ProxyFactory', () => {
@@ -36,7 +30,7 @@ describe('ERC1167ProxyFactory', () => {
 
       clonedContractAddress = await factory.latestClonedContract()
       clonedContract = (await ethers.getContractAt(
-        ClonedContractArtifact.abi,
+        'ClonedContract',
         clonedContractAddress,
         signers[0]
       )) as ClonedContract
@@ -50,7 +44,7 @@ describe('ERC1167ProxyFactory', () => {
 
       clonedContractAddress = await factory.latestClonedContract()
       clonedContract = (await ethers.getContractAt(
-        ClonedContractWithInitArtifact.abi,
+        'ClonedContractWithInit',
         clonedContractAddress,
         signers[0]
       )) as ClonedContractWithInit
@@ -66,7 +60,7 @@ describe('ERC1167ProxyFactory', () => {
 
       clonedContractAddress = await factory.latestClonedContract()
       clonedContract = (await ethers.getContractAt(
-        ClonedContractArtifact.abi,
+        'ClonedContract',
         clonedContractAddress,
         signers[0]
       )) as ClonedContract
@@ -80,7 +74,7 @@ describe('ERC1167ProxyFactory', () => {
 
       clonedContractAddress = await factory.latestClonedContract()
       clonedContract = (await ethers.getContractAt(
-        ClonedContractWithInitArtifact.abi,
+        'ClonedContractWithInit',
         clonedContractAddress,
         signers[0]
       )) as ClonedContractWithInit
