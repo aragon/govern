@@ -17,12 +17,13 @@ import {
   GovernTokenFactory,
 } from '../typechain'
 
-export const writeObjectToFile = async (path: string, obj: object) =>
-  await promises.writeFile(path, JSON.stringify(obj))
+export async function writeObjectToFile(path: string, obj: object) {
+  return promises.writeFile(path, JSON.stringify(obj))
+}
 
 // Hardhat Runtime Environment
 export let HRE: HardhatRuntimeEnvironment = {} as HardhatRuntimeEnvironment
-export const setHRE = (_HRE: HardhatRuntimeEnvironment) => {
+export function setHRE(_HRE: HardhatRuntimeEnvironment) {
   HRE = _HRE
 }
 
@@ -30,91 +31,81 @@ export const ZERO_ADDR = `0x${'00'.repeat(20)}`
 export const TWO_ADDRR = `0x${'00'.repeat(19)}02`
 export const NO_TOKEN = `0x${'00'.repeat(20)}`
 
-export const getEthersSigners = async (): Promise<Signer[]> =>
-  await Promise.all(await HRE.ethers.getSigners())
+export async function getEthersSigners(): Promise<Signer[]> {
+  return Promise.all(await HRE.ethers.getSigners())
+}
 
-export const getEthersSignersAddresses = async (): Promise<Address[]> =>
-  await Promise.all(
-    (await HRE.ethers.getSigners()).map((signer) => signer.getAddress())
-  )
+export async function getEthersSignersAddresses(): Promise<Address[]> {
+  const signers = await HRE.ethers.getSigners()
+  return Promise.all(signers.map((signer) => signer.getAddress()))
+}
 
-export const deployContract = async <ContractType extends Contract>(
+export async function deployContract<ContractType extends Contract>(
   contractName: string,
   args: any[]
-): Promise<ContractType> =>
-  (await (await HRE.ethers.getContractFactory(contractName)).deploy(
-    ...args
-  )) as ContractType
+): Promise<ContractType> {
+  const factory = await HRE.ethers.getContractFactory(contractName)
+  const deployedFactory = await factory.deploy(...args)
+  return deployedFactory as ContractType
+}
 
-export const getContract = async <ContractType extends Contract>(
+export async function getContract<ContractType extends Contract>(
   contractName: string,
   contractAddress: string
-): Promise<ContractType> =>
-  (await (await HRE.ethers.getContractAt(contractName, contractAddress)).attach(
-    contractAddress
-  )) as ContractType
+): Promise<ContractType> {
+  const contract = await HRE.ethers.getContractAt(contractName, contractAddress)
+  const attachedContract = await contract.attach(contractAddress)
+  return attachedContract as ContractType
+}
 
-export const getGovernRegistry = async () => {
-  const addressDeployed = (
-    await getDb()
-      .get(`${eContractid.GovernRegistry}.${HRE.network.name}`)
-      .value()
-  ).address
-  return await getContract<GovernRegistry>(
+export async function getGovernRegistry() {
+  const registry = await getDb()
+    .get(`${eContractid.GovernRegistry}.${HRE.network.name}`)
+    .value()
+  return getContract<GovernRegistry>(
     eContractid.GovernRegistry,
-    addressDeployed
+    registry.address
   )
 }
 
-export const getGovernQueueFactory = async () => {
-  const addressDeployed = (
-    await getDb()
-      .get(`${eContractid.GovernQueueFactory}.${HRE.network.name}`)
-      .value()
-  ).address
-  return await getContract<GovernQueueFactory>(
+export async function getGovernQueueFactory() {
+  const queueFactory = await getDb()
+    .get(`${eContractid.GovernQueueFactory}.${HRE.network.name}`)
+    .value()
+  return getContract<GovernQueueFactory>(
     eContractid.GovernQueueFactory,
-    addressDeployed
+    queueFactory.address
   )
 }
 
-export const getGovernFactory = async () => {
-  const addressDeployed = (
-    await getDb()
-      .get(`${eContractid.GovernFactory}.${HRE.network.name}`)
-      .value()
-  ).address
-  return await getContract<GovernFactory>(
-    eContractid.GovernFactory,
-    addressDeployed
-  )
+export async function getGovernFactory() {
+  const factory = await getDb()
+    .get(`${eContractid.GovernFactory}.${HRE.network.name}`)
+    .value()
+  return getContract<GovernFactory>(eContractid.GovernFactory, factory.address)
 }
 
-export const getGovernTokenFactory = async () => {
-  const addressDeployed = (
-    await getDb()
-      .get(`${eContractid.GovernTokenFactory}.${HRE.network.name}`)
-      .value()
-  ).address
-  return await getContract<GovernTokenFactory>(
+export async function getGovernTokenFactory() {
+  const tokenFactory = await getDb()
+    .get(`${eContractid.GovernTokenFactory}.${HRE.network.name}`)
+    .value()
+  return getContract<GovernTokenFactory>(
     eContractid.GovernTokenFactory,
-    addressDeployed
+    tokenFactory.address
   )
 }
 
-export const getGovernBaseFactory = async () => {
-  const addressDeployed = (
-    await getDb()
-      .get(`${eContractid.GovernBaseFactory}.${HRE.network.name}`)
-      .value()
-  ).address
-  return await getContract<GovernBaseFactory>(
+export async function getGovernBaseFactory() {
+  const baseFactory = await getDb()
+    .get(`${eContractid.GovernBaseFactory}.${HRE.network.name}`)
+    .value()
+  return getContract<GovernBaseFactory>(
     eContractid.GovernBaseFactory,
-    addressDeployed
+    baseFactory.address
   )
 }
 
-export const buildName = (name: string | null): string => {
+export function buildName(name: string | null): string {
   const uniqueName =
     name ??
     uniqueNamesGenerator({
