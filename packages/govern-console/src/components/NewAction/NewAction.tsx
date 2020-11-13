@@ -257,7 +257,7 @@ function ContractCallHandler({
         // This is necessary for DAOs with lower execution delays, in which
         // the tx getting picked up by a later block can make the tx fail.
         const currentDate =
-          Math.ceil(Date.now() / 1000) + Number(config.executionDelay) + 30
+          Math.ceil(Date.now() / 1000) + Number(config.executionDelay) + 60
         const container = {
           payload: {
             nonce: newNonce.toString(),
