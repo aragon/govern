@@ -8,6 +8,7 @@ import Button from '../Button'
 import Entity from '../Entity/Entity'
 import FilteredActions from '../FilteredActions/FilteredActions'
 import Frame from '../Frame/Frame'
+import { usePermissions } from '../../Providers/Permissions'
 import { useWalletAugmented } from '../../Providers/Wallet'
 import { KNOWN_GOVERN_ROLES, KNOWN_QUEUE_ROLES } from '../../lib/known-roles'
 import { ETH_ANY_ADDRESS } from '../../lib/web3-utils'
@@ -36,6 +37,9 @@ export default function ViewDao({ dao }: ViewDaoProps) {
     },
   )
   const { ethers } = useWalletAugmented()
+  const { permissions, populatePermissions } = usePermissions()
+  populatePermissions(dao.queue.roles)
+  const { schedule: canSchedule } = permissions
 
   useEffect(() => {
     async function fetchEthBalance() {
@@ -121,7 +125,9 @@ export default function ViewDao({ dao }: ViewDaoProps) {
               margin-bottom: 16px;
             `}
           >
-            <Button onClick={handleNewAction}>New action</Button>
+            {canSchedule && (
+              <Button onClick={handleNewAction}>New action</Button>
+            )}
           </div>
         </div>
         <FilteredActions

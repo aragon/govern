@@ -9,6 +9,7 @@ import Info from '../Info/Info'
 import { useContract } from '../../lib/web3-contracts'
 import { shortenAddress, ETH_EMPTY_HEX } from '../../lib/web3-utils'
 import queueAbi from '../../lib/abi/GovernQueue.json'
+import { usePermissions } from '../../Providers/Permissions'
 import { useWallet } from '../../Providers/Wallet'
 
 const EMPTY_FAILURE_MAP =
@@ -135,6 +136,12 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
     'error' | 'info' | 'success' | ''
   >('')
   const queueContract = useContract(queueAddress, queueAbi)
+  const { permissions } = usePermissions()
+  const {
+    execute: canExecute,
+    veto: canVeto,
+    challenge: canChallenge,
+  } = permissions
 
   const handleSetExecutionStatus = useCallback(
     (result, message) => {
@@ -276,7 +283,7 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
       )
     }
   }, [accountStatus, container, handleSetExecutionStatus, queueContract])
-
+  console.log(container)
   return (
     <>
       <Frame>
@@ -289,30 +296,36 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
       {container.state !== 'Executed' && (
         <Frame>
           <h2>Available actions</h2>
-          <Button
-            onClick={execute}
-            css={`
-              margin-right: 16px;
-            `}
-          >
-            Execute
-          </Button>
-          <Button
-            onClick={veto}
-            css={`
-              margin-right: 16px;
-            `}
-          >
-            Veto
-          </Button>
-          <Button
-            onClick={challenge}
-            css={`
-              margin-right: 16px;
-            `}
-          >
-            Challenge
-          </Button>
+          {container.state === 'Scheduled' && (
+            <Button
+              onClick={execute}
+              css={`
+                margin-right: 16px;
+              `}
+            >
+              Execute
+            </Button>
+          )}
+          {canVeto && (
+            <Button
+              onClick={veto}
+              css={`
+                margin-right: 16px;
+              `}
+            >
+              Veto
+            </Button>
+          )}
+          {canChallenge && (
+            <Button
+              onClick={challenge}
+              css={`
+                margin-right: 16px;
+              `}
+            >
+              Challenge
+            </Button>
+          )}
         </Frame>
       )}
       <Frame>
