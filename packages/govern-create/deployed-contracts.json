@@ -1,0 +1,58 @@
+{
+  "GovernRegistry": {
+    "hardhat": {
+      "address": "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853"
+    },
+    "rinkeby": {
+      "address": "0xf1D638E894fe4C5eee35D38b2ee46b20C788E81c"
+    }
+  },
+  "GovernQueueFactory": {
+    "hardhat": {
+      "address": "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6"
+    },
+    "rinkeby": {
+      "address": "0x52C9c322049B7e156979D4055c0E81b99DE692C7"
+    }
+  },
+  "QueueBase": {
+    "hardhat": {
+      "address": "0x8aCd85898458400f7Db866d53FCFF6f0D49741FF"
+    },
+    "rinkeby": {
+      "address": "0xE83148FEA0C1ea6914D360C37F4f20B319754f94"
+    }
+  },
+  "GovernFactory": {
+    "hardhat": {
+      "address": "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318"
+    },
+    "rinkeby": {
+      "address": "0xa566e67E744465DC7FDbF7364DC81e55A9274AF1"
+    }
+  },
+  "GovernBase": {
+    "hardhat": {
+      "address": "0x94099942864EA81cCF197E9D71ac53310b1468D8"
+    },
+    "rinkeby": {
+      "address": "0x1Ac2Ed8264B01264fA29a27691a0C90E954CB500"
+    }
+  },
+  "GovernTokenFactory": {
+    "hardhat": {
+      "address": "0x610178dA211FEF7D417bC0e6FeD39F05609AD788"
+    },
+    "rinkeby": {
+      "address": "0x7c488878600925FAE24261D11a18bC394709Bb65"
+    }
+  },
+  "GovernBaseFactory": {
+    "hardhat": {
+      "address": "0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e"
+    },
+    "rinkeby": {
+      "address": "0xD6bC44402b42B47562E8E4E9822722Dd9ec86ac3"
+    }
+  }
+}

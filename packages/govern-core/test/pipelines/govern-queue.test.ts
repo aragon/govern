@@ -1,7 +1,10 @@
 import { ethers } from '@nomiclabs/buidler'
 import { expect } from 'chai'
 import { Signer } from 'ethers'
-import { GovernQueue, GovernQueueFactory } from '../../typechain'
+import {
+  GovernQueue,
+  GovernQueue__factory as GovernQueueFactory,
+} from '../../typechain'
 
 const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
 
