@@ -22,11 +22,11 @@
     "hardhat": "^2.0.2"
   },
   "scripts": {
-    "build": "yarn compile && hardhat typechain",
+    "build": "yarn compile",
     "clean": "rm -rf artifacts",
     "compile": "yarn hardhat compile --force",
     "compile:cached": "yarn hardhat compile",
-    "test": "yarn build && yarn hardhat test",
+    "test": "yarn hardhat test",
     "prepublishOnly": "yarn test && yarn compile"
   },
   "dependencies": {
