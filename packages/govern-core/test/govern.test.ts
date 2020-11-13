@@ -82,4 +82,14 @@ describe('Govern', function() {
     .to.emit(govern, EVENTS.RECEIVED_CALLBACK)
     .withArgs(callbackSig, callbackSig)
   })
+
+  context('ERC-165', () => {
+    const ERC3000_EXEC_INTERFACE_ID = '0xc2d85afc'
+
+    it('supports ERC-3000 exec', async () => {
+      expect(
+        await govern.supportsInterface(ERC3000_EXEC_INTERFACE_ID)
+      ).to.equal(true)
+    })
+  })
 })
