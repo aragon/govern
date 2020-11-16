@@ -7,6 +7,7 @@ import 'styled-components/macro'
 import Button from '../Button'
 import Frame from '../Frame/Frame'
 import { useContract } from '../../lib/web3-contracts'
+import ercAbi from '../../lib/abi/erc20.json'
 import queueAbi from '../../lib/abi/GovernQueue.json'
 
 const EMPTY_BYTES = '0x00'
@@ -44,6 +45,7 @@ export default function NewAction({
   const [type, setType] = useState('')
 
   const queueContract = useContract(queueAddress, queueAbi)
+  const ercContract = useContract(config.scheduleDeposit.token, ercAbi)
 
   const handleParseAbi = useCallback(
     e => {
@@ -185,6 +187,7 @@ export default function NewAction({
 type ContractCallHandlerProps = {
   contractAddress: string
   config: any
+  ercContract: any
   executor: string
   handleSetExecutionResult: (result: string, v: string) => void
   inputs: Input[] | any[]
@@ -197,6 +200,7 @@ type ContractCallHandlerProps = {
 function ContractCallHandler({
   config,
   contractAddress,
+  ercContract,
   executor,
   handleSetExecutionResult,
   inputs,
@@ -240,6 +244,20 @@ function ContractCallHandler({
     async e => {
       e.preventDefault()
       try {
+        // First, let's handle token approvals.
+        // There are 3 cases to check
+        // 1. The user has more allowance than needed, we can skip. (0 tx)
+        // 2. The user has less allowance than needed, and we need to raise it. (2 tx)
+        // 3. The user has 0 allowance, we just need to approve the needed amount. (1 tx)
+
+        const allowance = await ercContract.getAllowance()
+        if (allowance.lt(new BN(config.scheduleDeposit.amount))) {
+          if (!allowance.isZero()) {
+            const resetTx = await ercContract.approve(account, '0')
+            await resetTx.wait(1)
+          }
+          await ercContract.approve(account, config.scheduleDeposit.amount)
+        }
         const functionValues = values ? values.map((val: any) => val.value) : []
 
         // @ts-ignore
@@ -252,7 +270,6 @@ function ContractCallHandler({
         const bnNonce = new BN(nonce.toString())
         const newNonce = bnNonce.add(new BN('1'))
 
-        // TODO: handle token approvals
         // Current time + 30 secs buffer.
         // This is necessary for DAOs with lower execution delays, in which
         // the tx getting picked up by a later block can make the tx fail.
