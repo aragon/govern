@@ -20,7 +20,7 @@ export default class Authenticator {
     constructor(
         private whitelist: Whitelist,
         private secret: string, 
-        private jwtOptions: JWTOptions
+        private jwtOptions?: JWTOptions
     ) { }
 
     /**

@@ -5,16 +5,13 @@ import fastifyCookie from 'fastify-cookie'
 
 export interface AuthOptions {
     authenticator: Authenticator,
-    secret: string,
     cookieName: string
 }
 
-
 function authPlugin(fastify, options: AuthOptions, next) {
     const authenticator = options.authenticator
-    const secret = options.secret
     fastify.register(fastifyCookie)
-    fastify.decorate('pkAuth', auth)
+    fastify.decorate('authPlugin', auth)
 
     next()
 
@@ -29,6 +26,7 @@ function authPlugin(fastify, options: AuthOptions, next) {
         const token = authenticator.authenticate(body.message, body.signature)
         if (!token) {
             next(new Unauthorized('Unknown account!'))
+
             return
         }
         

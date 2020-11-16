@@ -1,11 +1,12 @@
 // TODO: define request schema (eg. request validation, auth pre handler etc.)
 
 import fastify from 'fastify'
-import pkAuth from './auth/auth-plugin'
+import authPlugin from './auth/auth-plugin'
 
 import Configuration from './config/Configuration'
 import Database from './db/Database'
 import Whitelist from './db/Whitelist'
+import Authenticator from './auth/Authenticator'
 
 import ExecuteTransaction from './transactions/ExecuteTransaction'
 import ChallengeTransaction from './transactions/ChallengeTransaction'
@@ -23,11 +24,22 @@ const server = fastify({
         level: 'debug' // Make this configurable with a process ENV
     }
 })
-server.register(pkAuth)
+
+// Register AuthPlugin
+server.register(
+    authPlugin,
+    {
+        authenticator: new Authenticator(// TODO: Pass JWT options
+            whitelist,
+            'secret'
+        ),
+        cookieName: 'govern_token'
+    }
+)
 
 server.after(() => {
     // Register Auth pre handler hook
-    server.addHook('preHandler', server.pkAuth)
+    server.addHook('preHandler', server.authPlugin)
 
     /* -------------------- *
     *     Transactions     *
