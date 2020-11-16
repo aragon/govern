@@ -26,6 +26,7 @@
     "@ethersproject/bytes": "^5.0.5",
     "@ethersproject/wallet": "^5.0.7",
     "fastify": "^3.8.0",
+    "fastify-cookie": "^4.1.0",
     "fastify-jwt": "^2.1.3",
     "fastify-plugin": "^3.0.0",
     "jsonwebtoken": "^8.5.1"

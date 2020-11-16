@@ -8100,6 +8100,11 @@ cookie-signature@1.0.6:
   resolved "https://registry.yarnpkg.com/cookie-signature/-/cookie-signature-1.0.6.tgz#e303a882b342cc3ee8ca513a79999734dab3ae2c"
   integrity sha1-4wOogrNCzD7oylE6eZmXNNqzriw=
 
+cookie-signature@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/cookie-signature/-/cookie-signature-1.1.0.tgz#cc94974f91fb9a9c1bb485e95fc2b7f4b120aff2"
+  integrity sha512-Alvs19Vgq07eunykd3Xy2jF0/qSNv2u7KDbAek9H5liV1UMijbqFs5cycZvv5dVsvseT/U4H8/7/w8Koh35C4A==
+
 cookie@0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/cookie/-/cookie-0.4.0.tgz#beb437e7022b3b6d49019d088665303ebe9c14ba"
@@ -11067,6 +11072,15 @@ fastfall@^1.5.0:
   integrity sha1-P+4DMxpJ0dObPN96XpzWb0dee5Q=
   dependencies:
     reusify "^1.0.0"
+
+fastify-cookie@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/fastify-cookie/-/fastify-cookie-4.1.0.tgz#b063f2b97cf9de7a33eb799a951b604ede48a915"
+  integrity sha512-+se+kNPFDE49JCiBYQrfPfchcW9s8BXjCqP5ijuYpbydTcMlo9pnyd8tyxLi43SIXBmeTBkB1CjklmD7nlHsXg==
+  dependencies:
+    cookie "^0.4.0"
+    cookie-signature "^1.1.0"
+    fastify-plugin "^2.0.0"
 
 fastify-error@^0.2.0:
   version "0.2.0"
