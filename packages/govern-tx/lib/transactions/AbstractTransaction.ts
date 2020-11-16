@@ -1,44 +1,26 @@
+import AbstractAction from '../AbstractAction'
+import Configuration from '../../src/config/Configuration'
 
-export default abstract class AbstractTransaction {
+export interface TransactionReceipt {}
+
+export default abstract class AbstractTransaction extends AbstractAction {
     /**
      * The function signature used to create a transaction
      * 
-     * @var signature
+     * @var {string} signature
      * 
      * @protected
      */
     protected signature: string;
 
     /**
-     * The parameters used to create the transaction
-     * 
-     * @var {Array<any> parameters}
-     */
-    private parameters: any[];
-
-    /**
-     * @param {Configuration} configuration 
-     * @param {Array<any>} parameters 
+     * @param {Object} parameters - The given parameters by the user
+     * @param {Configuration} configuration - The configuration object to execute the transaction
      * 
      * @constructor
      */
-    constructor(private configuration: Configuration, parameters: any[]) {
-        this.parameters = this.validateParameters(parameters);
-     }
-
-     /**
-      * Validates the given parameters.
-      * 
-      * @method validateParameters 
-      * 
-      * @param {Array<any>} parameters 
-      * 
-      * @returns {Array<any>}
-      * 
-      * @protected
-      */
-    protected validateParameters(parameters: any[]): any[] {
-        return parameters;
+    constructor(parameters: any, private configuration: Configuration) {
+        super(parameters);
     }
 
     /**
@@ -50,7 +32,5 @@ export default abstract class AbstractTransaction {
      * 
      * @public
      */
-    public execute(): Promise<TransactionReceipt> {
-        // TODO
-    }
+    public abstract execute(): Promise<TransactionReceipt> 
 }

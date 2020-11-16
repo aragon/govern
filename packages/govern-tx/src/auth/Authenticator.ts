@@ -1,5 +1,13 @@
+import Whitelist, {ListItem} from '../db/Whitelist'
 
+// TODO: Implement session key to only authenticate once
 export default class Authenticator {
+    /**
+     * 
+     * @param {Whitelist} whitelist 
+     */
+    constructor(private whitelist: Whitelist) { }
+
     /**
      * Checks if the given public key is existing in the whitelist and if no rate limit is exceeded
      * 
@@ -9,42 +17,14 @@ export default class Authenticator {
      * 
      * @public
      */
-    public authenticate(signedMessage: string): Promise<boolean> {
-        return Promise.resolve(true);
-    }
+    public async authenticate(signedMessage: string): Promise<boolean> {
+        const item = await this.getItem(signedMessage);
 
-    /**
-     * TODO: If a DB is in usage can we remove this method
-     * 
-     * Checks if the rate limit of the given account is execeeded or if the globally set is
-     * 
-     * @method isRateLimitExceeded
-     * 
-     * @param {string} publicKey - Public key of the user
-     * 
-     * @returns {boolean}
-     * 
-     * @private
-     */
-    private isRateLimitExceeded(publicKey: string): boolean {
-        return false;
-    }
+        if (item && item.rateLimit < item.executedTransactions) {
+            return true
+        }
 
-    /**
-     * TODO: If a DB is in usage can we remove this method
-     * 
-     * Checks if the given public key is existing in the whitelist
-     * 
-     * @method isKnown
-     * 
-     * @param {string} publicKey - Public key of the user
-     * 
-     * @returns {boolean}
-     *  
-     * @private
-     */
-    private isKnown(publicKey: string): boolean {
-        return true; // TODO: implement whitelist check
+        return false
     }
 
     /**
@@ -60,5 +40,19 @@ export default class Authenticator {
      */
     private getPublicKey(signedMessage: string): string {
         return '0x0...';
+    }
+
+    /**
+     * 
+     * @method getItem
+     * 
+     * @param {string} signedMessage 
+     * 
+     * @returns {ListItem}
+     * 
+     * @private
+     */
+    private getItem(signedMessage: string): ListItem {
+        return this.whitelist.getItemByKey(this.getPublicKey(signedMessage));
     }
 }
