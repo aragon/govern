@@ -45,7 +45,7 @@ server.post('/whitelist', {}, async (request, reply): Promise<boolean> => {
 })
 
 server.delete('/whitelist', {}, async (request, reply): Promise<boolean> => {
-    return await new DeleteItemAction(config, request.params).execite()
+    return await new DeleteItemAction(config, request.params).execute()
 })
 
 server.get('/whitelist', {}, async (request, reply): Promise<ListItem[]> => {

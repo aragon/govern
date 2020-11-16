@@ -1,6 +1,7 @@
 import AbstractAction from '../AbstractAction'
 import Configuration from '../../src/config/Configuration'
 
+// TODO: Use type from ethers
 export interface TransactionReceipt {}
 
 export default abstract class AbstractTransaction extends AbstractAction {

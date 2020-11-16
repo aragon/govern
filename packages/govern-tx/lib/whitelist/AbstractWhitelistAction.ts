@@ -1,4 +1,4 @@
-import Whitelist from '../../src/db/Whitelist'
+import Whitelist, {ListItem} from '../../src/db/Whitelist'
 
 export default abstract class AbstractWhitelistAction {
     /**
@@ -13,9 +13,9 @@ export default abstract class AbstractWhitelistAction {
      * 
      * @method execute
      * 
-     * @returns {Promise<any>}
+     * @returns {Promise<ListItem | ListItem[] | boolean>}
      * 
      * @public
      */
-    public abstract execute(): Promise<any>
+    public abstract execute(): Promise<ListItem | ListItem[] | boolean>
 }
