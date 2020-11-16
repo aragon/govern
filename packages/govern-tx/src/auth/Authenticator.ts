@@ -79,6 +79,7 @@ export default class Authenticator {
      */
     private getPublicKey(message: string, signature: string): string {
         return verifyMessage(arrayify(message), signature);
+    }
 
     /**
      * Returns a item from the whitelist with the given key
