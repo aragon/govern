@@ -16,7 +16,9 @@ function authPlugin(fastify, options: AuthOptions, next) {
     next()
 
     async function auth(request, reply, next) {
-        if (authenticator.verify(request.cookies[options.cookieName])) {
+        const cookie = request.cookies[options.cookieName];
+        
+        if (cookie && authenticator.verify(cookie)) {
             next()
 
             return
@@ -30,7 +32,7 @@ function authPlugin(fastify, options: AuthOptions, next) {
             return
         }
         
-        reply.setCookie(request.cookies[options.cookieName], token, {secure: true})
+        reply.setCookie(options.cookieName, token, {secure: true})
         next()
     }
 }
