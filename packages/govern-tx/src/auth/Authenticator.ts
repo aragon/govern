@@ -1,28 +1,69 @@
 import Whitelist, {ListItem} from '../db/Whitelist'
+import jwt, {SignOptions, VerifyOptions} from 'jsonwebtoken'
+import {verifyMessage} from '@ethersproject/wallet';
+import {arrayify} from '@ethersproject/bytes'
 
-// TODO: Implement Request object from Fastify
+export interface JWTOptions {
+    sign: SignOptions,
+    verify: VerifyOptions
+}
+
+// TODO: Implement provide possibility to configure JWT
 export default class Authenticator {
     /**
-     * 
      * @param {Whitelist} whitelist 
+     * @param {string} secret
+     * @param {SignOptions} jqtOptions
+     *  
+     * @constructor
      */
-    constructor(private whitelist: Whitelist) { }
+    constructor(
+        private whitelist: Whitelist,
+        private secret: string, 
+        private jwtOptions: JWTOptions
+    ) { }
 
     /**
      * Checks if the given public key is existing in the whitelist and if no rate limit is exceeded
      * 
-     * @param {string} signedMessage - The signed message from the user
+     * @method authenticate
      * 
-     * @returns Promise<boolean>
+     * @param {string} message - The message from the user
+     * @param {string} signature - The sent signature from the user
+     * 
+     * @returns Promise<boolean | string> - Returns false or the JWT
      * 
      * @public
      */
-    public async authenticate(signedMessage: string): Promise<boolean> {
-        if (await this.getItem(signedMessage)) {
-            return true
+    public async authenticate(message: string, signature: string): Promise<boolean | string> {
+        const publicKey = this.getPublicKey(message, signature);
+
+        if (await this.getItem(publicKey)) {
+            return jwt.sign({data: publicKey}, this.secret, this.jwtOptions.sign)
         }
 
         return false
+    }
+
+    /**
+     * Verifiey the given JWT 
+     * 
+     * @method verify
+     * 
+     * @param {string} token
+     * 
+     * @returns {boolean}
+     * 
+     * @public 
+     */
+    public verify(token: string): boolean {
+        try {
+            jwt.verify(token, this.secret, this.jwtOptions.verify)   
+
+            return true;
+        } catch(error) {
+            return false;
+        }
     }
 
     /**
@@ -36,21 +77,21 @@ export default class Authenticator {
      * 
      * @private
      */
-    private getPublicKey(signedMessage: string): string {
-        return '0x0...';
-    }
+    private getPublicKey(message: string, signature: string): string {
+        return verifyMessage(arrayify(message), signature);
 
     /**
+     * Returns a item from the whitelist with the given key
      * 
      * @method getItem
      * 
-     * @param {string} signedMessage 
+     * @param {string} publicKey 
      * 
      * @returns {ListItem}
      * 
      * @private
      */
-    private getItem(signedMessage: string): ListItem {
-        return this.whitelist.getItemByKey(this.getPublicKey(signedMessage));
+    private getItem(publicKey: string): ListItem {
+        return this.whitelist.getItemByKey(publicKey);
     }
 }

@@ -32,32 +32,32 @@ server.after(() => {
     /* -------------------- *
     *     Transactions     *
     * -------------------- */
-    server.post('/execute', {}, async (request, reply): Promise<TransactionReceipt> => {
-        return await new ExecuteTransaction(config, request.params).execute()
+    server.post('/execute', {}, (request, reply): Promise<TransactionReceipt> => {
+        return new ExecuteTransaction(config, request.params).execute()
     })
 
-    server.post('/schedule', {}, async (request, reply): Promise<TransactionReceipt> => {
-        return await new ScheduleTransaction(config, request.params).execute()
+    server.post('/schedule', {}, (request, reply): Promise<TransactionReceipt> => {
+        return new ScheduleTransaction(config, request.params).execute()
     })
 
-    server.post('/challenge', {}, async (request, reply): Promise<TransactionReceipt> => {
-        return await new ChallengeTransaction(config, request.params).execute()
+    server.post('/challenge', {}, (request, reply): Promise<TransactionReceipt> => {
+        return new ChallengeTransaction(config, request.params).execute()
     })
 
 
     /* -------------------- *
     *      Whitelist       *
     * -------------------- */
-    server.post('/whitelist', {}, async (request, reply): Promise<boolean> => {
-        return await new AddItemAction(whitelist, request.params).execute()
+    server.post('/whitelist', {}, (request, reply): Promise<boolean> => {
+        return new AddItemAction(whitelist, request.params).execute()
     })
 
-    server.delete('/whitelist', {}, async (request, reply): Promise<boolean> => {
-        return await new DeleteItemAction(whitelist, request.params).execute()
+    server.delete('/whitelist', {}, (request, reply): Promise<boolean> => {
+        return new DeleteItemAction(whitelist, request.params).execute()
     })
 
-    server.get('/whitelist', {}, async (request, reply): Promise<ListItem[]> => {
-        return await new GetListAction(whitelist).execute()
+    server.get('/whitelist', {}, (request, reply): Promise<ListItem[]> => {
+        return new GetListAction(whitelist).execute()
     })
 })
 
