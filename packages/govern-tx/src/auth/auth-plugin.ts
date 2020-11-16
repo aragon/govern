@@ -15,7 +15,7 @@ function authPlugin(fastify, options: AuthOptions, next) {
 
     next()
 
-    function auth(request, reply, next) {
+    async function auth(request, reply, next) {
         if (authenticator.verify(request.cookies[options.cookieName])) {
             next()
 
@@ -23,7 +23,7 @@ function authPlugin(fastify, options: AuthOptions, next) {
         }
         
         const body = JSON.parse(request.body)
-        const token = authenticator.authenticate(body.message, body.signature)
+        const token = await authenticator.authenticate(body.message, body.signature)
         if (!token) {
             next(new Unauthorized('Unknown account!'))
 
