@@ -8,7 +8,6 @@ export interface JWTOptions {
     verify: VerifyOptions
 }
 
-// TODO: Implement provide possibility to configure JWT
 export default class Authenticator {
     /**
      * @param {Whitelist} whitelist 
@@ -36,9 +35,9 @@ export default class Authenticator {
      * @public
      */
     public async authenticate(message: string, signature: string): Promise<boolean | string> {
-        const publicKey = this.getPublicKey(message, signature);
+        const publicKey = verifyMessage(arrayify(message), signature);
 
-        if (await this.getItem(publicKey)) {
+        if (await this.whitelist.getItemByKey(publicKey)) {
             return jwt.sign({data: publicKey}, this.secret, this.jwtOptions.sign)
         }
 
@@ -64,35 +63,5 @@ export default class Authenticator {
         } catch(error) {
             return false;
         }
-    }
-
-    /**
-     * Extracts the public key from the given signed message
-     * 
-     * @method getPublicKey
-     * 
-     * @param signedMessage - The signed message from the user
-     * 
-     * @returns {boolean}
-     * 
-     * @private
-     */
-    private getPublicKey(message: string, signature: string): string {
-        return verifyMessage(arrayify(message), signature);
-    }
-
-    /**
-     * Returns a item from the whitelist with the given key
-     * 
-     * @method getItem
-     * 
-     * @param {string} publicKey 
-     * 
-     * @returns {ListItem}
-     * 
-     * @private
-     */
-    private getItem(publicKey: string): ListItem {
-        return this.whitelist.getItemByKey(publicKey);
     }
 }
