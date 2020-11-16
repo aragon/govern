@@ -20,7 +20,7 @@ export default abstract class AbstractTransaction extends AbstractAction {
      * 
      * @constructor
      */
-    constructor(parameters: any, private configuration: Configuration) {
+    constructor(private configuration: Configuration, parameters: any) {
         super(parameters);
     }
 

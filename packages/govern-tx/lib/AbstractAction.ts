@@ -7,11 +7,11 @@ export default abstract class AbstractAction {
     private parameters: any;
 
     /**
-     * @param {Array<any>} parameters 
+     * @param {Object} parameters 
      * 
      * @constructor
      */
-    constructor(parameters: any[]) {
+    constructor(parameters: any) {
         this.parameters = this.validateParameters(parameters);
      }
 
@@ -20,13 +20,13 @@ export default abstract class AbstractAction {
       * 
       * @method validateParameters 
       * 
-      * @param {Array<any>} parameters 
+      * @param {Object} parameters 
       * 
-      * @returns {Array<any>}
+      * @returns {Object}
       * 
       * @protected
       */
-    protected validateParameters(parameters: any[]): any[] {
+    protected validateParameters(parameters: any): any {
         return parameters;
     }
 

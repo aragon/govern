@@ -1,6 +1,6 @@
 import Whitelist, {ListItem} from '../db/Whitelist'
 
-// TODO: Implement session key to only authenticate once
+// TODO: Implement Request object from Fastify
 export default class Authenticator {
     /**
      * 
@@ -18,9 +18,7 @@ export default class Authenticator {
      * @public
      */
     public async authenticate(signedMessage: string): Promise<boolean> {
-        const item = await this.getItem(signedMessage);
-
-        if (item && item.rateLimit < item.executedTransactions) {
+        if (await this.getItem(signedMessage)) {
             return true
         }
 
