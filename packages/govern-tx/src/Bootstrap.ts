@@ -1,8 +1,9 @@
 import fastify, { FastifyInstance } from 'fastify'
 import Configuration from './config/Configuration'
 import Database from './db/Database'
-import Whitelist from './db/Whitelist'
-import Authenticator, { JWTOptions } from './auth/Authenticator';
+import Whitelist, { ListItem } from './db/Whitelist'
+import Admin from './db/Admin'
+import Authenticator, { JWTOptions } from './auth/Authenticator'
 
 import ExecuteTransaction from './transactions/ExecuteTransaction'
 import ChallengeTransaction from './transactions/ChallengeTransaction'
@@ -12,7 +13,7 @@ import AddItemAction from './whitelist/AddItemAction'
 import DeleteItemAction from './whitelist/DeleteItemAction'
 import GetListAction from './whitelist/GetListAction'
 import AbstractTransaction from '../lib/transactions/AbstractTransaction'
-import AbstractWhitelistAction from '../lib/whitelist/AbstractWhitelistAction';
+import AbstractWhitelistAction from '../lib/whitelist/AbstractWhitelistAction'
 
 export default class Bootstrap {
     /**
@@ -124,7 +125,7 @@ export default class Bootstrap {
         this.server.post(
             '/whitelist',
             {schema: AbstractWhitelistAction.schema},
-            (request): Promise<boolean> => {
+            (request): Promise<ListItem> => {
                 return new AddItemAction(this.whitelist, request.params).execute()
             }
         )
@@ -175,11 +176,15 @@ export default class Bootstrap {
      * @private
      */
     private setupAuth(): void {
-        this.whitelist =  new Whitelist(new Database(this.config.database));
+        const database = new Database(this.config.database)
+        const admin = new Admin(database);
+        this.whitelist =  new Whitelist(database)
+
 
         this.authenticator = new Authenticator(
             this.server,
             this.whitelist,
+            admin,
             this.config.auth.secret,
             this.config.auth.cookieName,
             this.config.auth.jwtOptions
