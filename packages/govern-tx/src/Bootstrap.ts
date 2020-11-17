@@ -175,8 +175,7 @@ export default class Bootstrap {
      * @private
      */
     private setupAuth(): void {
-        // TODO: Change database handling here to only have one open connection
-        this.whitelist =  new Whitelist(new Database(this.config));
+        this.whitelist =  new Whitelist(new Database(this.config.database));
 
         this.authenticator = new Authenticator(
             this.server,

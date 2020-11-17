@@ -1,12 +1,43 @@
-import Configuration from '../config/Configuration'
+import postgres from 'postgres'
+import { DatabaseOptions } from '../config/Configuration'
 
 export default class Database {
+    /**
+     * The sql function of the postgres client
+     * 
+     * @property {Function} sql
+     * 
+     * @private
+     */
+    private sql;
+
     /** 
-     * @param configuration - The configuration object of this service
+     * @param {DatabaseOptions} config - The database configuration
      * 
      * @constructor
      */
-    constructor(private configuration: Configuration) { }
+    constructor(private config: DatabaseOptions) { 
+        this.connect()
+    }
+
+    /**
+     * Establishes the connection to the postgres DB
+     * 
+     * @method connect
+     * 
+     * @returns {void}
+     * 
+     * @private
+     */
+    private connect(): void {
+        this.sql = postgres({
+            host: this.config.host,
+            port: this.config.port,
+            database: this.config.database,
+            username: this.config.user,
+            password: this.config.password
+        });
+    }
 
     /**
      * Executes a query on the DB
@@ -20,7 +51,6 @@ export default class Database {
      * @public 
      */
     public query(query: string): Promise<any> {
-        //TODO: Decide which DB to use (Should we share the DB with TheGraph?) and implement the DB adapter with the related driver
-        return Promise.resolve(true)
+        return this.sql(query)
     }
 }

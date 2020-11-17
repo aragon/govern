@@ -100,7 +100,7 @@ export default class Configuration {
      * 
      * @public
      */
-    public get auth() {
+    public get auth(): AuthOptions {
         return this._auth;
     }
 
@@ -126,7 +126,7 @@ export default class Configuration {
      * 
      * @public
      */
-    public get server() {
+    public get server(): ServerOptions {
         return this._server;
     }
 

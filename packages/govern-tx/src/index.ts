@@ -23,4 +23,3 @@ new Bootstrap(
         }
     )
 ).run()
-
