@@ -22,49 +22,54 @@ const whitelist = new Whitelist(new Database(config));
 const server = fastify({
     logger: {
         level: 'debug' // Make this configurable with a process ENV
-    }
+    },
+    ignoreTrailingSlash: true
+    //https: {} TODO: Configure TLS
 })
 
-// TODO: Pass JWT options
-const authenticator = new Authenticator(server, whitelist, 'secret', 'govern_token')
-
-server.after(() => {
-    // Register Auth pre handler hook
-    server.addHook('preHandler', authenticator.authenticate)
-
-    /* -------------------- *
-    *     Transactions     *
-    * -------------------- */
-    server.post('/execute', {}, (request, reply): Promise<TransactionReceipt> => {
-        return new ExecuteTransaction(config, request.params).execute()
-    })
-
-    server.post('/schedule', {}, (request, reply): Promise<TransactionReceipt> => {
-        return new ScheduleTransaction(config, request.params).execute()
-    })
-
-    server.post('/challenge', {}, (request, reply): Promise<TransactionReceipt> => {
-        return new ChallengeTransaction(config, request.params).execute()
-    })
+/* -------------------- *
+*     Setup Auth        *
+* -------------------- */
+const authenticator = new Authenticator(server, whitelist, 'secret', 'govern_token') // TODO: Pass JWT options
+server.addHook('preHandler', authenticator.authenticate.bind(authenticator))
 
 
-    /* -------------------- *
-    *      Whitelist       *
-    * -------------------- */
-    server.post('/whitelist', {}, (request, reply): Promise<boolean> => {
-        return new AddItemAction(whitelist, request.params).execute()
-    })
-
-    server.delete('/whitelist', {}, (request, reply): Promise<boolean> => {
-        return new DeleteItemAction(whitelist, request.params).execute()
-    })
-
-    server.get('/whitelist', {}, (request, reply): Promise<ListItem[]> => {
-        return new GetListAction(whitelist).execute()
-    })
+/* -------------------- *
+*     Transactions     *
+* -------------------- */
+server.post('/execute', {}, (request, reply): Promise<TransactionReceipt> => {
+    return new ExecuteTransaction(config, request.params).execute()
 })
 
-server.listen(4040, (error, address) => {
+server.post('/schedule', {}, (request, reply): Promise<TransactionReceipt> => {
+    return new ScheduleTransaction(config, request.params).execute()
+})
+
+server.post('/challenge', {}, (request, reply): Promise<TransactionReceipt> => {
+    return new ChallengeTransaction(config, request.params).execute()
+})
+
+
+/* -------------------- *
+*      Whitelist       *
+* -------------------- */
+server.post('/whitelist', {}, (request, reply): Promise<boolean> => {
+    return new AddItemAction(whitelist, request.params).execute()
+})
+
+server.delete('/whitelist', {}, (request, reply): Promise<boolean> => {
+    return new DeleteItemAction(whitelist, request.params).execute()
+})
+
+server.get('/whitelist', {}, (request, reply): Promise<ListItem[]> => {
+    return new GetListAction(whitelist).execute()
+})
+
+
+/* -------------------- *
+*      Start Server     *
+* -------------------- */
+server.listen(4040, '0.0.0.0', (error: Error, address: string): void => {
     if (error) {
         console.error(error)
         process.exit(0)
