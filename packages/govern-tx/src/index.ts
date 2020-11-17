@@ -59,15 +59,15 @@ server.addHook('preHandler', authenticator.authenticate.bind(authenticator))
 /* -------------------- *
 *     Transactions     *
 * -------------------- */
-server.post('/execute', {schema}, (request, reply): Promise<TransactionReceipt> => {
+server.post('/execute', {schema}, (request): Promise<TransactionReceipt> => {
     return new ExecuteTransaction(config, request.params).execute()
 })
 
-server.post('/schedule', {schema}, (request, reply): Promise<TransactionReceipt> => {
+server.post('/schedule', {schema}, (request): Promise<TransactionReceipt> => {
     return new ScheduleTransaction(config, request.params).execute()
 })
 
-server.post('/challenge', {schema}, (request, reply): Promise<TransactionReceipt> => {
+server.post('/challenge', {schema}, (request): Promise<TransactionReceipt> => {
     return new ChallengeTransaction(config, request.params).execute()
 })
 
@@ -75,15 +75,15 @@ server.post('/challenge', {schema}, (request, reply): Promise<TransactionReceipt
 /* -------------------- *
 *      Whitelist       *
 * -------------------- */
-server.post('/whitelist', {schema}, (request, reply): Promise<boolean> => {
+server.post('/whitelist', {schema}, (request): Promise<boolean> => {
     return new AddItemAction(whitelist, request.params).execute()
 })
 
-server.delete('/whitelist', {schema}, (request, reply): Promise<boolean> => {
+server.delete('/whitelist', {schema}, (request): Promise<boolean> => {
     return new DeleteItemAction(whitelist, request.params).execute()
 })
 
-server.get('/whitelist', {schema}, (request, reply): Promise<ListItem[]> => {
+server.get('/whitelist', {schema}, (): Promise<ListItem[]> => {
     return new GetListAction(whitelist).execute()
 })
 
