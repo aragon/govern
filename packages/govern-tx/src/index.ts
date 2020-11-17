@@ -15,7 +15,18 @@ import AddItemAction from './whitelist/AddItemAction'
 import DeleteItemAction from './whitelist/DeleteItemAction'
 import GetListAction from './whitelist/GetListAction'
 
-const config = new Configuration()
+const config = new Configuration(
+    {
+        url: 'localhost:8545'
+    }, 
+    {
+        user: 'govern',
+        host: 'localhost',
+        password: 'dev',
+        database: 'govern',
+        port: 4000
+    }
+)
 const whitelist = new Whitelist(new Database(config));
 
 const server = fastify({
@@ -48,15 +59,15 @@ server.addHook('preHandler', authenticator.authenticate.bind(authenticator))
 /* -------------------- *
 *     Transactions     *
 * -------------------- */
-server.post('/execute', {}, (request, reply): Promise<TransactionReceipt> => {
+server.post('/execute', {schema}, (request, reply): Promise<TransactionReceipt> => {
     return new ExecuteTransaction(config, request.params).execute()
 })
 
-server.post('/schedule', {}, (request, reply): Promise<TransactionReceipt> => {
+server.post('/schedule', {schema}, (request, reply): Promise<TransactionReceipt> => {
     return new ScheduleTransaction(config, request.params).execute()
 })
 
-server.post('/challenge', {}, (request, reply): Promise<TransactionReceipt> => {
+server.post('/challenge', {schema}, (request, reply): Promise<TransactionReceipt> => {
     return new ChallengeTransaction(config, request.params).execute()
 })
 
@@ -64,15 +75,15 @@ server.post('/challenge', {}, (request, reply): Promise<TransactionReceipt> => {
 /* -------------------- *
 *      Whitelist       *
 * -------------------- */
-server.post('/whitelist', {}, (request, reply): Promise<boolean> => {
+server.post('/whitelist', {schema}, (request, reply): Promise<boolean> => {
     return new AddItemAction(whitelist, request.params).execute()
 })
 
-server.delete('/whitelist', {}, (request, reply): Promise<boolean> => {
+server.delete('/whitelist', {schema}, (request, reply): Promise<boolean> => {
     return new DeleteItemAction(whitelist, request.params).execute()
 })
 
-server.get('/whitelist', {}, (request, reply): Promise<ListItem[]> => {
+server.get('/whitelist', {schema}, (request, reply): Promise<ListItem[]> => {
     return new GetListAction(whitelist).execute()
 })
 
