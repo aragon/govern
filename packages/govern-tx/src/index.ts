@@ -25,21 +25,12 @@ const server = fastify({
     }
 })
 
-// Register AuthPlugin
-server.register(
-    authPlugin,
-    {
-        authenticator: new Authenticator(// TODO: Pass JWT options
-            whitelist,
-            'secret'
-        ),
-        cookieName: 'govern_token'
-    }
-)
+// TODO: Pass JWT options
+const authenticator = new Authenticator(server, whitelist, 'secret', 'govern_token')
 
 server.after(() => {
     // Register Auth pre handler hook
-    server.addHook('preHandler', server.authPlugin)
+    server.addHook('preHandler', authenticator.authenticate)
 
     /* -------------------- *
     *     Transactions     *

@@ -2,6 +2,9 @@ import Whitelist, {ListItem} from '../db/Whitelist'
 import jwt, {SignOptions, VerifyOptions} from 'jsonwebtoken'
 import {verifyMessage} from '@ethersproject/wallet';
 import {arrayify} from '@ethersproject/bytes'
+import { Unauthorized } from 'http-errors'
+import fastifyCookie from 'fastify-cookie'
+import fastify, { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
 export interface JWTOptions {
     sign: SignOptions,
@@ -17,10 +20,14 @@ export default class Authenticator {
      * @constructor
      */
     constructor(
+        private fastify: FastifyInstance,
         private whitelist: Whitelist,
         private secret: string, 
+        private cookieName: string,
         private jwtOptions?: JWTOptions
-    ) { }
+    ) {
+        fastify.register(fastifyCookie)
+    }
 
     /**
      * Checks if the given public key is existing in the whitelist and if no rate limit is exceeded
@@ -34,14 +41,26 @@ export default class Authenticator {
      * 
      * @public
      */
-    public async authenticate(message: string, signature: string): Promise<boolean | string> {
-        const publicKey = verifyMessage(arrayify(message), signature);
-
-        if (await this.whitelist.getItemByKey(publicKey)) {
-            return jwt.sign({data: publicKey}, this.secret, this.jwtOptions.sign)
+    public async authenticate(request: FastifyRequest, reply: FastifyReply): Promise<undefined> {
+        const cookie = request.cookies[this.cookieName];
+        
+        if (cookie && this.verify(cookie)) {
+            return
         }
 
-        return false
+        const publicKey: string = verifyMessage(arrayify(request.body.message), body.signature);
+        let token: string;
+        
+        if (await this.whitelist.getItemByKey(publicKey)) {
+            token = jwt.sign({data: publicKey}, this.secret, this.jwtOptions.sign)
+        }
+
+        if (!token) {
+            throw new Unauthorized('Unknown account!')
+        }
+
+        reply.setCookie(this.cookieName, token, {secure: true})
+        return
     }
 
     /**
@@ -55,7 +74,7 @@ export default class Authenticator {
      * 
      * @public 
      */
-    public verify(token: string): boolean {
+    private verify(token: string): boolean {
         try {
             jwt.verify(token, this.secret, this.jwtOptions.verify)   
 
