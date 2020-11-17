@@ -34,4 +34,25 @@ export default abstract class AbstractTransaction extends AbstractAction {
      * @public
      */
     public abstract execute(): Promise<TransactionReceipt> 
+
+    /**
+     * Returns the schema of a transaction command
+     * 
+     * @property schema
+     * 
+     * @returns {any}
+     */
+    public static get schema(): any {
+        return {
+            body: {
+                type: 'object',
+                required: ['message', 'signature'],
+                properties: {
+                    message: { type: 'string' },
+                    signature: { type: 'string' }
+                }
+            },      
+            //response: {} TODO: Define response validation for each action/command
+        }
+    }
 }

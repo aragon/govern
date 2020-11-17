@@ -22,4 +22,15 @@ export default abstract class AbstractWhitelistAction extends AbstractAction {
      * @public
      */
     public abstract execute(): Promise<ListItem | ListItem[] | boolean>
+
+    /**
+     * Returns the schema of a whitelist command
+     * 
+     * @property schema
+     * 
+     * @returns {any}
+     */
+    public static get schema(): any {
+        return {} // TODO: Define schema
+    }
 }
