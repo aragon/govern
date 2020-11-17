@@ -52,7 +52,7 @@ export default class Authenticator {
         const publicKey: string = verifyMessage(arrayify(request.body.message), body.signature);
         let token: string;
         
-        if (await this.whitelist.getItemByKey(publicKey)) {
+        if (await this.whitelist.keyExists(publicKey)) {
             token = jwt.sign({data: publicKey}, this.secret, this.jwtOptions.sign)
         }
 

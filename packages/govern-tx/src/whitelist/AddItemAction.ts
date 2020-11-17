@@ -1,5 +1,6 @@
 import {isAddress} from '@ethersproject/address'
 import AbstractWhitelistAction from "../../lib/whitelist/AbstractWhitelistAction"
+import {ListItem} from '../db/Whitelist'
 
 export default class AddItemAction extends AbstractWhitelistAction {
     /**
@@ -30,11 +31,11 @@ export default class AddItemAction extends AbstractWhitelistAction {
      * 
      * @method execute
      * 
-     * @returns {Promise<boolean>}
+     * @returns {Promise<ListItem>}
      * 
      * @public
      */
-    public execute(): Promise<boolean> {
+    public execute(): Promise<ListItem> {
         return this.whitelist.addItem(
             this.parameters.publicKey,
             this.parameters.rateLimit

@@ -1,5 +1,6 @@
 import {isAddress} from '@ethersproject/address'
 import AbstractWhitelistAction from "../../lib/whitelist/AbstractWhitelistAction";
+import {ListItem} from '../db/Whitelist'
 
 export default class DeleteItemAction extends AbstractWhitelistAction {
     /**

@@ -4,7 +4,7 @@ import Whitelist, {ListItem} from '../../src/db/Whitelist'
 export default abstract class AbstractWhitelistAction extends AbstractAction {
     /**
      * @param {any} parameters - The given parameters by the user
-     * @param {Whitelist} whitelist - The whitelist DB adapter
+     * @param {Whitelist} whitelist - The whitelist entitiy
      * 
      * @constructor
      */

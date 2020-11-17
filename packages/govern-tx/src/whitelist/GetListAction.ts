@@ -7,7 +7,7 @@ export default class GetListAction extends AbstractWhitelistAction {
      * 
      * @method execute
      * 
-     * @returns {Promise<boolean>}
+     * @returns {Promise<ListItem[]>}
      * 
      * @public
      */
