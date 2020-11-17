@@ -1,4 +1,5 @@
 import Whitelist, {ListItem} from '../db/Whitelist'
+import Admin from '../db/Admin';
 import jwt, {SignOptions, VerifyOptions} from 'jsonwebtoken'
 import {verifyMessage} from '@ethersproject/wallet';
 import {arrayify} from '@ethersproject/bytes'
@@ -11,7 +12,6 @@ export interface JWTOptions {
     verify: VerifyOptions
 }
 
-// TODO: Implement rules for Admin public key resp. to execute whitelist actions
 export default class Authenticator {
     /**
      * @param {Whitelist} whitelist 
@@ -23,6 +23,7 @@ export default class Authenticator {
     constructor(
         private fastify: FastifyInstance,
         private whitelist: Whitelist,
+        private admin: Admin,
         private secret: string, 
         private cookieName: string,
         private jwtOptions?: JWTOptions
@@ -44,17 +45,24 @@ export default class Authenticator {
      */
     public async authenticate(request: FastifyRequest, reply: FastifyReply): Promise<undefined> {
         const cookie = request.cookies[this.cookieName];
-        
-        if (cookie && this.verify(cookie)) {
-            return
-        }
-
         const publicKey: string = verifyMessage(arrayify(request.body.message), body.signature);
+
+        if (cookie && this.verify(cookie)) {
+            if (request.routerPath === '/whitelist' && !(await this.admin.isAdmin(publicKey))) {
+                throw new Unauthorized('Not allowed action!')
+            }
+
+            return
+        } 
+
         let token: string;
-        
-        if (await this.whitelist.keyExists(publicKey)) {
+
+        if (
+            (request.routerPath !== '/whitelist' && await this.whitelist.keyExists(publicKey)) ||
+            (request.routerPath === '/whitelist' && await this.admin.isAdmin(publicKey))
+        ) {
             token = jwt.sign({data: publicKey}, this.secret, this.jwtOptions.sign)
-        }
+        } 
 
         if (!token) {
             throw new Unauthorized('Unknown account!')
