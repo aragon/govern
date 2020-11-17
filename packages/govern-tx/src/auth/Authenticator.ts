@@ -32,20 +32,20 @@ export default class Authenticator {
     }
 
     /**
-     * Checks if the given public key is existing in the whitelist and if no rate limit is exceeded
+     * Checks if the given public key is existing and if this account is allowed to execute the requested action
      * 
      * @method authenticate
      * 
      * @param {string} message - The message from the user
      * @param {string} signature - The sent signature from the user
      * 
-     * @returns Promise<boolean | string> - Returns false or the JWT
+     * @returns Promise<undefined>
      * 
      * @public
      */
     public async authenticate(request: FastifyRequest, reply: FastifyReply): Promise<undefined> {
         const cookie = request.cookies[this.cookieName];
-        const publicKey: string = verifyMessage(arrayify(request.body.message), body.signature);
+        const publicKey: string = verifyMessage(arrayify(request.body.message), request.body.signature);
 
         if (cookie && this.verify(cookie)) {
             if (request.routerPath === '/whitelist' && !(await this.admin.isAdmin(publicKey))) {
