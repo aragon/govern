@@ -18,7 +18,7 @@ export default class AddItemAction extends AbstractWhitelistAction {
             throw new Error('Invalid public key passed!')
         }
 
-        if (!(this.parameters.message.rateLimit > 0)) {
+        if (this.parameters.message.rateLimit == 0) {
             throw new Error('Invalid rate limit passed!')
         }
 
