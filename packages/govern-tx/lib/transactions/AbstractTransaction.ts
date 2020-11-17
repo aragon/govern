@@ -36,6 +36,8 @@ export default abstract class AbstractTransaction extends AbstractAction {
     public abstract execute(): Promise<TransactionReceipt> 
 
     /**
+     * TODO: Define response validation
+     * 
      * Returns the schema of a transaction command
      * 
      * @property schema
@@ -43,16 +45,6 @@ export default abstract class AbstractTransaction extends AbstractAction {
      * @returns {any}
      */
     public static get schema(): any {
-        return {
-            body: {
-                type: 'object',
-                required: ['message', 'signature'],
-                properties: {
-                    message: { type: 'string' },
-                    signature: { type: 'string' }
-                }
-            },      
-            //response: {} TODO: Define response validation for each action/command
-        }
+        return super.schema()
     }
 }

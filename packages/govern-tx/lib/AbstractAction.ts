@@ -4,7 +4,7 @@ export default abstract class AbstractAction {
      * 
      * @var {Object} parameters
      */
-    private parameters: any;
+    protected parameters: any;
 
     /**
      * @param {Object} parameters 
@@ -40,4 +40,24 @@ export default abstract class AbstractAction {
      * @public
      */
     public abstract execute(): Promise<any>
+
+    /**
+     * Returns the schema of a whitelist command
+     * 
+     * @property schema
+     * 
+     * @returns {any}
+     */
+    public static get schema(): any {
+        return {
+            body: {
+                type: 'object',
+                required: ['message', 'signature'],
+                properties: {
+                    message: { type: 'string' },
+                    signature: { type: 'string' }
+                }
+            }
+        }
+    }
 }

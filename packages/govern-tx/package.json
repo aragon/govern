@@ -23,6 +23,7 @@
     "typescript": "^4.0.5"
   },
   "dependencies": {
+    "@ethersproject/address": "^5.0.5",
     "@ethersproject/bytes": "^5.0.5",
     "@ethersproject/wallet": "^5.0.7",
     "fastify": "^3.8.0",

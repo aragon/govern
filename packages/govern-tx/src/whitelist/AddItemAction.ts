@@ -1,7 +1,30 @@
-import AbstractWhitelistAction from "../../lib/whitelist/AbstractWhitelistAction";
-import AbstractWhitelistAction from "../../lib/whitelist/AbstractWhitelistAction";
+import {isAddress} from '@ethersproject/address'
+import AbstractWhitelistAction from "../../lib/whitelist/AbstractWhitelistAction"
 
 export default class AddItemAction extends AbstractWhitelistAction {
+    /**
+      * Validates the given parameters.
+      * 
+      * @method validateParameters 
+      * 
+      * @param {Object} parameters 
+      * 
+      * @returns {Object}
+      * 
+      * @protected
+      */
+     protected validateParameters(parameters: any): any {
+        if (!isAddress(this.parameters.message.publicKey)) {
+            throw new Error('Invalid public key passed!')
+        }
+
+        if (!(this.parameters.message.rateLimit > 0)) {
+            throw new Error('Invalid rate limit passed!')
+        }
+
+        return parameters;
+    }
+
     /**
      * Adds a new item to the whitelist
      * 
@@ -12,6 +35,9 @@ export default class AddItemAction extends AbstractWhitelistAction {
      * @public
      */
     public execute(): Promise<boolean> {
-        return Promise.resolve(true)
+        return this.whitelist.addItem(
+            this.parameters.publicKey,
+            this.parameters.rateLimit
+        )
     }
 }

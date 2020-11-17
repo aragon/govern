@@ -12,6 +12,6 @@ export default class GetListAction extends AbstractWhitelistAction {
      * @public
      */
     public execute(): Promise<ListItem[]> {
-        return Promise.resolve([{publicKey: '0x0', rateLimit: 1}])
+        return this.whitelist.getList()
     }
 }
