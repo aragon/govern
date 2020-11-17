@@ -2,7 +2,7 @@ import fastify, { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import jwt, {SignOptions, VerifyOptions} from 'jsonwebtoken'
 import {verifyMessage} from '@ethersproject/wallet';
 import {arrayify} from '@ethersproject/bytes'
-import { Unauthorized } from 'http-errors'
+import { Unauthorized, HttpError } from 'http-errors'
 import fastifyCookie from 'fastify-cookie'
 import Whitelist from '../db/Whitelist'
 import Admin from '../db/Admin';
@@ -13,6 +13,8 @@ export interface JWTOptions {
 }
 
 export default class Authenticator {
+    private NOT_ALLOWED: HttpError = new Unauthorized('Not allowed action!')
+
     /**
      * @param {Whitelist} whitelist 
      * @param {string} secret
@@ -49,7 +51,7 @@ export default class Authenticator {
 
         if (cookie && this.verify(cookie)) {
             if (!(await this.hasPermission(request.routerPath, publicKey))) {
-                throw new Unauthorized('Not allowed action!')
+                throw this.NOT_ALLOWED
             }
 
             return
@@ -62,7 +64,7 @@ export default class Authenticator {
         } 
 
         if (!token) {
-            throw new Unauthorized('Unknown account!')
+            throw this.NOT_ALLOWED
         }
 
         reply.setCookie(this.cookieName, token, {secure: true})
@@ -81,7 +83,7 @@ export default class Authenticator {
      * 
      * @private 
      */
-    private async hasPermission(routerPath, publicKey): Promise<boolean> {
+    private async hasPermission(routerPath: string, publicKey: string): Promise<boolean> {
         if (
             routerPath !== '/whitelist' && 
             (await this.whitelist.keyExists(publicKey) || await this.admin.isAdmin(publicKey))
