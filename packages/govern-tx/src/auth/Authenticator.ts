@@ -11,6 +11,7 @@ export interface JWTOptions {
     verify: VerifyOptions
 }
 
+// TODO: Implement rules for Admin public key resp. to execute whitelist actions
 export default class Authenticator {
     /**
      * @param {Whitelist} whitelist 

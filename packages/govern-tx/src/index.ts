@@ -1,7 +1,6 @@
 // TODO: define request schema (eg. request validation, auth pre handler etc.)
 
 import fastify from 'fastify'
-import authPlugin from './auth/auth-plugin'
 
 import Configuration from './config/Configuration'
 import Database from './db/Database'
@@ -26,6 +25,18 @@ const server = fastify({
     ignoreTrailingSlash: true
     //https: {} TODO: Configure TLS
 })
+
+const schema = {
+    body: {
+        type: 'object',
+        required: ['message', 'signature'],
+        properties: {
+            message: { type: 'string' },
+            signature: { type: 'string' }
+        }
+    },      
+    //response: {} TODO: Define response validation for each action/command
+}
 
 /* -------------------- *
 *     Setup Auth        *
