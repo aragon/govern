@@ -1,11 +1,11 @@
-import Whitelist, {ListItem} from '../db/Whitelist'
-import Admin from '../db/Admin';
+import fastify, { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import jwt, {SignOptions, VerifyOptions} from 'jsonwebtoken'
 import {verifyMessage} from '@ethersproject/wallet';
 import {arrayify} from '@ethersproject/bytes'
 import { Unauthorized } from 'http-errors'
 import fastifyCookie from 'fastify-cookie'
-import fastify, { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import Whitelist from '../db/Whitelist'
+import Admin from '../db/Admin';
 
 export interface JWTOptions {
     sign: SignOptions,
@@ -48,7 +48,7 @@ export default class Authenticator {
         const publicKey: string = verifyMessage(arrayify(request.body.message), request.body.signature);
 
         if (cookie && this.verify(cookie)) {
-            if (request.routerPath === '/whitelist' && !(await this.admin.isAdmin(publicKey))) {
+            if (!(await this.hasPermission(request.routerPath, publicKey))) {
                 throw new Unauthorized('Not allowed action!')
             }
 
@@ -57,10 +57,7 @@ export default class Authenticator {
 
         let token: string;
 
-        if (
-            (request.routerPath !== '/whitelist' && await this.whitelist.keyExists(publicKey)) ||
-            (request.routerPath === '/whitelist' && await this.admin.isAdmin(publicKey))
-        ) {
+        if (await this.hasPermission(request.routerPath, publicKey)) {
             token = jwt.sign({data: publicKey}, this.secret, this.jwtOptions.sign)
         } 
 
@@ -70,6 +67,33 @@ export default class Authenticator {
 
         reply.setCookie(this.cookieName, token, {secure: true})
         return
+    }
+
+    /**
+     * Checks if the current requesting user has permissions
+     * 
+     * @method hasPermission
+     * 
+     * @param {string} routerPath 
+     * @param {string} publicKey
+     * 
+     * @returns {Promise<boolean>}
+     * 
+     * @private 
+     */
+    private async hasPermission(routerPath, publicKey): Promise<boolean> {
+        if (
+            routerPath !== '/whitelist' && 
+            (await this.whitelist.keyExists(publicKey) || await this.admin.isAdmin(publicKey))
+        ) {
+            return true
+        }
+
+        if (routerPath === '/whitelist' && this.admin.isAdmin(publicKey)) {
+            return true
+        }
+
+        return false
     }
 
     /**
