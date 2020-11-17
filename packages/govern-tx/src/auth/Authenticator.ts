@@ -13,6 +13,11 @@ export interface JWTOptions {
 }
 
 export default class Authenticator {
+    /**
+     * @property {HttpError}
+     * 
+     * @private
+     */
     private NOT_ALLOWED: HttpError = new Unauthorized('Not allowed action!')
 
     /**
@@ -57,18 +62,22 @@ export default class Authenticator {
             return
         } 
 
-        let token: string;
 
         if (await this.hasPermission(request.routerPath, publicKey)) {
-            token = jwt.sign({data: publicKey}, this.secret, this.jwtOptions.sign)
+            reply.setCookie(
+                this.cookieName,
+                jwt.sign(
+                    {data: publicKey},
+                    this.secret,
+                    this.jwtOptions.sign
+                ),
+                {secure: true}
+            )
+
+            return
         } 
 
-        if (!token) {
-            throw this.NOT_ALLOWED
-        }
-
-        reply.setCookie(this.cookieName, token, {secure: true})
-        return
+        throw this.NOT_ALLOWED
     }
 
     /**
