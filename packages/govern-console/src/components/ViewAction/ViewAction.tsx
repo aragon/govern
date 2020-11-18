@@ -1,12 +1,15 @@
 import React, { useMemo, useCallback, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import * as clipboard from 'clipboard-polyfill'
 import 'styled-components/macro'
 import Button from '../Button'
+import Entity from '../Entity/Entity'
 import Frame from '../Frame/Frame'
 import Info from '../Info/Info'
 import { useContract } from '../../lib/web3-contracts'
-import { shortenAddress } from '../../lib/web3-utils'
+import { shortenAddress, ETH_EMPTY_HEX } from '../../lib/web3-utils'
 import queueAbi from '../../lib/abi/GovernQueue.json'
+import { usePermissions } from '../../Providers/Permissions'
 import { useWallet } from '../../Providers/Wallet'
 
 const EMPTY_FAILURE_MAP =
@@ -133,6 +136,12 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
     'error' | 'info' | 'success' | ''
   >('')
   const queueContract = useContract(queueAddress, queueAbi)
+  const { permissions } = usePermissions()
+  const {
+    execute: canExecute,
+    veto: canVeto,
+    challenge: canChallenge,
+  } = permissions
 
   const handleSetExecutionStatus = useCallback(
     (result, message) => {
@@ -274,7 +283,7 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
       )
     }
   }, [accountStatus, container, handleSetExecutionStatus, queueContract])
-
+  console.log(container)
   return (
     <>
       <Frame>
@@ -284,44 +293,57 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
         {executionStatus && <Info mode={statusType}>{executionStatus}</Info>}
       </Frame>
 
-      <Frame>
-        <h2>Available actions</h2>
-        <Button
-          onClick={execute}
-          css={`
-            margin-right: 16px;
-          `}
-        >
-          Execute
-        </Button>
-        <Button
-          onClick={veto}
-          css={`
-            margin-right: 16px;
-          `}
-        >
-          Veto
-        </Button>
-        <Button
-          onClick={challenge}
-          css={`
-            margin-right: 16px;
-          `}
-        >
-          Challenge
-        </Button>
-      </Frame>
-
+      {container.state !== 'Executed' && (
+        <Frame>
+          <h2>Available actions</h2>
+          {container.state === 'Scheduled' && (
+            <Button
+              onClick={execute}
+              css={`
+                margin-right: 16px;
+              `}
+            >
+              Execute
+            </Button>
+          )}
+          {canVeto && (
+            <Button
+              onClick={veto}
+              css={`
+                margin-right: 16px;
+              `}
+            >
+              Veto
+            </Button>
+          )}
+          {canChallenge && (
+            <Button
+              onClick={challenge}
+              css={`
+                margin-right: 16px;
+              `}
+            >
+              Challenge
+            </Button>
+          )}
+        </Frame>
+      )}
       <Frame>
         <h2>Action Payload</h2>
+        <h3>Container hash</h3>
+        <p onClick={() => clipboard.writeText(container.id)}>{container.id}</p>
         <h3>Nonce</h3>
         <p>{container.payload.nonce}</p>
         <h3>Execution time</h3>
         <p>{container.payload.executionTime}</p>
         <h3>Submitter</h3>
-        <p>{container.payload.submitter}</p>
+        <p>
+          <Entity address={container.payload.submitter} type="address" />
+        </p>
         <h3>Proof (Justification)</h3>
-        <p>{container.payload.proof}</p>
+        <p>
+          <Entity address={container.payload.proof} type="address" />
+        </p>
         <h3>On-chain actions</h3>
         <p>
           <ul
@@ -331,7 +353,9 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
           >
             {container.payload.actions.map((action: Action) => (
               <React.Fragment key={action.id}>
-                <li>to: {action.to}</li>
+                <li>
+                  to: <Entity address={action.to} type="address" />
+                </li>
                 <li>value: {action.value}</li>
                 <li>data: {action.data}</li>
               </React.Fragment>
@@ -344,16 +368,36 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
         <h2>Action Configuration</h2>
         <h3>Execution Delay</h3>
         <p>{container.config.executionDelay}</p>
-        <h3>Schedule deposit</h3>
-        <p>Token: {container.config.scheduleDeposit.token}</p>
+        <h3>Schedule collateral</h3>
+        <p>
+          Token:{' '}
+          <Entity
+            address={container.config.scheduleDeposit.token}
+            type="address"
+          />
+        </p>
         <p>Amount: {container.config.scheduleDeposit.amount}</p>
-        <h3>Challenge deposit</h3>
-        <p>Token: {container.config.challengeDeposit.token}</p>
+        <h3>Challenge collateral</h3>
+        <p>
+          Token:{' '}
+          <Entity
+            address={container.config.challengeDeposit.token}
+            type="address"
+          />{' '}
+        </p>
         <p>Amount: {container.config.challengeDeposit.amount}</p>
         <h3>Resolver</h3>
-        <p>{container.config.resolver}</p>
+        <p>
+          <Entity address={container.config.resolver} type="address" />
+        </p>
         <h3>Rules</h3>
-        <p>{container.config.rules}</p>
+        <p>
+          {container.config.rules === ETH_EMPTY_HEX ? (
+            'No agreement attached.'
+          ) : (
+            <Entity address={container.config.rules} type="address" />
+          )}
+        </p>
       </Frame>
     </>
   )
