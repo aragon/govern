@@ -37,11 +37,12 @@ contract GovernTokenFactory {
         GovernMinter minter
     ) {
         if (!_useProxies) {
-            (token, minter) = _deployContracts(_initialMinter, _tokenName, _tokenSymbol, _tokenDecimals);
+            (token, minter) = _deployContracts(_initialMinter, false, _tokenName, _tokenSymbol, _tokenDecimals);
         } else {
             token = GovernToken(tokenBase.clone(abi.encodeWithSelector(
                 token.initialize.selector,
                 address(this),
+                false,
                 _tokenName,
                 _tokenSymbol,
                 _tokenDecimals
@@ -77,6 +78,7 @@ contract GovernTokenFactory {
         
         (GovernToken token, GovernMinter minter) = _deployContracts(
             address(this),
+            false,
             "GovernToken base",
             "GTB",
             0
@@ -94,6 +96,7 @@ contract GovernTokenFactory {
 
     function _deployContracts(
         address _initialMinter,
+        bool _transfersRestricted,
         string memory _tokenName,
         string memory _tokenSymbol,
         uint8 _tokenDecimals
@@ -101,7 +104,7 @@ contract GovernTokenFactory {
         GovernToken token,
         GovernMinter minter
     ) {
-        token = new GovernToken(address(this), _tokenName, _tokenSymbol, _tokenDecimals);
+        token = new GovernToken(address(this), _transfersRestricted, _tokenName, _tokenSymbol, _tokenDecimals);
         minter = new GovernMinter(GovernToken(token), address(_initialMinter), MerkleDistributor(distributorBase));
     }
 }

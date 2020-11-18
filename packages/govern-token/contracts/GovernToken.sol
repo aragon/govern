@@ -37,6 +37,9 @@ contract GovernToken is IERC20, Initializable {
     mapping (address => uint256) override public balanceOf;
     mapping (address => mapping (address => uint256)) override public allowance;
 
+    bool public transfersRestricted;
+    mapping (address => bool) internal isWhitelisted;
+
     // ERC-2612, ERC-3009 state
     mapping (address => uint256) public nonces;
     mapping (address => mapping (bytes32 => bool)) public authorizationState;
@@ -45,18 +48,26 @@ contract GovernToken is IERC20, Initializable {
     event Transfer(address indexed from, address indexed to, uint256 value);
     event AuthorizationUsed(address indexed authorizer, bytes32 indexed nonce);
     event ChangeMinter(address indexed minter);
+    event RestrictedTransfers(bool transfersRestricted);
+    event SetWhitelisted(address indexed entity, bool indexed whitelisted);
 
     modifier onlyMinter {
         require(msg.sender == minter, "token: not minter");
         _;
     }
 
-    constructor(address _initialMinter, string memory _name, string memory _symbol, uint8 _decimals) public {
-        initialize(_initialMinter, _name, _symbol, _decimals);
+    modifier canTransact(address entity, string memory inOrOut) {
+        require(!transfersRestricted || isWhitelisted[entity], string(abi.encodePacked("token: bouncer ", inOrOut)));
+        _;
     }
 
-    function initialize(address _initialMinter, string memory _name, string memory _symbol, uint8 _decimals) public onlyInit("token") {
+    constructor(address _initialMinter, bool _transfersRestricted, string memory _name, string memory _symbol, uint8 _decimals) public {
+        initialize(_initialMinter, _transfersRestricted,_name, _symbol, _decimals);
+    }
+
+    function initialize(address _initialMinter, bool _transfersRestricted, string memory _name, string memory _symbol, uint8 _decimals) public onlyInit("token") {
         _changeMinter(_initialMinter);
+        _setTransfersRestricted(_transfersRestricted);
         name = _name;
         symbol = _symbol;
         decimals = _decimals;
@@ -80,6 +91,11 @@ contract GovernToken is IERC20, Initializable {
         emit ChangeMinter(newMinter);
     }
 
+    function _setTransfersRestricted(bool _transfersRestricted) internal {
+        transfersRestricted = _transfersRestricted;
+        emit RestrictedTransfers(_transfersRestricted);
+    }
+
     function _mint(address to, uint256 value) internal {
         totalSupply = totalSupply.add(value);
         balanceOf[to] = balanceOf[to].add(value);
@@ -98,7 +114,11 @@ contract GovernToken is IERC20, Initializable {
         emit Approval(owner, spender, value);
     }
 
-    function _transfer(address from, address to, uint256 value) private {
+    function _transfer(address from, address to, uint256 value)
+        canTransact(from, "in")
+        canTransact(to,  "out")
+        private
+    {
         require(to != address(this) && to != address(0), "token: bad to");
 
         // Balance is implicitly checked with SafeMath's underflow protection
@@ -130,6 +150,15 @@ contract GovernToken is IERC20, Initializable {
 
     function changeMinter(address newMinter) external onlyMinter {
         _changeMinter(newMinter);
+    }
+
+    function setTransfersRestricted(bool _transfersRestricted) external onlyMinter {
+        _setTransfersRestricted(_transfersRestricted);
+    }
+
+    function setWhitelisted(address _entity, bool _whitelisted) external onlyMinter {
+        isWhitelisted[_entity] = _whitelisted;
+        emit SetWhitelisted(_entity, _whitelisted);
     }
 
     function burn(uint256 value) external returns (bool) {
