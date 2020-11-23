@@ -1,12 +1,6 @@
 import { defaultAbiCoder } from 'ethers/lib/utils';
 import { Result } from '@ethersproject/abi';
 
-export interface TransactionOptions {
-    from?: string,
-    to: string,
-    data: string
-}
-
 export default class ContractFunction {
     /**
      * The decoded function arguments
