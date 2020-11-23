@@ -3,6 +3,10 @@ import { JWTOptions } from '../auth/Authenticator';
 export interface EthereumOptions {
     url: string
     blockConfirmations: number
+    publicKey: string
+    contracts: {
+        [name: string]: string
+    }
 }
 
 export interface DatabaseOptions {

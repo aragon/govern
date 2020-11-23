@@ -4,6 +4,10 @@ import Bootstrap from './Bootstrap'
 new Bootstrap(
     new Configuration(
         {
+            publicKey: '0x0...',
+            contracts: {
+                GovernQueue: '0x0...'
+            },
             url: 'localhost:8545',
             blockConfirmations: 42
         }, 

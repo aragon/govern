@@ -3,6 +3,7 @@ import { TransactionReceipt } from '@ethersproject/abstract-provider'
 import AbstractAction, { Request } from '../AbstractAction'
 import ContractFunction from '../transactions/ContractFunction'
 import Provider from '../../src/provider/Provider'
+import Configuration from '../../src/config/Configuration';
 
 export default abstract class AbstractTransaction extends AbstractAction {
     /**
@@ -13,6 +14,15 @@ export default abstract class AbstractTransaction extends AbstractAction {
      * @protected
      */
     protected functionABI: any // TODO: Create functionABI object interface definition 
+
+    /**
+     * The contract name
+     * 
+     * @property {string} contract
+     * 
+     * @protected
+     */
+    protected contract: string
 
     /**
      * The contract function
@@ -34,7 +44,11 @@ export default abstract class AbstractTransaction extends AbstractAction {
         request: Request
     ) {
         super(request);
-        this.contractFunction = new ContractFunction(this.functionABI, request.message)
+
+        this.contractFunction = new ContractFunction(
+            this.functionABI,
+            request.message
+        )
     }
 
     /**
@@ -47,7 +61,7 @@ export default abstract class AbstractTransaction extends AbstractAction {
      * @public
      */
     public execute(): Promise<TransactionReceipt> {
-        return this.provider.sendTransaction(this.contractFunction)
+        return this.provider.sendTransaction(this.contract, this.contractFunction)
     } 
 
     /**
