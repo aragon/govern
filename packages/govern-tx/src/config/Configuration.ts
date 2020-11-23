@@ -29,7 +29,8 @@ export interface ServerOptions {
     logLevel?: string
 }
 
-// TODO: Add if required input validations
+// TODO: Add input validations for Ethereum addresses
+// TODO: Change constructor to only have one required argument to pass 
 export default class Configuration {
     /**
      * @param {EthereumOptions} _ethereum 

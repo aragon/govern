@@ -5,6 +5,7 @@ import ContractFunction from '../transactions/ContractFunction'
 import Provider from '../../src/provider/Provider'
 import { EthereumOptions } from '../../src/config/Configuration';
 
+// TODO: Overthink dependency handling of AbstractTransaction -> Provider -> Wallet and the configuration. Ignoring separation of concerns for Provider/Wallet?
 export default abstract class AbstractTransaction extends AbstractAction {
     /**
      * The function ABI used to create a transaction
@@ -63,7 +64,7 @@ export default abstract class AbstractTransaction extends AbstractAction {
      * @public
      */
     public execute(): Promise<TransactionReceipt> {
-        // TODO: This handling doesn't look that clean. Find a better solution.
+        // TODO: This handling doesn't look that clean. Find a better solution also without code duplication.
         this.contractFunction.functionArguments.container.payload.submitter = this.config.publicKey
 
         return this.provider.sendTransaction(this.contract, this.contractFunction)
