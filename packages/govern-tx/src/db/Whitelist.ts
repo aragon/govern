@@ -63,6 +63,7 @@ export default class Whitelist {
      * @method addItem
      * 
      * @param {string} publicKey - The public key we would like to add
+     * @param {string} rateLimit - The amount of allowed transactions for this user
      * 
      * @returns {Promise<ListItem>}
      *  

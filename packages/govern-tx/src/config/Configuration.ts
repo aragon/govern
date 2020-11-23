@@ -30,6 +30,8 @@ export default class Configuration {
     /**
      * @param {EthereumOptions} _ethereum 
      * @param {DatabaseOptions} _database 
+     * @param {AuthOptions} _auth
+     * @param {ServerOptions} _server
      * 
      * @constructor
      */

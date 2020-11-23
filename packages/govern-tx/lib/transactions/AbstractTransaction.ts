@@ -1,3 +1,4 @@
+import { FastifySchema } from 'fastify';
 import { TransactionReceipt } from '@ethersproject/abstract-provider'
 import AbstractAction, { Request } from '../AbstractAction'
 import ContractFunction from '../transactions/ContractFunction'
@@ -11,7 +12,7 @@ export default abstract class AbstractTransaction extends AbstractAction {
      * 
      * @protected
      */
-    protected functionABI: any
+    protected functionABI: any // TODO: Create functionABI object interface definition 
 
     /**
      * The contract function
@@ -23,6 +24,7 @@ export default abstract class AbstractTransaction extends AbstractAction {
     private contractFunction: ContractFunction
 
     /**
+     * @param {Provider} provider - The Ethereum provider object
      * @param {Request} request - The request body given by the user
      * 
      * @constructor
@@ -53,11 +55,11 @@ export default abstract class AbstractTransaction extends AbstractAction {
      * 
      * Returns the schema of a transaction command
      * 
-     * @property schema
+     * @property {FastifySchema} schema
      * 
-     * @returns {any}
+     * @returns {FastifySchema}
      */
-    public static get schema(): any {
-        return super.schema()
+    public static get schema(): FastifySchema {
+        return super.schema
     }
 }

@@ -1,3 +1,4 @@
+import { FastifySchema } from 'fastify';
 import AbstractAction, { Request } from '../AbstractAction'
 import Whitelist, {ListItem} from '../../src/db/Whitelist'
 
@@ -10,8 +11,8 @@ export interface WhitelistRequest extends Request {
 
 export default abstract class AbstractWhitelistAction extends AbstractAction {
     /**
+     * @param {Whitelist} whitelist - The whitelist database entitiy
      * @param {WhitelistRequest} request - The given request body by the user
-     * @param {Whitelist} whitelist - The whitelist entitiy
      * 
      * @constructor
      */
@@ -35,11 +36,11 @@ export default abstract class AbstractWhitelistAction extends AbstractAction {
      * 
      * Returns the schema of a transaction command
      * 
-     * @property schema
+     * @property {FastifySchema} schema
      * 
-     * @returns {any}
+     * @returns {FastifySchema}
      */
-    public static get schema(): any {
-        return super.schema()
+    public static get schema(): FastifySchema {
+        return super.schema
     }
 }

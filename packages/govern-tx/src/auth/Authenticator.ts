@@ -14,16 +14,19 @@ export interface JWTOptions {
 
 export default class Authenticator {
     /**
-     * @property {HttpError}
+     * @property {HttpError} NOT_ALLOWED
      * 
      * @private
      */
     private NOT_ALLOWED: HttpError = new Unauthorized('Not allowed action!')
 
     /**
+     * @param {FastifyInstance} fastify
      * @param {Whitelist} whitelist 
+     * @param {Admin} admin
      * @param {string} secret
-     * @param {SignOptions} jqtOptions
+     * @param {string} cookieName
+     * @param {JWTOptions} jwtOptions
      *  
      * @constructor
      */
@@ -43,8 +46,8 @@ export default class Authenticator {
      * 
      * @method authenticate
      * 
-     * @param {string} message - The message from the user
-     * @param {string} signature - The sent signature from the user
+     * @param {FastifyRequest} request - The fastify request object
+     * @param {FastifyReply} reply - The fastify response object
      * 
      * @returns Promise<undefined>
      * 
@@ -52,7 +55,7 @@ export default class Authenticator {
      */
     public async authenticate(request: FastifyRequest, reply: FastifyReply): Promise<undefined> {
         const cookie = request.cookies[this.cookieName];
-        const publicKey: string = verifyMessage(arrayify(request.body.message), request.body.signature);
+        const publicKey: string = verifyMessage(arrayify(request.body.message), request.body.signature); // TODO: Fix type definition
 
         if (cookie && this.verify(cookie)) {
             if (!(await this.hasPermission(request.routerPath, publicKey))) {
@@ -107,7 +110,7 @@ export default class Authenticator {
     }
 
     /**
-     * Verifiey the given JWT 
+     * Verify the given JWT 
      * 
      * @method verify
      * 
@@ -115,7 +118,7 @@ export default class Authenticator {
      * 
      * @returns {boolean}
      * 
-     * @public 
+     * @private 
      */
     private verify(token: string): boolean {
         try {

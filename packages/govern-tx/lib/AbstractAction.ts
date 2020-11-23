@@ -1,3 +1,4 @@
+import { FastifySchema } from 'fastify'
 export interface Request {
     message: string | any,
     signature: string
@@ -5,7 +6,7 @@ export interface Request {
 
 export default abstract class AbstractAction {
     /**
-     * The parameters used to create the transaction
+     * The given request by the user
      * 
      * @var {Request} parameters
      */
@@ -18,7 +19,7 @@ export default abstract class AbstractAction {
      */
     constructor(request: Request) {
         this.request = this.validateRequest(request);
-     }
+    }
 
      /**
       * Validates the given request body.
@@ -27,11 +28,11 @@ export default abstract class AbstractAction {
       * 
       * @param {Request} request 
       * 
-      * @returns {Object}
+      * @returns {Request}
       * 
       * @protected
       */
-    protected validateRequest(request: Request): any {
+    protected validateRequest(request: Request): Request {
         return request;
     }
 
@@ -47,13 +48,13 @@ export default abstract class AbstractAction {
     public abstract execute(): Promise<any>
 
     /**
-     * Returns the schema of a whitelist command
+     * Returns the required request schema
      * 
      * @property schema
      * 
-     * @returns {any}
+     * @returns {FastifySchema}
      */
-    public static get schema(): any {
+    public static get schema(): FastifySchema {
         return {
             body: {
                 type: 'object',
@@ -63,6 +64,6 @@ export default abstract class AbstractAction {
                     signature: { type: 'string' }
                 }
             }
-        }
+        } as FastifySchema
     }
 }

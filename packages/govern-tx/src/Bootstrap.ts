@@ -35,7 +35,7 @@ export default class Bootstrap {
     private authenticator: Authenticator
 
     /**
-     * @property {whitelist} Whitelist
+     * @property {Whitelist} whitelist
      * 
      * @private
      */
