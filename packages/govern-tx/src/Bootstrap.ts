@@ -1,5 +1,9 @@
 import fastify, { FastifyInstance } from 'fastify'
+import { TransactionReceipt } from '@ethersproject/abstract-provider'
+import { Request } from '../lib/AbstractAction'
 import Configuration from './config/Configuration'
+import Provider from './provider/Provider'
+import Wallet from './wallet/Wallet'
 import Database from './db/Database'
 import Whitelist, { ListItem } from './db/Whitelist'
 import Admin from './db/Admin'
@@ -38,12 +42,28 @@ export default class Bootstrap {
     private whitelist: Whitelist
 
     /**
+     * @property {Provider} provider
+     * 
+     * @private
+     */
+    private provider: Provider
+
+    /**
+     * @property {Database} database
+     * 
+     * @private
+     */
+    private database: Database
+
+    /**
      * @param {Configuration} config 
      * 
      * @constructor
      */
     constructor(private config: Configuration) {
         this.setServer()
+        this.setDatabase()
+        this.setProvider()
         this.setupAuth()
         this.registerTransactionRoutes()
         this.registerWhitelistRoutes()
@@ -89,7 +109,7 @@ export default class Bootstrap {
             '/execute',
             {schema: AbstractTransaction.schema},
             (request): Promise<TransactionReceipt> => {
-                return new ExecuteTransaction(this.config, request.params).execute()
+                return new ExecuteTransaction(this.provider, request.params as Request).execute()
             }
         )
         
@@ -97,7 +117,7 @@ export default class Bootstrap {
             '/schedule',
             {schema: AbstractTransaction.schema},
             (request): Promise<TransactionReceipt> => {
-                return new ScheduleTransaction(this.config, request.params).execute()
+                return new ScheduleTransaction(this.provider, request.params as Request).execute()
             }
         )
         
@@ -105,7 +125,7 @@ export default class Bootstrap {
             '/challenge',
             {schema: AbstractTransaction.schema},
             (request): Promise<TransactionReceipt> => {
-                return new ChallengeTransaction(this.config, request.params).execute()
+                return new ChallengeTransaction(this.provider, request.params as Request).execute()
             }
         )
     }
@@ -126,7 +146,7 @@ export default class Bootstrap {
             '/whitelist',
             {schema: AbstractWhitelistAction.schema},
             (request): Promise<ListItem> => {
-                return new AddItemAction(this.whitelist, request.params).execute()
+                return new AddItemAction(this.whitelist, request.params as Request).execute()
             }
         )
         
@@ -134,7 +154,7 @@ export default class Bootstrap {
             '/whitelist',
             {schema: AbstractWhitelistAction.schema},
             (request): Promise<boolean> => {
-                return new DeleteItemAction(this.whitelist, request.params).execute()
+                return new DeleteItemAction(this.whitelist, request.params as Request).execute()
             }
         )
         
@@ -167,6 +187,32 @@ export default class Bootstrap {
     }
 
     /**
+     * Initiates the database instance
+     * 
+     * @method setProvider
+     * 
+     * @returns {void}
+     * 
+     * @private
+     */
+    private setDatabase(): void {
+        this.database = new Database(this.config.database)
+    }
+
+    /**
+     * Initiates the provider instance
+     * 
+     * @method setProvider
+     * 
+     * @returns {void}
+     * 
+     * @private
+     */
+    private setProvider(): void {
+        this.provider = new Provider(this.config, new Wallet(this.database))
+    }
+
+    /**
      * Registers the authentication handler
      * 
      * @method setupAuth
@@ -176,9 +222,8 @@ export default class Bootstrap {
      * @private
      */
     private setupAuth(): void {
-        const database = new Database(this.config.database)
-        const admin = new Admin(database);
-        this.whitelist =  new Whitelist(database)
+        const admin = new Admin(this.database);
+        this.whitelist =  new Whitelist(this.database)
 
 
         this.authenticator = new Authenticator(

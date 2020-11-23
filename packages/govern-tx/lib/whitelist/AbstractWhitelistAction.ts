@@ -15,7 +15,7 @@ export default abstract class AbstractWhitelistAction extends AbstractAction {
      * 
      * @constructor
      */
-    constructor(protected whitelist: Whitelist, request: WhitelistRequest) {
+    constructor(protected whitelist: Whitelist, request?: WhitelistRequest) {
         super(request)
     }
 

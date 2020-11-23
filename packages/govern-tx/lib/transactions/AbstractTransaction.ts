@@ -1,48 +1,38 @@
+import { TransactionReceipt } from '@ethersproject/abstract-provider'
 import AbstractAction, { Request } from '../AbstractAction'
 import ContractFunction from '../transactions/ContractFunction'
-import Configuration from '../../src/config/Configuration'
-import { hexDataSlice } from 'ethers/lib/utils';
-
-// TODO: Use type from ethers
-export interface TransactionReceipt {}
-
-export interface TransactionRequest extends Request {
-    function: ContractFunction
-}
+import Provider from '../../src/provider/Provider'
 
 export default abstract class AbstractTransaction extends AbstractAction {
     /**
-     * The function identifier used to create a transaction
+     * The function ABI used to create a transaction
      * 
-     * @property {string} functionABI
+     * @property {Object} functionABI
      * 
      * @protected
      */
-    protected functionABI: any;
+    protected functionABI: any
+
+    /**
+     * The contract function
+     * 
+     * @property {ContractFunction} contractFunction
+     * 
+     * @private
+     */
+    private contractFunction: ContractFunction
 
     /**
      * @param {Request} request - The request body given by the user
-     * @param {Configuration} configuration - The configuration object to execute the transaction
      * 
      * @constructor
      */
-    constructor(private configuration: Configuration, request: TransactionRequest) {
+    constructor(
+        private provider: Provider,
+        request: Request
+    ) {
         super(request);
-    }
-
-    /**
-     * Validates the given request body.
-     * 
-     * @method validateRequest
-     * 
-     * @param {TransactionRequest} request - The request body given by the user
-     * 
-     * @public
-     */
-    public validateRequest(request: TransactionRequest) {
-        request.function = new ContractFunction(this.functionABI, request.message)
-
-        return request;
+        this.contractFunction = new ContractFunction(this.functionABI, request.message)
     }
 
     /**
@@ -55,7 +45,7 @@ export default abstract class AbstractTransaction extends AbstractAction {
      * @public
      */
     public execute(): Promise<TransactionReceipt> {
-        
+        return this.provider.sendTransaction(this.contractFunction)
     } 
 
     /**

@@ -4,7 +4,8 @@ import Bootstrap from './Bootstrap'
 new Bootstrap(
     new Configuration(
         {
-            url: 'localhost:8545'
+            url: 'localhost:8545',
+            blockConfirmations: 42
         }, 
         {
             user: 'govern',
