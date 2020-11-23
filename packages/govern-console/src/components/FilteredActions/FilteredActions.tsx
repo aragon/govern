@@ -86,11 +86,11 @@ export default function FilteredActions({
         `}
       >
         {hasActions &&
-          filteredAndPaginatedActions.map(
-            ({ id, state }: { id: string; state: string }) => (
+          filteredAndPaginatedActions
+            .reverse()
+            .map(({ id, state }: { id: string; state: string }) => (
               <ActionCard id={id} state={state} key={id} />
-            ),
-          )}
+            ))}
       </div>
       <div
         css={`

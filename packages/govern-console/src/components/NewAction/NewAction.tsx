@@ -13,6 +13,7 @@ import queueAbi from '../../lib/abi/GovernQueue.json'
 const EMPTY_BYTES = '0x00'
 const EMPTY_FAILURE_MAP =
   '0x0000000000000000000000000000000000000000000000000000000000000000'
+const NO_TOKEN = `${'0x'.padEnd(42, '0')}`
 
 type Input = {
   name: string | undefined
@@ -168,12 +169,14 @@ export default function NewAction({
                   <ContractCallHandler
                     config={config}
                     contractAddress={contractAddress}
+                    ercContract={ercContract}
                     executor={executorAddress}
                     handleSetExecutionResult={handleSetExecutionResult}
                     inputs={abiItem.inputs}
                     name={abiItem.name}
                     proof={proof}
                     queueContract={queueContract}
+                    queueAddress={queueAddress}
                     rawAbiItem={abiItem}
                   />
                 </Frame>
@@ -193,6 +196,7 @@ type ContractCallHandlerProps = {
   inputs: Input[] | any[]
   name: string
   proof: string
+  queueAddress: string
   queueContract: any
   rawAbiItem: AbiType
 }
@@ -206,6 +210,7 @@ function ContractCallHandler({
   inputs,
   name,
   proof,
+  queueAddress,
   queueContract,
   rawAbiItem,
 }: ContractCallHandlerProps) {
@@ -250,13 +255,17 @@ function ContractCallHandler({
         // 2. The user has less allowance than needed, and we need to raise it. (2 tx)
         // 3. The user has 0 allowance, we just need to approve the needed amount. (1 tx)
 
-        const allowance = await ercContract.getAllowance()
-        if (allowance.lt(new BN(config.scheduleDeposit.amount))) {
+        const allowance = await ercContract.allowance(account, queueAddress)
+        if (
+          allowance.lt(config.scheduleDeposit.amount) &&
+          config.scheduleDeposit.token !== NO_TOKEN
+        ) {
           if (!allowance.isZero()) {
             const resetTx = await ercContract.approve(account, '0')
             await resetTx.wait(1)
           }
-          await ercContract.approve(account, config.scheduleDeposit.amount)
+          console.log('approve', queueAddress, config.scheduleDeposit.amount)
+          await ercContract.approve(queueAddress, config.scheduleDeposit.amount)
         }
         const functionValues = values ? values.map((val: any) => val.value) : []
 

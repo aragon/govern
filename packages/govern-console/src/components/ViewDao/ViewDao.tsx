@@ -11,7 +11,7 @@ import Frame from '../Frame/Frame'
 import { usePermissions } from '../../Providers/Permissions'
 import { useWalletAugmented } from '../../Providers/Wallet'
 import { KNOWN_GOVERN_ROLES, KNOWN_QUEUE_ROLES } from '../../lib/known-roles'
-import { ETH_ANY_ADDRESS } from '../../lib/web3-utils'
+import { ETH_ANY_ADDRESS, ETH_EMPTY_HEX } from '../../lib/web3-utils'
 
 const ACTIONS_PER_PAGE = 8
 
@@ -53,6 +53,8 @@ export default function ViewDao({ dao }: ViewDaoProps) {
   const handleNewAction = useCallback(() => {
     history.push(`/${daoAddress}/new-action`)
   }, [history, daoAddress])
+
+  console.log(dao)
 
   return (
     <>
@@ -116,6 +118,14 @@ export default function ViewDao({ dao }: ViewDaoProps) {
           </li>
           <li>Amount: {dao.queue.config.challengeDeposit.amount}</li>
         </ul>
+        <h3>Rules</h3>
+        <p>
+          {dao.queue.config.rules === ETH_EMPTY_HEX ? (
+            'No agreement attached.'
+          ) : (
+            <Entity address={dao.queue.config.rules} type="address" />
+          )}
+        </p>
       </Frame>
       <Frame>
         <div>
@@ -125,9 +135,7 @@ export default function ViewDao({ dao }: ViewDaoProps) {
               margin-bottom: 16px;
             `}
           >
-            {canSchedule && (
-              <Button onClick={handleNewAction}>New action</Button>
-            )}
+            <Button onClick={handleNewAction}>New action</Button>
           </div>
         </div>
         <FilteredActions

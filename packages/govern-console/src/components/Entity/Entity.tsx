@@ -32,6 +32,7 @@ function detectAndComposeLinkType(
   type: string,
 ): string[] {
   try {
+    console.log(hash, 'hash', hexToUtf8(hash))
     if (isAddress(hash)) {
       return [composeEtherscanLink(hash, chainId, type), 'ethereum']
     }
@@ -40,6 +41,7 @@ function detectAndComposeLinkType(
       return [composeIpfsLink(hexToUtf8(hash)), 'ipfs']
     }
   } catch (err) {
+    console.log(err, hash)
     return ['', '']
   }
 
@@ -54,13 +56,14 @@ function formatAddress(
     if (isAddress(address)) {
       return shorten ? shortenAddress(address) : address
     }
-
+    console.log(address, hexToUtf8(address))
     if (isCid(hexToUtf8(address))) {
+      console.log('alo?')
       return hexToUtf8(address)
     }
   } catch (err) {
     // Won't be a valid string anyway, so we return it
-    return address
+    return address.length > 42 ? `${address.slice(0, 43)}...` : address
   }
 
   // In this case, it's possible that it's really just plain text, so we decode it anyways.
@@ -72,6 +75,7 @@ export default function Entity({
   shorten = false,
   type,
 }: EntityProps) {
+  console.log(address, 'entity')
   const { chainId } = useChainId()
   const [url] = detectAndComposeLinkType(address, chainId, type)
   return url ? (
@@ -79,6 +83,6 @@ export default function Entity({
       {formatAddress(address, { shorten })}
     </a>
   ) : (
-    <span>{address}</span>
+    <span>{address.length > 42 ? `${address.slice(0, 43)}...` : address}</span>
   )
 }
