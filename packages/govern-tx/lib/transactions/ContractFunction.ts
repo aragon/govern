@@ -9,16 +9,18 @@ export default class ContractFunction {
      * 
      * @private
      */
-    private functionArguments: any;
+    public functionArguments: any;
 
     /**
+     * TODO: Define ABI item interface
+     * 
      * @param {any} abiItem
      * @param {string} requestMsg
      * 
      * @constructor
      */
     constructor(
-        private abiItem,
+        private abiItem: any,
         private requestMsg: string,
     ) { 
         this.functionArguments = this.decode()

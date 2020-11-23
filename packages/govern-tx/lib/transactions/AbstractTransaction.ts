@@ -3,7 +3,7 @@ import { TransactionReceipt } from '@ethersproject/abstract-provider'
 import AbstractAction, { Request } from '../AbstractAction'
 import ContractFunction from '../transactions/ContractFunction'
 import Provider from '../../src/provider/Provider'
-import Configuration from '../../src/config/Configuration';
+import { EthereumOptions } from '../../src/config/Configuration';
 
 export default abstract class AbstractTransaction extends AbstractAction {
     /**
@@ -34,12 +34,14 @@ export default abstract class AbstractTransaction extends AbstractAction {
     private contractFunction: ContractFunction
 
     /**
+     * @param {EthereumOptions} config
      * @param {Provider} provider - The Ethereum provider object
      * @param {Request} request - The request body given by the user
      * 
      * @constructor
      */
     constructor(
+        private config: EthereumOptions, // TODO: Overthink configuration handling. I have the feeling I'm injecting it to often. 
         private provider: Provider,
         request: Request
     ) {
@@ -61,6 +63,9 @@ export default abstract class AbstractTransaction extends AbstractAction {
      * @public
      */
     public execute(): Promise<TransactionReceipt> {
+        // TODO: This handling doesn't look that clean. Find a better solution.
+        this.contractFunction.functionArguments.container.payload.submitter = this.config.publicKey
+
         return this.provider.sendTransaction(this.contract, this.contractFunction)
     } 
 

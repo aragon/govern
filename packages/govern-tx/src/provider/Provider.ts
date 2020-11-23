@@ -1,8 +1,8 @@
-import Wallet from '../wallet/Wallet'
 import { BaseProvider, TransactionRequest } from '@ethersproject/providers'
 import { TransactionReceipt } from '@ethersproject/abstract-provider'
+import Wallet from '../wallet/Wallet'
+import { EthereumOptions } from '../config/Configuration';
 import ContractFunction from '../../lib/transactions/ContractFunction'
-import Configuration from '../config/Configuration'
 
 export default class Provider {
     /**
@@ -15,13 +15,13 @@ export default class Provider {
     private provider: BaseProvider
 
     /**
-     * @param {Configuration} configuration 
+     * @param {EthereumOptions} config 
      * @param {Wallet} wallet 
      * 
      * @constructor
      */
-    constructor(private configuration: Configuration, private wallet: Wallet) {
-        this.provider = new BaseProvider(this.configuration.ethereum.url)
+    constructor(private config: EthereumOptions, private wallet: Wallet) {
+        this.provider = new BaseProvider(this.config.url)
     }
 
     /**
@@ -42,11 +42,11 @@ export default class Provider {
                         contract,
                         contractFunction
                     ),
-                    this.configuration.ethereum.publicKey
+                    this.config.publicKey
                 )
             )
         ).wait(
-            this.configuration.ethereum.blockConfirmations
+            this.config.blockConfirmations
         )
     }
 
@@ -64,7 +64,7 @@ export default class Provider {
      */
     private async getTransactionOptions(contract: string, contractFunction: ContractFunction): Promise<TransactionRequest> {
         const txOptions: TransactionRequest = {
-            to: this.configuration.ethereum.contracts[contract],
+            to: this.config.contracts[contract],
             data: contractFunction.encode()
         }
 

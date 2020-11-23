@@ -109,7 +109,7 @@ export default class Bootstrap {
             '/execute',
             {schema: AbstractTransaction.schema},
             (request): Promise<TransactionReceipt> => {
-                return new ExecuteTransaction(this.provider, request.params as Request).execute()
+                return new ExecuteTransaction(this.config.ethereum, this.provider, request.params as Request).execute()
             }
         )
         
@@ -117,7 +117,7 @@ export default class Bootstrap {
             '/schedule',
             {schema: AbstractTransaction.schema},
             (request): Promise<TransactionReceipt> => {
-                return new ScheduleTransaction(this.provider, request.params as Request).execute()
+                return new ScheduleTransaction(this.config.ethereum, this.provider, request.params as Request).execute()
             }
         )
         
@@ -125,7 +125,7 @@ export default class Bootstrap {
             '/challenge',
             {schema: AbstractTransaction.schema},
             (request): Promise<TransactionReceipt> => {
-                return new ChallengeTransaction(this.provider, request.params as Request).execute()
+                return new ChallengeTransaction(this.config.ethereum, this.provider, request.params as Request).execute()
             }
         )
     }
@@ -209,7 +209,7 @@ export default class Bootstrap {
      * @private
      */
     private setProvider(): void {
-        this.provider = new Provider(this.config, new Wallet(this.database))
+        this.provider = new Provider(this.config.ethereum, new Wallet(this.database))
     }
 
     /**
