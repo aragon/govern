@@ -1,15 +1,22 @@
-import AbstractAction from '../AbstractAction'
+import AbstractAction, { Request } from '../AbstractAction'
 import Whitelist, {ListItem} from '../../src/db/Whitelist'
+
+export interface WhitelistRequest extends Request {
+    message: {
+        publicKey: string,
+        rateLimit: number
+    }
+}
 
 export default abstract class AbstractWhitelistAction extends AbstractAction {
     /**
-     * @param {any} parameters - The given parameters by the user
+     * @param {WhitelistRequest} request - The given request body by the user
      * @param {Whitelist} whitelist - The whitelist entitiy
      * 
      * @constructor
      */
-    constructor(protected whitelist: Whitelist, parameters: any = {}) {
-        super(parameters)
+    constructor(protected whitelist: Whitelist, request: WhitelistRequest) {
+        super(request)
     }
 
     /**

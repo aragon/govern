@@ -1,27 +1,48 @@
-import AbstractAction from '../AbstractAction'
+import AbstractAction, { Request } from '../AbstractAction'
+import ContractFunction from '../transactions/ContractFunction'
 import Configuration from '../../src/config/Configuration'
+import { hexDataSlice } from 'ethers/lib/utils';
 
 // TODO: Use type from ethers
 export interface TransactionReceipt {}
 
+export interface TransactionRequest extends Request {
+    function: ContractFunction
+}
+
 export default abstract class AbstractTransaction extends AbstractAction {
     /**
-     * The function signature used to create a transaction
+     * The function identifier used to create a transaction
      * 
-     * @var {string} signature
+     * @var {string} functionABI
      * 
      * @protected
      */
-    protected signature: string;
+    protected functionABI: any;
 
     /**
-     * @param {Object} parameters - The given parameters by the user
+     * @param {Request} request - The request body given by the user
      * @param {Configuration} configuration - The configuration object to execute the transaction
      * 
      * @constructor
      */
-    constructor(private configuration: Configuration, parameters: any) {
-        super(parameters);
+    constructor(private configuration: Configuration, request: TransactionRequest) {
+        super(request);
+    }
+
+    /**
+     * Validates the given request body.
+     * 
+     * @method validateRequest
+     * 
+     * @param {TransactionRequest} request - The request body given by the user
+     * 
+     * @public
+     */
+    public validateRequest(request: TransactionRequest) {
+        request.function = new ContractFunction(this.functionABI, request.message)
+
+        return request;
     }
 
     /**
@@ -33,7 +54,9 @@ export default abstract class AbstractTransaction extends AbstractAction {
      * 
      * @public
      */
-    public abstract execute(): Promise<TransactionReceipt> 
+    public execute(): Promise<TransactionReceipt> {
+        
+    } 
 
     /**
      * TODO: Define response validation

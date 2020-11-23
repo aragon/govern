@@ -1,33 +1,38 @@
+export interface Request {
+    message: string | any,
+    signature: string
+}
+
 export default abstract class AbstractAction {
     /**
      * The parameters used to create the transaction
      * 
-     * @var {Object} parameters
+     * @var {Request} parameters
      */
-    protected parameters: any;
+    protected request: Request;
 
     /**
-     * @param {Object} parameters 
+     * @param {Request} parameters 
      * 
      * @constructor
      */
-    constructor(parameters: any) {
-        this.parameters = this.validateParameters(parameters);
+    constructor(request: Request) {
+        this.request = this.validateRequest(request);
      }
 
      /**
-      * Validates the given parameters.
+      * Validates the given request body.
       * 
-      * @method validateParameters 
+      * @method validateRequest 
       * 
-      * @param {Object} parameters 
+      * @param {Request} request 
       * 
       * @returns {Object}
       * 
       * @protected
       */
-    protected validateParameters(parameters: any): any {
-        return parameters;
+    protected validateRequest(request: Request): any {
+        return request;
     }
 
     /**

@@ -62,7 +62,6 @@ export default class Authenticator {
             return
         } 
 
-
         if (await this.hasPermission(request.routerPath, publicKey)) {
             reply.setCookie(
                 this.cookieName,

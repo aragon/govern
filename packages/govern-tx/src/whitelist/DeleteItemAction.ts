@@ -1,25 +1,25 @@
 import {isAddress} from '@ethersproject/address'
-import AbstractWhitelistAction from "../../lib/whitelist/AbstractWhitelistAction";
+import AbstractWhitelistAction, { WhitelistRequest } from "../../lib/whitelist/AbstractWhitelistAction";
 import {ListItem} from '../db/Whitelist'
 
 export default class DeleteItemAction extends AbstractWhitelistAction {
     /**
-      * Validates the given parameters.
+      * Validates the given request body.
       * 
-      * @method validateParameters 
+      * @method validateRequest 
       * 
-      * @param {Object} parameters 
+      * @param {WhitelistRequest} request 
       * 
-      * @returns {Object}
+      * @returns {WhitelistRequest}
       * 
       * @protected
       */
-     protected validateParameters(parameters: any): any {
-        if (!isAddress(this.parameters.message.publicKey)) {
+     protected validateRequest(request: WhitelistRequest): WhitelistRequest {
+        if (!isAddress(request.message.publicKey)) {
             throw new Error('Invalid public key passed!')
         }
 
-        return parameters;
+        return request;
     }
 
     /**
@@ -32,6 +32,6 @@ export default class DeleteItemAction extends AbstractWhitelistAction {
      * @public
      */
     public execute(): Promise<boolean> {
-        return this.whitelist.deleteItem(this.parameters.message.publicKey);
+        return this.whitelist.deleteItem(this.request.message.publicKey);
     }
 }
