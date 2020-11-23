@@ -14,7 +14,7 @@ export default abstract class AbstractTransaction extends AbstractAction {
     /**
      * The function identifier used to create a transaction
      * 
-     * @var {string} functionABI
+     * @property {string} functionABI
      * 
      * @protected
      */
