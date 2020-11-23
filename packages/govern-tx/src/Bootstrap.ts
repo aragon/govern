@@ -96,7 +96,7 @@ export default class Bootstrap {
     /**
      * TODO: Could be done cleaner but don't think it is necessary
      * 
-     * Register all transaction relates routes
+     * Register all transaction related routes
      * 
      * @method registerTransactionRoutes
      * 
@@ -133,7 +133,7 @@ export default class Bootstrap {
     /**
      * TODO: Could be done cleaner but don't think it is necessary
      * 
-     * Register all whitelist relates routes
+     * Register all whitelist related routes
      * 
      * @method registerWhitelistRoutes
      * 
