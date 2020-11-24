@@ -29,23 +29,64 @@ export interface ServerOptions {
     logLevel?: string
 }
 
+export interface Config {
+    ethereum: EthereumOptions,
+    database: DatabaseOptions,
+    auth: AuthOptions,
+    server: ServerOptions
+}
+
 // TODO: Add input validations for Ethereum addresses
-// TODO: Change constructor to only have one required argument to pass 
 export default class Configuration {
     /**
-     * @param {EthereumOptions} _ethereum 
-     * @param {DatabaseOptions} _database 
-     * @param {AuthOptions} _auth
-     * @param {ServerOptions} _server
+     * The options to connect to a Ethereum node and how TXs should be handled 
+     * 
+     * @property {EthereumOptions} _ethereum
+     * 
+     * @private
+     */
+    private _ethereum: EthereumOptions
+
+    /**
+     * The options to connect to the Postgres database
+     * 
+     * @property {DatabaseOptions} _database
+     * 
+     * @private
+     */
+    private _database: DatabaseOptions
+
+    /**
+     * The options to configure the Authenticator used by fastify
+     * 
+     * @property {AuthOptions} _auth
+     * 
+     * @private
+     */
+    private _auth: AuthOptions 
+
+    /**
+     * The options to configure fastify server
+     * 
+     * @property {ServerOptions} _server
+     * 
+     * @private
+     */
+    private _server: ServerOptions
+
+    /**
+     * @param {Config} config - The wrapper object for all configuration properties 
      * 
      * @constructor
      */
     constructor(
-        private _ethereum: EthereumOptions,
-        private _database: DatabaseOptions,
-        private _auth: AuthOptions,
-        private _server: ServerOptions,
-    ) { }
+        config: Config
+    ) {
+        this.ethereum = config.ethereum
+        this.database = config.database
+        this.auth = config.auth 
+        this.server = config.server
+    }
 
     /**
      * Getter for the database options. 
