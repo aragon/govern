@@ -70,7 +70,7 @@ export default abstract class AbstractTransaction extends AbstractAction {
     } 
 
     /**
-     * TODO: Define response validation
+     * TODO: Test BigNumber handling of the response and the fastify schema validation
      * 
      * Returns the schema of a transaction command
      * 
@@ -79,6 +79,29 @@ export default abstract class AbstractTransaction extends AbstractAction {
      * @returns {FastifySchema}
      */
     public static get schema(): FastifySchema {
-        return super.schema
+        const schema = AbstractAction.schema
+
+        schema.response = {
+            200: {
+                type: 'object',
+                properties: {
+                    to: { type: 'string' },
+                    from: { type: 'string' },
+                    contractAddress: { type: 'string' },
+                    transactionIndex: { type: 'number' },
+                    gasUsed: { type: 'object' }, // BigNumber
+                    logsBloom: { type: 'string' },
+                    blockHash: { type: 'string' },
+                    transactionHash: { type: 'string' },
+                    logs: { type: 'array' },
+                    confirmations: { type: 'number' },
+                    cumulativeGasUsed: { type: 'object'}, // BigNumber
+                    byzantium: { type: 'boolean' },
+                    status: { type: 'number' }
+                }
+            }
+        }
+
+        return schema
     }
 }
