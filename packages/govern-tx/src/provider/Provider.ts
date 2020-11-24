@@ -4,6 +4,7 @@ import Wallet from '../wallet/Wallet'
 import { EthereumOptions } from '../config/Configuration';
 import ContractFunction from '../../lib/transactions/ContractFunction'
 
+// TODO: Check populating of TX options
 export default class Provider {
     /**
      * The base provider of ethers.js
@@ -51,8 +52,6 @@ export default class Provider {
     }
 
     /**
-     * TODO: Add gas price definition (could get loaded from ethgasstation to a have average gas price)
-     * 
      * Returns the transaction options
      * 
      * @method getTransactionOptions

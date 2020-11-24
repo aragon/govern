@@ -18,7 +18,7 @@ export default abstract class AbstractAction {
      * 
      * @constructor
      */
-    constructor(request: Request) {
+    constructor(request: Request | undefined) {
         this.request = this.validateRequest(request);
     }
 

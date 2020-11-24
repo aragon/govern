@@ -41,6 +41,6 @@ export default abstract class AbstractWhitelistAction extends AbstractAction {
      * @returns {FastifySchema}
      */
     public static get schema(): FastifySchema {
-        return super.schema
+        return AbstractAction.schema
     }
 }
