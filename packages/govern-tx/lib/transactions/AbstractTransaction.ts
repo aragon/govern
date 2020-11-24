@@ -1,11 +1,11 @@
 import { FastifySchema } from 'fastify';
 import { TransactionReceipt } from '@ethersproject/abstract-provider'
+import { JsonFragment } from '@ethersproject/abi';
 import AbstractAction, { Request } from '../AbstractAction'
 import ContractFunction from '../transactions/ContractFunction'
 import Provider from '../../src/provider/Provider'
 import { EthereumOptions } from '../../src/config/Configuration';
 
-// TODO: Overthink dependency handling of AbstractTransaction -> Provider -> Wallet and the configuration. Ignoring separation of concerns for Provider/Wallet?
 export default abstract class AbstractTransaction extends AbstractAction {
     /**
      * The function ABI used to create a transaction
@@ -14,7 +14,7 @@ export default abstract class AbstractTransaction extends AbstractAction {
      * 
      * @protected
      */
-    protected functionABI: any // TODO: Create functionABI object interface definition 
+    protected functionABI: JsonFragment
 
     /**
      * The contract name

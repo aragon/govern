@@ -9,9 +9,9 @@ import Whitelist, { ListItem } from './db/Whitelist'
 import Admin from './db/Admin'
 import Authenticator, { JWTOptions } from './auth/Authenticator'
 
-import ExecuteTransaction from './transactions/ExecuteTransaction'
-import ChallengeTransaction from './transactions/ChallengeTransaction'
-import ScheduleTransaction from './transactions/ScheduleTransaction'
+import ExecuteTransaction from './transactions/execute/ExecuteTransaction'
+import ChallengeTransaction from './transactions/challenge/ChallengeTransaction'
+import ScheduleTransaction from './transactions/schedule/ScheduleTransaction'
 
 import AddItemAction from './whitelist/AddItemAction'
 import DeleteItemAction from './whitelist/DeleteItemAction'

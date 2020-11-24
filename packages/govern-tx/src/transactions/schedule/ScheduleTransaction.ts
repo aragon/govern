@@ -1,6 +1,7 @@
-import AbstractTransaction from '../../lib/transactions/AbstractTransaction';
+import AbstractTransaction from '../../../lib/transactions/AbstractTransaction'
+import * as scheduleABI from './schedule.json'
 
-export default class ChallengeTransaction extends AbstractTransaction {
+export default class ScheduleTransaction extends AbstractTransaction {
     /**
      * The contract name
      * 
@@ -17,5 +18,5 @@ export default class ChallengeTransaction extends AbstractTransaction {
      * 
      * @protected
      */
-    protected functionABI: any = {}
+    protected functionABI: any = scheduleABI
 }
