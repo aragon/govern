@@ -1,3 +1,4 @@
+import { JsonFragment } from '@ethersproject/abi';
 import AbstractTransaction from '../../../lib/transactions/AbstractTransaction'
 import * as challengeABI from './challenge.json'
 
@@ -18,5 +19,5 @@ export default class ChallengeTransaction extends AbstractTransaction {
      * 
      * @protected
      */
-    protected functionABI: any = challengeABI
+    protected functionABI: JsonFragment = challengeABI
 }

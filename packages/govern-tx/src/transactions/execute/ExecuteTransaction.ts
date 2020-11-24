@@ -1,3 +1,4 @@
+import { JsonFragment } from '@ethersproject/abi';
 import AbstractTransaction from '../../../lib/transactions/AbstractTransaction'
 import * as executeABI from './execute.json'
 
@@ -14,9 +15,9 @@ export default class ExecuteTransaction extends AbstractTransaction {
     /**
      * The function ABI used to create a transaction
      * 
-     * @property {Object} functionABI
+     * @property {JsonFragment} functionABI
      * 
      * @protected
      */
-    protected functionABI: any = executeABI
+    protected functionABI: JsonFragment = executeABI
 }
