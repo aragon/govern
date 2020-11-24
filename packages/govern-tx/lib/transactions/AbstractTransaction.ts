@@ -42,7 +42,7 @@ export default abstract class AbstractTransaction extends AbstractAction {
      * @constructor
      */
     constructor(
-        private config: EthereumOptions, // TODO: Overthink configuration handling. I have the feeling I'm injecting it to often. 
+        private config: EthereumOptions,
         private provider: Provider,
         request: Request
     ) {
@@ -64,8 +64,7 @@ export default abstract class AbstractTransaction extends AbstractAction {
      * @public
      */
     public execute(): Promise<TransactionReceipt> {
-        // TODO: This handling doesn't look that clean. Find a better solution also without code duplication.
-        this.contractFunction.functionArguments.container.payload.submitter = this.config.publicKey
+        this.contractFunction.functionArguments[0].payload.submitter = this.config.publicKey
 
         return this.provider.sendTransaction(this.contract, this.contractFunction)
     } 

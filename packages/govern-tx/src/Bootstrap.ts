@@ -182,7 +182,6 @@ export default class Bootstrap {
                 level: this.config.server.logLevel ?? 'debug'
             },
             ignoreTrailingSlash: true
-            //https: {} TODO: Configure TLS
         })
     }
 

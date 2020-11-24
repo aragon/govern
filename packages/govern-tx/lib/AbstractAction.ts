@@ -1,4 +1,5 @@
 import { FastifySchema } from 'fastify'
+
 export interface Request {
     message: string | any,
     signature: string

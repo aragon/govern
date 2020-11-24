@@ -1,15 +1,21 @@
-import { defaultAbiCoder } from 'ethers/lib/utils';
-import { Result } from '@ethersproject/abi';
+import { defaultAbiCoder, Fragment, JsonFragment } from '@ethersproject/abi';
 
 export default class ContractFunction {
     /**
      * The decoded function arguments
      * 
-     * @property functionArguments
+     * @property {Result} functionArguments
      * 
      * @private
      */
-    public functionArguments: any;
+    public functionArguments: any[];
+
+    /**
+     * The ABI item as ethers.js Fragment object
+     * 
+     * @property {Fragment} abiItem
+     */
+    private abiItem: Fragment;
 
     /**
      * TODO: Define ABI item interface
@@ -20,9 +26,10 @@ export default class ContractFunction {
      * @constructor
      */
     constructor(
-        private abiItem: any,
+        abiItem: JsonFragment,
         private requestMsg: string,
     ) { 
+        this.abiItem = Fragment.fromObject(abiItem)
         this.functionArguments = this.decode()
     }
 
@@ -36,7 +43,7 @@ export default class ContractFunction {
      * @public  
      */
     public encode(): string {
-        return defaultAbiCoder.encode(this.abiItem, this.functionArguments)
+        return defaultAbiCoder.encode(this.abiItem.inputs, this.functionArguments)
     }
 
     /**
@@ -46,9 +53,9 @@ export default class ContractFunction {
      * 
      * @returns {Result}
      * 
-     * @private
+     * @public
      */
-    public decode(): Result {
-        return defaultAbiCoder.decode(this.abiItem, this.requestMsg)
+    public decode(): any[] {
+        return defaultAbiCoder.decode(this.abiItem.inputs, this.requestMsg) as any[]
     }
 }
