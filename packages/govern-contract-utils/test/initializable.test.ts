@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import { ethers } from 'hardhat'
 import {
   InitializableMock,
-  InitializableMockFactory
+  InitializableMock__factory
 } from '../typechain'
 
 // NOTE: We cannot assert on the values emitted
@@ -11,7 +11,7 @@ describe('Initializable', function () {
   let init: InitializableMock
 
   beforeEach(async () => {
-    const Initializable = (await ethers.getContractFactory('InitializableMock')) as InitializableMockFactory
+    const Initializable = (await ethers.getContractFactory('InitializableMock')) as InitializableMock__factory
     init = await Initializable.deploy()
   })
 
