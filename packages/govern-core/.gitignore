@@ -4,11 +4,11 @@ govern-factory-rinkeby
 node_modules
 yarn-error.log
 
-#Buidler files
+# Hardhat files
 abi
 cache
 artifacts
-coverage
-coverage.json
-.coverage_*
 typechain
+
+coverage/
+coverage.json
