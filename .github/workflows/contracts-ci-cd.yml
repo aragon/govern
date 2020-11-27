@@ -33,13 +33,13 @@ jobs:
     - name: Build contracts
       run: yarn compile:cached
 
-    - name: Run coverage
-      run: yarn coverage
+    # - name: Run coverage
+    #   run: yarn coverage
 
-    - name: Upload report
-      run: bash <(curl -s https://codecov.io/bash)
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    # - name: Upload report
+    #   run: bash <(curl -s https://codecov.io/bash)
+    #   env:
+    #     CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 
   deploy-rinkeby:
