@@ -4,6 +4,11 @@
   "description": "Transactions service of Govern",
   "main": "./src/index.js",
   "scripts": {
+    "dev": "ts-node-dev src/index.ts",
+    "start": "yarn start:containers && yarn start:server",
+    "start:server": "node --loader ts-node/esm.mjs src/index.ts",
+    "start:containers": "docker-compose up -d",
+    "stop:containers": "docker-compose down",
     "test": "jest"
   },
   "authors": [
