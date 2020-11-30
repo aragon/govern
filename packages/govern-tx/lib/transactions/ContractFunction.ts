@@ -18,8 +18,6 @@ export default class ContractFunction {
     private abiItem: Fragment;
 
     /**
-     * TODO: Define ABI item interface
-     * 
      * @param {any} abiItem
      * @param {string} requestMsg
      * 
