@@ -1,13 +1,15 @@
 import fastify, { FastifyInstance } from 'fastify'
 import { TransactionReceipt } from '@ethersproject/abstract-provider'
+
 import { Request } from '../lib/AbstractAction'
 import Configuration from './config/Configuration'
 import Provider from './provider/Provider'
 import Wallet from './wallet/Wallet'
+
 import Database from './db/Database'
 import Whitelist, { ListItem } from './db/Whitelist'
 import Admin from './db/Admin'
-import Authenticator, { JWTOptions } from './auth/Authenticator'
+import Authenticator from './auth/Authenticator'
 
 import ExecuteTransaction from './transactions/execute/ExecuteTransaction'
 import ChallengeTransaction from './transactions/challenge/ChallengeTransaction'
