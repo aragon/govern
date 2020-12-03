@@ -41,7 +41,7 @@
   "scripts": {
     "clean": "rm -rf abi artifacts cache typechain",
     "compile": "hardhat compile --force",
-    "compile:cached": "hardhat compile --no-typechain",
+    "compile:cached": "hardhat compile",
     "test": "hardhat test",
     "coverage": "hardhat coverage --network coverage --temp artifacts",
     "prepublishOnly": "yarn clean && yarn compile && yarn test"
