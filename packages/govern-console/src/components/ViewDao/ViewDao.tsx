@@ -135,7 +135,9 @@ export default function ViewDao({ dao }: ViewDaoProps) {
               margin-bottom: 16px;
             `}
           >
-            <Button onClick={handleNewAction}>New action</Button>
+            {canSchedule && (
+              <Button onClick={handleNewAction}>New action</Button>
+            )}
           </div>
         </div>
         <FilteredActions

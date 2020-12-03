@@ -296,11 +296,13 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
     }
   }, [accountStatus, container, handleSetExecutionStatus, queueContract])
   console.log(container)
+
   const vetoEvent = container.history.find(
     (event: any) => event.__typename === 'ContainerEventVeto',
   )
   // @ts-ignore
   const reason = vetoEvent?.reason ?? ''
+
   return (
     <>
       <Frame>
@@ -347,14 +349,16 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
               Execute
             </Button>
           )}
-          <Button
-            onClick={veto}
-            css={`
-              margin-right: 16px;
-            `}
-          >
-            Veto
-          </Button>
+          {canVeto && (
+            <Button
+              onClick={veto}
+              css={`
+                margin-right: 16px;
+              `}
+            >
+              Veto
+            </Button>
+          )}
           {canChallenge && (
             <Button
               onClick={challenge}
