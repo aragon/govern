@@ -32,7 +32,6 @@ function detectAndComposeLinkType(
   type: string,
 ): string[] {
   try {
-    console.log(hash, 'hash', hexToUtf8(hash))
     if (isAddress(hash)) {
       return [composeEtherscanLink(hash, chainId, type), 'ethereum']
     }
@@ -41,7 +40,6 @@ function detectAndComposeLinkType(
       return [composeIpfsLink(hexToUtf8(hash)), 'ipfs']
     }
   } catch (err) {
-    console.log(err, hash)
     return ['', '']
   }
 
@@ -56,9 +54,9 @@ function formatAddress(
     if (isAddress(address)) {
       return shorten ? shortenAddress(address) : address
     }
-    console.log(address, hexToUtf8(address))
+
     if (isCid(hexToUtf8(address))) {
-      console.log('alo?')
+
       return hexToUtf8(address)
     }
   } catch (err) {
@@ -75,7 +73,6 @@ export default function Entity({
   shorten = false,
   type,
 }: EntityProps) {
-  console.log(address, 'entity')
   const { chainId } = useChainId()
   const [url] = detectAndComposeLinkType(address, chainId, type)
   return url ? (

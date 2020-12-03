@@ -254,7 +254,6 @@ function ContractCallHandler({
         // 1. The user has more allowance than needed, we can skip. (0 tx)
         // 2. The user has less allowance than needed, and we need to raise it. (2 tx)
         // 3. The user has 0 allowance, we just need to approve the needed amount. (1 tx)
-
         const allowance = await ercContract.allowance(account, queueAddress)
         if (
           allowance.lt(config.scheduleDeposit.amount) &&
