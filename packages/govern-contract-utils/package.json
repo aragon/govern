@@ -35,7 +35,7 @@
     "compile": "hardhat compile --force",
     "compile:cached": "hardhat compile --no-typechain",
     "test": "hardhat test",
-    "coverage": "hardhat coverage --network coverage",
+    "coverage": "hardhat coverage --network coverage --temp artifacts",
     "prepublishOnly": "yarn clean && yarn compile && yarn test"
   }
 }

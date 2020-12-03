@@ -39,7 +39,7 @@
     "compile": "hardhat compile --force",
     "compile:cached": "hardhat compile --no-typechain",
     "test": "hardhat test",
-    "coverage": "hardhat coverage --network coverage",
+    "coverage": "hardhat coverage --network coverage --temp artifacts",
     "prepublishOnly": "yarn clean && yarn compile && yarn test"
   },
   "gitHead": "aabbf6bd2dac11872ba9bb1f1dc8fffb6044aa7c"
