@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import { Signer } from 'ethers'
 import { hexDataSlice, id } from 'ethers/lib/utils'
 import { ethers } from 'hardhat'
-import { AdaptativeErc165Mock, AdaptativeErc165MockFactory } from '../typechain'
+import { AdaptativeERC165Mock, AdaptativeERC165Mock__factory } from '../typechain'
 
 const ERRORS = {
   UNKNOWN_CALLBACK: 'adap-erc165: unknown callback',
@@ -21,13 +21,13 @@ const magicNumber = '0x10000000'
 // NOTE: We cannot assert on the values emitted
 // in the events currently, see: https://github.com/EthWorks/Waffle/issues/87
 describe('AdaptativeErc165', function () {
-  let adaptative: AdaptativeErc165Mock, signers: Signer[]
+  let adaptative: AdaptativeERC165Mock, signers: Signer[]
 
   before(async () => {
     signers = await ethers.getSigners()
     const Adaptative = (await ethers.getContractFactory(
       'AdaptativeERC165Mock'
-    )) as AdaptativeErc165MockFactory
+    )) as AdaptativeERC165Mock__factory
     adaptative = await Adaptative.deploy()
   })
 
