@@ -56,11 +56,12 @@ function formatAddress(
     }
 
     if (isCid(hexToUtf8(address))) {
+
       return hexToUtf8(address)
     }
   } catch (err) {
     // Won't be a valid string anyway, so we return it
-    return address
+    return address.length > 42 ? `${address.slice(0, 43)}...` : address
   }
 
   // In this case, it's possible that it's really just plain text, so we decode it anyways.
@@ -79,6 +80,6 @@ export default function Entity({
       {formatAddress(address, { shorten })}
     </a>
   ) : (
-    <span>{address}</span>
+    <span>{address.length > 42 ? `${address.slice(0, 43)}...` : address}</span>
   )
 }

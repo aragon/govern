@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
+import { fromUnixTime } from 'date-fns'
 import 'styled-components/macro'
 import { shortenAddress } from '../../lib/web3-utils'
 
@@ -86,11 +87,19 @@ export default function FilteredActions({
         `}
       >
         {hasActions &&
-          filteredAndPaginatedActions.map(
-            ({ id, state }: { id: string; state: string }) => (
-              <ActionCard id={id} state={state} key={id} />
-            ),
-          )}
+          filteredAndPaginatedActions
+            .reverse()
+            .sort((a, b) => {
+              return b.payload.executionTime - a.payload.executionTime
+            })
+            .map((action: any) => (
+              <ActionCard
+                id={action.id}
+                state={action.state}
+                key={action.id}
+                executionTime={action.payload.executionTime}
+              />
+            ))}
       </div>
       <div
         css={`
@@ -149,11 +158,12 @@ function PaginationItem({ children, onClick }: PaginationItemProps) {
 }
 
 type ActionCardProps = {
+  executionTime: string
   id: string
   state: string
 }
 
-function ActionCard({ id, state }: ActionCardProps) {
+function ActionCard({ executionTime, id, state }: ActionCardProps) {
   const history = useHistory()
   const { daoAddress }: any = useParams()
 
@@ -200,7 +210,14 @@ function ActionCard({ id, state }: ActionCardProps) {
       >
         {shortenAddress(id)}
       </div>
-      {state}
+      <div
+        css={`
+          margin-bottom: 16px;
+        `}
+      >
+        {state}
+      </div>
+      {fromUnixTime(Number(executionTime)).toLocaleDateString('en-US')}
     </div>
   )
 }
