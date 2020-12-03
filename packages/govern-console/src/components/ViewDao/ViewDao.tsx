@@ -1,41 +1,89 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
+import { useQuery } from 'react-query'
+import axios from 'axios'
+import TokenAmount from 'token-amount'
 import 'styled-components/macro'
 import Button from '../Button'
+import Entity from '../Entity/Entity'
+import FilteredActions from '../FilteredActions/FilteredActions'
 import Frame from '../Frame/Frame'
+import { usePermissions } from '../../Providers/Permissions'
+import { useWalletAugmented } from '../../Providers/Wallet'
 import { KNOWN_GOVERN_ROLES, KNOWN_QUEUE_ROLES } from '../../lib/known-roles'
-import { shortenAddress, ETH_ANY_ADDRESS } from '../../lib/web3-utils'
+import { ETH_ANY_ADDRESS } from '../../lib/web3-utils'
+
+const ACTIONS_PER_PAGE = 8
 
 type ViewDaoProps = {
   dao: any
 }
 
+const BASE_ETHERSCAN_TX_URL =
+  'https://api.etherscan.io/api?module=account&action=txlistinternal&address='
+
 export default function ViewDao({ dao }: ViewDaoProps) {
+  const [ethBalance, setEthBalance] = useState('')
   const { daoAddress }: any = useParams()
   const history = useHistory()
+  const { isLoading, error, data: tokenData } = useQuery(
+    'daoActivity',
+    async () => {
+      const res = await axios.get(
+        `${BASE_ETHERSCAN_TX_URL}${dao.executor.address}&apiKey=${process.env.REACT_APP_ETHERSCAN_API_TOKEN}`,
+      )
+      console.log(res)
+      return res
+    },
+  )
+  const { ethers } = useWalletAugmented()
+  const { permissions, populatePermissions } = usePermissions()
+  populatePermissions(dao.queue.roles)
+  const { schedule: canSchedule } = permissions
+
+  useEffect(() => {
+    async function fetchEthBalance() {
+      const balance = await ethers.getBalance(dao.executor.address)
+      console.log(balance)
+      setEthBalance(balance.toString())
+    }
+    fetchEthBalance()
+  }, [dao, ethers])
 
   const handleNewAction = useCallback(() => {
     history.push(`/${daoAddress}/new-action`)
   }, [history, daoAddress])
-
-  const hasActions = useMemo(() => dao.queue.queued.length > 0, [dao])
 
   return (
     <>
       <h2
         css={`
           margin-top: 16px;
+          font-size: 24px;
         `}
       >
-        Info for {daoAddress}
+        {daoAddress} Overview
       </h2>
+      <Frame>
+        <h3>ETH balance</h3>
+        <p>
+          {' '}
+          {TokenAmount.format(ethBalance, 18, {
+            symbol: 'Ξ',
+          })}{' '}
+        </p>
+      </Frame>
       <Frame>
         <h2>Govern Executor</h2>
         <h3>Address</h3>
-        <p>{dao.executor.address}</p>
+        <p>
+          <Entity address={dao.executor.address} type="address" />
+        </p>
         <h2>Govern Queue</h2>
         <h3>Address</h3>
-        <p>{dao.queue.address}</p>
+        <p>
+          <Entity address={dao.queue.address} type="address" />
+        </p>
         <h3>Config</h3>
         <p>Execution delay: {dao.queue.config.executionDelay}</p>
         <p>Schedule collateral: </p>
@@ -44,7 +92,13 @@ export default function ViewDao({ dao }: ViewDaoProps) {
             margin-left: 16px;
           `}
         >
-          <li>Token: {dao.queue.config.scheduleDeposit.token}</li>
+          <li>
+            Token:
+            <Entity
+              address={dao.queue.config.scheduleDeposit.token}
+              type="address"
+            />
+          </li>
           <li>Amount: {dao.queue.config.scheduleDeposit.amount}</li>
         </ul>
         <p>Challenge collateral: </p>
@@ -53,98 +107,104 @@ export default function ViewDao({ dao }: ViewDaoProps) {
             margin-left: 16px;
           `}
         >
-          <li>Token: {dao.queue.config.challengeDeposit.token}</li>
+          <li>
+            Token:
+            <Entity
+              address={dao.queue.config.challengeDeposit.token}
+              type="address"
+            />
+          </li>
           <li>Amount: {dao.queue.config.challengeDeposit.amount}</li>
         </ul>
       </Frame>
       <Frame>
-        <h2>Actions</h2>
-        {hasActions
-          ? dao.queue.queued.map(({ id }: { id: string }) => (
-              <ActionCard id={id} key={id} />
-            ))
-          : 'No actions.'}
         <div>
-          <Button onClick={handleNewAction}>New action</Button>
+          <h2>Actions</h2>
+          <div
+            css={`
+              margin-bottom: 16px;
+            `}
+          >
+            {canSchedule && (
+              <Button onClick={handleNewAction}>New action</Button>
+            )}
+          </div>
         </div>
+        <FilteredActions
+          actions={dao.queue.queued}
+          actionsPerPage={ACTIONS_PER_PAGE}
+        />
       </Frame>
       <Frame>
         <h2>Permissions for Govern</h2>
-        {dao.executor.roles.map((role: any) => {
-          return (
-            <div key={role.selector}>
-              <h3>
-                {KNOWN_GOVERN_ROLES.get(role.selector)} - {role.selector}
-              </h3>
-              <p>
-                Who has permission:{' '}
-                {role.who === ETH_ANY_ADDRESS ? 'Anyone' : role.who}
-              </p>
-            </div>
-          )
-        })}
+        <table
+          css={`
+            width: 100%;
+            text-align: left;
+          `}
+        >
+          <thead>
+            <tr>
+              <th>Role (function)</th>
+              <th>Assigned to entity</th>
+            </tr>
+          </thead>
+          <tbody>
+            {dao.executor.roles.map((role: any, idx: number) => {
+              return (
+                <tr key={idx}>
+                  <td>
+                    {KNOWN_GOVERN_ROLES.get(role.selector)} - {role.selector}
+                  </td>
+                  <td>
+                    <Entity
+                      address={
+                        role.who === ETH_ANY_ADDRESS ? 'Anyone' : role.who
+                      }
+                      type="address"
+                    />
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
       </Frame>
       <Frame>
         <h2>Permissions for GovernQueue</h2>
-        {dao.queue.roles.map((role: any) => {
-          return (
-            <div key={role.selector}>
-              <h3>
-                {KNOWN_QUEUE_ROLES.get(role.selector)} - {role.selector}
-              </h3>
-              <p>
-                Who has permission:{' '}
-                {role.who === ETH_ANY_ADDRESS ? 'Anyone' : role.who}
-              </p>
-            </div>
-          )
-        })}
+        <table
+          css={`
+            width: 100%;
+            text-align: left;
+          `}
+        >
+          <thead>
+            <tr>
+              <th>Role (function)</th>
+              <th>Assigned to entity</th>
+            </tr>
+          </thead>
+          <tbody>
+            {dao.queue.roles.map((role: any, idx: number) => {
+              return (
+                <tr key={idx}>
+                  <td>
+                    {KNOWN_QUEUE_ROLES.get(role.selector)} - {role.selector}
+                  </td>
+                  <td>
+                    <Entity
+                      address={
+                        role.who === ETH_ANY_ADDRESS ? 'Anyone' : role.who
+                      }
+                      type="address"
+                    />
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
       </Frame>
     </>
-  )
-}
-
-type ActionCardProps = {
-  id: string
-}
-
-function ActionCard({ id }: ActionCardProps) {
-  const history = useHistory()
-  const { daoAddress }: any = useParams()
-
-  const handleCardClick = useCallback(() => {
-    history.push(`${daoAddress}/view-action/${id}`)
-  }, [daoAddress, history, id])
-
-  return (
-    <button
-      type="button"
-      css={`
-        position: relative;
-        background: transparent;
-        width: 280px;
-        height: 320px;
-        border: 2px solid transparent;
-        border-image: linear-gradient(
-          to bottom right,
-          #ad41bb 20%,
-          #ff7d7d 100%
-        );
-        border-image-slice: 1;
-        padding: 16px;
-        margin-right: 8px;
-        cursor: pointer;
-        &:not(:last-child) {
-          margin-right: 24px;
-          margin-bottom: 24px;
-        }
-        &:active {
-          top: 1px;
-        }
-      `}
-      onClick={handleCardClick}
-    >
-      {shortenAddress(id)}
-    </button>
   )
 }

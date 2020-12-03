@@ -1,5 +1,7 @@
 import React from 'react'
 import { render } from 'react-dom'
+import { HashRouter } from 'react-router-dom'
+import { QueryCache, ReactQueryCacheProvider } from 'react-query'
 import { createGlobalStyle } from 'styled-components'
 import 'styled-components/macro'
 import {
@@ -10,6 +12,8 @@ import {
 } from '@apollo/client'
 import App from './App'
 import GeneralProvider from './Providers/GeneralProvider'
+
+const queryCache = new QueryCache()
 
 export const rinkebyClient: ApolloClient<NormalizedCacheObject> = new ApolloClient(
   {
@@ -37,7 +41,6 @@ const GlobalStyle = createGlobalStyle`
   body {
     height: 0;
     min-height: 100vh;
-    width: 100vw;
     background: black;
     color: white;
     font-family: 'Roboto Mono', Helvetica, sans-serif;
@@ -66,12 +69,16 @@ const GlobalStyle = createGlobalStyle`
 
 render(
   <ApolloProvider client={rinkebyClient}>
-    <GeneralProvider>
-      <React.StrictMode>
-        <GlobalStyle />
-        <App />
-      </React.StrictMode>
-    </GeneralProvider>
+    <ReactQueryCacheProvider queryCache={queryCache}>
+      <GeneralProvider>
+        <React.StrictMode>
+          <GlobalStyle />
+          <HashRouter>
+            <App />
+          </HashRouter>
+        </React.StrictMode>
+      </GeneralProvider>
+    </ReactQueryCacheProvider>
   </ApolloProvider>,
   document.getElementById('root'),
 )
