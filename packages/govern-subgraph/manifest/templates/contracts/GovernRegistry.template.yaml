@@ -15,7 +15,7 @@
       - Govern
     abis:
       - name: GovernRegistry
-        file: $GOVERN_CORE_MODULE/abi/GovernRegistry.json
+        file: $GOVERN_CORE_MODULE/abi/contracts/GovernRegistry.sol/GovernRegistry.json
     eventHandlers:
       - event: Registered(indexed address,address,indexed address,indexed address,string)
         handler: handleRegistered
