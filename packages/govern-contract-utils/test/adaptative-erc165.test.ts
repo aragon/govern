@@ -2,7 +2,10 @@ import { expect } from 'chai'
 import { Signer } from 'ethers'
 import { hexDataSlice, id } from 'ethers/lib/utils'
 import { ethers } from 'hardhat'
-import { AdaptativeERC165Mock, AdaptativeERC165Mock__factory } from '../typechain'
+import {
+  AdaptativeERC165Mock,
+  AdaptativeERC165Mock__factory,
+} from '../typechain'
 
 const ERRORS = {
   UNKNOWN_CALLBACK: 'adap-erc165: unknown callback',
@@ -18,8 +21,6 @@ const beefInterfaceId = '0xbeefbeef'
 const callbackSig = hexDataSlice(id('callbackFunc()'), 0, 4) // 0x1eb2075a
 const magicNumber = '0x10000000'
 
-// NOTE: We cannot assert on the values emitted
-// in the events currently, see: https://github.com/EthWorks/Waffle/issues/87
 describe('AdaptativeErc165', function () {
   let adaptative: AdaptativeERC165Mock, signers: Signer[]
 
@@ -52,7 +53,7 @@ describe('AdaptativeErc165', function () {
       ).to.equal(true)
     })
 
-    it('ensures the right callback was call', async () => {
+    it('ensures the right callback was call with the right memory value', async () => {
       await expect(
         signers[0].sendTransaction({
           to: adaptative.address,
@@ -62,15 +63,15 @@ describe('AdaptativeErc165', function () {
         .to.emit(adaptative, EVENTS.RECEIVED_CALLBACK)
         .withArgs(callbackSig, callbackSig)
     })
-  })
 
-  it('reverts with unknown callback', async () => {
-    await expect(
-      signers[0].sendTransaction({
-        to: adaptative.address,
-        data: hexDataSlice(id('unknown()'), 0, 4),
-      })
-    ).to.be.revertedWith(ERRORS.UNKNOWN_CALLBACK)
+    it('reverts with unknown callback', async () => {
+      await expect(
+        signers[0].sendTransaction({
+          to: adaptative.address,
+          data: hexDataSlice(id('unknown()'), 0, 4),
+        })
+      ).to.be.revertedWith(ERRORS.UNKNOWN_CALLBACK)
+    })
   })
 
   context('ERC-165', () => {
