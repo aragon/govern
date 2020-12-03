@@ -2,8 +2,8 @@ import { expect } from 'chai'
 import { ethers } from 'hardhat'
 import { Signer } from 'ethers'
 import {
-  Acl,
-  AclFactory
+  ACL,
+  ACL__factory
 } from '../typechain'
 
 const ERRORS = {
@@ -27,8 +27,8 @@ describe('ACL', function () {
   let signers: Signer[]
   let root: string
   let notRoot: string
-  let acl: Acl
-  let aclNotRoot: Acl
+  let acl: ACL
+  let aclNotRoot: ACL
 
   before(async () => {
     signers = await ethers.getSigners()
@@ -37,14 +37,14 @@ describe('ACL', function () {
   })
 
   beforeEach(async () => {
-    const ACL = (await ethers.getContractFactory('ACL')) as AclFactory
+    const ACL = (await ethers.getContractFactory('ACL')) as ACL__factory
     acl = await ACL.deploy(root)
     aclNotRoot = await acl.connect(signers[1])
   })
 
-  const grant = (inst: Acl, role = ROLE, who = notRoot) => inst.grant(role, who)
-  const revoke = (inst: Acl, role = ROLE, who = notRoot) => inst.revoke(role, who)
-  const freeze = (inst: Acl, role = ROLE) => inst.freeze(role)
+  const grant = (inst: ACL, role = ROLE, who = notRoot) => inst.grant(role, who)
+  const revoke = (inst: ACL, role = ROLE, who = notRoot) => inst.revoke(role, who)
+  const freeze = (inst: ACL, role = ROLE) => inst.freeze(role)
 
   const assertRole = async (shouldHaveRole = true, role = ROLE, who = notRoot) =>
     expect(await acl.roles(role, who)).to.equal(shouldHaveRole ? ALLOW_ROLE : NO_ROLE)
