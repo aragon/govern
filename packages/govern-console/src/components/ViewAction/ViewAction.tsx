@@ -1,6 +1,7 @@
 import React, { useMemo, useCallback, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import * as clipboard from 'clipboard-polyfill'
+import { fromUnixTime } from 'date-fns'
 import { toHex } from 'web3-utils'
 import 'styled-components/macro'
 import Button from '../Button'
@@ -374,7 +375,9 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
         <h3>Nonce</h3>
         <p>{container.payload.nonce}</p>
         <h3>Execution time</h3>
-        <p>{container.payload.executionTime}</p>
+        <p>
+          {fromUnixTime(Number(container.payload.executionTime)).toUTCString()}
+        </p>
         <h3>Submitter</h3>
         <p>
           <Entity address={container.payload.submitter} type="address" />
