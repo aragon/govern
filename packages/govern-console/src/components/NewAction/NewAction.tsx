@@ -263,7 +263,6 @@ function ContractCallHandler({
             const resetTx = await ercContract.approve(account, '0')
             await resetTx.wait(1)
           }
-          console.log('approve', queueAddress, config.scheduleDeposit.amount)
           await ercContract.approve(queueAddress, config.scheduleDeposit.amount)
         }
         const functionValues = values ? values.map((val: any) => val.value) : []

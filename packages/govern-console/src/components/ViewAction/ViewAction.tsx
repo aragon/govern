@@ -296,7 +296,6 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
       )
     }
   }, [accountStatus, container, handleSetExecutionStatus, queueContract])
-  console.log(container)
 
   const vetoEvent = container.history.find(
     (event: any) => event.__typename === 'ContainerEventVeto',

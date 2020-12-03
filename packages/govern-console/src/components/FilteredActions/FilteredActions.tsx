@@ -166,7 +166,6 @@ type ActionCardProps = {
 function ActionCard({ executionTime, id, state }: ActionCardProps) {
   const history = useHistory()
   const { daoAddress }: any = useParams()
-  console.log('action id exec', id, executionTime)
 
   const handleCardClick = useCallback(() => {
     history.push(`${daoAddress}/view-action/${id}`)

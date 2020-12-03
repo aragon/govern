@@ -32,7 +32,6 @@ export default function ViewDao({ dao }: ViewDaoProps) {
       const res = await axios.get(
         `${BASE_ETHERSCAN_TX_URL}${dao.executor.address}&apiKey=${process.env.REACT_APP_ETHERSCAN_API_TOKEN}`,
       )
-      console.log(res)
       return res
     },
   )
@@ -44,7 +43,6 @@ export default function ViewDao({ dao }: ViewDaoProps) {
   useEffect(() => {
     async function fetchEthBalance() {
       const balance = await ethers.getBalance(dao.executor.address)
-      console.log(balance)
       setEthBalance(balance.toString())
     }
     fetchEthBalance()
@@ -53,8 +51,6 @@ export default function ViewDao({ dao }: ViewDaoProps) {
   const handleNewAction = useCallback(() => {
     history.push(`/${daoAddress}/new-action`)
   }, [history, daoAddress])
-
-  console.log(dao)
 
   return (
     <>
