@@ -11,7 +11,7 @@ import Frame from '../Frame/Frame'
 import { usePermissions } from '../../Providers/Permissions'
 import { useWalletAugmented } from '../../Providers/Wallet'
 import { KNOWN_GOVERN_ROLES, KNOWN_QUEUE_ROLES } from '../../lib/known-roles'
-import { ETH_ANY_ADDRESS } from '../../lib/web3-utils'
+import { ETH_ANY_ADDRESS, ETH_EMPTY_HEX } from '../../lib/web3-utils'
 
 const ACTIONS_PER_PAGE = 8
 
@@ -32,7 +32,6 @@ export default function ViewDao({ dao }: ViewDaoProps) {
       const res = await axios.get(
         `${BASE_ETHERSCAN_TX_URL}${dao.executor.address}&apiKey=${process.env.REACT_APP_ETHERSCAN_API_TOKEN}`,
       )
-      console.log(res)
       return res
     },
   )
@@ -44,7 +43,6 @@ export default function ViewDao({ dao }: ViewDaoProps) {
   useEffect(() => {
     async function fetchEthBalance() {
       const balance = await ethers.getBalance(dao.executor.address)
-      console.log(balance)
       setEthBalance(balance.toString())
     }
     fetchEthBalance()
@@ -116,6 +114,14 @@ export default function ViewDao({ dao }: ViewDaoProps) {
           </li>
           <li>Amount: {dao.queue.config.challengeDeposit.amount}</li>
         </ul>
+        <h3>Rules</h3>
+        <p>
+          {dao.queue.config.rules === ETH_EMPTY_HEX ? (
+            'No agreement attached.'
+          ) : (
+            <Entity address={dao.queue.config.rules} type="address" />
+          )}
+        </p>
       </Frame>
       <Frame>
         <div>

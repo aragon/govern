@@ -4,53 +4,23 @@ module.exports = {
     es6: true,
   },
   extends: [
-    'plugin:import/recommended',
-    'plugin:promise/recommended',
-    'standard',
-    'standard-react',
-    'prettier/react',
+    'eslint:recommended',
     'plugin:prettier/recommended',
+    'plugin:@typescript-eslint/recommended',
+    'prettier/@typescript-eslint',
+    'react-app',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    ecmaFeatures: {
-      experimentalObjectRestSpread: true,
-      jsx: true,
-    },
+    jsx: true,
     sourceType: 'module',
+    project: './tsconfig.json',
   },
-  plugins: ['prettier', 'react', 'react-hooks', 'import', 'promise', 'jest'],
+  plugins: ['prettier', 'react', 'react-hooks', '@typescript-eslint'],
   rules: {
-    'react/prop-types': 'warn',
-    'react-hooks/rules-of-hooks': 'error',
-    'react-hooks/exhaustive-deps': 'error',
-    'import/no-unresolved': [
-      'error',
-      { ignore: ['^react(-dom)?$', '^styled-components$'] },
-    ],
-    'promise/no-nesting': ['off'],
-    'valid-jsdoc': 'error',
-    'linebreak-style': ['error', 'unix'],
-    curly: 'error',
+    '@typescript-eslint/no-explicit-any': 'off',
+    'no-use-before-define': 'off',
+    '@typescript-eslint/no-use-before-define': ['error'],
+    '@typescript-eslint/ban-ts-comment': 'off',
   },
-  settings: {
-    react: {
-      pragma: 'React',
-      version: '16.13.1',
-    },
-    'import/parsers': {
-      '@typescript-eslint/parser': ['.ts', '.tsx'],
-    },
-    'import/resolver': {
-      typescript: {
-        alwaysTryTypes: true,
-      },
-    },
-  },
-  overrides: [
-    {
-      files: ['**/*.test.js'],
-      env: { jest: true },
-    },
-  ],
 }

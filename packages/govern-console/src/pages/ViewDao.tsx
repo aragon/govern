@@ -58,6 +58,11 @@ const DAO_QUERY = gql`
             resolver
             rules
           }
+          history {
+            ... on ContainerEventVeto {
+              reason
+            }
+          }
         }
         config {
           executionDelay
@@ -100,6 +105,8 @@ export default function DaoView() {
   if (!data.registryEntry) {
     return <p>DAO not found.</p>
   }
+
+  console.log(data)
 
   return (
     <Switch>

@@ -1,6 +1,8 @@
 import React, { useMemo, useCallback, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import * as clipboard from 'clipboard-polyfill'
+import { fromUnixTime } from 'date-fns'
+import { toHex } from 'web3-utils'
 import 'styled-components/macro'
 import Button from '../Button'
 import Entity from '../Entity/Entity'
@@ -67,7 +69,7 @@ type ContainerEventResolve = {
   id: string
   container: any
   createdAt: string
-  approved: Boolean
+  approved: boolean
 }
 
 type ContainerEventRule = {
@@ -90,7 +92,7 @@ type ContainerEventSubmitEvidence = {
   createdAt: string
   evidence: string
   submitter: string
-  finished: Boolean
+  finished: boolean
 }
 
 type ContainerEventVeto = {
@@ -129,12 +131,13 @@ type ViewActionProps = {
 }
 
 function ViewAction({ container, queueAddress }: ViewActionProps) {
-  const { wallet } = useWallet()
-  const { status: accountStatus } = wallet
   const [executionStatus, setExecutionStatus] = useState('')
+  const [justification, setJustification] = useState('')
   const [statusType, setStatusType] = useState<
     'error' | 'info' | 'success' | ''
   >('')
+  const { wallet } = useWallet()
+  const { status: accountStatus } = wallet
   const queueContract = useContract(queueAddress, queueAbi)
   const { permissions } = usePermissions()
   const {
@@ -212,9 +215,13 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
     }
     try {
       const containerHash = container.id
-      const tx = await queueContract!.veto(containerHash, '0x00', {
-        gasLimit: 500000,
-      })
+      const tx = await queueContract!.veto(
+        containerHash,
+        justification ? toHex(justification) : '0x00',
+        {
+          gasLimit: 500000,
+        },
+      )
       handleSetExecutionStatus('info', `Sending transaction.`)
       await tx.wait(1)
       handleSetExecutionStatus(
@@ -228,7 +235,13 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
         `There was an error with the transaction.`,
       )
     }
-  }, [accountStatus, container, handleSetExecutionStatus, queueContract])
+  }, [
+    accountStatus,
+    container,
+    handleSetExecutionStatus,
+    queueContract,
+    justification,
+  ])
 
   const challenge = useCallback(async () => {
     if (accountStatus !== 'connected') {
@@ -283,18 +296,48 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
       )
     }
   }, [accountStatus, container, handleSetExecutionStatus, queueContract])
-  console.log(container)
+
+  const vetoEvent = container.history.find(
+    (event: any) => event.__typename === 'ContainerEventVeto',
+  )
+  // @ts-ignore
+  const reason = vetoEvent?.reason ?? ''
+
   return (
     <>
       <Frame>
         <h2>Action {shortenAddress(container.id)}</h2>
         <h3>Status</h3>
         <p>{container.state}</p>
+        {container.state === 'Cancelled' && (
+          <>
+            <h3>Reason </h3>
+            <Entity address={reason} type="address" />
+          </>
+        )}
         {executionStatus && <Info mode={statusType}>{executionStatus}</Info>}
       </Frame>
 
-      {container.state !== 'Executed' && (
+      {container.state !== 'Executed' && container.state !== 'Cancelled' && (
         <Frame>
+          <div>
+            <label
+              css={`
+                display: flex;
+                flex-direction: column;
+              `}
+            >
+              Justification (if vetoing or challenging)
+              <input
+                value={justification}
+                onChange={e => setJustification(e.target.value)}
+                css={`
+                  margin-top: 12px;
+                  color: black;
+                `}
+              />
+            </label>
+          </div>
           <h2>Available actions</h2>
           {container.state === 'Scheduled' && (
             <Button
@@ -335,14 +378,16 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
         <h3>Nonce</h3>
         <p>{container.payload.nonce}</p>
         <h3>Execution time</h3>
-        <p>{container.payload.executionTime}</p>
+        <p>
+          {fromUnixTime(Number(container.payload.executionTime)).toUTCString()}
+        </p>
         <h3>Submitter</h3>
         <p>
           <Entity address={container.payload.submitter} type="address" />
         </p>
         <h3>Proof (Justification)</h3>
         <p>
-          <Entity address={container.payload.proof} type="address" />
+          <Entity address={container.payload.proof} type="address" shorten />
         </p>
         <h3>On-chain actions</h3>
         <p>
