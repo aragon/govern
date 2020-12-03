@@ -69,7 +69,7 @@ type ContainerEventResolve = {
   id: string
   container: any
   createdAt: string
-  approved: Boolean
+  approved: boolean
 }
 
 type ContainerEventRule = {
@@ -92,7 +92,7 @@ type ContainerEventSubmitEvidence = {
   createdAt: string
   evidence: string
   submitter: string
-  finished: Boolean
+  finished: boolean
 }
 
 type ContainerEventVeto = {
