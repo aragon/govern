@@ -1,8 +1,8 @@
-import { ethers } from '@nomiclabs/buidler'
+import { ethers } from 'hardhat'
 import { expect } from 'chai'
 import { Signer } from 'ethers'
-import { Govern } from '../typechain'
 import { hexDataSlice, id } from 'ethers/lib/utils'
+import { Govern } from '../typechain'
 
 const ERRORS = {
   AUTH: 'acl: auth'
