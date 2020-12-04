@@ -29,13 +29,16 @@ const fastifyMock: any = {
     post: jest.fn(),
     delete: jest.fn(),
     get: jest.fn(),
-    addHook: jest.fn()
+    addHook: jest.fn(),
+    options: {}
 }
 jest.mock('fastify', () => {
     return {
-        default: jest.fn(() => {
+        default: (options) => {
+            fastifyMock.options = options
+
             return fastifyMock
-        })
+        }
     }
 })
 
@@ -90,7 +93,7 @@ describe('BootstrapTest', () => {
         }
     }
 
-  beforeEach(() => {
+  it('calls the constructor and initiates the class as expected', () => {
     fastifyMock.post = jest.fn((path, schemaObj, callback) => {
         switch(path) {
             case '/execute':
@@ -139,16 +142,13 @@ describe('BootstrapTest', () => {
     bootstrap = new Bootstrap(
         new Configuration(config)
     )
-  })
 
-  it('calls the constructor and initiates the class as expected', (done) => {
     /******************************************** 
      *  Expectations for all invoked constructors 
      ********************************************/
     expect(
-        fastify
-    ).toHaveBeenNthCalledWith(
-        1,
+        fastifyMock.options
+    ).toEqual(
         {
             logger: {
                 level: 'debug'
@@ -166,7 +166,7 @@ describe('BootstrapTest', () => {
     
     expect(Provider).toHaveBeenNthCalledWith(1, config.ethereum, Wallet.mock.instances[0])
     
-    expect(Wallet).toHaveBeenNthCalledWith(1, config.database)
+    expect(Wallet).toHaveBeenNthCalledWith(1, Database.mock.instances[0])
     
     expect(bootstrap.whitelist).toBeInstanceOf(Whitelist)
 
@@ -179,28 +179,31 @@ describe('BootstrapTest', () => {
     /*********************************** 
      *  Expectations for added Auth Hook  
      ***********************************/
-
-    expect(bootstrap.server.addHook).toHaveBeenNthCalledWith(1, 'preHandler', Authenticator.mock.instances[0].authenticate)
+    expect(bootstrap.server.addHook).toHaveBeenNthCalledWith(
+        1,
+        'preHandler',
+        expect.any(Function)
+    )
 
     /************************************ 
      *  Expectations for all added routes 
      ************************************/
-    expect(ExecuteTransaction).toHaveBeenNthCalledWith(1, config.ethereum, providerMock, true)
+    expect(ExecuteTransaction).toHaveBeenNthCalledWith(1, config.ethereum, Provider.mock.instances[0], true)
     expect(executeTransactionMock.execute).toHaveBeenCalledTimes(1)
 
-    expect(ScheduleTransaction).toHaveBeenNthCalledWith(1, config.ethereum, providerMock, true)
+    expect(ScheduleTransaction).toHaveBeenNthCalledWith(1, config.ethereum, Provider.mock.instances[0], true)
     expect(scheduleTransactionMock.execute).toHaveBeenCalledTimes(1)
 
-    expect(ChallengeTransaction).toHaveBeenNthCalledWith(1, config.ethereum, providerMock, true)
+    expect(ChallengeTransaction).toHaveBeenNthCalledWith(1, config.ethereum, Provider.mock.instances[0], true)
     expect(challengeTransactionMock.execute).toHaveBeenCalledTimes(1)
 
-    expect(AddItemAction).toHaveBeenNthCalledWith(1, whitelistMock, true)
+    expect(AddItemAction).toHaveBeenNthCalledWith(1, Whitelist.mock.instances[0], true)
     expect(addItemActionMock.execute).toHaveBeenCalledTimes(1)
 
-    expect(DeleteItemAction).toHaveBeenNthCalledWith(1, whitelistMock, true)
+    expect(DeleteItemAction).toHaveBeenNthCalledWith(1, Whitelist.mock.instances[0], true)
     expect(deleteItemActionMock.execute).toHaveBeenCalledTimes(1)
 
-    expect(GetListAction).toHaveBeenNthCalledWith(1, whitelistMock, true)
+    expect(GetListAction).toHaveBeenNthCalledWith(1, Whitelist.mock.instances[0])
     expect(getListActionMock.execute).toHaveBeenCalledTimes(1)
 
     expect(fastifyMock.post).toHaveBeenCalledTimes(4)
@@ -208,7 +211,7 @@ describe('BootstrapTest', () => {
     expect(fastifyMock.get).toHaveBeenCalledTimes(1)
   })
 
-  it('calls the constructor and uses the configured logging level for fastify', async () => {
+  it('calls the constructor and uses the configured logging level for fastify', () => {
     config.server.logLevel = 'warn'
 
     bootstrap = new Bootstrap(
@@ -216,8 +219,8 @@ describe('BootstrapTest', () => {
     )
 
     expect(
-        fastify
-    ).toHaveBeenCalledWith(
+        fastifyMock.options
+    ).toEqual(
         {
             logger: {
                 level: 'warn'
@@ -227,10 +230,9 @@ describe('BootstrapTest', () => {
   })
 
   it('calls run and starts the server as expected on the configured port', (done) => {
-    bootstrap.run()
     console.log = jest.fn();
 
-    bootstrap.server.listen = jest.fn((port, host, callback) => {
+    fastifyMock.listen = jest.fn((port, host, callback) => {
         expect(port).toEqual(config.server.port)
         expect(host).toEqual(config.server.host)
 
@@ -240,10 +242,14 @@ describe('BootstrapTest', () => {
 
         done()
     })
+
+    bootstrap = new Bootstrap(
+        new Configuration(config)
+    )
+    bootstrap.run()
   })
 
   it('calls run and does log the error as expected', (done) => {
-    bootstrap.run()
     const realProcess = process
     console.error = jest.fn();
     process = {...realProcess, exit: jest.fn()}
@@ -261,5 +267,10 @@ describe('BootstrapTest', () => {
         done()
         process = realProcess
     })
+    
+    bootstrap = new Bootstrap(
+        new Configuration(config)
+    )
+    bootstrap.run()
   })
 })
