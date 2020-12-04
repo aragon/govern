@@ -1,6 +1,4 @@
 //@ts-nocheck
-import { fastify } from 'fastify'
-
 import AbstractWhitelistAction from '../../lib/whitelist/AbstractWhitelistAction'
 import AbstractTransaction from '../../lib/transactions/AbstractTransaction'
 
