@@ -1,15 +1,16 @@
-import postgres from 'postgres'
+const postgres = require('postgres')
 import { DatabaseOptions } from '../config/Configuration'
 
 export default class Database {
     /**
+     * TODO: Define type
      * The sql function of the postgres client
      * 
      * @property {Function} sql
      * 
      * @private
      */
-    private sql;
+    private sql: any;
 
     /** 
      * @param {DatabaseOptions} config - The database configuration

@@ -32,12 +32,13 @@ const fastifyMock: any = {
     addHook: jest.fn()
 }
 jest.mock('fastify', () => {
-    return jest.fn(() => {
-        return fastifyMock
-    });
+    return {
+        default: jest.fn(() => {
+            return fastifyMock
+        })
+    }
 })
 
-jest.mock('../../src/config/Configuration')
 jest.mock('../../src/provider/Provider')
 jest.mock('../../src/wallet/Wallet')
 
@@ -126,7 +127,7 @@ describe('BootstrapTest', () => {
     })
     
     fastifyMock.get = jest.fn((path, schemaObj, callback) => {
-        expect(path).toEquela('/whitelist')
+        expect(path).toEqual('/whitelist')
 
         expect(schemaObj).toEqual({schema: AbstractWhitelistAction.schema})
 
@@ -253,11 +254,12 @@ describe('BootstrapTest', () => {
 
         callback(true, null)
 
-        expect(console.log).toHaveBeenNthCalledWith(1, true)
+        expect(console.error).toHaveBeenNthCalledWith(1, true)
 
         expect(process.exit).toHaveBeenNthCalledWith(1, 0)
 
         done()
+        process = realProcess
     })
   })
 })

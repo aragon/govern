@@ -11,7 +11,7 @@ export default abstract class AbstractAction {
      * 
      * @var {Request} parameters
      */
-    protected request: Request;
+    protected request: Request | undefined;
 
     /**
      * @param {Request} parameters 
@@ -33,7 +33,7 @@ export default abstract class AbstractAction {
       * 
       * @protected
       */
-    protected validateRequest(request: Request): Request {
+    protected validateRequest(request: Request | undefined): Request | undefined {
         return request;
     }
 

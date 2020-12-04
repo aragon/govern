@@ -34,12 +34,13 @@ export default class Authenticator {
      * @public
      */
     public async authenticate(request: FastifyRequest, reply: FastifyReply): Promise<undefined> {
-        // TODO: Fix type definition
         if (
             await this.hasPermission(
                 request.routerPath,
                 verifyMessage(
+                    //@ts-ignore
                     arrayify(request.body.message),
+                    //@ts-ignore
                     request.body.signature
                 )
             )

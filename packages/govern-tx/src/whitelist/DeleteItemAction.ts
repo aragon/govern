@@ -32,6 +32,6 @@ export default class DeleteItemAction extends AbstractWhitelistAction {
      * @public
      */
     public execute(): Promise<boolean> {
-        return this.whitelist.deleteItem(this.request.message.publicKey);
+        return this.whitelist.deleteItem(this.request?.message.publicKey);
     }
 }
