@@ -87,17 +87,15 @@ export default function DaoView() {
   const { chainId } = useChainId()
   const { daoAddress }: any = useParams()
   const { path } = useRouteMatch()
-  const { data, isLoading: loading, error } = useQuery('DAO_DATA', async () => {
-    const res = await request(
+  const { data, isLoading: loading, error } = useQuery('DAO_DATA', async () =>
+    request(
       chainId === 4 ? RINKEBY_SUBGRAPH_URL : MAINNET_SUBGRAPH_URL,
       DAO_QUERY,
       {
         name: daoAddress,
       },
-    )
-
-    return res
-  })
+    ),
+  )
 
   if (loading) {
     return <p>Loading DAO data...</p>
