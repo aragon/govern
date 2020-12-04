@@ -1,12 +1,13 @@
 import React from 'react'
 import { Route, Switch, useRouteMatch, useParams } from 'react-router-dom'
+import { useQuery } from 'react-query'
+import { gql, request } from 'graphql-request'
 import 'styled-components/macro'
-import { gql, useQuery } from '@apollo/client'
 import NewAction from '../components/NewAction/NewAction'
 import ViewAction from '../components/ViewAction/ViewAction'
 import ViewDao from '../components/ViewDao/ViewDao'
 import { useChainId } from '../Providers/ChainId'
-import { rinkebyClient, mainnetClient } from '../index'
+import env from '../environment'
 
 const DAO_QUERY = gql`
   query DAOQuery($name: String) {
@@ -86,12 +87,15 @@ export default function DaoView() {
   const { chainId } = useChainId()
   const { daoAddress }: any = useParams()
   const { path } = useRouteMatch()
-  const { data, loading, error } = useQuery(DAO_QUERY, {
-    variables: {
-      name: daoAddress,
-    },
-    client: chainId === 4 ? rinkebyClient : mainnetClient,
-  })
+  const { data, isLoading: loading, error } = useQuery('DAO_DATA', async () =>
+    request(
+      chainId === 4 ? env('RINKEBY_SUBGRAPH_URL') : env('MAINNET_SUBGRAPH_URL'),
+      DAO_QUERY,
+      {
+        name: daoAddress,
+      },
+    ),
+  )
 
   if (loading) {
     return <p>Loading DAO data...</p>
@@ -105,8 +109,6 @@ export default function DaoView() {
   if (!data.registryEntry) {
     return <p>DAO not found.</p>
   }
-
-  console.log(data)
 
   return (
     <Switch>

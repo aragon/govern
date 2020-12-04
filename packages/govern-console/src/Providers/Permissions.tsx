@@ -61,13 +61,11 @@ export default function PermissionsProvider({
     (rawRoles: any) => {
       const newPermissions = permissions
       rawRoles.map((role: Role) => {
-        console.log(role.who, ETH_ANY_ADDRESS, account ?? '')
         if (
           addressesEqual(role.who, ETH_ANY_ADDRESS) ||
           addressesEqual(role.who, account ?? '')
         ) {
           const roleName = KNOWN_QUEUE_ROLES.get(role.selector) ?? ''
-          console.log(roleName, 'roleName')
           if (roleName) {
             // @ts-ignore
             newPermissions[roleName] = true
