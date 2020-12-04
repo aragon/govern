@@ -22,7 +22,6 @@ jobs:
       with:
         path: |
           packages/*/cache
-          packages/*/abi
           packages/*/artifacts
           ~/.cache/buidler-nodejs/
           ~/.cache/hardhat-nodejs/
@@ -71,7 +70,6 @@ jobs:
       with:
         path: |
           packages/*/cache
-          packages/*/abi
           packages/*/artifacts
           ~/.cache/buidler-nodejs/
           ~/.cache/hardhat-nodejs/

@@ -25,12 +25,15 @@ jobs:
         path: '**/node_modules'
         key: yarn-${{ hashFiles('yarn.lock') }}
     
-    - name: Cache abi
+    - name: Cache contracts
       uses: actions/cache@v2
       with:
         path: |
-          packages/*/abi
-        key: abi-${{ hashFiles('packages/*/abi/**/*.sol') }}
+          packages/*/cache
+          packages/*/artifacts
+          ~/.cache/buidler-nodejs/
+          ~/.cache/hardhat-nodejs/
+        key: contracts-${{ hashFiles('packages/*/contracts/**/*.sol') }}
 
     - name: Install dependencies
       run: yarn install --frozen-lockfile
