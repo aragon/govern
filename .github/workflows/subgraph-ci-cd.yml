@@ -24,9 +24,22 @@ jobs:
       with:
         path: '**/node_modules'
         key: yarn-${{ hashFiles('yarn.lock') }}
+    
+    - name: Cache contracts
+      uses: actions/cache@v2
+      with:
+        path: |
+          packages/*/cache
+          packages/*/artifacts
+          ~/.cache/buidler-nodejs/
+          ~/.cache/hardhat-nodejs/
+        key: contracts-${{ hashFiles('packages/*/contracts/**/*.sol') }}
 
     - name: Install dependencies
       run: yarn install --frozen-lockfile
+
+    - name: Build contracts
+      run: yarn compile:cached
 
     - name: Configure k8s
       run: .github/scripts/kubectl-config.sh ${{secrets.KUBE_CA}} ${{secrets.KUBE_SERVER}} ${{secrets.KUBE_TOKEN}}
