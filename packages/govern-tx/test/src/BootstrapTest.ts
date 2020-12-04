@@ -1,18 +1,28 @@
 //@ts-nocheck
-import { fastify } from 'fastify';
+import { fastify } from 'fastify'
 
-import Configuration from '../../src/config/Configuration';
-import Provider from '../../src/provider/Provider';
-import Wallet from '../../src/wallet/Wallet';
+import AbstractWhitelistAction from '../../lib/whitelist/AbstractWhitelistAction'
+import AbstractTransaction from '../../lib/transactions/AbstractTransaction'
 
-import Database from '../../src/db/Database';
-import Whitelist from '../../src/db/Whitelist';
-import Admin from '../../src/db/Admin';
+import Configuration from '../../src/config/Configuration'
+import Provider from '../../src/provider/Provider'
+import Wallet from '../../src/wallet/Wallet'
 
-import Authenticator from '../../src/auth/Authenticator';
+import Database from '../../src/db/Database'
+import Whitelist from '../../src/db/Whitelist'
+import Admin from '../../src/db/Admin'
 
-import Bootstrap from '../../src/Bootstrap';
+import Authenticator from '../../src/auth/Authenticator'
+
 import ExecuteTransaction from '../../src/transactions/execute/ExecuteTransaction';
+import ChallengeTransaction from '../../src/transactions/challenge/ChallengeTransaction'
+import ScheduleTransaction from '../../src/transactions/schedule/ScheduleTransaction'
+
+import AddItemAction from '../../src/whitelist/AddItemAction';
+import DeleteItemAction from '../../src/whitelist/DeleteItemAction';
+import GetListAction from '../../src/whitelist/GetListAction';
+
+import Bootstrap from '../../src/Bootstrap'
 
 //Mocks
 const fastifyMock: any = {
@@ -49,7 +59,13 @@ jest.mock('../../src/whitelist/GetListAction')
  * Bootstrap test
  */
 describe('BootstrapTest', () => {
-    let bootstrap: Bootstrap
+    let bootstrap: Bootstrap,
+    executeTransactionMock: ExecuteTransaction,
+    scheduleTransactionMock: ScheduleTransaction,
+    challengeTransactionMock: ChallengeTransaction,
+    addItemActionMock: AddItemAction,
+    deleteItemActionMock: DeleteItemAction,
+    getListActionMock: GetListAction
 
     const config = {
         ethereum: {
@@ -77,16 +93,26 @@ describe('BootstrapTest', () => {
     fastifyMock.post = jest.fn((path, schemaObj, callback) => {
         switch(path) {
             case '/execute':
+                expect(schemaObj).toEqual({schema: AbstractTransaction.schema})
+                callback({params: true})
+                executeTransactionMock = ExecuteTransaction.mock.instances[0]
+                break
             case '/schedule':
+                expect(schemaObj).toEqual({schema: AbstractTransaction.schema})
+                callback({params: true})
+                scheduleTransactionMock = ScheduleTransaction.mock.instances[0]
+                break
             case '/challenge':
                 expect(schemaObj).toEqual({schema: AbstractTransaction.schema})
+                callback({params: true})
+                challengeTransactionMock = ChallengeTransaction.mock.instances[0]
                 break
             case '/whitelist':
                 expect(schemaObj).toEqual({schema: AbstractWhitelistAction.schema})
+                callback({params: true})
+                addItemActionMock = AddItemAction.mock.instances[0]
                 break
         }
-
-        callback({params: true})
     })
 
     fastifyMock.delete = jest.fn((path, schemaObj, callback) => {
@@ -95,6 +121,8 @@ describe('BootstrapTest', () => {
         expect(schemaObj).toEqual({schema: AbstractWhitelistAction.schema})
 
         callback({params: true})
+
+        deleteItemActionMock = DeleteItemAction.mock.instances[0]
     })
     
     fastifyMock.get = jest.fn((path, schemaObj, callback) => {
@@ -103,6 +131,8 @@ describe('BootstrapTest', () => {
         expect(schemaObj).toEqual({schema: AbstractWhitelistAction.schema})
 
         callback({params: true})
+
+        getListActionMock = GetListAction.mock.instances[0]
     })
 
     bootstrap = new Bootstrap(
@@ -155,7 +185,7 @@ describe('BootstrapTest', () => {
      *  Expectations for all added routes 
      ************************************/
     expect(ExecuteTransaction).toHaveBeenNthCalledWith(1, config.ethereum, providerMock, true)
-    expect(executeTranscationMock.execute).toHaveBeenCalledTimes(1)
+    expect(executeTransactionMock.execute).toHaveBeenCalledTimes(1)
 
     expect(ScheduleTransaction).toHaveBeenNthCalledWith(1, config.ethereum, providerMock, true)
     expect(scheduleTransactionMock.execute).toHaveBeenCalledTimes(1)
@@ -170,7 +200,7 @@ describe('BootstrapTest', () => {
     expect(deleteItemActionMock.execute).toHaveBeenCalledTimes(1)
 
     expect(GetListAction).toHaveBeenNthCalledWith(1, whitelistMock, true)
-    expect(getListItemAction.execute).toHaveBeenCalledTimes(1)
+    expect(getListActionMock.execute).toHaveBeenCalledTimes(1)
 
     expect(fastifyMock.post).toHaveBeenCalledTimes(4)
     expect(fastifyMock.delete).toHaveBeenCalledTimes(1)
