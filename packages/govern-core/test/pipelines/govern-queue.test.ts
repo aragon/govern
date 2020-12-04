@@ -1,10 +1,7 @@
-import { ethers } from '@nomiclabs/buidler'
+import { ethers } from 'hardhat'
 import { expect } from 'chai'
 import { Signer } from 'ethers'
-import {
-  GovernQueue,
-  GovernQueue__factory as GovernQueueFactory,
-} from '../../typechain'
+import { GovernQueue, GovernQueue__factory } from '../../typechain'
 
 const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
 
@@ -37,7 +34,7 @@ describe('Govern Queue', function () {
 
     const GQ = (await ethers.getContractFactory(
       'GovernQueue'
-    )) as GovernQueueFactory
+    )) as GovernQueue__factory
     gq = (await GQ.deploy(ownerAddr, INIT_CONFIG)) as GovernQueue
   })
 

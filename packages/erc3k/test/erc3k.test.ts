@@ -1,16 +1,13 @@
-import { ethers } from '@nomiclabs/buidler'
-import {
-  Erc3000Mock,
-  Erc3000Mock__factory as Erc3000MockFactory,
-} from '../typechain'
+import { ethers } from 'hardhat'
+import { ERC3000Mock, ERC3000Mock__factory } from '../typechain'
 
 describe('ERC3000', function () {
-  let erc3k: Erc3000Mock
+  let erc3k: ERC3000Mock
 
   beforeEach(async () => {
     const ERC3000 = (await ethers.getContractFactory(
       'ERC3000Mock'
-    )) as Erc3000MockFactory
+    )) as ERC3000Mock__factory
     erc3k = await ERC3000.deploy()
   })
 })

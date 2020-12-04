@@ -1,7 +1,10 @@
 import { expect } from 'chai'
 import { ethers } from 'hardhat'
 import { Signer } from 'ethers'
-import { Acl, Acl__factory as AclFactory } from '../typechain'
+import {
+  ACL,
+  ACL__factory
+} from '../typechain'
 
 const ERRORS = {
   AUTH: 'acl: auth',
@@ -24,8 +27,8 @@ describe('ACL', function () {
   let signers: Signer[]
   let root: string
   let notRoot: string
-  let acl: Acl
-  let aclNotRoot: Acl
+  let acl: ACL
+  let aclNotRoot: ACL
 
   before(async () => {
     signers = await ethers.getSigners()
@@ -34,15 +37,14 @@ describe('ACL', function () {
   })
 
   beforeEach(async () => {
-    const ACL = (await ethers.getContractFactory('ACL')) as AclFactory
+    const ACL = (await ethers.getContractFactory('ACL')) as ACL__factory
     acl = await ACL.deploy(root)
     aclNotRoot = await acl.connect(signers[1])
   })
 
-  const grant = (inst: Acl, role = ROLE, who = notRoot) => inst.grant(role, who)
-  const revoke = (inst: Acl, role = ROLE, who = notRoot) =>
-    inst.revoke(role, who)
-  const freeze = (inst: Acl, role = ROLE) => inst.freeze(role)
+  const grant = (inst: ACL, role = ROLE, who = notRoot) => inst.grant(role, who)
+  const revoke = (inst: ACL, role = ROLE, who = notRoot) => inst.revoke(role, who)
+  const freeze = (inst: ACL, role = ROLE) => inst.freeze(role)
 
   const assertRole = async (
     shouldHaveRole = true,
@@ -147,5 +149,72 @@ describe('ACL', function () {
     await expect(grant(acl, ROLE, FREEZE_ADDR)).to.be.revertedWith(
       ERRORS.BAD_FREEZE
     )
+  })
+
+  context('ACL.bulk', () => {
+    it('Grant', async () => {
+      await expect(acl.bulk([
+        {
+          op: 0,
+          role: ROLE,
+          who: notRoot
+        }
+      ])).to.emit(acl, EVENTS.GRANTED)
+
+      await assertRole(true, ROLE, notRoot)
+    })
+
+    it('Revoke', async () => {
+      await expect(acl.bulk([
+        {
+          op: 1,
+          role: ROLE,
+          who: notRoot
+        }
+      ])).to.emit(acl, EVENTS.REVOKED)
+
+      await assertRole(false, ROLE, notRoot)
+    })
+
+    it('Freeze', async () => {
+      await expect(acl.bulk([
+        {
+          op: 2,
+          role: ROLE,
+          who: '0x0000000000000000000000000000000000000000'
+        }
+      ])).to.emit(acl, EVENTS.FROZEN)
+
+      expect(await acl.roles(ROLE, FREEZE_ADDR))
+        .to.equal(FREEZE_ADDR)
+    })
+
+    it("Grant, revoke, and freeze", async () => {
+      await expect(acl.bulk([
+        {
+          op: 0,
+          role: ROLE,
+          who: notRoot
+        },
+        {
+          op: 1,
+          role: ROLE,
+          who: notRoot
+        },
+        {
+          op: 2,
+          role: ROLE,
+          who: '0x0000000000000000000000000000000000000000'
+        }
+      ]))
+        .to.emit(acl, EVENTS.GRANTED)
+        .to.emit(acl, EVENTS.REVOKED)
+        .to.emit(acl, EVENTS.FROZEN)
+
+      await assertRole(false, ROLE, notRoot)
+
+      expect(await acl.roles(ROLE, FREEZE_ADDR))
+        .to.equal(FREEZE_ADDR)
+    })
   })
 })

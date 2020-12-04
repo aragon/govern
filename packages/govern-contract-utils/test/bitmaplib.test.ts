@@ -2,16 +2,14 @@ import { expect } from 'chai'
 import { ethers } from 'hardhat'
 import {
   BitmapLibMock,
-  BitmapLibMock__factory as BitmapLibMockFactory,
+  BitmapLibMock__factory
 } from '../typechain'
 
 describe('Bitmap', function () {
   let lib: BitmapLibMock
 
   beforeEach(async () => {
-    const BitmapLib = (await ethers.getContractFactory(
-      'BitmapLibMock'
-    )) as BitmapLibMockFactory
+    const BitmapLib = (await ethers.getContractFactory('BitmapLibMock')) as BitmapLibMock__factory
     lib = await BitmapLib.deploy()
   })
 
