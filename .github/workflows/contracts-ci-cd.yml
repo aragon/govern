@@ -23,7 +23,6 @@ jobs:
         path: |
           packages/*/cache
           packages/*/artifacts
-          packages/*/typechain
           ~/.cache/buidler-nodejs/
           ~/.cache/hardhat-nodejs/
         key: contracts-${{ hashFiles('packages/*/contracts/**/*.sol') }}

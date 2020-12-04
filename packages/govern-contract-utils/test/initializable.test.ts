@@ -16,23 +16,23 @@ describe('Initializable', function () {
   })
 
   it('ensures an init function can only be called once', async () => {
-    await expect(init.initOne()).to.emit(init, 'Initialized')
-    await expect(init.initOne()).to.be.revertedWith(
-      'initializable: already initialized'
-    )
+    await expect(init.initOne())
+      .to.emit(init, 'Initialized')
+    await expect(init.initOne())
+      .to.be.revertedWith('initializable: already initialized')
   })
 
   it('locks functions based on init key', async () => {
     // Can both be called since they use different keys
-    await expect(init.initOne()).to.emit(init, 'Initialized')
-    await expect(init.initTwo()).to.emit(init, 'Initialized')
+    await expect(init.initOne())
+      .to.emit(init, 'Initialized')
+    await expect(init.initTwo())
+      .to.emit(init, 'Initialized')
 
     // .. but can still only be called once
-    await expect(init.initOne()).to.be.revertedWith(
-      'initializable: already initialized'
-    )
-    await expect(init.initTwo()).to.be.revertedWith(
-      'initializable: already initialized'
-    )
+    await expect(init.initOne())
+      .to.be.revertedWith('initializable: already initialized')
+    await expect(init.initTwo())
+      .to.be.revertedWith('initializable: already initialized')
   })
 })

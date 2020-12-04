@@ -9,13 +9,13 @@ import {
 const ERRORS = {
   AUTH: 'acl: auth',
   FROZEN: 'acl: frozen',
-  BAD_FREEZE: 'acl: bad freeze',
+  BAD_FREEZE: 'acl: bad freeze'
 }
 
 const EVENTS = {
   GRANTED: 'Granted',
   REVOKED: 'Revoked',
-  FROZEN: 'Frozen',
+  FROZEN: 'Frozen'
 }
 
 const ROLE = '0xabcdabcd'
@@ -46,14 +46,8 @@ describe('ACL', function () {
   const revoke = (inst: ACL, role = ROLE, who = notRoot) => inst.revoke(role, who)
   const freeze = (inst: ACL, role = ROLE) => inst.freeze(role)
 
-  const assertRole = async (
-    shouldHaveRole = true,
-    role = ROLE,
-    who = notRoot
-  ) =>
-    expect(await acl.roles(role, who)).to.equal(
-      shouldHaveRole ? ALLOW_ROLE : NO_ROLE
-    )
+  const assertRole = async (shouldHaveRole = true, role = ROLE, who = notRoot) =>
+    expect(await acl.roles(role, who)).to.equal(shouldHaveRole ? ALLOW_ROLE : NO_ROLE)
 
   context('granting', async () => {
     beforeEach('root grants', async () => {
@@ -89,15 +83,15 @@ describe('ACL', function () {
       it('role is granted to freeze addr', async () => {
         expect(await acl.roles(ROLE, FREEZE_ADDR)).to.equal(FREEZE_ADDR)
       })
-
+  
       it('cannot grant', async () => {
         await expect(grant(acl)).to.be.revertedWith(ERRORS.FROZEN)
       })
-
+  
       it('cannot revoke', async () => {
         await expect(revoke(acl)).to.be.revertedWith(ERRORS.FROZEN)
       })
-
+  
       it('cannot freeze', async () => {
         await expect(freeze(acl)).to.be.revertedWith(ERRORS.FROZEN)
       })
@@ -135,20 +129,18 @@ describe('ACL', function () {
     it('non-root cannot grant', async () => {
       await expect(grant(aclNotRoot)).to.be.revertedWith(ERRORS.AUTH)
     })
-
+  
     it('non-root cannot revoke', async () => {
       await expect(revoke(aclNotRoot)).to.be.revertedWith(ERRORS.AUTH)
     })
-
+  
     it('non-root cannot freeze', async () => {
       await expect(freeze(aclNotRoot)).to.be.revertedWith(ERRORS.AUTH)
     })
   })
 
   it('root cannot freeze by granting', async () => {
-    await expect(grant(acl, ROLE, FREEZE_ADDR)).to.be.revertedWith(
-      ERRORS.BAD_FREEZE
-    )
+    await expect(grant(acl, ROLE, FREEZE_ADDR)).to.be.revertedWith(ERRORS.BAD_FREEZE)
   })
 
   context('ACL.bulk', () => {
