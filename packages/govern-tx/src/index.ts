@@ -19,10 +19,6 @@ new Bootstrap(
                 database: 'govern',
                 port: 4000
             },
-            auth: {
-                secret: 'secret',
-                cookieName: 'govern_cookie'
-            },
             server: {
                 host: '0.0.0.0',
                 port: 4040

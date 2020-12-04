@@ -1,5 +1,3 @@
-import { JWTOptions } from '../auth/Authenticator';
-
 export interface EthereumOptions {
     url: string
     blockConfirmations: number
@@ -17,12 +15,6 @@ export interface DatabaseOptions {
     port: number
 }
 
-export interface AuthOptions {
-    secret: string,
-    cookieName: string
-    jwtOptions?: JWTOptions
-}
-
 export interface ServerOptions {
     host: string,
     port: number,
@@ -32,7 +24,6 @@ export interface ServerOptions {
 export interface Config {
     ethereum: EthereumOptions,
     database: DatabaseOptions,
-    auth: AuthOptions,
     server: ServerOptions
 }
 
@@ -57,15 +48,6 @@ export default class Configuration {
     private _database: DatabaseOptions
 
     /**
-     * The options to configure the Authenticator used by fastify
-     * 
-     * @property {AuthOptions} _auth
-     * 
-     * @private
-     */
-    private _auth: AuthOptions 
-
-    /**
      * The options to configure fastify server
      * 
      * @property {ServerOptions} _server
@@ -84,7 +66,6 @@ export default class Configuration {
     ) {
         this.ethereum = config.ethereum
         this.database = config.database
-        this.auth = config.auth 
         this.server = config.server
     }
 
@@ -141,32 +122,6 @@ export default class Configuration {
     }
 
     /**
-     * Getter for the authentication options
-     * 
-     * @property auth
-     * 
-     * @returns {AuthOptions}
-     * 
-     * @public
-     */
-    public get auth(): AuthOptions {
-        return this._auth;
-    }
-
-    /**
-     * Setter for the authentication options
-     * 
-     * @property auth
-     * 
-     * @returns {void}
-     * 
-     * @public
-     */
-    public set auth(value: AuthOptions) {
-        this._auth = value;
-    }
-
-    /**
      * Getter for the server options
      * 
      * @property server
@@ -205,7 +160,6 @@ export default class Configuration {
         return {
             ethereum: this._ethereum,
             database: this._database,
-            auth: this._auth,
             server: this._server
         }
     }

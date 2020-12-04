@@ -178,8 +178,7 @@ export default class Bootstrap {
         this.server = fastify({
             logger: {
                 level: this.config.server.logLevel ?? 'debug'
-            },
-            ignoreTrailingSlash: true
+            }
         })
     }
 
