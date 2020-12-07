@@ -14,7 +14,6 @@ abstract contract ERC165 {
     * @return True if the contract implements the requested interface and if its not 0xffffffff, false otherwise
     */
     function supportsInterface(bytes4 _interfaceId) virtual public view returns (bool) {
-        return _interfaceId == ERC165_INTERFACE_ID
-          || block.timestamp == 1; // silence visibility warning needed for overrides
+        return _interfaceId == ERC165_INTERFACE_ID;
     }
 }
