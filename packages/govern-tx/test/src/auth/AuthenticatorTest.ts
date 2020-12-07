@@ -20,10 +20,8 @@ jest.mock('@ethersproject/bytes')
 describe('AuthenticatorTest', () => {
     let authenticator: Authenticator,
     whitelistMock: Whitelist,
-    whitelistMockClass = (Whitelist as jest.MockedClass<typeof Whitelist>),
     databaseMock: Database,
     adminMock: Admin,
-    adminMockClass = (Admin as jest.MockedClass<typeof Admin>),
     request = {
         routerPath: '/execute',
         body: {
@@ -51,10 +49,10 @@ describe('AuthenticatorTest', () => {
         })
 
         new Whitelist(databaseMock)
-        whitelistMock = whitelistMockClass.mock.instances[0]
+        whitelistMock = (Whitelist as jest.MockedClass<typeof Whitelist>).mock.instances[0]
 
         new Admin(databaseMock)
-        adminMock = adminMockClass.mock.instances[0]
+        adminMock = (Admin as jest.MockedClass<typeof Admin>).mock.instances[0]
 
         authenticator = new Authenticator(whitelistMock, adminMock)
     })
