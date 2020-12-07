@@ -28,8 +28,8 @@ export function addressesEqual(first, second) {
 export function getNetworkName(chainId) {
   chainId = String(chainId)
 
-  if (chainId === '1') return 'mainnet'
-  if (chainId === '4') return 'rinkeby'
+  if (chainId === '1') return 'Mainnet'
+  if (chainId === '4') return 'Rinkeby'
   if (chainId === '100') return 'xDai'
 
   return 'Unknown'

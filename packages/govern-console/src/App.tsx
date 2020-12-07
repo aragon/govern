@@ -1,15 +1,13 @@
 import React, { useEffect } from 'react'
-import { Redirect, Route, Switch, useLocation } from 'react-router-dom'
+import { Route, Switch, useLocation } from 'react-router-dom'
 import 'styled-components/macro'
+import TopHeader from './components/Header/Header'
 import SelectDao from './pages/SelectDao'
 import ViewDao from './pages/ViewDao'
-import TopHeader from './components/Header/Header'
-import { useChainId } from './Providers/ChainId'
-import { getNetworkName } from './lib/web3-utils'
+import ErcTool from './apps/Erc'
 
 function App() {
   const location: any = useLocation()
-  const { chainId } = useChainId()
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -26,12 +24,12 @@ function App() {
       <TopHeader />
       <Switch>
         <Route exact path="/">
-          <Redirect to={`/${getNetworkName(chainId)}`} />
-        </Route>
-        <Route exact path="/:network">
           <SelectDao />
         </Route>
-        <Route path="/:network/:daoAddress">
+        <Route exact path="/tools/erc">
+          <ErcTool />
+        </Route>
+        <Route path="/:daoAddress">
           <ViewDao />
         </Route>
       </Switch>

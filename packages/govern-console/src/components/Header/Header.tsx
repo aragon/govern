@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
 import { ChainUnsupportedError } from 'use-wallet'
 import 'styled-components/macro'
 import Button from '../Button'
@@ -11,21 +10,14 @@ import AragonSvg from '../../assets/aragon-metal.svg'
 function Header() {
   const { chainId, setChainId } = useChainId()
   const { wallet } = useWallet()
-  const history = useHistory()
 
   const handleWalletConnection = useCallback(() => {
     wallet.status === 'connected' ? wallet.reset() : wallet.connect('injected')
   }, [wallet])
 
-  const handleChangeChain = useCallback(
-    e => {
-      setChainId(e.target.value)
-      // When we change the chain ID, the DAO might not exist,
-      // so we must revert back to the DAO selection screen.
-      history.push(`/${getNetworkName(e.target.value)}`)
-    },
-    [setChainId],
-  )
+  const handleChangeChain = useCallback(e => setChainId(e.target.value), [
+    setChainId,
+  ])
 
   useEffect(() => {
     if (wallet!.error && wallet!.error instanceof ChainUnsupportedError) {
@@ -36,8 +28,6 @@ function Header() {
       )
     }
   }, [chainId, wallet])
-
-  const handleGoToHome = useCallback(() => history.push('/'), [history])
 
   return (
     <header
@@ -57,23 +47,7 @@ function Header() {
           align-items: center;
         `}
       >
-        <button
-          type="button"
-          onClick={handleGoToHome}
-          css={`
-            background: transparent;
-            border: 0px;
-            &:hover {
-              cursor: pointer;
-            }
-            &:active {
-              position: relative;
-              top: 1px;
-            }
-          `}
-        >
-          <img src={AragonSvg} width="36" alt="Grey Eagle Aragon logo" />
-        </button>
+        <img src={AragonSvg} width="36" alt="Grey Eagle Aragon logo" />
         <h1
           css={`
             flex-grow: 1;
