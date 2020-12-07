@@ -6,6 +6,7 @@ pragma solidity ^0.6.8;
 
 import "erc3k/contracts/ERC3000Data.sol";
 
+import "../erc20/ERC20.sol";
 import "../erc20/SafeERC20.sol";
 
 library DepositLib {
