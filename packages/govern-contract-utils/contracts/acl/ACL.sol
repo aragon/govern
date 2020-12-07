@@ -57,10 +57,6 @@ contract ACL is Initializable {
 
     constructor(address _initialRoot) public initACL(_initialRoot) { }
 
-    function _initializeACL(address _initialRoot) internal onlyInit("acl") {
-        _grant(ROOT_ROLE, _initialRoot);
-    }
-
     function grant(bytes4 _role, address _who) external auth(ROOT_ROLE) {
         _grant(_role, _who);
     }
@@ -103,6 +99,14 @@ contract ACL is Initializable {
         return false;
     }
 
+    function isFrozen(bytes4 _role) public view returns (bool) {
+        return roles[_role][FREEZE_FLAG] == FREEZE_FLAG;
+    }
+
+    function _initializeACL(address _initialRoot) internal onlyInit("acl") {
+        _grant(ROOT_ROLE, _initialRoot);
+    }
+
     function _grant(bytes4 _role, address _who) internal {
         _grantWithOracle(_role, _who, IACLOracle(ALLOW_FLAG));
     }
@@ -128,9 +132,5 @@ contract ACL is Initializable {
         roles[_role][FREEZE_FLAG] = FREEZE_FLAG;
 
         emit Frozen(_role, msg.sender);
-    }
-
-    function isFrozen(bytes4 _role) public view returns (bool) {
-        return roles[_role][FREEZE_FLAG] == FREEZE_FLAG;
     }
 }
