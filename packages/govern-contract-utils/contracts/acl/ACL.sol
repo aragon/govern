@@ -2,7 +2,7 @@
  * SPDX-License-Identifier:    MIT
  */
 
-pragma solidity 0.6.8;
+pragma solidity ^0.6.8;
 pragma experimental ABIEncoderV2;
 
 import "../initializable/Initializable.sol";

@@ -2,7 +2,7 @@
  * SPDX-License-Identifier:    GPL-3.0
  */
 
-pragma solidity 0.6.8; // TODO: reconsider compiler version before production release
+pragma solidity 0.6.8;
 pragma experimental ABIEncoderV2; // required for passing structs in calldata (fairly secure at this point)
 
 import "erc3k/contracts/IERC3000.sol";

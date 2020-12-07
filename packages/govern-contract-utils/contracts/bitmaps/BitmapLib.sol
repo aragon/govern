@@ -2,7 +2,7 @@
  * SPDX-License-Identifier:    MIT
  */
 
-pragma solidity 0.6.8;
+pragma solidity ^0.6.8;
 
 library BitmapLib {
     bytes32 constant internal empty = bytes32(0);
