@@ -15,7 +15,7 @@ contract CloneFactoryMock {
     address public cloningContractWithInit;
     address public latestClonedContract;
 
-    bytes public generatedCode;
+    bytes public generatedCreateData;
     string public revertMessage;
 
     constructor() public {
@@ -58,8 +58,8 @@ contract CloneFactoryMock {
         );
     }
 
-    function generateCode() public {
-        generatedCode = cloningContract.generateCode();
+    function generateCreateData() public {
+        generatedCreateData = cloningContract.generateCreateData();
     }
 
     function getRevertMessage(bytes memory _data) public {

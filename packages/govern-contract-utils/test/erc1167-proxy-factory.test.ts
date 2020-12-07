@@ -85,11 +85,12 @@ describe('ERC1167ProxyFactory', () => {
   })
 
   context('Helper methods', () => {
-    it.skip('calls "generateCode" as expected', async () => {
-      await factory.generateCode()
+    it('calls "generateCreateData" as expected', async () => {
+      const cloningContract = (await factory.cloningContract()).substring(2).toLowerCase()
+      await factory.generateCreateData()
 
-      expect(await factory.generatedCode())
-        .to.equal('0x3d602d80600a3d3981f3363d3d373d3d3d363d739467a509da43cb50eb332187602534991be1fea45af43d82803e903d91602b57fd5bf3')
+      expect(await factory.generatedCreateData())
+        .to.equal(`0x3d602d80600a3d3981f3363d3d373d3d3d363d73${cloningContract}5af43d82803e903d91602b57fd5bf3`)
     })
 
     it('calls "_getRevertMsg" with a revert message', async () => {
