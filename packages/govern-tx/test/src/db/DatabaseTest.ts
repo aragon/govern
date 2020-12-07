@@ -1,4 +1,3 @@
-import postgres = require('postgres');
 import Database from '../../../src/db/Database';
 
 const config = {
@@ -10,8 +9,6 @@ const config = {
 }    
 
 // Mocks
-const postgressMockFunc = jest.fn()
-
 jest.mock('postgres', () => {
     return (options: any) => {
         expect(options).toEqual({
@@ -22,7 +19,7 @@ jest.mock('postgres', () => {
             password: 'password'
         })
 
-        return postgressMockFunc
+        return jest.fn(() => Promise.resolve('EXECUTED'))
     }
 })
 
@@ -36,15 +33,7 @@ describe('DatabaseTest', () => {
         database = new Database(config)
     })
 
-    it('calls the constructor and establishes the connection as expected', () => {
-        //@ts-ignore
-        expect(database.sql).toEqual(postgressMockFunc)
-    })
-
-    it('calls query and calls the postgres sql function as expected', () => {
-        database.query('ASDF')
-
-        //@ts-ignore
-        expect(database.sql).toHaveBeenNthCalledWith(1, 'ASDF')
+    it('calls query and calls the postgres sql function as expected', async () => {
+        expect(await database.query('ASDF')).toEqual('EXECUTED')
     })
 })
