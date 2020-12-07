@@ -49,14 +49,14 @@ const GlobalStyle = createGlobalStyle`
 
 render(
   <ReactQueryCacheProvider queryCache={queryCache}>
-    <GeneralProvider>
-      <React.StrictMode>
-        <GlobalStyle />
-        <HashRouter>
+    <HashRouter>
+      <GeneralProvider>
+        <React.StrictMode>
+          <GlobalStyle />
           <App />
-        </HashRouter>
-      </React.StrictMode>
-    </GeneralProvider>
+        </React.StrictMode>
+      </GeneralProvider>
+    </HashRouter>
   </ReactQueryCacheProvider>,
   document.getElementById('root'),
 )
