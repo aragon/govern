@@ -15,7 +15,7 @@ contract AdaptativeERC165 is ERC165 {
     bytes32 internal constant UNREGISTERED_CALLBACK = bytes32(0);
 
     event RegisteredStandard(bytes4 interfaceId);
-    event RegisteredCallback(bytes4 sig, bytes4 magicNumber);
+    event RegisteredCallback(bytes4 sig, bytes32 magicNumber);
     event ReceivedCallback(bytes4 indexed sig, bytes data);
 
     function supportsInterface(bytes4 _interfaceId) override virtual public view returns (bool) {
@@ -35,7 +35,7 @@ contract AdaptativeERC165 is ERC165 {
         }
     }
 
-    function _registerStandardAndCallback(bytes4 _interfaceId, bytes4 _callbackSig, bytes4 _magicNumber) internal {
+    function _registerStandardAndCallback(bytes4 _interfaceId, bytes4 _callbackSig, bytes32 _magicNumber) internal {
         _registerStandard(_interfaceId);
         _registerCallback(_callbackSig, _magicNumber);
     }
@@ -47,7 +47,7 @@ contract AdaptativeERC165 is ERC165 {
         emit RegisteredStandard(_interfaceId);
     }
 
-    function _registerCallback(bytes4 _callbackSig, bytes4 _magicNumber) internal {
+    function _registerCallback(bytes4 _callbackSig, bytes32 _magicNumber) internal {
         callbackMagicNumbers[_callbackSig] = _magicNumber;
 
         emit RegisteredCallback(_callbackSig, _magicNumber);

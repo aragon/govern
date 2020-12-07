@@ -59,7 +59,7 @@ contract Govern is AdaptativeERC165, IERC3000Executor, ACL {
         return (failureMap, execResults);
     }
 
-    function registerStandardAndCallback(bytes4 _interfaceId, bytes4 _callbackSig, bytes4 _magicNumber) external auth(REGISTER_ROLE) {
+    function registerStandardAndCallback(bytes4 _interfaceId, bytes4 _callbackSig, bytes32 _magicNumber) external auth(REGISTER_ROLE) {
         _registerStandardAndCallback(_interfaceId, _callbackSig, _magicNumber);
     }
 
