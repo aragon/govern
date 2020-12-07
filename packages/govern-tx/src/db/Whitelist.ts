@@ -85,6 +85,6 @@ export default class Whitelist {
      * @public
      */
     public async deleteItem(publicKey: string): Promise<boolean> {
-        return (await this.db.query(`DELETE FROM whitelist WHERE PublicKey='${publicKey}'`)) > 0;
+        return (await this.db.query(`DELETE FROM whitelist WHERE PublicKey='${publicKey}'`)).length > 0;
     }
 }
