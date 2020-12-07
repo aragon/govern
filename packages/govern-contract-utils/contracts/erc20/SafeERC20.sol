@@ -47,9 +47,6 @@ abstract contract ERC20 {
 library SafeERC20 {
     using AddressUtils for address;
 
-    string private constant ERROR_TOKEN_BALANCE_REVERTED = "SAFE_ERC_20_BALANCE_REVERTED";
-    string private constant ERROR_TOKEN_ALLOWANCE_REVERTED = "SAFE_ERC_20_ALLOWANCE_REVERTED";
-
     function invokeAndCheckSuccess(address _addr, bytes memory _calldata)
         private
         returns (bool ret)
