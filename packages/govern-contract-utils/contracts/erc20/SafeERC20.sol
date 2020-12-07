@@ -62,7 +62,7 @@ library SafeERC20 {
             let ptr := mload(0x40)    // free memory pointer
 
             let success := call(
-                gas(),                // forward all 
+                gas(),                // forward all
                 _addr,                // address
                 0,                    // no value
                 add(_calldata, 0x20), // calldata start

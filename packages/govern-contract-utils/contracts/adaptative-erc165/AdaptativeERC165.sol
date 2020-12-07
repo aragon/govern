@@ -43,13 +43,11 @@ contract AdaptativeERC165 is ERC165 {
     function _registerStandard(bytes4 _interfaceId) internal {
         // use a random magic number for standards without number
         standardSupported[_interfaceId] = true;
-
         emit RegisteredStandard(_interfaceId);
     }
 
     function _registerCallback(bytes4 _callbackSig, bytes4 _magicNumber) internal {
         callbackMagicNumbers[_callbackSig] = _magicNumber;
-
         emit RegisteredCallback(_callbackSig, _magicNumber);
     }
 }

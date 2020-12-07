@@ -85,7 +85,7 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
         override
         auth(this.schedule.selector) // note that all functions in this contract are ACL protected (commonly some of them will be open for any addr to perform)
         returns (bytes32 containerHash)
-    {   
+    {
         // prevent griefing by front-running (the same container is sent by two different people and one must be challenged)
         require(_container.payload.nonce == ++nonce, "queue: bad nonce");
         // hash using ERC3000Data.hash(ERC3000Data.Config)
@@ -105,7 +105,7 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
         // we don't need to save any more state about the container in storage
         // we just authenticate the hash and assign it a state, since all future
         // actions regarding the container will need to provide it as a witness
-        // all witnesses are logged from this contract at least once, so the 
+        // all witnesses are logged from this contract at least once, so the
         // trust assumption should be the same as storing all on-chain (move complexity to clients)
 
         ERC3000Data.Collateral memory collateral = _container.config.scheduleDeposit;
@@ -188,7 +188,7 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
         if (queue[containerHash].state == GovernQueueStateLib.State.Challenged) {
             // will re-enter in `rule`, `rule` will perform state transition depending on ruling
             IArbitrator(_container.config.resolver).executeRuling(_disputeId);
-        } // else continue, as we must 
+        } // else continue, as we must
 
         GovernQueueStateLib.State state = queue[containerHash].state;
 

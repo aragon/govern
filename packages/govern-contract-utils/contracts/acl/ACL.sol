@@ -107,7 +107,7 @@ contract ACL is Initializable {
     function _grantWithOracle(bytes4 _role, address _who, IACLOracle _oracle) internal {
         require(!isFrozen(_role), "acl: frozen");
         require(_who != FREEZE_FLAG, "acl: bad freeze");
-        
+
         roles[_role][_who] = address(_oracle);
         emit Granted(_role, msg.sender, _who, _oracle);
     }
