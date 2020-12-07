@@ -1,4 +1,4 @@
-const postgres = require('postgres')
+import postgres = require('postgres');
 import { DatabaseOptions } from '../config/Configuration'
 
 export default class Database {
