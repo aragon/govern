@@ -55,7 +55,7 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
     mapping (bytes32 => GovernQueueStateLib.Item) public queue; // container hash -> execution state
 
     // Temporary state
-    mapping (bytes32 => address) public challengerCache; // container hash -> challenger addr (used after challenging and before resolution implementation)
+    mapping (bytes32 => address) public challengerCache; // container hash -> challenger addr (used after challenging and before dispute resolution)
     mapping (IArbitrator => mapping (uint256 => bytes32)) public disputeItemCache; // arbitrator addr -> dispute id -> container hash (used between dispute creation and ruling)
 
     /**
@@ -239,7 +239,7 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
         _container.config.scheduleDeposit.releaseTo(_container.payload.submitter);
         _container.config.challengeDeposit.releaseTo(_container.payload.submitter);
 
-        challengerCache[containerHash] = address(0); // release state, refund gas, no longer needed in state
+        challengerCache[containerHash] = address(0); // release state to refund gas; no longer needed in state
 
         return _execute(_container.payload, containerHash);
     }
@@ -256,7 +256,7 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
         // release all collateral to challenger
         _container.config.scheduleDeposit.releaseTo(challenger);
         _container.config.challengeDeposit.releaseTo(challenger);
-        challengerCache[containerHash] = address(0); // release state, refund gas, no longer needed in state
+        challengerCache[containerHash] = address(0); // release state to refund gas; no longer needed in state
     }
 
     // Arbitrable
@@ -269,7 +269,7 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
             GovernQueueStateLib.State.Challenged,
             _ruling == ALLOW_RULING ? GovernQueueStateLib.State.Approved : GovernQueueStateLib.State.Rejected
         );
-        disputeItemCache[arbitrator][_disputeId] = bytes32(0); // refund gas, no longer needed in state
+        disputeItemCache[arbitrator][_disputeId] = bytes32(0); // release state to refund gas; no longer needed in state
 
         emit Ruled(arbitrator, _disputeId, _ruling);
     }

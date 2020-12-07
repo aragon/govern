@@ -27,12 +27,15 @@ contract ACL is Initializable {
         ^ this.bulk.selector
     ;
 
-    address internal constant FREEZE_FLAG = address(1);
+    // "Who" constants
     address internal constant ANY_ADDR = address(-1);
 
+    // "Access" flags
     address internal constant UNSET_ROLE = address(0);
+    address internal constant FREEZE_FLAG = address(1); // Also used as "who"
     address internal constant ALLOW_FLAG = address(2);
-    
+
+    // Role -> Who -> Access flag (unset or allow) or ACLOracle (any other address denominates auth via ACLOracle)
     mapping (bytes4 => mapping (address => address)) public roles;
 
     event Granted(bytes4 indexed role, address indexed actor, address indexed who, IACLOracle oracle);

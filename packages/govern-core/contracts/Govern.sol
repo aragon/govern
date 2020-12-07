@@ -45,7 +45,7 @@ contract Govern is AdaptativeERC165, IERC3000Executor, ACL {
         bytes[] memory execResults = new bytes[](actions.length);
         bytes32 failureMap = BitmapLib.empty; // start with an empty bitmap
 
-        for (uint256 i = 0; i < actions.length; i++) { // can use uint8 given the action limit
+        for (uint256 i = 0; i < actions.length; i++) {
             // TODO: optimize with assembly
             (bool ok, bytes memory ret) = actions[i].to.call{value: actions[i].value}(actions[i].data);
             require(ok || allowFailuresMap.get(uint8(i)), "govern: call");
