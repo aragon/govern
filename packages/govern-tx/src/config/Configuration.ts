@@ -1,3 +1,6 @@
+/* istanbul ignore file */
+// Ignore added because VOs doesn't have to be tested especially if they do not have any logic
+
 export interface EthereumOptions {
     url: string
     blockConfirmations: number
@@ -27,7 +30,6 @@ export interface Config {
     server: ServerOptions
 }
 
-// TODO: Add input validations for Ethereum addresses
 export default class Configuration {
     /**
      * The options to connect to a Ethereum node and how TXs should be handled 
