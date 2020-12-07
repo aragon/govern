@@ -71,6 +71,8 @@ describe('AuthenticatorTest', () => {
         expect(verifyMessage).toHaveBeenNthCalledWith(1, new Uint8Array(0x00), request.body.signature)
 
         expect(arrayify).toHaveBeenNthCalledWith(1, request.body.message)
+
+        expect(whitelistMock.keyExists).toHaveBeenCalled()
     })
 
     it('calls authenticate as normal user and restricts access to the whitelist', async () => {
@@ -88,7 +90,7 @@ describe('AuthenticatorTest', () => {
 
         expect(arrayify).toHaveBeenNthCalledWith(1, request.body.message)
 
-        expect(adminMock.isAdmin).toHaveBeenNthCalledWith(1, '0x00')
+        expect(adminMock.isAdmin).toHaveBeenCalled()
     })
 
     it('calls authencticate as admin user and grants access to the transaction actions', async () => {
@@ -111,6 +113,10 @@ describe('AuthenticatorTest', () => {
         expect(verifyMessage).toHaveBeenNthCalledWith(1, new Uint8Array(0x00), request.body.signature)
 
         expect(arrayify).toHaveBeenNthCalledWith(1, request.body.message)
+
+        expect(adminMock.isAdmin).toHaveBeenCalled()
+
+        expect(whitelistMock.keyExists).toHaveBeenCalled()
     })
 
     it('calls authenticate as admin user and grants access to the whitelist actions', async () => {
@@ -127,5 +133,7 @@ describe('AuthenticatorTest', () => {
         expect(verifyMessage).toHaveBeenNthCalledWith(1, new Uint8Array(0x00), request.body.signature)
 
         expect(arrayify).toHaveBeenNthCalledWith(1, request.body.message)
+
+        expect(adminMock.isAdmin).toHaveBeenCalled()
     })
 })
