@@ -1,4 +1,4 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
+import { FastifyRequest } from 'fastify';
 import { verifyMessage } from '@ethersproject/wallet';
 import { arrayify } from '@ethersproject/bytes'
 import { Unauthorized, HttpError } from 'http-errors'
@@ -33,7 +33,7 @@ export default class Authenticator {
      * 
      * @public
      */
-    public async authenticate(request: FastifyRequest, reply: FastifyReply): Promise<undefined> {
+    public async authenticate(request: FastifyRequest): Promise<undefined> {
         if (
             await this.hasPermission(
                 request.routerPath,
