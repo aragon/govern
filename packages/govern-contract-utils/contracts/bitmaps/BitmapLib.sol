@@ -12,6 +12,6 @@ library BitmapLib {
     }
 
     function get(bytes32 map, uint8 index) internal pure returns (bool) {
-        return bool(uint256(map) >> index & 1 == 1);
+        return (uint256(map) >> index & 1) == 1;
     }
 }
