@@ -74,7 +74,7 @@ contract ACL is Initializable {
         _freeze(_role);
     }
 
-    function bulk(ACLData.BulkItem[] memory items) public auth(ROOT_ROLE) {
+    function bulk(ACLData.BulkItem[] calldata items) external auth(ROOT_ROLE) {
         for (uint256 i = 0; i < items.length; i++) {
             ACLData.BulkItem memory item = items[i];
 
@@ -84,20 +84,9 @@ contract ACL is Initializable {
         }
     }
 
-    function willPerform(bytes4 _role, address _sender, bytes memory _data) public returns (bool) {
-        address senderRole = roles[_role][msg.sender];
-        if (senderRole != UNSET_ROLE) {
-            if (senderRole == ALLOW_FLAG) return true;
-            if (IACLOracle(senderRole).willPerform(_role, _sender, _data)) return true;
-        }
-
-        address anyRole = roles[_role][ANY_ADDR];
-        if (anyRole != UNSET_ROLE) {
-            if (anyRole == ALLOW_FLAG) return true;
-            if (IACLOracle(anyRole).willPerform(_role, _sender, _data)) return true;
-        }
-
-        return false;
+    function willPerform(bytes4 _role, address _who, bytes memory _data) public returns (bool) {
+        // First check if the given who is auth'd, then if any address is auth'd
+        return _checkRole(_role, _who, _data) || _checkRole(_role, ANY_ADDR, _data);
     }
 
     function _grant(bytes4 _role, address _who) internal {
@@ -123,8 +112,21 @@ contract ACL is Initializable {
         require(!isFrozen(_role), "acl: frozen");
 
         roles[_role][FREEZE_FLAG] = FREEZE_FLAG;
-
         emit Frozen(_role, msg.sender);
+    }
+
+    function _checkRole(bytes4 _role, address _who, bytes memory _data) internal returns (bool) {
+        address accessFlagOrAclOracle = roles[_role][_who];
+        if (accessFlagOrAclOracle != UNSET_ROLE) {
+            if (accessFlagOrAclOracle == ALLOW_FLAG) return true;
+
+            // Since it's not a flag, assume it's an ACLOracle and try-catch to skip failures
+            try IACLOracle(accessFlagOrAclOracle).willPerform(_role, _who, _data) returns (bool allowed) {
+                if (allowed) return true;
+            } catch { }
+        }
+
+        return false;
     }
 
     function isFrozen(bytes4 _role) public view returns (bool) {
