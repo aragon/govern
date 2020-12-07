@@ -71,7 +71,7 @@ export default class Authenticator {
             return true
         }
 
-        if (routerPath === '/whitelist' && this.admin.isAdmin(publicKey)) {
+        if (routerPath === '/whitelist' && await this.admin.isAdmin(publicKey)) {
             return true
         }
 
