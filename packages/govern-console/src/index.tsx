@@ -13,11 +13,9 @@ const GlobalStyle = createGlobalStyle`
   *, *:before, *:after {
     box-sizing: border-box;
   }
-
   html {
     -webkit-overflow-scrolling: touch;
   }
-
   body {
     height: 0;
     min-height: 100vh;
@@ -25,23 +23,19 @@ const GlobalStyle = createGlobalStyle`
     color: white;
     font-family: 'Roboto Mono', Helvetica, sans-serif;
   }
-
   body, ul, p, h1, h2, h3, h4, h5, h6 {
     margin: 0;
     padding: 0;
   }
-
   button, select, input, textarea, h1, h2, h3, h4, h5, h6 {
     font-size: inherit;
     font-family: inherit;
     font-weight: inherit;
     line-height: inherit;
   }
-
   a, button, select, input, textarea {
     color: inherit;
   }
-
   strong, b {
     font-weight: 600;
   }
@@ -49,14 +43,14 @@ const GlobalStyle = createGlobalStyle`
 
 render(
   <ReactQueryCacheProvider queryCache={queryCache}>
-    <GeneralProvider>
-      <React.StrictMode>
-        <GlobalStyle />
-        <HashRouter>
+    <HashRouter>
+      <GeneralProvider>
+        <React.StrictMode>
+          <GlobalStyle />
           <App />
-        </HashRouter>
-      </React.StrictMode>
-    </GeneralProvider>
+        </React.StrictMode>
+      </GeneralProvider>
+    </HashRouter>
   </ReactQueryCacheProvider>,
   document.getElementById('root'),
 )

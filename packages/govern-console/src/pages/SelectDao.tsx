@@ -1,25 +1,18 @@
 import React, { useCallback, useState } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useHistory, useParams } from 'react-router-dom'
 import 'styled-components/macro'
 import Button from '../components/Button'
 
-const KNOWN_TOOLS = [
-  {
-    name: 'ERC-20 Tool',
-    id: 'erc',
-  },
-]
-
-export default function DaoSelector() {
+export default function SelectDao() {
   const [daoName, setDaoName] = useState('')
   const history = useHistory()
-
+  const { network }: any = useParams()
   const handleChangeDaoAddress = useCallback(e => {
     setDaoName(e.target.value)
   }, [])
   const handleGoToDao = useCallback(() => {
-    history.push(`/${daoName}`)
-  }, [daoName, history])
+    history.push(`/${network}/${daoName}`)
+  }, [daoName, history, network])
 
   return (
     <>
@@ -52,62 +45,6 @@ export default function DaoSelector() {
           Go to DAO
         </Button>
       </form>
-      <div
-        css={`
-          padding: 8px;
-          margin-top: ${4 * 8}px;
-          border: 2px solid rgba(255, 255, 255, 0.2);
-        `}
-      >
-        <h2>Tools</h2>
-        {KNOWN_TOOLS.map(({ name, id }) => (
-          <ToolCard key={id} name={name} id={id} />
-        ))}
-      </div>
     </>
-  )
-}
-
-type ToolCardProps = {
-  name: string
-  id: string
-}
-
-function ToolCard({ name, id }: ToolCardProps) {
-  const history = useHistory()
-
-  const handleCardClick = useCallback(() => {
-    history.push(`/tools/${id}`)
-  }, [history, id])
-
-  return (
-    <button
-      type="button"
-      onClick={handleCardClick}
-      css={`
-        position: relative;
-        background: transparent;
-        width: 280px;
-        height: 320px;
-        border: 2px solid transparent;
-        border-image: linear-gradient(
-          to bottom right,
-          #ad41bb 20%,
-          #ff7d7d 100%
-        );
-        border-image-slice: 1;
-        padding: 16px;
-        cursor: pointer;
-        &:not(:last-child) {
-          margin-right: 24px;
-          margin-bottom: 24px;
-        }
-        &:active {
-          top: 1px;
-        }
-      `}
-    >
-      {name}
-    </button>
   )
 }

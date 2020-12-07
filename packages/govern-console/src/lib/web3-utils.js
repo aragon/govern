@@ -28,8 +28,8 @@ export function addressesEqual(first, second) {
 export function getNetworkName(chainId) {
   chainId = String(chainId)
 
-  if (chainId === '1') return 'Mainnet'
-  if (chainId === '4') return 'Rinkeby'
+  if (chainId === '1') return 'mainnet'
+  if (chainId === '4') return 'rinkeby'
   if (chainId === '100') return 'xDai'
 
   return 'Unknown'
@@ -71,8 +71,8 @@ export const addressPattern = '(0x)?[0-9a-fA-F]{40}'
  * characters on both sides of the ellipsis.
  *
  * Examples:
- *   shortenAddress('0x19731977931271')    // 0x1973‚Ä¶1271
- *   shortenAddress('0x19731977931271', 2) // 0x19‚Ä¶71
+ *   shortenAddress('0x19731977931271')    // 0x1973…1271
+ *   shortenAddress('0x19731977931271', 2) // 0x19…71
  *   shortenAddress('0x197319')            // 0x197319 (already short enough)
  *
  * @param {string} address The address to shorten
