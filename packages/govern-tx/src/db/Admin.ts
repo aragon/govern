@@ -52,7 +52,7 @@ export default class Admin {
      * @public 
      */
     public async deleteAdmin(publicKey: string): Promise<boolean> {
-        return (await this.db.query(`DELETE FROM admins WHERE PublicKey='${publicKey}'`)) > 0
+        return (await this.db.query(`DELETE FROM admins WHERE PublicKey='${publicKey}'`)).length > 0
     }
 
     /**
