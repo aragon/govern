@@ -12,7 +12,7 @@ import "@aragon/govern-contract-utils/contracts/acl/ACL.sol";
 import "@aragon/govern-contract-utils/contracts/adaptative-erc165/AdaptativeERC165.sol";
 import "@aragon/govern-contract-utils/contracts/bitmaps/BitmapLib.sol";
 
-contract Govern is AdaptativeERC165, IERC3000Executor, ACL {
+contract Govern is IERC3000Executor, AdaptativeERC165, ACL {
     using BitmapLib for bytes32;
 
     bytes4 internal constant EXEC_ROLE = this.exec.selector;

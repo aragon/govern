@@ -9,7 +9,7 @@ import "./IERC3000Executor.sol";
 
 import "@aragon/govern-token/contracts/interfaces/IERC20.sol";
 
-abstract contract IERC3000Registry is ERC3000Interface {
+abstract contract IERC3000Registry {
     /**
      * @notice Registers a IERC3000Executor and IERC3000 contract by a name and with his metadata
      * @param executor IERC3000Executor contract

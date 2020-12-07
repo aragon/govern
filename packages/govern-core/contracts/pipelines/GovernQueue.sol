@@ -42,7 +42,7 @@ library GovernQueueStateLib {
     }
 }
 
-contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
+contract GovernQueue is IERC3000, IArbitrable, AdaptativeERC165, ACL {
     // Syntax sugar to enable method-calling syntax on types
     using ERC3000Data for *;
     using DepositLib for ERC3000Data.Collateral;
