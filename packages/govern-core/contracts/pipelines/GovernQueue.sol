@@ -7,11 +7,12 @@ pragma experimental ABIEncoderV2; // required for passing structs in calldata (f
 
 import "erc3k/contracts/IERC3000.sol";
 
-import "@aragon/govern-contract-utils/contracts/protocol/IArbitrable.sol";
-import "@aragon/govern-contract-utils/contracts/deposits/DepositLib.sol";
 import "@aragon/govern-contract-utils/contracts/acl/ACL.sol";
 import "@aragon/govern-contract-utils/contracts/adaptive-erc165/AdaptiveERC165.sol";
+import "@aragon/govern-contract-utils/contracts/deposits/DepositLib.sol";
 import "@aragon/govern-contract-utils/contracts/erc20/SafeERC20.sol";
+import "@aragon/govern-contract-utils/contracts/protocol/IArbitrable.sol";
+import "@aragon/govern-contract-utils/contracts/protocol/IArbitrator.sol";
 
 library GovernQueueStateLib {
     enum State {
@@ -120,7 +121,7 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
     }
 
     /**
-     * @notice Executes an action after its execution delayed has passed and its state hasn't been altered by a challenge or veto
+     * @notice Executes an action after its execution delay has passed and its state hasn't been altered by a challenge or veto
      * @param _container A ERC3000Data.Container struct holding both the payload being scheduled for execution and
      * the current configuration of the system
      */
@@ -128,10 +129,10 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
         public
         override
         auth(this.execute.selector) // in most instances this will be open for any addr, but leaving configurable for flexibility
-        returns (bytes32 failureMap, bytes[] memory execResults)
+        returns (bytes32 failureMap, bytes[] memory)
     {
         // ensure enough time has passed
-        require(uint64(block.timestamp) >= _container.payload.executionTime, "queue: wait more");
+        require(block.timestamp >= _container.payload.executionTime, "queue: wait more");
 
         bytes32 containerHash = _container.hash();
         queue[containerHash].checkAndSetState(
@@ -139,7 +140,7 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
             GovernQueueStateLib.State.Executed
         );
 
-        _container.config.scheduleDeposit.releaseTo(_container.payload.submitter); // release collateral to executor
+        _container.config.scheduleDeposit.releaseTo(_container.payload.submitter); // release collateral to original submitter
 
         return _execute(_container.payload, containerHash);
     }
@@ -167,7 +168,7 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
         require(feeToken.safeTransferFrom(msg.sender, address(this), feeAmount), "queue: bad fee pull");
         require(feeToken.safeApprove(recipient, feeAmount), "queue: bad approve");
         disputeId = arbitrator.createDispute(2, abi.encode(_container)); // create dispute sending full container ABI encoded (could prob just send payload to save gas)
-        require(feeToken.safeApprove(recipient, 0), "queue: bad reset"); // for security with non-compliant tokens (that fail on non-zero to non-zero approvals)
+        require(feeToken.safeApprove(recipient, 0), "queue: bad reset"); // reset just in case non-compliant tokens (that fail on non-zero to non-zero approvals) are used
 
         // submit both arguments as evidence and close evidence period. no more evidence can be submitted and a settlement can't happen (could happen off-protocol)
         arbitrator.submitEvidence(disputeId, _container.payload.submitter, _container.payload.proof);
@@ -185,12 +186,12 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
      * the current configuration of the system
      * @param _disputeId disputeId in the arbitrator in which the dispute over the container was created
      */
-    function resolve(ERC3000Data.Container memory _container, uint256 _disputeId) override public returns (bytes32 failureMap, bytes[] memory execResults) {
+    function resolve(ERC3000Data.Container memory _container, uint256 _disputeId) override public returns (bytes32 failureMap, bytes[] memory) {
         bytes32 containerHash = _container.hash();
         IArbitrator arbitrator = IArbitrator(_container.config.resolver);
 
         require(disputeItemCache[containerHash][arbitrator] == _disputeId, "queue: bad dispute id");
-        delete disputeItemCache[containerHash][arbitrator];
+        delete disputeItemCache[containerHash][arbitrator]; // release state to refund gas; no longer needed in state
 
         (address subject, uint256 ruling) = arbitrator.rule(_disputeId);
         require(subject == address(this), "queue: not subject");
@@ -208,9 +209,9 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
         emit Ruled(arbitrator, _disputeId, ruling);
 
         if (arbitratorApproved) {
-            return executeApproved(_container);
+            return _executeApproved(_container);
         } else {
-            return settleRejection(_container);
+            return _settleRejection(_container);
         }
     }
 
@@ -254,25 +255,25 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
         return _setConfig(_config);
     }
 
-    // Finalization functions
+    // Internal
 
-    function executeApproved(ERC3000Data.Container memory _container) internal returns (bytes32 failureMap, bytes[] memory execResults) {
+    function _executeApproved(ERC3000Data.Container memory _container) internal returns (bytes32 failureMap, bytes[] memory) {
         bytes32 containerHash = _container.hash();
         queue[containerHash].checkAndSetState(
             GovernQueueStateLib.State.Approved,
             GovernQueueStateLib.State.Executed
         );
 
+        delete challengerCache[containerHash]; // release state to refund gas; no longer needed in state
+
         // release all collateral to submitter
         _container.config.scheduleDeposit.releaseTo(_container.payload.submitter);
         _container.config.challengeDeposit.releaseTo(_container.payload.submitter);
 
-        challengerCache[containerHash] = address(0); // release state to refund gas; no longer needed in state
-
         return _execute(_container.payload, containerHash);
     }
 
-    function settleRejection(ERC3000Data.Container memory _container) internal returns (bytes32, bytes[] memory){
+    function _settleRejection(ERC3000Data.Container memory _container) internal returns (bytes32, bytes[] memory) {
         bytes32 containerHash = _container.hash();
         queue[containerHash].checkAndSetState(
             GovernQueueStateLib.State.Rejected,
@@ -280,16 +281,14 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
         );
 
         address challenger = challengerCache[containerHash];
+        delete challengerCache[containerHash]; // release state to refund gas; no longer needed in state
 
         // release all collateral to challenger
         _container.config.scheduleDeposit.releaseTo(challenger);
         _container.config.challengeDeposit.releaseTo(challenger);
-        challengerCache[containerHash] = address(0); // release state to refund gas; no longer needed in state
 
         // return zero values as nothing is executed on rejection
     }
-
-    // Internal
 
     function _execute(ERC3000Data.Payload memory _payload, bytes32 _containerHash) internal returns (bytes32, bytes[] memory) {
         emit Executed(_containerHash, msg.sender);
