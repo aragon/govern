@@ -71,7 +71,6 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
 
     function initialize(address _aclRoot, ERC3000Data.Config memory _initialConfig) public initACL(_aclRoot) onlyInit("queue") {
         _setConfig(_initialConfig);
-        _registerStandard(type(IArbitrable).interfaceId);
         _registerStandard(type(IERC3000).interfaceId);
     }
 

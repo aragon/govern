@@ -7,18 +7,7 @@ pragma experimental ABIEncoderV2;
 
 import "./ERC3000Data.sol";
 
-contract ERC3000Interface {
-    bytes4 internal constant ERC3000_INTERFACE_ID =
-        IERC3000(0).schedule.selector
-        ^ IERC3000(0).execute.selector
-        ^ IERC3000(0).challenge.selector
-        ^ IERC3000(0).resolve.selector
-        ^ IERC3000(0).veto.selector
-        ^ IERC3000(0).configure.selector
-    ;
-}
-
-abstract contract IERC3000 is ERC3000Interface {
+abstract contract IERC3000 {
     /**
      * @notice Schedules an action for execution, allowing for challenges and vetos on a defined time window
      * @param container A Container struct holding both the payload being scheduled for execution and
