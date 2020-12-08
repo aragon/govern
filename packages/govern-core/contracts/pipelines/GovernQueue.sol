@@ -11,8 +11,9 @@ import "@aragon/govern-contract-utils/contracts/acl/ACL.sol";
 import "@aragon/govern-contract-utils/contracts/adaptive-erc165/AdaptiveERC165.sol";
 import "@aragon/govern-contract-utils/contracts/deposits/DepositLib.sol";
 import "@aragon/govern-contract-utils/contracts/erc20/SafeERC20.sol";
-import "@aragon/govern-contract-utils/contracts/protocol/IArbitrable.sol";
-import "@aragon/govern-contract-utils/contracts/protocol/IArbitrator.sol";
+
+import "../protocol/IArbitrable.sol";
+import "../protocol/IArbitrator.sol";
 
 library GovernQueueStateLib {
     enum State {

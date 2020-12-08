@@ -6,7 +6,7 @@
 
 pragma solidity ^0.6.8;
 
-import "../erc20/SafeERC20.sol";
+import "@aragon/govern-contract-utils/contracts/erc20/ERC20.sol";
 
 interface IArbitrator {
     /**
