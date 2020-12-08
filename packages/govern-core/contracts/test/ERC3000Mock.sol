@@ -18,15 +18,11 @@ contract ERC3000Mock is IERC3000, ERC165 {
 
     function resolve(ERC3000Data.Container memory, uint256) override public returns (bytes32, bytes[] memory) { }
 
-    function veto(bytes32, bytes memory) override public { }
+    function veto(ERC3000Data.Container memory, bytes memory) override public { }
 
     function configure(ERC3000Data.Config memory) override public returns (bytes32) { }
 
     function interfaceID() public pure returns (bytes4) {
-        return ERC3000_INTERFACE_ID;
-    }
-
-    function supportsInterface(bytes4 interfaceId) override public view returns (bool) {
-        return interfaceId == ERC3000_INTERFACE_ID;
+        return type(IERC3000).interfaceId;
     }
 }
