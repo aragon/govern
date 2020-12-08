@@ -1,27 +1,17 @@
-import { HardhatUserConfig } from 'hardhat/config'
+import { config as dotenvConfig } from 'dotenv'
+import { resolve } from 'path'
+dotenvConfig({ path: resolve(__dirname, './.env') })
+
+import { HardhatUserConfig } from 'hardhat/types'
 import '@nomiclabs/hardhat-ethers'
 import '@nomiclabs/hardhat-etherscan'
 import '@nomiclabs/hardhat-waffle'
+import 'hardhat-deploy'
 import 'hardhat-typechain'
-import dotenv from 'dotenv'
-import path from 'path'
-import fs from 'fs'
-import { logInfo } from './helpers/logger'
+import 'solidity-coverage'
+import './tasks/govern'
 
-dotenv.config({ path: '../../.env' })
-
-if (!process.env.SKIP_TASKS) {
-  ;['misc', 'deployments', 'sequences'].forEach((folder) => {
-    const tasksPath = path.join(__dirname, 'tasks', folder)
-    fs.readdirSync(tasksPath).forEach((task) => require(`${tasksPath}/${task}`))
-  })
-  logInfo('Loaded tasks')
-}
-
-const HARDFORK = 'istanbul'
-const ETHERSCAN_KEY = process.env.ETHERSCAN_KEY || ''
-const ETH_KEY = process.env.ETH_KEYETH
-const accounts = ETH_KEY ? ETH_KEY.split(',') : []
+import { node_url, accounts } from './utils/network'
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -33,25 +23,33 @@ const config: HardhatUserConfig = {
       },
     },
   },
-  typechain: {
-    target: 'ethers-v5',
+  namedAccounts: {
+    deployer: 0,
   },
   etherscan: {
-    apiKey: ETHERSCAN_KEY,
+    apiKey: process.env.ETHERSCAN_KEY,
   },
   networks: {
-    rinkeby: {
-      url: 'https://rinkeby.eth.aragon.network',
-      accounts,
-    },
     hardhat: {
-      hardfork: HARDFORK,
       throwOnTransactionFailures: true,
       throwOnCallFailures: true,
+      accounts: accounts(),
+    },
+    localhost: {
+      url: 'http://localhost:8545',
+      accounts: accounts(),
     },
     coverage: {
       url: 'http://localhost:8555',
       allowUnlimitedContractSize: true,
+    },
+    mainnet: {
+      url: node_url('mainnet'),
+      accounts: accounts('mainnet'),
+    },
+    rinkeby: {
+      url: 'https://rinkeby.eth.aragon.network',
+      accounts: accounts('rinkeby'),
     },
   },
 }
