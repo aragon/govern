@@ -91,6 +91,7 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
         returns (bytes32 containerHash)
     {
         // prevent griefing by front-running (the same container is sent by two different people and one must be challenged)
+        // and ensure container hashes are unique
         require(_container.payload.nonce == ++nonce, "queue: bad nonce");
         // hash using ERC3000Data.hash(ERC3000Data.Config)
         bytes32 _configHash = _container.config.hash();
