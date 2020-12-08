@@ -1,0 +1,18 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "hardhat deploy",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/hardhat",
+      "args": [
+        "deploy"
+      ],
+      "cwd": "${workspaceFolder}/packages/govern-create/"
+    }
+  ]
+}
