@@ -11,7 +11,7 @@ abstract contract IERC3000 {
     /**
      * @notice Schedules an action for execution, allowing for challenges and vetos on a defined time window
      * @param container A Container struct holding both the payload being scheduled for execution and
-       the current configuration of the system
+     * the current configuration of the system
      * @return containerHash
      */
     function schedule(ERC3000Data.Container memory container) virtual public returns (bytes32 containerHash);
@@ -20,7 +20,7 @@ abstract contract IERC3000 {
     /**
      * @notice Executes an action after its execution delay has passed and its state hasn't been altered by a challenge or veto
      * @param container A ERC3000Data.Container struct holding both the paylaod being scheduled for execution and
-       the current configuration of the system
+     * the current configuration of the system
      * MUST be an ERC3000Executor call: payload.executor.exec(payload.actions)
      * @return failureMap
      * @return execResults
@@ -31,7 +31,7 @@ abstract contract IERC3000 {
     /**
      * @notice Challenge a container in case its scheduling is illegal as per Config.rules. Pulls collateral and dispute fees from sender into contract
      * @param container A ERC3000Data.Container struct holding both the payload being scheduled for execution and
-       the current configuration of the system
+     * the current configuration of the system
      * @param reason Hint for case reviewers as to why the scheduled container is illegal
      * @return resolverId
      */
@@ -41,7 +41,7 @@ abstract contract IERC3000 {
     /**
      * @notice Apply arbitrator's ruling over a challenge once it has come to a final ruling
      * @param container A ERC3000Data.Container struct holding both the payload being scheduled for execution and
-       the current configuration of the system
+     * the current configuration of the system
      * @param resolverId disputeId in the arbitrator in which the dispute over the container was created
      * @return failureMap
      * @return execResults
@@ -52,7 +52,7 @@ abstract contract IERC3000 {
     /**
      * @notice Apply arbitrator's ruling over a challenge once it has come to a final ruling
      * @param container A ERC3000Data.Container struct holding both the payload being scheduled for execution and
-       the current configuration of the system
+     * the current configuration of the system
      * @param reason Justification for the veto
      */
     function veto(ERC3000Data.Container memory container, bytes memory reason) virtual public;
