@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.0",
-    "@nomiclabs/hardhat-etherscan": "^2.0.0",
+    "@nomiclabs/hardhat-etherscan": "^2.1.0",
     "@nomiclabs/hardhat-waffle": "^2.0.0",
     "@typechain/ethers-v5": "^4.0.0",
     "@types/chai": "^4.2.13",
@@ -30,13 +30,13 @@
     "@types/mocha": "^8.0.3",
     "@types/node": "^14.11.8",
     "chai": "^4.2.0",
-    "chalk": "^4.1.0",
     "dotenv": "^8.2.0",
     "ethereum-waffle": "^3.0.0",
     "ethers": "^5.0.0",
-    "hardhat": "^2.0.2",
+    "hardhat": "^2.0.4",
+    "hardhat-deploy": "^0.7.0-beta.37",
     "hardhat-typechain": "^0.3.3",
-    "lowdb": "^1.0.0",
+    "solidity-coverage": "^0.7.13",
     "tmp-promise": "^3.0.2",
     "ts-generator": "0.1.1",
     "ts-node": "^9.0.0",
@@ -45,14 +45,13 @@
     "unique-names-generator": "^4.3.1"
   },
   "scripts": {
-    "build": "yarn compile",
-    "clean": "rm -rf artifacts",
-    "compile": "SKIP_TASKS=true hardhat compile --force",
-    "compile:cached": "SKIP_TASKS=true hardhat compile",
-    "deploy-govern": "hardhat deploy-govern --verify",
-    "deploy-factory": "hardhat deploy-factory --verify",
-    "deploy-registry": "hardhat deploy-registry --verify",
+    "clean": "rm -rf artifacts cache typechain",
+    "compile": "hardhat compile --force",
+    "compile:cached": "hardhat compile",
     "test": "hardhat test",
-    "prepublishOnly": "yarn test && yarn compile"
+    "coverage": "hardhat coverage --network coverage --temp artifacts",
+    "deploy": "hardhat deploy",
+    "deploy-govern": "hardhat deploy-govern",
+    "verify": "hardhat etherscan-verify --license GPL-3.0 --solc-input --api-key process.env.ETHERSCAN_KEY"
   }
 }
