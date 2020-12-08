@@ -35,35 +35,39 @@ let deposit = {
 
 function getPayloadHash(): string {
   return keccak256(
-    solidityPack(
+    defaultAbiCoder.encode(
       [
-        'uint256',
-        'uint256',
-        'address',
-        'address',
-        'bytes32',
-        'bytes32',
-        'bytes32',
+        'tuple(' +
+          'uint256 nonce, ' +
+          'uint256 executionTime, ' +
+          'address submitter, ' +
+          'address executor, ' +
+          'bytes32 actionHash, ' +
+          'bytes32 allowFailuresMap, ' +
+          'bytes32 proofBytes' +
+          ')',
       ],
       [
-        container.payload.nonce,
-        container.payload.executionTime,
-        container.payload.submitter,
-        container.payload.executor,
-        keccak256(
-          defaultAbiCoder.encode(
-            [
-              'tuple(' +
-                'address to, ' +
-                'uint256 value, ' +
-                'bytes data' +
-                ')[]',
-            ],
-            [container.payload.actions]
-          )
-        ),
-        container.payload.allowFailuresMap,
-        keccak256(container.payload.proof),
+        {
+          nonce: container.payload.nonce,
+          executionTime: container.payload.executionTime,
+          submitter: container.payload.submitter,
+          executor: container.payload.executor,
+          actionHash: keccak256(
+            defaultAbiCoder.encode(
+              [
+                'tuple(' +
+                  'address to, ' +
+                  'uint256 value, ' +
+                  'bytes data' +
+                  ')[]',
+              ],
+              [container.payload.actions]
+            )
+          ),
+          allowFailuresMap: container.payload.allowFailuresMap,
+          proofBytes: keccak256(container.payload.proof),
+        }
       ]
     )
   )
@@ -111,7 +115,7 @@ describe('ERC3000Data', function () {
     )
   })
 
-  it.skip('calls testContainerHash and returns the expected hash', async () => {
+  it('calls testContainerHash and returns the expected hash', async () => {
     expect(await erc3kDataLib.testContainerHash(container)).to.be.equal(
       keccak256(
         solidityPack(
