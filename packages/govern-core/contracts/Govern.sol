@@ -21,7 +21,7 @@ contract Govern is IERC3000Executor, AdaptativeERC165, ACL {
 
     event ETHDeposited(address indexed sender, uint256 value);
 
-    constructor(address _initialExecutor) ACL(address(this)) public {
+    constructor(address _initialExecutor) ACL(address(_initialExecutor)) public {
         initialize(_initialExecutor);
     }
 

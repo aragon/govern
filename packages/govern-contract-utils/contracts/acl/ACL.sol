@@ -51,6 +51,8 @@ contract ACL is Initializable {
         // ACL might have been already initialized by constructors
         if (initBlocks["acl"] == 0) {
             _initializeACL(_initialRoot);
+        } else {
+            require(roles[ROOT_ROLE][_initialRoot] == ALLOW_FLAG, "acl: initial root misaligned");
         }
         _;
     }
