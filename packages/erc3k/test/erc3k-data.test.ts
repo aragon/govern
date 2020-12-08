@@ -115,7 +115,7 @@ describe('ERC3000Data', function () {
     )
   })
 
-  it('calls testContainerHash and returns the expected hash', async () => {
+  it('calls testContainerHash and returns the expected hash [ @skip-on-coverage ]', async () => {
     expect(await erc3kDataLib.testContainerHash(container)).to.be.equal(
       keccak256(
         solidityPack(
