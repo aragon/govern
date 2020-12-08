@@ -24,7 +24,7 @@ describe('Bitmap', function () {
     for (let i = 0; i < 256; i++) {
       const bit = Math.random() >= 0.5
       map.push(bit)
-      
+
       bitmap = bit ? await lib.flip(bitmap, i) : bitmap
     }
 

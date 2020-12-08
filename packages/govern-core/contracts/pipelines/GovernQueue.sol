@@ -2,7 +2,7 @@
  * SPDX-License-Identifier:    GPL-3.0
  */
 
-pragma solidity 0.6.8; // TODO: reconsider compiler version before production release
+pragma solidity 0.6.8;
 pragma experimental ABIEncoderV2; // required for passing structs in calldata (fairly secure at this point)
 
 import "erc3k/contracts/IERC3000.sol";
@@ -42,7 +42,7 @@ library GovernQueueStateLib {
     }
 }
 
-contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
+contract GovernQueue is IERC3000, IArbitrable, AdaptativeERC165, ACL {
     // Syntax sugar to enable method-calling syntax on types
     using ERC3000Data for *;
     using DepositLib for ERC3000Data.Collateral;
@@ -55,7 +55,7 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
     mapping (bytes32 => GovernQueueStateLib.Item) public queue; // container hash -> execution state
 
     // Temporary state
-    mapping (bytes32 => address) public challengerCache; // container hash -> challenger addr (used after challenging and before resolution implementation)
+    mapping (bytes32 => address) public challengerCache; // container hash -> challenger addr (used after challenging and before dispute resolution)
     mapping (IArbitrator => mapping (uint256 => bytes32)) public disputeItemCache; // arbitrator addr -> dispute id -> container hash (used between dispute creation and ruling)
 
     /**
@@ -85,7 +85,7 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
         override
         auth(this.schedule.selector) // note that all functions in this contract are ACL protected (commonly some of them will be open for any addr to perform)
         returns (bytes32 containerHash)
-    {   
+    {
         // prevent griefing by front-running (the same container is sent by two different people and one must be challenged)
         require(_container.payload.nonce == ++nonce, "queue: bad nonce");
         // hash using ERC3000Data.hash(ERC3000Data.Config)
@@ -105,7 +105,7 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
         // we don't need to save any more state about the container in storage
         // we just authenticate the hash and assign it a state, since all future
         // actions regarding the container will need to provide it as a witness
-        // all witnesses are logged from this contract at least once, so the 
+        // all witnesses are logged from this contract at least once, so the
         // trust assumption should be the same as storing all on-chain (move complexity to clients)
 
         ERC3000Data.Collateral memory collateral = _container.config.scheduleDeposit;
@@ -188,7 +188,7 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
         if (queue[containerHash].state == GovernQueueStateLib.State.Challenged) {
             // will re-enter in `rule`, `rule` will perform state transition depending on ruling
             IArbitrator(_container.config.resolver).executeRuling(_disputeId);
-        } // else continue, as we must 
+        } // else continue, as we must
 
         GovernQueueStateLib.State state = queue[containerHash].state;
 
@@ -239,7 +239,7 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
         _container.config.scheduleDeposit.releaseTo(_container.payload.submitter);
         _container.config.challengeDeposit.releaseTo(_container.payload.submitter);
 
-        challengerCache[containerHash] = address(0); // release state, refund gas, no longer needed in state
+        challengerCache[containerHash] = address(0); // release state to refund gas; no longer needed in state
 
         return _execute(_container.payload, containerHash);
     }
@@ -256,7 +256,7 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
         // release all collateral to challenger
         _container.config.scheduleDeposit.releaseTo(challenger);
         _container.config.challengeDeposit.releaseTo(challenger);
-        challengerCache[containerHash] = address(0); // release state, refund gas, no longer needed in state
+        challengerCache[containerHash] = address(0); // release state to refund gas; no longer needed in state
     }
 
     // Arbitrable
@@ -269,7 +269,7 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
             GovernQueueStateLib.State.Challenged,
             _ruling == ALLOW_RULING ? GovernQueueStateLib.State.Approved : GovernQueueStateLib.State.Rejected
         );
-        disputeItemCache[arbitrator][_disputeId] = bytes32(0); // refund gas, no longer needed in state
+        disputeItemCache[arbitrator][_disputeId] = bytes32(0); // release state to refund gas; no longer needed in state
 
         emit Ruled(arbitrator, _disputeId, _ruling);
     }

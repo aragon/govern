@@ -13,7 +13,7 @@ library ERC1167ProxyFactory {
         assembly {
             cloneAddr := create(0, add(code, 0x20), 55)
         }
-        
+
         require(cloneAddr != address(0), "proxy-factory: bad create");
     }
 
@@ -30,7 +30,7 @@ library ERC1167ProxyFactory {
         assembly {
             cloneAddr := create2(0, add(code, 0x20), 55, _salt)
         }
-        
+
         require(cloneAddr != address(0), "proxy-factory: bad create2");
     }
 

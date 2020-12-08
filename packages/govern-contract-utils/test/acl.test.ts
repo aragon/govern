@@ -83,15 +83,15 @@ describe('ACL', function () {
       it('role is granted to freeze addr', async () => {
         expect(await acl.roles(ROLE, FREEZE_ADDR)).to.equal(FREEZE_ADDR)
       })
-  
+
       it('cannot grant', async () => {
         await expect(grant(acl)).to.be.revertedWith(ERRORS.FROZEN)
       })
-  
+
       it('cannot revoke', async () => {
         await expect(revoke(acl)).to.be.revertedWith(ERRORS.FROZEN)
       })
-  
+
       it('cannot freeze', async () => {
         await expect(freeze(acl)).to.be.revertedWith(ERRORS.FROZEN)
       })
@@ -129,11 +129,11 @@ describe('ACL', function () {
     it('non-root cannot grant', async () => {
       await expect(grant(aclNotRoot)).to.be.revertedWith(ERRORS.AUTH)
     })
-  
+
     it('non-root cannot revoke', async () => {
       await expect(revoke(aclNotRoot)).to.be.revertedWith(ERRORS.AUTH)
     })
-  
+
     it('non-root cannot freeze', async () => {
       await expect(freeze(aclNotRoot)).to.be.revertedWith(ERRORS.AUTH)
     })

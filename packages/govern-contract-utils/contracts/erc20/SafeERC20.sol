@@ -11,44 +11,10 @@ pragma solidity ^0.6.8;
 
 import "../address-utils/AddressUtils.sol";
 
-/**
- * @title ERC20 interface
- * @dev see https://github.com/ethereum/EIPs/issues/20
- */
-abstract contract ERC20 {
-    function totalSupply() virtual public view returns (uint256);
-
-    function balanceOf(address _who) virtual public view returns (uint256);
-
-    function allowance(address _owner, address _spender)
-        virtual public view returns (uint256);
-
-    function transfer(address _to, uint256 _value) virtual public returns (bool);
-
-    function approve(address _spender, uint256 _value)
-        virtual public returns (bool);
-
-    function transferFrom(address _from, address _to, uint256 _value)
-        virtual public returns (bool);
-
-    event Transfer(
-        address indexed from,
-        address indexed to,
-        uint256 value
-    );
-
-    event Approval(
-        address indexed owner,
-        address indexed spender,
-        uint256 value
-    );
-}
+import "./ERC20.sol";
 
 library SafeERC20 {
     using AddressUtils for address;
-
-    string private constant ERROR_TOKEN_BALANCE_REVERTED = "SAFE_ERC_20_BALANCE_REVERTED";
-    string private constant ERROR_TOKEN_ALLOWANCE_REVERTED = "SAFE_ERC_20_ALLOWANCE_REVERTED";
 
     function invokeAndCheckSuccess(address _addr, bytes memory _calldata)
         private
@@ -62,7 +28,7 @@ library SafeERC20 {
             let ptr := mload(0x40)    // free memory pointer
 
             let success := call(
-                gas(),                // forward all 
+                gas(),                // forward all
                 _addr,                // address
                 0,                    // no value
                 add(_calldata, 0x20), // calldata start
