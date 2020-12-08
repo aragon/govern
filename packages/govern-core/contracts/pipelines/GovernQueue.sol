@@ -115,7 +115,8 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
         ERC3000Data.Collateral memory collateral = _container.config.scheduleDeposit;
         collateral.collectFrom(_container.payload.submitter); // pull collateral from submitter (requires previous approval)
 
-        // TODO: pay court tx fee
+        // the configured resolver may specify additional out-of-band payments for scheduling actions
+        // schedule() leaves these requirements up to the callers of `schedule()` or other users to fulfill
 
         // emit an event to ensure data availability of all state that cannot be otherwise fetched (see how config isn't emitted since an observer should already have it)
         emit Scheduled(containerHash, _container.payload);
