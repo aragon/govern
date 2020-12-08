@@ -49,6 +49,9 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
     using GovernQueueStateLib for GovernQueueStateLib.Item;
     using SafeERC20 for ERC20;
 
+    // Map '4' as the 'allow' ruling; this implicitly maps '3' as the 'reject' ruling
+    uint256 internal constant ALLOW_RULING = 4;
+
     // Permanent state
     bytes32 public configHash; // keccak256 hash of the current ERC3000Data.Config
     uint256 public nonce; // number of scheduled payloads so far

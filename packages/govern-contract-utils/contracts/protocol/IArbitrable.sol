@@ -13,8 +13,6 @@ import "./IArbitrator.sol";
 *      Note that this is actually optional, although it does allow the Protocol to at least have a way to identify a specific set of instances.
 */
 abstract contract IArbitrable {
-    uint256 internal constant ALLOW_RULING = 4;
-
     /**
     * @dev Emitted when an IArbitrable instance's dispute is ruled by an IArbitrator
     * @param arbitrator IArbitrator instance ruling the dispute
