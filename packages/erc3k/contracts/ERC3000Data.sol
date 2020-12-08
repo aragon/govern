@@ -59,7 +59,7 @@ library ERC3000Data {
 
     function hash(Payload memory payload) internal pure returns (bytes32) {
         return keccak256(
-            abi.encodePacked(
+            abi.encode(
                 payload.nonce,
                 payload.executionTime,
                 payload.submitter,
