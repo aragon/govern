@@ -8,6 +8,6 @@ import "../initializable/Initializable.sol";
 
 contract InitializableMock is Initializable {
     function initOne() external onlyInit("one") {}
-    
+
     function initTwo() external onlyInit("two") {}
 }

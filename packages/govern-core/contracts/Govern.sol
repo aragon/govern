@@ -12,7 +12,7 @@ import "@aragon/govern-contract-utils/contracts/acl/ACL.sol";
 import "@aragon/govern-contract-utils/contracts/adaptative-erc165/AdaptativeERC165.sol";
 import "@aragon/govern-contract-utils/contracts/bitmaps/BitmapLib.sol";
 
-contract Govern is AdaptativeERC165, IERC3000Executor, ACL {
+contract Govern is IERC3000Executor, AdaptativeERC165, ACL {
     using BitmapLib for bytes32;
 
     bytes4 internal constant EXEC_ROLE = this.exec.selector;
@@ -41,11 +41,11 @@ contract Govern is AdaptativeERC165, IERC3000Executor, ACL {
 
     function exec(ERC3000Data.Action[] memory actions, bytes32 allowFailuresMap, bytes32 memo) override public auth(EXEC_ROLE) returns (bytes32, bytes[] memory) {
         require(actions.length <= MAX_ACTIONS, "govern: too many"); // need to limit since we use 256-bit bitmaps
-        
+
         bytes[] memory execResults = new bytes[](actions.length);
         bytes32 failureMap = BitmapLib.empty; // start with an empty bitmap
 
-        for (uint256 i = 0; i < actions.length; i++) { // can use uint8 given the action limit
+        for (uint256 i = 0; i < actions.length; i++) {
             // TODO: optimize with assembly
             (bool ok, bytes memory ret) = actions[i].to.call{value: actions[i].value}(actions[i].data);
             require(ok || allowFailuresMap.get(uint8(i)), "govern: call");

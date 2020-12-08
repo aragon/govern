@@ -74,5 +74,5 @@ abstract contract IERC3000 is ERC3000Interface {
      * @return configHash
      */
     function configure(ERC3000Data.Config memory config) virtual public returns (bytes32 configHash);
-    event Configured(bytes32 indexed containerHash, address indexed actor, ERC3000Data.Config config);
+    event Configured(bytes32 indexed configHash, address indexed actor, ERC3000Data.Config config);
 }

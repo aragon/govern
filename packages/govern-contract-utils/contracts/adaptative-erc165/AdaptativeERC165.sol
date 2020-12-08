@@ -7,9 +7,9 @@ pragma solidity ^0.6.8;
 import "../erc165/ERC165.sol";
 
 contract AdaptativeERC165 is ERC165 {
-    // erc165 interface ID -> whether it is supported
+    // ERC165 interface ID -> whether it is supported
     mapping (bytes4 => bool) internal standardSupported;
-    // callback function signature -> magic number to return
+    // Callback function signature -> magic number to return
     mapping (bytes4 => bytes32) internal callbackMagicNumbers;
 
     bytes32 internal constant UNREGISTERED_CALLBACK = bytes32(0);
@@ -41,15 +41,12 @@ contract AdaptativeERC165 is ERC165 {
     }
 
     function _registerStandard(bytes4 _interfaceId) internal {
-        // use a random magic number for standards without number
         standardSupported[_interfaceId] = true;
-
         emit RegisteredStandard(_interfaceId);
     }
 
     function _registerCallback(bytes4 _callbackSig, bytes4 _magicNumber) internal {
         callbackMagicNumbers[_callbackSig] = _magicNumber;
-
         emit RegisteredCallback(_callbackSig, _magicNumber);
     }
 }
