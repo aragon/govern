@@ -19,7 +19,7 @@ abstract contract IERC3000 {
 
     /**
      * @notice Executes an action after its execution delay has passed and its state hasn't been altered by a challenge or veto
-     * @param container A ERC3000Data.Container struct holding both the paylaod being scheduled for execution and
+     * @param container A ERC3000Data.Container struct holding both the payload being scheduled for execution and
      * the current configuration of the system
      * MUST be an ERC3000Executor call: payload.executor.exec(payload.actions)
      * @return failureMap

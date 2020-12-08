@@ -76,7 +76,7 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
 
      /**
      * @notice Schedules an action for execution, allowing for challenges and vetos on a defined time window. Pulls collateral from submitter into contract.
-     * @param _container A ERC3000Data.Container struct holding both the paylaod being scheduled for execution and
+     * @param _container A ERC3000Data.Container struct holding both the payload being scheduled for execution and
      * the current configuration of the system
      */
     function schedule(ERC3000Data.Container memory _container) // TO FIX: Container is in memory and function has to be public to avoid an unestrutable solidity crash
@@ -118,7 +118,7 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
 
     /**
      * @notice Executes an action after its execution delayed has passed and its state hasn't been altered by a challenge or veto
-     * @param _container A ERC3000Data.Container struct holding both the paylaod being scheduled for execution and
+     * @param _container A ERC3000Data.Container struct holding both the payload being scheduled for execution and
      * the current configuration of the system
      */
     function execute(ERC3000Data.Container memory _container)
@@ -143,7 +143,7 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
 
     /**
      * @notice Challenge a container in case its scheduling is illegal as per Config.rules. Pulls collateral and dispute fees from sender into contract
-     * @param _container A ERC3000Data.Container struct holding both the paylaod being scheduled for execution and
+     * @param _container A ERC3000Data.Container struct holding both the payload being scheduled for execution and
      * the current configuration of the system
      * @param _reason Hint for case reviewers as to why the scheduled container is illegal
      */
@@ -178,7 +178,7 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
 
     /**
      * @notice Apply arbitrator's ruling over a challenge once it has come to a final ruling
-     * @param _container A ERC3000Data.Container struct holding both the paylaod being scheduled for execution and
+     * @param _container A ERC3000Data.Container struct holding both the payload being scheduled for execution and
      * the current configuration of the system
      * @param _disputeId disputeId in the arbitrator in which the dispute over the container was created
      */
