@@ -10,7 +10,7 @@ import "erc3k/contracts/IERC3000.sol";
 import "@aragon/govern-contract-utils/contracts/protocol/IArbitrable.sol";
 import "@aragon/govern-contract-utils/contracts/deposits/DepositLib.sol";
 import "@aragon/govern-contract-utils/contracts/acl/ACL.sol";
-import "@aragon/govern-contract-utils/contracts/adaptative-erc165/AdaptativeERC165.sol";
+import "@aragon/govern-contract-utils/contracts/adaptive-erc165/AdaptiveERC165.sol";
 import "@aragon/govern-contract-utils/contracts/erc20/SafeERC20.sol";
 
 library GovernQueueStateLib {
@@ -42,7 +42,7 @@ library GovernQueueStateLib {
     }
 }
 
-contract GovernQueue is IERC3000, IArbitrable, AdaptativeERC165, ACL {
+contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
     // Syntax sugar to enable method-calling syntax on types
     using ERC3000Data for *;
     using DepositLib for ERC3000Data.Collateral;
