@@ -69,6 +69,7 @@ export const runTaskWithRetry = async (
     }
   } catch (error) {
     counter--
+    // TODO: exit if error: Contract source code already verified
     console.log(`Retrying attemps: ${counter}.`)
     console.error(error.message)
     await runTaskWithRetry(task, params, counter, msDelay, cleanup)

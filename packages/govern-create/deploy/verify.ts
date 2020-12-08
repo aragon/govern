@@ -1,5 +1,6 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployFunction } from 'hardhat-deploy/types'
+import { TASK_ETHERSCAN_VERIFY } from 'hardhat-deploy'
 
 import { verifyContract } from '../utils/etherscan'
 
@@ -16,7 +17,17 @@ const dummyConfig = {
 }
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  const { deployments, ethers } = hre
+  const { deployments, ethers, run } = hre
+
+  console.log('Verifying registry and factories contracts')
+
+  await run(TASK_ETHERSCAN_VERIFY, {
+    apiKey: process.env.ETHERSCAN_KEY,
+    license: 'GPL-3.0',
+    solcInput: true,
+  })
+
+  console.log('Verifying factories base contracts')
 
   const governFactoryDeployment = await deployments.get('GovernFactory')
   const queueFactoryDeploymnet = await deployments.get('GovernQueueFactory')
@@ -33,8 +44,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const governBase = await governFactoryContract.base()
   const queueBase = await queueFactoryContract.base()
 
-  console.log('Verifying factories base contracts')
-
   await verifyContract(governBase, [TWO_ADDRR])
   await verifyContract(queueBase, [TWO_ADDRR, dummyConfig])
 }
@@ -46,3 +55,9 @@ func.dependencies = [
   'GovernTokenFactory',
   'GovernBaseFactory',
 ]
+func.skip = (hre: HardhatRuntimeEnvironment) =>
+  Promise.resolve(
+    hre.network.name === 'localhost' ||
+      hre.network.name === 'hardhat' ||
+      hre.network.name === 'coverage'
+  )
