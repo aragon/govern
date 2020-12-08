@@ -6,7 +6,7 @@ pragma solidity ^0.6.8;
 
 import "../erc165/ERC165.sol";
 
-contract AdaptativeERC165 is ERC165 {
+contract AdaptiveERC165 is ERC165 {
     // ERC165 interface ID -> whether it is supported
     mapping (bytes4 => bool) internal standardSupported;
     // Callback function signature -> magic number to return
