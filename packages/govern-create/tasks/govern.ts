@@ -78,7 +78,7 @@ task('deploy-govern', 'Deploys a Govern instance')
       const queueAddress = args?.args[1] as string
       const governAddress = args?.args[0] as string
 
-      if (network.name !== 'hardhat' && network.name !== 'soliditycoverage') {
+      if (network.name !== 'hardhat' && network.name !== 'coverage') {
         console.log(`----\nA wild new Govern named *${name}* appeared 🦅`)
         console.log(format(queueAddress, 'Queue', network.name))
         console.log(format(governAddress, 'Govern', network.name))
