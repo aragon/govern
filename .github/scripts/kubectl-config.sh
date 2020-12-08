@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e # exit on error
 KUBE_CA="$1"
 KUBE_SERVER="$2"
 KUBE_TOKEN="$3"

@@ -1,25 +1,13 @@
 import React from 'react'
 import { render } from 'react-dom'
+import { HashRouter } from 'react-router-dom'
+import { QueryCache, ReactQueryCacheProvider } from 'react-query'
 import { createGlobalStyle } from 'styled-components'
 import 'styled-components/macro'
-import {
-  ApolloClient,
-  InMemoryCache,
-  NormalizedCacheObject,
-  ApolloProvider
-} from '@apollo/client';
 import App from './App'
 import GeneralProvider from './Providers/GeneralProvider'
 
-export const rinkebyClient: ApolloClient<NormalizedCacheObject> = new ApolloClient({
-  uri: 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby',
-  cache: new InMemoryCache()
-});
-
-export const mainnetClient: ApolloClient<NormalizedCacheObject> = new ApolloClient({
-  uri: 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-mainnet',
-  cache: new InMemoryCache()
-})
+const queryCache = new QueryCache()
 
 const GlobalStyle = createGlobalStyle`
   *, *:before, *:after {
@@ -33,7 +21,6 @@ const GlobalStyle = createGlobalStyle`
   body {
     height: 0;
     min-height: 100vh;
-    width: 100vw;
     background: black;
     color: white;
     font-family: 'Roboto Mono', Helvetica, sans-serif;
@@ -61,14 +48,15 @@ const GlobalStyle = createGlobalStyle`
 `
 
 render(
-  <ApolloProvider client={rinkebyClient}>
+  <ReactQueryCacheProvider queryCache={queryCache}>
     <GeneralProvider>
       <React.StrictMode>
         <GlobalStyle />
-        <App />
+        <HashRouter>
+          <App />
+        </HashRouter>
       </React.StrictMode>
     </GeneralProvider>
-  </ApolloProvider>
-  ,
+  </ReactQueryCacheProvider>,
   document.getElementById('root'),
 )

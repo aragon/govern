@@ -1,10 +1,8 @@
-// rinkeby
 const CHAIN_ID_DEFAULT = 4
 
 const ENV_VARS = {
   CHAIN_ID() {
-    // @ts-ignore
-    const chainId = parseInt(process.env.REACT_APP_CHAIN_ID)
+    const chainId = parseInt(process.env.REACT_APP_CHAIN_ID ?? '4')
     return isNaN(chainId) ? CHAIN_ID_DEFAULT : chainId
   },
   ENABLE_SENTRY() {
@@ -13,8 +11,24 @@ const ENV_VARS = {
   FORTMATIC_API_KEY() {
     return process.env.REACT_APP_FORTMATIC_API_KEY || ''
   },
+  MAINNET_SUBGRAPH_URL() {
+    return (
+      process.env.MAINNET_SUBGRAPH_URL ||
+      // Setting a sensible default as a fallback, as the subgraph is the backbone
+      // of the app
+      'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-mainnet'
+    )
+  },
   PORTIS_DAPP_ID() {
     return process.env.REACT_APP_PORTIS_DAPP_ID || ''
+  },
+  RINKEBY_SUBGRAPH_URL() {
+    return (
+      process.env.REACT_APP_RINKEBY_SUBGRAPH_URL ||
+      // Setting a sensible default as a fallback, as the subgraph is the backbone
+      // of the app
+      'https://api.thegraph.com/subgraphs/name/evalir/aragon-govern-rinkeby'
+    )
   },
   SENTRY_DSN() {
     const dsn = process.env.REACT_APP_SENTRY_DSN || ''

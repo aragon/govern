@@ -1,12 +1,18 @@
-import React from 'react'
-import { HashRouter as Router, Route, Switch } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { Route, Switch, useLocation } from 'react-router-dom'
 import 'styled-components/macro'
 import TopHeader from './components/Header/Header'
-import DaoSelector from './pages/DaoSelector'
-import DaoView from './pages/DaoView'
-import ErcTool from './Tools/Erc'
+import SelectDao from './pages/SelectDao'
+import ViewDao from './pages/ViewDao'
+import ErcTool from './apps/Erc'
 
 function App() {
+  const location: any = useLocation()
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [location.pathname])
+
   return (
     <div
       css={`
@@ -16,19 +22,17 @@ function App() {
       `}
     >
       <TopHeader />
-      <Router>
-        <Switch>
-          <Route exact path="/">
-            <DaoSelector />
-          </Route>
-          <Route exact path="/tools/erc">
-            <ErcTool />
-          </Route>
-          <Route path="/:daoAddress">
-            <DaoView />
-          </Route>
-        </Switch>
-      </Router>
+      <Switch>
+        <Route exact path="/">
+          <SelectDao />
+        </Route>
+        <Route exact path="/tools/erc">
+          <ErcTool />
+        </Route>
+        <Route path="/:daoAddress">
+          <ViewDao />
+        </Route>
+      </Switch>
     </div>
   )
 }

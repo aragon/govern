@@ -1,7 +1,7 @@
 node_modules
 yarn-error.log
 
-#Buidler files
+# Hardhat files
 abi
 artifacts
 cache

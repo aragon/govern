@@ -2,7 +2,7 @@
  * SPDX-License-Identifier:    GPL-3.0
  */
 
-pragma solidity 0.6.8; // TODO: reconsider compiler version before production release
+pragma solidity 0.6.8;
 pragma experimental ABIEncoderV2; // required for passing structs in calldata (fairly secure at this point)
 
 import "erc3k/contracts/IERC3000.sol";
@@ -10,7 +10,7 @@ import "erc3k/contracts/IERC3000.sol";
 import "@aragon/govern-contract-utils/contracts/protocol/IArbitrable.sol";
 import "@aragon/govern-contract-utils/contracts/deposits/DepositLib.sol";
 import "@aragon/govern-contract-utils/contracts/acl/ACL.sol";
-import "@aragon/govern-contract-utils/contracts/adaptative-erc165/AdaptativeERC165.sol";
+import "@aragon/govern-contract-utils/contracts/adaptive-erc165/AdaptiveERC165.sol";
 import "@aragon/govern-contract-utils/contracts/erc20/SafeERC20.sol";
 
 library GovernQueueStateLib {
@@ -42,7 +42,7 @@ library GovernQueueStateLib {
     }
 }
 
-contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
+contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
     // Syntax sugar to enable method-calling syntax on types
     using ERC3000Data for *;
     using DepositLib for ERC3000Data.Collateral;
@@ -55,8 +55,8 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
     mapping (bytes32 => GovernQueueStateLib.Item) public queue; // container hash -> execution state
 
     // Temporary state
-    mapping (bytes32 => address) public challengerCache; // container hash -> challenger addr (used after challenging and before resolution implementation)
-    mapping (bytes32 => mapping (IArbitrator => uint256)) public disputeItemCache; // container hash -> arbitrator addr -> dispute id (used between challenge and resolve)
+    mapping (bytes32 => address) public challengerCache; // container hash -> challenger addr (used after challenging and before dispute resolution)
+    mapping (bytes32 => mapping (IArbitrator => uint256)) public disputeItemCache; // container hash -> arbitrator addr -> dispute id (used between dispute creation and ruling)
 
     /**
      * @param _aclRoot account that will be given root permissions on ACL (commonly given to factory)
@@ -265,7 +265,7 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
         _container.config.scheduleDeposit.releaseTo(_container.payload.submitter);
         _container.config.challengeDeposit.releaseTo(_container.payload.submitter);
 
-        challengerCache[containerHash] = address(0); // release state, refund gas, no longer needed in state
+        challengerCache[containerHash] = address(0); // release state to refund gas; no longer needed in state
 
         return _execute(_container.payload, containerHash);
     }
@@ -282,7 +282,7 @@ contract GovernQueue is IERC3000, AdaptativeERC165, IArbitrable, ACL {
         // release all collateral to challenger
         _container.config.scheduleDeposit.releaseTo(challenger);
         _container.config.challengeDeposit.releaseTo(challenger);
-        challengerCache[containerHash] = address(0); // release state, refund gas, no longer needed in state
+        challengerCache[containerHash] = address(0); // release state to refund gas; no longer needed in state
 
         // return zero values as nothing is executed on rejection
     }
