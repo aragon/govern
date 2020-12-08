@@ -227,9 +227,14 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
                 GovernQueueStateLib.State.Cancelled
             );
 
-            _container.config.challengeDeposit.releaseTo(challengerCache[containerHash]);
-            challengerCache[containerHash] = address(0); // release state, refund gas, no longer needed in state
+            address challenger = challengerCache[containerHash];
+            // release state to refund gas; no longer needed in state
+            delete challengerCache[containerHash];
             delete disputeItemCache[containerHash][IArbitrator(_container.config.resolver)];
+
+            // release all collateral to challenger
+            _container.config.scheduleDeposit.releaseTo(challenger);
+            _container.config.challengeDeposit.releaseTo(challenger);
         } else {
             // If the given container doesn't have the state Challenged
             // has it to be the Scheduled state and otherwise should it throw as expected
