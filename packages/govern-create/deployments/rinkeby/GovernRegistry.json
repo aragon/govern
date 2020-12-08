@@ -1,0 +1,184 @@
+{
+  "address": "0x51C523E0eEDD112C5a08803951466Cd10271b0fF",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "contract IERC3000Executor",
+          "name": "executor",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "contract IERC3000",
+          "name": "queue",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "contract IERC20",
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "registrant",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        }
+      ],
+      "name": "Registered",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "contract IERC3000Executor",
+          "name": "executor",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes",
+          "name": "metadata",
+          "type": "bytes"
+        }
+      ],
+      "name": "SetMetadata",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "name": "nameUsed",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "contract IERC3000Executor",
+          "name": "_executor",
+          "type": "address"
+        },
+        {
+          "internalType": "contract IERC3000",
+          "name": "_queue",
+          "type": "address"
+        },
+        {
+          "internalType": "contract IERC20",
+          "name": "_token",
+          "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "_name",
+          "type": "string"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_initialMetadata",
+          "type": "bytes"
+        }
+      ],
+      "name": "register",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "_metadata",
+          "type": "bytes"
+        }
+      ],
+      "name": "setMetadata",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0x239ed4497d5024cf7dcc431a0748b23a30aaba85b4db1d7ab28f205d61be3d1f",
+  "receipt": {
+    "to": "0x4e59b44847b379578588920cA78FbF26c0B4956C",
+    "from": "0x4355a2cdec902C372F404007114bbCf2C65A3eb0",
+    "contractAddress": null,
+    "transactionIndex": 8,
+    "gasUsed": "359041",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0xa1a2868eb6a794cebecbe9eaac73c745f5e0c3bab61d23ffad850cd21377317a",
+    "transactionHash": "0x239ed4497d5024cf7dcc431a0748b23a30aaba85b4db1d7ab28f205d61be3d1f",
+    "logs": [],
+    "blockNumber": 7682261,
+    "cumulativeGasUsed": "1739279",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [],
+  "solcInputHash": "ab40b143b50742d171e87e19303a80b3",
+  "metadata": "{\"compiler\":{\"version\":\"0.6.8+commit.0bbfe453\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"contract IERC3000Executor\",\"name\":\"executor\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"contract IERC3000\",\"name\":\"queue\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"contract IERC20\",\"name\":\"token\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"registrant\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"}],\"name\":\"Registered\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"contract IERC3000Executor\",\"name\":\"executor\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"metadata\",\"type\":\"bytes\"}],\"name\":\"SetMetadata\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"nameUsed\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"contract IERC3000Executor\",\"name\":\"_executor\",\"type\":\"address\"},{\"internalType\":\"contract IERC3000\",\"name\":\"_queue\",\"type\":\"address\"},{\"internalType\":\"contract IERC20\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"_name\",\"type\":\"string\"},{\"internalType\":\"bytes\",\"name\":\"_initialMetadata\",\"type\":\"bytes\"}],\"name\":\"register\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"_metadata\",\"type\":\"bytes\"}],\"name\":\"setMetadata\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"@aragon/govern-core/contracts/GovernRegistry.sol\":\"GovernRegistry\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":20000},\"remappings\":[]},\"sources\":{\"@aragon/govern-contract-utils/contracts/erc165/ERC165.sol\":{\"content\":\"/*\\n * SPDX-License-Identifier:    MIT\\n */\\n\\npragma solidity ^0.6.8;\\n\\nabstract contract ERC165 {\\n    // Includes supportsInterface method:\\n    bytes4 internal constant ERC165_INTERFACE_ID = bytes4(0x01ffc9a7);\\n\\n    /**\\n    * @dev Query if a contract implements a certain interface\\n    * @param _interfaceId The interface identifier being queried, as specified in ERC-165\\n    * @return True if the contract implements the requested interface and if its not 0xffffffff, false otherwise\\n    */\\n    function supportsInterface(bytes4 _interfaceId) virtual public view returns (bool) {\\n        return _interfaceId == ERC165_INTERFACE_ID\\n          || block.timestamp == 1; // silence visibility warning needed for overrides\\n    }\\n}\",\"keccak256\":\"0x48bc84112e6ba3faee6e57081d97284338bda87af97e1353a957701b8059c80d\",\"license\":\"MIT\"},\"@aragon/govern-core/contracts/GovernRegistry.sol\":{\"content\":\"/*\\n * SPDX-License-Identifier:    GPL-3.0\\n */\\n\\npragma solidity 0.6.8;\\n\\nimport \\\"erc3k/contracts/IERC3000.sol\\\";\\nimport \\\"erc3k/contracts/IERC3000Executor.sol\\\";\\nimport \\\"erc3k/contracts/IERC3000Registry.sol\\\";\\n\\nimport \\\"@aragon/govern-contract-utils/contracts/erc165/ERC165.sol\\\";\\n\\ncontract GovernRegistry is IERC3000Registry {\\n    mapping(string => bool) public nameUsed;\\n\\n    function register(\\n        IERC3000Executor _executor,\\n        IERC3000 _queue,\\n        IERC20 _token,\\n        string calldata _name,\\n        bytes calldata _initialMetadata\\n    ) override external\\n    {\\n        require(!nameUsed[_name], \\\"registry: name used\\\");\\n\\n        nameUsed[_name] = true;\\n\\n        emit Registered(_executor, _queue, _token, msg.sender, _name);\\n        _setMetadata(_executor, _initialMetadata);\\n    }\\n\\n    function setMetadata(bytes memory _metadata) override public {\\n        _setMetadata(IERC3000Executor(msg.sender), _metadata);\\n    }\\n\\n    function _setMetadata(IERC3000Executor _executor, bytes memory _metadata) internal {\\n        emit SetMetadata(_executor, _metadata);\\n    }\\n}\\n\",\"keccak256\":\"0xf74e1f0675b81489a914b337b16f9010cda1152da59095af238114a2fdce633e\",\"license\":\"GPL-3.0\"},\"@aragon/govern-token/contracts/interfaces/IERC20.sol\":{\"content\":\"/*\\n * SPDX-License-Identifier:    GPL-3.0\\n */\\n\\npragma solidity ^0.6.8;\\n\\ninterface IERC20 {\\n    function totalSupply() external view returns (uint256);\\n    function balanceOf(address account) external view returns (uint256);\\n    function allowance(address owner, address spender) external view returns (uint256);\\n    function approve(address spender, uint256 amount) external returns (bool);\\n    function transfer(address recipient, uint256 amount) external returns (bool);\\n    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);\\n}\\n\",\"keccak256\":\"0xbed499479e4f3313d3529772756ff7bb9f2f3a0e4d9986b80d9daa3096141d98\",\"license\":\"GPL-3.0\"},\"erc3k/contracts/ERC3000Data.sol\":{\"content\":\"/*\\n * SPDX-License-Identifier:    MIT\\n */\\n\\npragma solidity ^0.6.8;\\npragma experimental ABIEncoderV2;\\n\\nimport \\\"./IERC3000Executor.sol\\\";\\n\\nlibrary ERC3000Data {\\n    // TODO: come up with a non-shitty name\\n    struct Container {\\n        Payload payload;\\n        Config config;\\n    }\\n\\n    // WARN: Always remember to change the 'hash' function if modifying the struct\\n    struct Payload {\\n        uint256 nonce;\\n        uint256 executionTime;\\n        address submitter;\\n        IERC3000Executor executor;\\n        Action[] actions;\\n        bytes32 allowFailuresMap;\\n        bytes proof;\\n    }\\n\\n    struct Action {\\n        address to;\\n        uint256 value;\\n        bytes data;\\n    }\\n\\n    struct Config {\\n        uint256 executionDelay;\\n        Collateral scheduleDeposit;\\n        Collateral challengeDeposit;\\n        address resolver;\\n        bytes rules;\\n    }\\n\\n    struct Collateral {\\n        address token;\\n        uint256 amount;\\n    }\\n\\n    function containerHash(bytes32 payloadHash, bytes32 configHash) internal view returns (bytes32) {\\n        uint chainId;\\n        assembly {\\n            chainId := chainid()\\n        }\\n\\n        return keccak256(abi.encodePacked(\\\"erc3k-v1\\\", address(this), chainId, payloadHash, configHash));\\n    }\\n\\n    function hash(Container memory container) internal view returns (bytes32) {\\n        return containerHash(hash(container.payload), hash(container.config));\\n    }\\n\\n    function hash(Payload memory payload) internal pure returns (bytes32) {\\n        return keccak256(\\n            abi.encodePacked(\\n                payload.nonce,\\n                payload.executionTime,\\n                payload.submitter,\\n                payload.executor,\\n                keccak256(abi.encode(payload.actions)),\\n                payload.allowFailuresMap,\\n                keccak256(payload.proof)\\n            )\\n        );\\n    }\\n\\n    function hash(Config memory config) internal pure returns (bytes32) {\\n        return keccak256(abi.encode(config));\\n    }\\n}\\n\",\"keccak256\":\"0x361ff1535d9950c8140bc71ec5102018bf2c14d7d33fef965ccea0656866bab5\",\"license\":\"MIT\"},\"erc3k/contracts/IERC3000.sol\":{\"content\":\"/*\\n * SPDX-License-Identifier:    MIT\\n */\\n\\npragma solidity ^0.6.8;\\npragma experimental ABIEncoderV2;\\n\\nimport \\\"./ERC3000Data.sol\\\";\\n\\ncontract ERC3000Interface {\\n    bytes4 internal constant ERC3000_INTERFACE_ID =\\n        IERC3000(0).schedule.selector\\n        ^ IERC3000(0).execute.selector\\n        ^ IERC3000(0).challenge.selector\\n        ^ IERC3000(0).resolve.selector\\n        ^ IERC3000(0).veto.selector\\n        ^ IERC3000(0).configure.selector\\n    ;\\n}\\n\\nabstract contract IERC3000 is ERC3000Interface {\\n    /**\\n     * @notice Schedules an action for execution, allowing for challenges and vetos on a defined time window\\n     * @param container A Container struct holding both the payload being scheduled for execution and\\n       the current configuration of the system\\n     * @return containerHash\\n     */\\n    function schedule(ERC3000Data.Container memory container) virtual public returns (bytes32 containerHash);\\n    event Scheduled(bytes32 indexed containerHash, ERC3000Data.Payload payload);\\n\\n    /**\\n     * @notice Executes an action after its execution delay has passed and its state hasn't been altered by a challenge or veto\\n     * @param container A ERC3000Data.Container struct holding both the paylaod being scheduled for execution and\\n       the current configuration of the system\\n     * MUST be an ERC3000Executor call: payload.executor.exec(payload.actions)\\n     * @return failureMap\\n     * @return execResults\\n     */\\n    function execute(ERC3000Data.Container memory container) virtual public returns (bytes32 failureMap, bytes[] memory execResults);\\n    event Executed(bytes32 indexed containerHash, address indexed actor);\\n\\n    /**\\n     * @notice Challenge a container in case its scheduling is illegal as per Config.rules. Pulls collateral and dispute fees from sender into contract\\n     * @param container A ERC3000Data.Container struct holding both the payload being scheduled for execution and\\n       the current configuration of the system\\n     * @param reason Hint for case reviewers as to why the scheduled container is illegal\\n     * @return resolverId\\n     */\\n    function challenge(ERC3000Data.Container memory container, bytes memory reason) virtual public returns (uint256 resolverId);\\n    event Challenged(bytes32 indexed containerHash, address indexed actor, bytes reason, uint256 resolverId, ERC3000Data.Collateral collateral);\\n\\n    /**\\n     * @notice Apply arbitrator's ruling over a challenge once it has come to a final ruling\\n     * @param container A ERC3000Data.Container struct holding both the payload being scheduled for execution and\\n       the current configuration of the system\\n     * @param resolverId disputeId in the arbitrator in which the dispute over the container was created\\n     * @return failureMap\\n     * @return execResults\\n     */\\n    function resolve(ERC3000Data.Container memory container, uint256 resolverId) virtual public returns (bytes32 failureMap, bytes[] memory execResults);\\n    event Resolved(bytes32 indexed containerHash, address indexed actor, bool approved);\\n\\n    /**\\n     * @notice Apply arbitrator's ruling over a challenge once it has come to a final ruling\\n     * @param containerHash Hash of the container being vetoed\\n     * @param reason Justification for the veto\\n     */\\n    function veto(bytes32 containerHash, bytes memory reason) virtual public;\\n    event Vetoed(bytes32 indexed containerHash, address indexed actor, bytes reason);\\n\\n    /**\\n     * @notice Apply a new configuration for all *new* containers to be scheduled\\n     * @param config A ERC3000Data.Config struct holding all the new params that will control the system\\n     * @return configHash\\n     */\\n    function configure(ERC3000Data.Config memory config) virtual public returns (bytes32 configHash);\\n    event Configured(bytes32 indexed containerHash, address indexed actor, ERC3000Data.Config config);\\n}\\n\",\"keccak256\":\"0x274bc6206afff001e43f8c51ecddc1af5f6576cb0cf8738669211e7a384398b2\",\"license\":\"MIT\"},\"erc3k/contracts/IERC3000Executor.sol\":{\"content\":\"/*\\n * SPDX-License-Identifier:    MIT\\n */\\n\\npragma solidity ^0.6.8;\\npragma experimental ABIEncoderV2;\\n\\nimport \\\"./ERC3000Data.sol\\\";\\n\\nabstract contract IERC3000Executor {\\n    bytes4 internal constant ERC3000_EXEC_INTERFACE_ID = this.exec.selector;\\n\\n    /**\\n     * @notice Executes all given actions\\n     * @param actions A array of ERC3000Data.Action for later executing those\\n     * @param allowFailuresMap A map with the allowed failures\\n     * @param memo The hash of the ERC3000Data.Container\\n     * @return failureMap\\n     * @return execResults\\n     */\\n    function exec(ERC3000Data.Action[] memory actions, bytes32 allowFailuresMap, bytes32 memo) virtual public returns (bytes32 failureMap, bytes[] memory execResults);\\n    event Executed(address indexed actor, ERC3000Data.Action[] actions, bytes32 memo, bytes32 failureMap, bytes[] execResults);\\n}\\n\",\"keccak256\":\"0x568a412f560f477d831f5bc0bec927045686eea66a3a797c3f6784c7acefbf74\",\"license\":\"MIT\"},\"erc3k/contracts/IERC3000Registry.sol\":{\"content\":\"/*\\n * SPDX-License-Identifier:    GPL-3.0\\n */\\n\\npragma solidity 0.6.8;\\n\\nimport \\\"./IERC3000.sol\\\";\\nimport \\\"./IERC3000Executor.sol\\\";\\n\\nimport \\\"@aragon/govern-token/contracts/interfaces/IERC20.sol\\\";\\n\\nabstract contract IERC3000Registry is ERC3000Interface {\\n    /**\\n     * @notice Registers a IERC3000Executor and IERC3000 contract by a name and with his metadata\\n     * @param executor IERC3000Executor contract\\n     * @param queue IERC3000 contract\\n     * @param name The name of this DAO\\n     * @param token Governance token of the DAO\\n     * @param initialMetadata Additional data to store for this DAO\\n     */\\n    function register(IERC3000Executor executor, IERC3000 queue, IERC20 token, string calldata name, bytes calldata initialMetadata) virtual external;\\n    event Registered(IERC3000Executor indexed executor, IERC3000 queue, IERC20 indexed token, address indexed registrant, string name);\\n\\n    /**\\n     * @notice Sets or updates the metadata of a DAO\\n     * @param metadata Additional data to store for this DAO\\n     */\\n    function setMetadata(bytes memory metadata) virtual public;\\n    event SetMetadata(IERC3000Executor indexed executor, bytes metadata);\\n}\\n\",\"keccak256\":\"0x04ec42671ea3601d9a50f227d666ac187d0712b24b168edaf1c037ac38c83973\",\"license\":\"GPL-3.0\"}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b50610588806100206000396000f3fe608060405234801561001057600080fd5b50600436106100415760003560e01c80630b905028146100465780630b9b6e8b14610138578063ee57e36f146101f2575b600080fd5b610136600480360360a081101561005c57600080fd5b73ffffffffffffffffffffffffffffffffffffffff823581169260208101358216926040820135909216918101906080810160608201356401000000008111156100a557600080fd5b8201836020820111156100b757600080fd5b803590602001918460018302840111640100000000831117156100d957600080fd5b9193909290916020810190356401000000008111156100f757600080fd5b82018360208201111561010957600080fd5b8035906020019184600183028401116401000000008311171561012b57600080fd5b509092509050610298565b005b6101de6004803603602081101561014e57600080fd5b81019060208101813564010000000081111561016957600080fd5b82018360208201111561017b57600080fd5b8035906020019184600183028401116401000000008311171561019d57600080fd5b91908080601f016020809104026020016040519081016040528093929190818152602001838380828437600092019190915250929550610471945050505050565b604080519115158252519081900360200190f35b6101366004803603602081101561020857600080fd5b81019060208101813564010000000081111561022357600080fd5b82018360208201111561023557600080fd5b8035906020019184600183028401116401000000008311171561025757600080fd5b91908080601f016020809104026020016040519081016040528093929190818152602001838380828437600092019190915250929550610491945050505050565b6000848460405180838380828437919091019485525050604051928390036020019092205460ff16159150610330905057604080517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601360248201527f72656769737472793a206e616d65207573656400000000000000000000000000604482015290519081900360640190fd5b60016000858560405180838380828437919091019485525050604080516020948190038501812080547fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00169615159690961790955573ffffffffffffffffffffffffffffffffffffffff8b8116865293850181815290850188905233948a8516948d1693507f8dfddb09c08116a0346477db61e50edc35c83622ff678af78a0146c5ceb77a2c92508b918a918a9160608201848480828437600083820152604051601f9091017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe016909201829003965090945050505050a46104688783838080601f01602080910402602001604051908101604052809392919081815260200183838082843760009201919091525061049e92505050565b50505050505050565b805160208183018101805160008252928201919093012091525460ff1681565b61049b338261049e565b50565b8173ffffffffffffffffffffffffffffffffffffffff167f8fa78869a20b896e44b704e4e5ee97cbb81cc5639ff16aec59c41cd97427b5a6826040518080602001828103825283818151815260200191508051906020019080838360005b838110156105145781810151838201526020016104fc565b50505050905090810190601f1680156105415780820380516001836020036101000a031916815260200191505b509250505060405180910390a2505056fea2646970667358221220b56746de33649d00add6dce08be4835eac5e3306c9e55ece6e2c5dbf9c18e94664736f6c63430006080033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100415760003560e01c80630b905028146100465780630b9b6e8b14610138578063ee57e36f146101f2575b600080fd5b610136600480360360a081101561005c57600080fd5b73ffffffffffffffffffffffffffffffffffffffff823581169260208101358216926040820135909216918101906080810160608201356401000000008111156100a557600080fd5b8201836020820111156100b757600080fd5b803590602001918460018302840111640100000000831117156100d957600080fd5b9193909290916020810190356401000000008111156100f757600080fd5b82018360208201111561010957600080fd5b8035906020019184600183028401116401000000008311171561012b57600080fd5b509092509050610298565b005b6101de6004803603602081101561014e57600080fd5b81019060208101813564010000000081111561016957600080fd5b82018360208201111561017b57600080fd5b8035906020019184600183028401116401000000008311171561019d57600080fd5b91908080601f016020809104026020016040519081016040528093929190818152602001838380828437600092019190915250929550610471945050505050565b604080519115158252519081900360200190f35b6101366004803603602081101561020857600080fd5b81019060208101813564010000000081111561022357600080fd5b82018360208201111561023557600080fd5b8035906020019184600183028401116401000000008311171561025757600080fd5b91908080601f016020809104026020016040519081016040528093929190818152602001838380828437600092019190915250929550610491945050505050565b6000848460405180838380828437919091019485525050604051928390036020019092205460ff16159150610330905057604080517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601360248201527f72656769737472793a206e616d65207573656400000000000000000000000000604482015290519081900360640190fd5b60016000858560405180838380828437919091019485525050604080516020948190038501812080547fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00169615159690961790955573ffffffffffffffffffffffffffffffffffffffff8b8116865293850181815290850188905233948a8516948d1693507f8dfddb09c08116a0346477db61e50edc35c83622ff678af78a0146c5ceb77a2c92508b918a918a9160608201848480828437600083820152604051601f9091017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe016909201829003965090945050505050a46104688783838080601f01602080910402602001604051908101604052809392919081815260200183838082843760009201919091525061049e92505050565b50505050505050565b805160208183018101805160008252928201919093012091525460ff1681565b61049b338261049e565b50565b8173ffffffffffffffffffffffffffffffffffffffff167f8fa78869a20b896e44b704e4e5ee97cbb81cc5639ff16aec59c41cd97427b5a6826040518080602001828103825283818151815260200191508051906020019080838360005b838110156105145781810151838201526020016104fc565b50505050905090810190601f1680156105415780820380516001836020036101000a031916815260200191505b509250505060405180910390a2505056fea2646970667358221220b56746de33649d00add6dce08be4835eac5e3306c9e55ece6e2c5dbf9c18e94664736f6c63430006080033",
+  "devdoc": {
+    "methods": {}
+  },
+  "userdoc": {
+    "methods": {}
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 1650,
+        "contract": "@aragon/govern-core/contracts/GovernRegistry.sol:GovernRegistry",
+        "label": "nameUsed",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_mapping(t_string_memory_ptr,t_bool)"
+      }
+    ],
+    "types": {
+      "t_bool": {
+        "encoding": "inplace",
+        "label": "bool",
+        "numberOfBytes": "1"
+      },
+      "t_mapping(t_string_memory_ptr,t_bool)": {
+        "encoding": "mapping",
+        "key": "t_string_memory_ptr",
+        "label": "mapping(string => bool)",
+        "numberOfBytes": "32",
+        "value": "t_bool"
+      },
+      "t_string_memory_ptr": {
+        "encoding": "bytes",
+        "label": "string",
+        "numberOfBytes": "32"
+      }
+    }
+  }
+}
