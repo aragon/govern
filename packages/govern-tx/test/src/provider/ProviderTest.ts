@@ -29,7 +29,7 @@ class TXResponse implements TransactionResponse {
 /**
  * Provider test
  */
-describe.skip('ProviderTest', () => {
+describe('ProviderTest', () => {
     let provider: Provider,
     walletMock: Wallet,
     databaseMock: Database,
@@ -68,19 +68,21 @@ describe.skip('ProviderTest', () => {
     it('calls sendTransaction and returns with the expected value', async () => {
         const txResponse = new TXResponse()
 
-        txResponse.wait.mockReturnValueOnce(Promise.resolve('RECEIPT'))
+        txResponse.wait.mockReturnValueOnce(Promise.resolve('RECEIPT'));
 
-        (walletMock.sign as jest.MockedFunction<typeof walletMock.sign>).mockReturnValueOnce('0x00')
+        (walletMock.sign as jest.MockedFunction<typeof walletMock.sign>).mockReturnValueOnce(Promise.resolve('0x00'));
 
-        (contractFunctionMock.encode as jest.MockedFunction<typeof contractFunctionMock.encode>).mockReturnValue('0x00')
+        (contractFunctionMock.encode as jest.MockedFunction<typeof contractFunctionMock.encode>).mockReturnValue('0x00');
 
-        (baseProviderMock.sendTransaction as jest.MockedFunction<typeof baseProviderMock.sendTransaction>).mockReturnValue(Promise.resolve(txResponse))
+        (baseProviderMock.sendTransaction as jest.MockedFunction<typeof baseProviderMock.sendTransaction>).mockReturnValue(Promise.resolve(txResponse));
 
-        (baseProviderMock.estimateGas as jest.MockedFunction<typeof baseProviderMock.estimateGas>).mockReturnValue(Promise.resolve(BigNumber.from(0)))
+        (baseProviderMock.estimateGas as jest.MockedFunction<typeof baseProviderMock.estimateGas>).mockReturnValue(Promise.resolve(BigNumber.from(0)));
 
-        expect(baseProviderMock.sendTransaction).toHaveBeenNthCalledWith(1, '0x00')
+        await expect(provider.sendTransaction('GovernQueue', contractFunctionMock)).resolves.toEqual('RECEIPT');
 
-        expect(txResponse.wait).toHaveBeenNthCalledWith(1, 0)
+        expect(baseProviderMock.sendTransaction).toHaveBeenNthCalledWith(1, '0x00');
+
+        expect(txResponse.wait).toHaveBeenNthCalledWith(1, 0);
 
         expect(walletMock.sign).toHaveBeenNthCalledWith(
             1,
@@ -88,29 +90,108 @@ describe.skip('ProviderTest', () => {
                 to: '0x00',
                 data: '0x00',
                 gasLimit: BigNumber.from(0)
-            }
-        )
+            },
+            'publicKey'
+        );
 
-        expect(contractFunctionMock.encode).toHaveBeenCalledTimes(1)
+        expect(contractFunctionMock.encode).toHaveBeenCalledTimes(1);
     })
 
     it('calls sendTransaction and the wallet throws on signing', async () => {
+        (walletMock.sign as jest.MockedFunction<typeof walletMock.sign>).mockReturnValueOnce(Promise.reject('NOPE'));
 
+        (contractFunctionMock.encode as jest.MockedFunction<typeof contractFunctionMock.encode>).mockReturnValue('0x00');
+
+        (baseProviderMock.estimateGas as jest.MockedFunction<typeof baseProviderMock.estimateGas>).mockReturnValue(Promise.resolve(BigNumber.from(0)));
+
+        await expect(provider.sendTransaction('GovernQueue', contractFunctionMock)).rejects.toEqual('NOPE');
+
+        expect(walletMock.sign).toHaveBeenNthCalledWith(
+            1,
+            {
+                to: '0x00',
+                data: '0x00',
+                gasLimit: BigNumber.from(0)
+            },
+            'publicKey'
+        );
+
+        expect(contractFunctionMock.encode).toHaveBeenCalledTimes(1);
     })
 
     it('calls sendTransaction and estimation of the gas throws', async () => {
+        (contractFunctionMock.encode as jest.MockedFunction<typeof contractFunctionMock.encode>).mockReturnValue('0x00');
 
+        (baseProviderMock.estimateGas as jest.MockedFunction<typeof baseProviderMock.estimateGas>).mockReturnValue(Promise.reject('NOPE'));
+
+        await expect(provider.sendTransaction('GovernQueue', contractFunctionMock)).rejects.toEqual('NOPE');
+
+        expect(contractFunctionMock.encode).toHaveBeenCalledTimes(1);
     })
 
     it('calls sendTransaction and encoding of the contract function throws', async () => {
+        (contractFunctionMock.encode as jest.MockedFunction<typeof contractFunctionMock.encode>).mockImplementation(() => {throw 'NOPE'})
 
+        await expect(provider.sendTransaction('GovernQueue', contractFunctionMock)).rejects.toEqual('NOPE');
+
+        expect(contractFunctionMock.encode).toHaveBeenCalledTimes(1);
     })
 
     it('calls sendTransaction and the BaseProvider throws on executing the request', async () => {
+        (walletMock.sign as jest.MockedFunction<typeof walletMock.sign>).mockReturnValueOnce(Promise.resolve('0x00'));
 
+        (contractFunctionMock.encode as jest.MockedFunction<typeof contractFunctionMock.encode>).mockReturnValue('0x00');
+
+        (baseProviderMock.sendTransaction as jest.MockedFunction<typeof baseProviderMock.sendTransaction>).mockReturnValue(Promise.reject('NOPE'));
+
+        (baseProviderMock.estimateGas as jest.MockedFunction<typeof baseProviderMock.estimateGas>).mockReturnValue(Promise.resolve(BigNumber.from(0)));
+
+        await expect(provider.sendTransaction('GovernQueue', contractFunctionMock)).rejects.toEqual('NOPE');
+
+        expect(baseProviderMock.sendTransaction).toHaveBeenNthCalledWith(1, '0x00');
+
+        expect(walletMock.sign).toHaveBeenNthCalledWith(
+            1,
+            {
+                to: '0x00',
+                data: '0x00',
+                gasLimit: BigNumber.from(0)
+            },
+            'publicKey'
+        );
+
+        expect(contractFunctionMock.encode).toHaveBeenCalledTimes(1);
     })
 
     it('calls sendTransaction and the BaseProvider throws while waiting until it is mined', async () => {
+        const txResponse = new TXResponse()
 
+        txResponse.wait.mockReturnValueOnce(Promise.reject('NOPE'));
+
+        (walletMock.sign as jest.MockedFunction<typeof walletMock.sign>).mockReturnValueOnce(Promise.resolve('0x00'));
+
+        (contractFunctionMock.encode as jest.MockedFunction<typeof contractFunctionMock.encode>).mockReturnValue('0x00');
+
+        (baseProviderMock.sendTransaction as jest.MockedFunction<typeof baseProviderMock.sendTransaction>).mockReturnValue(Promise.resolve(txResponse));
+
+        (baseProviderMock.estimateGas as jest.MockedFunction<typeof baseProviderMock.estimateGas>).mockReturnValue(Promise.resolve(BigNumber.from(0)));
+
+        await expect(provider.sendTransaction('GovernQueue', contractFunctionMock)).rejects.toEqual('NOPE');
+
+        expect(baseProviderMock.sendTransaction).toHaveBeenNthCalledWith(1, '0x00');
+
+        expect(txResponse.wait).toHaveBeenNthCalledWith(1, 0);
+
+        expect(walletMock.sign).toHaveBeenNthCalledWith(
+            1,
+            {
+                to: '0x00',
+                data: '0x00',
+                gasLimit: BigNumber.from(0)
+            },
+            'publicKey'
+        );
+
+        expect(contractFunctionMock.encode).toHaveBeenCalledTimes(1);
     })
 })
