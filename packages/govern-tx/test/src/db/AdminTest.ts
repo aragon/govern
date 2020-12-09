@@ -25,102 +25,82 @@ describe('AdminTest', () => {
     })
 
     it('calls isAdmin and returns true', async () => {
-        databaseMock.query = jest.fn((query) => {
-            expect(query).toEqual(`SELECT * FROM admins WHERE PublicKey='0x00'`)
-
-            return Promise.resolve([0])
-        })
+        (databaseMock.query as jest.MockedFunction<typeof databaseMock.query>).mockReturnValueOnce(Promise.resolve([0]))
 
         await expect(admin.isAdmin('0x00')).resolves.toEqual(true)
+
+        expect(databaseMock.query).toHaveBeenNthCalledWith(1, `SELECT * FROM admins WHERE PublicKey='0x00'`)
     })
 
     it('calls isAdmin and returns false', async () => {
-        databaseMock.query = jest.fn((query) => {
-            expect(query).toEqual(`SELECT * FROM admins WHERE PublicKey='0x00'`)
-
-            return Promise.resolve([])
-        })
+        (databaseMock.query as jest.MockedFunction<typeof databaseMock.query>).mockReturnValueOnce(Promise.resolve([]))
 
         await expect(admin.isAdmin('0x00')).resolves.toEqual(false)
+
+        expect(databaseMock.query).toHaveBeenNthCalledWith(1, `SELECT * FROM admins WHERE PublicKey='0x00'`)
     })
 
     it('calls isAdmin and throws as expected', async () => {
-        databaseMock.query = jest.fn((query) => {
-            expect(query).toEqual(`SELECT * FROM admins WHERE PublicKey='0x00'`)
-
-            return Promise.reject('NOPE')
-        })
+        (databaseMock.query as jest.MockedFunction<typeof databaseMock.query>).mockReturnValueOnce(Promise.reject('NOPE'))
 
         await expect(admin.isAdmin('0x00')).rejects.toEqual('NOPE')
+
+        expect(databaseMock.query).toHaveBeenNthCalledWith(1, `SELECT * FROM admins WHERE PublicKey='0x00'`)
     })
 
     it('calls addAdmin and returns the expected value', async () => {
-        databaseMock.query = jest.fn((query) => {
-            expect(query).toEqual(`INSERT INTO admins VALUES (0x00)`)
-
-            return Promise.resolve(true)
-        })
+        (databaseMock.query as jest.MockedFunction<typeof databaseMock.query>).mockReturnValueOnce(Promise.resolve(true))
 
         await expect(admin.addAdmin('0x00')).resolves.toEqual(true)
+
+        expect(databaseMock.query).toHaveBeenNthCalledWith(1, `INSERT INTO admins VALUES (0x00)`)
     })
 
     it('calls addAdmin and throws as expected', async () => {
-        databaseMock.query = jest.fn((query) => {
-            expect(query).toEqual(`INSERT INTO admins VALUES (0x00)`)
-
-            return Promise.reject('NOPE')
-        })
+        (databaseMock.query as jest.MockedFunction<typeof databaseMock.query>).mockReturnValueOnce(Promise.reject('NOPE'))
 
         await expect(admin.addAdmin('0x00')).rejects.toEqual('NOPE')
+
+        expect(databaseMock.query).toHaveBeenNthCalledWith(1, `INSERT INTO admins VALUES (0x00)`)
     })
 
     it('calls deleteAdmin and returns true', async () => {
-        databaseMock.query = jest.fn((query) => {
-            expect(query).toEqual(`DELETE FROM admins WHERE PublicKey='0x00'`)
-
-            return Promise.resolve([0])
-        })
+        (databaseMock.query as jest.MockedFunction<typeof databaseMock.query>).mockReturnValueOnce(Promise.resolve([0]))
 
         await expect(admin.deleteAdmin('0x00')).resolves.toEqual(true)
+
+        expect(databaseMock.query).toHaveBeenNthCalledWith(1, `DELETE FROM admins WHERE PublicKey='0x00'`)
     })
 
     it('calls deleteAdmin and returns false', async () => {
-        databaseMock.query = jest.fn((query) => {
-            expect(query).toEqual(`DELETE FROM admins WHERE PublicKey='0x00'`)
-
-            return Promise.resolve([])
-        })
+        (databaseMock.query as jest.MockedFunction<typeof databaseMock.query>).mockReturnValueOnce(Promise.resolve([]))
 
         await expect(admin.deleteAdmin('0x00')).resolves.toEqual(false)
+
+        expect(databaseMock.query).toHaveBeenNthCalledWith(1, `DELETE FROM admins WHERE PublicKey='0x00'`)
     })
 
     it('calls deleteAdmin and throws as expected', async () => {
-        databaseMock.query = jest.fn((query) => {
-            expect(query).toEqual(`DELETE FROM admins WHERE PublicKey='0x00'`)
-
-            return Promise.reject('NOPE')
-        })
+        (databaseMock.query as jest.MockedFunction<typeof databaseMock.query>).mockReturnValueOnce(Promise.reject('NOPE'))
 
         await expect(admin.deleteAdmin('0x00')).rejects.toEqual('NOPE')
+
+        expect(databaseMock.query).toHaveBeenNthCalledWith(1, `DELETE FROM admins WHERE PublicKey='0x00'`)
     })
 
     it('calls getAdmins and returns the expected value', async () => {
-        databaseMock.query = jest.fn((query) => {
-            expect(query).toEqual('SELECT * from admins')
-
-            return Promise.resolve(true)
-        })
+        (databaseMock.query as jest.MockedFunction<typeof databaseMock.query>).mockReturnValueOnce(Promise.resolve(true))
 
         await expect(admin.getAdmins()).resolves.toEqual(true)
+
+        expect(databaseMock.query).toHaveBeenNthCalledWith(1, 'SELECT * from admins')
     })
 
     it('calls getAdmins and throws as expected', async () => {
-        databaseMock.query = jest.fn((query) => {
-            expect(query).toEqual('SELECT * from admins')
-
-            return Promise.reject('NOPE')
-        })
+        (databaseMock.query as jest.MockedFunction<typeof databaseMock.query>).mockReturnValueOnce(Promise.reject('NOPE'))
 
         await expect(admin.getAdmins()).rejects.toEqual('NOPE')
+
+        expect(databaseMock.query).toHaveBeenNthCalledWith(1, 'SELECT * from admins')
     })
 })

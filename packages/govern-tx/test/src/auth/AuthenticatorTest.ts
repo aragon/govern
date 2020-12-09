@@ -34,11 +34,8 @@ describe('AuthenticatorTest', () => {
     const NO_ALLOWED = new Unauthorized('Not allowed action!');
 
     beforeEach(() => {
-        const verifyMock = verifyMessage as jest.MockedFunction<typeof verifyMessage>
-        const arrayifyMock = arrayify as jest.MockedFunction<typeof arrayify>
-
-        verifyMock.mockReturnValue('0x00')
-        arrayifyMock.mockReturnValue(new Uint8Array(0x00))
+        (arrayify as jest.MockedFunction<typeof arrayify>).mockReturnValue(new Uint8Array(0x00));
+        (verifyMessage as jest.MockedFunction<typeof verifyMessage>).mockReturnValue('0x00')
 
         databaseMock = new Database({
             user: 'user',
@@ -58,11 +55,7 @@ describe('AuthenticatorTest', () => {
     })
 
     it('calls authenticate as normal user and grants access to the transaction actions', async () => {
-        whitelistMock.keyExists = jest.fn((publicKey) => {
-            expect(publicKey).toEqual('0x00')
-
-            return Promise.resolve(true)
-        })
+        (whitelistMock.keyExists as jest.MockedFunction<typeof whitelistMock.keyExists>).mockReturnValueOnce(Promise.resolve(true))
 
         await authenticator.authenticate(request as FastifyRequest)
 
@@ -70,16 +63,12 @@ describe('AuthenticatorTest', () => {
 
         expect(arrayify).toHaveBeenNthCalledWith(1, request.body.message)
 
-        expect(whitelistMock.keyExists).toHaveBeenCalled()
+        expect(whitelistMock.keyExists).toHaveBeenNthCalledWith(1, '0x00')
     })
 
     it('calls authenticate as normal user and restricts access to the whitelist', async () => {
-        adminMock.isAdmin = jest.fn((publicKey) => {
-            expect(publicKey).toEqual('0x00')
+        (adminMock.isAdmin as jest.MockedFunction<typeof adminMock.isAdmin>).mockReturnValueOnce(Promise.resolve(false))
 
-            return Promise.resolve(false)
-        })
-        
         request.routerPath = '/whitelist'
         
         await expect(authenticator.authenticate(request as FastifyRequest)).rejects.toThrowError(NO_ALLOWED)
@@ -88,21 +77,13 @@ describe('AuthenticatorTest', () => {
 
         expect(arrayify).toHaveBeenNthCalledWith(1, request.body.message)
 
-        expect(adminMock.isAdmin).toHaveBeenCalled()
+        expect(adminMock.isAdmin).toHaveBeenNthCalledWith(1, '0x00')
     })
 
     it('calls authencticate as admin user and grants access to the transaction actions', async () => {
-        adminMock.isAdmin = jest.fn((publicKey) => {
-            expect(publicKey).toEqual('0x00')
+        (adminMock.isAdmin as jest.MockedFunction<typeof adminMock.isAdmin>).mockReturnValueOnce(Promise.resolve(true));
 
-            return Promise.resolve(true)
-        })
-
-        whitelistMock.keyExists = jest.fn((publicKey) => {
-            expect(publicKey).toEqual('0x00')
-
-            return Promise.resolve(false)
-        })
+        (whitelistMock.keyExists as jest.MockedFunction<typeof whitelistMock.keyExists>).mockReturnValueOnce(Promise.resolve(false))
 
         request.routerPath = '/execute'
 
@@ -112,18 +93,14 @@ describe('AuthenticatorTest', () => {
 
         expect(arrayify).toHaveBeenNthCalledWith(1, request.body.message)
 
-        expect(adminMock.isAdmin).toHaveBeenCalled()
+        expect(adminMock.isAdmin).toHaveBeenNthCalledWith(1, '0x00')
 
-        expect(whitelistMock.keyExists).toHaveBeenCalled()
+        expect(whitelistMock.keyExists).toHaveBeenNthCalledWith(1, '0x00')
     })
 
     it('calls authenticate as admin user and grants access to the whitelist actions', async () => {
-        adminMock.isAdmin = jest.fn((publicKey) => {
-            expect(publicKey).toEqual('0x00')
-
-            return Promise.resolve(true)
-        })
-
+        (adminMock.isAdmin as jest.MockedFunction<typeof adminMock.isAdmin>).mockReturnValueOnce(Promise.resolve(true));
+        
         request.routerPath = '/whitelist'
 
         await authenticator.authenticate(request as FastifyRequest)
@@ -132,6 +109,6 @@ describe('AuthenticatorTest', () => {
 
         expect(arrayify).toHaveBeenNthCalledWith(1, request.body.message)
 
-        expect(adminMock.isAdmin).toHaveBeenCalled()
+        expect(adminMock.isAdmin).toHaveBeenNthCalledWith(1, '0x00')
     })
 })
