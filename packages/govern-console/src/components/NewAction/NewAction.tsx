@@ -33,6 +33,24 @@ type NewActionProps = {
   queueAddress: string
 }
 
+function determineMemberType(
+  memberMutabilityType: string,
+): 'event' | 'fallback' | 'function' | 'view' {
+  if (memberMutabilityType === 'view' || memberMutabilityType === 'pure') {
+    return 'view'
+  }
+
+  if (memberMutabilityType === 'receive') {
+    return 'fallback'
+  }
+
+  if (memberMutabilityType === 'event') {
+    return 'event'
+  }
+
+  return 'function'
+}
+
 export default function NewAction({
   config,
   executorAddress,
@@ -161,27 +179,26 @@ export default function NewAction({
           </label>
           <Button onClick={handleParseAbi}>Parse ABI</Button>
         </form>
+
         {abi &&
-          parsedAbi!.map(
-            (abiItem: any) =>
-              abiItem?.type === 'function' && (
-                <Frame key={abiItem.name}>
-                  <ContractCallHandler
-                    config={config}
-                    contractAddress={contractAddress}
-                    ercContract={ercContract}
-                    executor={executorAddress}
-                    handleSetExecutionResult={handleSetExecutionResult}
-                    inputs={abiItem.inputs}
-                    name={abiItem.name}
-                    proof={proof}
-                    queueContract={queueContract}
-                    queueAddress={queueAddress}
-                    rawAbiItem={abiItem}
-                  />
-                </Frame>
-              ),
-          )}
+          parsedAbi!.map((abiItem: any) => (
+            <Frame key={abiItem.name}>
+              <ContractCallHandler
+                config={config}
+                contractAddress={contractAddress}
+                ercContract={ercContract}
+                executor={executorAddress}
+                handleSetExecutionResult={handleSetExecutionResult}
+                inputs={abiItem.inputs}
+                memberType={determineMemberType(abiItem.stateMutability)}
+                name={abiItem.name}
+                proof={proof}
+                queueContract={queueContract}
+                queueAddress={queueAddress}
+                rawAbiItem={abiItem}
+              />
+            </Frame>
+          ))}
       </Frame>
     </>
   )
@@ -194,6 +211,7 @@ type ContractCallHandlerProps = {
   executor: string
   handleSetExecutionResult: (result: string, v: string) => void
   inputs: Input[] | any[]
+  memberType: string
   name: string
   proof: string
   queueAddress: string
@@ -227,7 +245,6 @@ function ContractCallHandler({
       value: '',
     }))
   })
-
   const { account } = useWallet()
 
   const updateValue = useCallback(
@@ -360,13 +377,27 @@ function ContractCallHandler({
           <div key={value.name}>
             <label>
               {value.name}
-              <input
-                value={values[i].value}
-                onChange={e => updateValue(value.name, e.target.value)}
-                css={`
-                  margin-top: 12px;
-                `}
-              />
+              {value.type === 'bool' ? (
+                <select
+                  value={values[i].value}
+                  onChange={e => updateValue(value.name, e.target.value)}
+                  css={`
+                    color: black;
+                  `}
+                >
+                  <option value={'true'}>true</option>
+                  <option value={'false'}>false</option>
+                </select>
+              ) : (
+                <input
+                  value={values[i].value}
+                  onChange={e => updateValue(value.name, e.target.value)}
+                  css={`
+                    margin-top: 12px;
+                    color: black;
+                  `}
+                />
+              )}
             </label>
           </div>
         ))}
