@@ -9,7 +9,6 @@ import Provider from '../../../src/provider/Provider'
 // Mocks
 jest.mock('@ethersproject/providers')
 jest.mock('../../../src/wallet/Wallet')
-jest.mock('../../../src/db/Database')
 jest.mock('../../../lib/transactions/ContractFunction')
 
 // Mock TX response class 
@@ -32,21 +31,11 @@ class TXResponse implements TransactionResponse {
 describe('ProviderTest', () => {
     let provider: Provider,
     walletMock: Wallet,
-    databaseMock: Database,
     baseProviderMock: BaseProvider,
     contractFunctionMock: ContractFunction;
 
     beforeEach(() => {
-        new Database({
-            host: 'host',
-            port: 100,
-            database: 'database',
-            user: 'user',
-            password: 'password'
-        })
-        databaseMock = (Database as jest.MockedClass<typeof Database>).mock.instances[0]
-        
-        new Wallet(databaseMock)
+        new Wallet({} as Database)
         walletMock = (Wallet as jest.MockedClass<typeof Wallet>).mock.instances[0]
 
         new ContractFunction({} as JsonFragment, 'request')

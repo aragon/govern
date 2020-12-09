@@ -10,7 +10,6 @@ import Database from '../../../src/db/Database';
 // Mocks
 jest.mock('../../../src/db/Admin')
 jest.mock('../../../src/db/Whitelist')
-jest.mock('../../../src/db/Database')
 jest.mock('@ethersproject/wallet')
 jest.mock('@ethersproject/bytes')
 
@@ -20,7 +19,6 @@ jest.mock('@ethersproject/bytes')
 describe('AuthenticatorTest', () => {
     let authenticator: Authenticator,
     whitelistMock: Whitelist,
-    databaseMock: Database,
     adminMock: Admin,
     request = {
         routerPath: '/execute',
@@ -30,25 +28,16 @@ describe('AuthenticatorTest', () => {
         }
     };
 
-
     const NO_ALLOWED = new Unauthorized('Not allowed action!');
 
     beforeEach(() => {
         (arrayify as jest.MockedFunction<typeof arrayify>).mockReturnValue(new Uint8Array(0x00));
         (verifyMessage as jest.MockedFunction<typeof verifyMessage>).mockReturnValue('0x00')
 
-        databaseMock = new Database({
-            user: 'user',
-            host: 'host',
-            password: 'password',
-            database: 'databaseName',
-            port: 1000
-        })
-
-        new Whitelist(databaseMock)
+        new Whitelist({} as Database)
         whitelistMock = (Whitelist as jest.MockedClass<typeof Whitelist>).mock.instances[0]
 
-        new Admin(databaseMock)
+        new Admin({} as Database)
         adminMock = (Admin as jest.MockedClass<typeof Admin>).mock.instances[0]
 
         authenticator = new Authenticator(whitelistMock, adminMock)
