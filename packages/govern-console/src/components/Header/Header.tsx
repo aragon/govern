@@ -60,6 +60,7 @@ function Header() {
           type="button"
           onClick={handleGoToHome}
           css={`
+            display: flex;
             background: transparent;
             border: 0px;
             &:hover {
@@ -71,17 +72,17 @@ function Header() {
             }
           `}
         >
-          <img src={AragonSvg} width="36" alt="Grey Eagle Aragon logo" />
+          <img src={AragonSvg} width="36" alt="" />
+          <h1
+            css={`
+              flex-grow: 1;
+              font-size: 24px;
+              margin-left: 8px;
+            `}
+          >
+            Govern Console
+          </h1>
         </button>
-        <h1
-          css={`
-            flex-grow: 1;
-            font-size: 24px;
-            margin-left: 8px;
-          `}
-        >
-          Govern Console
-        </h1>
       </div>
       <div>
         <label
