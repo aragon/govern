@@ -87,14 +87,23 @@ export default function DaoView() {
   const { chainId } = useChainId()
   const { daoAddress }: any = useParams()
   const { path } = useRouteMatch()
-  const { data, isLoading: loading, error } = useQuery('DAO_DATA', async () =>
-    request(
-      chainId === 4 ? env('RINKEBY_SUBGRAPH_URL') : env('MAINNET_SUBGRAPH_URL'),
-      DAO_QUERY,
-      {
-        name: daoAddress,
-      },
-    ),
+  const { data, isLoading: loading, error } = useQuery(
+    // This is the key for retrieving the data from react-query's cache;
+    // originally we were using the same key for this DAO query, no matter
+    // which DAO, but having an unique (but reproducible) key per DAO lets
+    // us store data on the user browser and persist it while avoiding
+    // false "info" flashes on other DAOs due to key collisions
+    `DAO_DATA_${daoAddress}`,
+    async () =>
+      request(
+        chainId === 4
+          ? env('RINKEBY_SUBGRAPH_URL')
+          : env('MAINNET_SUBGRAPH_URL'),
+        DAO_QUERY,
+        {
+          name: daoAddress,
+        },
+      ),
   )
 
   if (loading) {
