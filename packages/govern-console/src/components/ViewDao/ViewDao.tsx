@@ -17,7 +17,7 @@ type ViewDaoProps = {
   dao: any
 }
 
-export default function ViewDao({ dao }: ViewDaoProps) {
+export default function ViewDao({ dao }: ViewDaoProps): JSX.Element {
   const [ethBalance, setEthBalance] = useState('')
   const { daoAddress }: any = useParams()
   const history = useHistory()

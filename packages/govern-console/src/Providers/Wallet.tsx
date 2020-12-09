@@ -22,12 +22,12 @@ export function useWalletAugmented() {
   return walletContext
 }
 
-type WalletAugmentedProps = {
-  children: React.ReactNode
-}
-
 // Adds Ethers.js to the useWallet() object
-function WalletAugmented({ children }: WalletAugmentedProps) {
+function WalletAugmented({
+  children,
+}: {
+  children: React.ReactNode
+}): JSX.Element {
   const wallet: Wallet<any> = useWallet()
   const { ethereum } = wallet
   const { chainId } = useChainId()
@@ -49,11 +49,11 @@ function WalletAugmented({ children }: WalletAugmentedProps) {
   )
 }
 
-type WalletProviderProps = {
+export default function WalletProvider({
+  children,
+}: {
   children: React.ReactNode
-}
-
-export default function WalletProvider({ children }: WalletProviderProps) {
+}): JSX.Element {
   const { chainId } = useChainId()
 
   return (

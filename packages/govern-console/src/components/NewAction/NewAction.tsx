@@ -37,7 +37,7 @@ export default function NewAction({
   config,
   executorAddress,
   queueAddress,
-}: NewActionProps) {
+}: NewActionProps): JSX.Element {
   const [abi, setAbi] = useState('')
   const [contractAddress, setContractAddress] = useState('')
   const [parsedAbi, setParsedAbi] = useState([])

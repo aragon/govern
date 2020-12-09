@@ -8,7 +8,7 @@ import { useWallet } from '../../Providers/Wallet'
 import { shortenAddress, getNetworkName } from '../../lib/web3-utils'
 import AragonSvg from '../../assets/aragon-metal.svg'
 
-function Header() {
+function Header(): JSX.Element {
   const { chainId, setChainId } = useChainId()
   const { wallet } = useWallet()
   const history = useHistory()

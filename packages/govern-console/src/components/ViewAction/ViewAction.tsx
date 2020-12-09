@@ -451,7 +451,7 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
 export default function ViewActionWrapper({
   containers,
   queueAddress,
-}: ViewActionWrapperProps) {
+}: ViewActionWrapperProps): JSX.Element {
   const { containerId }: any = useParams()
   const container = useMemo(() => {
     return containers.find(container => container.id === containerId)

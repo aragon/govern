@@ -12,7 +12,7 @@ type FilteredActionsProps = {
 export default function FilteredActions({
   actions,
   actionsPerPage,
-}: FilteredActionsProps) {
+}: FilteredActionsProps): JSX.Element {
   const [selected, setSelected] = useState(0)
   const [selectedFilter, setSelectedFilter] = useState<
     'Executed' | 'Scheduled' | 'All'

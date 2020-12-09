@@ -7,7 +7,7 @@ import TopHeader from './components/Header/Header'
 import { useChainId } from './Providers/ChainId'
 import { getNetworkName } from './lib/web3-utils'
 
-function App() {
+function App(): JSX.Element {
   const location: any = useLocation()
   const { chainId } = useChainId()
 
