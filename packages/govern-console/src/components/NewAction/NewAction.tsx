@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import BN from 'bn.js'
 import { useWallet } from 'use-wallet'
 import abiCoder from 'web3-eth-abi'
@@ -65,6 +65,7 @@ export default function NewAction({
 
   const queueContract = useContract(queueAddress, queueAbi)
   const ercContract = useContract(config.scheduleDeposit.token, ercAbi)
+  const targetContract = useContract(contractAddress, parsedAbi)
 
   const handleParseAbi = useCallback(
     e => {
@@ -95,6 +96,36 @@ export default function NewAction({
       }
     },
     [setExecutionResult],
+  )
+
+  const abiFunctions = useMemo(
+    () =>
+      parsedAbi.filter(
+        (abiItem: any) =>
+          abiItem.type === 'function' &&
+          abiItem.stateMutability !== 'constructor' &&
+          abiItem.stateMutability !== 'event' &&
+          abiItem.stateMutability !== 'pure' &&
+          abiItem.stateMutability !== 'receive' &&
+          abiItem.stateMutability !== 'view',
+      ),
+    [parsedAbi],
+  )
+
+  const abiEvents = useMemo(
+    () => parsedAbi.filter((abiItem: any) => abiItem.type === 'event'),
+    [parsedAbi],
+  )
+
+  const abiViewFunctions = useMemo(
+    () =>
+      parsedAbi.filter(
+        (abiItem: any) =>
+          abiItem.type === 'function' &&
+          (abiItem.stateMutability === 'pure' ||
+            abiItem.stateMutability === 'view'),
+      ),
+    [parsedAbi],
   )
 
   return (
@@ -180,25 +211,76 @@ export default function NewAction({
           <Button onClick={handleParseAbi}>Parse ABI</Button>
         </form>
 
-        {abi &&
-          parsedAbi!.map((abiItem: any) => (
-            <Frame key={abiItem.name}>
-              <ContractCallHandler
-                config={config}
-                contractAddress={contractAddress}
-                ercContract={ercContract}
-                executor={executorAddress}
-                handleSetExecutionResult={handleSetExecutionResult}
-                inputs={abiItem.inputs}
-                memberType={determineMemberType(abiItem.stateMutability)}
-                name={abiItem.name}
-                proof={proof}
-                queueContract={queueContract}
-                queueAddress={queueAddress}
-                rawAbiItem={abiItem}
-              />
+        {parsedAbi.length && (
+          <>
+            <Frame>
+              <h2> Functions </h2>
+              {abiFunctions!.map((abiItem: any) => (
+                <Frame key={abiItem.name}>
+                  <ContractCallHandler
+                    config={config}
+                    contractAddress={contractAddress}
+                    ercContract={ercContract}
+                    executor={executorAddress}
+                    handleSetExecutionResult={handleSetExecutionResult}
+                    inputs={abiItem.inputs}
+                    memberType={determineMemberType(abiItem.stateMutability)}
+                    name={abiItem.name}
+                    proof={proof}
+                    queueContract={queueContract}
+                    queueAddress={queueAddress}
+                    rawAbiItem={abiItem}
+                    targetContract={targetContract}
+                  />
+                </Frame>
+              ))}
             </Frame>
-          ))}
+            <Frame>
+              <h2> View functions </h2>
+              {abiViewFunctions!.map((abiItem: any) => (
+                <Frame key={abiItem.name}>
+                  <ContractCallHandler
+                    config={config}
+                    contractAddress={contractAddress}
+                    ercContract={ercContract}
+                    executor={executorAddress}
+                    handleSetExecutionResult={handleSetExecutionResult}
+                    inputs={abiItem.inputs}
+                    memberType={determineMemberType(abiItem.stateMutability)}
+                    name={abiItem.name}
+                    proof={proof}
+                    queueContract={queueContract}
+                    queueAddress={queueAddress}
+                    rawAbiItem={abiItem}
+                    targetContract={targetContract}
+                  />
+                </Frame>
+              ))}
+            </Frame>
+            <Frame>
+              <h2> Events </h2>
+              {abiEvents!.map((abiItem: any) => (
+                <Frame key={abiItem.name}>
+                  <ContractCallHandler
+                    config={config}
+                    contractAddress={contractAddress}
+                    ercContract={ercContract}
+                    executor={executorAddress}
+                    handleSetExecutionResult={handleSetExecutionResult}
+                    inputs={abiItem.inputs}
+                    memberType={determineMemberType(abiItem.stateMutability)}
+                    name={abiItem.name}
+                    proof={proof}
+                    queueContract={queueContract}
+                    queueAddress={queueAddress}
+                    rawAbiItem={abiItem}
+                    targetContract={targetContract}
+                  />
+                </Frame>
+              ))}
+            </Frame>
+          </>
+        )}
       </Frame>
     </>
   )
@@ -217,6 +299,7 @@ type ContractCallHandlerProps = {
   queueAddress: string
   queueContract: any
   rawAbiItem: AbiType
+  targetContract: any
 }
 
 function ContractCallHandler({
@@ -226,16 +309,18 @@ function ContractCallHandler({
   executor,
   handleSetExecutionResult,
   inputs,
+  memberType,
   name,
   proof,
   queueAddress,
   queueContract,
   rawAbiItem,
+  targetContract,
 }: ContractCallHandlerProps) {
   const [result, setResult] = useState('')
   const [values, setValues] = useState(() => {
     if (inputs.length === 0) {
-      return null
+      return []
     }
     // @ts-ignore
     // Sorry but I got very tired of fighting with types
@@ -262,25 +347,51 @@ function ContractCallHandler({
     [values],
   )
 
+  const handleCall = useCallback(
+    async e => {
+      e.preventDefault()
+      const args = values.map(
+        (value: { name: string; type: string; value: any }) => value.value,
+      )
+      try {
+        handleSetExecutionResult('info', `Calling function...`)
+        const callResponse = args
+          ? await targetContract[name](...args)
+          : await targetContract[name]()
+        setResult(callResponse.toString())
+        handleSetExecutionResult('confirmed', callResponse.toString())
+      } catch (err) {
+        // TODO: handle error with sentry.
+        console.error(err)
+      }
+    },
+    [name, targetContract, values],
+  )
+
   const handleExecute = useCallback(
     async e => {
       e.preventDefault()
       try {
-        // First, let's handle token approvals.
+        // First, let's handle token approvals (if a token has been configured).
         // There are 3 cases to check
         // 1. The user has more allowance than needed, we can skip. (0 tx)
         // 2. The user has less allowance than needed, and we need to raise it. (2 tx)
         // 3. The user has 0 allowance, we just need to approve the needed amount. (1 tx)
-        const allowance = await ercContract.allowance(account, queueAddress)
-        if (
-          allowance.lt(config.scheduleDeposit.amount) &&
-          config.scheduleDeposit.token !== NO_TOKEN
-        ) {
-          if (!allowance.isZero()) {
-            const resetTx = await ercContract.approve(account, '0')
-            await resetTx.wait(1)
+        if (config.scheduleDeposit.token !== NO_TOKEN) {
+          const allowance = await ercContract.allowance(account, queueAddress)
+          if (
+            allowance.lt(config.scheduleDeposit.amount) &&
+            config.scheduleDeposit.token !== NO_TOKEN
+          ) {
+            if (!allowance.isZero()) {
+              const resetTx = await ercContract.approve(account, '0')
+              await resetTx.wait(1)
+            }
+            await ercContract.approve(
+              queueAddress,
+              config.scheduleDeposit.amount,
+            )
           }
-          await ercContract.approve(queueAddress, config.scheduleDeposit.amount)
         }
         const functionValues = values ? values.map((val: any) => val.value) : []
 
@@ -354,13 +465,26 @@ function ContractCallHandler({
       account,
       config,
       contractAddress,
+      ercContract,
       executor,
       handleSetExecutionResult,
+      queueAddress,
       queueContract,
       proof,
       rawAbiItem,
       values,
     ],
+  )
+
+  const handleFunctionCall = useCallback(
+    e => {
+      if (memberType === 'function') {
+        handleExecute(e)
+      } else {
+        handleCall(e)
+      }
+    },
+    [handleCall, handleExecute],
   )
 
   return (
@@ -401,7 +525,7 @@ function ContractCallHandler({
             </label>
           </div>
         ))}
-        <Button type="submit" onClick={handleExecute}>
+        <Button type="submit" onClick={handleFunctionCall}>
           Execute
         </Button>
         <span>Result: {result}</span>
