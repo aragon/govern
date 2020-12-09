@@ -44,15 +44,3 @@ services:
       dockerfile: ./hardhat.dockerfile
     ports:
       - '8545:8545'
-  govern-server:
-    build:
-      context: ../..
-      dockerfile: packages/govern-server/Dockerfile
-    ports:
-      - '3000:3000'
-    command: ['yarn', 'start:server']
-    environment:
-      GVN_CHAIN_ID: 31337
-      GVN_ENS_ADDRESS: '0x'
-      GVN_GRAPHQL_HTTP_PORT: 3000
-      GVN_SUBGRAPH_URL: 'http://localhost:8000/'
