@@ -140,11 +140,7 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
   const { status: accountStatus } = wallet
   const queueContract = useContract(queueAddress, queueAbi)
   const { permissions } = usePermissions()
-  const {
-    execute: canExecute,
-    veto: canVeto,
-    challenge: canChallenge,
-  } = permissions
+  const { veto: canVeto, challenge: canChallenge } = permissions
 
   const handleSetExecutionStatus = useCallback(
     (result, message) => {
