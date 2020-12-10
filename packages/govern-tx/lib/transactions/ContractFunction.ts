@@ -42,7 +42,7 @@ export default class ContractFunction {
      * @public  
      */
     public encode(): string {
-        return this.abiItem.format() + defaultAbiCoder.encode(this.abiItem.inputs, this.functionArguments)
+        return id(this.abiItem.format()) + defaultAbiCoder.encode(this.abiItem.inputs, this.functionArguments).replace('0x', '')
     }
 
     /**
