@@ -1,0 +1,18 @@
+version: "3"
+services:
+  postgres:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: govern-tx
+      POSTGRES_PASSWORD: tx-service
+      POSTGRES_DB: govern-tx
+    user: "${HOST_UID}:${HOST_GID}"
+    volumes:
+      - ./dev-data/postgres:/var/lib/postgresql/data
+      - ./postgres:/docker-entrypoint-initdb.d/
+  ganache:
+    image: trufflesuite/ganache-cli
+    ports:
+      - "8545:8545"
