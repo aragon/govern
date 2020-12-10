@@ -23,7 +23,6 @@ export default function ViewDao({ dao }: ViewDaoProps): JSX.Element {
   const history = useHistory()
   const { ethers } = useWalletAugmented()
   const { permissions, populatePermissions } = usePermissions()
-  populatePermissions(dao.queue.roles)
   const { schedule: canSchedule } = permissions
 
   useEffect(() => {
@@ -33,6 +32,10 @@ export default function ViewDao({ dao }: ViewDaoProps): JSX.Element {
     }
     fetchEthBalance()
   }, [dao, ethers])
+
+  useEffect(() => {
+    populatePermissions(dao.queue.roles)
+  }, [dao, populatePermissions])
 
   const handleNewAction = useCallback(() => {
     history.push(`/${daoAddress}/new-action`)
