@@ -4,21 +4,20 @@ import { UseWalletProvider, useWallet, Wallet } from 'use-wallet'
 import { useChainId } from './ChainId'
 import { getNetworkNode, getUseWalletConnectors } from '../lib/web3-utils'
 
-type WalletAugmentedContextProps = {
+export type WalletAugmentedData = {
   wallet: Wallet<any>
   ethers: any
-} | null
+}
 
-const WalletAugmentedContext = createContext<WalletAugmentedContextProps>(null)
+const WalletAugmentedContext = createContext<WalletAugmentedData | null>(null)
 
-export function useWalletAugmented() {
+export function useWalletAugmented(): WalletAugmentedData {
   const walletContext = useContext(WalletAugmentedContext)
   if (!walletContext) {
     throw new Error(
       'useWalletAugmented can only be used inside a WalletProvider',
     )
   }
-
   return walletContext
 }
 
