@@ -10,7 +10,7 @@ jest.mock('../../../../lib/transactions/AbstractTransaction')
 /**
  * ChallengeTransaction test
  */
-describe('ChallengeTransaction Test', () => {
+describe('ChallengeTransactionTest', () => {
     let challengeTransaction: ChallengeTransaction
 
     beforeEach(() => {

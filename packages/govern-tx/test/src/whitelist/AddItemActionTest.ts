@@ -11,7 +11,7 @@ jest.mock('@ethersproject/address')
 /**
  * AddItemAction test
  */
-describe('AddItemAction Test', () => {
+describe('AddItemActionTest', () => {
     let addItemAction: AddItemAction,
     whitelistMock: Whitelist
 

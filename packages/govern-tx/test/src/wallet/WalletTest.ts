@@ -11,7 +11,7 @@ jest.mock('@ethersproject/wallet')
 /**
  * Wallet test
  */
-describe('Wallet Test', () => {
+describe('WalletTest', () => {
     let wallet: Wallet,
     databaseMock: Database
 

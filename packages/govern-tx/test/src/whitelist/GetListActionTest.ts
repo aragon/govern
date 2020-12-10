@@ -11,7 +11,7 @@ jest.mock('@ethersproject/address')
 /**
  * GetListAction test
  */
-describe('GetListAction Test', () => {
+describe('GetListActionTest', () => {
     let getListAction: GetListAction,
     whitelistMock: Whitelist
 
