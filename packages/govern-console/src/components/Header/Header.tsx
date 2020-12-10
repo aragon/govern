@@ -9,7 +9,7 @@ import { shortenAddress, getNetworkName } from '../../lib/web3-utils'
 import AragonSvg from '../../assets/aragon-metal.svg'
 
 function Header(): JSX.Element {
-  const { chainId, setChainId } = useChainId()
+  const { chainId, updateChainId } = useChainId()
   const { wallet } = useWallet()
   const history = useHistory()
 
@@ -25,12 +25,12 @@ function Header(): JSX.Element {
 
   const handleChangeChain = useCallback(
     e => {
-      setChainId(e.target.value)
+      updateChainId(Number(e.target.value))
       // When we change the chain ID, the DAO might not exist,
       // so we must revert back to the DAO selection screen.
       history.push(`/${getNetworkName(e.target.value)}`)
     },
-    [history, setChainId],
+    [history, updateChainId],
   )
 
   const handleGoToHome = useCallback(() => history.push('/'), [history])
