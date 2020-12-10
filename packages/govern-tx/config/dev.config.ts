@@ -1,4 +1,6 @@
-export const config = {
+import { Config } from '../src/config/Configuration';
+
+export const config: Config = {
     ethereum: {
         publicKey: '', // Add default EOA
         contracts: {
