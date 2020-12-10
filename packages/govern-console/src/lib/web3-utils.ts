@@ -1,16 +1,9 @@
 import env from '../environment'
-import { BigNumber as EthersBigNumber } from 'ethers'
 
 export const DEFAULT_LOCAL_CHAIN = 'private'
 export const ETH_FAKE_ADDRESS = `0x${''.padEnd(40, '0')}`
 export const ETH_ANY_ADDRESS = '0xffffffffffffffffffffffffffffffffffffffff'
 export const ETH_EMPTY_HEX = '0x'
-
-export function bigNum(
-  value: string | number | bigint | EthersBigNumber,
-): EthersBigNumber {
-  return EthersBigNumber.from(value)
-}
 
 /**
  * Check address equality without checksums
@@ -86,8 +79,6 @@ export function getUseWalletConnectors(): UseWalletConnectors {
     {},
   )
 }
-
-export const addressPattern = '(0x)?[0-9a-fA-F]{40}'
 
 /**
  * Shorten an Ethereum address. `charsLength` allows to change the number of
