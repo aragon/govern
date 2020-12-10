@@ -38,7 +38,7 @@ export default class AddItemAction extends AbstractWhitelistAction {
     public execute(): Promise<ListItem> {
         return this.whitelist.addItem(
             (this.request as WhitelistRequest).message.publicKey,
-            (this.request as WhitelistRequest).message.rateLimit
+            ((this.request as WhitelistRequest).message.rateLimit as number)
         )
     }
 }

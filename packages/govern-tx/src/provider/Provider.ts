@@ -1,4 +1,4 @@
-import { BaseProvider, TransactionRequest } from '@ethersproject/providers'
+import { JsonRpcProvider, TransactionRequest } from '@ethersproject/providers'
 import { TransactionReceipt } from '@ethersproject/abstract-provider'
 import Wallet from '../wallet/Wallet'
 import { EthereumOptions } from '../config/Configuration';
@@ -13,7 +13,7 @@ export default class Provider {
      * 
      * @private
      */
-    private provider: BaseProvider
+    private provider: JsonRpcProvider
 
     /**
      * @param {EthereumOptions} config 
@@ -22,7 +22,7 @@ export default class Provider {
      * @constructor
      */
     constructor(private config: EthereumOptions, private wallet: Wallet) {
-        this.provider = new BaseProvider(this.config.url)
+        this.provider = new JsonRpcProvider(this.config.url)
     }
 
     /**

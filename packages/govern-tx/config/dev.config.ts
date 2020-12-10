@@ -6,7 +6,7 @@ export const config: Config = {
         contracts: {
             GovernQueue: '' // Add deployment address can get calculated if deployed with create2
         },
-        url: 'localhost:8545',
+        url: 'http://localhost:8545',
         blockConfirmations: 42
     }, 
     database: {

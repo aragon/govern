@@ -1,4 +1,4 @@
-import { BaseProvider, TransactionResponse } from '@ethersproject/providers';
+import { JsonRpcProvider, TransactionResponse } from '@ethersproject/providers';
 import { BigNumber } from "@ethersproject/bignumber";
 import { JsonFragment } from '@ethersproject/abi';
 import ContractFunction from '../../../lib/transactions/ContractFunction';
@@ -31,7 +31,7 @@ class TXResponse implements TransactionResponse {
 describe('ProviderTest', () => {
     let provider: Provider,
     walletMock: Wallet,
-    baseProviderMock: BaseProvider,
+    jsonRpcProviderMock: JsonRpcProvider,
     contractFunctionMock: ContractFunction;
 
     beforeEach(() => {
@@ -51,7 +51,7 @@ describe('ProviderTest', () => {
             walletMock
         )
 
-        baseProviderMock = (BaseProvider as jest.MockedClass<typeof BaseProvider>).mock.instances[0]
+        jsonRpcProviderMock = (JsonRpcProvider as jest.MockedClass<typeof JsonRpcProvider>).mock.instances[0]
     })
 
     it('calls sendTransaction and returns with the expected value', async () => {
@@ -63,13 +63,13 @@ describe('ProviderTest', () => {
 
         (contractFunctionMock.encode as jest.MockedFunction<typeof contractFunctionMock.encode>).mockReturnValue('0x00');
 
-        (baseProviderMock.sendTransaction as jest.MockedFunction<typeof baseProviderMock.sendTransaction>).mockReturnValue(Promise.resolve(txResponse));
+        (jsonRpcProviderMock.sendTransaction as jest.MockedFunction<typeof jsonRpcProviderMock.sendTransaction>).mockReturnValue(Promise.resolve(txResponse));
 
-        (baseProviderMock.estimateGas as jest.MockedFunction<typeof baseProviderMock.estimateGas>).mockReturnValue(Promise.resolve(BigNumber.from(0)));
+        (jsonRpcProviderMock.estimateGas as jest.MockedFunction<typeof jsonRpcProviderMock.estimateGas>).mockReturnValue(Promise.resolve(BigNumber.from(0)));
 
         await expect(provider.sendTransaction('GovernQueue', contractFunctionMock)).resolves.toEqual('RECEIPT');
 
-        expect(baseProviderMock.sendTransaction).toHaveBeenNthCalledWith(1, '0x00');
+        expect(jsonRpcProviderMock.sendTransaction).toHaveBeenNthCalledWith(1, '0x00');
 
         expect(txResponse.wait).toHaveBeenNthCalledWith(1, 0);
 
@@ -91,7 +91,7 @@ describe('ProviderTest', () => {
 
         (contractFunctionMock.encode as jest.MockedFunction<typeof contractFunctionMock.encode>).mockReturnValue('0x00');
 
-        (baseProviderMock.estimateGas as jest.MockedFunction<typeof baseProviderMock.estimateGas>).mockReturnValue(Promise.resolve(BigNumber.from(0)));
+        (jsonRpcProviderMock.estimateGas as jest.MockedFunction<typeof jsonRpcProviderMock.estimateGas>).mockReturnValue(Promise.resolve(BigNumber.from(0)));
 
         await expect(provider.sendTransaction('GovernQueue', contractFunctionMock)).rejects.toEqual('NOPE');
 
@@ -111,7 +111,7 @@ describe('ProviderTest', () => {
     it('calls sendTransaction and estimation of the gas throws', async () => {
         (contractFunctionMock.encode as jest.MockedFunction<typeof contractFunctionMock.encode>).mockReturnValue('0x00');
 
-        (baseProviderMock.estimateGas as jest.MockedFunction<typeof baseProviderMock.estimateGas>).mockReturnValue(Promise.reject('NOPE'));
+        (jsonRpcProviderMock.estimateGas as jest.MockedFunction<typeof jsonRpcProviderMock.estimateGas>).mockReturnValue(Promise.reject('NOPE'));
 
         await expect(provider.sendTransaction('GovernQueue', contractFunctionMock)).rejects.toEqual('NOPE');
 
@@ -131,13 +131,13 @@ describe('ProviderTest', () => {
 
         (contractFunctionMock.encode as jest.MockedFunction<typeof contractFunctionMock.encode>).mockReturnValue('0x00');
 
-        (baseProviderMock.sendTransaction as jest.MockedFunction<typeof baseProviderMock.sendTransaction>).mockReturnValue(Promise.reject('NOPE'));
+        (jsonRpcProviderMock.sendTransaction as jest.MockedFunction<typeof jsonRpcProviderMock.sendTransaction>).mockReturnValue(Promise.reject('NOPE'));
 
-        (baseProviderMock.estimateGas as jest.MockedFunction<typeof baseProviderMock.estimateGas>).mockReturnValue(Promise.resolve(BigNumber.from(0)));
+        (jsonRpcProviderMock.estimateGas as jest.MockedFunction<typeof jsonRpcProviderMock.estimateGas>).mockReturnValue(Promise.resolve(BigNumber.from(0)));
 
         await expect(provider.sendTransaction('GovernQueue', contractFunctionMock)).rejects.toEqual('NOPE');
 
-        expect(baseProviderMock.sendTransaction).toHaveBeenNthCalledWith(1, '0x00');
+        expect(jsonRpcProviderMock.sendTransaction).toHaveBeenNthCalledWith(1, '0x00');
 
         expect(walletMock.sign).toHaveBeenNthCalledWith(
             1,
@@ -161,13 +161,13 @@ describe('ProviderTest', () => {
 
         (contractFunctionMock.encode as jest.MockedFunction<typeof contractFunctionMock.encode>).mockReturnValue('0x00');
 
-        (baseProviderMock.sendTransaction as jest.MockedFunction<typeof baseProviderMock.sendTransaction>).mockReturnValue(Promise.resolve(txResponse));
+        (jsonRpcProviderMock.sendTransaction as jest.MockedFunction<typeof jsonRpcProviderMock.sendTransaction>).mockReturnValue(Promise.resolve(txResponse));
 
-        (baseProviderMock.estimateGas as jest.MockedFunction<typeof baseProviderMock.estimateGas>).mockReturnValue(Promise.resolve(BigNumber.from(0)));
+        (jsonRpcProviderMock.estimateGas as jest.MockedFunction<typeof jsonRpcProviderMock.estimateGas>).mockReturnValue(Promise.resolve(BigNumber.from(0)));
 
         await expect(provider.sendTransaction('GovernQueue', contractFunctionMock)).rejects.toEqual('NOPE');
 
-        expect(baseProviderMock.sendTransaction).toHaveBeenNthCalledWith(1, '0x00');
+        expect(jsonRpcProviderMock.sendTransaction).toHaveBeenNthCalledWith(1, '0x00');
 
         expect(txResponse.wait).toHaveBeenNthCalledWith(1, 0);
 
