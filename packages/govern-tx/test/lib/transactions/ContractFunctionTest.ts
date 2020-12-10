@@ -1,19 +1,22 @@
-import { defaultAbiCoder, Fragment, JsonFragment } from '@ethersproject/abi';
+import { defaultAbiCoder, Fragment, JsonFragment, FunctionFragment } from '@ethersproject/abi';
+import { id } from '@ethersproject/hash'
 import ContractFunction from '../../../lib/transactions/ContractFunction';
 
 // Mocks
 jest.mock('@ethersproject/abi')
+jest.mock('@ethersproject/hash')
 
 /**
  * ContractFunction test
  */
 describe('ContractFunctionTest', () => {
-    let contractFunction: ContractFunction
+    let contractFunction: ContractFunction,
+    fragmentMock = {inputs: 'INPUTS', format: jest.fn()}
 
     beforeEach(() => {
         (defaultAbiCoder.decode as jest.MockedFunction<typeof defaultAbiCoder.decode>).mockReturnValueOnce(['ARGUMENT']);
- 
-        (Fragment.fromObject as jest.MockedFunction<typeof Fragment.fromObject>).mockReturnValueOnce({inputs: 'INPUTS'} as any);
+        
+        (Fragment.fromObject as jest.MockedFunction<typeof Fragment.fromObject>).mockReturnValueOnce(fragmentMock as any);
 
         contractFunction = new ContractFunction({} as JsonFragment, 'MESSAGE')
 
@@ -23,11 +26,17 @@ describe('ContractFunctionTest', () => {
     })
 
     it('calls encode and returns the expected value', () => {
-        (defaultAbiCoder.encode as jest.MockedFunction<typeof defaultAbiCoder.encode>).mockReturnValueOnce('ENCODED')
+        (id as jest.MockedFunction<typeof id>).mockReturnValueOnce('0x0');
 
-        expect(contractFunction.encode()).toEqual('ENCODED')
+        (fragmentMock.format as jest.MockedFunction<typeof fragmentMock.format>).mockReturnValueOnce('SIGNATURE');
+
+        (defaultAbiCoder.encode as jest.MockedFunction<typeof defaultAbiCoder.encode>).mockReturnValueOnce('0xENCODED');
+
+        expect(contractFunction.encode()).toEqual('0x0ENCODED')
 
         expect(defaultAbiCoder.encode).toHaveBeenNthCalledWith(1, 'INPUTS', ['ARGUMENT'])
+
+        expect(id).toHaveBeenNthCalledWith(1, 'SIGNATURE')
     })
 
     it('calls encode and throws as expected', () => {
