@@ -1,4 +1,5 @@
 import { defaultAbiCoder, Fragment, JsonFragment } from '@ethersproject/abi';
+import { id } from '@ethersproject/hash'
 
 export default class ContractFunction {
     /**
@@ -41,7 +42,7 @@ export default class ContractFunction {
      * @public  
      */
     public encode(): string {
-        return defaultAbiCoder.encode(this.abiItem.inputs, this.functionArguments)
+        return this.abiItem.format() + defaultAbiCoder.encode(this.abiItem.inputs, this.functionArguments)
     }
 
     /**
