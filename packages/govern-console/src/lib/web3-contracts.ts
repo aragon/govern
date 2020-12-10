@@ -1,44 +1,44 @@
 import { useEffect, useCallback, useMemo, useState, useRef } from 'react'
 import {
+  BigNumber as EthersBigNumber,
   Contract as EthersContract,
+  getDefaultProvider,
   providers,
   utils as EthersUtils,
-  getDefaultProvider,
 } from 'ethers'
-import { useWallet } from 'use-wallet'
+import { useWallet } from '../Providers/Wallet'
 import { getKnownContract } from './known-contracts'
 import { useChainId } from '../Providers/ChainId'
-import { bigNum, getNetworkNode } from './web3-utils'
+import { bigNum, getNetworkNode, getNetworkEthersName } from './web3-utils'
 
 export function useContract(
   address: string,
   abi: any[],
   signer = true,
-): EthersContract {
-  const { ethereum } = useWallet()
+): EthersContract | null {
+  const { wallet } = useWallet()
   const { chainId } = useChainId()
 
-  let ethersProvider
-  if (!ethereum) {
-    ethersProvider = getDefaultProvider(chainId)
-  } else {
-    ethersProvider = new providers.Web3Provider(ethereum)
-  }
+  const ethersProvider = wallet.ethereum
+    ? new providers.Web3Provider(wallet.ethereum)
+    : getDefaultProvider(getNetworkEthersName(chainId))
 
-  if (!address || !EthersUtils.isAddress(address) || !ethersProvider || !abi) {
-    return null
-  }
+  const ethersSignerProvider =
+    signer &&
+    wallet.ethereum &&
+    ethersProvider instanceof providers.Web3Provider
+      ? ethersProvider.getSigner()
+      : null
 
-  const contract = new EthersContract(
-    address,
-    abi,
-    signer && ethereum ? ethersProvider.getSigner() : ethersProvider,
-  )
-
-  return contract
+  return address && EthersUtils.isAddress(address) && ethersProvider && abi
+    ? new EthersContract(address, abi, ethersSignerProvider || ethersProvider)
+    : null
 }
 
-export function useKnownContract(name: string, signer = true): EthersContract {
+export function useKnownContract(
+  name: string,
+  signer = true,
+): EthersContract | null {
   const [address, abi] = getKnownContract(name)
   return useContract(address, abi, signer)
 }
@@ -46,7 +46,7 @@ export function useKnownContract(name: string, signer = true): EthersContract {
 export function useContractWithKnownAbi(
   name: string,
   address: string,
-): EthersContract {
+): EthersContract | null {
   const [, abi] = getKnownContract(name)
   return useContract(address, abi, true)
 }
@@ -58,32 +58,31 @@ export function useContractReadOnly(
   const ethEndpoint = getNetworkNode()
   const [, abi] = getKnownContract(name)
 
-  const ethProvider = useMemo(
-    () => (ethEndpoint ? new providers.JsonRpcProvider(ethEndpoint) : null),
-    [ethEndpoint],
-  )
-
-  return useMemo(
-    () => (address ? new EthersContract(address, abi, ethProvider) : null),
-    [abi, address, ethProvider],
-  )
+  return useMemo(() => {
+    if (!address) {
+      return null
+    }
+    return new EthersContract(
+      address,
+      abi,
+      ethEndpoint ? new providers.JsonRpcProvider(ethEndpoint) : undefined,
+    )
+  }, [abi, address, ethEndpoint])
 }
 
-export function useTokenBalance(
-  symbol: string,
-  address = '',
-): EthersUtils.BigNumber {
-  const { account } = useWallet()
+export function useTokenBalance(symbol: string, address = ''): EthersBigNumber {
   const [balance, setBalance] = useState(bigNum(-1))
   const tokenContract = useKnownContract(`TOKEN_${symbol}`)
+  const { wallet } = useWallet()
+  const { account } = wallet
 
-  const cancelBalanceUpdate = useRef(null)
+  const cancelBalanceUpdate = useRef<(() => void) | null>(null)
 
   const updateBalance = useCallback(() => {
     let cancelled = false
 
     if (cancelBalanceUpdate.current) {
-      cancelBalanceUpdate.current()
+      cancelBalanceUpdate.current?.()
       cancelBalanceUpdate.current = null
     }
 
@@ -98,12 +97,12 @@ export function useTokenBalance(
     const requestedAddress = address || account
     tokenContract
       .balanceOf(requestedAddress)
-      .then(balance => {
+      .then((balance: EthersBigNumber) => {
         if (!cancelled) {
           setBalance(balance)
         }
       })
-      .catch(err => err)
+      .catch((err: Error) => err)
   }, [account, address, tokenContract])
 
   useEffect(() => {
@@ -114,7 +113,7 @@ export function useTokenBalance(
       return
     }
 
-    const onTransfer = (from, to) => {
+    const onTransfer = (from: string, to: string) => {
       if (
         from === account ||
         to === account ||

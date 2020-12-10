@@ -4,8 +4,24 @@ import { UseWalletProvider, useWallet, Wallet } from 'use-wallet'
 import { useChainId } from './ChainId'
 import { getNetworkNode, getUseWalletConnectors } from '../lib/web3-utils'
 
+// From ethers.js
+export type Eip1193Provider = {
+  isMetaMask?: boolean
+  host?: string
+  path?: string
+  sendAsync?: (
+    request: { method: string; params?: Array<any> },
+    callback: (error: any, response: any) => void,
+  ) => void
+  send?: (
+    request: { method: string; params?: Array<any> },
+    callback: (error: any, response: any) => void,
+  ) => void
+  request?: (request: { method: string; params?: Array<any> }) => Promise<any>
+}
+
 export type WalletAugmentedData = {
-  wallet: Wallet<any>
+  wallet: Wallet<Eip1193Provider>
   ethers: any
 }
 
@@ -27,7 +43,7 @@ function WalletAugmented({
 }: {
   children: React.ReactNode
 }): JSX.Element {
-  const wallet: Wallet<any> = useWallet()
+  const wallet = useWallet<Eip1193Provider>()
   const { ethereum } = wallet
   const { chainId } = useChainId()
 

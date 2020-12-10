@@ -80,7 +80,10 @@ function permissionsFromRoles(
   )
 }
 
-function permissionsReducer(permissions, { account, roles }) {
+function permissionsReducer(
+  permissions: Permissions,
+  { account, roles }: { account: string; roles: Role[] },
+) {
   return permissionsFromRoles(account, roles, permissions)
 }
 
@@ -89,10 +92,14 @@ export default function PermissionsProvider({
 }: {
   children: React.ReactNode
 }): JSX.Element {
-  const [permissions, dispatchPermissions] = useReducer<Permissions>(
-    permissionsReducer,
-    { execute: false, schedule: false, veto: false, challenge: false },
-  )
+  const [permissions, dispatchPermissions] = useReducer<
+    React.Reducer<Permissions, { account: string; roles: Role[] }>
+  >(permissionsReducer, {
+    execute: false,
+    schedule: false,
+    veto: false,
+    challenge: false,
+  })
 
   const { wallet } = useWalletAugmented()
   const { account } = wallet
