@@ -80,13 +80,12 @@ export function useTokenBalance(symbol: string, address = ''): EthersBigNumber {
 
   const updateBalance = useCallback(() => {
     let cancelled = false
+    const requestedAddress = address || account
 
-    if (cancelBalanceUpdate.current) {
-      cancelBalanceUpdate.current?.()
+    cancelBalanceUpdate.current?.()
+
+    if (!requestedAddress || !tokenContract) {
       cancelBalanceUpdate.current = null
-    }
-
-    if ((!account && !address) || !tokenContract) {
       setBalance(bigNum(-1))
       return
     }
@@ -94,7 +93,7 @@ export function useTokenBalance(symbol: string, address = ''): EthersBigNumber {
     cancelBalanceUpdate.current = () => {
       cancelled = true
     }
-    const requestedAddress = address || account
+
     tokenContract
       .balanceOf(requestedAddress)
       .then((balance: EthersBigNumber) => {
