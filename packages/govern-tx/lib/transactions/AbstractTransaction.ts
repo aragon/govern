@@ -26,15 +26,6 @@ export default abstract class AbstractTransaction extends AbstractAction {
     protected contract: string
 
     /**
-     * The contract function
-     * 
-     * @property {ContractFunction} contractFunction
-     * 
-     * @private
-     */
-    private contractFunction: ContractFunction
-
-    /**
      * @param {EthereumOptions} config
      * @param {Provider} provider - The Ethereum provider object
      * @param {Request} request - The request body given by the user
@@ -47,11 +38,6 @@ export default abstract class AbstractTransaction extends AbstractAction {
         request: Request
     ) {
         super(request);
-
-        this.contractFunction = new ContractFunction(
-            this.functionABI,
-            request.message
-        )
     }
 
     /**
@@ -64,9 +50,14 @@ export default abstract class AbstractTransaction extends AbstractAction {
      * @public
      */
     public execute(): Promise<TransactionReceipt> {
-        this.contractFunction.functionArguments[0].payload.submitter = this.config.publicKey
+        const contractFunction = new ContractFunction(
+            this.functionABI,
+            (this.request as Request).message
+        )
 
-        return this.provider.sendTransaction(this.contract, this.contractFunction)
+        contractFunction.functionArguments[0].payload.submitter = this.config.publicKey
+
+        return this.provider.sendTransaction(this.contract, contractFunction)
     } 
 
     /**
