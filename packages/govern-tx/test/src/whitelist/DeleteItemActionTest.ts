@@ -2,23 +2,22 @@ import { isAddress } from '@ethersproject/address';
 import { WhitelistRequest } from '../../../lib/whitelist/AbstractWhitelistAction';
 import Database from '../../../src/db/Database';
 import Whitelist, { ListItem } from '../../../src/db/Whitelist';
-import AddItemAction from '../../../src/whitelist/AddItemAction';
+import DeleteItemAction from '../../../src/whitelist/DeleteItemAction';
 
 // Mocks
 jest.mock('../../../src/db/Whitelist')
 jest.mock('@ethersproject/address')
 
 /**
- * AddItemAction test
+ * DeleteItemAction test
  */
-describe('AddItemAction Test', () => {
-    let addItemAction: AddItemAction,
+describe('DeleteItemAction Test', () => {
+    let deleteItemAction: DeleteItemAction,
     whitelistMock: Whitelist
 
     const request: WhitelistRequest = {
         message: {
-            publicKey: '0x00',
-            rateLimit: 1
+            publicKey: '0x00'
         },
         signature: ''
     }
@@ -31,7 +30,7 @@ describe('AddItemAction Test', () => {
     it('calls validateRequest and returns the expected values', () => {
         (isAddress as jest.MockedFunction<typeof isAddress>).mockReturnValueOnce(true)
 
-        addItemAction = new AddItemAction(whitelistMock, request)
+        deleteItemAction = new DeleteItemAction(whitelistMock, request)
 
         expect(isAddress).toHaveBeenNthCalledWith(1, '0x00')
     })
@@ -40,47 +39,33 @@ describe('AddItemAction Test', () => {
         (isAddress as jest.MockedFunction<typeof isAddress>).mockReturnValueOnce(false)
 
         expect(() => {
-            addItemAction = new AddItemAction(whitelistMock, request)
+            deleteItemAction = new DeleteItemAction(whitelistMock, request)
         }).toThrow('Invalid public key passed!')
 
         expect(isAddress).toHaveBeenNthCalledWith(1, '0x00')
     })
 
-    it('calls validateRequest and throws because of a invalid rate limit', () => {
-        (isAddress as jest.MockedFunction<typeof isAddress>).mockReturnValueOnce(true)
-
-        request.message.rateLimit = 0;
-
-        expect(() => {
-            addItemAction = new AddItemAction(whitelistMock, request)
-        }).toThrow('Invalid rate limit passed!')
-
-        expect(isAddress).toHaveBeenNthCalledWith(1, '0x00')
-
-        request.message.rateLimit = 1;
-    })
-
     it('calls execute and returns the expected result', async () => {
         (isAddress as jest.MockedFunction<typeof isAddress>).mockReturnValueOnce(true);
 
-        (whitelistMock.addItem as jest.MockedFunction<typeof whitelistMock.addItem>).mockReturnValueOnce(Promise.resolve({} as ListItem));
+        (whitelistMock.deleteItem as jest.MockedFunction<typeof whitelistMock.deleteItem>).mockReturnValueOnce(Promise.resolve(true));
         
-        addItemAction = new AddItemAction(whitelistMock, request)
+        deleteItemAction = new DeleteItemAction(whitelistMock, request)
         
-        await expect(addItemAction.execute()).resolves.toEqual({})
+        await expect(deleteItemAction.execute()).resolves.toEqual(true)
 
-        expect(whitelistMock.addItem).toHaveBeenNthCalledWith(1, '0x00', 1)
+        expect(whitelistMock.deleteItem).toHaveBeenNthCalledWith(1, '0x00')
     })
 
     it('calls execute and throws as expected', async () => {
         (isAddress as jest.MockedFunction<typeof isAddress>).mockReturnValueOnce(true);
 
-        (whitelistMock.addItem as jest.MockedFunction<typeof whitelistMock.addItem>).mockReturnValueOnce(Promise.reject('NOPE'));
+        (whitelistMock.deleteItem as jest.MockedFunction<typeof whitelistMock.deleteItem>).mockReturnValueOnce(Promise.reject('NOPE'));
         
-        addItemAction = new AddItemAction(whitelistMock, request)
+        deleteItemAction = new DeleteItemAction(whitelistMock, request)
         
-        await expect(addItemAction.execute()).rejects.toEqual('NOPE')
+        await expect(deleteItemAction.execute()).rejects.toEqual('NOPE')
 
-        expect(whitelistMock.addItem).toHaveBeenNthCalledWith(1, '0x00', 1)
+        expect(whitelistMock.deleteItem).toHaveBeenNthCalledWith(1, '0x00')
     })
 })

@@ -5,7 +5,7 @@ import Whitelist, {ListItem} from '../../src/db/Whitelist'
 export interface WhitelistRequest extends Request {
     message: {
         publicKey: string,
-        rateLimit: number
+        rateLimit?: number
     }
 }
 
