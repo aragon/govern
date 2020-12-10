@@ -10,7 +10,11 @@ import { getKnownContract } from './known-contracts'
 import { useChainId } from '../Providers/ChainId'
 import { bigNum, getNetworkNode } from './web3-utils'
 
-export function useContract(address, abi, signer = true) {
+export function useContract(
+  address: string,
+  abi: any[],
+  signer = true,
+): EthersContract {
   const { ethereum } = useWallet()
   const { chainId } = useChainId()
 
@@ -34,17 +38,23 @@ export function useContract(address, abi, signer = true) {
   return contract
 }
 
-export function useKnownContract(name, signer = true) {
+export function useKnownContract(name: string, signer = true): EthersContract {
   const [address, abi] = getKnownContract(name)
   return useContract(address, abi, signer)
 }
 
-export function useContractWithKnownAbi(name, address) {
+export function useContractWithKnownAbi(
+  name: string,
+  address: string,
+): EthersContract {
   const [, abi] = getKnownContract(name)
   return useContract(address, abi, true)
 }
 
-export function useContractReadOnly(name, address) {
+export function useContractReadOnly(
+  name: string,
+  address: string,
+): EthersContract | null {
   const ethEndpoint = getNetworkNode()
   const [, abi] = getKnownContract(name)
 
@@ -53,15 +63,16 @@ export function useContractReadOnly(name, address) {
     [ethEndpoint],
   )
 
-  return useMemo(() => {
-    if (!address) {
-      return null
-    }
-    return new EthersContract(address, abi, ethProvider)
-  }, [abi, address, ethProvider])
+  return useMemo(
+    () => (address ? new EthersContract(address, abi, ethProvider) : null),
+    [abi, address, ethProvider],
+  )
 }
 
-export function useTokenBalance(symbol, address = '') {
+export function useTokenBalance(
+  symbol: string,
+  address = '',
+): EthersUtils.BigNumber {
   const { account } = useWallet()
   const [balance, setBalance] = useState(bigNum(-1))
   const tokenContract = useKnownContract(`TOKEN_${symbol}`)
@@ -103,7 +114,7 @@ export function useTokenBalance(symbol, address = '') {
       return
     }
 
-    const onTransfer = (from, to, value) => {
+    const onTransfer = (from, to) => {
       if (
         from === account ||
         to === account ||
