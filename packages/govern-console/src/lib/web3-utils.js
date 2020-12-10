@@ -1,5 +1,6 @@
 import env from '../environment'
-import { utils as EthersUtils } from 'ethers'
+import { BigNumber as EthersBigNumber } from 'ethers'
+import { Wallet } from 'use-wallet'
 
 export const DEFAULT_LOCAL_CHAIN = 'private'
 export const ETH_FAKE_ADDRESS = `0x${''.padEnd(40, '0')}`
@@ -9,8 +10,10 @@ export const ETH_EMPTY_HEX = '0x'
 const ETH_ADDRESS_SPLIT_REGEX = /(0x[a-fA-F0-9]{40}(?:\b|\.|,|\?|!|;))/g
 const ETH_ADDRESS_TEST_REGEX = /(0x[a-fA-F0-9]{40}(?:\b|\.|,|\?|!|;))/g
 
-export function bigNum(value) {
-  return new EthersUtils.BigNumber(value)
+export function bigNum(
+  value: string | number | bigint | EthersBigNumber,
+): EthersBigNumber {
+  return EthersBigNumber.from(value)
 }
 
 /**
@@ -19,13 +22,13 @@ export function bigNum(value) {
  * @param {string} second Second address
  * @returns {boolean} Address equality
  */
-export function addressesEqual(first, second) {
+export function addressesEqual(first: string, second: string): boolean {
   first = first && first.toLowerCase()
   second = second && second.toLowerCase()
   return first === second
 }
 
-export function getNetworkName(chainId) {
+export function getNetworkName(chainId: number): string {
   chainId = String(chainId)
 
   if (chainId === '1') return 'mainnet'
@@ -35,7 +38,27 @@ export function getNetworkName(chainId) {
   return 'Unknown'
 }
 
-export function getUseWalletProviders() {
+export function getNetworkType(chainId = env('CHAIN_ID')): string {
+  chainId = String(chainId)
+
+  if (chainId === '1') return 'main'
+  if (chainId === '3') return 'ropsten'
+  if (chainId === '4') return 'rinkeby'
+
+  return DEFAULT_LOCAL_CHAIN
+}
+
+export function getNetworkNode(chainId = env('CHAIN_ID')): string {
+  chainId = String(chainId)
+
+  if (chainId === '1') return 'https://mainnet.eth.aragon.network/'
+  if (chainId === '4') return 'https://rinkeby.eth.aragon.network/'
+}
+
+export function getUseWalletProviders(): {
+  id: string,
+  useWalletConf?: unknown,
+}[] {
   const providers = [{ id: 'injected' }, { id: 'frame' }]
 
   if (env('FORTMATIC_API_KEY')) {
@@ -55,7 +78,9 @@ export function getUseWalletProviders() {
   return providers
 }
 
-export function getUseWalletConnectors() {
+export function getUseWalletConnectors(): {
+  [k: string]: unknown,
+} {
   return getUseWalletProviders().reduce((connectors, provider) => {
     if (provider.useWalletConf) {
       connectors[provider.id] = provider.useWalletConf
@@ -79,7 +104,7 @@ export const addressPattern = '(0x)?[0-9a-fA-F]{40}'
  * @param {number} [charsLength=4] The number of characters to change on both sides of the ellipsis
  * @returns {string} The shortened address
  */
-export function shortenAddress(address, charsLength = 4) {
+export function shortenAddress(address: string, charsLength = 4): string {
   const prefixLength = 2 // "0x"
   if (!address) {
     return ''
@@ -95,43 +120,14 @@ export function shortenAddress(address, charsLength = 4) {
   )
 }
 
-export function getNetworkType(chainId = env('CHAIN_ID')) {
-  chainId = String(chainId)
-
-  if (chainId === '1') return 'main'
-  if (chainId === '3') return 'ropsten'
-  if (chainId === '4') return 'rinkeby'
-
-  return DEFAULT_LOCAL_CHAIN
-}
-
-export function getNetworkNode(chainId = env('CHAIN_ID')) {
-  chainId = String(chainId)
-
-  if (chainId === '1') return 'https://mainnet.eth.aragon.network/'
-  if (chainId === '4') return 'https://rinkeby.eth.aragon.network/'
-}
-
-export function sanitizeNetworkType(networkType) {
-  if (networkType === 'private') {
-    return 'localhost'
-  } else if (networkType === 'main') {
-    return 'mainnet'
-  }
+export function sanitizeNetworkType(networkType: string): string {
+  if (networkType === 'private') return 'localhost'
+  if (networkType === 'main') return 'mainnet'
   return networkType
 }
 
-export function isLocalOrUnknownNetwork(chainId = env('CHAIN_ID')) {
+export function isLocalOrUnknownNetwork(chainId = env('CHAIN_ID')): boolean {
   return getNetworkType(chainId) === DEFAULT_LOCAL_CHAIN
-}
-
-export function hexToAscii(hexx) {
-  const hex = hexx.toString()
-  let str = ''
-  for (let i = 0; i < hex.length && hex.substr(i, 2) !== '00'; i += 2) {
-    str += String.fromCharCode(parseInt(hex.substr(i, 2), 16))
-  }
-  return str
 }
 
 // Detect Ethereum addresses in a string and transform each part.
@@ -140,14 +136,21 @@ export function hexToAscii(hexx) {
 //   - The string of the current part.
 //   - A boolean indicating if it is an address.
 //
-export function transformAddresses(str, callback) {
+export function transformAddresses<T = unknown>(
+  str: string,
+  callback: (part: string, isAddress: boolean) => T,
+): T[] {
   return str
     .split(ETH_ADDRESS_SPLIT_REGEX)
     .map((part, index) =>
       callback(part, ETH_ADDRESS_TEST_REGEX.test(part), index),
     )
 }
-export async function signMessage(wallet, message) {
+
+export async function signMessage(
+  wallet: Wallet<any>,
+  message: string,
+): { signHash: string, error: boolean, errorMsg: Error } {
   let signHash
   let error = false
   let errorMsg
