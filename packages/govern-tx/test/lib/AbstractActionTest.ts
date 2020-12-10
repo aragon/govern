@@ -17,7 +17,6 @@ describe('AbstractAction Test', () => {
     })
 
     it('has the correct schema defined', () => {
-        //@ts-ignore
         expect(AbstractAction.schema).toEqual({
             body: {
                 type: 'object',
