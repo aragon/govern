@@ -24,11 +24,14 @@ function Header(): JSX.Element {
   }, [chainId, wallet])
 
   const handleChangeChain = useCallback(
-    e => {
-      updateChainId(Number(e.target.value))
+    (event: { target: { value: string } }) => {
+      const chainId = Number(event.target.value)
+
+      updateChainId(chainId)
+
       // When we change the chain ID, the DAO might not exist,
       // so we must revert back to the DAO selection screen.
-      history.push(`/${getNetworkName(e.target.value)}`)
+      history.push(`/${getNetworkName(chainId)}`)
     },
     [history, updateChainId],
   )
