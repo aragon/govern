@@ -18,9 +18,9 @@ jest.mock('../../../src/provider/Provider')
 jest.mock('../../../lib/transactions/ContractFunction')
 
 /**
- * AbstractAction test
+ * AbstractTransaction test
  */
-describe('AbstractAction Test', () => {
+describe('AbstractTransactionTest', () => {
     let txAction: MockTransaction,
     providerMock: Provider,
     contractFunctionMock: ContractFunction
