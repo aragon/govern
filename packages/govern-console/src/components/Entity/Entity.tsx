@@ -56,7 +56,6 @@ function formatAddress(
     }
 
     if (isCid(hexToUtf8(address))) {
-
       return hexToUtf8(address)
     }
   } catch (err) {
@@ -72,7 +71,7 @@ export default function Entity({
   address,
   shorten = false,
   type,
-}: EntityProps) {
+}: EntityProps): JSX.Element {
   const { chainId } = useChainId()
   const [url] = detectAndComposeLinkType(address, chainId, type)
   return url ? (

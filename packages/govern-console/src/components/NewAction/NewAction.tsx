@@ -37,7 +37,7 @@ export default function NewAction({
   config,
   executorAddress,
   queueAddress,
-}: NewActionProps) {
+}: NewActionProps): JSX.Element {
   const [abi, setAbi] = useState('')
   const [contractAddress, setContractAddress] = useState('')
   const [parsedAbi, setParsedAbi] = useState([])
@@ -162,7 +162,7 @@ export default function NewAction({
           <Button onClick={handleParseAbi}>Parse ABI</Button>
         </form>
         {abi &&
-          parsedAbi!.map(
+          parsedAbi.map(
             (abiItem: any) =>
               abiItem?.type === 'function' && (
                 <Frame key={abiItem.name}>
@@ -337,10 +337,12 @@ function ContractCallHandler({
       account,
       config,
       contractAddress,
+      ercContract,
       executor,
       handleSetExecutionResult,
-      queueContract,
       proof,
+      queueAddress,
+      queueContract,
       rawAbiItem,
       values,
     ],

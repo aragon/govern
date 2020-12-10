@@ -3,7 +3,7 @@ import { useHistory, useParams } from 'react-router-dom'
 import 'styled-components/macro'
 import Button from '../components/Button'
 
-export default function SelectDao() {
+export default function SelectDao(): JSX.Element {
   const [daoName, setDaoName] = useState('')
   const history = useHistory()
   const { network }: any = useParams()

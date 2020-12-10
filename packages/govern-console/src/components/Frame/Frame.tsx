@@ -5,7 +5,7 @@ type FrameProps = {
   children: React.ReactNode
 }
 
-export default function Frame({ children }: FrameProps) {
+export default function Frame({ children }: FrameProps): JSX.Element {
   return (
     <div
       css={`

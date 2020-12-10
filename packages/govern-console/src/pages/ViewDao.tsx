@@ -83,7 +83,7 @@ const DAO_QUERY = gql`
   }
 `
 
-export default function DaoView() {
+export default function DaoView(): JSX.Element {
   const { chainId } = useChainId()
   const { daoAddress }: any = useParams()
   const { path } = useRouteMatch()
