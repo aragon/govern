@@ -14,7 +14,7 @@ function Header(): JSX.Element {
   const history = useHistory()
 
   useEffect(() => {
-    if (wallet!.error && wallet!.error instanceof ChainUnsupportedError) {
+    if (wallet.error && wallet.error instanceof ChainUnsupportedError) {
       alert(
         `Wrong network. Please connect to the ${getNetworkName(
           chainId,
@@ -121,7 +121,7 @@ function Header(): JSX.Element {
           `}
         >
           {wallet.status === 'connected'
-            ? shortenAddress(wallet.account!)
+            ? shortenAddress(wallet?.account ?? '')
             : 'Connect account'}
         </Button>
       </div>
