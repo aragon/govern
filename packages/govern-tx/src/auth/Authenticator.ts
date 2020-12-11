@@ -41,6 +41,7 @@ export default class Authenticator {
      */
     public async authenticate(request: FastifyRequest): Promise<undefined> {
         request.body = JSON.parse((request.body as string))
+        
         const publicKey = verifyMessage(
             arrayify(
                 (request.body as Params).message
