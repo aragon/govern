@@ -1,7 +1,6 @@
 import Database from './Database'
 
 export interface AdminItem {
-    ID: number
     PublicKey: string
     PrivateKey: string
 }
@@ -24,7 +23,7 @@ export default class Admin {
      * @returns {boolean} 
      */
     public async isAdmin(publicKey: string): Promise<boolean> {
-        return (await this.db.query(`SELECT * FROM admins WHERE PublicKey='${publicKey}'`)).length > 0
+        return (await this.db.query<AdminItem[]>(`SELECT * FROM admins WHERE PublicKey='${publicKey}'`)).length > 0
     }
 
     /**
@@ -39,7 +38,7 @@ export default class Admin {
      * @public
      */
     public addAdmin(publicKey: string): Promise<AdminItem> {
-        return this.db.query(`INSERT INTO admins VALUES ('${publicKey}')`)
+        return this.db.query<AdminItem>(`INSERT INTO admins VALUES ('${publicKey}')`)
     }
 
     /**
@@ -54,7 +53,7 @@ export default class Admin {
      * @public 
      */
     public async deleteAdmin(publicKey: string): Promise<boolean> {
-        return (await this.db.query(`DELETE FROM admins WHERE PublicKey='${publicKey}'`)).length > 0
+        return (await this.db.query<AdminItem[]>(`DELETE FROM admins WHERE PublicKey='${publicKey}'`)).length > 0
     }
 
     /**
@@ -67,6 +66,6 @@ export default class Admin {
      * @public
      */
     public getAdmins(): Promise<AdminItem[]> {
-        return this.db.query('SELECT * from admins')
+        return this.db.query<AdminItem[]>('SELECT * from admins')
     }
 }

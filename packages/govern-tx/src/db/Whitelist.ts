@@ -1,7 +1,6 @@
 import Database from './Database'
 
 export interface ListItem {
-    ID: number
     PublicKey: string,
     Limit: number,
     Executed: number
@@ -23,7 +22,7 @@ export default class Whitelist {
      * @returns {Promise<ListItem[]>}
      */
     public getList(): Promise<ListItem[]> {
-        return this.db.query('SELECT * FROM whitelist')
+        return this.db.query<ListItem[]>('SELECT * FROM whitelist')
     }
 
     /**
@@ -55,7 +54,7 @@ export default class Whitelist {
      * @public 
      */
     public getItemByKey(publicKey: string): Promise<ListItem> {
-        return this.db.query(`SELECT * FROM whitelist WHERE PublicKey='${publicKey}'`)
+        return this.db.query<ListItem>(`SELECT * FROM whitelist WHERE PublicKey='${publicKey}'`)
     }
 
     /**
@@ -71,7 +70,7 @@ export default class Whitelist {
      * @public
      */
     public addItem(publicKey: string, rateLimit: number): Promise<ListItem> {
-        return this.db.query(`INSERT INTO whitelist (PublicKey, TxLimit) VALUES ('${publicKey}', '${rateLimit}')`)
+        return this.db.query<ListItem>(`INSERT INTO whitelist (PublicKey, TxLimit) VALUES ('${publicKey}', '${rateLimit}')`)
     }
 
     /**
@@ -86,7 +85,7 @@ export default class Whitelist {
      * @public
      */
     public async deleteItem(publicKey: string): Promise<boolean> {
-        return (await this.db.query(`DELETE FROM whitelist WHERE PublicKey='${publicKey}'`)).length > 0
+        return (await this.db.query<ListItem[]>(`DELETE FROM whitelist WHERE PublicKey='${publicKey}'`)).length > 0
     }
 
     /**
@@ -101,7 +100,7 @@ export default class Whitelist {
      * @public
      */
     public async increaseExecutionCounter(publicKey: string): Promise<number> {
-        return this.db.query(`UPDATE whitelist SET Executed = Executed + 1 WHERE PublicKey='${publicKey}'`)
+        return this.db.query<number>(`UPDATE whitelist SET Executed = Executed + 1 WHERE PublicKey='${publicKey}'`)
     }
 
     /**
