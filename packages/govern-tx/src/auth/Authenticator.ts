@@ -4,6 +4,7 @@ import { arrayify } from '@ethersproject/bytes'
 import { Unauthorized, HttpError } from 'http-errors'
 import Whitelist from '../db/Whitelist'
 import Admin from '../db/Admin';
+import { Params } from '../../lib/AbstractAction';
 
 export interface AuthenticatedRequest extends FastifyRequest {
     publicKey: string
@@ -39,8 +40,12 @@ export default class Authenticator {
      * @public
      */
     public async authenticate(request: FastifyRequest): Promise<undefined> {
-        //@ts-ignore
-        const publicKey = verifyMessage(arrayify(request.body.message), request.body.signature)
+        const publicKey = verifyMessage(
+            arrayify(
+                (request.body as Params).message
+            ),
+            (request.body as Params).signature
+        )
 
         if (
             await this.hasPermission(

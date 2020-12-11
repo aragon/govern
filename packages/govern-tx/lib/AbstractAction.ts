@@ -3,7 +3,6 @@ import { FastifySchema, FastifyRequest } from 'fastify'
 export interface Params {
     message: string | any,
     signature: string,
-    publicKey: string
 }
 
 export default abstract class AbstractAction {
