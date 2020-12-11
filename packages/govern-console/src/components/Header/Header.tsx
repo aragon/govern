@@ -8,13 +8,13 @@ import { useWallet } from '../../Providers/Wallet'
 import { shortenAddress, getNetworkName } from '../../lib/web3-utils'
 import AragonSvg from '../../assets/aragon-metal.svg'
 
-function Header() {
-  const { chainId, setChainId } = useChainId()
+function Header(): JSX.Element {
+  const { chainId, updateChainId } = useChainId()
   const { wallet } = useWallet()
   const history = useHistory()
 
   useEffect(() => {
-    if (wallet!.error && wallet!.error instanceof ChainUnsupportedError) {
+    if (wallet.error && wallet.error instanceof ChainUnsupportedError) {
       alert(
         `Wrong network. Please connect to the ${getNetworkName(
           chainId,
@@ -25,12 +25,12 @@ function Header() {
 
   const handleChangeChain = useCallback(
     e => {
-      setChainId(e.target.value)
+      updateChainId(Number(e.target.value))
       // When we change the chain ID, the DAO might not exist,
       // so we must revert back to the DAO selection screen.
       history.push(`/${getNetworkName(e.target.value)}`)
     },
-    [history, setChainId],
+    [history, updateChainId],
   )
 
   const handleGoToHome = useCallback(() => history.push('/'), [history])
@@ -121,7 +121,7 @@ function Header() {
           `}
         >
           {wallet.status === 'connected'
-            ? shortenAddress(wallet.account!)
+            ? shortenAddress(wallet?.account ?? '')
             : 'Connect account'}
         </Button>
       </div>

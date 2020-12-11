@@ -140,11 +140,7 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
   const { status: accountStatus } = wallet
   const queueContract = useContract(queueAddress, queueAbi)
   const { permissions } = usePermissions()
-  const {
-    execute: canExecute,
-    veto: canVeto,
-    challenge: canChallenge,
-  } = permissions
+  const { veto: canVeto, challenge: canChallenge } = permissions
 
   const handleSetExecutionStatus = useCallback(
     (result, message) => {
@@ -157,6 +153,10 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
   const execute = useCallback(async () => {
     if (accountStatus !== 'connected') {
       alert('Executing actions requires a signer. Please connect your account.')
+      return
+    }
+    if (!queueContract) {
+      alert('The queue contract hasn’t loaded. Please retry.')
       return
     }
     const payloadActions = container.payload.actions.map((action: Action) => ({
@@ -190,7 +190,7 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
     }
 
     try {
-      const tx = await queueContract!.execute(craftedContainer, {
+      const tx = await queueContract.execute(craftedContainer, {
         gasLimit: 500000,
       })
       handleSetExecutionStatus('info', `Sending transaction.`)
@@ -213,14 +213,16 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
       alert('Executing actions requires a signer. Please connect your account.')
       return
     }
+    if (!queueContract) {
+      alert('The queue contract hasn’t loaded. Please retry.')
+      return
+    }
     try {
       const containerHash = container.id
-      const tx = await queueContract!.veto(
+      const tx = await queueContract.veto(
         containerHash,
         justification ? toHex(justification) : '0x00',
-        {
-          gasLimit: 500000,
-        },
+        { gasLimit: 500000 },
       )
       handleSetExecutionStatus('info', `Sending transaction.`)
       await tx.wait(1)
@@ -246,6 +248,10 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
   const challenge = useCallback(async () => {
     if (accountStatus !== 'connected') {
       alert('Executing actions requires a signer. Please connect your account.')
+      return
+    }
+    if (!queueContract) {
+      alert('The queue contract hasn’t loaded. Please retry.')
       return
     }
     const payloadActions = container.payload.actions.map((action: Action) => ({
@@ -279,7 +285,7 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
       },
     }
     try {
-      const tx = await queueContract!.challenge(craftedContainer, '0x00', {
+      const tx = await queueContract.challenge(craftedContainer, '0x00', {
         gasLimit: 500000,
       })
       handleSetExecutionStatus('info', `Sending transaction.`)
@@ -457,7 +463,7 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
 export default function ViewActionWrapper({
   containers,
   queueAddress,
-}: ViewActionWrapperProps) {
+}: ViewActionWrapperProps): JSX.Element {
   const { containerId }: any = useParams()
   const container = useMemo(() => {
     return containers.find(container => container.id === containerId)

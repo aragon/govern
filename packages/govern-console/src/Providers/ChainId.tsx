@@ -6,16 +6,31 @@ import React, {
   useMemo,
 } from 'react'
 
-const CHAIN_ID = 'ARAGON_CONSOLE_CHAIN_ID'
-
-type ChainIdContextProps = {
+type ChainIdData = {
   chainId: number
-  setChainId: Function
-} | null
+  updateChainId: (chainId: number) => void
+}
 
-const ChainIdContext = createContext<ChainIdContextProps>(null)
+const CHAIN_ID_KEY = 'ARAGON_CONSOLE_CHAIN_ID'
 
-export function useChainId() {
+const ChainIdContext = createContext<ChainIdData | null>(null)
+
+function loadChainId(): number {
+  const id = Number(localStorage.getItem(CHAIN_ID_KEY))
+
+  // Default to rinkeby if there is no chain id stored
+  if (isNaN(id) || id <= 0) {
+    return 4
+  }
+
+  return id
+}
+
+function saveChainId(chainId: number): void {
+  localStorage.setItem(CHAIN_ID_KEY, String(chainId))
+}
+
+export function useChainId(): ChainIdData {
   const chainIdContext = useContext(ChainIdContext)
 
   if (!chainIdContext) {
@@ -25,31 +40,22 @@ export function useChainId() {
   return chainIdContext
 }
 
-type ChainIdProviderProps = {
+export default function ChainIdProvider({
+  children,
+}: {
   children: React.ReactNode
-}
+}): JSX.Element {
+  const [chainId, setChainId] = useState<number>(loadChainId())
 
-export default function ChainIdProvider({ children }: ChainIdProviderProps) {
-  const [chainId, setChainId] = useState(
-    // Always default to rinkeby if there's no chain id cached
-    Number(localStorage.getItem(CHAIN_ID)) || 4,
-  )
+  const updateChainId = useCallback(chainId => {
+    setChainId(chainId)
+    saveChainId(chainId)
+  }, [])
 
-  const handleChangeChainId = useCallback(
-    chainId => {
-      setChainId(Number(chainId))
-      localStorage.setItem(CHAIN_ID, String(chainId))
-    },
-    [setChainId],
-  )
-
-  const contextValue = useMemo(
-    () => ({
-      chainId,
-      setChainId: handleChangeChainId,
-    }),
-    [chainId, handleChangeChainId],
-  )
+  const contextValue = useMemo(() => ({ chainId, updateChainId }), [
+    chainId,
+    updateChainId,
+  ])
 
   return (
     <ChainIdContext.Provider value={contextValue}>

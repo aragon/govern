@@ -16,7 +16,7 @@ function resolveColorsFromStatus(mode: string): string {
   return 'cyan'
 }
 
-export default function Info({ mode, children }: InfoProps) {
+export default function Info({ mode, children }: InfoProps): JSX.Element {
   return (
     <div
       css={`

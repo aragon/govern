@@ -4,31 +4,46 @@ import { UseWalletProvider, useWallet, Wallet } from 'use-wallet'
 import { useChainId } from './ChainId'
 import { getNetworkNode, getUseWalletConnectors } from '../lib/web3-utils'
 
-type WalletAugmentedContextProps = {
-  wallet: Wallet<any>
+// From ethers.js
+export type Eip1193Provider = {
+  isMetaMask?: boolean
+  host?: string
+  path?: string
+  sendAsync?: (
+    request: { method: string; params?: Array<any> },
+    callback: (error: any, response: any) => void,
+  ) => void
+  send?: (
+    request: { method: string; params?: Array<any> },
+    callback: (error: any, response: any) => void,
+  ) => void
+  request?: (request: { method: string; params?: Array<any> }) => Promise<any>
+}
+
+export type WalletAugmentedData = {
+  wallet: Wallet<Eip1193Provider>
   ethers: any
-} | null
+}
 
-const WalletAugmentedContext = createContext<WalletAugmentedContextProps>(null)
+const WalletAugmentedContext = createContext<WalletAugmentedData | null>(null)
 
-export function useWalletAugmented() {
+export function useWalletAugmented(): WalletAugmentedData {
   const walletContext = useContext(WalletAugmentedContext)
   if (!walletContext) {
     throw new Error(
       'useWalletAugmented can only be used inside a WalletProvider',
     )
   }
-
   return walletContext
 }
 
-type WalletAugmentedProps = {
-  children: React.ReactNode
-}
-
 // Adds Ethers.js to the useWallet() object
-function WalletAugmented({ children }: WalletAugmentedProps) {
-  const wallet: Wallet<any> = useWallet()
+function WalletAugmented({
+  children,
+}: {
+  children: React.ReactNode
+}): JSX.Element {
+  const wallet = useWallet<Eip1193Provider>()
   const { ethereum } = wallet
   const { chainId } = useChainId()
 
@@ -49,11 +64,11 @@ function WalletAugmented({ children }: WalletAugmentedProps) {
   )
 }
 
-type WalletProviderProps = {
+export default function WalletProvider({
+  children,
+}: {
   children: React.ReactNode
-}
-
-export default function WalletProvider({ children }: WalletProviderProps) {
+}): JSX.Element {
   const { chainId } = useChainId()
 
   return (

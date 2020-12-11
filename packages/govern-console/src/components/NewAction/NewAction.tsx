@@ -205,7 +205,6 @@ export default function NewAction({
           </label>
           <Button onClick={handleParseAbi}>Parse ABI</Button>
         </form>
-
         {parsedAbi.length && (
           <>
             <Frame>
@@ -419,9 +418,9 @@ function ContractCallHandler({
       ercContract,
       executor,
       handleSetExecutionResult,
+      proof,
       queueAddress,
       queueContract,
-      proof,
       rawAbiItem,
       values,
     ],
