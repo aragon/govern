@@ -39,7 +39,7 @@ export default class Admin {
      * @public
      */
     public addAdmin(publicKey: string): Promise<AdminItem> {
-        return this.db.query(`INSERT INTO admins VALUES (${publicKey})`)
+        return this.db.query(`INSERT INTO admins VALUES ('${publicKey}')`)
     }
 
     /**
