@@ -4,7 +4,7 @@ import {
   providers,
   utils as EthersUtils,
 } from 'ethers'
-import { useChainId } from '../Providers/ChainId'
+import { useChainId } from './chain-id'
 import { useWallet } from '../Providers/Wallet'
 import { getNetworkEthersName } from './web3-utils'
 

@@ -17,6 +17,26 @@ export function addressesEqual(first: string, second: string): boolean {
   return first === second
 }
 
+// Identifiers representing networks. Useful for URLs for example.
+// See getNetworkId() and chainIdFromNetworkId().
+const NETWORK_IDS = new Map([
+  [1, 'mainnet'],
+  [4, 'rinkeby'],
+  [100, 'xdai'],
+])
+export function getNetworkId(chainId: number): string | undefined {
+  return NETWORK_IDS.get(chainId)
+}
+export function chainIdFromNetworkId(networkId: string): number | undefined {
+  for (const [chainId, _networkId] of NETWORK_IDS.entries()) {
+    if (_networkId === networkId) {
+      return chainId
+    }
+  }
+  return undefined
+}
+
+// An name describing a given network. Useful when displaying networks in UI.
 export function getNetworkName(chainId: number): string {
   if (chainId === 1) return 'mainnet'
   if (chainId === 4) return 'rinkeby'
@@ -24,18 +44,19 @@ export function getNetworkName(chainId: number): string {
   return 'Unknown'
 }
 
+// Network names as defined by Ethers.js. Used to interact with Ethers.js only.
+export function getNetworkEthersName(chainId: number): string | undefined {
+  if (chainId === 1) return 'homestead'
+  if (chainId === 3) return 'ropsten'
+  if (chainId === 4) return 'rinkeby'
+  return undefined
+}
+
 export function getNetworkNode(
   chainId: number = env('CHAIN_ID'),
 ): string | undefined {
   if (chainId === 1) return 'https://mainnet.eth.aragon.network/'
   if (chainId === 4) return 'https://rinkeby.eth.aragon.network/'
-  return undefined
-}
-
-export function getNetworkEthersName(chainId: number): string | undefined {
-  if (chainId === 1) return 'homestead'
-  if (chainId === 3) return 'ropsten'
-  if (chainId === 4) return 'rinkeby'
   return undefined
 }
 

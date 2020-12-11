@@ -6,7 +6,7 @@ import 'styled-components/macro'
 import NewAction from '../components/NewAction/NewAction'
 import ViewAction from '../components/ViewAction/ViewAction'
 import ViewDao from '../components/ViewDao/ViewDao'
-import { useChainId } from '../Providers/ChainId'
+import { useChainId } from '../lib/chain-id'
 import env from '../environment'
 
 const DAO_QUERY = gql`
