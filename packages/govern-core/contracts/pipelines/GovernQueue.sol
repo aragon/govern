@@ -190,6 +190,9 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
      * @param _disputeId disputeId in the arbitrator in which the dispute over the container was created
      */
     function resolve(ERC3000Data.Container memory _container, uint256 _disputeId) override public returns (bytes32 failureMap, bytes[] memory) {
+        // ensure enough time has passed
+        require(block.timestamp >= _container.payload.executionTime, "queue: wait more");
+
         bytes32 containerHash = _container.hash();
         IArbitrator arbitrator = IArbitrator(_container.config.resolver);
 
