@@ -402,7 +402,13 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
                   to: <Entity address={action.to} type="address" />
                 </li>
                 <li>value: {action.value}</li>
-                <li>data: {action.data}</li>
+                <li
+                  css={`
+                    word-wrap: break-word;
+                  `}
+                >
+                  data: {action.data}
+                </li>
               </React.Fragment>
             ))}
           </ul>

@@ -1,20 +1,13 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import BN from 'bn.js'
 import { Contract as EthersContract } from 'ethers'
 import { useWallet } from 'use-wallet'
-import abiCoder from 'web3-eth-abi'
-import { toHex } from 'web3-utils'
 import 'styled-components/macro'
 import Button from '../Button'
 import Frame from '../Frame/Frame'
+import { sendAction, callContractFunction } from './handlers'
 import { useContract } from '../../lib/web3-contracts'
 import ercAbi from '../../lib/abi/erc20.json'
 import queueAbi from '../../lib/abi/GovernQueue.json'
-
-const EMPTY_BYTES = '0x00'
-const EMPTY_FAILURE_MAP =
-  '0x0000000000000000000000000000000000000000000000000000000000000000'
-const NO_TOKEN = `${'0x'.padEnd(42, '0')}`
 
 type Input = {
   name: string
@@ -355,25 +348,26 @@ function ContractCallHandler({
     async e => {
       e.preventDefault()
 
-      const args = values.map((value: InputStateData) => value.value)
-
       if (!targetContract) {
         alert('Please input the address for the contract.')
         return
       }
 
       try {
-        handleSetExecutionResult('info', `Calling function...`)
+        const callResponse = await callContractFunction(
+          name,
+          values,
+          targetContract,
+        )
 
-        const callResponse = args
-          ? await targetContract[name](...args)
-          : await targetContract[name]()
-
-        setResult(callResponse.toString())
-        handleSetExecutionResult('confirmed', callResponse.toString())
+        setResult(callResponse)
       } catch (err) {
         // TODO: handle error with sentry.
         console.error(err)
+        handleSetExecutionResult(
+          'error',
+          'There was an error with the function call.',
+        )
       }
     },
     [handleSetExecutionResult, name, targetContract, values],
@@ -383,88 +377,26 @@ function ContractCallHandler({
     async e => {
       e.preventDefault()
       try {
-        if (!queueContract) {
+        if (!queueContract || !account || !targetContract) {
           alert(
             'Executing transactions requires a signer. Please connect your account.',
           )
           return
         }
-        // First, let's handle token approvals (if a token has been configured).
-        // There are 3 cases to check
-        // 1. The user has more allowance than needed, we can skip. (0 tx)
-        // 2. The user has less allowance than needed, and we need to raise it. (2 tx)
-        // 3. The user has 0 allowance, we just need to approve the needed amount. (1 tx)
-        if (config.scheduleDeposit.token !== NO_TOKEN && ercContract) {
-          const allowance = await ercContract.allowance(account, queueAddress)
-          if (
-            allowance.lt(config.scheduleDeposit.amount) &&
-            config.scheduleDeposit.token !== NO_TOKEN
-          ) {
-            if (!allowance.isZero()) {
-              const resetTx = await ercContract.approve(account, '0')
-              await resetTx.wait(1)
-            }
-            await ercContract.approve(
-              queueAddress,
-              config.scheduleDeposit.amount,
-            )
-          }
-        }
-        const functionValues = values
-          ? values.map((val: InputStateData) => val.value)
-          : []
-
-        // @ts-ignore
-        const encodedFunctionCall = abiCoder.encodeFunctionCall(
-          rawAbiItem,
-          functionValues,
-        )
-
-        const nonce = await queueContract.nonce()
-        const bnNonce = new BN(nonce.toString())
-        const newNonce = bnNonce.add(new BN('1'))
-
-        // Current time + 30 secs buffer.
-        // This is necessary for DAOs with lower execution delays, in which
-        // the tx getting picked up by a later block can make the tx fail.
-        const currentDate =
-          Math.ceil(Date.now() / 1000) + Number(config.executionDelay) + 60
-        const container = {
-          payload: {
-            nonce: newNonce.toString(),
-            executionTime: currentDate,
-            submitter: account,
-            executor,
-            actions: [
-              {
-                to: contractAddress,
-                value: EMPTY_BYTES,
-                data: encodedFunctionCall,
-              },
-            ],
-            allowFailuresMap: EMPTY_FAILURE_MAP,
-            proof: proof ? toHex(proof) : EMPTY_BYTES,
-          },
-          config: {
-            executionDelay: config.executionDelay,
-            scheduleDeposit: {
-              token: config.scheduleDeposit.token,
-              amount: config.scheduleDeposit.amount,
-            },
-            challengeDeposit: {
-              token: config.challengeDeposit.token,
-              amount: config.challengeDeposit.amount,
-            },
-            resolver: config.resolver,
-            rules: config.rules,
-          },
-        }
-
-        const tx = await queueContract.schedule(container, {
-          gasLimit: 500000,
-        })
-
         handleSetExecutionResult('info', `Sending transaction.`)
+
+        const tx = await sendAction(
+          account,
+          config,
+          ercContract,
+          executor,
+          proof,
+          rawAbiItem,
+          values,
+          contractAddress,
+          queueAddress,
+          queueContract,
+        )
         await tx.wait(1)
 
         setResult(tx.hash)
