@@ -1,6 +1,6 @@
 import {isAddress} from '@ethersproject/address'
-import AbstractWhitelistAction, { WhitelistRequest } from "../../lib/whitelist/AbstractWhitelistAction";
-import {ListItem} from '../db/Whitelist'
+import { FastifyRequest } from 'fastify';
+import AbstractWhitelistAction, { WhitelistParams } from "../../lib/whitelist/AbstractWhitelistAction";
 
 export default class DeleteItemAction extends AbstractWhitelistAction {
     /**
@@ -8,14 +8,14 @@ export default class DeleteItemAction extends AbstractWhitelistAction {
       * 
       * @method validateRequest 
       * 
-      * @param {WhitelistRequest} request 
+      * @param {FastifyRequest} request 
       * 
-      * @returns {WhitelistRequest}
+      * @returns {FastifyRequest}
       * 
       * @protected
       */
-     protected validateRequest(request: WhitelistRequest): WhitelistRequest {
-        if (!isAddress(request.message.publicKey)) {
+     protected validateRequest(request: FastifyRequest): FastifyRequest {
+        if (!isAddress((this.request.params as WhitelistParams).message.publicKey)) {
             throw new Error('Invalid public key passed!')
         }
 
@@ -32,6 +32,6 @@ export default class DeleteItemAction extends AbstractWhitelistAction {
      * @public
      */
     public execute(): Promise<boolean> {
-        return this.whitelist.deleteItem((this.request as WhitelistRequest).message.publicKey);
+        return this.whitelist.deleteItem((this.request.params as WhitelistParams).message.publicKey);
     }
 }

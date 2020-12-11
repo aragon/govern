@@ -1,11 +1,13 @@
-import { FastifySchema } from 'fastify';
+import { FastifySchema, FastifyRequest } from 'fastify';
 import { TransactionReceipt } from '@ethersproject/abstract-provider'
 import { JsonFragment } from '@ethersproject/abi';
-import AbstractAction, { Request } from '../AbstractAction'
+import AbstractAction from '../AbstractAction'
 import ContractFunction from '../transactions/ContractFunction'
 import Provider from '../../src/provider/Provider'
 import { EthereumOptions } from '../../src/config/Configuration';
 import Whitelist from '../../src/db/Whitelist';
+import { Params } from '../AbstractAction';
+import { AuthenticatedRequest } from '../../src/auth/Authenticator';
 
 export default abstract class AbstractTransaction extends AbstractAction {
     /**
@@ -39,9 +41,7 @@ export default abstract class AbstractTransaction extends AbstractAction {
         private config: EthereumOptions,
         private provider: Provider,
         private whitelist: Whitelist,
-        request: Request,
-        private publicKey: string,
-        private admin: boolean
+        request: FastifyRequest,
     ) {
         super(request);
     }
@@ -58,14 +58,14 @@ export default abstract class AbstractTransaction extends AbstractAction {
     public async execute(): Promise<TransactionReceipt> {
         const contractFunction = new ContractFunction(
             this.functionABI,
-            (this.request as Request).message
+            (this.request.params as Params).message
         )
         contractFunction.functionArguments[0].payload.submitter = this.config.publicKey
-        
+
         let receipt: TransactionReceipt = await this.provider.sendTransaction(this.contract, contractFunction)
 
-        if(!this.admin) {
-            this.whitelist.increaseExecutionCounter(this.publicKey)
+        if(!(this.request as AuthenticatedRequest).admin) {
+            this.whitelist.increaseExecutionCounter((this.request as AuthenticatedRequest).publicKey)
         }
 
         return receipt;

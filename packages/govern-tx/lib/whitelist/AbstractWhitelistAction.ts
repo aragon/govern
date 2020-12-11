@@ -1,8 +1,8 @@
-import { FastifySchema } from 'fastify';
-import AbstractAction, { Request } from '../AbstractAction'
+import { FastifyRequest, FastifySchema } from 'fastify';
+import AbstractAction, { Params } from '../AbstractAction'
 import Whitelist, {ListItem} from '../../src/db/Whitelist'
 
-export interface WhitelistRequest extends Request {
+export interface WhitelistParams extends Params {
     message: {
         publicKey: string,
         rateLimit?: number
@@ -16,7 +16,7 @@ export default abstract class AbstractWhitelistAction extends AbstractAction {
      * 
      * @constructor
      */
-    constructor(protected whitelist: Whitelist, request?: WhitelistRequest) {
+    constructor(protected whitelist: Whitelist, request: FastifyRequest) {
         super(request)
     }
 

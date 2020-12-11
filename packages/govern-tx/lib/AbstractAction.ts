@@ -1,6 +1,6 @@
-import { FastifySchema } from 'fastify'
+import { FastifySchema, FastifyRequest } from 'fastify'
 
-export interface Request {
+export interface Params {
     message: string | any,
     signature: string,
     publicKey: string
@@ -12,14 +12,14 @@ export default abstract class AbstractAction {
      * 
      * @var {Request} parameters
      */
-    protected request: Request | undefined;
+    protected request: FastifyRequest;
 
     /**
      * @param {Request} parameters 
      * 
      * @constructor
      */
-    constructor(request: Request | undefined) {
+    constructor(request: FastifyRequest) {
         this.request = this.validateRequest(request);
     }
 
@@ -34,7 +34,7 @@ export default abstract class AbstractAction {
       * 
       * @protected
       */
-    protected validateRequest(request: Request | undefined): Request | undefined {
+    protected validateRequest(request: FastifyRequest): FastifyRequest {
         return request;
     }
 

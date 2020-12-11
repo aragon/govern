@@ -1,7 +1,6 @@
 import fastify, { FastifyInstance } from 'fastify'
 import { TransactionReceipt } from '@ethersproject/abstract-provider'
 
-import { Request } from '../lib/AbstractAction'
 import Configuration from './config/Configuration'
 import Provider from './provider/Provider'
 import Wallet from './wallet/Wallet'
@@ -115,9 +114,7 @@ export default class Bootstrap {
                     this.config.ethereum,
                     this.provider,
                     this.whitelist,
-                    request.params as Request,
-                    (request as AuthenticatedRequest).publicKey,
-                    (request as AuthenticatedRequest).admin
+                    request
                 ).execute()
             }
         )
@@ -130,9 +127,7 @@ export default class Bootstrap {
                     this.config.ethereum,
                     this.provider,
                     this.whitelist,
-                    request.params as Request,
-                    (request as AuthenticatedRequest).publicKey,
-                    (request as AuthenticatedRequest).admin
+                    request
                 ).execute()
             }
         )
@@ -145,9 +140,7 @@ export default class Bootstrap {
                     this.config.ethereum,
                     this.provider,
                     this.whitelist,
-                    request.params as Request,
-                    (request as AuthenticatedRequest).publicKey,
-                    (request as AuthenticatedRequest).admin
+                    request
                 ).execute()
             }
         )
@@ -160,9 +153,7 @@ export default class Bootstrap {
                     this.config.ethereum,
                     this.provider,
                     this.whitelist,
-                    request.params as Request,
-                    (request as AuthenticatedRequest).publicKey,
-                    (request as AuthenticatedRequest).admin
+                    request
                 ).execute()
             }
         )
@@ -182,7 +173,7 @@ export default class Bootstrap {
             '/whitelist',
             {schema: AbstractWhitelistAction.schema},
             (request): Promise<ListItem> => {
-                return new AddItemAction(this.whitelist, request.params as Request).execute()
+                return new AddItemAction(this.whitelist, request).execute()
             }
         )
         
@@ -190,15 +181,15 @@ export default class Bootstrap {
             '/whitelist',
             {schema: AbstractWhitelistAction.schema},
             (request): Promise<boolean> => {
-                return new DeleteItemAction(this.whitelist, request.params as Request).execute()
+                return new DeleteItemAction(this.whitelist, request).execute()
             }
         )
         
         this.server.get(
             '/whitelist',
             {schema: AbstractWhitelistAction.schema},
-            (): Promise<ListItem[]> => {
-                return new GetListAction(this.whitelist).execute()
+            (request): Promise<ListItem[]> => {
+                return new GetListAction(this.whitelist, request).execute()
             }
         )
     }
