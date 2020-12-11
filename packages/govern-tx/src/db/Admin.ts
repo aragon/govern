@@ -1,7 +1,9 @@
 import Database from './Database'
 
 export interface AdminItem {
+    ID: number
     PublicKey: string
+    PrivateKey: string
 }
 
 export default class Admin {
