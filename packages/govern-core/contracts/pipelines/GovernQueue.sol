@@ -134,9 +134,6 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
         auth(this.execute.selector) // in most instances this will be open for any addr, but leaving configurable for flexibility
         returns (bytes32 failureMap, bytes[] memory)
     {
-        // ensure enough time has passed
-        require(block.timestamp >= _container.payload.executionTime, "queue: wait more");
-
         bytes32 containerHash = _container.hash();
         queue[containerHash].checkAndSetState(
             GovernQueueStateLib.State.Scheduled, // note that we will revert here if the container wasn't previously scheduled
@@ -190,9 +187,6 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
      * @param _disputeId disputeId in the arbitrator in which the dispute over the container was created
      */
     function resolve(ERC3000Data.Container memory _container, uint256 _disputeId) override public returns (bytes32 failureMap, bytes[] memory) {
-        // ensure enough time has passed
-        require(block.timestamp >= _container.payload.executionTime, "queue: wait more");
-
         bytes32 containerHash = _container.hash();
         IArbitrator arbitrator = IArbitrator(_container.config.resolver);
 
@@ -302,6 +296,9 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
     }
 
     function _execute(ERC3000Data.Payload memory _payload, bytes32 _containerHash) internal returns (bytes32, bytes[] memory) {
+        // ensure enough time has passed
+        require(block.timestamp >= _payload.executionTime, "queue: wait more");
+
         emit Executed(_containerHash, msg.sender);
         return _payload.executor.exec(_payload.actions, _payload.allowFailuresMap, _containerHash);
     }
