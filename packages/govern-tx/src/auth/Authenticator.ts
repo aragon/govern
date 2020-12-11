@@ -80,6 +80,7 @@ export default class Authenticator {
             return true
         }
 
+        // TODO: Fire only one SQL statement to check if the key exists and if the limit is reached
         if (
             request.routerPath !== '/whitelist' && 
             await this.whitelist.keyExists(publicKey) &&

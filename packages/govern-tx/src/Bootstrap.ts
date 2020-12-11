@@ -20,7 +20,6 @@ import DeleteItemAction from './whitelist/DeleteItemAction'
 import GetListAction from './whitelist/GetListAction'
 import AbstractTransaction from '../lib/transactions/AbstractTransaction'
 import AbstractWhitelistAction from '../lib/whitelist/AbstractWhitelistAction'
-import { AuthenticatedRequest } from './auth/Authenticator';
 
 export default class Bootstrap {
     /**
