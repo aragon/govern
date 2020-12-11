@@ -71,7 +71,7 @@ export default class Whitelist {
      * @public
      */
     public addItem(publicKey: string, rateLimit: number): Promise<ListItem> {
-        return this.db.query(`INSERT INTO whitelist VALUES (${publicKey}, ${rateLimit})`)
+        return this.db.query(`INSERT INTO whitelist (PublicKey, TxLimit) VALUES ('${publicKey}', ${rateLimit})`)
     }
 
     /**

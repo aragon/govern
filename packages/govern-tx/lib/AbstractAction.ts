@@ -61,7 +61,12 @@ export default abstract class AbstractAction {
                 type: 'object',
                 required: ['message', 'signature'],
                 properties: {
-                    message: { type: 'string' },
+                    message: {
+                        oneOf: [
+                          { type: 'string'},
+                          { type: 'object'}
+                        ]
+                      },
                     signature: { type: 'string' }
                 }
             }

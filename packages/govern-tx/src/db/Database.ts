@@ -3,7 +3,6 @@ import { DatabaseOptions } from '../config/Configuration'
 
 export default class Database {
     /**
-     * TODO: Define type
      * The sql function of the postgres client
      * 
      * @property {Function} sql

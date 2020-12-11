@@ -2,13 +2,15 @@ CREATE TABLE whitelist (
     ID SERIAL PRIMARY KEY,
     PublicKey CHAR(42)           NOT NULL,
     TxLimit   INT DEFAULT 100    NOT NULL,
-    Executed  INT DEFAULT 0      NOT NULL
+    Executed  INT DEFAULT 0      NOT NULL,
+    UNIQUE(PublicKey)
 );
 
 CREATE TABLE admins (
     ID          SERIAL    PRIMARY KEY,
     PublicKey   CHAR(42)     NOT NULL,
-    PrivateKey  CHAR(64)     NOT NULL
+    PrivateKey  CHAR(64)     NOT NULL,
+    UNIQUE(PublicKey)
 );
 
 INSERT INTO whitelist (PublicKey, TxLimit) VALUES ('0x6FA59C2C8EAaCC1f8875794f2DAe145Bb32Bd9B1', '100');

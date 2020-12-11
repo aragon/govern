@@ -1,6 +1,7 @@
 import { FastifyRequest } from 'fastify';
 import { verifyMessage } from '@ethersproject/wallet';
 import { arrayify } from '@ethersproject/bytes'
+import { toUtf8Bytes } from '@ethersproject/strings'
 import { Unauthorized, HttpError } from 'http-errors'
 import Whitelist from '../db/Whitelist'
 import Admin from '../db/Admin';
@@ -40,10 +41,16 @@ export default class Authenticator {
      * @public
      */
     public async authenticate(request: FastifyRequest): Promise<undefined> {
+        let message = (request.body as Params).message
+
+        if (typeof message === 'object' && message != null) {
+            message = toUtf8Bytes(JSON.stringify(message))
+        } else {
+            message = arrayify(message)
+        }
+
         const publicKey = verifyMessage(
-            arrayify(
-                (request.body as Params).message
-            ),
+            message,
             (request.body as Params).signature
         )
 
