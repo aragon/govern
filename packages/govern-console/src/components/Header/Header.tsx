@@ -1,17 +1,17 @@
 import React, { useCallback, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
 import { ChainUnsupportedError } from 'use-wallet'
 import 'styled-components/macro'
 import Button from '../Button'
-import { useChainId } from '../../Providers/ChainId'
+import { useChainId } from '../../lib/chain-id'
 import { useWallet } from '../../Providers/Wallet'
+import { useRouting } from '../../lib/routing'
 import { shortenAddress, getNetworkName } from '../../lib/web3-utils'
 import AragonSvg from '../../assets/aragon-metal.svg'
 
 function Header(): JSX.Element {
+  const { goHome } = useRouting()
   const { chainId, updateChainId } = useChainId()
   const { wallet } = useWallet()
-  const history = useHistory()
 
   useEffect(() => {
     if (wallet.error && wallet.error instanceof ChainUnsupportedError) {
@@ -24,16 +24,11 @@ function Header(): JSX.Element {
   }, [chainId, wallet])
 
   const handleChangeChain = useCallback(
-    e => {
-      updateChainId(Number(e.target.value))
-      // When we change the chain ID, the DAO might not exist,
-      // so we must revert back to the DAO selection screen.
-      history.push(`/${getNetworkName(e.target.value)}`)
+    (event: { target: { value: string } }) => {
+      updateChainId(Number(event.target.value))
     },
-    [history, updateChainId],
+    [updateChainId],
   )
-
-  const handleGoToHome = useCallback(() => history.push('/'), [history])
 
   const handleWalletConnection = useCallback(() => {
     wallet.status === 'connected' ? wallet.reset() : wallet.connect('injected')
@@ -58,7 +53,7 @@ function Header(): JSX.Element {
       >
         <button
           type="button"
-          onClick={handleGoToHome}
+          onClick={goHome}
           css={`
             display: flex;
             background: transparent;

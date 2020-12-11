@@ -16,10 +16,7 @@ export default function ErcTool() {
 
   return (
     <>
-      <Button
-        type="button"
-        onClick={() => history.goBack()}
-      >
+      <Button type="button" onClick={() => history.goBack()}>
         Back
       </Button>
       <div
@@ -63,7 +60,7 @@ export default function ErcTool() {
                   `}
                 >
                   <ContractCallHandler
-                    constant={abiItem.constant!}
+                    constant={abiItem.constant ?? false}
                     ercContract={tokenContract}
                     name={abiItem.name}
                     inputs={abiItem.inputs}
@@ -174,10 +171,7 @@ function ContractCallHandler({
             </label>
           </div>
         ))}
-        <Button
-          type="submit"
-          onClick={handleExecute}
-        >
+        <Button type="submit" onClick={handleExecute}>
           Execute
         </Button>
         <span>Result: {result}</span>
