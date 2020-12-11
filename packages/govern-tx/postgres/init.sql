@@ -6,7 +6,7 @@ CREATE TABLE whitelist {
     PRIMARY KEY (id)
 };
 
-CREATE TABLE admin {
+CREATE TABLE admins {
     ID int NOT NULL AUTO_INCREMENT,
     PublicKey char(42) NOT NULL,
     PrivateKey char(64) NOT NULL,
