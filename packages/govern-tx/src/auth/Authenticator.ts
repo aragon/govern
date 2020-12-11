@@ -5,6 +5,10 @@ import { Unauthorized, HttpError } from 'http-errors'
 import Whitelist from '../db/Whitelist'
 import Admin from '../db/Admin';
 
+export interface AuthenticatedRequest extends FastifyRequest {
+    publicKey: string
+}
+
 export default class Authenticator {
     /**
      * @property {HttpError} NOT_ALLOWED
@@ -34,17 +38,17 @@ export default class Authenticator {
      * @public
      */
     public async authenticate(request: FastifyRequest): Promise<undefined> {
+        //@ts-ignore
+        const publicKey = verifyMessage(arrayify(request.body.message), request.body.signature)
+
         if (
             await this.hasPermission(
                 request.routerPath,
-                verifyMessage(
-                    //@ts-ignore
-                    arrayify(request.body.message),
-                    //@ts-ignore
-                    request.body.signature
-                )
+                publicKey
             )
         ) {
+            (request as AuthenticatedRequest).publicKey = publicKey
+
             return
         } 
 

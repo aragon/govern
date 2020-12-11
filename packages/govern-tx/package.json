@@ -4,9 +4,8 @@
   "description": "Transactions service of Govern",
   "main": "./src/index.js",
   "scripts": {
-    "dev": "DEV=true ts-node-dev src/index.ts",
-    "start": "yarn start:containers && yarn start:server",
-    "start:server": "node --loader ts-node/esm.mjs src/index.ts",
+    "dev": "yarn start:containers && DEV=true ts-node-dev src/index.ts",
+    "start": "node --loader ts-node/esm.mjs src/index.ts",
     "start:containers": "docker-compose up -d",
     "stop:containers": "docker-compose down",
     "e2e": "yarn start && jest -c ./jest.config.e2e.js",

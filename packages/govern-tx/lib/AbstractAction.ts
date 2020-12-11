@@ -2,7 +2,8 @@ import { FastifySchema } from 'fastify'
 
 export interface Request {
     message: string | any,
-    signature: string
+    signature: string,
+    publicKey: string
 }
 
 export default abstract class AbstractAction {

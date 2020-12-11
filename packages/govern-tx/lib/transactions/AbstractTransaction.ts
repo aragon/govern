@@ -5,6 +5,7 @@ import AbstractAction, { Request } from '../AbstractAction'
 import ContractFunction from '../transactions/ContractFunction'
 import Provider from '../../src/provider/Provider'
 import { EthereumOptions } from '../../src/config/Configuration';
+import Whitelist from '../../src/db/Whitelist';
 
 export default abstract class AbstractTransaction extends AbstractAction {
     /**
@@ -26,16 +27,20 @@ export default abstract class AbstractTransaction extends AbstractAction {
     protected contract: string
 
     /**
-     * @param {EthereumOptions} config
+     * @param {EthereumOptions} config - Ethereum related configurations
      * @param {Provider} provider - The Ethereum provider object
+     * @param {Whitelist} whitelist - Whitelist DB adapter
      * @param {Request} request - The request body given by the user
+     * @param {string} publicKey - The public key of the user
      * 
      * @constructor
      */
     constructor(
         private config: EthereumOptions,
         private provider: Provider,
-        request: Request
+        private whitelist: Whitelist,
+        request: Request,
+        private publicKey: string
     ) {
         super(request);
     }
@@ -49,7 +54,7 @@ export default abstract class AbstractTransaction extends AbstractAction {
      * 
      * @public
      */
-    public execute(): Promise<TransactionReceipt> {
+    public async execute(): Promise<TransactionReceipt> {
         const contractFunction = new ContractFunction(
             this.functionABI,
             (this.request as Request).message
@@ -57,7 +62,12 @@ export default abstract class AbstractTransaction extends AbstractAction {
 
         contractFunction.functionArguments[0].payload.submitter = this.config.publicKey
 
-        return this.provider.sendTransaction(this.contract, contractFunction)
+        let receipt: TransactionReceipt;
+
+        receipt = await this.provider.sendTransaction(this.contract, contractFunction)
+        this.whitelist.increaseExecutionCounter(this.publicKey)
+
+        return receipt;
     } 
 
     /**

@@ -20,6 +20,7 @@ import DeleteItemAction from './whitelist/DeleteItemAction'
 import GetListAction from './whitelist/GetListAction'
 import AbstractTransaction from '../lib/transactions/AbstractTransaction'
 import AbstractWhitelistAction from '../lib/whitelist/AbstractWhitelistAction'
+import { AuthenticatedRequest } from './auth/Authenticator';
 
 export default class Bootstrap {
     /**
@@ -109,7 +110,13 @@ export default class Bootstrap {
             '/execute',
             {schema: AbstractTransaction.schema},
             (request): Promise<TransactionReceipt> => {
-                return new ExecuteTransaction(this.config.ethereum, this.provider, request.params as Request).execute()
+                return new ExecuteTransaction(
+                    this.config.ethereum,
+                    this.provider,
+                    this.whitelist,
+                    request.params as Request,
+                    (request as AuthenticatedRequest).publicKey
+                ).execute()
             }
         )
         
@@ -117,7 +124,13 @@ export default class Bootstrap {
             '/schedule',
             {schema: AbstractTransaction.schema},
             (request): Promise<TransactionReceipt> => {
-                return new ScheduleTransaction(this.config.ethereum, this.provider, request.params as Request).execute()
+                return new ScheduleTransaction(
+                    this.config.ethereum,
+                    this.provider,
+                    this.whitelist,
+                    request.params as Request,
+                    (request as AuthenticatedRequest).publicKey
+                ).execute()
             }
         )
         
@@ -125,7 +138,13 @@ export default class Bootstrap {
             '/challenge',
             {schema: AbstractTransaction.schema},
             (request): Promise<TransactionReceipt> => {
-                return new ChallengeTransaction(this.config.ethereum, this.provider, request.params as Request).execute()
+                return new ChallengeTransaction(
+                    this.config.ethereum,
+                    this.provider,
+                    this.whitelist,
+                    request.params as Request,
+                    (request as AuthenticatedRequest).publicKey
+                ).execute()
             }
         )
     }

@@ -39,7 +39,7 @@ export default class Whitelist {
      * @public
      */
     public async keyExists(publicKey: string): Promise<boolean> {
-        return (await this.getItemByKey(publicKey)).length > 0;
+        return (await this.getItemByKey(publicKey)).length > 0
     }
 
     /**
@@ -70,7 +70,7 @@ export default class Whitelist {
      * @public
      */
     public addItem(publicKey: string, rateLimit: number): Promise<ListItem> {
-        return this.db.query(`INSERT INTO whitelist VALUES (${publicKey}, ${rateLimit})`);
+        return this.db.query(`INSERT INTO whitelist VALUES (${publicKey}, ${rateLimit})`)
     }
 
     /**
@@ -85,6 +85,21 @@ export default class Whitelist {
      * @public
      */
     public async deleteItem(publicKey: string): Promise<boolean> {
-        return (await this.db.query(`DELETE FROM whitelist WHERE PublicKey='${publicKey}'`)).length > 0;
+        return (await this.db.query(`DELETE FROM whitelist WHERE PublicKey='${publicKey}'`)).length > 0
+    }
+
+    /**
+     * Increases the execution counter
+     * 
+     * @method increaseExecutionCounter
+     * 
+     * @param {string} publicKey 
+     * 
+     * @returns {Promise<number>}
+     * 
+     * @public
+     */
+    public async increaseExecutionCounter(publicKey: string): Promise<number> {
+        return this.db.query(`UPDATE whitelist SET Executed = Executed + 1 WHERE PublicKey='${publicKey}'`)
     }
 }
