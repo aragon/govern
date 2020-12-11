@@ -7,6 +7,7 @@ import Admin from '../db/Admin';
 
 export interface AuthenticatedRequest extends FastifyRequest {
     publicKey: string
+    admin: boolean
 }
 
 export default class Authenticator {
@@ -43,7 +44,7 @@ export default class Authenticator {
 
         if (
             await this.hasPermission(
-                request.routerPath,
+                request,
                 publicKey
             )
         ) {
@@ -60,22 +61,25 @@ export default class Authenticator {
      * 
      * @method hasPermission
      * 
-     * @param {string} routerPath 
+     * @param {FastifyRequest} request 
      * @param {string} publicKey
      * 
      * @returns {Promise<boolean>}
      * 
      * @private 
      */
-    private async hasPermission(routerPath: string, publicKey: string): Promise<boolean> {
-        if (
-            routerPath !== '/whitelist' && 
-            (await this.whitelist.keyExists(publicKey) || await this.admin.isAdmin(publicKey))
-        ) {
+    private async hasPermission(request: FastifyRequest, publicKey: string): Promise<boolean> {
+        if (await this.admin.isAdmin(publicKey)) {
+            (request as AuthenticatedRequest).admin = true
+
             return true
         }
 
-        if (routerPath === '/whitelist' && await this.admin.isAdmin(publicKey)) {
+        if (
+            request.routerPath !== '/whitelist' && await this.whitelist.keyExists(publicKey)
+        ) {
+            (request as AuthenticatedRequest).admin = false
+
             return true
         }
 

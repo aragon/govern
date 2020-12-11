@@ -40,7 +40,8 @@ export default abstract class AbstractTransaction extends AbstractAction {
         private provider: Provider,
         private whitelist: Whitelist,
         request: Request,
-        private publicKey: string
+        private publicKey: string,
+        private admin: boolean
     ) {
         super(request);
     }
@@ -65,7 +66,10 @@ export default abstract class AbstractTransaction extends AbstractAction {
         let receipt: TransactionReceipt;
 
         receipt = await this.provider.sendTransaction(this.contract, contractFunction)
-        this.whitelist.increaseExecutionCounter(this.publicKey)
+
+        if(!this.admin) {
+            this.whitelist.increaseExecutionCounter(this.publicKey)
+        }
 
         return receipt;
     } 

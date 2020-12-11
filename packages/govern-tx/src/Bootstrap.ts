@@ -14,6 +14,7 @@ import Authenticator from './auth/Authenticator'
 import ExecuteTransaction from './transactions/execute/ExecuteTransaction'
 import ChallengeTransaction from './transactions/challenge/ChallengeTransaction'
 import ScheduleTransaction from './transactions/schedule/ScheduleTransaction'
+import CreateTransaction from './transactions/create/CreateTransaction';
 
 import AddItemAction from './whitelist/AddItemAction'
 import DeleteItemAction from './whitelist/DeleteItemAction'
@@ -115,7 +116,8 @@ export default class Bootstrap {
                     this.provider,
                     this.whitelist,
                     request.params as Request,
-                    (request as AuthenticatedRequest).publicKey
+                    (request as AuthenticatedRequest).publicKey,
+                    (request as AuthenticatedRequest).admin
                 ).execute()
             }
         )
@@ -129,7 +131,8 @@ export default class Bootstrap {
                     this.provider,
                     this.whitelist,
                     request.params as Request,
-                    (request as AuthenticatedRequest).publicKey
+                    (request as AuthenticatedRequest).publicKey,
+                    (request as AuthenticatedRequest).admin
                 ).execute()
             }
         )
@@ -143,7 +146,23 @@ export default class Bootstrap {
                     this.provider,
                     this.whitelist,
                     request.params as Request,
-                    (request as AuthenticatedRequest).publicKey
+                    (request as AuthenticatedRequest).publicKey,
+                    (request as AuthenticatedRequest).admin
+                ).execute()
+            }
+        )
+        
+        this.server.post(
+            '/create',
+            {schema: AbstractTransaction.schema},
+            (request): Promise<TransactionReceipt> => {
+                return new CreateTransaction(
+                    this.config.ethereum,
+                    this.provider,
+                    this.whitelist,
+                    request.params as Request,
+                    (request as AuthenticatedRequest).publicKey,
+                    (request as AuthenticatedRequest).admin
                 ).execute()
             }
         )

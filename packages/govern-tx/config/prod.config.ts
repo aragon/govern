@@ -4,7 +4,8 @@ export const config: Config = {
     ethereum: {
         publicKey: '', // Add default EOA
         contracts: {
-            GovernQueue: '' // Add deployment address can get calculated if deployed with create2
+            GovernQueue: '', // Add deployment address can get calculated if deployed with create2
+            GovernBaseFactory: ''
         },
         url: 'localhost:8545',
         blockConfirmations: 42
