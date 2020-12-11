@@ -39,7 +39,7 @@ export default class Whitelist {
      * @public
      */
     public async keyExists(publicKey: string): Promise<boolean> {
-        return typeof (await this.getItemByKey(publicKey)).ID !== 'undefined'
+        return typeof (await this.getItemByKey(publicKey)) !== 'undefined'
     }
 
     /**
@@ -53,8 +53,8 @@ export default class Whitelist {
      * 
      * @public 
      */
-    public getItemByKey(publicKey: string): Promise<ListItem> {
-        return this.db.query<ListItem>(`SELECT * FROM whitelist WHERE PublicKey='${publicKey}'`)
+    public async getItemByKey(publicKey: string): Promise<ListItem> {
+        return (await this.db.query<ListItem[]>(`SELECT * FROM whitelist WHERE PublicKey='${publicKey}'`))[0]
     }
 
     /**
