@@ -1,10 +1,9 @@
 import React, { useEffect } from 'react'
-import { Redirect, Route, Switch, useLocation } from 'react-router-dom'
+import { Route, Switch, useLocation } from 'react-router-dom'
 import 'styled-components/macro'
 import SelectDao from './pages/SelectDao'
 import ViewDao from './pages/ViewDao'
 import Header from './components/Header/Header'
-import { getNetworkName } from './lib/web3-utils'
 import { useChainId } from './lib/chain-id'
 import env from './environment'
 
