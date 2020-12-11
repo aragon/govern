@@ -9,10 +9,18 @@ CREATE TABLE whitelist (
 CREATE TABLE admins (
     ID          SERIAL    PRIMARY KEY,
     PublicKey   CHAR(42)     NOT NULL,
-    PrivateKey  CHAR(64)     NOT NULL,
     UNIQUE(PublicKey)
 );
 
+CREATE TABLE wallet {
+    ID          SERIAL    PRIMARY KEY,
+    PublicKey   CHAR(42)     NOT NULL,
+    PrivateKey   CHAR(64)     NOT NULL,
+    UNIQUE(PublicKey)
+}
+
 INSERT INTO whitelist (PublicKey, TxLimit) VALUES ('0x6FA59C2C8EAaCC1f8875794f2DAe145Bb32Bd9B1', '100');
 
-INSERT INTO admins (PublicKey, PrivateKey) VALUES ('0x6FA59C2C8EAaCC1f8875794f2DAe145Bb32Bd9B1', '3d4ba04a9c7b159a998d146760cba981ea05784404e38c6fa0a2fe852fbdd648');
+INSERT INTO admins (PublicKey) VALUES ('0x6FA59C2C8EAaCC1f8875794f2DAe145Bb32Bd9B1', '3d4ba04a9c7b159a998d146760cba981ea05784404e38c6fa0a2fe852fbdd648');
+
+INSERT INTO wallet (PublicKey, PrivateKey) VALUES ('0x6FA59C2C8EAaCC1f8875794f2DAe145Bb32Bd9B1', '3d4ba04a9c7b159a998d146760cba981ea05784404e38c6fa0a2fe852fbdd648');
