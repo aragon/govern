@@ -5,7 +5,7 @@ import Whitelist, {ListItem} from '../../src/db/Whitelist'
 export interface WhitelistParams extends Params {
     message: {
         publicKey: string,
-        rateLimit?: number
+        txLimit?: number
     }
 }
 

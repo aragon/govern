@@ -16,11 +16,11 @@ export default class AddItemAction extends AbstractWhitelistAction {
       * @protected
       */
      protected validateRequest(request: FastifyRequest): FastifyRequest {
-        if (!isAddress((request.params as WhitelistParams).message.publicKey)) {
+        if (!isAddress((request.body as WhitelistParams).message.publicKey)) {
             throw new Error('Invalid public key passed!')
         }
 
-        if ((request.params as WhitelistParams).message.rateLimit == 0) {
+        if ((request.body as WhitelistParams).message.txLimit == 0) {
             throw new Error('Invalid rate limit passed!')
         }
 
@@ -38,8 +38,8 @@ export default class AddItemAction extends AbstractWhitelistAction {
      */
     public execute(): Promise<ListItem> {
         return this.whitelist.addItem(
-            (this.request.params as WhitelistParams).message.publicKey,
-            ((this.request.params as WhitelistParams).message.rateLimit as number)
+            (this.request.body as WhitelistParams).message.publicKey,
+            ((this.request.body as WhitelistParams).message.txLimit as number)
         )
     }
 }

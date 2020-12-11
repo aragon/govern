@@ -15,7 +15,7 @@ export default class DeleteItemAction extends AbstractWhitelistAction {
       * @protected
       */
      protected validateRequest(request: FastifyRequest): FastifyRequest {
-        if (!isAddress((this.request.params as WhitelistParams).message.publicKey)) {
+        if (!isAddress((this.request.body as WhitelistParams).message.publicKey)) {
             throw new Error('Invalid public key passed!')
         }
 
@@ -32,6 +32,6 @@ export default class DeleteItemAction extends AbstractWhitelistAction {
      * @public
      */
     public execute(): Promise<boolean> {
-        return this.whitelist.deleteItem((this.request.params as WhitelistParams).message.publicKey);
+        return this.whitelist.deleteItem((this.request.body as WhitelistParams).message.publicKey);
     }
 }
