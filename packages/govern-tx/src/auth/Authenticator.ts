@@ -40,24 +40,29 @@ export default class Authenticator {
      * @public
      */
     public async authenticate(request: FastifyRequest): Promise<undefined> {
-        const publicKey = verifyMessage(
-            arrayify(
-                (request.body as Params).message
-            ),
-            (request.body as Params).signature
-        )
-
-        if (
-            await this.hasPermission(
-                request,
-                publicKey
+        console.log(request.body)
+        try {
+            const publicKey = verifyMessage(
+                arrayify(
+                    (request.body as Params).message
+                ),
+                (request.body as Params).signature
             )
-        ) {
-            (request as AuthenticatedRequest).publicKey = publicKey
-
-            return
-        } 
-
+    
+            if (
+                await this.hasPermission(
+                    request,
+                    publicKey
+                )
+            ) {
+                (request as AuthenticatedRequest).publicKey = publicKey
+    
+                return
+            } 
+        } catch(e) {
+            throw this.NOT_ALLOWED
+        }
+        
         throw this.NOT_ALLOWED
     }
 
