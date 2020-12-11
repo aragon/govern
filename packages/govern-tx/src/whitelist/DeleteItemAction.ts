@@ -15,7 +15,7 @@ export default class DeleteItemAction extends AbstractWhitelistAction {
       * @protected
       */
      protected validateRequest(request: FastifyRequest): FastifyRequest {
-        if (!isAddress((this.request.body as WhitelistParams).message.publicKey)) {
+        if (!isAddress((request.body as WhitelistParams).message.publicKey)) {
             throw new Error('Invalid public key passed!')
         }
 

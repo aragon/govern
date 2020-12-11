@@ -61,6 +61,6 @@ export default class ContractFunction {
      * @public
      */
     public decode(): any[] {
-        return defaultAbiCoder.decode(this.abiItem.inputs, this.requestMsg) as any[]
+        return defaultAbiCoder.decode(this.abiItem.inputs, '0x' + this.requestMsg.slice(10)) as any[]
     }
 }
