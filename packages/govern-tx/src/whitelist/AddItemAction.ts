@@ -3,7 +3,7 @@ import { FastifyRequest } from 'fastify'
 import AbstractWhitelistAction, { WhitelistParams } from "../../lib/whitelist/AbstractWhitelistAction"
 import {ListItem} from '../db/Whitelist'
 
-export default class AddItemAction extends AbstractWhitelistAction {
+export default class AddItemAction extends AbstractWhitelistAction<ListItem> {
     /**
       * Validates the given request body.
       * 

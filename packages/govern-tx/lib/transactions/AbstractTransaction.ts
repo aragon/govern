@@ -9,7 +9,7 @@ import Whitelist from '../../src/db/Whitelist';
 import { Params } from '../AbstractAction';
 import { AuthenticatedRequest } from '../../src/auth/Authenticator';
 
-export default abstract class AbstractTransaction extends AbstractAction {
+export default abstract class AbstractTransaction extends AbstractAction<TransactionReceipt> {
     /**
      * The function ABI used to create a transaction
      * 

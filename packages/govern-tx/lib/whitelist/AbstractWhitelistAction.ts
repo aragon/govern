@@ -9,7 +9,7 @@ export interface WhitelistParams extends Params {
     }
 }
 
-export default abstract class AbstractWhitelistAction extends AbstractAction {
+export default abstract class AbstractWhitelistAction<T> extends AbstractAction<T> {
     /**
      * @param {Whitelist} whitelist - The whitelist database entitiy
      * @param {WhitelistRequest} request - The given request body by the user
@@ -25,11 +25,11 @@ export default abstract class AbstractWhitelistAction extends AbstractAction {
      * 
      * @method execute
      * 
-     * @returns {Promise<ListItem | ListItem[] | boolean>}
+     * @returns {Promise<T>}
      * 
      * @public
      */
-    public abstract execute(): Promise<ListItem | ListItem[] | boolean>
+    public abstract execute(): Promise<T>
 
     /**
      * TODO: Define response validation

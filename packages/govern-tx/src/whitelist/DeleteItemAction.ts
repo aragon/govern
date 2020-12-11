@@ -2,7 +2,7 @@ import {isAddress} from '@ethersproject/address'
 import { FastifyRequest } from 'fastify';
 import AbstractWhitelistAction, { WhitelistParams } from "../../lib/whitelist/AbstractWhitelistAction";
 
-export default class DeleteItemAction extends AbstractWhitelistAction {
+export default class DeleteItemAction extends AbstractWhitelistAction<boolean> {
     /**
       * Validates the given request body.
       * 

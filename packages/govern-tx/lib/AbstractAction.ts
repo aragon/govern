@@ -5,7 +5,7 @@ export interface Params {
     signature: string,
 }
 
-export default abstract class AbstractAction {
+export default abstract class AbstractAction<T> {
     /**
      * The given request by the user
      * 
@@ -46,7 +46,7 @@ export default abstract class AbstractAction {
      * 
      * @public
      */
-    public abstract execute(): Promise<any>
+    public abstract execute(): Promise<T>
 
     /**
      * Returns the required request schema

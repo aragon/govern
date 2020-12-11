@@ -1,7 +1,7 @@
 import AbstractWhitelistAction from '../../lib/whitelist/AbstractWhitelistAction';
 import {ListItem} from '../db/Whitelist'
 
-export default class GetListAction extends AbstractWhitelistAction {
+export default class GetListAction extends AbstractWhitelistAction<ListItem[]> {
     /**
      * Adds a new item to the whitelist
      * 
