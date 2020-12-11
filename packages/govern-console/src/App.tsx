@@ -1,19 +1,27 @@
 import React, { useEffect } from 'react'
-import { Redirect, Route, Switch, useLocation } from 'react-router-dom'
+import { Route, Switch, useLocation } from 'react-router-dom'
 import 'styled-components/macro'
 import SelectDao from './pages/SelectDao'
 import ViewDao from './pages/ViewDao'
-import TopHeader from './components/Header/Header'
-import { useChainId } from './Providers/ChainId'
-import { getNetworkName } from './lib/web3-utils'
+import Header from './components/Header/Header'
+import { useChainId } from './lib/chain-id'
+import env from './environment'
 
 function App(): JSX.Element {
-  const location: any = useLocation()
-  const { chainId } = useChainId()
+  const location = useLocation()
+  const { chainId, updateChainId } = useChainId()
 
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [location.pathname])
+
+  // If the ChainId doesn’t exist, we redirect
+  // to the default, defined in the environment.
+  useEffect(() => {
+    if (chainId === -1) {
+      updateChainId(env('CHAIN_ID'))
+    }
+  }, [chainId, updateChainId])
 
   return (
     <div
@@ -23,11 +31,8 @@ function App(): JSX.Element {
         margin: 0 auto;
       `}
     >
-      <TopHeader />
+      <Header />
       <Switch>
-        <Route exact path="/">
-          <Redirect to={`/${getNetworkName(chainId)}`} />
-        </Route>
         <Route exact path="/:network">
           <SelectDao />
         </Route>

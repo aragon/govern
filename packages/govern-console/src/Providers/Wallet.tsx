@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useMemo } from 'react'
 import { providers as EthersProviders } from 'ethers'
 import { UseWalletProvider, useWallet, Wallet } from 'use-wallet'
-import { useChainId } from './ChainId'
+import { useChainId } from '../lib/chain-id'
 import { getNetworkNode, getUseWalletConnectors } from '../lib/web3-utils'
 
 // From ethers.js
