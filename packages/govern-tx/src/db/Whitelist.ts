@@ -1,11 +1,10 @@
 import Database from './Database'
 
-// TODO: Define DB schema to handle global rate limits and to have Admin public key
-
 export interface ListItem {
+    ID: number
     PublicKey: string,
-    RateLimit: number,
-    ExecutedTransactions: number
+    Limit: number,
+    Executed: number
 }
 
 export default class Whitelist {
@@ -28,6 +27,8 @@ export default class Whitelist {
     }
 
     /**
+     * TODO: Check return values of postgres package
+     * 
      * Checks if a key is existing
      * 
      * @method keyExists
@@ -39,7 +40,7 @@ export default class Whitelist {
      * @public
      */
     public async keyExists(publicKey: string): Promise<boolean> {
-        return (await this.getItemByKey(publicKey)).length > 0
+        return typeof (await this.getItemByKey(publicKey)).ID !== 'undefined'
     }
 
     /**
@@ -49,11 +50,11 @@ export default class Whitelist {
      * 
      * @param {string} publicKey - The public key to look for
      * 
-     * @returns {Promise<ListItem[]>} 
+     * @returns {Promise<ListItem>} 
      * 
      * @public 
      */
-    public getItemByKey(publicKey: string): Promise<ListItem[]> {
+    public getItemByKey(publicKey: string): Promise<ListItem> {
         return this.db.query(`SELECT * FROM whitelist WHERE PublicKey='${publicKey}'`)
     }
 
@@ -101,5 +102,22 @@ export default class Whitelist {
      */
     public async increaseExecutionCounter(publicKey: string): Promise<number> {
         return this.db.query(`UPDATE whitelist SET Executed = Executed + 1 WHERE PublicKey='${publicKey}'`)
+    }
+
+    /**
+     * Returns true if the limit isn't reached otherwise false
+     * 
+     * @method increaseExecutionCounter
+     * 
+     * @param {string} publicKey 
+     * 
+     * @returns {Promise<boolean>}
+     * 
+     * @public
+     */
+    public async limitReached(publicKey: string): Promise<boolean> {
+        const item: ListItem = await this.getItemByKey(publicKey)
+
+        return (item.Executed + 1) >= item.Limit
     }
 }

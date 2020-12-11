@@ -60,12 +60,9 @@ export default abstract class AbstractTransaction extends AbstractAction {
             this.functionABI,
             (this.request as Request).message
         )
-
         contractFunction.functionArguments[0].payload.submitter = this.config.publicKey
-
-        let receipt: TransactionReceipt;
-
-        receipt = await this.provider.sendTransaction(this.contract, contractFunction)
+        
+        let receipt: TransactionReceipt = await this.provider.sendTransaction(this.contract, contractFunction)
 
         if(!this.admin) {
             this.whitelist.increaseExecutionCounter(this.publicKey)

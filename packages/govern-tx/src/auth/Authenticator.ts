@@ -76,7 +76,9 @@ export default class Authenticator {
         }
 
         if (
-            request.routerPath !== '/whitelist' && await this.whitelist.keyExists(publicKey)
+            request.routerPath !== '/whitelist' && 
+            await this.whitelist.keyExists(publicKey) &&
+            !(await this.whitelist.limitReached(publicKey))
         ) {
             (request as AuthenticatedRequest).admin = false
 
