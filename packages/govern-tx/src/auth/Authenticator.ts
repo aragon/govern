@@ -41,7 +41,7 @@ export default class Authenticator {
      */
     public async authenticate(request: FastifyRequest): Promise<undefined> {
         request.body = JSON.parse((request.body as string))
-        
+
         const publicKey = verifyMessage(
             arrayify(
                 (request.body as Params).message
@@ -76,7 +76,7 @@ export default class Authenticator {
      * @private 
      */
     private async hasPermission(request: FastifyRequest, publicKey: string): Promise<boolean> {
-        if (await this.admin.isAdmin(publicKey)) {
+        if (request.routerPath === '/whitelist' && await this.admin.isAdmin(publicKey)) {
             (request as AuthenticatedRequest).admin = true
 
             return true
@@ -85,8 +85,10 @@ export default class Authenticator {
         // TODO: Fire only one SQL statement to check if the key exists and if the limit is reached
         if (
             request.routerPath !== '/whitelist' && 
-            await this.whitelist.keyExists(publicKey) &&
-            !(await this.whitelist.limitReached(publicKey))
+            (
+                (await this.whitelist.keyExists(publicKey) && !(await this.whitelist.limitReached(publicKey))) ||
+                await this.admin.isAdmin(publicKey)
+            )
         ) {
             (request as AuthenticatedRequest).admin = false
 
