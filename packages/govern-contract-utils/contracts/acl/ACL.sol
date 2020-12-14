@@ -85,7 +85,7 @@ contract ACL is Initializable {
         }
     }
 
-    function willPerform(bytes4 _role, address _who, bytes memory _data) public returns (bool) {
+    function willPerform(bytes4 _role, address _who, bytes memory _data) internal returns (bool) {
         // First check if the given who is auth'd, then if any address is auth'd
         return _checkRole(_role, _who, _data) || _checkRole(_role, ANY_ADDR, _data);
     }
