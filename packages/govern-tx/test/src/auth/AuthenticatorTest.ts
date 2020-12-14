@@ -88,7 +88,7 @@ describe('AuthenticatorTest', () => {
     })
 
     it('calls authenticate as admin user and grants access to the whitelist actions', async () => {
-        (adminMock.isAdmin as jest.MockedFunction<typeof adminMock.isAdmin>).mockReturnValueOnce(Promise.resolve(true));
+        (adminMock.isAdmin as jest.MockedFunction<typeof adminMock.isAdmin>).mockReturnValueOnce(Promise.resolve(true))
         
         request.routerPath = '/whitelist'
 

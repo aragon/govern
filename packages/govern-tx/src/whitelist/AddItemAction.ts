@@ -24,7 +24,7 @@ export default class AddItemAction extends AbstractWhitelistAction<ListItem> {
             throw new Error('Invalid rate limit passed!')
         }
 
-        return request;
+        return request
     }
 
     /**

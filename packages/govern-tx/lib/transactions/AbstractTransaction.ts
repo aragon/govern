@@ -43,7 +43,7 @@ export default abstract class AbstractTransaction extends AbstractAction<Transac
         private whitelist: Whitelist,
         request: FastifyRequest,
     ) {
-        super(request);
+        super(request)
     }
 
     /**
