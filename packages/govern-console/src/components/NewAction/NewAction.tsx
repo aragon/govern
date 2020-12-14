@@ -50,7 +50,7 @@ export default function NewAction({
   config,
   executorAddress,
   queueAddress,
-}: NewActionData) {
+}: NewActionData): JSX.Element {
   const [abi, setAbi] = useState('')
   const [contractAddress, setContractAddress] = useState('')
   const [parsedAbi, setParsedAbi] = useState([])
@@ -209,7 +209,7 @@ export default function NewAction({
           <>
             <Frame>
               <h2> Functions </h2>
-              {abiFunctions!.map((abiItem: AbiType) => (
+              {abiFunctions.map((abiItem: AbiType) => (
                 <Frame key={abiItem.name}>
                   <ContractCallHandler
                     config={config}
@@ -231,7 +231,7 @@ export default function NewAction({
             </Frame>
             <Frame>
               <h2> View functions </h2>
-              {abiViewFunctions!.map((abiItem: AbiType) => (
+              {abiViewFunctions.map((abiItem: AbiType) => (
                 <Frame key={abiItem.name}>
                   <ContractCallHandler
                     config={config}
@@ -253,7 +253,7 @@ export default function NewAction({
             </Frame>
             <Frame>
               <h2> Events </h2>
-              {abiEvents!.map((abiItem: AbiType) => (
+              {abiEvents.map((abiItem: AbiType) => (
                 <Frame key={abiItem.name}>
                   <ContractCallHandler
                     config={config}
@@ -422,6 +422,7 @@ function ContractCallHandler({
       queueAddress,
       queueContract,
       rawAbiItem,
+      targetContract,
       values,
     ],
   )

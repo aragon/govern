@@ -5,14 +5,6 @@ type Input = {
   type: string
 }
 
-type AbiType = {
-  name: string
-  inputs: Input[]
-  payable: string
-  stateMutability: string
-  type: string
-}
-
 interface InputStateData extends Input {
   value: string
 }
@@ -20,7 +12,7 @@ export default async function callContractFunction(
   functionName: string,
   rawFunctionArguments: InputStateData[],
   targetContract: EthersContract,
-) {
+): Promise<string> {
   const args = rawFunctionArguments.map((value: InputStateData) => value.value)
 
   const callResponse = args

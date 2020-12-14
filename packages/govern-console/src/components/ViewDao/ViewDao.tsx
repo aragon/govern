@@ -6,9 +6,9 @@ import Button from '../Button'
 import Entity from '../Entity/Entity'
 import FilteredActions from '../FilteredActions/FilteredActions'
 import Frame from '../Frame/Frame'
-import { useChainId } from '../../Providers/ChainId'
 import { usePermissions } from '../../Providers/Permissions'
 import { useWalletAugmented } from '../../Providers/Wallet'
+import { useChainId } from '../../lib/chain-id'
 import { KNOWN_GOVERN_ROLES, KNOWN_QUEUE_ROLES } from '../../lib/known-roles'
 import {
   getNetworkName,
