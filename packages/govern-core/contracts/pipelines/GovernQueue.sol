@@ -63,6 +63,14 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
     mapping (bytes32 => address) public challengerCache; // container hash -> challenger addr (used after challenging and before dispute resolution)
     mapping (bytes32 => mapping (IArbitrator => uint256)) public disputeItemCache; // container hash -> arbitrator addr -> dispute id (used between dispute creation and ruling)
 
+    modifier maxRelativeGas(uint256 allowedGasPct) {
+        uint256 initialGas = gasleft();
+        _;
+        uint256 gasSpent = initialGas - gasleft();
+        uint256 maxGas = block.gaslimit() * allowedGasPct / 100;
+        require(gasSpent <= maxGas, "queue: gas");
+    }
+
     /**
      * @param _aclRoot account that will be given root permissions on ACL (commonly given to factory)
      * @param _initialConfig initial configuration parameters
@@ -88,6 +96,7 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
         public
         override
         auth(this.schedule.selector) // note that all functions in this contract are ACL protected (commonly some of them will be open for any addr to perform)
+        maxRelativeGas(33) // DOS protection: To ensure that the container can always be challenged
         returns (bytes32 containerHash)
     {
         // prevent griefing by front-running (the same container is sent by two different people and one must be challenged)
@@ -258,6 +267,7 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
         public
         override
         auth(this.configure.selector)
+        maxRelativeGas(20) // DOS protection: to ensure that the config doesn't take up a lot of space in containers
         returns (bytes32)
     {
         return _setConfig(_config);
