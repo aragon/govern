@@ -235,8 +235,8 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
             delete challengerCache[containerHash];
             delete disputeItemCache[containerHash][IArbitrator(_container.config.resolver)];
 
-            // release all collateral to challenger
-            _container.config.scheduleDeposit.releaseTo(challenger);
+            // release collateral to challenger and scheduler
+            _container.config.scheduleDeposit.releaseTo(_container.payload.submitter);
             _container.config.challengeDeposit.releaseTo(challenger);
         } else {
             // If the given container doesn't have the state Challenged
