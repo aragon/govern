@@ -5,10 +5,11 @@ import 'styled-components/macro'
 import Button from '../Button'
 import Frame from '../Frame/Frame'
 import { sendAction, callContractFunction } from './handlers'
-import { useContract } from '../../lib/web3-contracts'
+import { useApprove, useContract } from '../../lib/web3-contracts'
+import { ETH_ZERO_ADDRESS } from '../../lib/web3-utils'
+import { AbiType, Input } from '../../lib/abi-types'
 import ercAbi from '../../lib/abi/erc20.json'
 import queueAbi from '../../lib/abi/GovernQueue.json'
-import { AbiType, Input } from '../../lib/abi-types'
 
 function determineMemberType(
   memberMutabilityType: string,
@@ -291,12 +292,14 @@ interface InputStateData extends Input {
 function ContractCallHandler({
   config,
   contractAddress,
+  ercContract,
   executor,
   handleSetExecutionResult,
   inputs,
   memberType,
   name,
   proof,
+  queueAddress,
   queueContract,
   rawAbiItem,
   targetContract,
@@ -313,6 +316,7 @@ function ContractCallHandler({
     })) as InputStateData[]
   })
   const { account } = useWallet()
+  const approve = useApprove(ercContract)
 
   const updateValue = useCallback(
     (name, updatedValue) => {
@@ -369,7 +373,10 @@ function ContractCallHandler({
           return
         }
         handleSetExecutionResult('info', `Sending transaction.`)
-
+        console.log(config.scheduleDeposit.token, ETH_ZERO_ADDRESS)
+        if (config.scheduleDeposit.token !== ETH_ZERO_ADDRESS) {
+          await approve(config.scheduleDeposit.amount, queueAddress)
+        }
         const tx = await sendAction(
           account,
           config,
@@ -397,11 +404,13 @@ function ContractCallHandler({
     },
     [
       account,
+      approve,
       config,
       contractAddress,
       executor,
       handleSetExecutionResult,
       proof,
+      queueAddress,
       queueContract,
       rawAbiItem,
       targetContract,
