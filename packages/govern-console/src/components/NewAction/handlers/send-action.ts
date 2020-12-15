@@ -6,7 +6,6 @@ import { toHex } from 'web3-utils'
 const EMPTY_BYTES = '0x00'
 const EMPTY_FAILURE_MAP =
   '0x0000000000000000000000000000000000000000000000000000000000000000'
-const NO_TOKEN = `${'0x'.padEnd(42, '0')}`
 
 type Input = {
   name: string
@@ -28,33 +27,13 @@ interface InputStateData extends Input {
 export default async function sendAction(
   account: string,
   config: any,
-  ercContract: EthersContract | null,
   executorAddress: string,
   proof: string,
   rawFunctionAbi: AbiType,
   rawFunctionArguments: InputStateData[],
   targetContractAddress: string,
-  queueAddress: string,
   queueContract: EthersContract,
 ): Promise<ContractTransaction> {
-  // First, let's handle token approvals (if a token has been configured).
-  // There are 3 cases to check
-  // 1. The user has more allowance than needed, we can skip. (0 tx)
-  // 2. The user has less allowance than needed, and we need to raise it. (2 tx)
-  // 3. The user has 0 allowance, we just need to approve the needed amount. (1 tx)
-  if (config.scheduleDeposit.token !== NO_TOKEN && ercContract) {
-    const allowance = await ercContract.allowance(account, queueAddress)
-    if (
-      allowance.lt(config.scheduleDeposit.amount) &&
-      config.scheduleDeposit.token !== NO_TOKEN
-    ) {
-      if (!allowance.isZero()) {
-        const resetTx = await ercContract.approve(account, '0')
-        await resetTx.wait(1)
-      }
-      await ercContract.approve(queueAddress, config.scheduleDeposit.amount)
-    }
-  }
 
   const functionValues = rawFunctionArguments.map(
     (val: InputStateData) => val.value,

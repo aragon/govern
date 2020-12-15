@@ -1,7 +1,7 @@
 import env from '../environment'
 
 export const DEFAULT_LOCAL_CHAIN = 'private'
-export const ETH_FAKE_ADDRESS = `0x${''.padEnd(40, '0')}`
+export const ETH_ZERO_ADDRESS = `0x${''.padEnd(42, '0')}`
 export const ETH_ANY_ADDRESS = '0xffffffffffffffffffffffffffffffffffffffff'
 export const ETH_EMPTY_HEX = '0x'
 

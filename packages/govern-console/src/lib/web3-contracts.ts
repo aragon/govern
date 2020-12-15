@@ -1,11 +1,13 @@
+import { useCallback } from 'react'
 import {
+  ContractTransaction,
   Contract as EthersContract,
   getDefaultProvider,
   providers,
   utils as EthersUtils,
 } from 'ethers'
 import { useChainId } from './chain-id'
-import { useWallet } from '../Providers/Wallet'
+import { useWalletAugmented } from '../Providers/Wallet'
 import { getNetworkEthersName } from './web3-utils'
 
 export function useContract(
@@ -13,7 +15,7 @@ export function useContract(
   abi: any[],
   signer = true,
 ): EthersContract | null {
-  const { wallet } = useWallet()
+  const { wallet } = useWalletAugmented()
   const { chainId } = useChainId()
 
   const ethersProvider = wallet.ethereum
@@ -30,4 +32,31 @@ export function useContract(
   return address && EthersUtils.isAddress(address) && ethersProvider && abi
     ? new EthersContract(address, abi, ethersSignerProvider || ethersProvider)
     : null
+}
+
+export function useApprove(
+  amount: string | BigInt,
+  spender: string,
+  tokenContract: EthersContract,
+): () => Promise<ContractTransaction> {
+  const {
+    wallet: { account },
+  } = useWalletAugmented()
+  return useCallback(async () => {
+    if (!account) {
+      throw new Error('Approving tokens requires a signer.')
+    }
+    // There are 3 cases to check
+    // 1. The user has more allowance than needed, we can skip. (0 tx)
+    // 2. The user has less allowance than needed, and we need to raise it. (2 tx)
+    // 3. The user has 0 allowance, we just need to approve the needed amount. (1 tx)
+    const allowance = await tokenContract.allowance(account, spender)
+    if (allowance.lt(amount)) {
+      if (!allowance.isZero()) {
+        const resetTx = await tokenContract.approve(account, '0')
+        await resetTx.wait(1)
+      }
+      return tokenContract.approve(spender, amount)
+    }
+  }, [account, amount, spender, tokenContract])
 }
