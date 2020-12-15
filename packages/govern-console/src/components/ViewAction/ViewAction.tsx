@@ -8,125 +8,25 @@ import Button from '../Button'
 import Entity from '../Entity/Entity'
 import Frame from '../Frame/Frame'
 import Info from '../Info/Info'
+import { usePermissions } from '../../Providers/Permissions'
+import { useWallet } from '../../Providers/Wallet'
 import { useContract } from '../../lib/web3-contracts'
 import { shortenAddress, ETH_EMPTY_HEX } from '../../lib/web3-utils'
 import queueAbi from '../../lib/abi/GovernQueue.json'
-import { usePermissions } from '../../Providers/Permissions'
-import { useWallet } from '../../Providers/Wallet'
+import { Action, Container, ContainerEvent } from '../../lib/queue-types'
 
 const EMPTY_FAILURE_MAP =
   '0x0000000000000000000000000000000000000000000000000000000000000000'
 
-type Collateral = {
-  token: string
-  amount: string
-}
-
-type Config = {
-  executionDelay: string
-  scheduleDeposit: Collateral
-  challengeDeposit: Collateral
-  resolver: string
-  rules: string
-}
-
-type Action = {
-  id: string
-  to: string
-  value: string
-  data: string
-}
-
-type Payload = {
-  id: string
-  nonce: string
-  executionTime: string
-  submitter: string
-  executor: any
-  actions: Action[]
-  proof: string
-}
-
-type ContainerEventChallenge = {
-  id: string
-  container: any
-  createdAt: string
-  actor: string
-  collateral: Collateral
-  disputeId: string
-  reason: string
-  resolver: string
-}
-
-type ContainerEventExecute = {
-  id: string
-  container: any
-  createdAt: string
-  execResults: string[]
-}
-
-type ContainerEventResolve = {
-  id: string
-  container: any
-  createdAt: string
-  approved: boolean
-}
-
-type ContainerEventRule = {
-  id: string
-  container: any
-  createdAt: string
-  ruling: string
-}
-
-type ContainerEventSchedule = {
-  id: string
-  container: any
-  createdAt: string
-  collateral: Collateral
-}
-
-type ContainerEventSubmitEvidence = {
-  id: string
-  container: any
-  createdAt: string
-  evidence: string
-  submitter: string
-  finished: boolean
-}
-
-type ContainerEventVeto = {
-  id: string
-  container: any
-  created: string
-  reason: string
-}
-
-type ContainerEvent =
-  | ContainerEventChallenge
-  | ContainerEventExecute
-  | ContainerEventResolve
-  | ContainerEventRule
-  | ContainerEventSchedule
-  | ContainerEventSubmitEvidence
-  | ContainerEventVeto
-
-type Container = {
+interface ActionContainer extends Container {
   id: string
   queue: string
   state: string
-  config: Config
-  payload: Payload
   history: ContainerEvent[]
 }
 
-type ViewActionWrapperProps = {
-  containers: Container[]
-  queueAddress: string
-}
-
 type ViewActionProps = {
-  container: Container
+  container: ActionContainer
   queueAddress: string
 }
 
@@ -402,8 +302,8 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
               margin-left: 16px;
             `}
           >
-            {container.payload.actions.map((action: Action) => (
-              <React.Fragment key={action.id}>
+            {container.payload.actions.map((action: Action, index: number) => (
+              <React.Fragment key={index}>
                 <li>
                   to: <Entity address={action.to} type="address" />
                 </li>
@@ -458,6 +358,11 @@ function ViewAction({ container, queueAddress }: ViewActionProps) {
       </Frame>
     </>
   )
+}
+
+type ViewActionWrapperProps = {
+  containers: ActionContainer[]
+  queueAddress: string
 }
 
 export default function ViewActionWrapper({
