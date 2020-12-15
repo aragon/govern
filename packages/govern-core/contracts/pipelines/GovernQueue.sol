@@ -11,6 +11,7 @@ import "@aragon/govern-contract-utils/contracts/acl/ACL.sol";
 import "@aragon/govern-contract-utils/contracts/adaptive-erc165/AdaptiveERC165.sol";
 import "@aragon/govern-contract-utils/contracts/deposits/DepositLib.sol";
 import "@aragon/govern-contract-utils/contracts/erc20/SafeERC20.sol";
+import '@aragon/govern-contract-utils/contracts/safe-math/SafeMath.sol';
 
 import "../protocol/IArbitrable.sol";
 import "../protocol/IArbitrator.sol";
@@ -50,6 +51,7 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
     using DepositLib for ERC3000Data.Collateral;
     using GovernQueueStateLib for GovernQueueStateLib.Item;
     using SafeERC20 for ERC20;
+    using SafeMath for uint256;
 
     // Map '4' as the 'allow' ruling; this implicitly maps '3' as the 'reject' ruling
     uint256 internal constant ALLOW_RULING = 4;
@@ -98,7 +100,7 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
         // ensure that the hash of the config passed in the container matches the current config (implicit agreement approval by scheduler)
         require(_configHash == configHash, "queue: bad config");
         // ensure that the time delta to the execution timestamp provided in the payload is at least after the config's execution delay
-        require(_container.payload.executionTime >= block.timestamp + _container.config.executionDelay, "queue: bad delay");
+        require(_container.payload.executionTime >= _container.config.executionDelay.add(block.timestamp), "queue: bad delay");
         // ensure that the submitter of the payload is also the sender of this call
         require(_container.payload.submitter == msg.sender, "queue: bad submitter");
 
