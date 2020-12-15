@@ -1,9 +1,5 @@
 import { Contract as EthersContract } from 'ethers'
-
-type Input = {
-  name: string
-  type: string
-}
+import { Input } from '../../../lib/abi-types'
 
 interface InputStateData extends Input {
   value: string

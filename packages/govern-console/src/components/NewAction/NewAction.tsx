@@ -8,19 +8,7 @@ import { sendAction, callContractFunction } from './handlers'
 import { useContract } from '../../lib/web3-contracts'
 import ercAbi from '../../lib/abi/erc20.json'
 import queueAbi from '../../lib/abi/GovernQueue.json'
-
-type Input = {
-  name: string
-  type: string
-}
-
-type AbiType = {
-  name: string
-  inputs: Input[]
-  payable: string
-  stateMutability: string
-  type: string
-}
+import { AbiType, Input } from '../../lib/abi-types'
 
 function determineMemberType(
   memberMutabilityType: string,
@@ -303,14 +291,12 @@ interface InputStateData extends Input {
 function ContractCallHandler({
   config,
   contractAddress,
-  ercContract,
   executor,
   handleSetExecutionResult,
   inputs,
   memberType,
   name,
   proof,
-  queueAddress,
   queueContract,
   rawAbiItem,
   targetContract,
@@ -387,13 +373,11 @@ function ContractCallHandler({
         const tx = await sendAction(
           account,
           config,
-          ercContract,
           executor,
           proof,
           rawAbiItem,
           values,
           contractAddress,
-          queueAddress,
           queueContract,
         )
         await tx.wait(1)
@@ -415,11 +399,9 @@ function ContractCallHandler({
       account,
       config,
       contractAddress,
-      ercContract,
       executor,
       handleSetExecutionResult,
       proof,
-      queueAddress,
       queueContract,
       rawAbiItem,
       targetContract,

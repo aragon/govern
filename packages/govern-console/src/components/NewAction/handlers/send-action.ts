@@ -1,24 +1,11 @@
 import BN from 'bn.js'
 import { Contract as EthersContract, ContractTransaction } from 'ethers'
 import abiCoder from 'web3-eth-abi'
-import { toHex } from 'web3-utils'
+import { marshallContainer } from '../../../lib/queue-utils'
+import { Config } from '../../../lib/queue-types'
+import { AbiType, Input } from '../../../lib/abi-types'
 
 const EMPTY_BYTES = '0x00'
-const EMPTY_FAILURE_MAP =
-  '0x0000000000000000000000000000000000000000000000000000000000000000'
-
-type Input = {
-  name: string
-  type: string
-}
-
-type AbiType = {
-  name: string
-  inputs: Input[]
-  payable: string
-  stateMutability: string
-  type: string
-}
 
 interface InputStateData extends Input {
   value: string
@@ -26,7 +13,7 @@ interface InputStateData extends Input {
 
 export default async function sendAction(
   account: string,
-  config: any,
+  config: Config,
   executorAddress: string,
   proof: string,
   rawFunctionAbi: AbiType,
@@ -34,7 +21,6 @@ export default async function sendAction(
   targetContractAddress: string,
   queueContract: EthersContract,
 ): Promise<ContractTransaction> {
-
   const functionValues = rawFunctionArguments.map(
     (val: InputStateData) => val.value,
   )
@@ -52,38 +38,23 @@ export default async function sendAction(
   // Current time + 30 secs buffer.
   // This is necessary for DAOs with lower execution delays, in which
   // the tx getting picked up by a later block can make the tx fail.
-  const currentDate =
+  const executionTime =
     Math.ceil(Date.now() / 1000) + Number(config.executionDelay) + 60
-  const container = {
-    payload: {
-      nonce: newNonce.toString(),
-      executionTime: currentDate,
-      submitter: account,
-      executor: executorAddress,
-      actions: [
-        {
-          to: targetContractAddress,
-          value: EMPTY_BYTES,
-          data: encodedFunctionCall,
-        },
-      ],
-      allowFailuresMap: EMPTY_FAILURE_MAP,
-      proof: proof ? toHex(proof) : EMPTY_BYTES,
-    },
-    config: {
-      executionDelay: config.executionDelay,
-      scheduleDeposit: {
-        token: config.scheduleDeposit.token,
-        amount: config.scheduleDeposit.amount,
+  const container = marshallContainer(
+    account,
+    [
+      {
+        to: targetContractAddress,
+        value: EMPTY_BYTES,
+        data: encodedFunctionCall,
       },
-      challengeDeposit: {
-        token: config.challengeDeposit.token,
-        amount: config.challengeDeposit.amount,
-      },
-      resolver: config.resolver,
-      rules: config.rules,
-    },
-  }
+    ],
+    config,
+    executorAddress,
+    executionTime.toString(),
+    newNonce.toString(),
+    proof,
+  )
 
   const tx = await queueContract.schedule(container, {
     gasLimit: 500000,
