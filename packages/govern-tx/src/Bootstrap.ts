@@ -1,4 +1,4 @@
-import fastify, { FastifyInstance } from 'fastify'
+import fastify, { FastifyInstance, FastifyRequest } from 'fastify'
 import { TransactionReceipt } from '@ethersproject/abstract-provider'
 
 import Configuration from './config/Configuration'
@@ -108,7 +108,7 @@ export default class Bootstrap {
         this.server.post(
             '/execute',
             {schema: AbstractTransaction.schema},
-            (request): Promise<TransactionReceipt> => {
+            (request: FastifyRequest): Promise<TransactionReceipt> => {
                 return new ExecuteTransaction(
                     this.config.ethereum,
                     this.provider,
@@ -121,7 +121,7 @@ export default class Bootstrap {
         this.server.post(
             '/schedule',
             {schema: AbstractTransaction.schema},
-            (request): Promise<TransactionReceipt> => {
+            (request: FastifyRequest): Promise<TransactionReceipt> => {
                 return new ScheduleTransaction(
                     this.config.ethereum,
                     this.provider,
@@ -134,7 +134,7 @@ export default class Bootstrap {
         this.server.post(
             '/challenge',
             {schema: AbstractTransaction.schema},
-            (request): Promise<TransactionReceipt> => {
+            (request: FastifyRequest): Promise<TransactionReceipt> => {
                 return new ChallengeTransaction(
                     this.config.ethereum,
                     this.provider,
@@ -147,7 +147,7 @@ export default class Bootstrap {
         this.server.post(
             '/create',
             {schema: AbstractTransaction.schema},
-            (request): Promise<TransactionReceipt> => {
+            (request: FastifyRequest): Promise<TransactionReceipt> => {
                 return new CreateTransaction(
                     this.config.ethereum,
                     this.provider,
@@ -171,7 +171,7 @@ export default class Bootstrap {
         this.server.post(
             '/whitelist',
             {schema: AbstractWhitelistAction.schema},
-            (request): Promise<ListItem> => {
+            (request: FastifyRequest): Promise<ListItem> => {
                 return new AddItemAction(this.whitelist, request).execute()
             }
         )
@@ -179,15 +179,14 @@ export default class Bootstrap {
         this.server.delete(
             '/whitelist',
             {schema: AbstractWhitelistAction.schema},
-            (request): Promise<boolean> => {
+            (request: FastifyRequest): Promise<boolean> => {
                 return new DeleteItemAction(this.whitelist, request).execute()
             }
         )
         
         this.server.get(
             '/whitelist',
-            {schema: AbstractWhitelistAction.schema},
-            (request): Promise<ListItem[]> => {
+            (request: FastifyRequest): Promise<ListItem[]> => {
                 return new GetListAction(this.whitelist, request).execute()
             }
         )

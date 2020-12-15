@@ -66,7 +66,7 @@ export default class Wallet {
      */
     private async loadWallet(publicKey: string): Promise<void> {
         if (!this.wallet || this.publicKey !== publicKey) {
-            const pk = await this.db.query(`SELECT PrivateKey FROM wallet WHERE PublicKey='${publicKey}'`);
+            const pk = (await this.db.query<string[]>(`SELECT PrivateKey FROM wallet WHERE PublicKey='${publicKey}'`))[0];
             this.wallet = new EthersWallet(pk)
             this.publicKey = publicKey;
         }
