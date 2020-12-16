@@ -50,7 +50,7 @@ library SafeERC20 {
                 case 0x20 {
                     // Only return success if returned data was true
                     // Already have output in ptr
-                    ret := eq(mload(ptr), 1)
+                    ret := not(iszero(mload(ptr)))
                 }
 
                 // Not sure what was returned: don't mark as success
