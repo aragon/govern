@@ -12,12 +12,17 @@ import "@aragon/govern-contract-utils/contracts/acl/ACL.sol";
 import "@aragon/govern-contract-utils/contracts/adaptive-erc165/AdaptiveERC165.sol";
 import "@aragon/govern-contract-utils/contracts/bitmaps/BitmapLib.sol";
 
-contract Govern is IERC3000Executor, AdaptiveERC165, ACL {
+import "./erc1271/ERC1271.sol";
+
+contract Govern is IERC3000Executor, AdaptiveERC165, ERC1271, ACL {
     using BitmapLib for bytes32;
 
     bytes4 internal constant EXEC_ROLE = this.exec.selector;
-    bytes4 internal constant REGISTER_ROLE = this.registerStandardAndCallback.selector;
+    bytes4 internal constant REGISTER_STANDARD_ROLE = this.registerStandardAndCallback.selector;
+    bytes4 internal constant SET_SIGNATURE_VALIDATOR_ROLE = this.setSignatureValidator.selector;
     uint256 internal constant MAX_ACTIONS = 256;
+
+    ERC1271 signatureValidator;
 
     event ETHDeposited(address indexed sender, uint256 value);
 
@@ -27,8 +32,11 @@ contract Govern is IERC3000Executor, AdaptiveERC165, ACL {
 
     function initialize(address _initialExecutor) public initACL(address(this)) onlyInit("govern") {
         _grant(EXEC_ROLE, address(_initialExecutor));
-        _grant(REGISTER_ROLE, address(this));
+        _grant(REGISTER_STANDARD_ROLE, address(this));
+        _grant(SET_SIGNATURE_VALIDATOR_ROLE, address(this));
+
         _registerStandard(ERC3000_EXEC_INTERFACE_ID);
+        _registerStandard(type(ERC1271).interfaceId);
     }
 
     receive () external payable {
@@ -59,9 +67,16 @@ contract Govern is IERC3000Executor, AdaptiveERC165, ACL {
         return (failureMap, execResults);
     }
 
-    function registerStandardAndCallback(bytes4 _interfaceId, bytes4 _callbackSig, bytes4 _magicNumber) external auth(REGISTER_ROLE) {
+    function registerStandardAndCallback(bytes4 _interfaceId, bytes4 _callbackSig, bytes4 _magicNumber) external auth(REGISTER_STANDARD_ROLE) {
         _registerStandardAndCallback(_interfaceId, _callbackSig, _magicNumber);
     }
 
-    // TODO: ERC-1271
+    function setSignatureValidator(ERC1271 _signatureValidator) external auth(SET_SIGNATURE_VALIDATOR_ROLE) {
+        signatureValidator = _signatureValidator;
+    }
+
+    function isValidSignature(bytes32 _hash, bytes memory _signature) override public view returns (bytes4) {
+        if (address(signatureValidator) == address(0)) return bytes4(0); // invalid magic number
+        return signatureValidator.isValidSignature(_hash, _signature); // forward call to set validation contract
+    }
 }
