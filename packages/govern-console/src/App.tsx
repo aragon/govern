@@ -1,17 +1,27 @@
 import React, { useEffect } from 'react'
 import { Route, Switch, useLocation } from 'react-router-dom'
 import 'styled-components/macro'
-import TopHeader from './components/Header/Header'
 import SelectDao from './pages/SelectDao'
 import ViewDao from './pages/ViewDao'
-import ErcTool from './apps/Erc'
+import Header from './components/Header/Header'
+import { useChainId } from './lib/chain-id'
+import env from './environment'
 
-function App() {
-  const location: any = useLocation()
+function App(): JSX.Element {
+  const location = useLocation()
+  const { chainId, updateChainId } = useChainId()
 
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [location.pathname])
+
+  // If the ChainId doesn’t exist, we redirect
+  // to the default, defined in the environment.
+  useEffect(() => {
+    if (chainId === -1) {
+      updateChainId(env('CHAIN_ID'))
+    }
+  }, [chainId, updateChainId])
 
   return (
     <div
@@ -21,15 +31,12 @@ function App() {
         margin: 0 auto;
       `}
     >
-      <TopHeader />
+      <Header />
       <Switch>
-        <Route exact path="/">
+        <Route exact path="/:network">
           <SelectDao />
         </Route>
-        <Route exact path="/tools/erc">
-          <ErcTool />
-        </Route>
-        <Route path="/:daoAddress">
+        <Route path="/:network/:daoAddress">
           <ViewDao />
         </Route>
       </Switch>

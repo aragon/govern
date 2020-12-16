@@ -8,10 +8,10 @@ pragma solidity ^0.6.8;
 
 library ERC1167ProxyFactory {
     function clone(address _implementation) internal returns (address cloneAddr) {
-        bytes memory code = generateCode(_implementation);
+        bytes memory createData = generateCreateData(_implementation);
 
         assembly {
-            cloneAddr := create(0, add(code, 0x20), 55)
+            cloneAddr := create(0, add(createData, 0x20), 55)
         }
 
         require(cloneAddr != address(0), "proxy-factory: bad create");
@@ -25,10 +25,10 @@ library ERC1167ProxyFactory {
     }
 
     function clone2(address _implementation, bytes32 _salt) internal returns (address cloneAddr) {
-        bytes memory code = generateCode(_implementation);
-        
+        bytes memory createData = generateCreateData(_implementation);
+
         assembly {
-            cloneAddr := create2(0, add(code, 0x20), 55, _salt)
+            cloneAddr := create2(0, add(createData, 0x20), 55, _salt)
         }
 
         require(cloneAddr != address(0), "proxy-factory: bad create2");
@@ -41,14 +41,15 @@ library ERC1167ProxyFactory {
         require(ok, _getRevertMsg(ret));
     }
 
-    function generateCode(address _implementation) internal pure returns (bytes memory code) {
-        code = new bytes(55);
-        
-        assembly {
-            mstore(add(code, 0x20), 0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000000000000000000000)
-            mstore(add(code, 0x34), shl(0x60, _implementation))
-            mstore(add(code, 0x48), 0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000)
-        }
+    function generateCreateData(address _implementation) internal pure returns (bytes memory) {
+        return abi.encodePacked(
+            //---- constructor -----
+            bytes10(0x3d602d80600a3d3981f3),
+            //---- proxy code -----
+            bytes10(0x363d3d373d3d3d363d73),
+            _implementation,
+            bytes15(0x5af43d82803e903d91602b57fd5bf3)
+        );
     }
 
     // From: https://ethereum.stackexchange.com/a/83577

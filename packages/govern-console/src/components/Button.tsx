@@ -6,12 +6,11 @@ export default function Button({
   disabled = false,
   onClick,
   type,
-}: React.HTMLProps<HTMLButtonElement>) {
+}: React.ComponentProps<'button'>): JSX.Element {
   return (
     <button
       disabled={disabled}
-      // @ts-ignore
-      type={type!}
+      type={type}
       onClick={onClick}
       css={`
         font-family: 'Roboto Mono', monospace;

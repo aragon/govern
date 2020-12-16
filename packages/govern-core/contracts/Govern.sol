@@ -34,6 +34,7 @@ contract Govern is IERC3000Executor, AdaptiveERC165, ERC1271, ACL {
         _grant(EXEC_ROLE, address(_initialExecutor));
         _grant(REGISTER_STANDARD_ROLE, address(this));
         _grant(SET_SIGNATURE_VALIDATOR_ROLE, address(this));
+
         _registerStandard(ERC3000_EXEC_INTERFACE_ID);
         _registerStandard(type(ERC1271).interfaceId);
     }
