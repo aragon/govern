@@ -198,16 +198,15 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
         require(disputeItemCache[containerHash][arbitrator] == _disputeId, "queue: bad dispute id");
         delete disputeItemCache[containerHash][arbitrator]; // release state to refund gas; no longer needed in state
 
+        queue[containerHash].checkState(GovernQueueStateLib.State.Challenged);
         (address subject, uint256 ruling) = arbitrator.rule(_disputeId);
         require(subject == address(this), "queue: not subject");
         bool arbitratorApproved = ruling == ALLOW_RULING;
 
-        GovernQueueStateLib.State newState = arbitratorApproved
-            ? GovernQueueStateLib.State.Approved
-            : GovernQueueStateLib.State.Rejected;
-        queue[containerHash].checkAndSetState(
-            GovernQueueStateLib.State.Challenged, // checks now that this container was indeed in Challenged state
-            newState
+        queue[containerHash].setState(
+            arbitratorApproved
+              ? GovernQueueStateLib.State.Approved
+              : GovernQueueStateLib.State.Rejected
         );
 
         emit Resolved(containerHash, msg.sender, arbitratorApproved);
