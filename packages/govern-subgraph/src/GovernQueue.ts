@@ -10,7 +10,6 @@ import {
   Scheduled as ScheduledEvent,
   Vetoed as VetoedEvent,
   Ruled as RuledEvent,
-  EvidenceSubmitted as EvidenceSubmittedEvent,
   GovernQueue as GovernQueueContract
 } from '../generated/templates/GovernQueue/GovernQueue'
 import {
@@ -38,7 +37,6 @@ import {
   handleContainerEventResolve,
   handleContainerEventRule,
   handleContainerEventSchedule,
-  handleContainerEventSubmitEvidence,
   handleContainerEventVeto
 } from './utils/events'
 
@@ -95,7 +93,7 @@ export function handleChallenged(event: ChallengedEvent): void {
 export function handleResolved(event: ResolvedEvent): void {
   let container = loadOrCreateContainer(event.params.containerHash)
 
-  container.state = event.params.approved ? EXECUTED_STATUS : CANCELLED_STATUS
+  container.state = event.params.approved ? APPROVED_STATUS : REJECTED_STATUS
 
   handleContainerEventResolve(container, event)
 
@@ -149,31 +147,22 @@ export function handleConfigured(event: ConfiguredEvent): void {
 
 // IArbitrable Events
 
-export function handleEvidenceSubmitted(event: EvidenceSubmittedEvent): void {
-  let governQueue = GovernQueueContract.bind(event.address)
-  let containerHash = governQueue.disputeItemCache(
-    event.params.arbitrator,
-    event.params.disputeId
-  )
-  let container = loadOrCreateContainer(containerHash)
 
-  handleContainerEventSubmitEvidence(container, event)
-}
 
 export function handleRuled(event: RuledEvent): void {
-  let governQueue = GovernQueueContract.bind(event.address)
-  let containerHash = governQueue.disputeItemCache(
-    event.params.arbitrator,
-    event.params.disputeId
-  )
-  let container = loadOrCreateContainer(containerHash)
+  // let governQueue = GovernQueueContract.bind(event.address)
+  // let containerHash = governQueue.disputeItemCache(
+  //   event.params.arbitrator,
+  //   event.params.disputeId
+  // )
+  // let container = loadOrCreateContainer(containerHash)
 
-  container.state =
-    event.params.ruling === ALLOW_RULING ? APPROVED_STATUS : REJECTED_STATUS
+  // container.state =
+  //   event.params.ruling === ALLOW_RULING ? APPROVED_STATUS : REJECTED_STATUS
 
-  handleContainerEventRule(container, event)
+  // handleContainerEventRule(container, event)
 
-  container.save()
+  // container.save()
 }
 
 // MiniACL Events

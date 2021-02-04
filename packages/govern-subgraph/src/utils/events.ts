@@ -15,7 +15,6 @@ import {
   Resolved as ResolvedEvent,
   Ruled as RuledEvent,
   Scheduled as ScheduledEvent,
-  EvidenceSubmitted as EvidenceSubmittedEvent,
   Vetoed as VetoedEvent
 } from '../../generated/templates/GovernQueue/GovernQueue'
 import { buildId, buildIndexedId, buildEventHandlerId } from './ids'
@@ -131,22 +130,7 @@ export function handleContainerEventSchedule(
   )
 }
 
-export function handleContainerEventSubmitEvidence(
-  container: ContainerEntity,
-  ethereumEvent: EvidenceSubmittedEvent
-): ContainerEventSubmitEvidenceEntity {
-  let eventId = buildEventHandlerId(container.id, 'submitEvidence', ethereumEvent.transactionLogIndex.toHexString())
 
-  let containerEvent = new ContainerEventSubmitEvidenceEntity(eventId)
-  containerEvent.evidence = ethereumEvent.params.evidence
-  containerEvent.submitter = ethereumEvent.params.submitter
-  containerEvent.finished = ethereumEvent.params.finished
-
-  return finalizeContainerEvent<
-    EvidenceSubmittedEvent,
-    ContainerEventSubmitEvidenceEntity
-  >(container, containerEvent, ethereumEvent)
-}
 
 export function handleContainerEventVeto(
   container: ContainerEntity,
