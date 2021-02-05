@@ -59,11 +59,19 @@ describe('Govern', function() {
     const magicNumber = '0x10000000'
     const callbackSig = hexDataSlice(id('callbackFunc()'), 0, 4)
 
+    const calldata = govern.interface.encodeFunctionData("registerStandardAndCallback", [callbackSig, callbackSig, magicNumber]);
+    
+    const action = {
+      to:govern.address,
+      value: 0,
+      data: calldata
+    };
+
     await expect(
-      govern.registerStandardAndCallback(
-        callbackSig,
-        callbackSig,
-        magicNumber
+      govern.exec(
+        [action],
+        B32_ZERO,
+        B32_ZERO
       )
     )
       .to.emit(govern, EVENTS.REGISTERED_STANDARD)
