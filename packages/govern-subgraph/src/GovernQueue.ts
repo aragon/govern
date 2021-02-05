@@ -145,26 +145,6 @@ export function handleConfigured(event: ConfiguredEvent): void {
   queue.save()
 }
 
-// IArbitrable Events
-
-
-
-export function handleRuled(event: RuledEvent): void {
-  // let governQueue = GovernQueueContract.bind(event.address)
-  // let containerHash = governQueue.disputeItemCache(
-  //   event.params.arbitrator,
-  //   event.params.disputeId
-  // )
-  // let container = loadOrCreateContainer(containerHash)
-
-  // container.state =
-  //   event.params.ruling === ALLOW_RULING ? APPROVED_STATUS : REJECTED_STATUS
-
-  // handleContainerEventRule(container, event)
-
-  // container.save()
-}
-
 // MiniACL Events
 
 export function handleFrozen(event: FrozenEvent): void {

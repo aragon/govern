@@ -46,8 +46,6 @@ templates:
           handler: handleResolved
         - event: Revoked(indexed bytes4,indexed address,indexed address)
           handler: handleRevoked
-        - event: Ruled(indexed address,indexed uint256,uint256)
-          handler: handleRuled
       file: ./src/GovernQueue.ts
   - kind: ethereum/contract
     name: Govern
