@@ -1,8 +1,14 @@
 import Whitelist from '../../../src/db/Whitelist';
 import AbstractWhitelistAction from '../../../lib/whitelist/AbstractWhitelistAction';
+import WhiteListParams from '../../../lib/whitelist/AbstractWhitelistAction'
+
+interface MockInterface {
+    message: string | any
+}
+
 
 // Mocks
-class MockAction extends AbstractWhitelistAction {
+class MockAction extends AbstractWhitelistAction<MockInterface>{
     public execute(): Promise<any> {
         return Promise.resolve(true)
     }
@@ -20,10 +26,10 @@ describe('AbstractWhitelistAction Test', () => {
             {
                 message: {
                     publicKey: '0x00',
-                    rateLimit: 0
+                    txLimit: 0
                 },
                 signature: ''
-            }
+            } as any,
         )
     })
 
@@ -33,7 +39,12 @@ describe('AbstractWhitelistAction Test', () => {
                 type: 'object',
                 required: ['message', 'signature'],
                 properties: {
-                    message: { type: 'string' },
+                    message: {
+                        oneOf: [
+                          { type: 'string'},
+                          { type: 'object'}
+                        ]
+                      },
                     signature: { type: 'string' }
                 }
             }

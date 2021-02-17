@@ -1,6 +1,11 @@
-import AbstractAction, { Request } from '../../lib/AbstractAction';
+import AbstractAction from '../../lib/AbstractAction';
 
-class MockAction extends AbstractAction {
+interface MockInterface {
+    message: string | any
+}
+
+
+class MockAction extends AbstractAction<MockInterface> {
     public execute(): Promise<any> {
         return Promise.resolve(true)
     }
@@ -13,7 +18,7 @@ describe('AbstractAction Test', () => {
     let action: MockAction
 
     beforeEach(() => {
-        action = new MockAction({message: true} as Request)
+        action = new MockAction({message: true} as any)
     })
 
     it('has the correct schema defined', () => {
@@ -22,7 +27,12 @@ describe('AbstractAction Test', () => {
                 type: 'object',
                 required: ['message', 'signature'],
                 properties: {
-                    message: { type: 'string' },
+                    message: {
+                        oneOf: [
+                          { type: 'string'},
+                          { type: 'object'}
+                        ]
+                      },
                     signature: { type: 'string' }
                 }
             }

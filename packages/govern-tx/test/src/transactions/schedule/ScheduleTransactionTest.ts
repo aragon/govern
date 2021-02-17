@@ -1,8 +1,8 @@
 import { EthereumOptions } from '../../../../src/config/Configuration'
-import { Request } from '../../../../lib/AbstractAction'
 import Provider from '../../../../src/provider/Provider'
 import * as scheduleABI from '../../../../src/transactions/schedule/schedule.json'
 import ScheduleTransaction from '../../../../src/transactions/schedule/ScheduleTransaction'
+import Whitelist from '../../../../src/db/Whitelist';
 
 // Mocks
 jest.mock('../../../../lib/transactions/AbstractTransaction')
@@ -17,7 +17,8 @@ describe('ScheduleTransactionTest', () => {
         scheduleTransaction = new ScheduleTransaction(
             {} as EthereumOptions,
             {} as Provider,
-            {} as Request
+            {} as Whitelist,
+            {} as any
         )
     })
 

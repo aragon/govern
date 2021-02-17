@@ -1,4 +1,6 @@
-import { Request } from '../../../lib//AbstractAction';
+// import { Request } from '../../../lib//AbstractAction';
+import { FastifySchema, FastifyRequest } from 'fastify'
+
 import Provider from '../../../src/provider/Provider';
 import Wallet from '../../../src/wallet/Wallet';
 import { JsonFragment } from '@ethersproject/abi';
@@ -7,6 +9,8 @@ import { EthereumOptions } from '../../../src/config/Configuration';
 import AbstractAction from '../../../lib/AbstractAction';
 import ContractFunction from '../../../lib/transactions/ContractFunction';
 import AbstractTransaction from '../../../lib/transactions/AbstractTransaction';
+import Whitelist from '../../../src/db/Whitelist';
+import Database from '../../../src/db/Database';
 
 // Mocks
 class MockTransaction extends AbstractTransaction {
@@ -16,6 +20,7 @@ class MockTransaction extends AbstractTransaction {
 
 jest.mock('../../../src/provider/Provider')
 jest.mock('../../../lib/transactions/ContractFunction')
+jest.mock('../../../src/db/Whitelist')
 
 /**
  * AbstractTransaction test
@@ -23,12 +28,16 @@ jest.mock('../../../lib/transactions/ContractFunction')
 describe('AbstractTransactionTest', () => {
     let txAction: MockTransaction,
     providerMock: Provider,
-    contractFunctionMock: ContractFunction
+    contractFunctionMock: ContractFunction,
+    whiteListMock: Whitelist
 
     beforeEach(() => {
         new Provider({} as EthereumOptions, {} as Wallet)
         providerMock = (Provider as jest.MockedClass<typeof Provider>).mock.instances[0]
 
+        new Whitelist({} as Database);
+        whiteListMock = (Whitelist as jest.MockedClass<typeof Whitelist>).mock.instances[0];
+        
         ContractFunction.prototype.functionArguments = [{payload: {submitter: ''}}]
 
         txAction = new MockTransaction(
@@ -36,10 +45,14 @@ describe('AbstractTransactionTest', () => {
                 publicKey: '0x00'
             } as EthereumOptions,
             providerMock,
+            whiteListMock,
             {
-                message: 'MESSAGE'
-            } as Request
+                params: {
+                    message: 'MESSAGE'
+                }
+            } as unknown as FastifyRequest
         )
+        
     })
 
     it('calls execute and returns the expected value', async () => {

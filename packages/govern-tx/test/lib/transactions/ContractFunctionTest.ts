@@ -17,10 +17,10 @@ describe('ContractFunctionTest', () => {
         (defaultAbiCoder.decode as jest.MockedFunction<typeof defaultAbiCoder.decode>).mockReturnValueOnce(['ARGUMENT']);
         
         (Fragment.fromObject as jest.MockedFunction<typeof Fragment.fromObject>).mockReturnValueOnce(fragmentMock as any);
+        // calldata(4 byte + arguments)
+        contractFunction = new ContractFunction({} as JsonFragment, '0x9f7b4579MESSAGE')
 
-        contractFunction = new ContractFunction({} as JsonFragment, 'MESSAGE')
-
-        expect(defaultAbiCoder.decode).toHaveBeenNthCalledWith(1, 'INPUTS', 'MESSAGE')
+        expect(defaultAbiCoder.decode).toHaveBeenNthCalledWith(1, 'INPUTS', '0xMESSAGE')
 
         expect(contractFunction.functionArguments).toEqual(['ARGUMENT'])
     })
@@ -53,7 +53,7 @@ describe('ContractFunctionTest', () => {
         
         expect(contractFunction.decode()).toEqual(['DECODED'])
 
-        expect(defaultAbiCoder.decode).toHaveBeenNthCalledWith(1, 'INPUTS', 'MESSAGE')
+        expect(defaultAbiCoder.decode).toHaveBeenNthCalledWith(1, 'INPUTS', '0xMESSAGE')
     })
 
     it('calls decode and throws as expected', () => {
@@ -62,6 +62,6 @@ describe('ContractFunctionTest', () => {
         
         expect(() => contractFunction.decode()).toThrow('NOPE')
 
-        expect(defaultAbiCoder.decode).toHaveBeenNthCalledWith(1, 'INPUTS', 'MESSAGE')
+        expect(defaultAbiCoder.decode).toHaveBeenNthCalledWith(1, 'INPUTS', '0xMESSAGE')
     })
 })

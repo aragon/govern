@@ -1,5 +1,4 @@
 import { isAddress } from '@ethersproject/address';
-import { WhitelistRequest } from '../../../lib/whitelist/AbstractWhitelistAction';
 import Database from '../../../src/db/Database';
 import Whitelist, { ListItem } from '../../../src/db/Whitelist';
 import DeleteItemAction from '../../../src/whitelist/DeleteItemAction';
@@ -15,11 +14,13 @@ describe('DeleteItemActionTest', () => {
     let deleteItemAction: DeleteItemAction,
     whitelistMock: Whitelist
 
-    const request: WhitelistRequest = {
-        message: {
-            publicKey: '0x00'
-        },
-        signature: ''
+    const request = {
+        body: {
+            message: {
+                publicKey: '0x00'
+            },
+            signature: ''
+        }
     }
 
     beforeEach(() => {
@@ -30,7 +31,7 @@ describe('DeleteItemActionTest', () => {
     it('calls validateRequest and returns the expected values', () => {
         (isAddress as jest.MockedFunction<typeof isAddress>).mockReturnValueOnce(true)
 
-        deleteItemAction = new DeleteItemAction(whitelistMock, request)
+        deleteItemAction = new DeleteItemAction(whitelistMock, request as any)
 
         expect(isAddress).toHaveBeenNthCalledWith(1, '0x00')
     })
@@ -39,7 +40,7 @@ describe('DeleteItemActionTest', () => {
         (isAddress as jest.MockedFunction<typeof isAddress>).mockReturnValueOnce(false)
 
         expect(() => {
-            deleteItemAction = new DeleteItemAction(whitelistMock, request)
+            deleteItemAction = new DeleteItemAction(whitelistMock, request as any)
         }).toThrow('Invalid public key passed!')
 
         expect(isAddress).toHaveBeenNthCalledWith(1, '0x00')
@@ -50,7 +51,7 @@ describe('DeleteItemActionTest', () => {
 
         (whitelistMock.deleteItem as jest.MockedFunction<typeof whitelistMock.deleteItem>).mockReturnValueOnce(Promise.resolve(true));
         
-        deleteItemAction = new DeleteItemAction(whitelistMock, request)
+        deleteItemAction = new DeleteItemAction(whitelistMock, request as any)
         
         await expect(deleteItemAction.execute()).resolves.toEqual(true)
 
@@ -62,7 +63,7 @@ describe('DeleteItemActionTest', () => {
 
         (whitelistMock.deleteItem as jest.MockedFunction<typeof whitelistMock.deleteItem>).mockReturnValueOnce(Promise.reject('NOPE'));
         
-        deleteItemAction = new DeleteItemAction(whitelistMock, request)
+        deleteItemAction = new DeleteItemAction(whitelistMock, request as any)
         
         await expect(deleteItemAction.execute()).rejects.toEqual('NOPE')
 

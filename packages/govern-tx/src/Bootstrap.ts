@@ -186,6 +186,7 @@ export default class Bootstrap {
         
         this.server.get(
             '/whitelist',
+            {schema: AbstractWhitelistAction.schema},
             (request: FastifyRequest): Promise<ListItem[]> => {
                 return new GetListAction(this.whitelist, request).execute()
             }

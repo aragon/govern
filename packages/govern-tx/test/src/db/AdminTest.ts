@@ -53,7 +53,7 @@ describe('AdminTest', () => {
 
         await expect(admin.addAdmin('0x00')).resolves.toEqual(true)
 
-        expect(databaseMock.query).toHaveBeenNthCalledWith(1, `INSERT INTO admins VALUES (0x00)`)
+        expect(databaseMock.query).toHaveBeenNthCalledWith(1, `INSERT INTO admins VALUES ('0x00')`)
     })
 
     it('calls addAdmin and throws as expected', async () => {
@@ -61,7 +61,7 @@ describe('AdminTest', () => {
 
         await expect(admin.addAdmin('0x00')).rejects.toEqual('NOPE')
 
-        expect(databaseMock.query).toHaveBeenNthCalledWith(1, `INSERT INTO admins VALUES (0x00)`)
+        expect(databaseMock.query).toHaveBeenNthCalledWith(1, `INSERT INTO admins VALUES ('0x00')`)
     })
 
     it('calls deleteAdmin and returns true', async () => {

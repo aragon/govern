@@ -28,7 +28,8 @@ const fastifyMock: any = {
     delete: jest.fn(),
     get: jest.fn(),
     addHook: jest.fn(),
-    options: {}
+    options: {},
+    FastifyRequest: jest.fn()
 }
 jest.mock('fastify', () => {
     return {
@@ -96,22 +97,22 @@ describe('BootstrapTest', () => {
         switch(path) {
             case '/execute':
                 expect(schemaObj).toEqual({schema: AbstractTransaction.schema})
-                callback({params: true})
+                callback(fastifyMock.FastifyRequest)
                 executeTransactionMock = ExecuteTransaction.mock.instances[0]
                 break
             case '/schedule':
                 expect(schemaObj).toEqual({schema: AbstractTransaction.schema})
-                callback({params: true})
+                callback(fastifyMock.FastifyRequest)
                 scheduleTransactionMock = ScheduleTransaction.mock.instances[0]
                 break
             case '/challenge':
                 expect(schemaObj).toEqual({schema: AbstractTransaction.schema})
-                callback({params: true})
+                callback(fastifyMock.FastifyRequest)
                 challengeTransactionMock = ChallengeTransaction.mock.instances[0]
                 break
             case '/whitelist':
                 expect(schemaObj).toEqual({schema: AbstractWhitelistAction.schema})
-                callback({params: true})
+                callback(fastifyMock.FastifyRequest)
                 addItemActionMock = AddItemAction.mock.instances[0]
                 break
         }
@@ -122,7 +123,7 @@ describe('BootstrapTest', () => {
 
         expect(schemaObj).toEqual({schema: AbstractWhitelistAction.schema})
 
-        callback({params: true})
+        callback(fastifyMock.FastifyRequest)
 
         deleteItemActionMock = DeleteItemAction.mock.instances[0]
     })
@@ -132,7 +133,7 @@ describe('BootstrapTest', () => {
 
         expect(schemaObj).toEqual({schema: AbstractWhitelistAction.schema})
 
-        callback({params: true})
+        callback(fastifyMock.FastifyRequest)
 
         getListActionMock = GetListAction.mock.instances[0]
     })
@@ -186,25 +187,22 @@ describe('BootstrapTest', () => {
     /************************************ 
      *  Expectations for all added routes 
      ************************************/
-    expect(ExecuteTransaction).toHaveBeenNthCalledWith(1, config.ethereum, Provider.mock.instances[0], true)
+    expect(ExecuteTransaction).toHaveBeenNthCalledWith(1, config.ethereum, Provider.mock.instances[0], Whitelist.mock.instances[0], fastifyMock.FastifyRequest)
     expect(executeTransactionMock.execute).toHaveBeenCalledTimes(1)
 
-    expect(ScheduleTransaction).toHaveBeenNthCalledWith(1, config.ethereum, Provider.mock.instances[0], true)
+    expect(ScheduleTransaction).toHaveBeenNthCalledWith(1, config.ethereum, Provider.mock.instances[0], Whitelist.mock.instances[0], fastifyMock.FastifyRequest)
     expect(scheduleTransactionMock.execute).toHaveBeenCalledTimes(1)
 
-    expect(ChallengeTransaction).toHaveBeenNthCalledWith(1, config.ethereum, Provider.mock.instances[0], true)
+    expect(ChallengeTransaction).toHaveBeenNthCalledWith(1, config.ethereum, Provider.mock.instances[0], Whitelist.mock.instances[0], fastifyMock.FastifyRequest)
     expect(challengeTransactionMock.execute).toHaveBeenCalledTimes(1)
 
-    expect(AddItemAction).toHaveBeenNthCalledWith(1, Whitelist.mock.instances[0], true)
+    expect(AddItemAction).toHaveBeenNthCalledWith(1, Whitelist.mock.instances[0], fastifyMock.FastifyRequest)
     expect(addItemActionMock.execute).toHaveBeenCalledTimes(1)
 
-    expect(DeleteItemAction).toHaveBeenNthCalledWith(1, Whitelist.mock.instances[0], true)
+    expect(DeleteItemAction).toHaveBeenNthCalledWith(1, Whitelist.mock.instances[0], fastifyMock.FastifyRequest)
     expect(deleteItemActionMock.execute).toHaveBeenCalledTimes(1)
 
-    expect(GetListAction).toHaveBeenNthCalledWith(1, Whitelist.mock.instances[0])
-    expect(getListActionMock.execute).toHaveBeenCalledTimes(1)
-
-    expect(fastifyMock.post).toHaveBeenCalledTimes(4)
+    expect(fastifyMock.post).toHaveBeenCalledTimes(5)
     expect(fastifyMock.delete).toHaveBeenCalledTimes(1)
     expect(fastifyMock.get).toHaveBeenCalledTimes(1)
   })

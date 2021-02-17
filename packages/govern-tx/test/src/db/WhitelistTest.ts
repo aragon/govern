@@ -65,7 +65,7 @@ describe('WhitelistTest', () => {
     })
 
     it('calls getItemByKey and returns the expected value', async () => {
-        (databaseMock.query as jest.MockedFunction<typeof databaseMock.query>).mockReturnValueOnce(Promise.resolve(true))
+        (databaseMock.query as jest.MockedFunction<typeof databaseMock.query>).mockReturnValueOnce(Promise.resolve([true]))
 
         await expect(whitelist.getItemByKey('0x00')).resolves.toEqual(true)
 
@@ -85,7 +85,7 @@ describe('WhitelistTest', () => {
 
         await expect(whitelist.addItem('0x00', 0)).resolves.toEqual(true)
 
-        expect(databaseMock.query).toHaveBeenNthCalledWith(1, `INSERT INTO whitelist VALUES (0x00, 0)`)
+        expect(databaseMock.query).toHaveBeenNthCalledWith(1, `INSERT INTO whitelist (PublicKey, TxLimit) VALUES ('0x00', '0')`)
     })
 
     it('calls addItem and throws as expected', async () => {
@@ -93,7 +93,7 @@ describe('WhitelistTest', () => {
 
         await expect(whitelist.addItem('0x00', 0)).rejects.toEqual('NOPE')
 
-        expect(databaseMock.query).toHaveBeenNthCalledWith(1, `INSERT INTO whitelist VALUES (0x00, 0)`)
+        expect(databaseMock.query).toHaveBeenNthCalledWith(1, `INSERT INTO whitelist (PublicKey, TxLimit) VALUES ('0x00', '0')`)
     })
 
     it('calls deleteItem and returns true', async () => {

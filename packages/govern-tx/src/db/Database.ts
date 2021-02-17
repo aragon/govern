@@ -51,6 +51,6 @@ export default class Database {
      * @public 
      */
     public query<T>(query: string): Promise<T> {
-        return this.sql.unsafe(query) // TODO: Change back to normal call of the sql function
+        return this.sql(query);
     }
 }

@@ -1,5 +1,4 @@
 import { isAddress } from '@ethersproject/address';
-import { WhitelistRequest } from '../../../lib/whitelist/AbstractWhitelistAction';
 import Database from '../../../src/db/Database';
 import Whitelist, { ListItem } from '../../../src/db/Whitelist';
 import GetListAction from '../../../src/whitelist/GetListAction';
@@ -25,7 +24,7 @@ describe('GetListActionTest', () => {
 
         (whitelistMock.getList as jest.MockedFunction<typeof whitelistMock.getList>).mockReturnValueOnce(Promise.resolve([{}] as ListItem[]));
         
-        getListAction = new GetListAction(whitelistMock)
+        getListAction = new GetListAction(whitelistMock, {} as any)
         
         await expect(getListAction.execute()).resolves.toEqual([{}])
 
@@ -37,7 +36,7 @@ describe('GetListActionTest', () => {
 
         (whitelistMock.getList as jest.MockedFunction<typeof whitelistMock.getList>).mockReturnValueOnce(Promise.reject('NOPE'));
         
-        getListAction = new GetListAction(whitelistMock)
+        getListAction = new GetListAction(whitelistMock, {} as any)
         
         await expect(getListAction.execute()).rejects.toEqual('NOPE')
 

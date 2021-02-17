@@ -1,8 +1,8 @@
 import { EthereumOptions } from '../../../../src/config/Configuration'
-import { Request } from '../../../../lib/AbstractAction'
 import Provider from '../../../../src/provider/Provider'
 import * as challengeABI from '../../../../src/transactions/challenge/challenge.json'
 import ChallengeTransaction from '../../../../src/transactions/challenge/ChallengeTransaction'
+import Whitelist from '../../../../src/db/Whitelist';
 
 // Mocks
 jest.mock('../../../../lib/transactions/AbstractTransaction')
@@ -17,7 +17,8 @@ describe('ChallengeTransactionTest', () => {
         challengeTransaction = new ChallengeTransaction(
             {} as EthereumOptions,
             {} as Provider,
-            {} as Request
+            {} as Whitelist,
+            {} as any
         )
     })
 

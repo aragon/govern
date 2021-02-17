@@ -1,8 +1,8 @@
 import { isAddress } from '@ethersproject/address';
-import { WhitelistRequest } from '../../../lib/whitelist/AbstractWhitelistAction';
 import Database from '../../../src/db/Database';
 import Whitelist, { ListItem } from '../../../src/db/Whitelist';
 import AddItemAction from '../../../src/whitelist/AddItemAction';
+
 
 // Mocks
 jest.mock('../../../src/db/Whitelist')
@@ -15,12 +15,14 @@ describe('AddItemActionTest', () => {
     let addItemAction: AddItemAction,
     whitelistMock: Whitelist
 
-    const request: WhitelistRequest = {
-        message: {
-            publicKey: '0x00',
-            rateLimit: 1
-        },
-        signature: ''
+    const request = {
+        body : {
+            message: {
+                publicKey: '0x00',
+                txLimit: 1
+            },
+            signature: ''
+        }
     }
 
     beforeEach(() => {
@@ -31,7 +33,7 @@ describe('AddItemActionTest', () => {
     it('calls validateRequest and returns the expected values', () => {
         (isAddress as jest.MockedFunction<typeof isAddress>).mockReturnValueOnce(true)
 
-        addItemAction = new AddItemAction(whitelistMock, request)
+        addItemAction = new AddItemAction(whitelistMock, request as any)
 
         expect(isAddress).toHaveBeenNthCalledWith(1, '0x00')
     })
@@ -40,7 +42,7 @@ describe('AddItemActionTest', () => {
         (isAddress as jest.MockedFunction<typeof isAddress>).mockReturnValueOnce(false)
 
         expect(() => {
-            addItemAction = new AddItemAction(whitelistMock, request)
+            addItemAction = new AddItemAction(whitelistMock, request as any)
         }).toThrow('Invalid public key passed!')
 
         expect(isAddress).toHaveBeenNthCalledWith(1, '0x00')
@@ -49,15 +51,15 @@ describe('AddItemActionTest', () => {
     it('calls validateRequest and throws because of a invalid rate limit', () => {
         (isAddress as jest.MockedFunction<typeof isAddress>).mockReturnValueOnce(true)
 
-        request.message.rateLimit = 0;
+        request.body.message.txLimit = 0;
 
         expect(() => {
-            addItemAction = new AddItemAction(whitelistMock, request)
+            addItemAction = new AddItemAction(whitelistMock, request as any)
         }).toThrow('Invalid rate limit passed!')
 
         expect(isAddress).toHaveBeenNthCalledWith(1, '0x00')
 
-        request.message.rateLimit = 1;
+        request.body.message.txLimit = 1;
     })
 
     it('calls execute and returns the expected result', async () => {
@@ -65,7 +67,7 @@ describe('AddItemActionTest', () => {
 
         (whitelistMock.addItem as jest.MockedFunction<typeof whitelistMock.addItem>).mockReturnValueOnce(Promise.resolve({} as ListItem));
         
-        addItemAction = new AddItemAction(whitelistMock, request)
+        addItemAction = new AddItemAction(whitelistMock, request as any)
         
         await expect(addItemAction.execute()).resolves.toEqual({})
 
@@ -77,7 +79,7 @@ describe('AddItemActionTest', () => {
 
         (whitelistMock.addItem as jest.MockedFunction<typeof whitelistMock.addItem>).mockReturnValueOnce(Promise.reject('NOPE'));
         
-        addItemAction = new AddItemAction(whitelistMock, request)
+        addItemAction = new AddItemAction(whitelistMock, request as any)
         
         await expect(addItemAction.execute()).rejects.toEqual('NOPE')
 
