@@ -180,7 +180,7 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
         arbitrator.submitEvidence(disputeId, msg.sender, _reason);
         arbitrator.closeEvidencePeriod(disputeId);
 
-        disputeItemCache[containerHash][arbitrator] = disputeId; // cache a relation between disputeId and containerHash while needed
+        disputeItemCache[containerHash][arbitrator] = disputeId + 1; // cache a relation between disputeId and containerHash while needed
 
         emit Challenged(containerHash, msg.sender, _reason, disputeId, collateral);
     }
@@ -195,7 +195,7 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
         bytes32 containerHash = _container.hash();
         IArbitrator arbitrator = IArbitrator(_container.config.resolver);
 
-        require(disputeItemCache[containerHash][arbitrator] == _disputeId, "queue: bad dispute id");
+        require(disputeItemCache[containerHash][arbitrator] == _disputeId + 1, "queue: bad dispute id");
         delete disputeItemCache[containerHash][arbitrator]; // release state to refund gas; no longer needed in state
 
         queue[containerHash].checkState(GovernQueueStateLib.State.Challenged);
