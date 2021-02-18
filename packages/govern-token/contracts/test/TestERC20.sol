@@ -19,3 +19,4 @@ contract TestERC20 is ERC20 {
         }
     }
 }
+

@@ -122,3 +122,4 @@ export default class MerkleTree {
     return Buffer.concat([...args].sort(Buffer.compare))
   }
 }
+

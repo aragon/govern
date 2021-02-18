@@ -43,3 +43,4 @@ export default class BalanceTree {
     return this.tree.getHexProof(BalanceTree.toNode(index, account, amount))
   }
 }
+
