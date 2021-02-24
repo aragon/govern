@@ -37,7 +37,7 @@ contract GovernTokenFactory {
         GovernMinter minter
     ) {
         if (!_useProxies) {
-            (token, minter) = _deployContracts(_initialMinter, _tokenName, _tokenSymbol, _tokenDecimals);
+            (token, minter) = _deployContracts(address(this), _tokenName, _tokenSymbol, _tokenDecimals);
         } else {
             token = GovernToken(tokenBase.clone(abi.encodeWithSelector(
                 token.initialize.selector,
