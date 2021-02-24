@@ -18,6 +18,7 @@ import {
   Vetoed as VetoedEvent
 } from '../../generated/templates/GovernQueue/GovernQueue'
 import { buildId, buildIndexedId, buildEventHandlerId } from './ids'
+import { Bytes } from "@graphprotocol/graph-ts" 
 
 function finalizeContainerEvent<T, U>(
   container: ContainerEntity,
@@ -35,7 +36,8 @@ function finalizeContainerEvent<T, U>(
 
 export function handleContainerEventChallenge(
   container: ContainerEntity,
-  ethereumEvent: ChallengedEvent
+  ethereumEvent: ChallengedEvent,
+  resolver: Bytes
 ): ContainerEventChallengeEntity {
   let eventId = buildEventHandlerId(container.id, 'challenge', ethereumEvent.transactionLogIndex.toHexString())
 
@@ -44,7 +46,8 @@ export function handleContainerEventChallenge(
   containerEvent.actor = ethereumEvent.params.actor
   containerEvent.reason = ethereumEvent.params.reason
   containerEvent.disputeId = ethereumEvent.params.resolverId
-
+  containerEvent.resolver = resolver
+  
   let collateral = new CollateralEntity(buildId(ethereumEvent))
   collateral.token = ethereumEvent.params.collateral.token
   collateral.amount = ethereumEvent.params.collateral.amount
