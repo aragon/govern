@@ -13,5 +13,5 @@ export function buildEventHandlerId(
   eventName: string,
   logIndex: string
 ): string {
-  return containerHash + logIndex.toString()
+  return containerHash + eventName + logIndex.toString()
 }
