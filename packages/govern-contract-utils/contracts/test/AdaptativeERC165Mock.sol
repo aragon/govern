@@ -16,3 +16,26 @@ contract AdaptativeERC165Mock is AdaptativeERC165 {
         _registerStandardAndCallback(_interfaceId, _callbackSig, _magicNumber);
     }
 }
+
+
+contract AdaptativeERC165MockHelper {
+
+    address addr;
+
+    event ReceivedCallback(bytes32 b);
+
+    constructor(address _addr) public {
+        addr = _addr;
+    }
+
+    /**
+     * @notice Executes fallback function on the AdaptativeERC165Mock and emits the returned value.
+     * @param selector any kind of selector in order to call fallback
+     */
+    function handleCallback(bytes4 selector) external {
+        (, bytes memory value) = addr.call(abi.encodeWithSelector(selector));
+        bytes32 decoded = abi.decode(value, (bytes32));
+        emit ReceivedCallback(decoded);
+    }
+
+}

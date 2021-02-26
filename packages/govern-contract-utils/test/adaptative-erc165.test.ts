@@ -4,7 +4,9 @@ import { hexDataSlice, id } from 'ethers/lib/utils'
 import { ethers } from 'hardhat'
 import {
   AdaptativeERC165Mock,
+  AdaptativeERC165MockHelper,
   AdaptativeERC165Mock__factory,
+  AdaptativeERC165MockHelper__factory
 } from '../typechain'
 
 const ERRORS = {
@@ -20,16 +22,23 @@ const EVENTS = {
 const beefInterfaceId = '0xbeefbeef'
 const callbackSig = hexDataSlice(id('callbackFunc()'), 0, 4) // 0x1eb2075a
 const magicNumber = '0x10000000'
+const magicNumberReturn = magicNumber + "0".repeat(56)
 
 describe('AdaptativeErc165', function () {
   let adaptative: AdaptativeERC165Mock, signers: Signer[]
+  let adaptativeHelper: AdaptativeERC165MockHelper
 
   before(async () => {
     signers = await ethers.getSigners()
     const Adaptative = (await ethers.getContractFactory(
       'AdaptativeERC165Mock'
     )) as AdaptativeERC165Mock__factory
+    const AdaptativeHelper = (await ethers.getContractFactory(
+      'AdaptativeERC165MockHelper'
+    )) as AdaptativeERC165MockHelper__factory
+
     adaptative = await Adaptative.deploy()
+    adaptativeHelper = await AdaptativeHelper.deploy(adaptative.address)
   })
 
   context('registerStandardAndCallback', () => {
@@ -71,6 +80,14 @@ describe('AdaptativeErc165', function () {
           data: hexDataSlice(id('unknown()'), 0, 4),
         })
       ).to.be.revertedWith(ERRORS.UNKNOWN_CALLBACK)
+    })
+
+    it('returns the correct value from handleCallback assembly', async () => {
+      await expect(
+        adaptativeHelper.handleCallback(callbackSig)
+      )
+        .to.emit(adaptativeHelper, EVENTS.RECEIVED_CALLBACK)
+        .withArgs(magicNumberReturn)
     })
   })
 
