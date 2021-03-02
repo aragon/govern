@@ -1,10 +1,9 @@
 {
   "name": "@aragon/govern-discord",
-  "version": "1.0.1-beta.0",
+  "version": "1.0.0-beta.12",
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\"",
     "start": "node -r dotenv/config server.js dotenv_config_path=../../.env",
     "new-dao": "cd ../govern-create && yarn deploy-govern --network rinkeby"
   },

@@ -15,10 +15,10 @@ import {
   Resolved as ResolvedEvent,
   Ruled as RuledEvent,
   Scheduled as ScheduledEvent,
-  EvidenceSubmitted as EvidenceSubmittedEvent,
   Vetoed as VetoedEvent
 } from '../../generated/templates/GovernQueue/GovernQueue'
-import { buildId, buildIndexedId } from './ids'
+import { buildId, buildIndexedId, buildEventHandlerId } from './ids'
+import { Bytes } from "@graphprotocol/graph-ts" 
 
 function finalizeContainerEvent<T, U>(
   container: ContainerEntity,
@@ -36,16 +36,18 @@ function finalizeContainerEvent<T, U>(
 
 export function handleContainerEventChallenge(
   container: ContainerEntity,
-  ethereumEvent: ChallengedEvent
+  ethereumEvent: ChallengedEvent,
+  resolver: Bytes
 ): ContainerEventChallengeEntity {
-  let eventId = buildIndexedId(container.id, container.history.length)
+  let eventId = buildEventHandlerId(container.id, 'challenge', ethereumEvent.transactionLogIndex.toHexString())
 
   let containerEvent = new ContainerEventChallengeEntity(eventId)
 
   containerEvent.actor = ethereumEvent.params.actor
   containerEvent.reason = ethereumEvent.params.reason
   containerEvent.disputeId = ethereumEvent.params.resolverId
-
+  containerEvent.resolver = resolver
+  
   let collateral = new CollateralEntity(buildId(ethereumEvent))
   collateral.token = ethereumEvent.params.collateral.token
   collateral.amount = ethereumEvent.params.collateral.amount
@@ -64,7 +66,7 @@ export function handleContainerEventExecute(
   container: ContainerEntity,
   ethereumEvent: ExecutedEvent
 ): ContainerEventExecuteEntity {
-  let eventId = buildIndexedId(container.id, container.history.length)
+  let eventId = buildEventHandlerId(container.id, 'execute', ethereumEvent.transactionLogIndex.toHexString())
 
   let containerEvent = new ContainerEventExecuteEntity(eventId)
   containerEvent.execResults = ethereumEvent.params.execResults
@@ -80,7 +82,7 @@ export function handleContainerEventResolve(
   container: ContainerEntity,
   ethereumEvent: ResolvedEvent
 ): ContainerEventResolveEntity {
-  let eventId = buildIndexedId(container.id, container.history.length)
+  let eventId = buildEventHandlerId(container.id, 'resolve', ethereumEvent.transactionLogIndex.toHexString())
 
   let containerEvent = new ContainerEventResolveEntity(eventId)
   containerEvent.approved = ethereumEvent.params.approved
@@ -96,7 +98,7 @@ export function handleContainerEventRule(
   container: ContainerEntity,
   ethereumEvent: RuledEvent
 ): ContainerEventRuleEntity {
-  let eventId = buildIndexedId(container.id, container.history.length)
+  let eventId = buildEventHandlerId(container.id, 'rule', ethereumEvent.transactionLogIndex.toHexString())
 
   let containerEvent = new ContainerEventRuleEntity(eventId)
   containerEvent.ruling = ethereumEvent.params.ruling
@@ -110,15 +112,16 @@ export function handleContainerEventRule(
 
 export function handleContainerEventSchedule(
   container: ContainerEntity,
-  ethereumEvent: ScheduledEvent
+  ethereumEvent: ScheduledEvent,
+  scheduleDeposit: CollateralEntity
 ): ContainerEventScheduleEntity {
-  let eventId = buildIndexedId(container.id, container.history.length)
+  let eventId = buildEventHandlerId(container.id, 'schedule', ethereumEvent.transactionLogIndex.toHexString())
 
   let containerEvent = new ContainerEventScheduleEntity(eventId)
 
   let collateral = new CollateralEntity(buildId(ethereumEvent))
-  collateral.token = ethereumEvent.params.collateral.token
-  collateral.amount = ethereumEvent.params.collateral.amount
+  collateral.token = scheduleDeposit.token
+  collateral.amount = scheduleDeposit.amount
   collateral.save()
 
   containerEvent.collateral = collateral.id
@@ -130,28 +133,13 @@ export function handleContainerEventSchedule(
   )
 }
 
-export function handleContainerEventSubmitEvidence(
-  container: ContainerEntity,
-  ethereumEvent: EvidenceSubmittedEvent
-): ContainerEventSubmitEvidenceEntity {
-  let eventId = buildIndexedId(container.id, container.history.length)
 
-  let containerEvent = new ContainerEventSubmitEvidenceEntity(eventId)
-  containerEvent.evidence = ethereumEvent.params.evidence
-  containerEvent.submitter = ethereumEvent.params.submitter
-  containerEvent.finished = ethereumEvent.params.finished
-
-  return finalizeContainerEvent<
-    EvidenceSubmittedEvent,
-    ContainerEventSubmitEvidenceEntity
-  >(container, containerEvent, ethereumEvent)
-}
 
 export function handleContainerEventVeto(
   container: ContainerEntity,
   ethereumEvent: VetoedEvent
 ): ContainerEventVetoEntity {
-  let eventId = buildIndexedId(container.id, container.history.length)
+  let eventId = buildEventHandlerId(container.id, 'veto', ethereumEvent.transactionLogIndex.toHexString())
 
   let containerEvent = new ContainerEventVetoEntity(eventId)
   containerEvent.reason = ethereumEvent.params.reason

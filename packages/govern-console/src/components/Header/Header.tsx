@@ -2,25 +2,19 @@ import React, { useCallback, useEffect } from 'react'
 import { ChainUnsupportedError } from 'use-wallet'
 import 'styled-components/macro'
 import Button from '../Button'
-import { useChainId } from '../../Providers/ChainId'
+import { useChainId } from '../../lib/chain-id'
 import { useWallet } from '../../Providers/Wallet'
+import { useRouting } from '../../lib/routing'
 import { shortenAddress, getNetworkName } from '../../lib/web3-utils'
 import AragonSvg from '../../assets/aragon-metal.svg'
 
-function Header() {
-  const { chainId, setChainId } = useChainId()
+function Header(): JSX.Element {
+  const { goHome } = useRouting()
+  const { chainId, updateChainId } = useChainId()
   const { wallet } = useWallet()
 
-  const handleWalletConnection = useCallback(() => {
-    wallet.status === 'connected' ? wallet.reset() : wallet.connect('injected')
-  }, [wallet])
-
-  const handleChangeChain = useCallback(e => setChainId(e.target.value), [
-    setChainId,
-  ])
-
   useEffect(() => {
-    if (wallet!.error && wallet!.error instanceof ChainUnsupportedError) {
+    if (wallet.error && wallet.error instanceof ChainUnsupportedError) {
       alert(
         `Wrong network. Please connect to the ${getNetworkName(
           chainId,
@@ -29,12 +23,22 @@ function Header() {
     }
   }, [chainId, wallet])
 
+  const handleChangeChain = useCallback(
+    (event: { target: { value: string } }) => {
+      updateChainId(Number(event.target.value))
+    },
+    [updateChainId],
+  )
+
+  const handleWalletConnection = useCallback(() => {
+    wallet.status === 'connected' ? wallet.reset() : wallet.connect('injected')
+  }, [wallet])
+
   return (
     <header
       css={`
         display: flex;
         justify-content: space-between;
-
         width: 100%;
         border: 2px solid rgba(255, 255, 255, 0.2);
         padding: 8px;
@@ -47,16 +51,33 @@ function Header() {
           align-items: center;
         `}
       >
-        <img src={AragonSvg} width="36" alt="Grey Eagle Aragon logo"/>
-        <h1
+        <button
+          type="button"
+          onClick={goHome}
           css={`
-            flex-grow: 1;
-            font-size: 24px;
-            margin-left: 8px;
+            display: flex;
+            background: transparent;
+            border: 0px;
+            &:hover {
+              cursor: pointer;
+            }
+            &:active {
+              position: relative;
+              top: 1px;
+            }
           `}
         >
-          Govern Console
-        </h1>
+          <img src={AragonSvg} width="36" alt="" />
+          <h1
+            css={`
+              flex-grow: 1;
+              font-size: 24px;
+              margin-left: 8px;
+            `}
+          >
+            Govern Console
+          </h1>
+        </button>
       </div>
       <div>
         <label
@@ -86,7 +107,6 @@ function Header() {
             background: transparent;
             color: white;
             cursor: pointer;
-
             &:hover {
               background: rgba(255, 255, 255, 0.2);
             }
@@ -96,7 +116,7 @@ function Header() {
           `}
         >
           {wallet.status === 'connected'
-            ? shortenAddress(wallet.account!)
+            ? shortenAddress(wallet?.account ?? '')
             : 'Connect account'}
         </Button>
       </div>

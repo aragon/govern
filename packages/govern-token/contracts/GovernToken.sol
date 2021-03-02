@@ -4,10 +4,10 @@
 
 pragma solidity ^0.6.8;
 
-import "@aragon/govern-contract-utils/contracts/initializable/Initializable.sol";
+import '@aragon/govern-contract-utils/contracts/initializable/Initializable.sol';
+import '@aragon/govern-contract-utils/contracts/safe-math/SafeMath.sol';
 
 import './interfaces/IERC20.sol';
-import './libraries/SafeMath.sol';
 
 // Copied and slightly modified from https://github.com/aragon/aragon-network-token/blob/v2-v1.0.0/packages/v2/contracts/token.sol
 // Lightweight token modelled after UNI-LP: https://github.com/Uniswap/uniswap-v2-core/blob/v1.0.1/contracts/UniswapV2ERC20.sol

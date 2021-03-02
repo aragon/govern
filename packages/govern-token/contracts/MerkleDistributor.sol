@@ -12,6 +12,7 @@ import "@aragon/govern-contract-utils/contracts/erc20/SafeERC20.sol";
 import "@aragon/govern-contract-utils/contracts/initializable/Initializable.sol";
 
 contract MerkleDistributor is Initializable {
+    
     using SafeERC20 for ERC20;
 
     ERC20 public token;
@@ -48,7 +49,7 @@ contract MerkleDistributor is Initializable {
 
     function _verifyBalanceOnTree(uint256 _index, address _to, uint256 _amount, bytes32[] memory _proof) internal view returns (bool) {
         bytes32 node = keccak256(abi.encodePacked(_index, _to, _amount));
-        return !MerkleProof.verify(_proof, merkleRoot, node);
+        return MerkleProof.verify(_proof, merkleRoot, node);
     }
 
     function isClaimed(uint256 _index) public view returns (bool) {

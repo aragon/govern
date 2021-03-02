@@ -10,7 +10,6 @@ import {
   Scheduled as ScheduledEvent,
   Vetoed as VetoedEvent,
   Ruled as RuledEvent,
-  EvidenceSubmitted as EvidenceSubmittedEvent,
   GovernQueue as GovernQueueContract
 } from '../generated/templates/GovernQueue/GovernQueue'
 import {
@@ -38,7 +37,6 @@ import {
   handleContainerEventResolve,
   handleContainerEventRule,
   handleContainerEventSchedule,
-  handleContainerEventSubmitEvidence,
   handleContainerEventVeto
 } from './utils/events'
 
@@ -62,13 +60,10 @@ export function handleScheduled(event: ScheduledEvent): void {
   // should be impossible to get at this stage
   container.config = queue.config
   container.queue = queue.id
+  let config = loadConfig(queue.config)
+  let scheduleDeposit = loadCollateral(config.scheduleDeposit)
 
-  handleContainerEventSchedule(container, event)
-
-  // add the container to the queue
-  let scheduled = queue.queued
-  scheduled.push(container.id)
-  queue.queued = scheduled
+  handleContainerEventSchedule(container, event, scheduleDeposit as CollateralEntity)
 
   payload.save()
   container.save()
@@ -87,8 +82,8 @@ export function handleChallenged(event: ChallengedEvent): void {
 
   container.state = CHALLENGED_STATUS
 
-  let containerEvent = handleContainerEventChallenge(container, event)
-  containerEvent.resolver = ConfigEntity.load(queue.config).resolver
+  let resolver = ConfigEntity.load(queue.config).resolver
+  let containerEvent = handleContainerEventChallenge(container, event, resolver)
 
   containerEvent.save()
   container.save()
@@ -98,7 +93,7 @@ export function handleChallenged(event: ChallengedEvent): void {
 export function handleResolved(event: ResolvedEvent): void {
   let container = loadOrCreateContainer(event.params.containerHash)
 
-  container.state = event.params.approved ? EXECUTED_STATUS : CANCELLED_STATUS
+  container.state = event.params.approved ? APPROVED_STATUS : REJECTED_STATUS
 
   handleContainerEventResolve(container, event)
 
@@ -148,35 +143,6 @@ export function handleConfigured(event: ConfiguredEvent): void {
   challengeDeposit.save()
   config.save()
   queue.save()
-}
-
-// IArbitrable Events
-
-export function handleEvidenceSubmitted(event: EvidenceSubmittedEvent): void {
-  let governQueue = GovernQueueContract.bind(event.address)
-  let containerHash = governQueue.disputeItemCache(
-    event.params.arbitrator,
-    event.params.disputeId
-  )
-  let container = loadOrCreateContainer(containerHash)
-
-  handleContainerEventSubmitEvidence(container, event)
-}
-
-export function handleRuled(event: RuledEvent): void {
-  let governQueue = GovernQueueContract.bind(event.address)
-  let containerHash = governQueue.disputeItemCache(
-    event.params.arbitrator,
-    event.params.disputeId
-  )
-  let container = loadOrCreateContainer(containerHash)
-
-  container.state =
-    event.params.ruling === ALLOW_RULING ? APPROVED_STATUS : REJECTED_STATUS
-
-  handleContainerEventRule(container, event)
-
-  container.save()
 }
 
 // MiniACL Events
@@ -251,6 +217,22 @@ function loadOrCreatePayload(containerHash: Bytes): PayloadEntity {
   return payload!
 }
 
+function loadConfig(configAddress: string): ConfigEntity {
+  let config = ConfigEntity.load(configAddress)
+  if (config === null) {
+    throw new Error('Config not found.')
+  }
+  return config!
+}
+
+function loadCollateral(collateralAddress: string): CollateralEntity {
+  let collateral = CollateralEntity.load(collateralAddress)
+  if (collateral === null) {
+    throw new Error('Collateral not found.')
+  }
+  return collateral!
+}
+
 function buildActions(event: ScheduledEvent): void {
   let actions = event.params.payload.actions
   for (let index = 0; index < actions.length; index++) {
@@ -265,3 +247,4 @@ function buildActions(event: ScheduledEvent): void {
     action.save()
   }
 }
+

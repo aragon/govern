@@ -1,12 +1,28 @@
-import React from 'react'
-import { HashRouter as Router, Route, Switch } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { Route, Switch, useLocation } from 'react-router-dom'
 import 'styled-components/macro'
-import TopHeader from './components/Header/Header'
-import DaoSelector from './pages/DaoSelector'
-import DaoView from './pages/DaoView'
-import ErcTool from './Tools/Erc'
+import SelectDao from './pages/SelectDao'
+import ViewDao from './pages/ViewDao'
+import Header from './components/Header/Header'
+import { useChainId } from './lib/chain-id'
+import env from './environment'
 
-function App() {
+function App(): JSX.Element {
+  const location = useLocation()
+  const { chainId, updateChainId } = useChainId()
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [location.pathname])
+
+  // If the ChainId doesn’t exist, we redirect
+  // to the default, defined in the environment.
+  useEffect(() => {
+    if (chainId === -1) {
+      updateChainId(env('CHAIN_ID'))
+    }
+  }, [chainId, updateChainId])
+
   return (
     <div
       css={`
@@ -15,20 +31,15 @@ function App() {
         margin: 0 auto;
       `}
     >
-      <TopHeader />
-      <Router>
-        <Switch>
-          <Route exact path="/">
-            <DaoSelector />
-          </Route>
-          <Route exact path="/tools/erc">
-            <ErcTool />
-          </Route>
-          <Route path="/:daoAddress">
-            <DaoView />
-          </Route>
-        </Switch>
-      </Router>
+      <Header />
+      <Switch>
+        <Route exact path="/:network">
+          <SelectDao />
+        </Route>
+        <Route path="/:network/:daoAddress">
+          <ViewDao />
+        </Route>
+      </Switch>
     </div>
   )
 }

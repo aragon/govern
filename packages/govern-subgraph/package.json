@@ -1,9 +1,8 @@
 {
   "name": "@aragon/govern-subgraph",
-  "version": "1.0.1-beta.0",
+  "version": "1.0.0-beta.12",
   "scripts": {
-    "codegen": "rm -rf generated; graph codegen",
-    "build": "rm -rf build; graph build",
+    "build": "scripts/build-subgraph.sh",
     "manifest-mainnet": "scripts/build-manifest.sh mainnet",
     "manifest-mainnet-staging": "STAGING=true scripts/build-manifest.sh mainnet",
     "manifest-rinkeby": "scripts/build-manifest.sh rinkeby",
@@ -25,7 +24,7 @@
     "mustache": "^4.0.1"
   },
   "dependencies": {
-    "@aragon/govern-core": "^1.0.1-beta.0",
+    "@aragon/govern-core": "^1.0.0-beta.12",
     "babel-polyfill": "^6.26.0",
     "babel-register": "^6.26.0"
   },

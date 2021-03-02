@@ -50,7 +50,7 @@ library ERC3000Data {
             chainId := chainid()
         }
 
-        return keccak256(abi.encodePacked("erc3k-v1", this, chainId, payloadHash, configHash));
+        return keccak256(abi.encodePacked("erc3k-v1", address(this), chainId, payloadHash, configHash));
     }
 
     function hash(Container memory container) internal view returns (bytes32) {
@@ -59,7 +59,7 @@ library ERC3000Data {
 
     function hash(Payload memory payload) internal pure returns (bytes32) {
         return keccak256(
-            abi.encodePacked(
+            abi.encode(
                 payload.nonce,
                 payload.executionTime,
                 payload.submitter,

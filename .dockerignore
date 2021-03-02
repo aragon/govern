@@ -1,0 +1,11 @@
+# from .gitignore
+node_modules/
+yarn-error.log
+.env
+/packages/govern-server/dev-data/
+
+# extra ignores to help docker caching
+.git
+.github
+docker-compose.yml
+*.md

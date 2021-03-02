@@ -6,12 +6,11 @@ export default function Button({
   disabled = false,
   onClick,
   type,
-}: React.HTMLProps<HTMLButtonElement>) {
+}: React.ComponentProps<'button'>): JSX.Element {
   return (
     <button
       disabled={disabled}
-      //@ts-ignore
-      type={type!}
+      type={type}
       onClick={onClick}
       css={`
         font-family: 'Roboto Mono', monospace;
@@ -23,7 +22,11 @@ export default function Button({
         min-height: 40px;
         cursor: pointer;
         border: 2px solid transparent;
-        border-image: linear-gradient(to bottom right, #AD41BB 20%, #FF7D7D 100%);
+        border-image: linear-gradient(
+          to bottom right,
+          #ad41bb 20%,
+          #ff7d7d 100%
+        );
         border-image-slice: 1;
 
         &:active {

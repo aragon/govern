@@ -1,13 +1,13 @@
-import { ethers } from '@nomiclabs/buidler'
+import { ethers } from 'hardhat'
 import { expect } from 'chai'
 import { Signer } from 'ethers'
 import {
   GovernRegistry,
-  GovernRegistryFactory,
-  Erc3000Mock,
-  Erc3000MockFactory,
-  Erc3000ExecutorMock,
-  Erc3000ExecutorMockFactory,
+  GovernRegistry__factory,
+  ERC3000Mock,
+  ERC3000Mock__factory,
+  ERC3000ExecutorMock,
+  ERC3000ExecutorMock__factory,
 } from '../typechain'
 
 const ERRORS = {
@@ -23,8 +23,8 @@ const NO_TOKEN = `0x${'00'.repeat(20)}`
 
 describe('GovernRegistry', function () {
   let governRegistry: GovernRegistry,
-    erc3k: Erc3000Mock,
-    erc3kExec: Erc3000ExecutorMock,
+    erc3k: ERC3000Mock,
+    erc3kExec: ERC3000ExecutorMock,
     signers: Signer[],
     current: string
 
@@ -36,15 +36,15 @@ describe('GovernRegistry', function () {
   beforeEach(async () => {
     const ERC3000Mock = (await ethers.getContractFactory(
       'ERC3000Mock'
-    )) as Erc3000MockFactory
+    )) as ERC3000Mock__factory
 
     const ERC3000ExecutorMock = (await ethers.getContractFactory(
       'ERC3000ExecutorMock'
-    )) as Erc3000ExecutorMockFactory
+    )) as ERC3000ExecutorMock__factory
 
     const GovernRegistry = (await ethers.getContractFactory(
       'GovernRegistry'
-    )) as GovernRegistryFactory
+    )) as GovernRegistry__factory
 
     erc3kExec = await ERC3000ExecutorMock.deploy()
 
