@@ -9,10 +9,6 @@ export const container: any = {
       'token': '',
       'amount': 100
     },
-    'vetoDeposit': {
-      'token': '',
-      'amount': 100
-    },
     'resolver': '0x0000000000000000000000000000000000000000',
     'rules': '0x'
   },

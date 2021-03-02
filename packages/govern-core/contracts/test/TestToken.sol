@@ -7,7 +7,7 @@ pragma solidity ^0.6.8;
 import "@aragon/govern-contract-utils/contracts/initializable/Initializable.sol";
 
 import '@aragon/govern-token/contracts/interfaces/IERC20.sol';
-import '@aragon/govern-token/contracts/libraries/SafeMath.sol';
+import '@aragon/govern-contract-utils/contracts/safe-math/SafeMath.sol';
 
 contract TestToken is IERC20, Initializable {
     using SafeMath for uint256;

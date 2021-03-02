@@ -9,7 +9,7 @@ import { keccak256, defaultAbiCoder, solidityPack } from 'ethers/lib/utils'
  */
 export function getPayloadHash(container: any): string {
   return keccak256(
-    solidityPack(
+    defaultAbiCoder.encode(
       [
         'uint256',
         'uint256',

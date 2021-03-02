@@ -12,9 +12,12 @@ contract ArbitratorMock {
     ERC20 public token;
 
     uint256 public possibleRulings;
-    bytes public metadata;
+    bytes   public metadata;
     uint256 public evidencePeriodClosed;
     uint256 public rulingExecuted;
+    address public subject;
+    uint256 public winningOutcome;
+
 
     constructor(ERC20 _token) public {
         token = _token;
@@ -29,8 +32,17 @@ contract ArbitratorMock {
     function createDispute(uint256 _possibleRulings, bytes calldata _metadata) external returns (uint256) {
         possibleRulings = _possibleRulings;
         metadata = _metadata;
-
+        subject = msg.sender;
+       
         return 1000;
+    }
+
+    /**
+    * @dev Close the evidence period of a dispute
+    * @param _disputeId Identification number of the dispute to close its evidence submitting period
+    */
+    function submitEvidence(uint256 _disputeId, address /*subtmitter*/, bytes calldata /*proof*/) external {
+        evidencePeriodClosed = _disputeId;
     }
 
     /**
@@ -43,11 +55,11 @@ contract ArbitratorMock {
 
 
     /**
-    * @dev Execute the Arbitrable associated to a dispute based on its final ruling
-    * @param _disputeId Identification number of the dispute to be executed
+    * @dev Update the final Ruling of the dispute
+    * @param _rule Identification number of the dispute to be executed
     */
-    function executeRuling(uint256 _disputeId) external {
-        rulingExecuted = _disputeId;
+    function executeRuling(uint256 /*_disputeId*/, uint256 _rule) external {
+        rulingExecuted = _rule;
     }
 
     /**
@@ -63,12 +75,21 @@ contract ArbitratorMock {
 
     /**
     * @dev Tell the subscription fees information for a subscriber to be up-to-date
-    * @param _subscriber Address of the account paying the subscription fees for
     * @return recipient Address where the corresponding subscriptions fees must be transferred to
     * @return feeToken ERC20 token used for the subscription fees
     * @return feeAmount Total amount of fees that must be allowed to the recipient
     */
-    function getSubscriptionFees(address _subscriber) external view returns (address recipient, ERC20 feeToken, uint256 feeAmount) {
+    function getSubscriptionFees(address /*_subscriber*/) external view returns (address recipient, ERC20 feeToken, uint256 feeAmount) {
         return (address(this), token, 1000);
     }
+    
+    /**
+    * @dev Tell the winning outcome of the final ruling.
+    * @return subject address who made the dispute
+    * @return rulingExecuted final outcome
+    */
+    function rule(uint256 /*_disputeId*/) external view virtual returns(address, uint256){
+        return (subject, rulingExecuted);
+    }
+
 }
