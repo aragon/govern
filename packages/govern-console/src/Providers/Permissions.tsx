@@ -3,27 +3,36 @@ import React, {
   useCallback,
   useContext,
   useMemo,
-  useState,
+  useReducer,
 } from 'react'
 import { useWalletAugmented } from './Wallet'
 import { addressesEqual, ETH_ANY_ADDRESS } from '../lib/web3-utils'
 import { KNOWN_QUEUE_ROLES } from '../lib/known-roles'
 
-type PermissionsObj = {
+type Permissions = {
   execute: boolean
   schedule: boolean
   veto: boolean
   challenge: boolean
 }
 
-type PermissionsContextProps = {
-  permissions: PermissionsObj
-  populatePermissions: (rawRoles: any) => void
-} | null
+type PermissionsData = {
+  permissions: Permissions
+  populatePermissions: (rawRoles: Role[]) => void
+}
 
-const PermissionsContext = createContext<PermissionsContextProps>(null)
+function isPermissionsKey(value: unknown): value is keyof Permissions {
+  return (
+    value === 'execute' ||
+    value === 'schedule' ||
+    value === 'veto' ||
+    value === 'challenge'
+  )
+}
 
-export function usePermissions() {
+const PermissionsContext = createContext<PermissionsData | null>(null)
+
+export function usePermissions(): PermissionsData {
   const permissionsContext = useContext(PermissionsContext)
 
   if (!permissionsContext) {
@@ -41,42 +50,65 @@ type Role = {
   who: string
 }
 
-type PermissionsProviderProps = {
-  children: React.ReactNode
+function permissionsFromRoles(
+  account: string,
+  roles: Role[],
+  permissions: Permissions = {
+    execute: false,
+    schedule: false,
+    veto: false,
+    challenge: false,
+  },
+): Permissions {
+  return roles.reduce(
+    (permissions: Permissions, role: Role) => {
+      const anyOrCurrentAccount =
+        addressesEqual(role.who, ETH_ANY_ADDRESS) ||
+        addressesEqual(role.who, account)
+
+      if (!anyOrCurrentAccount) {
+        return permissions
+      }
+
+      const roleName = KNOWN_QUEUE_ROLES.get(role.selector)
+      if (roleName && isPermissionsKey(roleName)) {
+        permissions[roleName] = true
+      }
+      return permissions
+    },
+    { ...permissions },
+  )
+}
+
+function permissionsReducer(
+  permissions: Permissions,
+  { account, roles }: { account: string; roles: Role[] },
+) {
+  return permissionsFromRoles(account, roles, permissions)
 }
 
 export default function PermissionsProvider({
   children,
-}: PermissionsProviderProps) {
-  const [permissions, setPermissions] = useState({
+}: {
+  children: React.ReactNode
+}): JSX.Element {
+  const [permissions, dispatchPermissions] = useReducer<
+    React.Reducer<Permissions, { account: string; roles: Role[] }>
+  >(permissionsReducer, {
     execute: false,
     schedule: false,
     veto: false,
     challenge: false,
   })
+
   const { wallet } = useWalletAugmented()
   const { account } = wallet
 
   const populatePermissions = useCallback(
-    (rawRoles: any) => {
-      const newPermissions = permissions
-      rawRoles.map((role: Role) => {
-        console.log(role.who, ETH_ANY_ADDRESS, account ?? '')
-        if (
-          addressesEqual(role.who, ETH_ANY_ADDRESS) ||
-          addressesEqual(role.who, account ?? '')
-        ) {
-          const roleName = KNOWN_QUEUE_ROLES.get(role.selector) ?? ''
-          console.log(roleName, 'roleName')
-          if (roleName) {
-            // @ts-ignore
-            newPermissions[roleName] = true
-          }
-        }
-      })
-      setPermissions(newPermissions)
+    (roles: Role[]) => {
+      dispatchPermissions({ account: account ?? '', roles })
     },
-    [account, permissions],
+    [account],
   )
 
   const contextValue = useMemo(

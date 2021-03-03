@@ -1,7 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
-import { useQuery } from 'react-query'
-import axios from 'axios'
 import TokenAmount from 'token-amount'
 import 'styled-components/macro'
 import Button from '../Button'
@@ -19,25 +17,12 @@ type ViewDaoProps = {
   dao: any
 }
 
-const BASE_ETHERSCAN_TX_URL =
-  'https://api.etherscan.io/api?module=account&action=txlistinternal&address='
-
-export default function ViewDao({ dao }: ViewDaoProps) {
+export default function ViewDao({ dao }: ViewDaoProps): JSX.Element {
   const [ethBalance, setEthBalance] = useState('')
   const { daoAddress }: any = useParams()
   const history = useHistory()
-  const { isLoading, error, data: tokenData } = useQuery(
-    'daoActivity',
-    async () => {
-      const res = await axios.get(
-        `${BASE_ETHERSCAN_TX_URL}${dao.executor.address}&apiKey=${process.env.REACT_APP_ETHERSCAN_API_TOKEN}`,
-      )
-      return res
-    },
-  )
   const { ethers } = useWalletAugmented()
   const { permissions, populatePermissions } = usePermissions()
-  populatePermissions(dao.queue.roles)
   const { schedule: canSchedule } = permissions
 
   useEffect(() => {
@@ -47,6 +32,10 @@ export default function ViewDao({ dao }: ViewDaoProps) {
     }
     fetchEthBalance()
   }, [dao, ethers])
+
+  useEffect(() => {
+    populatePermissions(dao.queue.roles)
+  }, [dao, populatePermissions])
 
   const handleNewAction = useCallback(() => {
     history.push(`/${daoAddress}/new-action`)

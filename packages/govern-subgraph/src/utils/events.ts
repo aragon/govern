@@ -15,10 +15,10 @@ import {
   Resolved as ResolvedEvent,
   Ruled as RuledEvent,
   Scheduled as ScheduledEvent,
-  EvidenceSubmitted as EvidenceSubmittedEvent,
   Vetoed as VetoedEvent
 } from '../../generated/templates/GovernQueue/GovernQueue'
 import { buildId, buildIndexedId, buildEventHandlerId } from './ids'
+import { Bytes } from "@graphprotocol/graph-ts" 
 
 function finalizeContainerEvent<T, U>(
   container: ContainerEntity,
@@ -36,7 +36,8 @@ function finalizeContainerEvent<T, U>(
 
 export function handleContainerEventChallenge(
   container: ContainerEntity,
-  ethereumEvent: ChallengedEvent
+  ethereumEvent: ChallengedEvent,
+  resolver: Bytes
 ): ContainerEventChallengeEntity {
   let eventId = buildEventHandlerId(container.id, 'challenge', ethereumEvent.transactionLogIndex.toHexString())
 
@@ -45,7 +46,8 @@ export function handleContainerEventChallenge(
   containerEvent.actor = ethereumEvent.params.actor
   containerEvent.reason = ethereumEvent.params.reason
   containerEvent.disputeId = ethereumEvent.params.resolverId
-
+  containerEvent.resolver = resolver
+  
   let collateral = new CollateralEntity(buildId(ethereumEvent))
   collateral.token = ethereumEvent.params.collateral.token
   collateral.amount = ethereumEvent.params.collateral.amount
@@ -131,22 +133,7 @@ export function handleContainerEventSchedule(
   )
 }
 
-export function handleContainerEventSubmitEvidence(
-  container: ContainerEntity,
-  ethereumEvent: EvidenceSubmittedEvent
-): ContainerEventSubmitEvidenceEntity {
-  let eventId = buildEventHandlerId(container.id, 'submitEvidence', ethereumEvent.transactionLogIndex.toHexString())
 
-  let containerEvent = new ContainerEventSubmitEvidenceEntity(eventId)
-  containerEvent.evidence = ethereumEvent.params.evidence
-  containerEvent.submitter = ethereumEvent.params.submitter
-  containerEvent.finished = ethereumEvent.params.finished
-
-  return finalizeContainerEvent<
-    EvidenceSubmittedEvent,
-    ContainerEventSubmitEvidenceEntity
-  >(container, containerEvent, ethereumEvent)
-}
 
 export function handleContainerEventVeto(
   container: ContainerEntity,

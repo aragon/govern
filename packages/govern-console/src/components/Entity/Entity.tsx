@@ -2,7 +2,7 @@ import React from 'react'
 import 'styled-components/macro'
 import { cid as isCid } from 'is-ipfs'
 import { hexToUtf8, isAddress } from 'web3-utils'
-import { useChainId } from '../../Providers/ChainId'
+import { useChainId } from '../../lib/chain-id'
 import { shortenAddress } from '../../lib/web3-utils'
 import { RINKEBY } from '../../lib/known-chains'
 
@@ -56,7 +56,6 @@ function formatAddress(
     }
 
     if (isCid(hexToUtf8(address))) {
-
       return hexToUtf8(address)
     }
   } catch (err) {
@@ -72,7 +71,7 @@ export default function Entity({
   address,
   shorten = false,
   type,
-}: EntityProps) {
+}: EntityProps): JSX.Element {
   const { chainId } = useChainId()
   const [url] = detectAndComposeLinkType(address, chainId, type)
   return url ? (

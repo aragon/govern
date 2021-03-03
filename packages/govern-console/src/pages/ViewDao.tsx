@@ -1,12 +1,13 @@
 import React from 'react'
 import { Route, Switch, useRouteMatch, useParams } from 'react-router-dom'
+import { useQuery } from 'react-query'
+import { gql, request } from 'graphql-request'
 import 'styled-components/macro'
-import { gql, useQuery } from '@apollo/client'
 import NewAction from '../components/NewAction/NewAction'
 import ViewAction from '../components/ViewAction/ViewAction'
 import ViewDao from '../components/ViewDao/ViewDao'
-import { useChainId } from '../Providers/ChainId'
-import { rinkebyClient, mainnetClient } from '../index'
+import { useChainId } from '../lib/chain-id'
+import env from '../environment'
 
 const DAO_QUERY = gql`
   query DAOQuery($name: String) {
@@ -82,16 +83,28 @@ const DAO_QUERY = gql`
   }
 `
 
-export default function DaoView() {
+export default function DaoView(): JSX.Element {
   const { chainId } = useChainId()
   const { daoAddress }: any = useParams()
   const { path } = useRouteMatch()
-  const { data, loading, error } = useQuery(DAO_QUERY, {
-    variables: {
-      name: daoAddress,
-    },
-    client: chainId === 4 ? rinkebyClient : mainnetClient,
-  })
+  const { data, isLoading: loading, error } = useQuery(
+    // This is the key for retrieving the data from react-query's cache;
+    // originally we were using the same key for this DAO query, no matter
+    // which DAO, but having an unique (but reproducible) key per DAO lets
+    // us store data on the user browser and persist it while avoiding
+    // false "info" flashes on other DAOs due to key collisions
+    `DAO_DATA_${daoAddress}`,
+    async () =>
+      request(
+        chainId === 4
+          ? env('RINKEBY_SUBGRAPH_URL')
+          : env('MAINNET_SUBGRAPH_URL'),
+        DAO_QUERY,
+        {
+          name: daoAddress,
+        },
+      ),
+  )
 
   if (loading) {
     return <p>Loading DAO data...</p>
@@ -105,8 +118,6 @@ export default function DaoView() {
   if (!data.registryEntry) {
     return <p>DAO not found.</p>
   }
-
-  console.log(data)
 
   return (
     <Switch>

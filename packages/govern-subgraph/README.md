@@ -125,7 +125,6 @@ Tracked:
 - `Vetoed`
 - `Resolved`
 - `Revoked`
-- `EvidenceSubmitted`
 - `Ruled`
 
 Left out: None.
