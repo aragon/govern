@@ -16,10 +16,16 @@ const dummyConfig = {
   rules: '0x',
 }
 
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, ethers, run } = hre
 
   console.log('Verifying registry and factories contracts')
+  
+  await delay(3000); // Etherscan needs some time to process before trying to verify.
 
   await run(TASK_ETHERSCAN_VERIFY, {
     apiKey: process.env.ETHERSCAN_KEY,
