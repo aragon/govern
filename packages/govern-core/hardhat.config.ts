@@ -15,15 +15,11 @@ const config: HardhatUserConfig = {
     settings: {
       optimizer: {
         enabled: true,
-        runs: 2000, // TODO: target average DAO use
+        runs: 2000,
       },
     },
   },
   networks: {
-    coverage: {
-      url: 'http://localhost:8555',
-      allowUnlimitedContractSize: true,
-    },
     rinkeby: {
       url: 'https://rinkeby.eth.aragon.network',
       accounts,
