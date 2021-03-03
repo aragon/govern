@@ -4,9 +4,9 @@
 
 pragma solidity 0.6.8;
 
-import "../adaptative-erc165/AdaptativeERC165.sol";
+import "../adaptive-erc165/AdaptiveERC165.sol";
 
-contract AdaptativeERC165Mock is AdaptativeERC165 {
+contract AdaptiveERC165Mock is AdaptiveERC165 {
 
     fallback () external {
         _handleCallback(msg.sig, msg.data);
@@ -18,7 +18,7 @@ contract AdaptativeERC165Mock is AdaptativeERC165 {
 }
 
 
-contract AdaptativeERC165MockHelper {
+contract AdaptiveERC165MockHelper {
 
     address addr;
 
@@ -29,7 +29,7 @@ contract AdaptativeERC165MockHelper {
     }
 
     /**
-     * @notice Executes fallback function on the AdaptativeERC165Mock and emits the returned value.
+     * @notice Executes fallback function on the AdaptiveERC165Mock and emits the returned value.
      * @param selector any kind of selector in order to call fallback
      */
     function handleCallback(bytes4 selector) external {
