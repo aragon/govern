@@ -94,7 +94,7 @@ describe('Govern', function() {
   context('ERC-165', () => {
     const ERC165_INTERFACE_ID = '0x01ffc9a7'
     const ERC3000_EXEC_INTERFACE_ID = '0xc2d85afc'
-
+    
     it('supports ERC-165', async () => {
       expect(await govern.supportsInterface(ERC165_INTERFACE_ID)).to.equal(true)
     })
