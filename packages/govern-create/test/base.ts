@@ -48,12 +48,12 @@ describe('Govern Base Factory', function () {
     console.log('gas used:', gasUsed.toNumber())
   }
 
-  const GAS_TARGET = network.name !== 'coverage' ? 5.5e6 : 20e6
+  const GAS_TARGET = network.name !== 'hardhat' ? 5.5e6 : 20e6
   it(`deploys DAO under ${GAS_TARGET} gas`, async () => {
     await deployDAO(false, GAS_TARGET)
   })
 
-  const GAS_TARGET_PROXY = network.name !== 'coverage' ? 6e5 : 2e6
+  const GAS_TARGET_PROXY = network.name !== 'hardhat' ? 6e5 : 2e6
   it(`deploys DAO with proxies under ${GAS_TARGET_PROXY} gas`, async () => {
     await deployDAO(true, GAS_TARGET_PROXY)
   })

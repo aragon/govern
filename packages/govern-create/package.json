@@ -36,7 +36,7 @@
     "hardhat": "^2.0.4",
     "hardhat-deploy": "^0.7.0-beta.37",
     "hardhat-typechain": "^0.3.3",
-    "solidity-coverage": "^0.7.13",
+    "solidity-coverage": "^0.7.15",
     "tmp-promise": "^3.0.2",
     "ts-generator": "0.1.1",
     "ts-node": "^9.0.0",
@@ -49,7 +49,7 @@
     "compile": "hardhat compile --force",
     "compile:cached": "hardhat compile",
     "test": "hardhat test",
-    "coverage": "hardhat coverage --network coverage --temp artifacts",
+    "coverage": "hardhat coverage --temp artifacts",
     "deploy": "hardhat deploy",
     "deploy-govern": "hardhat deploy-govern",
     "verify": "hardhat etherscan-verify --license GPL-3.0 --solc-input --api-key process.env.ETHERSCAN_KEY"
