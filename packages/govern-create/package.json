@@ -33,7 +33,7 @@
     "dotenv": "^8.2.0",
     "ethereum-waffle": "^3.0.0",
     "ethers": "^5.0.0",
-    "hardhat": "^2.0.4",
+    "hardhat": "^2.1.1",
     "hardhat-deploy": "^0.7.0-beta.37",
     "hardhat-typechain": "^0.3.3",
     "solidity-coverage": "^0.7.15",
