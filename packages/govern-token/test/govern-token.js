@@ -1,16 +1,34 @@
-const { ecsign, ecrecover } = require('ethereumjs-util')
-const { keccak256 } = require('web3-utils')
-const { bn, MAX_UINT256, ZERO_ADDRESS } = require('@aragon/contract-helpers-test')
-const { assertBn, assertEvent, assertRevert } = require('@aragon/contract-helpers-test/src/asserts')
-const { createDomainSeparator } = require('./helpers/erc712')
-const { createPermitDigest, PERMIT_TYPEHASH } = require('./helpers/erc2612')
-const { createTransferWithAuthorizationDigest, TRANSFER_WITH_AUTHORIZATION_TYPEHASH } = require('./helpers/erc3009')
-const { tokenAmount } = require('./helpers/tokens')
+const { ecsign }  = require('ethereumjs-util')
+const { keccak256, toUtf8Bytes } = require('ethers/lib/utils')
+const { ZERO_ADDRESS }  = require('@aragon/contract-helpers-test')
+const { createDomainSeparator }  = require('./helpers/erc712')
+const { createPermitDigest, PERMIT_TYPEHASH }  = require('./helpers/erc2612')
+const { createTransferWithAuthorizationDigest, TRANSFER_WITH_AUTHORIZATION_TYPEHASH }  = require('./helpers/erc3009')
+const { BigNumber }  = require('ethers')
+const { expect }  = require('chai');
 
-const GovernToken = artifacts.require('GovernToken')
+const MAX_UINT256 = ethers.constants.MaxUint256
 
-contract('GovernToken', ([_, minter, newMinter, holder1, holder2, newHolder]) => {
+describe('GovernToken', async function ()  {
   let token
+  let signers
+  let minter, newMinter, holder1, holder2, newHolder
+  let GovernToken
+  
+  
+  before(async () => {
+    signers = await ethers.getSigners()
+    minter = await signers[0].getAddress();
+    newMinter = await signers[1].getAddress();
+    holder1 = await signers[2].getAddress();
+    holder2 = await signers[3].getAddress();
+    newHolder = await signers[4].getAddress();
+
+    GovernToken = await ethers.getContractFactory('GovernToken')
+  })
+
+
+  
 
   async function itTransfersCorrectly(fn, { from, to, value }) {
     const isMint = from === ZERO_ADDRESS
@@ -23,92 +41,100 @@ contract('GovernToken', ([_, minter, newMinter, holder1, holder2, newHolder]) =>
     const receipt = await fn(from, to, value)
 
     if (isMint) {
-      assertBn(await token.balanceOf(to), prevToBal.add(value), 'mint: to balance')
-      assertBn(await token.totalSupply(), prevSupply.add(value), 'mint: total supply')
+      expect(await token.balanceOf(to)).to.equal(prevToBal.add(value))
+      expect(await token.totalSupply()).to.equal(prevSupply.add(value))
     } else if (isBurn) {
-      assertBn(await token.balanceOf(from), prevFromBal.sub(value), 'burn: from balance')
-      assertBn(await token.totalSupply(), prevSupply.sub(value), 'burn: total supply')
+      expect(await token.balanceOf(from)).to.equal(prevFromBal.sub(value))
+      expect(await token.totalSupply()).to.equal(prevSupply.sub(value))
     } else {
-      assertBn(await token.balanceOf(from), prevFromBal.sub(value), 'transfer: from balance')
-      assertBn(await token.balanceOf(to), prevToBal.add(value), 'transfer: to balance')
-      assertBn(await token.totalSupply(), prevSupply, 'transfer: total supply')
+      expect(await token.balanceOf(from)).to.equal(prevFromBal.sub(value))
+      expect(await token.balanceOf(to)).to.equal(prevToBal.add(value))
+      expect(await token.totalSupply()).to.equal(prevSupply)
     }
 
-    assertEvent(receipt, 'Transfer', { expectedArgs: { from, to, value } })
+    await expect(receipt).to.emit(token, 'Transfer').withArgs(from, to, value)
+
   }
 
   async function itApprovesCorrectly(fn, { owner, spender, value }) {
     const receipt = await fn(owner, spender, value)
 
-    assertBn(await token.allowance(owner, spender), value, 'approve: allowance')
-    assertEvent(receipt, 'Approval', { expectedArgs: { owner, spender, value } })
+    expect(await token.allowance(owner, spender)).to.equal(value);
+    await expect(receipt).to.emit(token, 'Approval').withArgs(owner, spender, value);
   }
 
   beforeEach('deploy GovernToken', async () => {
-    token = await GovernToken.new(minter, 'Aragon Network Token', 'ANT', 18)
+    token = await GovernToken.deploy(minter, 'Aragon Network Token', 'ANT', 18)
 
-    await token.mint(holder1, tokenAmount(100), { from: minter })
-    await token.mint(holder2, tokenAmount(200), { from: minter })
+    await token.mint(holder1, BigNumber.from(100))
+    await token.mint(holder2, BigNumber.from(200))
   })
 
   it('set up the token correctly', async () => {
-    assert.equal(await token.name(), 'Aragon Network Token', 'token: name')
-    assert.equal(await token.symbol(), 'ANT', 'token: symbol')
-    assert.equal(await token.decimals(), '18', 'token: decimals')
+    expect(await token.name()).to.equal("Aragon Network Token")
+    expect(await token.symbol()).to.equal("ANT")
+    expect(await token.decimals()).to.equal(18)
 
-    assertBn(await token.totalSupply(), tokenAmount(300))
-    assertBn(await token.balanceOf(holder1), tokenAmount(100))
-    assertBn(await token.balanceOf(holder2), tokenAmount(200))
+
+    expect(await token.totalSupply()).to.equal(BigNumber.from(300))
+    expect(await token.balanceOf(holder1)).to.equal(BigNumber.from(100));
+    expect(await token.balanceOf(holder2)).to.equal(BigNumber.from(200));
   })
 
   context('mints', () => {
     context('is minter', () => {
       it('can mint tokens', async () => {
         await itTransfersCorrectly(
-          (_, to, value) => token.mint(to, value, { from: minter }),
+          (_, to, value) => token.mint(to, value),
           {
             from: ZERO_ADDRESS,
             to: newHolder,
-            value: tokenAmount(100)
+            value: BigNumber.from(100)
           }
         )
       })
 
       it('can change minter', async () => {
-        const receipt = await token.changeMinter(newMinter, { from: minter })
-
-        assert.equal(await token.minter(), newMinter, 'minter: changed')
-        assertEvent(receipt, 'ChangeMinter', { expectedArgs: { minter: newMinter } })
+        const receipt = await token.changeMinter(newMinter);
+        expect(await token.minter()).to.equal(newMinter);
+        await expect(receipt).to.emit(token, 'ChangeMinter').withArgs(newMinter);
       })
     })
 
     context('not minter', () => {
       it('cannot mint tokens', async () => {
-        await assertRevert(token.mint(newHolder, tokenAmount(100), { from: holder1 }), 'token: not minter')
+        token = token.connect(signers[2]) // holder1
+        await expect(token.mint(newHolder, BigNumber.from(100))).to.be.revertedWith('token: not minter');
       })
 
       it('cannot change minter', async () => {
-        await assertRevert(token.changeMinter(newMinter, { from: holder1 }), 'token: not minter')
+        token = token.connect(signers[2]) // holder1
+        await expect(token.changeMinter(newHolder)).to.be.revertedWith('token: not minter');
       })
     })
   })
 
   context('transfers', () => {
     context('holds bag', () => {
+      
+      beforeEach(() => {
+        token = token.connect(signers[2]) // holder1
+      })
+      
       it('can transfer tokens', async () => {
         await itTransfersCorrectly(
-          (from, to, value) => token.transfer(to, value, { from }),
+          (from, to, value) => token.transfer(to, value),
           {
             from: holder1,
             to: newHolder,
-            value: (await token.balanceOf(holder1)).sub(tokenAmount(1))
+            value: (await token.balanceOf(holder1)).sub(BigNumber.from(1))
           }
         )
       })
 
       it('can transfer all tokens', async () => {
         await itTransfersCorrectly(
-          (from, to, value) => token.transfer(to, value, { from }),
+          (from, to, value) => token.transfer(to, value),
           {
             from: holder1,
             to: newHolder,
@@ -118,165 +144,164 @@ contract('GovernToken', ([_, minter, newMinter, holder1, holder2, newHolder]) =>
       })
 
       it('cannot transfer above balance', async () => {
-        await assertRevert(
-          token.transfer(newHolder, (await token.balanceOf(holder1)).add(bn('1')), { from: holder1 }),
-          'math: underflow'
-        )
+        const balance = (await token.balanceOf(holder1)).add(BigNumber.from(1))
+        await expect(token.transfer(newHolder, balance)).to.be.revertedWith('math: underflow');
       })
 
       it('cannot transfer to token', async () => {
-        await assertRevert(
-          token.transfer(token.address, bn('1'), { from: holder1 }),
-          'token: bad to'
-        )
+        await expect(token.transfer(token.address, BigNumber.from(1))).to.be.revertedWith('token: bad to');
       })
 
       it('cannot transfer to zero address', async () => {
-        await assertRevert(
-          token.transfer(ZERO_ADDRESS, bn('1'), { from: holder1 }),
-          'token: bad to'
-        )
+        await expect(token.transfer(ZERO_ADDRESS, BigNumber.from(1))).to.be.revertedWith('token: bad to');
       })
     })
 
     context('bagless', () => {
+
+      beforeEach(() => {
+        token = token.connect(signers[4]); // newHolder
+      })
       it('cannot transfer any', async () => {
-        await assertRevert(
-          token.transfer(holder1, bn('1'), { from: newHolder }),
-          'math: underflow'
-        )
+        await expect(token.transfer(holder1, BigNumber.from(1))).to.be.revertedWith('math: underflow');
       })
     })
   })
 
   context('approvals', () => {
-    const owner = holder1
-    const spender = newHolder
+    let owner
+    let spender
+
+    before(() => {
+      owner = holder1;
+      spender = newHolder;
+    })
 
     context('has allowance', () => {
-      const value = tokenAmount(50)
+      const value = BigNumber.from(50)
 
       beforeEach(async () => {
-        await token.approve(spender, value, { from: owner })
+        token = token.connect(signers[2]); // holder1
+        await token.approve(spender, value);
+        token = token.connect(signers[4]); // newHolder
       })
 
       it('can change allowance', async () => {
+        token  = token.connect(signers[2]); // holder1
         await itApprovesCorrectly(
-          (owner, spender, value) => token.approve(spender, value, { from: owner }),
-          { owner, spender, value: value.add(tokenAmount(10)) }
+          (owner, spender, value) => token.approve(spender, value),
+          { owner, spender, value: value.add(BigNumber.from(10)) }
         )
       })
 
       it('can transfer below allowance', async () => {
         await itTransfersCorrectly(
-          (from, to, value) => token.transferFrom(from, to, value, { from: spender }),
+          (from, to, value) => token.transferFrom(from, to, value),
           {
             from: owner,
             to: spender,
-            value: value.sub(tokenAmount(1))
+            value: value.sub(BigNumber.from(1))
           }
         )
       })
 
       it('can transfer all of allowance', async () => {
         await itTransfersCorrectly(
-          (from, to, value) => token.transferFrom(from, to, value, { from: spender }),
+          (from, to, value) => token.transferFrom(from, to, value),
           {
             from: owner,
             to: spender,
-            value: value.sub(tokenAmount(1))
+            value: value.sub(BigNumber.from(1))
           }
         )
       })
 
       it('cannot transfer above balance', async () => {
-        await assertRevert(
-          token.transferFrom(owner, spender, value.add(bn('1')), { from: spender }),
-          'math: underflow'
-        )
+        await expect(token.transferFrom(owner, spender, value.add(BigNumber.from(1)))).to.be.revertedWith('math: underflow');
+
       })
 
       it('cannot transfer to token', async () => {
-        await assertRevert(
-          token.transferFrom(owner, token.address, bn('1'), { from: spender }),
-          'token: bad to'
-        )
+        await expect(token.transferFrom(owner, token.address, BigNumber.from(1))).to.be.revertedWith('token: bad to');
       })
 
       it('cannot transfer to zero address', async () => {
-        await assertRevert(
-          token.transferFrom(owner, ZERO_ADDRESS, bn('1'), { from: spender }),
-          'token: bad to'
-        )
+        await expect(token.transferFrom(owner, ZERO_ADDRESS, BigNumber.from(1))).to.be.revertedWith('token: bad to');
       })
     })
+    
 
     context('has infinity allowance', () => {
       beforeEach(async () => {
-        await token.approve(spender, MAX_UINT256, { from: owner })
+        token = token.connect(signers[2]) // holder1
+        await token.approve(spender, MAX_UINT256)
       })
 
       it('can change allowance', async () => {
         await itApprovesCorrectly(
-          (owner, spender, value) => token.approve(spender, value, { from: owner }),
-          { owner, spender, value: tokenAmount(10) }
+          (owner, spender, value) => token.approve(spender, value),
+          { owner, spender, value: BigNumber.from(10) }
         )
       })
 
       it('can transfer without changing allowance', async () => {
+        token = token.connect(signers[4]) // newHolder
         await itTransfersCorrectly(
-          (from, to, value) => token.transferFrom(from, to, value, { from: spender }),
+          (from, to, value) => token.transferFrom(from, to, value),
           {
             from: owner,
             to: spender,
             value: await token.balanceOf(owner)
           }
         )
-
-        assertBn(await token.allowance(owner, spender), MAX_UINT256, 'approve: stays infinity')
+        expect(await token.allowance(owner,spender)).to.equal(MAX_UINT256);
       })
 
       it('cannot transfer above balance', async () => {
-        await assertRevert(
-          token.transferFrom(owner, spender, (await token.balanceOf(owner)).add(bn('1')), { from: spender }),
-          'math: underflow'
-        )
+        token = token.connect(signers[4]);
+        const balance = (await token.balanceOf(owner)).add(BigNumber.from('1'))
+        await expect(token.transferFrom(owner, spender, balance)).to.be.revertedWith('math: underflow');
       })
     })
 
     context('no allowance', () => {
       it('can increase allowance', async () => {
+        token = token.connect(signers[2]); // holder1
         await itApprovesCorrectly(
-          (owner, spender, value) => token.approve(spender, value, { from: owner }),
-          { owner, spender, value: tokenAmount(10) }
+          (owner, spender, value) => token.approve(spender, value),
+          { owner, spender, value: BigNumber.from(10) }
         )
       })
 
       it('cannot transfer', async () => {
-        await assertRevert(
-          token.transferFrom(owner, spender, bn('1'), { from: spender }),
-          'math: underflow'
-        )
+        token = token.connect(signers[4]); // newHolder
+        await expect(token.transferFrom(owner, spender, BigNumber.from(1))).to.be.revertedWith('math: underflow');
       })
     })
   })
 
+
   context('burns', () => {
     context('holds bag', () => {
+      
+      beforeEach(() => {
+        token = token.connect(signers[2]) // holder1
+      })
+
       it('can burn tokens', async () => {
         await itTransfersCorrectly(
-          (from, to, value) => token.burn(value, { from }),
+          (from, to, value) => token.burn(value),
           {
             from: holder1,
             to: ZERO_ADDRESS,
-            value: (await token.balanceOf(holder1)).sub(tokenAmount(1))
+            value: (await token.balanceOf(holder1)).sub(BigNumber.from(1))
           }
         )
       })
 
       it('can burn all tokens', async () => {
         await itTransfersCorrectly(
-          (from, to, value) => token.burn(value, { from }),
+          (from, to, value) => token.burn(value),
           {
             from: holder1,
             to: ZERO_ADDRESS,
@@ -286,33 +311,34 @@ contract('GovernToken', ([_, minter, newMinter, holder1, holder2, newHolder]) =>
       })
 
       it('cannot burn above balance', async () => {
-        await assertRevert(
-          token.burn((await token.balanceOf(holder1)).add(bn('1')), { from: holder1 }),
-          'math: underflow'
-        )
+        const value = (await token.balanceOf(holder1)).add(BigNumber.from(1));
+        await expect(token.burn(value)).to.be.revertedWith('math: underflow');
       })
     })
 
     context('bagless', () => {
+      beforeEach(() => {
+        token = token.connect(signers[4]) // newHolder
+      })
+
       it('cannot burn any', async () => {
-        await assertRevert(
-          token.burn(bn('1'), { from: newHolder }),
-          'math: underflow'
-        )
+        await expect(token.burn(BigNumber.from(1))).to.be.revertedWith('math: underflow');
       })
     })
 
     it('can burn all tokens', async () => {
+      token = token.connect(signers[2]) // holder1
       await itTransfersCorrectly(
-        (from, to, value) => token.burn(value, { from }),
+        (from, to, value) => token.burn(value),
         {
           from: holder1,
           to: ZERO_ADDRESS,
           value: await token.balanceOf(holder1)
         }
       )
+      token = token.connect(signers[3]) // holder2
       await itTransfersCorrectly(
-        (from, to, value) => token.burn(value, { from }),
+        (from, to, value) => token.burn(value),
         {
           from: holder2,
           to: ZERO_ADDRESS,
@@ -320,7 +346,8 @@ contract('GovernToken', ([_, minter, newMinter, holder1, holder2, newHolder]) =>
         }
       )
 
-      assertBn(await token.totalSupply(), 0, 'burn: no total supply')
+      expect(await token.totalSupply()).to.equal(0);
+
     })
   })
 
@@ -328,21 +355,23 @@ contract('GovernToken', ([_, minter, newMinter, holder1, holder2, newHolder]) =>
     it('has the correct ERC712 domain separator', async () => {
       const domainSeparator = createDomainSeparator(
         await token.name(),
-        bn('1'),
+        '1',
         await token.getChainId(),
         token.address
       )
-      assert.equal(await token.getDomainSeparator(), domainSeparator, 'erc712: domain')
+      
+      expect(await token.getDomainSeparator()).to.equal(domainSeparator);
     })
   })
 
   context('ERC-2612', () => {
     let owner, ownerPrivKey
-    const spender = newHolder
+    let spender
 
     async function createPermitSignature(owner, spender, value, nonce, deadline) {
       const digest = await createPermitDigest(token, owner, spender, value, nonce, deadline)
 
+      // TODO:change ecsign to ethers's signMessage
       const { r, s, v } = ecsign(
         Buffer.from(digest.slice(2), 'hex'),
         Buffer.from(ownerPrivKey.slice(2), 'hex')
@@ -352,64 +381,67 @@ contract('GovernToken', ([_, minter, newMinter, holder1, holder2, newHolder]) =>
     }
 
     before(async () => {
-      const wallet = web3.eth.accounts.create('erc2612')
+      const wallet = ethers.Wallet.createRandom();
       owner = wallet.address
       ownerPrivKey = wallet.privateKey
+      spender = newHolder
     })
 
     beforeEach(async () => {
-      await token.mint(owner, tokenAmount(50), { from: minter })
+      token = token.connect(signers[0]) // minter
+      await token.mint(owner, BigNumber.from(50))
     })
 
     it('has the correct permit typehash', async () => {
-      assert.equal(await token.PERMIT_TYPEHASH(), PERMIT_TYPEHASH, 'erc2612: typehash')
+      expect(await token.PERMIT_TYPEHASH()).to.equal(PERMIT_TYPEHASH);
     })
 
     it('can set allowance through permit', async () => {
-      const deadline = MAX_UINT256
-
-      const firstValue = tokenAmount(100)
+      const deadline = MAX_UINT256;
+      
+      const firstValue = BigNumber.from(100)
       const firstNonce = await token.nonces(owner)
       const firstSig = await createPermitSignature(owner, spender, firstValue, firstNonce, deadline)
       const firstReceipt = await token.permit(owner, spender, firstValue, deadline, firstSig.v, firstSig.r, firstSig.s)
 
-      assertBn(await token.allowance(owner, spender), firstValue, 'erc2612: first permit allowance')
-      assertBn(await token.nonces(owner), firstNonce.add(bn(1)), 'erc2612: first permit nonce')
-      assertEvent(firstReceipt, 'Approval', { expectedArgs: { owner, spender, value: firstValue } })
+      expect(await token.allowance(owner, spender)).to.equal(firstValue)
+      expect(await token.nonces(owner)).to.equal(firstNonce.add(BigNumber.from(1)))
+      await expect(firstReceipt).to.emit(token, 'Approval').withArgs(owner, spender, firstValue);
 
-      const secondValue = tokenAmount(500)
+      const secondValue = BigNumber.from(500)
       const secondNonce = await token.nonces(owner)
       const secondSig = await createPermitSignature(owner, spender, secondValue, secondNonce, deadline)
       const secondReceipt = await token.permit(owner, spender, secondValue, deadline, secondSig.v, secondSig.r, secondSig.s)
 
-      assertBn(await token.allowance(owner, spender), secondValue, 'erc2612: second permit allowance')
-      assertBn(await token.nonces(owner), secondNonce.add(bn(1)), 'erc2612: second permit nonce')
-      assertEvent(secondReceipt, 'Approval', { expectedArgs: { owner, spender, value: secondValue } })
+      expect(await token.allowance(owner, spender)).to.equal(secondValue)
+      expect(await token.nonces(owner)).to.equal(secondNonce.add(BigNumber.from(1)))
+      await expect(secondReceipt).to.emit(token, 'Approval').withArgs(owner, spender, secondValue);
     })
 
+
     it('cannot use wrong signature', async () => {
-      const deadline = MAX_UINT256
+      const deadline =  MAX_UINT256;
       const nonce = await token.nonces(owner)
 
-      const firstValue = tokenAmount(100)
-      const secondValue = tokenAmount(500)
+      const firstValue = BigNumber.from(100)
+      const secondValue = BigNumber.from(500)
       const firstSig = await createPermitSignature(owner, spender, firstValue, nonce, deadline)
       const secondSig = await createPermitSignature(owner, spender, secondValue, nonce, deadline)
 
       // Use a mismatching signature
-      await assertRevert(token.permit(owner, spender, firstValue, deadline, secondSig.v, secondSig.r, secondSig.s), 'token: bad sig')
+      await expect(token.permit(owner, spender, firstValue, deadline, secondSig.v, secondSig.r, secondSig.s)).to.be.revertedWith('token: bad sig')
     })
 
     it('cannot use expired permit', async () => {
-      const value = tokenAmount(100)
+      const value = BigNumber.from(100)
       const nonce = await token.nonces(owner)
 
       // Use a prior deadline
-      const now = bn((await web3.eth.getBlock('latest')).timestamp)
-      const deadline = now.sub(bn(60))
+      const now = BigNumber.from((await ethers.provider.getBlock('latest')).timestamp)
+      const deadline = now.sub(BigNumber.from(60))
 
       const { r, s, v } = await createPermitSignature(owner, spender, value, nonce, deadline)
-      await assertRevert(token.permit(owner, spender, value, deadline, v, r, s), 'token: auth expired')
+      await expect(token.permit(owner, spender, value, deadline, v, r, s)).to.be.revertedWith('token: auth expired')
     })
 
     it('cannot use surpassed permit', async () => {
@@ -417,20 +449,20 @@ contract('GovernToken', ([_, minter, newMinter, holder1, holder2, newHolder]) =>
       const nonce = await token.nonces(owner)
 
       // Generate two signatures with the same nonce and use one
-      const firstValue = tokenAmount(100)
-      const secondValue = tokenAmount(500)
+      const firstValue = BigNumber.from(100)
+      const secondValue = BigNumber.from(500)
       const firstSig = await createPermitSignature(owner, spender, firstValue, nonce, deadline)
       const secondSig = await createPermitSignature(owner, spender, secondValue, nonce, deadline)
 
       // Using one should disallow the other
       await token.permit(owner, spender, secondValue, deadline, secondSig.v, secondSig.r, secondSig.s)
-      await assertRevert(token.permit(owner, spender, firstValue, deadline, firstSig.v, firstSig.r, firstSig.s), 'token: bad sig')
+      await expect(token.permit(owner, spender, firstValue, deadline, firstSig.v, firstSig.r, firstSig.s)).to.be.revertedWith('token: bad sig')
     })
   })
 
   context('ERC-3009', () => {
     let from, fromPrivKey
-    const to = newHolder
+    let to
 
     async function createTransferWithAuthorizationSignature(from, to, value, validBefore, validAfter, nonce) {
       const digest = await createTransferWithAuthorizationDigest(token, from, to, value, validBefore, validAfter, nonce)
@@ -444,151 +476,170 @@ contract('GovernToken', ([_, minter, newMinter, holder1, holder2, newHolder]) =>
     }
 
     before(async () => {
-      const wallet = web3.eth.accounts.create('erc3009')
+      const wallet = ethers.Wallet.createRandom()
       from = wallet.address
       fromPrivKey = wallet.privateKey
+      to = newHolder
     })
 
     beforeEach(async () => {
-      await token.mint(from, tokenAmount(50), { from: minter })
+      token = token.connect(signers[0]) // minter
+      await token.mint(from, BigNumber.from(50))
     })
 
     it('has the correct transferWithAuthorization typehash', async () => {
-      assert.equal(await token.TRANSFER_WITH_AUTHORIZATION_TYPEHASH(), TRANSFER_WITH_AUTHORIZATION_TYPEHASH, 'erc3009: typehash')
+      expect(await token.TRANSFER_WITH_AUTHORIZATION_TYPEHASH()).to.equal(TRANSFER_WITH_AUTHORIZATION_TYPEHASH);
     })
 
     it('can transfer through transferWithAuthorization', async () => {
       const validAfter = 0
       const validBefore = MAX_UINT256
 
-      const firstNonce = keccak256('first')
-      const secondNonce = keccak256('second')
-      assert.equal(await token.authorizationState(from, firstNonce), false, 'erc3009: first auth unused')
-      assert.equal(await token.authorizationState(from, secondNonce), false, 'erc3009: second auth unused')
+      const firstNonce = keccak256(toUtf8Bytes('first'))
+      const secondNonce = keccak256(toUtf8Bytes('second'))
+      expect(await token.authorizationState(from, firstNonce)).to.equal(false);
+      expect(await token.authorizationState(from, secondNonce)).to.equal(false);
 
-      const firstValue = tokenAmount(25)
+      const firstValue = BigNumber.from(25)
       const firstSig = await createTransferWithAuthorizationSignature(from, to, firstValue, validAfter, validBefore, firstNonce)
       await itTransfersCorrectly(
         () => token.transferWithAuthorization(from, to, firstValue, validAfter, validBefore, firstNonce, firstSig.v, firstSig.r, firstSig.s),
         { from, to, value: firstValue }
       )
-      assert.equal(await token.authorizationState(from, firstNonce), true, 'erc3009: first auth')
+      expect(await token.authorizationState(from, firstNonce)).to.equal(true);
 
-      const secondValue = tokenAmount(10)
+      const secondValue = BigNumber.from(10)
       const secondSig = await createTransferWithAuthorizationSignature(from, to, secondValue, validAfter, validBefore, secondNonce)
       await itTransfersCorrectly(
         () => token.transferWithAuthorization(from, to, secondValue, validAfter, validBefore, secondNonce, secondSig.v, secondSig.r, secondSig.s),
         { from, to, value: secondValue }
       )
-      assert.equal(await token.authorizationState(from, secondNonce), true, 'erc3009: second auth')
+
+      expect(await token.authorizationState(from, secondNonce)).to.equal(true);
     })
 
     it('cannot transfer above balance', async () => {
-      const value = (await token.balanceOf(from)).add(bn('1'))
-      const nonce = keccak256('nonce')
+      const value = (await token.balanceOf(from)).add(BigNumber.from(1));
+      const nonce = keccak256(toUtf8Bytes('nonce'))
       const validAfter = 0
       const validBefore = MAX_UINT256
 
       const { r, s, v } = await createTransferWithAuthorizationSignature(from, to, value, validAfter, validBefore, nonce)
-      await assertRevert(
-        token.transferWithAuthorization(from, to, value, validAfter, validBefore, nonce, v, r, s),
-        'math: underflow'
-      )
+      
+      await expect(
+        token.transferWithAuthorization(
+          from, to, value, validAfter, validBefore, nonce, v, r, s
+        )
+      ).to.be.revertedWith('math: underflow')
+      
     })
 
     it('cannot transfer to token', async () => {
-      const value = tokenAmount(100)
-      const nonce = keccak256('nonce')
+      const value = BigNumber.from(100)
+      const nonce = keccak256(toUtf8Bytes('nonce'))
       const validAfter = 0
       const validBefore = MAX_UINT256
 
       const { r, s, v } = await createTransferWithAuthorizationSignature(from, token.address, value, validAfter, validBefore, nonce)
-      await assertRevert(
-        token.transferWithAuthorization(from, token.address, value, validAfter, validBefore, nonce, v, r, s),
-        'token: bad to'
-      )
+      
+      await expect(
+        token.transferWithAuthorization(
+          from, token.address, value, validAfter, validBefore, nonce, v, r, s
+        )
+      ).to.be.revertedWith('token: bad to')
+
     })
 
     it('cannot transfer to zero address', async () => {
-      const value = tokenAmount(100)
-      const nonce = keccak256('nonce')
+      const value = BigNumber.from(100)
+      const nonce = keccak256(toUtf8Bytes('nonce'))
       const validAfter = 0
       const validBefore = MAX_UINT256
 
       const { r, s, v } = await createTransferWithAuthorizationSignature(from, ZERO_ADDRESS, value, validAfter, validBefore, nonce)
-      await assertRevert(
-        token.transferWithAuthorization(from, ZERO_ADDRESS, value, validAfter, validBefore, nonce, v, r, s),
-        'token: bad to'
-      )
+      
+      await expect(
+        token.transferWithAuthorization(
+          from, ZERO_ADDRESS, value, validAfter, validBefore, nonce, v, r, s
+        )
+      ).to.be.revertedWith('token: bad to')
     })
 
     it('cannot use wrong signature', async () => {
       const validAfter = 0
       const validBefore = MAX_UINT256
 
-      const firstNonce = keccak256('first')
-      const firstValue = tokenAmount(25)
+      const firstNonce = keccak256(toUtf8Bytes('first'))
+      const firstValue = BigNumber.from(25)
       const firstSig = await createTransferWithAuthorizationSignature(from, to, firstValue, validAfter, validBefore, firstNonce)
 
-      const secondNonce = keccak256('second')
-      const secondValue = tokenAmount(10)
+      const secondNonce = keccak256(toUtf8Bytes('second'))
+      const secondValue = BigNumber.from(10)
       const secondSig = await createTransferWithAuthorizationSignature(from, to, secondValue, validAfter, validBefore, secondNonce)
 
       // Use a mismatching signature
-      await assertRevert(
-        token.transferWithAuthorization(from, to, firstValue, validAfter, validBefore, firstNonce, secondSig.v, secondSig.r, secondSig.s),
-        'token: bad sig'
-      )
+      
+      await expect(
+        token.transferWithAuthorization(
+          from, to, firstValue, validAfter, validBefore, firstNonce, secondSig.v, secondSig.r, secondSig.s
+        )
+      ).to.be.revertedWith('token: bad sig')
     })
 
     it('cannot use before valid period', async () => {
-      const value = tokenAmount(100)
-      const nonce = keccak256('nonce')
+      const value = BigNumber.from(100)
+      const nonce = keccak256(toUtf8Bytes('nonce'))
 
       // Use a future period
-      const now = bn((await web3.eth.getBlock('latest')).timestamp)
-      const validAfter = now.add(bn(60))
+      const now = BigNumber.from((await ethers.provider.getBlock('latest')).timestamp)
+      const validAfter = now.add(BigNumber.from(60))
       const validBefore = MAX_UINT256
 
       const { r, s, v } = await createTransferWithAuthorizationSignature(from, to, value, validAfter, validBefore, nonce)
-      await assertRevert(
-        token.transferWithAuthorization(from, to, value, validAfter, validBefore, nonce, v, r, s),
-        'token: auth wait'
-      )
+      
+      await expect(
+        token.transferWithAuthorization(
+          from, to, value, validAfter, validBefore, nonce, v, r, s
+        )
+      ).to.be.revertedWith('token: auth wait')
     })
 
     it('cannot use after valid period', async () => {
-      const value = tokenAmount(100)
-      const nonce = keccak256('nonce')
+      const value = BigNumber.from(100)
+      const nonce = keccak256(toUtf8Bytes('nonce'))
 
       // Use a prior period
-      const now = bn((await web3.eth.getBlock('latest')).timestamp)
-      const validBefore = now.sub(bn(60))
+      const now = BigNumber.from((await ethers.provider.getBlock('latest')).timestamp)
+      const validBefore = now.sub(BigNumber.from(60))
       const validAfter = 0
 
       const { r, s, v } = await createTransferWithAuthorizationSignature(from, to, value, validAfter, validBefore, nonce)
-      await assertRevert(
-        token.transferWithAuthorization(from, to, value, validAfter, validBefore, nonce, v, r, s),
-        'token: auth expired'
-      )
+      
+      await expect(
+        token.transferWithAuthorization(
+          from, to, value, validAfter, validBefore, nonce, v, r, s
+        )
+      ).to.be.revertedWith('token: auth expired')
     })
 
     it('cannot use expired nonce', async () => {
-      const nonce = keccak256('nonce')
+      const nonce = keccak256(toUtf8Bytes('nonce'))
       const validAfter = 0
       const validBefore = MAX_UINT256
 
-      const firstValue = tokenAmount(25)
-      const secondValue = tokenAmount(10)
+      const firstValue = BigNumber.from(25)
+      const secondValue = BigNumber.from(10)
       const firstSig = await createTransferWithAuthorizationSignature(from, to, firstValue, validAfter, validBefore, nonce)
       const secondSig = await createTransferWithAuthorizationSignature(from, to, secondValue, validAfter, validBefore, nonce)
 
       // Using one should disallow the other
       await token.transferWithAuthorization(from, to, firstValue, validAfter, validBefore, nonce, firstSig.v, firstSig.r, firstSig.s)
-      await assertRevert(
-        token.transferWithAuthorization(from, to, secondValue, validAfter, validBefore, nonce, secondSig.v, secondSig.r, secondSig.s),
-        'token: auth used'
-      )
+      
+      await expect(
+        token.transferWithAuthorization(
+          from, to, secondValue, validAfter, validBefore, nonce, secondSig.v, secondSig.r, secondSig.s
+        )
+      ).to.be.revertedWith('token: auth used')
     })
   })
 })

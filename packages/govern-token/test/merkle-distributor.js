@@ -1,33 +1,38 @@
-const { assertBn, assertEvent, assertRevert } = require('@aragon/contract-helpers-test/src/asserts')
 const { BigNumber } = require('ethers')
 
 const BalanceTree = require('./helpers/merkle-tree/balance-tree').default;
-
-const TestERC20 = artifacts.require('TestERC20')
-const Distributor = artifacts.require('MerkleDistributor')
+const  { expect } =require('chai');
 
 const ZERO_BYTES32 = `0x${`0`.repeat(64)}`
 
-contract('MerkleDistributor', (wallets) => {
+describe('MerkleDistributor', () => {
+    let wallet0, wallet1
+    let TestERC20, Distributor
 
-    let wallet0 = wallets[0];
-    let wallet1 = wallets[1];
+    before(async () => {
+        signers = await ethers.getSigners()
+        wallet0 = await signers[0].getAddress(); // by default, contracts get deployed from the 0th address
+        wallet1 = await signers[1].getAddress();
+
+        TestERC20 = await ethers.getContractFactory('TestERC20')
+        Distributor = await ethers.getContractFactory('MerkleDistributor')
+    })
 
     beforeEach('deploy token', async () => {
-        token = await TestERC20.new('Aragon Network Token', 'ANT', 0, { from : wallet0 })
+        token = await TestERC20.deploy('Aragon Network Token', 'ANT', 0)
     })
     
     describe('#token', () => {
         it('returns the token address', async () => {
-            const distributor = await Distributor.new(token.address, ZERO_BYTES32, { from : wallet0 })
-            expect(await distributor.token()).to.eq(token.address)
+            const distributor = await Distributor.deploy(token.address, ZERO_BYTES32)
+            expect(await distributor.token()).to.equal(token.address)
         })
     })
 
     describe('#merkleRoot', () => {
         it('returns the zero merkle root', async () => {
-            const distributor = await Distributor.new(token.address, ZERO_BYTES32, { from : wallet0 })
-            expect(await distributor.merkleRoot()).to.eq(ZERO_BYTES32)
+            const distributor = await Distributor.deploy(token.address, ZERO_BYTES32)
+            expect(await distributor.merkleRoot()).to.equal(ZERO_BYTES32)
         })
     })
 
@@ -40,66 +45,66 @@ contract('MerkleDistributor', (wallets) => {
                 { account: wallet1, amount: BigNumber.from(101) },
             ])
 
-            distributor = await Distributor.new(token.address, tree.getHexRoot(), { from : wallet0 })
+            distributor = await Distributor.deploy(token.address, tree.getHexRoot())
             await token.setBalance(distributor.address, 201)
         })
   
         it('successful claim', async () => {
             const proof0 = tree.getProof(0, wallet0, BigNumber.from(100))
             const receipt1 = await distributor.claim(0, wallet0, 100, proof0)
-            assertEvent(receipt1, 'Claimed', { expectedArgs:  { index:0, to:wallet0, amount: 100 } })
+            await expect(receipt1).to.emit(distributor, 'Claimed').withArgs(0, wallet0, 100);
 
             const proof1 = tree.getProof(1, wallet1, BigNumber.from(101))
             const receipt2 = await distributor.claim(1, wallet1, 101, proof1)
-            assertEvent(receipt2, 'Claimed', { expectedArgs:  { index:1, to:wallet1, amount: 101 } })
+            await expect(receipt2).to.emit(distributor, 'Claimed').withArgs(1, wallet1, 101);
         })
 
         it('transfers the token', async () => {
             const proof0 = tree.getProof(0, wallet0, BigNumber.from(100))
-            assertBn(await token.balanceOf(wallet0), 0)
+            expect(await token.balanceOf(wallet0)).to.equal(0)
 
             await distributor.claim(0, wallet0, 100, proof0)
-            assertBn(await token.balanceOf(wallet0), 100)
+            expect(await token.balanceOf(wallet0)).to.equal(100)
         })
 
         it('should not fail and should not transfer', async () => {
             const proof0 = tree.getProof(0, wallet0, BigNumber.from(100))
             await token.setBalance(distributor.address, 99)
             await distributor.claim(0, wallet0, 100, proof0)
-            assertBn(await token.balanceOf(distributor.address), 99)
-            assertBn(await token.balanceOf(wallet0), 0)
+            expect(await token.balanceOf(distributor.address)).to.equal(99)
+            expect(await token.balanceOf(wallet0)).to.equal(0)
         })
 
         it('sets #isClaimed', async () => {
-            expect(await distributor.isClaimed(0)).to.eq(false)
-            expect(await distributor.isClaimed(1)).to.eq(false)
+            expect(await distributor.isClaimed(0)).to.equal(false)
+            expect(await distributor.isClaimed(1)).to.equal(false)
 
             const proof = tree.getProof(0, wallet0, BigNumber.from(100))
             await distributor.claim(0, wallet0, 100, proof)
-            expect(await distributor.isClaimed(0)).to.eq(true)
-            expect(await distributor.isClaimed(1)).to.eq(false)
+            expect(await distributor.isClaimed(0)).to.equal(true)
+            expect(await distributor.isClaimed(1)).to.equal(false)
         })
 
         it('returns unclaimed balance', async () => {
             const proof = tree.getProof(0, wallet0, BigNumber.from(100))
-            assertBn(await distributor.unclaimedBalance(0, wallet0, 100, proof), 100);
+            expect(await distributor.unclaimedBalance(0, wallet0, 100, proof)).to.equal(100);
         })
 
         it('returns 0 when it is claimed', async () => {
             const proof = tree.getProof(0, wallet0, BigNumber.from(100))
             await distributor.claim(0, wallet0, 100, proof)
-            assertBn(await distributor.unclaimedBalance(0, wallet0, 100, proof), 0);
+            expect(await distributor.unclaimedBalance(0, wallet0, 100, proof)).to.equal(0)
         })
 
         it('returns 0 for invalid proof', async () => {
-            assertBn(await distributor.unclaimedBalance(0, wallet0, 100, [ZERO_BYTES32]), 0);
+            expect(await distributor.unclaimedBalance(0, wallet0, 100, [ZERO_BYTES32])).to.equal(0)
         })
 
         
         it('cannot allow two claims', async () => {
             const proof0 = tree.getProof(0, wallet0, BigNumber.from(100))
             await distributor.claim(0, wallet0, 100, proof0)
-            await assertRevert(distributor.claim(0, wallet0, 100, proof0), 'dist: already claimed')
+            await expect(distributor.claim(0, wallet0, 100, proof0)).to.be.revertedWith('dist: already claimed');
         })
 
         it('cannot claim more than once: 0 and then 1', async () => {
@@ -108,15 +113,8 @@ contract('MerkleDistributor', (wallets) => {
             const proof2 = tree.getProof(1, wallet1, BigNumber.from(101))
             await distributor.claim(1, wallet1, 101, proof2)
             
-            await assertRevert(
-                distributor.claim(
-                    0, 
-                    wallet0, 
-                    100, 
-                    tree.getProof(0, wallet0, BigNumber.from(100))
-                ), 
-                'dist: already claimed'
-            )
+            await expect(distributor.claim(0, wallet0,  100, proof1)).to.be.revertedWith('dist: already claimed');
+          
         })
 
         it('cannot claim more than once: 1 and then 0', async () => {
@@ -125,26 +123,17 @@ contract('MerkleDistributor', (wallets) => {
             const proof2 = tree.getProof(0, wallet0, BigNumber.from(100))
             await distributor.claim(0, wallet0, 100, proof2)
             
-
-            await assertRevert(
-                distributor.claim(
-                    1, 
-                    wallet1, 
-                    101, 
-                    tree.getProof(1, wallet1, BigNumber.from(101))
-                ), 
-                'dist: already claimed'
-            )
+            await expect(distributor.claim(1, wallet1,  101, proof1)).to.be.revertedWith('dist: already claimed');
         })
 
         it('cannot claim for address other than proof', async () => {
             const proof0 = tree.getProof(0, wallet0, BigNumber.from(100))
-            await assertRevert(distributor.claim(1, wallet1, 101, proof0), 'dist: proof failed')
+            await expect(distributor.claim(1, wallet1,  101, proof0)).to.be.revertedWith('dist: proof failed');
         })
 
         it('cannot claim more than proof', async () => {
             const proof0 = tree.getProof(0, wallet0, BigNumber.from(100))
-            await assertRevert(distributor.claim(0, wallet0, 101, proof0), 'dist: proof failed')
+            await expect(distributor.claim(0, wallet0,  101, proof0)).to.be.revertedWith('dist: proof failed');
         })
 
     })
@@ -154,26 +143,32 @@ contract('MerkleDistributor', (wallets) => {
         let distributor, tree
         
         beforeEach('deploy', async () => {
+
+            const signerAddresses = await Promise.all(signers.map(signer => signer.getAddress()))
+
             tree = new BalanceTree(
-                wallets.map((wallet, ix) => {
-                  return { account: wallet, amount: BigNumber.from(ix + 1) }
+                signerAddresses.map((address, ix) => {
+                  return { account: address, amount: BigNumber.from(ix + 1) }
                 })
             )
 
-            distributor = await Distributor.new(token.address, tree.getHexRoot(), { from : wallet0 })
+            distributor = await Distributor.deploy(token.address, tree.getHexRoot())
             await token.setBalance(distributor.address, 201)
         })
   
         it('claim index 4', async () => {
-          const proof = tree.getProof(4, wallets[4], BigNumber.from(5))
-          const receipt = await distributor.claim(4, wallets[4], 5, proof)
-          assertEvent(receipt, 'Claimed', { expectedArgs:  { index:4, to:wallets[4], amount: 5 } })
+            const signer = await signers[4].getAddress();
+
+            const proof = tree.getProof(4, signer, BigNumber.from(5))
+            const receipt = await distributor.claim(4, signer, 5, proof)
+            await expect(receipt).to.emit(distributor, 'Claimed').withArgs(4, signer, 5);
         })
   
         it('claim index 9', async () => {
-            const proof = tree.getProof(9, wallets[9], BigNumber.from(10))
-            const receipt = await distributor.claim(9, wallets[9], 10, proof)
-            assertEvent(receipt, 'Claimed', { expectedArgs:  { index:9, to:wallets[9], amount: 10 } })
+            const signer = await signers[9].getAddress();
+            const proof = tree.getProof(9, signer, BigNumber.from(10))
+            const receipt = await distributor.claim(9, signer, 10, proof)
+            await expect(receipt).to.emit(distributor, 'Claimed').withArgs(9, signer, 10);
         })
   
     })
