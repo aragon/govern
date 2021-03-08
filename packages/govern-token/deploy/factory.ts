@@ -1,8 +1,3 @@
-const { print } = require('../lib/utils')
-
-
-
-
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployFunction } from 'hardhat-deploy/types'
 

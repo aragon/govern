@@ -1,6 +1,5 @@
 import { config as dotenvConfig } from 'dotenv'
 import { resolve } from 'path'
-dotenvConfig({ path: resolve(__dirname, './.env') })
 
 import { HardhatUserConfig } from 'hardhat/types'
 import '@nomiclabs/hardhat-ethers'
@@ -11,6 +10,7 @@ import 'hardhat-typechain'
 import 'solidity-coverage'
 import './tasks/token'
 
+dotenvConfig({ path: resolve(__dirname, './.env') })
 
 const PRIV_KEYS = process.env.PRIVATE_KEY ? [`0x${process.env.PRIVATE_KEY}`] : [];
 
