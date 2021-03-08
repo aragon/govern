@@ -1,5 +1,4 @@
-import { bufferToHex, keccak256 } from 'ethereumjs-util'
-import { hexlify, toUtf8Bytes } from 'ethers/lib/utils'
+import { hexlify, arrayify, keccak256 } from 'ethers/lib/utils'
 
 export default class MerkleTree {
   
@@ -58,8 +57,7 @@ export default class MerkleTree {
       return first
     }
 
-    // TODO: change keccak256 to eth ethers/lib/utils's keccak256
-    return keccak256(MerkleTree.sortAndConcat(first, second))
+    return Buffer.from(arrayify(keccak256(MerkleTree.sortAndConcat(first, second))))
   }
 
   getRoot(): Buffer {

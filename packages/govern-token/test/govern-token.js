@@ -1,5 +1,4 @@
-const { ecsign }  = require('ethereumjs-util')
-const { keccak256, toUtf8Bytes } = require('ethers/lib/utils')
+const { keccak256, toUtf8Bytes, SigningKey } = require('ethers/lib/utils')
 const { ZERO_ADDRESS }  = require('@aragon/contract-helpers-test')
 const { createDomainSeparator }  = require('./helpers/erc712')
 const { createPermitDigest, PERMIT_TYPEHASH }  = require('./helpers/erc2612')
@@ -17,11 +16,11 @@ describe('GovernToken', async function ()  {
   
   
   before(async () => {
-    signers = await ethers.getSigners()
-    minter = await signers[0].getAddress();
+    signers   = await ethers.getSigners()
+    minter    = await signers[0].getAddress();
     newMinter = await signers[1].getAddress();
-    holder1 = await signers[2].getAddress();
-    holder2 = await signers[3].getAddress();
+    holder1   = await signers[2].getAddress();
+    holder2   = await signers[3].getAddress();
     newHolder = await signers[4].getAddress();
 
     GovernToken = await ethers.getContractFactory('GovernToken')
@@ -35,8 +34,8 @@ describe('GovernToken', async function ()  {
     const isBurn = to === ZERO_ADDRESS
 
     const prevFromBal = await token.balanceOf(from)
-    const prevToBal = await token.balanceOf(to)
-    const prevSupply = await token.totalSupply()
+    const prevToBal   = await token.balanceOf(to)
+    const prevSupply  = await token.totalSupply()
 
     const receipt = await fn(from, to, value)
 
@@ -371,12 +370,8 @@ describe('GovernToken', async function ()  {
     async function createPermitSignature(owner, spender, value, nonce, deadline) {
       const digest = await createPermitDigest(token, owner, spender, value, nonce, deadline)
 
-      // TODO:change ecsign to ethers's signMessage
-      const { r, s, v } = ecsign(
-        Buffer.from(digest.slice(2), 'hex'),
-        Buffer.from(ownerPrivKey.slice(2), 'hex')
-      )
-
+      const { r, s, v } = new SigningKey(ownerPrivKey).signDigest(digest);
+    
       return { r, s, v }
     }
 
@@ -461,24 +456,21 @@ describe('GovernToken', async function ()  {
   })
 
   context('ERC-3009', () => {
-    let from, fromPrivKey
+    let from, ownerPrivKey
     let to
 
     async function createTransferWithAuthorizationSignature(from, to, value, validBefore, validAfter, nonce) {
       const digest = await createTransferWithAuthorizationDigest(token, from, to, value, validBefore, validAfter, nonce)
 
-      const { r, s, v } = ecsign(
-        Buffer.from(digest.slice(2), 'hex'),
-        Buffer.from(fromPrivKey.slice(2), 'hex')
-      )
-
+      const { r, s, v } = new SigningKey(ownerPrivKey).signDigest(digest);
+    
       return { r, s, v }
     }
 
     before(async () => {
       const wallet = ethers.Wallet.createRandom()
       from = wallet.address
-      fromPrivKey = wallet.privateKey
+      ownerPrivKey = wallet.privateKey
       to = newHolder
     })
 
