@@ -11,7 +11,6 @@ NC='\033[0m'
 
 cd ./packages/govern-core/
 yarn compile
-yarn abi:extract
 
 if [ $? -ne 0 ]
 then
