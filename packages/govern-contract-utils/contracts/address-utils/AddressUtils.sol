@@ -5,6 +5,7 @@
 pragma solidity ^0.6.8;
 
 library AddressUtils {
+    
     function toPayable(address addr) internal pure returns (address payable) {
         return address(bytes20(addr));
     }
@@ -23,7 +24,7 @@ library AddressUtils {
      */
     function isContract(address addr) internal view returns (bool result) {
         assembly {
-            result := not(iszero(extcodesize(addr)))
+            result := iszero(iszero(extcodesize(addr)))
         }
     }
 }
