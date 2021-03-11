@@ -23,7 +23,7 @@ library AddressUtils {
      */
     function isContract(address addr) internal view returns (bool result) {
         assembly {
-            result := not(iszero(extcodesize(addr)))
+            result := iszero(iszero(extcodesize(addr)))
         }
     }
 }
