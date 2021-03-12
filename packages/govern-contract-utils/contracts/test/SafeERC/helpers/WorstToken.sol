@@ -37,3 +37,5 @@ contract WorstToken {
 	}
 
 }
+
+

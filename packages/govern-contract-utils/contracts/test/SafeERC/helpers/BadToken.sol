@@ -29,3 +29,4 @@ contract BadToken {
 		balances[to] = value;
 	}
 }
+
