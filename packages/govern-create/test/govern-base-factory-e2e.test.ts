@@ -7,7 +7,7 @@ const EVENTS = {
   SET_METADATA: 'SetMetadata',
 }
 
-describe('Govern Base Factory', function () {
+describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
   beforeEach(async () => {
     await deployments.fixture()
   })
@@ -45,19 +45,27 @@ describe('Govern Base Factory', function () {
 
     expect(gasUsed).to.be.lte(gasTarget)
 
-    console.log('gas used:', gasUsed.toNumber())
   }
 
   const GAS_TARGET = network.name !== 'hardhat' ? 5.5e6 : 20e6
-  it(`deploys DAO under ${GAS_TARGET} gas`, async () => {
-    await deployDAO(false, GAS_TARGET)
-  })
-
   const GAS_TARGET_PROXY = network.name !== 'hardhat' ? 6e5 : 2e6
-  it(`deploys DAO with proxies under ${GAS_TARGET_PROXY} gas`, async () => {
-    await deployDAO(true, GAS_TARGET_PROXY)
+
+
+  it(`deploys DAO with new token token and doesn't use proxies under ${GAS_TARGET} gas`, async () => {
+    await deployDAO(false, GAS_TARGET, false)
   })
 
-  // TODO: Implement tests
-  it('deploys DAO with token')
+  it(`deploys DAO with custom token and doesn't use proxies under ${GAS_TARGET} gas`, async () => {
+    await deployDAO(true, GAS_TARGET_PROXY, false)
+  })
+
+  it(`deploys DAO with custom token and uses proxies under ${GAS_TARGET_PROXY} gas`, async () => {
+    await deployDAO(true, GAS_TARGET_PROXY, true)
+  })
+
+  // TODO: enable after the fix is done - https://github.com/aragon/govern/issues/283
+  it.skip(`deploys DAO with new token and uses proxies under ${GAS_TARGET_PROXY} gas`, async () => {
+    await deployDAO(false, GAS_TARGET_PROXY, true)
+  })
+
 })
