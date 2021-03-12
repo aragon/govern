@@ -1,16 +1,10 @@
 import { expect } from 'chai'
 import { ethers } from 'hardhat'
-
 import {
-    SafeERC20Mock,
-    SafeERC20Mock__factory,
-    GoodToken,
-    GoodToken__factory,
-    BadToken,
-    BadToken__factory,
-    WorstToken,
-    WorstToken__factory
-
+    SafeERC20Mock, SafeERC20Mock__factory,
+    GoodToken, GoodToken__factory,
+    BadToken, BadToken__factory,
+    WorstToken, WorstToken__factory
 } from '../typechain'
 
 
@@ -37,7 +31,6 @@ describe('SafeERC20', function () {
     let owner: any;
 
     beforeEach(async () => {
-
         const safeERCMock = (await ethers.getContractFactory('SafeERC20Mock')) as SafeERC20Mock__factory
         safeERC20 = await safeERCMock.deploy()
 
@@ -57,7 +50,7 @@ describe('SafeERC20', function () {
     })
 
 
-    it("reverts if the token address is not the contract", async () => {
+    it("reverts if the token address is a EOA", async () => {
         await expect(safeERC20.safeTransfer(owner, balanceAmount)).to.be.revertedWith(ERRORS.SAFE_TRANSFER)
     })
 
@@ -96,5 +89,4 @@ describe('SafeERC20', function () {
             await expect(safeERC20.safeApprove(worstToken.address, balanceAmount)).to.emit(safeERC20, EVENTS.Approve);
         })
     })
-    
 })
