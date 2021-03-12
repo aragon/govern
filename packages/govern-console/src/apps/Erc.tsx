@@ -137,7 +137,7 @@ function ContractCallHandler({
             return
           }
         }
-        const args = values.map((val: any) => val.value)
+        const args = (values as any).map((val: any) => val.value)
         const res = await ercContract[name](...args)
         setResult(res.hash)
       } catch (e) {

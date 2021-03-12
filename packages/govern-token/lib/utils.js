@@ -6,3 +6,4 @@ const format = ({ address }, name) =>
 const print = (contract, name) => console.log(format(contract, name))
 
 module.exports = { format, print }
+

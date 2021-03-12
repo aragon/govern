@@ -1,6 +1,12 @@
 node_modules
 yarn-error.log
 
-#Buidler files
+#Hardhat files
 cache
 artifacts
+typechain
+deployments
+
+#Coverage
+coverage/
+coverage.json
