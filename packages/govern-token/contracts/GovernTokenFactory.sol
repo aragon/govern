@@ -6,6 +6,7 @@ pragma solidity 0.6.8;
 pragma experimental ABIEncoderV2;
 
 import "@aragon/govern-contract-utils/contracts/minimal-proxies/ERC1167ProxyFactory.sol";
+import "erc3k/contracts/IERC3000Executor.sol";
 
 import "./GovernToken.sol";
 import "./GovernMinter.sol";
@@ -25,7 +26,7 @@ contract GovernTokenFactory {
     }
 
     function newToken(
-        address _initialMinter,
+        IERC3000Executor _governExecutor,
         string calldata _tokenName,
         string calldata _tokenSymbol,
         uint8 _tokenDecimals,
@@ -37,7 +38,7 @@ contract GovernTokenFactory {
         GovernMinter minter
     ) {
         if (!_useProxies) {
-            (token, minter) = _deployContracts(address(this), _tokenName, _tokenSymbol, _tokenDecimals);
+            (token, minter) = _deployContracts(_tokenName, _tokenSymbol, _tokenDecimals);
         } else {
             token = GovernToken(tokenBase.clone(abi.encodeWithSelector(
                 token.initialize.selector,
@@ -62,8 +63,8 @@ contract GovernTokenFactory {
 
         ACLData.BulkItem[] memory items = new ACLData.BulkItem[](4);
 
-        items[0] = ACLData.BulkItem(ACLData.BulkOp.Grant, mintRole, _initialMinter);
-        items[1] = ACLData.BulkItem(ACLData.BulkOp.Grant, rootRole, _initialMinter);
+        items[0] = ACLData.BulkItem(ACLData.BulkOp.Grant, mintRole, address(_governExecutor));
+        items[1] = ACLData.BulkItem(ACLData.BulkOp.Grant, rootRole, address(_governExecutor));
         items[2] = ACLData.BulkItem(ACLData.BulkOp.Revoke, mintRole, address(this));
         items[3] = ACLData.BulkItem(ACLData.BulkOp.Revoke, rootRole, address(this));
 
@@ -76,7 +77,6 @@ contract GovernTokenFactory {
         distributorBase = address(new MerkleDistributor(ERC20(tokenBase), bytes32(0)));
         
         (GovernToken token, GovernMinter minter) = _deployContracts(
-            address(this),
             "GovernToken base",
             "GTB",
             0
@@ -93,7 +93,6 @@ contract GovernTokenFactory {
     }
 
     function _deployContracts(
-        address _initialMinter,
         string memory _tokenName,
         string memory _tokenSymbol,
         uint8 _tokenDecimals
@@ -102,6 +101,6 @@ contract GovernTokenFactory {
         GovernMinter minter
     ) {
         token = new GovernToken(address(this), _tokenName, _tokenSymbol, _tokenDecimals);
-        minter = new GovernMinter(GovernToken(token), address(_initialMinter), MerkleDistributor(distributorBase));
+        minter = new GovernMinter(GovernToken(token), address(this), MerkleDistributor(distributorBase));
     }
 }
