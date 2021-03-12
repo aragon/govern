@@ -12,7 +12,6 @@ import "./helpers/WorstToken.sol";
 import "../../erc20/ERC20.sol";
 
 contract SafeERC20Mock {
-
 	event Transfer(bool transfer);
 	event Approve(bool approve);
 
@@ -30,6 +29,4 @@ contract SafeERC20Mock {
 		require(SafeERC20.safeApprove(ERC20(token), address(this), _amount), "SAFE_APPROVE: Fail");
 		emit Approve(true);
 	}
-    
 }
-

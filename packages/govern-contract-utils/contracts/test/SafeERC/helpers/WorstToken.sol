@@ -5,7 +5,6 @@
 pragma solidity ^0.6.8;
 
 contract WorstToken {
-
     mapping(address => uint256) public balances;
     mapping(address => uint256) public approvals;
 

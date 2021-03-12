@@ -7,7 +7,6 @@ pragma solidity ^0.6.8;
 import '../../../safe-math/SafeMath.sol';
 
 contract GoodToken {
-	
     mapping(address => uint256) public balances;
     mapping(address => uint256) public approvals;
 
