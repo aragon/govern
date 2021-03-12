@@ -47,7 +47,7 @@ contract GovernBaseFactory {
 
         if (address(_token) == address(0)) {
             (_token,) = tokenFactory.newToken(
-                address(this),
+                govern,
                 _tokenName,
                 _tokenSymbol,
                 18, // NOTE: hardcoding due to stack to deep issues

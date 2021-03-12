@@ -17,7 +17,8 @@
   "dependencies": {
     "@aragon/govern-contract-utils": "^1.0.0-beta.12",
     "@aragon/govern-core": "^1.0.0-beta.12",
-    "@aragon/govern-token": "^1.0.0-beta.12"
+    "@aragon/govern-token": "^1.0.0-beta.12",
+    "erc3k": "^1.0.0-beta.12"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.0",
