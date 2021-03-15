@@ -35,6 +35,9 @@ const config: HardhatUserConfig = {
       throwOnCallFailures: true,
       allowUnlimitedContractSize: true,
       blockGasLimit: 0x1fffffffffffff,
+      // tests that deploy new tokens with proxies set to false, require more than 8,000,000 GAS. 
+      // Without setting this,tests do fail due to out of gas error
+      gas: 10000000,
       accounts: accounts(),
     },
     localhost: {

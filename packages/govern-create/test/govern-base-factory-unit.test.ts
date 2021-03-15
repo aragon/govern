@@ -85,7 +85,7 @@ describe('Govern Base Factory with mocked contracts', function () {
     if(deployToken) {
       await expect(tx).
         to.emit(GovernTokenFactoryMock, 'NewTokenCalledWith')
-        .withArgs(GovernBaseFactory.address, 'Eagle Token', 'EAG', 18,  owner, BigNumber.from(10).pow(BigNumber.from(18)), useProxies)
+        .withArgs(GovernFactoryMock.address, 'Eagle Token', 'EAG', 18,  owner, BigNumber.from(10).pow(BigNumber.from(18)), useProxies)
     }
 
 

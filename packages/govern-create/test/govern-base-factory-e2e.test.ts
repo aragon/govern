@@ -51,21 +51,20 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
   const GAS_TARGET_PROXY = network.name !== 'hardhat' ? 6e5 : 2e6
 
 
-  it(`deploys DAO with new token token and doesn't use proxies under ${GAS_TARGET} gas`, async () => {
+  it(`deploys DAO with custom token and doesn't use proxies under ${GAS_TARGET} gas`, async () => {
     await deployDAO(false, GAS_TARGET, false)
   })
 
-  it(`deploys DAO with custom token and doesn't use proxies under ${GAS_TARGET} gas`, async () => {
-    await deployDAO(true, GAS_TARGET_PROXY, false)
+  it(`deploys DAO with new token and doesn't use proxies under ${GAS_TARGET} gas`, async () => {
+    await deployDAO(false, GAS_TARGET, true)
   })
 
-  it(`deploys DAO with custom token and uses proxies under ${GAS_TARGET_PROXY} gas`, async () => {
+  it(`deploys DAO with new token and uses proxies under ${GAS_TARGET_PROXY} gas`, async () => {
     await deployDAO(true, GAS_TARGET_PROXY, true)
   })
 
-  // TODO: enable after the fix is done - https://github.com/aragon/govern/issues/283
-  it.skip(`deploys DAO with new token and uses proxies under ${GAS_TARGET_PROXY} gas`, async () => {
-    await deployDAO(false, GAS_TARGET_PROXY, true)
+  it(`deploys DAO with custom token and uses proxies under ${GAS_TARGET_PROXY} gas`, async () => {
+    await deployDAO(true, GAS_TARGET_PROXY, false)
   })
 
 })
