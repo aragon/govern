@@ -20,9 +20,9 @@ const ERRORS = {
 const amount = 1000
 
 describe('DepositLib', function () {
-    let depositLibMock: DepositLibMock
-    let goodToken: GoodToken
-    let owner: any;
+    let depositLibMock: DepositLibMock,
+        goodToken: GoodToken,
+        owner: any;
 
     before(async () => {
         const DepositLibMockFactory = (await ethers.getContractFactory('DepositLibMock')) as DepositLibMock__factory
