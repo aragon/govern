@@ -14,7 +14,6 @@ describe('GovernToken', async function ()  {
   let minter, newMinter, holder1, holder2, newHolder
   let GovernToken
   
-  
   before(async () => {
     signers   = await ethers.getSigners()
     minter    = await signers[0].getAddress();
@@ -25,9 +24,6 @@ describe('GovernToken', async function ()  {
 
     GovernToken = await ethers.getContractFactory('GovernToken')
   })
-
-
-  
 
   async function itTransfersCorrectly(fn, { from, to, value }) {
     const isMint = from === ZERO_ADDRESS
@@ -52,7 +48,6 @@ describe('GovernToken', async function ()  {
     }
 
     await expect(receipt).to.emit(token, 'Transfer').withArgs(from, to, value)
-
   }
 
   async function itApprovesCorrectly(fn, { owner, spender, value }) {
