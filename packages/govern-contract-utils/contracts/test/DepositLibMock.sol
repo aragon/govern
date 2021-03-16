@@ -9,8 +9,11 @@ import "../deposits/DepositLib.sol";
 import "erc3k/contracts/ERC3000Data.sol";
 
 contract DepositLibMock {
-    event Transfer(bool transfer);
-	event Approve(bool approve);
+    // Below two events are duplicated from the DepositLib library to make sure that this contract
+    // contains the Locked/Unlocked event in its own abi in order to test if the events were thrown or not.
+    // For more info: https://github.com/ethereum/solidity/pull/10996
+    event Locked(address indexed token, address indexed from, uint256 amount);
+    event Unlocked(address indexed token, address indexed to, uint256 amount);
 
     using DepositLib for ERC3000Data.Collateral;
 
