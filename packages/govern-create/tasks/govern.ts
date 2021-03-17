@@ -25,12 +25,14 @@ const format = (address: string, name: string, network: string): string =>
   }etherscan.io/address/${address}`
 
 task('deploy-govern', 'Deploys a Govern instance')
+  .addOptionalParam('registry', 'GovernRegistry address')
   .addOptionalParam('factory', 'GovernBaseFactory address')
   .addOptionalParam('useProxies', 'Whether to deploy govern with proxies')
   .addOptionalParam('name', 'DAO name (must be unique at GovernRegistry level)')
   .setAction(
     async (
       {
+        registry,
         factory,
         useProxies = true,
         name,
@@ -43,11 +45,12 @@ task('deploy-govern', 'Deploys a Govern instance')
       name = buildName(name)
       const { ethers, deployments, network } = HRE
 
-      const registryDeployment = await deployments.get('GovernRegistry')
-      const registryContract = await ethers.getContractAt(
-        'GovernRegistry',
-        registryDeployment.address
-      )
+      const registryContract = registry
+      ? await ethers.getContractAt('GovernRegistry', registry)
+      : await ethers.getContractAt(
+          'GovernRegistry',
+          (await deployments.get('GovernRegistry')).address
+        )
 
       const baseFactoryContract = factory
         ? await ethers.getContractAt('GovernBaseFactory', factory)
