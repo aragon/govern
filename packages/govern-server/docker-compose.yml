@@ -14,6 +14,7 @@ services:
       - ganache
     environment:
       postgres_host: postgres
+      postgres_port: 5432
       postgres_user: graph-node
       postgres_pass: let-me-in
       postgres_db: graph-node
