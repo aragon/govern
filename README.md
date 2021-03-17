@@ -60,8 +60,8 @@ To use Govern, feel free to deploy your own registries and factories, but using 
 
 #### Rinkeby
 
-- 📜 GovernRegistry: [`0x87eE5EA31dCf1f526f21Bb576131C37890AE65E0`](https://rinkeby.etherscan.io/address/0x87eE5EA31dCf1f526f21Bb576131C37890AE65E0)
-- 🏭 GovernBaseFactory: [`0x615e3d83B8e1403c39F98c7066faA1D9bBF9E867`](https://rinkeby.etherscan.io/address/0x615e3d83B8e1403c39F98c7066faA1D9bBF9E867)
+- 📜 GovernRegistry: [`0x8adf949adbab3614f5340b21d9d9ad928d218096`](https://rinkeby.etherscan.io/address/0x8adf949adbab3614f5340b21d9d9ad928d218096)
+- 🏭 GovernBaseFactory: [`0x1791E1D949c21703f49FC2C9a24570FA72ed62Ae`](https://rinkeby.etherscan.io/address/0x1791E1D949c21703f49FC2C9a24570FA72ed62Ae)
 
 ## Help shape Aragon Govern
 - Discuss in [Aragon Forum](https://forum.aragon.org/tags/aragon-govern)
