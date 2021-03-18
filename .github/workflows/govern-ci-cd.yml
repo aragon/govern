@@ -27,6 +27,6 @@ jobs:
     - name: Install dependencies
       run: yarn install --frozen-lockfile
 
-    - name: Run e2e tests
-      run: cd packages/govern && yarn e2e
+    - name: Run all govern tests
+      run: cd packages/govern && yarn test
 
