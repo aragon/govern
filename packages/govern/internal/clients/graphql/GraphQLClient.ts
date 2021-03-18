@@ -19,11 +19,11 @@ export default class GraphQLClient implements ClientInterface {
   private client: Client
 
   /**
-   * @param {string} governUrl
+   * @param {string} subgraphUrl
    *
    * @constructor
    */
-  constructor(private governUrl: string) {
+  constructor(private subgraphUrl: string) {
     this.connect()
   }
 
@@ -37,7 +37,7 @@ export default class GraphQLClient implements ClientInterface {
   private connect(): void {
     this.client = new Client({
       maskTypename: true,
-      url: this.governUrl,
+      url: this.subgraphUrl,
       fetch
     })
   }
@@ -79,7 +79,7 @@ export default class GraphQLClient implements ClientInterface {
    */
   private mapResponse(result: any): string {
     return (
-      `Govern: ${result.operation.context.url}\n\n` +
+      `Subgraph: ${result.operation.context.url}\n\n` +
       `Arguments: ${JSON.stringify(result.operation.variables, null, 2)}\n\n` +
       `Query: ${result.operation.query.loc?.source.body}\n\n` +
       `Returned data: ${JSON.stringify(result.data, null, 2)}\n\n`

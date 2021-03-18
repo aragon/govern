@@ -25,7 +25,7 @@ describe('DaoActionTest', () => {
 
       expect(args).toEqual({name: 'myName'})
 
-      return Promise.resolve({dao: true})
+      return Promise.resolve({ registryEntries: [{ executor: true }] })
     });
 
     const response = await action.execute();
