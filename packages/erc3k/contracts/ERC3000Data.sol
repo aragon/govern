@@ -37,6 +37,14 @@ library ERC3000Data {
         Collateral challengeDeposit;
         address resolver;
         bytes rules;
+        LimitLengths limits;
+    }
+
+    struct LimitLengths {
+        uint16 rulesLimit;
+        uint16 proofLimit;
+        uint16 actionLimit;
+        uint16 actionDataLimit;
     }
 
     struct Collateral {

@@ -103,7 +103,16 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
         require(_container.payload.executionTime >= _container.config.executionDelay.add(block.timestamp), "queue: bad delay");
         // ensure that the submitter of the payload is also the sender of this call
         require(_container.payload.submitter == msg.sender, "queue: bad submitter");
+        // Check if the dynamic sized parameters don't exceed the limits
+        require(_container.payload.proof.length <= _container.config.limits.proofLimit, "proof: limit exceeded");
+        require(_container.config.rules.length <= _container.config.limits.rulesLimit, "rules: limit exceeded");
+        require(_container.payload.actions.length <= _container.config.limits.actionLimit, "actions: limit exceeded");
 
+        for(uint i=0; i < _container.payload.actions.length; i++) {
+            require(_container.payload.actions[i].data.length <= _container.config.limits.actionDataLimit, "action data: limit exceeded");
+        }
+
+        // store and set state of the container
         containerHash = ERC3000Data.containerHash(_container.payload.hash(), _configHash);
         queue[containerHash].checkAndSetState(
             GovernQueueStateLib.State.None, // ensure that the state for this container is None
