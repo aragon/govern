@@ -72,12 +72,14 @@ contract GovernBaseFactory {
 
     function dummyConfig() internal pure returns (ERC3000Data.Config memory) {
         ERC3000Data.Collateral memory noCollateral;
+        ERC3000Data.LimitLengths memory limitLengths = ERC3000Data.LimitLengths(100, 100, 100, 100);
         return ERC3000Data.Config(
             0,
             noCollateral,
             noCollateral,
             address(0),
-            ""
+            "",
+            limitLengths
         );
     }
 }

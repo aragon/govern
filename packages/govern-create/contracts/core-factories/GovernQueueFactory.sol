@@ -27,12 +27,14 @@ contract GovernQueueFactory {
 
     function setupBase() private {
         ERC3000Data.Collateral memory noCollateral;
+        ERC3000Data.LimitLengths memory limitLengths = ERC3000Data.LimitLengths(100, 100, 100, 100);
         ERC3000Data.Config memory config = ERC3000Data.Config(
             0,
             noCollateral,
             noCollateral,
             address(0),
-            ""
+            "",
+            limitLengths
         );
         base = address(new GovernQueue(address(2), config));
     }
