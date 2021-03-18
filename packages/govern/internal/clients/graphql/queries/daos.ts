@@ -5,7 +5,7 @@ export type Daos = Dao[]
 
 const daos: string = `
    query DAOS {
-      daos {
+      governs {
         id
         address
         metadata

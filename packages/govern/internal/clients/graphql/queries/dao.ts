@@ -9,12 +9,15 @@ export interface Dao {
 
 const dao: string = `
     query DAO($name: String!) {
-      dao(name: $name) {
+      registryEntries(where: { name: $name }, first: 1) {
         id
-        address
-        metadata
-        registryEntries {
-            ...RegistryEntry_registryEntry
+        executor {
+           id
+           address
+           metadata
+           registryEntries {
+               ...RegistryEntry_registryEntry
+           }
         }
       }
     }

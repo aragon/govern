@@ -1,29 +1,32 @@
 import { configure, dao } from '@aragon/govern'
+import { subgraphURL } from './config'
+import expected from '../fixtures/dao-data'
 
 /**
  * dao e2e test
  */
 describe('[e2e] dao Test', () => {
   beforeEach(() => {
-    configure({ governURL: 'http://localhost:3000/' })
+    configure({ subgraphURL })
   })
 
   it('calls dao and returns as expected', async () => {
-    const response = await dao("M")
+    const name = expected.name
+    const response = await dao(name)
 
-    expect(response.id).toEqual('0x24319b199e9e3867ede90eaf0fad56168c54d077')
+    expect(response.id).toEqual(expected.id)
 
-    expect(response.address).toEqual('0x24319b199e9e3867ede90eaf0fad56168c54d077')
+    expect(response.address).toEqual(expected.address)
 
     expect(response.metadata).toBeDefined()
 
-    expect(response.registryEntries[0].id).toEqual('M')
+    expect(response.registryEntries[0].id).toEqual(name)
 
-    expect(response.registryEntries[0].name).toEqual('M')
+    expect(response.registryEntries[0].name).toEqual(name)
 
-    expect(response.registryEntries[0].queue.id).toEqual('0x498cbf401df68196dc41b4bf53817088cb70b815')
+    expect(response.registryEntries[0].queue.id).toEqual(expected.registryEntries[0].queue.id)
 
-    expect(response.registryEntries[0].queue.address).toEqual('0x498cbf401df68196dc41b4bf53817088cb70b815')
+    expect(response.registryEntries[0].queue.address).toEqual(expected.registryEntries[0].queue.address)
 
     expect(response.registryEntries[0].queue.config.executionDelay).toBeDefined()
 
@@ -35,6 +38,6 @@ describe('[e2e] dao Test', () => {
 
     expect(response.registryEntries[0].queue.config.rules).toBeDefined()
 
-    expect(Array.isArray(response.registryEntries[0].queue.queued)).toEqual(true)
+    expect(Array.isArray(response.registryEntries[0].queue.queued)).toEqual(expected.registryEntries[0].queue.queued)
   })
 })

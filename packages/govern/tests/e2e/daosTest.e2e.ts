@@ -1,15 +1,17 @@
 import { configure, daos } from '@aragon/govern'
+import { subgraphURL } from './config'
 
 /**
  * daos e2e test
  */
 describe('[e2e] daos Test', () => {
   beforeEach(() => {
-    configure({ governURL: 'http://localhost:3000/' })
+    configure({ subgraphURL })
   })
 
   it('calls daos and returns as expected', async () => {
     const response = await daos()
+    console.log('response', response)
 
     expect(response[0].id).toEqual('0x24319b199e9e3867ede90eaf0fad56168c54d077')
 

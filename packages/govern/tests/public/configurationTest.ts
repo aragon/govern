@@ -10,11 +10,11 @@ jest.mock('../../internal/clients/graphql/GraphQLClient')
  */
 describe('configure Test', () => {
   it('calls configure and defines the expected default config', () => {
-    configure({ governURL: 'localhost' } as ConfigurationObject)
+    configure({ subgraphURL: 'localhost' } as ConfigurationObject)
 
     const config = Configuration.get()
 
-    expect(config.governURL).toEqual('localhost')
+    expect(config.subgraphURL).toEqual('localhost')
 
     expect(config.client).toBeInstanceOf(GraphQLClient)
 

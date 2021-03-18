@@ -89,7 +89,7 @@ describe('GraphQLClientTest', () => {
     })
 
     await expect(client.request(testQuery, { test: 'test' })).rejects.toEqual(new Error(
-      'Govern: localhost\n' +
+      'Subgraph: localhost\n' +
       '\n' +
       'Arguments: "variables"\n' +
       '\n' +
