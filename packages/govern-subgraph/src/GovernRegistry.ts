@@ -12,9 +12,17 @@ import {
   RegistryEntry as RegistryEntryEntity
 } from '../generated/schema'
 import { loadOrCreateGovern } from './Govern'
+import { loadOrCreateQueue } from './GovernQueue'
 
 export function handleRegistered(event: RegisteredEvent): void {
   let registry = loadOrCreateRegistry(event.address)
+
+  // create and save these to avoid null error from
+  // registryEntries queries due to missing data
+  let queue = loadOrCreateQueue(event.params.queue)
+  let govern = loadOrCreateGovern(event.params.executor)
+  queue.save()
+  govern.save()
 
   let registryEntry = new RegistryEntryEntity(event.params.name)
 
