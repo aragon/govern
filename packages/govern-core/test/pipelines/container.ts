@@ -10,7 +10,8 @@ export const container: any = {
       'amount': 100
     },
     'resolver': '0x0000000000000000000000000000000000000000',
-    'rules': '0x'
+    'rules': '0x',
+    'maxCalldataSize': 100000 // initial maxCalldatasize
   },
   'payload': {
     'nonce': 1,

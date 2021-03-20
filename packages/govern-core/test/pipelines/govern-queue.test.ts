@@ -54,6 +54,7 @@ describe('Govern Queue', function() {
     BAD_CONFIG: 'queue: bad config',
     BAD_DELAY: 'queue: bad delay',
     BAD_SUBMITTER: 'queue: bad submitter',
+    CALLDATASIZE_LIMIT: 'calldatasize: limit exceeded',
     WAIT_MORE: 'queue: wait more',
     BAD_FEE_PULL: 'queue: bad fee pull',
     BAD_APPROVE: 'queue: bad approve',
@@ -167,6 +168,21 @@ describe('Govern Queue', function() {
       expect(await testToken.balanceOf(ownerAddr)).to.equal(ownerTokenAmount - container.config.scheduleDeposit.amount)
     })
 
+
+    it('reverts with "calldatasize: limit exceeded"', async () => {
+      const currentCalldatasizeLimit = container.config.maxCalldataSize
+      container.config.maxCalldataSize = 100
+      
+      await gq.configure(container.config);
+     
+      await expect(gq.schedule(container)).to.be.revertedWith(ERRORS.CALLDATASIZE_LIMIT)
+      
+      container.config.maxCalldataSize = currentCalldatasizeLimit
+      await gq.configure(container.config);
+      
+    })
+    
+
     it('reverts with "queue: bad config"', async () => {
       container.config.executionDelay = 100
 
@@ -262,7 +278,7 @@ describe('Govern Queue', function() {
 
       expect(await gq.challengerCache(containerHash)).to.equal(ownerAddr)
 
-      expect(await gq.disputeItemCache(containerHash, container.config.resolver)).to.equal(disputeId+1)
+      expect(await gq.disputeItemCache(containerHash, container.config.resolver)).to.equal(disputeId + 1)
     
       expect(await testToken.balanceOf(ownerAddr)).to.equal(
         ownerBalance -(container.config.challengeDeposit.amount + container.config.challengeDeposit.amount + disputeFee)
