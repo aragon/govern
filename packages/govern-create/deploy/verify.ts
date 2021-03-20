@@ -14,6 +14,7 @@ const dummyConfig = {
   challengeDeposit: [NO_TOKEN, '0'],
   resolver: ZERO_ADDR,
   rules: '0x',
+  maxCalldataSize: 1000000
 }
 
 function delay(ms: number) {
@@ -25,7 +26,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   console.log('Verifying registry and factories contracts')
   
-  await delay(3000); // Etherscan needs some time to process before trying to verify.
+  await delay(30000); // Etherscan needs some time to process before trying to verify.
 
   await run(TASK_ETHERSCAN_VERIFY, {
     apiKey: process.env.ETHERSCAN_KEY,
