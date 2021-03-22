@@ -1,6 +1,6 @@
 import { configure, dao } from '@aragon/govern'
 import { subgraphURL } from './config'
-import expected from '../fixtures/dao-data'
+import * as daosData from '../fixtures/daos-data-loo.json'
 
 /**
  * dao e2e test
@@ -11,7 +11,9 @@ describe('[e2e] dao Test', () => {
   })
 
   it('calls dao and returns as expected', async () => {
-    const name = expected.name
+    const expected = daosData[2]
+    const name = "github-disastrous-coffee"
+
     const response = await dao(name)
 
     expect(response.id).toEqual(expected.id)
@@ -38,6 +40,6 @@ describe('[e2e] dao Test', () => {
 
     expect(response.registryEntries[0].queue.config.rules).toBeDefined()
 
-    expect(Array.isArray(response.registryEntries[0].queue.queued)).toEqual(expected.registryEntries[0].queue.queued)
+    expect(Array.isArray(response.registryEntries[0].queue.queued)).toEqual(true)
   })
 })

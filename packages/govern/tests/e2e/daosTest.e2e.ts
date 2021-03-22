@@ -1,6 +1,6 @@
 import { configure, daos } from '@aragon/govern'
 import { subgraphURL } from './config'
-
+import * as daosData from '../fixtures/daos-data-loo.json'
 /**
  * daos e2e test
  */
@@ -11,21 +11,23 @@ describe('[e2e] daos Test', () => {
 
   it('calls daos and returns as expected', async () => {
     const response = await daos()
-    console.log('response', response)
 
-    expect(response[0].id).toEqual('0x24319b199e9e3867ede90eaf0fad56168c54d077')
+    const expected = daosData[0]
+    const expectedRegistry = expected.registryEntries[0]
 
-    expect(response[0].address).toEqual('0x24319b199e9e3867ede90eaf0fad56168c54d077')
+    expect(response[0].id).toEqual(expected.id)
+
+    expect(response[0].address).toEqual(expected.address)
 
     expect(response[0].metadata).toBeDefined()
 
-    expect(response[0].registryEntries[0].id).toEqual('M')
+    expect(response[0].registryEntries[0].id).toEqual(expectedRegistry.id)
 
-    expect(response[0].registryEntries[0].name).toEqual('M')
+    expect(response[0].registryEntries[0].name).toEqual(expectedRegistry.name)
 
-    expect(response[0].registryEntries[0].queue.id).toEqual('0x498cbf401df68196dc41b4bf53817088cb70b815')
+    expect(response[0].registryEntries[0].queue.id).toEqual(expectedRegistry.queue.id)
 
-    expect(response[0].registryEntries[0].queue.address).toEqual('0x498cbf401df68196dc41b4bf53817088cb70b815')
+    expect(response[0].registryEntries[0].queue.address).toEqual(expectedRegistry.queue.address)
 
     expect(response[0].registryEntries[0].queue.config.executionDelay).toBeDefined()
 
