@@ -1,9 +1,12 @@
 import GraphQLClient from '../../../internal/clients/graphql/GraphQLClient'
 import Configuration from '../../../internal/configuration/Configuration'
-import expected from '../../fixtures/config-data'
 
 // Mocks
 jest.mock('../../../internal/clients/graphql/GraphQLClient')
+
+const expected = {
+  "defaultUrl": "https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby"
+}
 
 /**
  * Configuration test
