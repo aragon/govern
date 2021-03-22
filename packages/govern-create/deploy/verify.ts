@@ -14,7 +14,7 @@ const dummyConfig = {
   challengeDeposit: [NO_TOKEN, '0'],
   resolver: ZERO_ADDR,
   rules: '0x',
-  maxCalldataSize: 1000000
+  maxCalldataSize: 100000 // initial maxCalldatasize
 }
 
 function delay(ms: number) {
