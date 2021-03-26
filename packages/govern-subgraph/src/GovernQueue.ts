@@ -40,19 +40,20 @@ import {
   handleContainerEventSchedule,
   handleContainerEventVeto
 } from './utils/events'
-
+import { loadOrCreateGovern } from './Govern'
 
 export function handleScheduled(event: ScheduledEvent): void {
   let queue = loadOrCreateQueue(event.address)
   let payload = loadOrCreatePayload(event.params.containerHash)
   let container = loadOrCreateContainer(event.params.containerHash)
+  let executor = loadOrCreateGovern(event.params.payload.executor)
   // Builds each of the actions bundled in the payload,
   // and saves them to the DB.
   buildActions(event)
   payload.nonce = event.params.payload.nonce
   payload.executionTime = event.params.payload.executionTime
   payload.submitter = event.params.payload.submitter
-  payload.executor = event.params.payload.executor.toHex()
+  payload.executor = executor.id
   payload.allowFailuresMap = event.params.payload.allowFailuresMap
   payload.proof = event.params.payload.proof
 
