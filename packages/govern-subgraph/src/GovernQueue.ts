@@ -1,4 +1,4 @@
-import { Address, Bytes } from '@graphprotocol/graph-ts'
+import { Address, Bytes, BigInt } from '@graphprotocol/graph-ts'
 import {
   Challenged as ChallengedEvent,
   Configured as ConfiguredEvent,
@@ -23,6 +23,7 @@ import {
 import { frozenRoles, roleGranted, roleRevoked } from './lib/MiniACL'
 import { buildId, buildIndexedId } from './utils/ids'
 import {
+  ZERO_ADDRESS,
   APPROVED_STATUS,
   CANCELLED_STATUS,
   CHALLENGED_STATUS,
@@ -39,6 +40,7 @@ import {
   handleContainerEventSchedule,
   handleContainerEventVeto
 } from './utils/events'
+
 
 export function handleScheduled(event: ScheduledEvent): void {
   let queue = loadOrCreateQueue(event.address)
@@ -182,6 +184,41 @@ export function handleRevoked(event: RevokedEvent): void {
 }
 
 // Helpers
+// create a dummy config when creating queue to avoid not-null error
+export function createDummyConfig(queueId: string): string {
+  let ZERO = BigInt.fromI32(0)
+
+  // use queueId as the configId for this dummy config
+  // subsequent config configure call will use transaction
+  // id and log id as the id
+  let configId = queueId
+  let config = new ConfigEntity(configId)
+
+  let scheduleDeposit = new CollateralEntity(
+    buildIndexedId(configId, 1)
+  )
+  scheduleDeposit.token = ZERO_ADDRESS
+  scheduleDeposit.amount = ZERO
+
+  let challengeDeposit = new CollateralEntity(
+    buildIndexedId(configId, 2)
+  )
+  challengeDeposit.token = ZERO_ADDRESS
+  challengeDeposit.amount = ZERO
+
+  config.queue = queueId
+  config.executionDelay = ZERO
+  config.scheduleDeposit = scheduleDeposit.id
+  config.challengeDeposit = challengeDeposit.id
+  config.resolver = ZERO_ADDRESS
+  config.rules = Bytes.fromI32(0) as Bytes
+
+  scheduleDeposit.save()
+  challengeDeposit.save()
+  config.save()
+
+  return config.id!
+}
 
 export function loadOrCreateQueue(entity: Address): GovernQueueEntity {
   let queueId = entity.toHex()
@@ -190,7 +227,7 @@ export function loadOrCreateQueue(entity: Address): GovernQueueEntity {
   if (queue === null) {
     queue = new GovernQueueEntity(queueId)
     queue.address = entity
-    queue.config = ''
+    queue.config = createDummyConfig(queueId)
     queue.roles = []
   }
   return queue!
