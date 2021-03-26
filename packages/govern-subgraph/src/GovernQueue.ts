@@ -68,6 +68,7 @@ export function handleScheduled(event: ScheduledEvent): void {
 
   handleContainerEventSchedule(container, event, scheduleDeposit as CollateralEntity)
 
+  executor.save()
   payload.save()
   container.save()
   queue.save()
