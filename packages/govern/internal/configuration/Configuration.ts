@@ -6,7 +6,7 @@ export interface ConfigurationObject {
 }
 
 let defaultConfig: Configuration
-const subgraphURL = 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby'
+const subgraphURL = 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-mainnet'
 
 /**
  * @class Configuration
