@@ -3,6 +3,7 @@ on:
   push:
     branches:
     - master
+    - development
     tags:
     - v*
 env:
@@ -45,9 +46,9 @@ jobs:
       run: .github/scripts/kubectl-config.sh ${{secrets.KUBE_CA}} ${{secrets.KUBE_SERVER}} ${{secrets.KUBE_TOKEN}}
 
     - name: Deploy rinkeby
-      if: github.ref == 'refs/heads/master'
+      if: github.ref == 'refs/heads/development'
       run: yarn deploy:subgraph:rinkeby
 
     - name: Deploy mainnet
-      if: startsWith(github.ref, 'refs/tags/v')
+      if: github.ref == 'refs/heads/master'
       run: yarn deploy:subgraph:mainnet
