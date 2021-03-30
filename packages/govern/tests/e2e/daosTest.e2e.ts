@@ -1,6 +1,6 @@
 import { configure, daos } from '@aragon/govern'
 import { subgraphURL } from './config'
-import * as daosData from '../fixtures/daos-data-loo.json'
+import * as daosData from '../fixtures/daos-data.json'
 /**
  * daos e2e test
  */
