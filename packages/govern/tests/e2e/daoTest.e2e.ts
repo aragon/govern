@@ -1,6 +1,6 @@
 import { configure, dao } from '@aragon/govern'
 import { subgraphURL } from './config'
-import * as daosData from '../fixtures/daos-data-loo.json'
+import * as daosData from '../fixtures/daos-data.json'
 
 /**
  * dao e2e test
@@ -12,7 +12,7 @@ describe('[e2e] dao Test', () => {
 
   it('calls dao and returns as expected', async () => {
     const expected = daosData[2]
-    const name = "github-disastrous-coffee"
+    const name = "GIORGI-DAO3"
 
     const response = await dao(name)
 
