@@ -5,8 +5,10 @@ on:
     - 'packages/govern/**'
     branches:
     - master
-    - dao
-    
+    tags:
+    - v*
+  pull_request:
+
 jobs:
   Test:
     runs-on: ubuntu-latest
