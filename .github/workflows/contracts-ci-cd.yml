@@ -1,9 +1,5 @@
 name: Contracts CI/CD
-on: 
-  push:
-    paths:
-    - 'packages/govern-create/**'
-
+on: push
 jobs:
   coverage:
     runs-on: ubuntu-latest
