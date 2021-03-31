@@ -1,10 +1,11 @@
-name: Govern CI/CD
+name: Govern API tests
 on: 
   push:
     paths:
     - 'packages/govern/**'
     branches:
     - master
+    - develop
     tags:
     - v*
   pull_request:
