@@ -3,9 +3,8 @@ on:
   push:
     branches:
     - master
-    - development
-    tags:
-    - v*
+    - develop
+    
 env:
   GRAPHKEY: ${{secrets.GRAPHKEY}}
 
@@ -46,7 +45,7 @@ jobs:
       run: .github/scripts/kubectl-config.sh ${{secrets.KUBE_CA}} ${{secrets.KUBE_SERVER}} ${{secrets.KUBE_TOKEN}}
 
     - name: Deploy rinkeby
-      if: github.ref == 'refs/heads/development'
+      if: github.ref == 'refs/heads/develop'
       run: yarn deploy:subgraph:rinkeby
 
     - name: Deploy mainnet

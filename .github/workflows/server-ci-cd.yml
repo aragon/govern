@@ -3,9 +3,8 @@ on:
   push:
     branches:
     - master
-    - development
-    tags:
-    - v*
+    - develop
+
 env:
   # This is a base repository and we use git refs to set the version of the container
   # ${GITHUB_REF##*/} will be either a branch name or a tag depending on the event
@@ -29,7 +28,7 @@ jobs:
     - run: .github/scripts/docker-release.sh $REPO:${GITHUB_SHA} $REPO:latest
 
   deploy-rinkeby:
-    if: github.ref == 'refs/heads/development'
+    if: github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
     needs: release
     steps:
