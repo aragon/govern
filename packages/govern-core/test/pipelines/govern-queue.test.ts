@@ -1,5 +1,7 @@
 import { ethers, waffle} from 'hardhat'
-import { expect } from 'chai'
+import chai, { expect } from 'chai'
+import chaiUtils from '../chai-utils'
+chai.use(chaiUtils);
 
 import { GovernQueue } from '../../typechain/GovernQueue'
 import { TestToken } from '../../typechain/TestToken'
@@ -160,7 +162,24 @@ describe('Govern Queue', function() {
       const containerHash = getContainerHash(container, gq.address, chainId)
       await expect(gq.schedule(container))
         .to.emit(gq, EVENTS.SCHEDULED)
-      // .withArgs(containerHash, container.payload) // TODO also check container.payload
+        .withArgs(
+          containerHash,
+          [
+            container.payload.nonce,
+            container.payload.executionTime,
+            container.payload.submitter,
+            container.payload.executor,
+            [
+              [
+                container.payload.actions[0].to,
+                BigNumber.from(container.payload.actions[0].value),
+                container.payload.actions[0].data
+              ]
+            ],
+            container.payload.allowFailuresMap,
+            container.payload.proof
+          ]
+        )
 
       expect(await gq.queue(containerHash)).to.equal(STATE.SCHEDULED)
 
@@ -467,19 +486,19 @@ describe('Govern Queue', function() {
     
         await expect(gq.configure(container.config))
           .to.emit(gq, EVENTS.CONFIGURED)
-          // .withArgs(
-          //   configHash,
-          //   ownerAddr,
-          //   [
-          //     container.config.executionDelay,
-          //     [ container.config.scheduleDeposit.token, BigNumber.from(container.config.scheduleDeposit.amount) ],
-          //     [ container.config.challengeDeposit.token, BigNumber.from(container.config.challengeDeposit.amount) ],
-          //     container.config.resolver,
-          //     container.config.rules,
-          //   ]  //TODO:GIORGI
-          // )
+          .withArgs(
+            configHash,
+            ownerAddr,
+            [
+              container.config.executionDelay,
+              [ container.config.scheduleDeposit.token, BigNumber.from(container.config.scheduleDeposit.amount) ],
+              [ container.config.challengeDeposit.token, BigNumber.from(container.config.challengeDeposit.amount) ],
+              container.config.resolver,
+              container.config.rules,
+            ]
+          )
     
-        // expect(await gq.configHash()).to.equal(configHash)
+        expect(await gq.configHash()).to.equal(configHash)
       })
     })
   })
