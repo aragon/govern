@@ -35,7 +35,7 @@
     "ethereum-waffle": "^3.0.0",
     "ethers": "^5.0.0",
     "hardhat": "^2.1.1",
-    "hardhat-deploy": "^0.7.0-beta.37",
+    "hardhat-deploy": "^0.7.1",
     "hardhat-typechain": "^0.3.3",
     "solidity-coverage": "^0.7.15",
     "tmp-promise": "^3.0.2",
@@ -46,7 +46,7 @@
     "unique-names-generator": "^4.3.1"
   },
   "scripts": {
-    "clean": "rm -rf artifacts cache typechain",
+    "clean": "rm -rf artifacts cache typechain deployments",
     "compile": "hardhat compile --force",
     "compile:cached": "hardhat compile",
     "test": "hardhat test",
