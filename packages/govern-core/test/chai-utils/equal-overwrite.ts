@@ -32,7 +32,7 @@ const deepEqual = ( actual: any, expected: any ): boolean => {
   return actual === expected;
 }
 
-export function arrayEqualOverwrite(Assertion: Chai.AssertionStatic, utils: Chai.ChaiUtils) {
+export function equalOverwrite(Assertion: Chai.AssertionStatic, utils: Chai.ChaiUtils) {
   
   // Overwrite the Waffle withArgs() event log args comparison
   // performed on arrays (for arguments of struct type) causing test cases to fail

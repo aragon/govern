@@ -1,6 +1,6 @@
-import { arrayEqualOverwrite } from './array-overwrite';
+import { equalOverwrite } from './equal-overwrite';
 
 
 export default function (chai: Chai.ChaiStatic, utils: Chai.ChaiUtils) {
-    arrayEqualOverwrite(chai.Assertion, utils);
+    equalOverwrite(chai.Assertion, utils);
 };
