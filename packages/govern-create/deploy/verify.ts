@@ -25,8 +25,10 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   console.log('Verifying registry and factories contracts')
   
-  await delay(3000); // Etherscan needs some time to process before trying to verify.
-
+  console.log('Waiting for 2 minutes so Etherscan is aware of contracts before verifying')
+  await delay(120000); // Etherscan needs some time to process before trying to verify.
+  console.log('Starting to verify now')
+  
   await run(TASK_ETHERSCAN_VERIFY, {
     apiKey: process.env.ETHERSCAN_KEY,
     license: 'GPL-3.0',
