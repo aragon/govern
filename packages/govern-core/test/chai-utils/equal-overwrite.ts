@@ -34,8 +34,9 @@ const deepEqual = ( actual: any, expected: any ): boolean => {
 
 export function equalOverwrite(Assertion: Chai.AssertionStatic, utils: Chai.ChaiUtils) {
   
-  // Overwrite the Waffle withArgs() event log args comparison
-  // performed on arrays (for arguments of struct type) causing test cases to fail
+  // Overwrite the Waffle withArgs() event log args comparison logic
+  // It was doing Assertion(array1).equal(array2) instead of deepEqual
+  // and this cause tests to fail
   Assertion.overwriteMethod( 'equal', (_super: (...args: any[]) => any ) => {  
     return function( this: Chai.AssertionStatic, ...args: any[] ) {
       const actual = utils.flag(this, 'object');
