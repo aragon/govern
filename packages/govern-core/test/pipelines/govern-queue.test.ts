@@ -11,6 +11,7 @@ import { ERC3000ExecutorMock } from '../../typechain/ERC3000ExecutorMock'
 const { deployMockContract, provider } = waffle;
 
 const  abi = require('../../artifacts/contracts/test/TestToken.sol/TestToken.json');
+const unlockedEventAbi = ["event Unlocked(address indexed token, address indexed to, uint256 amount)"];
 
 import {
   GovernQueue__factory,
@@ -404,8 +405,7 @@ describe('Govern Queue', function() {
       // workaround for events defined in a library which doesn't get included in the ABI
       // generated when contract was compiled.  The event was emitted, the `to.emit` just
       // need a contract interface with event interface to detect the event
-      const eventAbi = ["event Unlocked(address indexed token, address indexed to, uint256 amount)"];
-      const eventContract = new Contract(gq.address, eventAbi, gq.provider);
+      const eventContract = new Contract(gq.address, unlockedEventAbi, gq.provider);
 
       await expect(gq.resolve(container, disputeId))
             .to.emit(eventContract, 'Unlocked')
@@ -447,8 +447,7 @@ describe('Govern Queue', function() {
         // workaround for events defined in a library which doesn't get included in the ABI
         // generated when contract was compiled.  The event was emitted, the `to.emit` just
         // need a contract interface with event interface to detect the event
-        const eventAbi = ["event Unlocked(address indexed token, address indexed to, uint256 amount)"];
-        const eventContract = new Contract(gq.address, eventAbi, gq.provider);
+        const eventContract = new Contract(gq.address, unlockedEventAbi, gq.provider);
 
         await expect(gq.veto(container, "0x02"))
                .to.emit(eventContract, EVENTS.UNLOCK)
@@ -476,9 +475,13 @@ describe('Govern Queue', function() {
 
         const containerHash = getContainerHash(container, gq.address, chainId);
 
+        // workaround for events defined in a library which doesn't get included in the ABI
+        // generated when contract was compiled.  The event was emitted, the `to.emit` just
+        // need a contract interface with event interface to detect the event
+        const eventContract = new Contract(gq.address, unlockedEventAbi, gq.provider);
         await expect(gq.veto(container, "0x02"))
-            // .to.emit(gq, EVENTS.UNLOCK) TODO:GIORGI
-            // .withArgs(container.config.scheduleDeposit.token, ownerAddr, container.config.scheduleDeposit.amount)
+               .to.emit(eventContract, EVENTS.UNLOCK)
+               .withArgs(container.config.scheduleDeposit.token, ownerAddr, container.config.scheduleDeposit.amount)
                .to.emit(gq, EVENTS.VETOED)
                .withArgs(containerHash, ownerAddr, '0x02')
 
