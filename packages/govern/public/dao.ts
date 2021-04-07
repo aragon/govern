@@ -8,8 +8,8 @@ export { Dao }
  *
  * @param {string} name
  *
- * @returns {Promise<Dao>}
+ * @returns {Promise<Dao|null>}
  */
-export function dao(name: string): Promise<Dao> {
+export function dao(name: string): Promise<Dao|null> {
   return new DaoAction({ name: name }).execute()
 }

@@ -55,19 +55,6 @@ export default abstract class AbstractAction {
   }
 
   /**
-   * Perform custom data formating, default no formatting
-   *
-   * @method resolve
-   *
-   * @param {any} data
-   *
-   * @returns {any}
-   */
-  protected format(data?: any): any {
-    return data
-  }
-
-  /**
    * TODO: Add if to check in the future if REST is configured for this execution
    *
    * Will execute the action and return the response from the Govern server.
@@ -80,6 +67,5 @@ export default abstract class AbstractAction {
    */
   public execute(): Promise<any> {
     return this.configuration.client.request(this.gqlQuery, this.parameters)
-           .then(this.format)
   }
 }

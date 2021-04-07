@@ -22,6 +22,5 @@ describe('[e2e] query Test', () => {
     `)
 
     expect(ethers.utils.isAddress(response.daos[0].address)).toEqual(true)
-    // expect(response.daos[0].address).toEqual('0x24319b199e9e3867ede90eaf0fad56168c54d077')
   })
 })

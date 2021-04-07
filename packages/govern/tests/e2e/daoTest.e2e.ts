@@ -14,7 +14,11 @@ describe('[e2e] dao Test', () => {
     const expected = daosData[2]
     const name = "GIORGI-DAO3"
 
-    const response = await dao(name)
+    const rawResponse = await dao(name)
+
+    expect(rawResponse).not.toBeNull()
+
+    const response = rawResponse!
 
     expect(response.id).toEqual(expected.id)
 
@@ -41,5 +45,13 @@ describe('[e2e] dao Test', () => {
     expect(response.registryEntries[0].queue.config.rules).toBeDefined()
 
     expect(Array.isArray(response.registryEntries[0].queue.queued)).toEqual(true)
+  })
+
+  it('non-existent dao should return null', async () => {
+    const name = "non-existent"
+
+    const response = await dao(name)
+
+    expect(response).toBeNull()
   })
 })

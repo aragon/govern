@@ -7,10 +7,13 @@ export interface Dao {
   registryEntries: RegistryEntry[]
 }
 
+export interface Executor {
+  executor: Dao
+}
+
 const dao: string = `
     query DAO($name: String!) {
-      registryEntries(where: { name: $name }, first: 1) {
-        id
+      executors: registryEntries(where: { name: $name }, first: 1) {
         executor {
            id
            address
