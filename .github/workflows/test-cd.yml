@@ -1,0 +1,16 @@
+name: TEST
+on:
+  push:
+    paths:
+    - 'packages/govern-subgraph/**'
+    branches:
+    - workflow-path
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: dummy job
+      run: echo hello
