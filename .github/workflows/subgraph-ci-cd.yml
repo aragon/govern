@@ -1,6 +1,8 @@
 name: Subgraph CI/CD
 on:
   push:
+    paths:
+    - 'packages/govern-subgraph/**'
     branches:
     - master
     - develop

@@ -1,6 +1,8 @@
 name: Server CI/CD
 on:
   push:
+    paths:
+    - 'packages/govern-server/**'
     branches:
     - master
     - develop
