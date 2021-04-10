@@ -11,7 +11,7 @@ describe('[e2e] dao Test', () => {
   })
 
   it('calls dao and returns as expected', async () => {
-    const expected = daosData[2]
+    const expected = daosData[0]
     const name = "GIORGI-DAO3"
 
     const rawResponse = await dao(name)
@@ -20,31 +20,37 @@ describe('[e2e] dao Test', () => {
 
     const response = rawResponse!
 
-    expect(response.id).toEqual(expected.id)
+    expect(response.id).toEqual(name)
 
-    expect(response.address).toEqual(expected.address)
+    expect(response.name).toEqual(name)
 
-    expect(response.metadata).toBeDefined()
+    expect(response.queue.id).toEqual(expected.queue.id)
 
-    expect(response.registryEntries[0].id).toEqual(name)
+    expect(response.queue.address).toEqual(expected.queue.address)
 
-    expect(response.registryEntries[0].name).toEqual(name)
+    expect(response.queue.nonce).toEqual(expected.queue.nonce)
 
-    expect(response.registryEntries[0].queue.id).toEqual(expected.registryEntries[0].queue.id)
+    expect(response.queue.config.executionDelay).toBeDefined()
 
-    expect(response.registryEntries[0].queue.address).toEqual(expected.registryEntries[0].queue.address)
+    expect(response.queue.config.scheduleDeposit).toBeDefined()
 
-    expect(response.registryEntries[0].queue.config.executionDelay).toBeDefined()
+    expect(response.queue.config.challengeDeposit).toBeDefined()
 
-    expect(response.registryEntries[0].queue.config.scheduleDeposit).toBeDefined()
+    expect(response.queue.config.resolver).toBeDefined()
 
-    expect(response.registryEntries[0].queue.config.challengeDeposit).toBeDefined()
+    expect(response.queue.config.rules).toBeDefined()
 
-    expect(response.registryEntries[0].queue.config.resolver).toBeDefined()
+    expect(response.queue.containers).toBeDefined()
 
-    expect(response.registryEntries[0].queue.config.rules).toBeDefined()
+    expect(response.executor.id).toEqual(expected.executor.id)
+    expect(response.executor.address).toEqual(expected.executor.address)
+    expect(response.executor.metadata).toBeDefined()
+    expect(response.executor.balance).toEqual(expected.executor.balance)
+    expect(response.executor.roles[0]).toBeDefined()
 
-    expect(Array.isArray(response.registryEntries[0].queue.queued)).toEqual(true)
+    expect(response.token).toEqual(expected.token)
+    expect(response.registrant).toEqual(expected.registrant)
+
   })
 
   it('non-existent dao should return null', async () => {
@@ -54,4 +60,6 @@ describe('[e2e] dao Test', () => {
 
     expect(response).toBeNull()
   })
+
 })
+

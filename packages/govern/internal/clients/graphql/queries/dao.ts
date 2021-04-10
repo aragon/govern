@@ -1,30 +1,12 @@
-import registryEntry, { RegistryEntry } from '../fragments/registry-entry'
+import daoEntry from '../fragments/dao-entry'
 
-export interface Dao {
-  id: string,
-  metadata: string,
-  address: string,
-  registryEntries: RegistryEntry[]
-}
-
-export interface Executor {
-  executor: Dao
-}
-
-const dao: string = `
+const daoQuery: string = `
     query DAO($name: String!) {
-      executors: registryEntries(where: { name: $name }, first: 1) {
-        executor {
-           id
-           address
-           metadata
-           registryEntries {
-               ...RegistryEntry_registryEntry
-           }
-        }
+      dao(id: $name) {
+        ...daoEntry
       }
     }
-    ${registryEntry}
+    ${daoEntry}
   `
 
-export default dao
+export default daoQuery

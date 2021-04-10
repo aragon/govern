@@ -1,20 +1,14 @@
-import { Dao } from './dao'
-import registryEntry from '../fragments/registry-entry'
+import daoEntry, { Dao } from '../fragments/dao-entry'
 
 export type Daos = Dao[]
 
-const daos: string = `
+const daosQuery: string = `
    query DAOS {
-      daos: governs {
-        id
-        address
-        metadata
-        registryEntries {
-            ...RegistryEntry_registryEntry
-        }
+      daos {
+         ...daoEntry
       }
    }
-   ${registryEntry}
+   ${daoEntry}
 `
 
-export default daos
+export default daosQuery

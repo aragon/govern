@@ -25,7 +25,7 @@ describe('DaoActionTest', () => {
 
       expect(args).toEqual({name: 'myName'})
 
-      return Promise.resolve({ executors: [{ executor: true }] })
+      return Promise.resolve({ dao: true })
     });
 
     const response = await action.execute();
