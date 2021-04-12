@@ -1,3 +1,0 @@
-import _Map from '../node_modules/lodash/_Map.js';
-export { default } from '../node_modules/lodash/_Map.js';
-//# sourceMappingURL=_Map.js_commonjs-proxy.map

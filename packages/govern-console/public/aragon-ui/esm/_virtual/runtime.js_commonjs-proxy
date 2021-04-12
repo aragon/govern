@@ -1,3 +1,0 @@
-import runtime_1 from '../node_modules/regenerator-runtime/runtime.js';
-export { default } from '../node_modules/regenerator-runtime/runtime.js';
-//# sourceMappingURL=runtime.js_commonjs-proxy.map
