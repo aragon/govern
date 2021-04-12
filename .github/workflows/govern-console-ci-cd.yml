@@ -3,6 +3,10 @@ on:
   push:
     paths:
     - 'packages/govern-console/**'
+    push:
+    - 'develop'
+    - 'master'
+    - '**'
 
 env:
   working-directory: packages/govern-console
