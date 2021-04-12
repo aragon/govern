@@ -3,7 +3,10 @@ on:
   push:
     paths:
     - 'packages/govern-console/**'
-    
+
+env: 
+  CI: false
+  
 jobs:
   deploy-rinkeby:
     runs-on: ubuntu-latest
