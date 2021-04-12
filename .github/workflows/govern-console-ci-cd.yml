@@ -4,9 +4,6 @@ on:
     paths:
     - 'packages/govern-console/**'
 
-env: 
-  CI: false
-  
 jobs:
   deploy-rinkeby:
     runs-on: ubuntu-latest
@@ -24,9 +21,6 @@ jobs:
         if: github.ref == 'refs/heads/master'
       - name: activate rinkeby's fleek on PR
         run: mv rinkeby.fleek.json .fleek.json
-        working-directory: packages/govern-console
-      - name: Install dependencies and build the project
-        run: yarn install --frozen-lockfile && yarn build
         working-directory: packages/govern-console
       - name: Deploy test site
         id: deploy
