@@ -25,7 +25,4 @@
     "src",
     "decs.d.ts"
   ],
-  "exclude": [
-    "src/**/**/*.stories.tsx",
-  ]
 }
