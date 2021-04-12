@@ -1,31 +1,42 @@
-name: Subgraph CI/CD
+name: Govern-Console CI/CD
 on:
   push:
     paths:
     - 'packages/govern-console/**'
+    
 
 jobs:
-  deploy-rinkeby:
+  build-and-deploy-console:
     runs-on: ubuntu-latest
     container: fleek/create-react-app:node-15
     name: deploys to rinkeby/mainnet depending on the branch
     steps:
       - uses: actions/checkout@v2
       - name: activate rinkeby's fleek
-        run: mv rinkeby.fleek.json .fleek.json
+        run: mv fleek/console.rinkeby.json .fleek.json
         working-directory: packages/govern-console
         if: github.ref == 'refs/heads/develop'
       - name: activate mainnet's fleek
-        run: mv mainnet.fleek.json .fleek.json
+        run: mv fleek/console.mainnet.json .fleek.json
         working-directory: packages/govern-console
         if: github.ref == 'refs/heads/master'
-      - name: activate rinkeby's fleek on PR
-        run: mv rinkeby.fleek.json .fleek.json
-        working-directory: packages/govern-console
       - name: Deploy test site
         id: deploy
         uses: fleekhq/action-deploy@v1
         with:
           apiKey: ${{ secrets.FLEEK_API_KEY }}
           workDir: packages/govern-console
+
+  build-and-deploy-storybook:
+    runs-on: ubuntu-latest
+    container: fleek/create-react-app:node-15
+    name: builds and deploys storybook
+    steps:
+      - uses: actions/checkout@v2
+      - name: activate rinkeby's fleek
+        run: mv fleek/storybook.json .fleek.json
+        working-directory: packages/govern-console
+        if: github.ref == 'refs/heads/develop'
+
+  
 
