@@ -63,9 +63,13 @@ templates:
       abis:
         - name: Govern
           file: $GOVERN_CORE_MODULE/abi/contracts/Govern.sol/Govern.json
+        - name: GovernQueue
+          file: $GOVERN_CORE_MODULE/abi/contracts/pipelines/GovernQueue.sol/GovernQueue.json
       eventHandlers:
         - event: Executed(indexed address,(address,uint256,bytes)[],bytes32,bytes32,bytes[])
           handler: handleExecuted
+        - event: ETHDeposited(indexed address,uint256)
+          handler: handleETHDeposited
         - event: Frozen(indexed bytes4,indexed address)
           handler: handleFrozen
         - event: Granted(indexed bytes4,indexed address,indexed address,address)

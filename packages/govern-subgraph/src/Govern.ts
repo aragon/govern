@@ -1,11 +1,12 @@
-import { Address } from '@graphprotocol/graph-ts'
+import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts'
 import {
   Executed as ExecutedEvent,
   Frozen as FrozenEvent,
   Granted as GrantedEvent,
-  Revoked as RevokedEvent
+  Revoked as RevokedEvent,
+  ETHDeposited as ETHDepositedEvent
 } from '../generated/templates/Govern/Govern'
-import { Govern as GovernEntity } from '../generated/schema'
+import { Govern } from '../generated/schema'
 import { frozenRoles, roleGranted, roleRevoked } from './lib/MiniACL'
 import { loadOrCreateContainer } from './GovernQueue'
 import { handleContainerEventExecute } from './utils/events'
@@ -16,9 +17,12 @@ export function handleExecuted(event: ExecutedEvent): void {
 
   handleContainerEventExecute(container, event)
 
-  let currentContainers = govern.containers
-  currentContainers.push(container.id)
-  govern.containers = currentContainers
+  govern.save()
+}
+
+export function handleETHDeposited(event: ETHDepositedEvent): void {
+  let govern = loadOrCreateGovern(event.address)
+  govern.balance = event.params.value
 
   govern.save()
 }
@@ -35,8 +39,6 @@ export function handleFrozen(event: FrozenEvent): void {
 
 export function handleGranted(event: GrantedEvent): void {
   let govern = loadOrCreateGovern(event.address)
-
-  // contemplar el caso en que se crea un nueva cola
 
   let role = roleGranted(event.address, event.params.role, event.params.who)
 
@@ -63,15 +65,15 @@ export function handleRevoked(event: RevokedEvent): void {
 
 // Helpers
 
-export function loadOrCreateGovern(entity: Address): GovernEntity {
+export function loadOrCreateGovern(entity: Address): Govern {
   let governId = entity.toHex()
   // Create govern
-  let govern = GovernEntity.load(governId)
+  let govern = Govern.load(governId)
   if (govern === null) {
-    govern = new GovernEntity(governId)
+    govern = new Govern(governId)
     govern.address = entity
     govern.roles = []
-    govern.containers = []
+    govern.balance = BigInt.fromI32(0)
   }
   return govern!
 }
