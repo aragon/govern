@@ -6,7 +6,6 @@ on:
     push:
     - 'develop'
     - 'master'
-    - '**'
 
 env:
   working-directory: packages/govern-console
