@@ -1,0 +1,3 @@
+import _isMasked from '../node_modules/lodash/_isMasked.js';
+export { default } from '../node_modules/lodash/_isMasked.js';
+//# sourceMappingURL=_isMasked.js_commonjs-proxy.map

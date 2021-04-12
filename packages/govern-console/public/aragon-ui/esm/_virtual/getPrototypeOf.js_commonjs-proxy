@@ -1,0 +1,3 @@
+import getPrototypeOf from '../node_modules/@babel/runtime/helpers/getPrototypeOf.js';
+export { default } from '../node_modules/@babel/runtime/helpers/getPrototypeOf.js';
+//# sourceMappingURL=getPrototypeOf.js_commonjs-proxy.map
