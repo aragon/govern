@@ -77,7 +77,7 @@ export const AddressIdentifier: React.FC<any> = ({
       console.log('xyz');
       return <Avatar src={imageUrl} />;
     }
-    console.log('abc');
+    console.log('abc123');
     return <Avatar src="/src/images/svgs/DefaultImageAddress.svg" />;
   };
 
