@@ -3,6 +3,9 @@ on:
   push:
     paths:
     - 'packages/govern-console/**'
+    branches:
+    - 'develop'
+    - 'master'
     
 
 jobs:
@@ -10,15 +13,14 @@ jobs:
     runs-on: ubuntu-latest
     container: fleek/create-react-app:node-15
     name: builds and deploys console
+    working-directory: packages/govern-console
     steps:
       - uses: actions/checkout@v2
       - name: activate rinkeby's fleek
         run: mv fleek/console.rinkeby.json .fleek.json
-        working-directory: packages/govern-console
         if: github.ref == 'refs/heads/develop'
       - name: activate mainnet's fleek
         run: mv fleek/console.mainnet.json .fleek.json
-        working-directory: packages/govern-console
         if: github.ref == 'refs/heads/master'
       - name: builds and deploys console
         id: deploy
@@ -31,12 +33,12 @@ jobs:
     runs-on: ubuntu-latest
     container: fleek/create-react-app:node-15
     name: builds and deploys storybook
+    working-directory: packages/govern-console
+    if: github.ref == 'refs/heads/develop'
     steps:
       - uses: actions/checkout@v2
       - name: activate rinkeby's fleek
         run: mv fleek/storybook.json .fleek.json
-        working-directory: packages/govern-console
-        if: github.ref == 'refs/heads/develop'
       - name: builds and deploys storybook
         id: deploy
         uses: fleekhq/action-deploy@v1
