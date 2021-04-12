@@ -9,7 +9,7 @@ jobs:
   build-and-deploy-console:
     runs-on: ubuntu-latest
     container: fleek/create-react-app:node-15
-    name: deploys to rinkeby/mainnet depending on the branch
+    name: builds and deploys console
     steps:
       - uses: actions/checkout@v2
       - name: activate rinkeby's fleek
@@ -20,7 +20,7 @@ jobs:
         run: mv fleek/console.mainnet.json .fleek.json
         working-directory: packages/govern-console
         if: github.ref == 'refs/heads/master'
-      - name: Deploy test site
+      - name: builds and deploys console
         id: deploy
         uses: fleekhq/action-deploy@v1
         with:
@@ -37,6 +37,12 @@ jobs:
         run: mv fleek/storybook.json .fleek.json
         working-directory: packages/govern-console
         if: github.ref == 'refs/heads/develop'
+      - name: builds and deploys storybook
+        id: deploy
+        uses: fleekhq/action-deploy@v1
+        with:
+          apiKey: ${{ secrets.FLEEK_API_KEY }}
+          workDir: packages/govern-console
 
   
 
