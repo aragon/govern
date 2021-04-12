@@ -7,7 +7,7 @@ export type Collateral = {
 export type ContainerEventChallenge = {
   id: string
   createdAt: string
-  actor: string
+  challenger: string
   collateral: Collateral
   disputeId: string
   reason: string
@@ -38,14 +38,6 @@ export type ContainerEventSchedule = {
   collateral: Collateral
 }
 
-export type ContainerEventSubmitEvidence = {
-  id: string
-  createdAt: string
-  evidence: string
-  submitter: string
-  finished: boolean
-}
-
 export type ContainerEventVeto = {
   id: string
   createdAt: string
@@ -58,7 +50,6 @@ export type ContainerEvent =
   | ContainerEventResolve
   | ContainerEventRule
   | ContainerEventSchedule
-  | ContainerEventSubmitEvidence
   | ContainerEventVeto
 
 export interface Action {
@@ -68,66 +59,128 @@ export interface Action {
   data: string
 }
 
-export interface RegistryEntry {
+type Role = {
+  id: string,
+  entity: string,
+  selector: string,
+  who: string,
+  granted: boolean,
+  frozen: boolean
+}
+
+type Config = {
+  id: string,
+  executionDelay: string
+  scheduleDeposit: Collateral,
+  challengeDeposit: Collateral,
+  resolver: string,
+  rules: string
+}
+
+type Executor = {
+  id: string,
+  address: string,
+  metadata: string,
+  balance: string,
+  roles: Role[]
+}
+
+type Container = {
+  id: string,
+  state: string,
+  config: Config,
+  payload: {
+    id: string,
+    nonce: string,
+    executionTime: string,
+    submitter: string,
+    executor: Executor,
+    actions: Action[]
+    allowFailuresMap: string,
+    proof: string
+  },
+  history: ContainerEvent[]
+}
+
+export interface Dao {
   id: string,
   name: string,
   queue: {
     id: string,
     address: string,
-    config: {
-      executionDelay: string
-      scheduleDeposit: Collateral,
-      challengeDeposit: Collateral,
-      resolver: string,
-      rules: string
-    },
-    queued: {
-      id: string,
-      state: string,
-      payload: {
-        id: string,
-        nonce: string,
-        executionTime: string,
-        submitter: string,
-        actions: Action[]
-        allowFailuresMap: string,
-        proof: string
-      },
-      history: ContainerEvent[]
-    }
-  }
+    nonce: string,
+    config: Config,
+    containers: Container[]
+  },
+  executor: Executor,
+  token: string,
+  registrant: string
 }
 
-const registryEntry = `
-  fragment RegistryEntry_registryEntry on RegistryEntry {
+export type Daos = Dao[]
+
+const daoFragment= `
+  fragment daoFragment on Dao {
     id
     name
     queue {
         id
         address
+        nonce
         config {
-            executionDelay
-            scheduleDeposit {
-                id
-                token
-                amount
-            }
-            challengeDeposit {
-                id
-                token
-                amount
-            }
-            resolver 
-            rules
+          id
+          executionDelay
+          scheduleDeposit {
+            id
+            token
+            amount
+          }
+          challengeDeposit {
+            id
+            token
+            amount
+          }
+          resolver
+          rules
         }
-        queued {
+        containers {
             id
             state
+            config {
+              id
+              executionDelay
+              scheduleDeposit {
+                id
+                token
+                amount
+              }
+              challengeDeposit {
+                id
+                token
+                amount
+              }
+              resolver
+              rules
+            }
             payload {
                 id
                 nonce
                 executionTime
                 submitter
+                executor {
+                  id
+                  address
+                  metadata
+                  balance
+                  roles {
+                    id
+                    entity
+                    selector
+                    who
+                    granted
+                    frozen
+                  }
+                }
                 actions {
                     id
                     to
@@ -141,7 +194,7 @@ const registryEntry = `
                 ... on ContainerEventChallenge {
                   id
                   createdAt
-                  actor
+                  challenger
                   collateral {
                     id
                     token
@@ -175,13 +228,6 @@ const registryEntry = `
                     amount
                   }
                 }
-                ... on ContainerEventSubmitEvidence {
-                  id
-                  createdAt
-                  evidence
-                  submitter
-                  finished
-                }
                 ... on ContainerEventVeto {
                   id
                   createdAt
@@ -189,8 +235,32 @@ const registryEntry = `
                 }
             }
         }
+        roles {
+          id
+          entity
+          selector
+          who
+          granted
+          frozen
+        }
     }
+    executor {
+      id
+      address
+      metadata
+      balance
+      roles {
+        id
+        entity
+        selector
+        who
+        granted
+        frozen
+      }
+    }
+    token
+    registrant
   }
 `
 
-export default registryEntry;
+export default daoFragment;

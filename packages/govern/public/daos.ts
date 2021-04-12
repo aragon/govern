@@ -1,4 +1,4 @@
-import { Daos } from '../internal/clients/graphql/queries/daos'
+import { Daos } from '../internal/clients/graphql/fragments/dao-entry'
 import DaosAction from '../internal/actions/DaosAction'
 
 export { Daos }
