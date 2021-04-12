@@ -1,0 +1,34 @@
+name: Subgraph CI/CD
+on:
+  push:
+    paths:
+    - 'packages/govern-console/**'
+    
+jobs:
+  deploy-rinkeby:
+    runs-on: ubuntu-latest
+    container: fleek/create-react-app:node-15
+    name: deploys to rinkeby/mainnet depending on the branch
+    steps:
+      - uses: actions/checkout@v2
+      - name: activate rinkeby's fleek
+        run: mv rinkeby.fleek.json .fleek.json
+        working-directory: packages/govern-console
+        if: github.ref == 'refs/heads/develop'
+      - name: activate mainnet's fleek
+        run: mv mainnet.fleek.json .fleek.json
+        working-directory: packages/govern-console
+        if: github.ref == 'refs/heads/master'
+      - name: activate rinkeby's fleek on PR
+        run: mv rinkeby.fleek.json .fleek.json
+        working-directory: packages/govern-console
+      - name: Install dependencies and build the project
+        run: yarn install --frozen-lockfile && yarn build
+        working-directory: packages/govern-console
+      - name: Deploy test site
+        id: deploy
+        uses: fleekhq/action-deploy@v1
+        with:
+          apiKey: ${{ secrets.FLEEK_API_KEY }}
+          workDir: packages/govern-console
+
