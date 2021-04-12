@@ -8,7 +8,7 @@
 # testing
 /coverage
 
-/public
+/public/aragon-ui
 
 # production
 /build
