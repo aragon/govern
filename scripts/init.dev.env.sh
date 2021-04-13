@@ -45,10 +45,10 @@ mkdir -p ./dev-data/postgres
 mkdir -p ./dev-data/ipfs
 
 if [[ "$(docker ps -a | grep graph)" ]]; then
-    yarn stop:containers
+    yarn stop:dev
 fi
 
-yarn start:containers
+yarn start:dev
 
 if [ $? -ne 0 ]
 then
