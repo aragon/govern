@@ -2,7 +2,7 @@ import { gql } from '@apollo/client';
 
 export const GET_DAO_LIST = gql`
   query DAOs($offset: Int, $limit: Int) {
-    daos(skip: $offset, limit: $limit) {
+    daos(skip: $offset, first: $limit) {
       id
       name
       queue {
