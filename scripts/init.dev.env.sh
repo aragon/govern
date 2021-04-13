@@ -35,7 +35,7 @@ fi
 # Init docker containers
 # ----------------------------------
 
-cd ../govern-server/
+cd ../../
 
 if [[ -d "./dev-data" ]]; then
     rm -rf ./dev-data
@@ -80,7 +80,7 @@ echo -e ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 # Create local subgraph
 # ---------------------
 
-cd ../govern-subgraph/
+cd ./packages/govern-subgraph/
 yarn create-local
 
 if [ $? -ne 0 ]
