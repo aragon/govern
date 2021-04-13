@@ -44,7 +44,7 @@ contract GovernBaseFactory {
 
         queue = queueFactory.newQueue(address(this), dummyConfig(), salt);
         govern = governFactory.newGovern(queue, salt);
-
+        
         if (address(_token) == address(0)) {
             (_token,) = tokenFactory.newToken(
                 govern,

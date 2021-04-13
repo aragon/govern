@@ -13,6 +13,7 @@
   ],
   "dependencies": {
     "@aragon/govern-contract-utils": "^1.0.0-beta.12",
+    "@openzeppelin/contracts": "3.3.0",
     "erc3k": "^1.0.0-beta.12"
   },
   "devDependencies": {
