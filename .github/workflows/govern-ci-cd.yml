@@ -3,13 +3,7 @@ on:
   push:
     paths:
     - 'packages/govern/**'
-    branches:
-    - master
-    - develop
-    tags:
-    - v*
-  pull_request:
-
+    
 jobs:
   Test:
     runs-on: ubuntu-latest
