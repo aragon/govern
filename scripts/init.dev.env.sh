@@ -124,7 +124,7 @@ else
     echo "**                    Govern: local dev env initialized                         **"
     echo "**                                                                              **"
     echo "**      Execute from now on just 'yarn start:dev' in the root folder or         **"
-    echo "**           'yarn start:containers' in the 'govern-server' package.            **"
+    echo "**                                                                              **"
     echo "**                                                                              **"
     echo -e ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>${NC}"
 fi

@@ -4,7 +4,6 @@ import gql from 'graphql-tag'
 import ClientInterface from '../lib/ClientInterface'
 
 /**
- * TODO: Use QueryResult type from govern-server/core
  *
  * @class GraphQLClient
  */
