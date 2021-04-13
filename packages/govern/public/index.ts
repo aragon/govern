@@ -5,6 +5,7 @@ export { configure, ConfigurationObject } from './configure'
 export { dao, Dao } from './dao'
 export { daos, Daos } from './daos'
 export { query } from './query'
+export { createDao, CreateDaoOptions, CreateDaoParams } from './create-dao'
 
 // Types
 

@@ -1,3 +1,9 @@
 dist/
 coverage/
 package/
+
+#Hardhat files
+cache
+artifacts
+typechain
+deployments
