@@ -1,15 +1,15 @@
 {
     "site": {
-      "id": "45621c7b-6339-40a3-b785-93148b1cf625",
-      "team": "aragonone-team",
-      "platform": "ipfs",
-      "source": "github",
-      "name": "steep-union-3321"
+        "id": "45621c7b-6339-40a3-b785-93148b1cf625",
+        "team": "aragonone-team",
+        "platform": "ipfs",
+        "source": "github",
+        "name": "steep-union-3321"
     },
     "build": {
-      "baseDir": "packages/govern-console",
-      "publicDir": "storybook-static",
-      "command": "yarn install --frozen-lockfile && yarn build-storybook",
-      "rootDir": ""
+        "baseDir": "packages/govern-console",
+        "publicDir": "storybook-static",
+        "command": "yarn install --frozen-lockfile && yarn build-storybook",
+        "rootDir": ""
     }
-  }
+}
