@@ -1,15 +1,18 @@
 import React from 'react';
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
+import { Web3ReactProvider } from '@web3-react/core';
 import Home from 'containers/HomePage/HomePage';
-// This site has 3 pages, all of which are rendered
-// dynamically in the browser (not server rendered).
-//
-// Although the page does not ever refresh, notice how
-// React Router keeps the URL up to date as you navigate
-// through the site. This preserves the browser history,
-// making sure things like the back button and bookmarks
-// work properly.
+import { Web3Provider } from '@ethersproject/providers';
+
+function getLibrary(provider: any): Web3Provider {
+  const library = new Web3Provider(provider);
+  library.pollingInterval = 12000;
+  return library;
+}
 
 export default function App() {
-  return <Home />;
+  return (
+    <Web3ReactProvider getLibrary={getLibrary}>
+      <Home />
+    </Web3ReactProvider>
+  );
 }
