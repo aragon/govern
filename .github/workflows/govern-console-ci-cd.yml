@@ -3,7 +3,7 @@ on:
   push:
     paths:
     - 'packages/govern-console/**'
-    push:
+    branches:
     - 'develop'
     - 'master'
 
