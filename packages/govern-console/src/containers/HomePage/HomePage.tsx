@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import Header from 'components/Header/Header';
 // import NavigationBar from '../../components/Navigation';
@@ -10,6 +10,17 @@ const HomePage = ({ ...props }) => {
     width: 'calc(100vw - 96px)',
     margin: 'auto',
   });
+
+  const [selectedDao, updateSelectedDao] = React.useState({});
+
+  const DaoContext = React.createContext({
+    selectedDao,
+    updateSelectedDao,
+    // updateSelectedDao: (daoDetails: any) => {
+    //   selectedDao = daoDetails;
+    // },
+  });
+
   return (
     <Router>
       <AppWrapper>
@@ -18,8 +29,11 @@ const HomePage = ({ ...props }) => {
         <Switch>
           <div>
             <Route exact path="/">
-              <ConsoleMainPage daoList={[]} />
+              <ConsoleMainPage />
             </Route>
+            {/* <Route exact path="/">
+              <ConsoleMainPage />
+            </Route> */}
             {/* <Route path="/about">
         <About />
       </Route>

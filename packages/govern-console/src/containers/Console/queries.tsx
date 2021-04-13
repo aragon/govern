@@ -2,7 +2,7 @@ import { gql } from '@apollo/client';
 
 export const GET_DAO_LIST = gql`
   query DAOs($offset: Int, $limit: Int) {
-    daos(offset: $offset, limit: $limit) {
+    daos(skip: $offset, limit: $limit) {
       id
       name
       queue {
@@ -15,6 +15,14 @@ export const GET_DAO_LIST = gql`
       }
       token
       registrant
+    }
+  }
+`;
+export const GET_GOVERN_REGISTRY_DATA = gql`
+  {
+    governRegistries(limit: 1) {
+      id
+      count
     }
   }
 `;

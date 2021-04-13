@@ -24,10 +24,10 @@ export interface DaoMainPageProps {
    * List of Proposal
    */
   proposalList: any;
-  /**
-   * Profile page or not
-   */
-  isProfile: boolean;
+  // /**
+  //  * Profile page or not
+  //  */
+  // isProfile: boolean;
 }
 
 export const DaoMainPage: React.FC<DaoMainPageProps> = ({
@@ -35,21 +35,20 @@ export const DaoMainPage: React.FC<DaoMainPageProps> = ({
   ethBalance,
   usdBalance,
   proposalList,
-  isProfile,
+  // isProfile,
   ...props
 }) => {
-  console.log('xyz');
   const theme = useTheme();
   const [isProposalPage, setProposalPage] = useState(true);
   const [isProfilePage, setProfilePage] = useState(false);
   const searchString = useRef('');
 
-  useEffect(() => {
-    if (isProfile) {
-      setProposalPage(false);
-      setProfilePage(true);
-    }
-  }, [isProfile]);
+  // useEffect(() => {
+  //   if (isProfile) {
+  //     setProposalPage(false);
+  //     setProfilePage(true);
+  //   }
+  // }, [isProfile]);
 
   const onInputChange = (val: string) => {
     searchString.current = val;
@@ -128,13 +127,13 @@ export const DaoMainPage: React.FC<DaoMainPageProps> = ({
               Proposal
             </PageLabel>
           )}
-          {isProfilePage ? (
+          {/* {isProfilePage ? (
             <PageLabelSelected>Profile</PageLabelSelected>
           ) : (
             <PageLabel onClick={() => onPageChange('profile')}>
               Profile
             </PageLabel>
-          )}
+          )} */}
         </div>
         {isProposalPage ? (
           <div>
@@ -201,7 +200,7 @@ export const DaoMainPage: React.FC<DaoMainPageProps> = ({
             </div>
           </div>
         ) : (
-          <div></div>
+          <></>
         )}
       </div>
     </DaoPageMainDiv>

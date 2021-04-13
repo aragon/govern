@@ -47,6 +47,7 @@ export const DaoCard: React.FC<DaoCardProps> = ({
     borderRadius: '8px',
     display: 'flex',
     flexDirection: 'column',
+    cursor: 'pointer',
   });
 
   const CardLabel = styled(MUITypography)({
