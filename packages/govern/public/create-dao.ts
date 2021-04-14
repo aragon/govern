@@ -46,10 +46,11 @@ export async function createDao(
   if (!args.token.address)
   {
     address = AddressZero
+  }
 
-    if (!args.token.name || !args.token.symbol) {
-      throw new Error('Missing token name and/or symbol')
-    }
+  if (address === AddressZero && (!args.token.name || !args.token.symbol))
+  {
+    throw new Error('Missing token name and/or symbol')
   }
 
   const factoryAddress = options.daoFactoryAddress || FACTORY_ADDRESS
@@ -58,8 +59,8 @@ export async function createDao(
   const result = contract.newGovernWithoutConfig(
     args.name,
     address,
-    args.token.name,
-    args.token.symbol,
+    args.token.name || '',
+    args.token.symbol || '',
     args.useProxies
   )
 

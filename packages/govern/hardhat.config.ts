@@ -4,6 +4,7 @@ dotenvConfig({ path: resolve(__dirname, './.env') })
 
 import { HardhatUserConfig } from 'hardhat/types'
 import '@nomiclabs/hardhat-ethers'
+import '@nomiclabs/hardhat-waffle'
 import 'hardhat-deploy'
 import 'hardhat-typechain'
 
@@ -34,7 +35,7 @@ const config: HardhatUserConfig = {
       // Without setting this,tests do fail due to out of gas error
       gas: 10000000,
       forking: {
-        url: "https://rinkeby.infura.io/v3/5d13279315f4432b84b020fb34cebcb7"
+        url: "https://rinkeby.infura.io/v3/84842078b09946638c03157f83405213"
       }
     }
   }
