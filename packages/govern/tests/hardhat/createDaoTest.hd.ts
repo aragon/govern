@@ -6,7 +6,7 @@ import { createDao, CreateDaoParams, CreateDaoOptions } from '../../public/creat
 const tokenAddress = '0x9fB402A33761b88D5DcbA55439e6668Ec8D4F2E8'
 const daoFactoryAddress = '0x1791E1D949c21703f49FC2C9a24570FA72ed62Ae'
 const registryAddress = '0x8Adf949ADBAB3614f5340b21d9D9AD928d218096'
-import * as registryAbi from './registry-abi.json' 
+import * as registryAbi from './registryAbi.json'
 
 describe("Create Dao", function() {
   it("Should create a dao successfully", async function() {

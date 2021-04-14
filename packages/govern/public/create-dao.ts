@@ -3,9 +3,8 @@ import { Contract } from '@ethersproject/contracts'
 import { Web3Provider } from '@ethersproject/providers'
 import { AddressZero } from '@ethersproject/constants'
 import { TransactionResponse } from '@ethersproject/abstract-provider'
+import Configuration from '../internal/configuration/Configuration'
 
-// rinkeby address for now
-const FACTORY_ADDRESS = '0x1791E1D949c21703f49FC2C9a24570FA72ed62Ae'
 const FACTORY_ABI = ["function newGovernWithoutConfig(string,address,string,string,bool)"]
 
 declare let window: any;
@@ -53,7 +52,8 @@ export async function createDao(
     throw new Error('Missing token name and/or symbol')
   }
 
-  const factoryAddress = options.daoFactoryAddress || FACTORY_ADDRESS
+  const config = Configuration.get()
+  const factoryAddress = options.daoFactoryAddress || config.daoFactoryAddress
   const signer = await new Web3Provider(options.provider || window.ethereum).getSigner()
   const contract = new Contract(factoryAddress, FACTORY_ABI, signer)
   const result = contract.newGovernWithoutConfig(
