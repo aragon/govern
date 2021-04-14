@@ -1,17 +1,15 @@
 import React, { useState, useRef, memo, useCallback } from 'react';
 import { ANButton } from '../../components/Button/ANButton';
-import { useTheme, styled } from '@material-ui/core/styles';
+import { useTheme, styled, Theme } from '@material-ui/core/styles';
 import useStyles from '../../ReusableStyles';
 import backButtonIcon from '../../images/back-btn.svg';
 import Typography from '@material-ui/core/Typography';
 import { HelpButton } from '../../components/HelpButton/HelpButton';
 import TextArea from '../../components/TextArea/TextArea';
 import Paper from '@material-ui/core/Paper';
-// import Modal from '@material-ui/core/Modal';
-import Dialog from '@material-ui/core/Dialog';
-import MuiDialogTitle from '@material-ui/core/DialogTitle';
-import MuiDialogContent from '@material-ui/core/DialogContent';
-import MuiDialogActions from '@material-ui/core/DialogActions';
+import { NewActionModal } from '../../components/Modal/NewActionModal';
+import { AddActionsModal } from '../../components/Modal/AddActionsModal';
+import { InputField } from '../../components/InputFields/InputField';
 export interface NewProposalProps {
   /**
    * All the details of DAO
@@ -23,34 +21,128 @@ export interface NewProposalProps {
   onSchedule?: any;
 }
 
+export interface AddedActionsProps {
+  /**
+   * Added actions
+   */
+  selectedActions?: any;
+}
+
+const SubTitle = styled(Typography)({
+  fontFamily: 'Manrope',
+  fontStyle: 'normal',
+  fontWeight: 'normal',
+  fontSize: 18,
+  lineHeight: '25px',
+  color: '#7483AB',
+});
+
+const TextBlack = styled(Typography)({
+  fontFamily: 'Manrope',
+  fontStyle: 'normal',
+  fontWeight: 400,
+  fontSize: 18,
+  lineHeight: '25px',
+  color: '0A0B0B',
+});
+
+const ContractAddressText = styled(Typography)({
+  fontFamily: 'Manrope',
+  fontStyle: 'normal',
+  fontWeight: 600,
+  fontSize: 18,
+  lineHeight: '25px',
+  color: '0A0B0B',
+});
+
+const AddedActions: React.FC<AddedActionsProps> = ({
+  selectedActions,
+  ...props
+}) => {
+  const actionDivStyle = {
+    width: '862px',
+    border: '2px solid #E2ECF5',
+    borderRadius: '10px',
+    paddingLeft: '24px',
+    paddingRight: '24px',
+    paddingBottom: '22px',
+    paddingTop: '22px',
+    marginTop: '18px',
+  };
+
+  const actionNameDivStyle = {
+    paddingBottom: '21px',
+    borderBottom: '2px solid #E2ECF5',
+  };
+
+  return selectedActions.map((action: any) => (
+    <div style={{ marginTop: '24px' }} key={action.name}>
+      <div>
+        <SubTitle>Contract Address</SubTitle>
+        <ContractAddressText>{action.contractAddress}</ContractAddressText>
+      </div>
+      <div style={actionDivStyle}>
+        <div style={actionNameDivStyle}>
+          <TextBlack>{action.name}</TextBlack>
+        </div>
+        {action.item.inputs.map((input: any) => (
+          <div key={input.name}>
+            <div style={{ marginTop: '20px' }}>
+              <SubTitle>{input.name}</SubTitle>
+            </div>
+            <div style={{ marginTop: '20px' }}>
+              <InputField
+                label=""
+                onInputChange={() => {
+                  console.log('click');
+                }}
+                height="46px"
+                width="814px"
+                placeholder={input.name}
+              ></InputField>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  ));
+};
+
 const NewProposal: React.FC<NewProposalProps> = ({
   daoDetails,
   onSchedule,
 }) => {
   const theme = useTheme();
   const classes = useStyles();
-  const textFieldRef = useRef();
-  const [justification, updateJustification] = useState('');
-
-  const [isAddingActions, updateIsAddingActions] = useState(false);
-
+  const justification = useRef();
+  // const [isAddingActions, updateIsAddingActions] = useState(false);
   const [selectedActions, updateSelectedOptions] = useState([]);
-
   // const [modalStyle] = React.useState(getModalStyle);
-  const [open, setOpen] = React.useState(false);
+  const [isInputModalOpen, setInputModalOpen] = useState(false);
+  const [isActionModalOpen, setActionModalOpen] = useState(false);
+  const abiFunctions = useRef([]);
 
-  const handleOpenModal = () => {
-    setOpen(true);
+  const handleInputModalOpen = () => {
+    setInputModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setOpen(false);
+  const handleInputModalClose = () => {
+    setInputModalOpen(false);
   };
 
-  // const onAddNewAction = () => {};
-  // const onMoveSelectedAction = () => {};
-  // const onRemoveSelectedAction = () => {};
-  // const onScheduleAction = () => {};
+  const handleActionModalOpen = () => {
+    setActionModalOpen(true);
+  };
+
+  const handleActionModalClose = () => {
+    setActionModalOpen(false);
+  };
+
+  const onAddNewAction = (action: any) => {
+    const newActions = [...selectedActions, action];
+    updateSelectedOptions(newActions);
+  };
+  // const onScheduleProposal = () => {};
 
   const WrapperDiv = styled(Paper)({
     width: '100%',
@@ -79,17 +171,6 @@ const NewProposal: React.FC<NewProposalProps> = ({
     marginTop: 17,
     height: 50,
     display: 'block',
-  });
-  const SubTitle = styled(Typography)({
-    fontFamily: 'Manrope',
-    fontStyle: 'normal',
-    fontWeight: 'normal',
-    fontSize: 18,
-    lineHeight: '25px',
-    color: '#7483AB',
-    marginTop: 17,
-    height: 31,
-    display: 'inline-block',
   });
   const JustificationTextArea = styled(TextArea)({
     background: '#FFFFFF',
@@ -124,9 +205,38 @@ const NewProposal: React.FC<NewProposalProps> = ({
     },
   });
   const isProposalValid = () => {
-    if (justification === '') return false;
+    if (justification.current === '') return false;
     if (selectedActions.length === 0) return false;
     return true;
+  };
+
+  const onGenerateActionsFromAbi = async (
+    contractAddress: string,
+    abi: any,
+  ) => {
+    console.log(contractAddress, abi);
+    const functions = [];
+    await abi.forEach((item: any) => {
+      const { name, type, stateMutability } = item;
+      if (
+        type === 'function' &&
+        stateMutability !== 'view' &&
+        stateMutability !== 'pure'
+      ) {
+        const data = {
+          name,
+          type,
+          item,
+          contractAddress,
+        };
+        functions.push(data);
+      }
+    });
+
+    abiFunctions.current = functions;
+    console.log(abiFunctions);
+    handleInputModalClose();
+    handleActionModalOpen();
   };
 
   return (
@@ -136,22 +246,34 @@ const NewProposal: React.FC<NewProposalProps> = ({
           <img src={backButtonIcon} />
         </BackButton>
         <Title>New Proposal</Title>
-        <SubTitle style={{ marginTop: 22, marginBottom: 6 }}>
-          Justification
-        </SubTitle>{' '}
-        {<HelpButton helpText="" />}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            marginBottom: '10px',
+          }}
+        >
+          <div>
+            <SubTitle>Justification</SubTitle>{' '}
+          </div>
+          <div style={{ marginLeft: '10px' }}>{<HelpButton helpText="" />}</div>
+        </div>
         <JustificationTextArea
           // ref={}
-          value={justification}
+          value={justification.current}
           onChange={useCallback((event) => {
-            updateJustification(event.target.value);
+            justification.current = event.target.value;
           }, [])}
           placeholder={'Enter Justification '}
         ></JustificationTextArea>
         <Title>Actions</Title>
         {selectedActions.length === 0 ? (
           <SubTitle>No actions defined Yet</SubTitle>
-        ) : null}
+        ) : (
+          <div>
+            <AddedActions selectedActions={selectedActions} />
+          </div>
+        )}
         <br />
         <ANButton
           label="Add new action"
@@ -160,7 +282,7 @@ const NewProposal: React.FC<NewProposalProps> = ({
           type="secondary"
           color="#00C2FF"
           style={{ marginTop: 40 }}
-          onClick={handleOpenModal}
+          onClick={handleInputModalOpen}
         />
         <br />
         <ANButton
@@ -172,6 +294,17 @@ const NewProposal: React.FC<NewProposalProps> = ({
           style={{ marginTop: 16 }}
           disabled={!isProposalValid()}
         />
+        <NewActionModal
+          onCloseModal={handleInputModalClose}
+          onGenerate={onGenerateActionsFromAbi}
+          open={isInputModalOpen}
+        ></NewActionModal>
+        <AddActionsModal
+          onCloseModal={handleActionModalClose}
+          open={isActionModalOpen}
+          onAddAction={onAddNewAction}
+          actions={abiFunctions.current}
+        ></AddActionsModal>
       </WrapperDiv>
     </>
   );
