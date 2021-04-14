@@ -1,51 +1,69 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
+import React from 'react';
+import { Switch, Route } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
+import { styled } from '@material-ui/core/styles';
+
 import Header from 'components/Header/Header';
 // import NavigationBar from '../../components/Navigation';
-import { styled } from '@material-ui/core/styles';
 import { ConsoleMainPage } from 'containers/Console/ConsoleMainPage';
+import { DaoMainPage } from 'containers/DAO/DaoMainPage';
+import ProposalDetails from 'containers/ProposalDetails/ProposalDetails';
 
 const HomePage = ({ ...props }) => {
   const AppWrapper = styled('div')({
     width: 'calc(100vw - 96px)',
     margin: 'auto',
   });
-
+  const history = useHistory();
+  debugger;
   const [selectedDao, updateSelectedDao] = React.useState({});
-
-  const DaoContext = React.createContext({
-    selectedDao,
-    updateSelectedDao,
-    // updateSelectedDao: (daoDetails: any) => {
-    //   selectedDao = daoDetails;
-    // },
-  });
-
+  const updateSelectedDaoAndPushToHistory = React.useCallback(
+    (daoDetails: any) => {
+      history.push(`/${daoDetails.name}`, {
+        daoDetails,
+      });
+    },
+    [history],
+  );
+  const onClickProposalCard = React.useCallback(
+    (proposalDetails: any) => {
+      history.push(`/proposals/${proposalDetails.id}`, {
+        proposalDetails,
+      });
+    },
+    [history],
+  );
+  const onClickBackFromProposalPage = () => {
+    history.goBack();
+  };
   return (
-    <Router>
-      <AppWrapper>
-        <Header />
-        {/* <NavigationBar /> */}
-        <Switch>
-          <div>
-            <Route exact path="/">
-              <ConsoleMainPage />
-            </Route>
-            {/* <Route exact path="/">
-              <ConsoleMainPage />
-            </Route> */}
-            {/* <Route path="/about">
+    <AppWrapper>
+      <Header />
+      {/* add breadcrumbs later */}
+      <Switch>
+        <div>
+          <Route exact path="/">
+            <ConsoleMainPage
+              updateSelectedDao={updateSelectedDaoAndPushToHistory}
+            />
+          </Route>
+          <Route exact path="/:daoName">
+            <DaoMainPage onClickProposalCard={onClickProposalCard} />
+          </Route>
+          <Route exact path="/proposals/:id">
+            <ProposalDetails onClickBack={onClickBackFromProposalPage} />
+          </Route>
+          {/* <Route path="/about">
         <About />
       </Route>
       <Route path="/dashboard">
         <Dashboard />
       </Route>
     */}
-          </div>
-        </Switch>
-        {/* <Footer /> */}
-      </AppWrapper>
-    </Router>
+        </div>
+      </Switch>
+      {/* <Footer /> */}
+    </AppWrapper>
   );
 };
 

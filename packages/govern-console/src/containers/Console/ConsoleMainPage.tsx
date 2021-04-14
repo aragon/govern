@@ -1,13 +1,23 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { styled, useTheme } from '@material-ui/core/styles';
 import { ConsoleHeader } from '../../components/ConsoleHeader/ConsoleHeader';
 import { DaoCard } from '../../components/DaoCards/DaoCard';
 import { ANButton } from '../../components/Button/ANButton';
 import Paper from '@material-ui/core/Paper';
-import { useQuery, useLazyQuery, gql } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { GET_DAO_LIST, GET_GOVERN_REGISTRY_DATA } from './queries';
+import { Link } from 'react-router-dom';
+export interface ConsoleMainPageProps {
+  /**
+   * Callback on selection of Dao
+   */
+  updateSelectedDao: any;
+}
 
-export const ConsoleMainPage = ({ ...props }) => {
+export const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
+  updateSelectedDao,
+  ...props
+}) => {
   const theme = useTheme();
   const [visibleDaoList, updateDaoList] = useState<any>([]);
   const [totalDaoCount, updateTotalDaoCount] = useState<number>();
@@ -44,12 +54,7 @@ export const ConsoleMainPage = ({ ...props }) => {
 
   useEffect(() => {
     if (daoListData && daoListData.daos) {
-      if (visibleDaoList.length > 0) {
-        updateDaoList([...visibleDaoList, ...daoListData.daos]);
-      } else {
-        //fetch extra daoListData - Number of proposals and value
-        updateDaoList(daoListData.daos);
-      }
+      updateDaoList([...daoListData.daos]);
     }
   }, [daoListData]);
 
@@ -73,7 +78,11 @@ export const ConsoleMainPage = ({ ...props }) => {
       >
         {daoListData &&
           daoListData.daos.map((dao: any) => (
-            <div style={{ marginTop: '32px' }} key={dao.id}>
+            <div
+              style={{ marginTop: '32px' }}
+              onClick={() => updateSelectedDao(dao)}
+              key={dao.name}
+            >
               <DaoCard
                 label={dao.name}
                 aumValue={dao.executor.balance}
@@ -105,7 +114,6 @@ export const ConsoleMainPage = ({ ...props }) => {
               fetchMoreDaos({
                 variables: {
                   offset: visibleDaoList.length,
-                  limit: 12,
                 },
               });
             }}

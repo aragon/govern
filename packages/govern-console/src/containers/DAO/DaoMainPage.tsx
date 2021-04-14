@@ -6,42 +6,21 @@ import { ANButton } from '../../components/Button/ANButton';
 import { InputField } from '../../components/InputFields/InputField';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
+import { GET_PROPOSAL_LIST } from './queries';
+import { useQuery } from '@apollo/client';
+import { useHistory } from 'react-router-dom';
 
-export interface DaoMainPageProps {
-  /**
-   * List of Daos
-   */
-  daoName: string;
-  /**
-   * List of Daos
-   */
-  ethBalance: string | number;
-  /**
-   * List of Daos
-   */
-  usdBalance: string | number;
-  /**
-   * List of Proposal
-   */
-  proposalList: any;
-  // /**
-  //  * Profile page or not
-  //  */
-  // isProfile: boolean;
-}
-
-export const DaoMainPage: React.FC<DaoMainPageProps> = ({
-  daoName,
-  ethBalance,
-  usdBalance,
-  proposalList,
-  // isProfile,
+export const DaoMainPage: React.FC<{ onClickProposalCard: any }> = ({
+  onClickProposalCard,
   ...props
 }) => {
   const theme = useTheme();
   const [isProposalPage, setProposalPage] = useState(true);
+  const [visibleProposalList, updateVisibleProposalList] = useState<any>([]);
   const [isProfilePage, setProfilePage] = useState(false);
   const searchString = useRef('');
+  const history: any = useHistory();
+  const daoDetails = history.location.state.daoDetails;
 
   // useEffect(() => {
   //   if (isProfile) {
@@ -66,8 +45,26 @@ export const DaoMainPage: React.FC<DaoMainPageProps> = ({
     }
   };
 
+  const {
+    data: queueData,
+    loading: isLoadingProposals,
+    error: errorLoadingProposals,
+    fetchMore: fetchMoreProposals,
+  } = useQuery(GET_PROPOSAL_LIST, {
+    variables: {
+      id: daoDetails.queue.id,
+    },
+  });
+
+  useEffect(() => {
+    if (queueData) {
+      updateVisibleProposalList(queueData.governQueue.containers);
+    }
+  }, [queueData]);
+
+  //* Styled Components List
   const DaoPageMainDiv = styled(Paper)({
-    width: '1408px',
+    width: '100%',
     background: theme.custom.white,
     height: 'auto',
     padding: '0px',
@@ -96,13 +93,14 @@ export const DaoMainPage: React.FC<DaoMainPageProps> = ({
     fontStyle: theme.custom.daoCard.fontStyle,
     cursor: 'pointer',
   });
+  //* Styled Components List End
 
   return (
     <DaoPageMainDiv>
       <DaoHeader
-        ethBalance={ethBalance}
-        usdBalance={usdBalance}
-        daoName={daoName}
+        ethBalance={'1'}
+        usdBalance={'2222'}
+        daoName={daoDetails.name}
       />
       <div
         style={{
@@ -168,15 +166,13 @@ export const DaoMainPage: React.FC<DaoMainPageProps> = ({
                 justifyContent: 'space-between',
               }}
             >
-              {proposalList.map((proposal: any) => (
-                <div
-                  style={{ marginTop: '16px' }}
-                  key={proposal.transactionHash}
-                >
+              {visibleProposalList.map((proposal: any) => (
+                <div style={{ marginTop: '16px' }} key={proposal.id}>
                   <ProposalCard
-                    transactionHash={proposal.transactionHash}
-                    proposalDate={proposal.proposalDate}
-                    proposalStatus={proposal.proposalStatus}
+                    transactionHash={proposal.id}
+                    proposalDate={'3/29/2021'}
+                    proposalStatus={proposal.state}
+                    onClickProposalCard={() => onClickProposalCard(proposal)}
                   ></ProposalCard>
                 </div>
               ))}
@@ -196,6 +192,7 @@ export const DaoMainPage: React.FC<DaoMainPageProps> = ({
                 type="secondary"
                 height="46px"
                 width="196px"
+                color="#00C2FF"
               ></ANButton>
             </div>
           </div>
