@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, memo } from 'react';
 import MuiDialog from '@material-ui/core/Dialog';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
@@ -17,7 +17,7 @@ import {
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
 
-export interface NewActionModalProps {
+export interface AddActionsModalProps {
   /**
    * Open Modal or not
    */
@@ -29,7 +29,11 @@ export interface NewActionModalProps {
   /**
    * What happens when clicked on generate
    */
-  onGenerate: (contractAddress: any, abi: any) => void;
+  onAddAction: (action: any) => void;
+  /**
+   * What happens when clicked on generate
+   */
+  actions: [];
 }
 
 const styles = (theme: Theme) =>
@@ -64,7 +68,9 @@ const DialogContent = withStyles((theme: Theme) => ({
   root: {
     paddingTop: '33px',
     paddingLeft: '40px',
+    paddingRight: '40px',
     paddingBottom: '0px',
+    maxHeight: '424px',
   },
 }))(MuiDialogContent);
 
@@ -73,6 +79,7 @@ const DialogActions = withStyles((theme: Theme) => ({
     margin: 0,
     paddingTop: '24px',
     paddingLeft: '40px',
+    paddingRight: '40px',
     paddingBottom: '35px',
     display: 'flex',
     justifyContent: 'left',
@@ -98,80 +105,74 @@ export const DialogTitle = withStyles(styles)((props: DialogTitleProps) => {
   );
 });
 
-export const NewActionModal: React.FC<NewActionModalProps> = ({
+export const AddActionsModal: React.FC<AddActionsModalProps> = ({
   open,
   onCloseModal,
-  onGenerate,
+  onAddAction,
+  actions,
 }) => {
   const theme = useTheme();
-  const contractAddress = useRef();
-  const abi = useRef(null);
-  const isJsonString = (str: string) => {
-    try {
-      JSON.parse(str);
-    } catch (e) {
-      return false;
-    }
-    return true;
+  const actionStyle = {
+    display: 'flex',
+    paddingTop: '23px',
+    paddingLeft: '21px',
+    paddingRight: '21px',
+    paddingBottom: '23px',
+    justifyContent: 'space-between',
+    borderBottom: '2px solid #E2ECF5',
   };
 
-  const onInputABI = (val: string) => {
-    if (isJsonString(val)) {
-      abi.current = JSON.parse(val);
-    } else return;
-  };
-  const onInputContractAddress = (val: any) => {
-    contractAddress.current = val;
-  };
-  const onGenerateClick = () => {
-    if (abi.current === null) return;
-    if (contractAddress.current === null) return;
-
-    console.log(abi.current, contractAddress.current);
-    onGenerate(contractAddress.current, abi.current);
-  };
-  const InputLabelText = styled(Typography)({
-    color: theme.custom.modal.labelColor,
+  const ActionText = styled(Typography)({
+    color: theme.custom.black,
     lineHeight: theme.custom.modal.labelLineHeight,
     fontSize: theme.custom.modal.labelFontSize,
     fontWeight: theme.custom.modal.labelFontWeight,
     fontFamily: theme.typography.fontFamily,
     fontStyle: 'normal',
-    marginBottom: '12px',
   });
+
   return (
     <MuiDialog open={open}>
-      <DialogTitle onClose={onCloseModal}> New Action </DialogTitle>
+      <DialogTitle onClose={onCloseModal}> Actions </DialogTitle>
       <DialogContent>
-        <InputLabelText>Input ABI</InputLabelText>
         <div style={{ marginBottom: '26px' }}>
           <InputField
             height={'46px'}
-            width={'530px'}
-            onInputChange={onInputABI}
-            placeholder="ABI..."
+            width={'604px'}
+            onInputChange={() => console.log('xyz')}
+            placeholder="Search Actions"
             label=""
           ></InputField>
         </div>
-        <InputLabelText>Input Contract Address</InputLabelText>
-        <div style={{ marginBottom: '26px' }}>
-          <InputField
-            height={'46px'}
-            width={'530px'}
-            onInputChange={onInputContractAddress}
-            placeholder="Contract Address"
-            label=""
-          ></InputField>
-        </div>
+        {actions && actions.length > 0 && (
+          <div
+            style={{
+              width: '100%',
+              borderRadius: '10px',
+              border: '2px solid #E2ECF5',
+            }}
+          >
+            {actions.map((action: any) => (
+              <div style={actionStyle} key={action.name}>
+                <ActionText>{action.name}</ActionText>
+                <ANButton
+                  label="Add"
+                  onClick={() => onAddAction(action)}
+                  height={'30px'}
+                  width="80px"
+                ></ANButton>
+              </div>
+            ))}
+          </div>
+        )}
       </DialogContent>
       <DialogActions>
-        <ANButton
+        {/* <ANButton
           type="primary"
-          width={'112px'}
+          width={'100%'}
           height={'45px'}
-          label="Generate"
-          onClick={() => onGenerateClick()}
-        ></ANButton>
+          label="Add Action"
+        ></ANButton> */}
       </DialogActions>
     </MuiDialog>
   );
