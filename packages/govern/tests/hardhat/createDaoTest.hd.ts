@@ -1,6 +1,6 @@
 import { ethers, network, waffle } from 'hardhat'
 import { expect } from 'chai'
-import { createDao, CreateDaoParams, CreateDaoOptions } from '../../public/create-dao'
+import { createDao, CreateDaoParams, CreateDaoOptions } from '../../public/createDao'
 
 // use rinkeby addresses as the tests run on a hardhat network forked from rinkeby
 const tokenAddress = '0x9fB402A33761b88D5DcbA55439e6668Ec8D4F2E8'
