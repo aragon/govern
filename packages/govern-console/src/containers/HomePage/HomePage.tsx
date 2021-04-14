@@ -8,6 +8,7 @@ import Header from 'components/Header/Header';
 import { ConsoleMainPage } from 'containers/Console/ConsoleMainPage';
 import { DaoMainPage } from 'containers/DAO/DaoMainPage';
 import ProposalDetails from 'containers/ProposalDetails/ProposalDetails';
+import NewProposal from 'containers/NewProposal/NewProposal';
 
 const HomePage = ({ ...props }) => {
   const AppWrapper = styled('div')({
@@ -47,11 +48,14 @@ const HomePage = ({ ...props }) => {
               updateSelectedDao={updateSelectedDaoAndPushToHistory}
             />
           </Route>
-          <Route exact path="/:daoName">
+          <Route exact path="daos/:daoName">
             <DaoMainPage onClickProposalCard={onClickProposalCard} />
           </Route>
           <Route exact path="/proposals/:id">
             <ProposalDetails onClickBack={onClickBackFromProposalPage} />
+          </Route>
+          <Route exact path="/new-proposal">
+            <NewProposal />
           </Route>
           {/* <Route path="/about">
         <About />

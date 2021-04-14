@@ -139,7 +139,7 @@ const NewProposal: React.FC<NewProposalProps> = ({
   };
 
   const onAddNewAction = (action: any) => {
-    const newActions = [...selectedActions, action];
+    const newActions = [...selectedActions, action] as any;
     updateSelectedOptions(newActions);
   };
   // const onScheduleProposal = () => {};
@@ -215,7 +215,7 @@ const NewProposal: React.FC<NewProposalProps> = ({
     abi: any,
   ) => {
     console.log(contractAddress, abi);
-    const functions = [];
+    const functions = [] as any;
     await abi.forEach((item: any) => {
       const { name, type, stateMutability } = item;
       if (
@@ -303,7 +303,7 @@ const NewProposal: React.FC<NewProposalProps> = ({
           onCloseModal={handleActionModalClose}
           open={isActionModalOpen}
           onAddAction={onAddNewAction}
-          actions={abiFunctions.current}
+          actions={abiFunctions.current as any}
         ></AddActionsModal>
       </WrapperDiv>
     </>
