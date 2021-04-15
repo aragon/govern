@@ -21,6 +21,17 @@ contract GovernBaseFactory {
     GovernTokenFactory public tokenFactory;
     GovernRegistry public registry;
 
+    struct Token {
+        IERC20 tokenAddress;
+        uint8  tokenDecimals;
+        string tokenName;
+        string tokenSymbol;
+    }
+
+    struct Config {
+        address resolver;
+    }
+
     constructor(
         GovernRegistry _registry,
         GovernFactory _governFactory,
@@ -35,29 +46,29 @@ contract GovernBaseFactory {
 
     function newGovernWithoutConfig(
         string calldata _name,
-        IERC20 _token,
-        string calldata _tokenName,
-        string calldata _tokenSymbol,
+        Token calldata _token,
+        Config calldata _config,
         bool _useProxies
     ) external returns (Govern govern, GovernQueue queue) {
         bytes32 salt = _useProxies ? keccak256(abi.encodePacked(_name)) : bytes32(0);
 
-        queue = queueFactory.newQueue(address(this), dummyConfig(), salt);
+        queue = queueFactory.newQueue(address(this), initialConfig(_config.resolver), salt);
         govern = governFactory.newGovern(queue, salt);
 
-        if (address(_token) == address(0)) {
-            (_token,) = tokenFactory.newToken(
+        IERC20 token = _token.tokenAddress;
+        if (address(token) == address(0)) {
+            (token,) = tokenFactory.newToken(
                 govern,
-                _tokenName,
-                _tokenSymbol,
-                18, // NOTE: hardcoding due to stack to deep issues
+                _token.tokenName,
+                _token.tokenSymbol,
+                _token.tokenDecimals,
                 msg.sender,
                 1 * 10 ** 18,
                 _useProxies
             );
         }
 
-        registry.register(govern, queue, _token, _name, "");
+        registry.register(govern, queue, token, _name, "");
 
         ACLData.BulkItem[] memory items = new ACLData.BulkItem[](6);
         items[0] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.schedule.selector, ANY_ADDR);
@@ -70,14 +81,14 @@ contract GovernBaseFactory {
         queue.bulk(items);
     }
 
-    function dummyConfig() internal pure returns (ERC3000Data.Config memory) {
+    function initialConfig(address _resolver) internal pure returns (ERC3000Data.Config memory) {
         ERC3000Data.Collateral memory noCollateral;
         return ERC3000Data.Config(
             3600, // how many seconds to wait before being able to call `execute`.
-            noCollateral,
-            noCollateral,
-            address(0),
-            "",
+            noCollateral, // no collateral by default
+            noCollateral, // no collateral by default
+            _resolver, // the initial resolver for the disputes
+            "", // initial rules property
             100000 // initial maxCalldatasize
         );
     }

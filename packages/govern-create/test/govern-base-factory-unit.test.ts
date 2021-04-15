@@ -70,9 +70,15 @@ describe('Govern Base Factory with mocked contracts', function () {
 
     const tx = await GovernBaseFactory.newGovernWithoutConfig(
       name,
-      deployToken ? zeroAddress : customAddress,
-      'Eagle Token',
-      'EAG',
+      {
+        tokenAddress: deployToken ? zeroAddress : customAddress,
+        tokenName: 'Eagle Token',
+        tokenSymbol: 'EAG',
+        tokenDecimals: 18
+      },
+      {
+        resolver: '0x' + '00'.repeat(20)
+      },
       useProxies
     );
 

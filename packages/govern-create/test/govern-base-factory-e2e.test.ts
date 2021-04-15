@@ -31,9 +31,15 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
 
     const tx = baseFactoryContract.newGovernWithoutConfig(
       'eagle',
-      `0x${(deployToken ? '00' : '11').repeat(20)}`, // NOTE: zero addr deploys a token
-      'Eaglet Token',
-      'EAG',
+      {
+        tokenAddress: `0x${(deployToken ? '00' : '11').repeat(20)}`,
+        tokenName: 'Eaglet Token',
+        tokenSymbol: 'EAG',
+        tokenDecimals: 18
+      },
+      {
+        resolver: '0x' + '00'.repeat(20)
+      },
       useProxies
     )
 
