@@ -22,24 +22,27 @@ const config: HardhatUserConfig = {
     deployer: 0,
   },
   paths: {
-    tests: './tests/hardhat'
+    tests: './tests/hardhat',
   },
-  defaultNetwork: "hardhat",
+  defaultNetwork: 'hardhat',
   networks: {
     hardhat: {
       throwOnTransactionFailures: true,
       throwOnCallFailures: true,
       allowUnlimitedContractSize: true,
       blockGasLimit: 0x1fffffffffffff,
-      // tests that deploy new tokens with proxies set to false, require more than 8,000,000 GAS. 
+      // tests that deploy new tokens with proxies set to false, require more than 8,000,000 GAS.
       // Without setting this,tests do fail due to out of gas error
       gas: 10000000,
       forking: {
-        url: "https://rinkeby.infura.io/v3/84842078b09946638c03157f83405213"
-      }
-    }
-  }
+        url:
+          'https://eth-rinkeby.alchemyapi.io/v2/Zs10tQqfrIf1s-np9tQB0RV6BijG0zIe',
+      },
+    },
+  },
+  mocha: {
+    timeout: 50000,
+  },
 }
 
 export default config
-

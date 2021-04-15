@@ -1,3 +1,4 @@
 // TODO: update this to mainnet address or ens name, rinkeby address for now
 export const DAO_FACTORY_ADDRESS = '0x1791E1D949c21703f49FC2C9a24570FA72ed62Ae'
-
+export const TOKEN_STORAGE_PROOF_ADDRESS = '0xf215116795EE6add4789a8E891CAEB26A623221d'
+export const GOVERN_REGISTRY_ADDRESS = '0x8Adf949ADBAB3614f5340b21d9D9AD928d218096'

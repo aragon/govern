@@ -1,6 +1,8 @@
 import { ethers, network, waffle } from 'hardhat'
 import { expect } from 'chai'
 import { createDao, CreateDaoParams, CreateDaoOptions } from '../../public/createDao'
+import { TOKEN_STORAGE_PROOF_ADDRESS } from '../../internal/configuration/ConfigDefaults'
+import { TOKEN_STORAGE_PROOF_ABI } from '../../internal/actions/RegisterToken'
 
 // use rinkeby addresses as the tests run on a hardhat network forked from rinkeby
 const tokenAddress = '0x9fB402A33761b88D5DcbA55439e6668Ec8D4F2E8'
@@ -211,6 +213,66 @@ describe("Create Dao", function() {
 
     const result = await createDao(params, options);
     expect(result).to.have.property('hash')
+
+  })
+
+
+  it.only('Should create dao successfully and register token in vocdoni contract', async function () {
+    const params: CreateDaoParams = {
+      name: 'tree',
+      token: {
+        name: 'tree',
+        symbol: 'TREE',
+      },
+      useVocdoni: true,
+    }
+
+    const options: CreateDaoOptions = {
+      provider: network.provider,
+      daoFactoryAddress,
+    }
+
+    const result = await createDao(params, options)
+    const receipt = await result.wait()
+
+    console.log("DAO has been created")
+
+    expect(result).to.have.property('hash')
+    expect(receipt).to.have.property('transactionHash')
+    expect(receipt.status).to.equal(1)
+    expect(result.hash).to.equal(receipt.transactionHash)
+
+    // make sure register event is emitted
+    const registryContract = new ethers.Contract(
+      registryAddress,
+      registryAbi,
+      ethers.provider
+    )
+
+    const args = receipt.logs
+      .filter(
+        ({ address }: { address: string }) =>
+          address === registryContract.address
+      )
+      .map((log: any) => registryContract.interface.parseLog(log))
+      .find(({ name }: { name: string }) => name === 'Registered')
+
+    const tokenAddress = args?.args[2] as string
+    console.log("token address ", tokenAddress)
+    expect(ethers.utils.isAddress(tokenAddress)).to.equal(true)
+    await new Promise((resolve) => {
+      setTimeout(resolve, 40000)
+    })
+
+    const tokenStorage = new ethers.Contract(
+      TOKEN_STORAGE_PROOF_ADDRESS,
+      TOKEN_STORAGE_PROOF_ABI,
+      ethers.provider
+    )
+
+    console.log("This is the token address on test ", tokenAddress)
+    const t= await tokenStorage.isRegistered(tokenAddress)
+    console.log(t)
 
   })
 
