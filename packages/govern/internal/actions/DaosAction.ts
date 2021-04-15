@@ -1,5 +1,6 @@
 import AbstractAction from './lib/AbstractAction'
-import daos, { Daos } from '../clients/graphql/queries/daos'
+import daos from '../clients/graphql/queries/daos'
+import { Daos } from '../clients/graphql/fragments/dao-entry'
 
 /**
  * @class DaosAction

@@ -120,6 +120,7 @@ export const ANButton: React.FC<ANButtonProps> = ({
     textTransform: 'none',
     animation: 'none',
     transition: 'none',
+    cursor: 'pointer',
     '&:hover': {
       background: getBackgroundForHoveredState(),
       boxShadow: '0px 4px 4px rgba(116, 131, 178, 0.25)',
