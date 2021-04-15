@@ -84,7 +84,10 @@ import { createDao } from '@aragon/govern'
 const result = await createDao(args, options);
 ```
 
-For ES6 in the Web Browser:
+For Web:
+After installing `@aragon/govern`, you will find the Govern javascript bundles under `node_modules/@aragon/govern/dist`.
+
+For ES6:
 ``` typescript
 <script type="module">
     import { createDao } from './dist/esm/public/govern-esm.min.js'
@@ -100,7 +103,7 @@ For ES6 in the Web Browser:
 </script>
 ```
 
-For ES3 (UMD) in the Browser:
+For ES3 (UMD):
 ``` typescript
 <script type="application/javascript" src="./dist/umd/public/govern-umd.min.js"></script>
 <script type="application/javascript">
