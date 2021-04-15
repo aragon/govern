@@ -59,11 +59,28 @@ task('deploy-govern', 'Deploys a Govern instance')
             (await deployments.get('GovernBaseFactory')).address
           )
 
-      const tx = await baseFactoryContract.newGovernWithoutConfig(
+      const tx = await baseFactoryContract.newGovern(
         name,
-        token,
-        tokenName || name,
-        tokenSymbol,
+        {
+          tokenAddress: token,
+          tokenName:  tokenName || name,
+          tokenSymbol: tokenSymbol,
+          tokenDecimals: 18
+        },
+        {
+          executionDelay: 3600, // how many seconds to wait before being able to call `execute`.
+          scheduleDeposit: {
+            token: '0x' + '00'.repeat(20),
+            amount: 0
+          },
+          challengeDeposit: {
+            token: '0x' + '00'.repeat(20),
+            amount: 0
+          },
+          resolver: '0x' + '00'.repeat(20),
+          rules: "0x",
+          maxCalldataSize: 100000 // initial maxCalldatasize
+        },
         useProxies,
         {
           gasLimit: useProxies ? 2e6 : 9e6,

@@ -28,7 +28,7 @@ templates:
         - name: GovernQueue
           file: $GOVERN_CORE_MODULE/abi/contracts/pipelines/GovernQueue.sol/GovernQueue.json
       eventHandlers:
-        - event: Configured(indexed bytes32,indexed address,(uint256,(address,uint256),(address,uint256),address,bytes))
+        - event: Configured(indexed bytes32,indexed address,(uint256,(address,uint256),(address,uint256),address,bytes,uint256))
           handler: handleConfigured
         - event: Frozen(indexed bytes4,indexed address)
           handler: handleFrozen

@@ -11,7 +11,6 @@ import {
   Vetoed as VetoedEvent,
   Ruled,
 } from '../generated/templates/GovernQueue/GovernQueue'
-import { log } from '@graphprotocol/graph-ts'
 
 import { GovernQueue as GovernQueueContract } from '../generated/templates/GovernQueue/GovernQueue'
 import {
@@ -138,12 +137,9 @@ export function handleConfigured(event: ConfiguredEvent): void {
   config.challengeDeposit = challengeDeposit.id
   config.resolver = event.params.config.resolver
   config.rules = event.params.config.rules
+  config.maxCalldataSize = event.params.config.maxCalldataSize
 
   queue.config = config.id
-
-
-  // update dao.config
-
 
   scheduleDeposit.save()
   challengeDeposit.save()
@@ -207,7 +203,7 @@ export function createDummyConfig(queueId: string): string {
   config.challengeDeposit = challengeDeposit.id
   config.resolver = ZERO_ADDRESS
   config.rules = Bytes.fromI32(0) as Bytes
-
+  config.maxCalldataSize = BigInt.fromI32(0)
   scheduleDeposit.save()
   challengeDeposit.save()
   config.save()
@@ -226,15 +222,7 @@ export function loadOrCreateQueue(queueAddress: Address): GovernQueue {
     queue.roles = []
   }
 
-  // update the current nonce
-  // TODO:GIORGI
-  // Subgraph instance failed to run: Failed to process trigger in block #8244999 (03c22a005a0bb985f1bbdc180c39af9e46d7f499e47fbbf50468b49a47cc4675), 
-  // transaction 20b3d7db4b649fbcc675873a86d72d7a27c477dd096c78a3af5652fb5f0c636c: Could not find ABI for contract "GovernQueue", 
-  // try adding it to the 'abis' section of the subgraph manifest wasm backtrace: 
-  // 0: 0x1f21 - <unknown>!~lib/@graphprotocol/graph-ts/chain/ethereum/ethereum.SmartContract#call 1: 
-  // 0x1fc1 - <unknown>!src/GovernQueue/loadOrCreateQueue 2: 0x2214 - <unknown>!src/GovernRegistry/handleRegistered , 
-  // code: SubgraphSyncingFailure, id: QmT8FXVVbQVvxzuPYucZysnbUjXCdFfm5kN7AwM8ema8SZ
-  
+
   queue.nonce = GovernQueueContract.bind(queueAddress).nonce()
 
   return queue!
