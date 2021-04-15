@@ -49,6 +49,7 @@ type Config @entity {
   challengeDeposit: Collateral!
   resolver: Bytes!
   rules: Bytes!
+  maxCalldataSize: BigInt!
 }
 
 type Payload @entity {
