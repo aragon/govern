@@ -4,6 +4,10 @@ import Configuration from '../../../internal/configuration/Configuration'
 // Mocks
 jest.mock('../../../internal/clients/graphql/GraphQLClient')
 
+const expected = {
+  "defaultUrl": "https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-mainnet"
+}
+
 /**
  * Configuration test
  */
@@ -11,37 +15,37 @@ describe('ConfigurationTest', () => {
   let config: Configuration
 
   beforeEach(() => {
-    config = new Configuration({ governURL: 'localhost' })
+    config = new Configuration({ subgraphURL: 'localhost' })
   })
 
   it('initialization test', () => {
-    expect(config.governURL).toEqual('localhost')
+    expect(config.subgraphURL).toEqual('localhost')
 
     expect(config.client).toBeInstanceOf(GraphQLClient)
   })
 
   it('initialization failed test', () => {
     expect(() => {
-      new Configuration({ governURL: null })
-    }).toThrow('Missing Govern server URL!')
+      new Configuration({ subgraphURL: null })
+    }).toThrow('Missing Govern subgraph URL!')
   })
 
   it('calls Configuration.get and returns the expected default config', () => {
     const config = Configuration.get()
 
-    expect(config.governURL).toEqual('https://govern.backend.aragon.org')
+    expect(config.subgraphURL).toEqual(expected.defaultUrl)
 
     expect(config.client).toBeInstanceOf(GraphQLClient)
 
     expect(config).toBeInstanceOf(Configuration)
   })
 
-  it('calls Configuration.set without the governURL and defines the default aragon govern URL as expected', () => {
+  it('calls Configuration.set without the subgraphURL and receives the default subgraph URL as expected', () => {
     Configuration.set({})
 
     const config = Configuration.get()
 
-    expect(config.governURL).toEqual('https://govern.backend.aragon.org')
+    expect(config.subgraphURL).toEqual(expected.defaultUrl)
 
     expect(config.client).toBeInstanceOf(GraphQLClient)
 

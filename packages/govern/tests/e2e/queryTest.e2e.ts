@@ -1,11 +1,13 @@
 import { configure, query } from '@aragon/govern'
+import { subgraphURL } from './config'
+import { ethers } from 'ethers'
 
 /**
  * query e2e test
  */
 describe('[e2e] query Test', () => {
   beforeEach(() => {
-    configure({ governURL: 'http://localhost:3000/' })
+    configure({ subgraphURL })
   })
 
   it('calls query and returns as expected', async () => {
@@ -13,12 +15,13 @@ describe('[e2e] query Test', () => {
       query DAOS {
         daos {
           id
-          address
-          metadata
+          token
+          registrant
         }
       }
     `)
 
-    expect(response.daos[0].address).toEqual('0x24319b199e9e3867ede90eaf0fad56168c54d077')
+    expect(ethers.utils.isAddress(response.daos[0].token)).toEqual(true)
+    expect(ethers.utils.isAddress(response.daos[0].registrant)).toEqual(true)
   })
 })

@@ -12,7 +12,7 @@ import './index.css';
 
 // move to env files.
 const subgraphUri =
-  'https://thegraph.com/explorer/subgraph/aragon/aragon-govern-rinkeby';
+  'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby';
 
 const client = new ApolloClient({
   uri: subgraphUri,

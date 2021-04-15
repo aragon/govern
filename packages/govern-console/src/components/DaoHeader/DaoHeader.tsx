@@ -31,11 +31,13 @@ export const DaoHeader: React.FC<DaoHeaderProps> = ({
   const theme = useTheme();
   const DaoHeaderCard = styled(MUICard)({
     background: theme.custom.daoHeader.background,
-    width: '1344px',
-    height: '80px',
+    width: '100%',
+    height: '197px',
     paddingLeft: '64px',
-    paddingTop: '55px',
-    paddingBottom: '63px',
+    paddingTop: '54px',
+    paddingBottom: '53px',
+    boxShadow: 'none',
+    boxSizing: 'border-box',
   });
 
   const HeaderLabel = styled(MUITypography)({

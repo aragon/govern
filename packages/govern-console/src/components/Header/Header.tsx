@@ -2,6 +2,7 @@ import React from 'react';
 import { styled, useTheme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import governIcon from 'images/aragon-icon.svg';
+import Wallet from 'components/Wallet/Wallet';
 // import
 
 const Header = ({}) => {
@@ -17,8 +18,10 @@ const Header = ({}) => {
     fontSize: '18px',
     lineHeight: '25px',
     color: '#7483B2',
-    width: 'fit-content',
-    '& img': {},
+    width: '200px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   });
   const Navbar = styled('div')({
     display: 'flex',
@@ -28,15 +31,17 @@ const Header = ({}) => {
     height: '100%',
   });
   const Title = styled('div')({
-    display: 'block',
+    display: 'flex',
     width: 'fit-content',
     cursor: 'pointer',
+    '& img': {},
   });
   const Account = styled('div')({
     display: 'flex',
     width: '100%',
     flexDirection: 'row',
-    justifyContent: 'flex-start',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
   });
   return (
     <HeaderWrapperDiv id="header">
@@ -47,7 +52,7 @@ const Header = ({}) => {
         </Title>
         <Account id="account">
           {/* <ChainSelector /> */}
-          {/* <Wallet /> */}
+          <Wallet />
         </Account>
       </Navbar>
     </HeaderWrapperDiv>

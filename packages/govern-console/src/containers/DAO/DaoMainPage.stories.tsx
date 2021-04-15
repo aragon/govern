@@ -104,6 +104,6 @@ ANDaoMainPage.args = {
   daoName: 'Aragon Dao',
   usdBalance: 562912,
   ethBalance: 120.91,
-  isProfile: false,
+  // isProfile: false,
   proposalList,
 };
