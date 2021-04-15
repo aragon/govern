@@ -75,12 +75,47 @@ Create
 | args     | <code>CreateDaoParams</code>    | Dao name, Dao token, useProxies option  |
 | options  | <code>CreateDaoOptions</code>   | EIP 1193 provider, Dao factory address  |
 
-Example:
+Examples:
+
+For Node.js:
 ``` typescript
 import { createDao } from '@aragon/govern'
 
 const result = await createDao(args, options);
 ```
+
+For ES6 in the Web Browser:
+``` typescript
+<script type="module">
+    import { createDao } from './dist/esm/public/govern-esm.min.js'
+    const btn = document.getElementById('btn-umd')
+    btn.onclick = async (e) => {
+        if (typeof window.ethereum === 'undefined') {
+            alert('MetaMask is not installed!');
+            return;
+        }
+
+        const tx = await createDao({name: "hello", token: { name: 'hello', symbol: 'HLO'}, useProxis: false})
+    }
+</script>
+```
+
+For ES3 (UMD) in the Browser:
+``` typescript
+<script type="application/javascript" src="./dist/umd/public/govern-umd.min.js"></script>
+<script type="application/javascript">
+    const btn = document.getElementById('btn-esm')
+    btn.onclick = async (e) => {
+        if (typeof window.ethereum === 'undefined') {
+            alert('MetaMask is not installed!');
+            return;
+        }
+
+        const tx = await govern.createDao({name: "world", token: { name: 'world', symbol: 'WLD'}, useProxis: false})
+    }
+</script>
+```
+
 
 ### configure(config) ⇒ ``void``
 
