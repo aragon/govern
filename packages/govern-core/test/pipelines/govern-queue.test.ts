@@ -499,5 +499,19 @@ describe('Govern Queue', function() {
     
         // expect(await gq.configHash()).to.equal(configHash)
       })
+
+      it("reverts if schedule collateral doesn't have balanceOf", async () => {
+        container.config.scheduleDeposit.amount = 1
+        container.config.scheduleDeposit.token = gq.address
+
+        await expect(gq.configure(container.config)).to.be.revertedWith(ERRORS.BAD_CONFIG)
+      })
+
+      it("reverts if challenge collateral doesn't have balanceOf", async () => {
+        container.config.scheduleDeposit.amount = 1
+        container.config.scheduleDeposit.token = gq.address
+
+        await expect(gq.configure(container.config)).to.be.revertedWith(ERRORS.BAD_CONFIG)
+      })
     })
   })
