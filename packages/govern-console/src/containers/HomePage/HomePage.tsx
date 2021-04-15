@@ -48,7 +48,7 @@ const HomePage = ({ ...props }) => {
               updateSelectedDao={updateSelectedDaoAndPushToHistory}
             />
           </Route>
-          <Route exact path="daos/:daoName">
+          <Route exact path="/daos/:daoName">
             <DaoMainPage onClickProposalCard={onClickProposalCard} />
           </Route>
           <Route exact path="/proposals/:id">
