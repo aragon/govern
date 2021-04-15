@@ -20,13 +20,14 @@ export interface ProposalCardProps {
   /**
    * Optional Function Handler
    */
-  onClick?: () => void;
+  onClickProposalCard?: () => void;
 }
 
 export const ProposalCard: React.FC<ProposalCardProps> = ({
   transactionHash,
   proposalDate,
   proposalStatus,
+  onClickProposalCard,
   ...props
 }) => {
   const theme = useTheme();
@@ -34,13 +35,14 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
   const ProposalCard = styled(MUICard)({
     backgroundColor: theme.custom.proposalCard.background,
     height: '150px',
-    width: '427px',
-    border: `2px ${theme.custom.proposalCard.border}`,
+    width: '400px',
+    border: `2px solid ${theme.custom.proposalCard.border}`,
     paddingLeft: '0px',
     paddingTop: '21px',
     borderRadius: '8px',
     boxSizing: 'border-box',
     boxShadow: '0px 6px 6px rgba(180, 193, 228, 0.35)',
+    cursor: 'pointer',
   });
 
   const ProposalHash = styled(MUITypography)({
@@ -66,13 +68,9 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
   });
 
   const getColorOfLabel = () => {
-    if (proposalStatus === 'scheduled') return 'yellow';
-    if (proposalStatus === 'executed') return 'green';
-  };
-
-  const getLabelText = () => {
-    if (proposalStatus === 'scheduled') return 'Scheduled';
-    if (proposalStatus === 'executed') return 'Executed';
+    if (proposalStatus === 'Scheduled') return 'yellow';
+    if (proposalStatus === 'Executed') return 'green';
+    if (proposalStatus === 'Challenged') return 'red';
   };
 
   const getSlicedTransactionHash = () => {
@@ -87,9 +85,9 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
   };
 
   return (
-    <ProposalCard>
+    <ProposalCard onClick={onClickProposalCard}>
       <div style={{ marginLeft: '32px' }}>
-        <Label labelColor={getColorOfLabel()} labelText={getLabelText()} />
+        <Label labelColor={getColorOfLabel()} labelText={proposalStatus} />
       </div>
       <ProposalHash>{getSlicedTransactionHash()}</ProposalHash>
       <ProposalDateText>{proposalDate}</ProposalDateText>

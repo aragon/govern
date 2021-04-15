@@ -75,6 +75,16 @@ interface CustomTheme {
     valueLineHeight: string;
     valueColor: string;
   };
+  modal: {
+    labelFontSize: string;
+    labelLineHeight: string;
+    labelColor: string;
+    labelFontWeight: number;
+    valueFontSize: string;
+    valueFontWeight: number;
+    valueLineHeight: string;
+    valueColor: string;
+  };
   black: string;
   white: string;
 }
@@ -212,6 +222,16 @@ const custom = {
     valueFontSize: '38px',
     valueFontWeight: 500,
     valueLineHeight: '51.91px',
+    valueColor: '#20232C',
+  },
+  modal: {
+    labelFontSize: '18px',
+    labelLineHeight: '24.59px',
+    labelColor: '#7483B3',
+    labelFontWeight: 400,
+    valueFontSize: '18px',
+    valueFontWeight: 500,
+    valueLineHeight: '24.59px',
     valueColor: '#20232C',
   },
   black: '#20232C',
