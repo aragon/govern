@@ -103,7 +103,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     fontSize: '18px',
     height: '25px',
     width: 'fit-content',
-    display: 'inline',
+    display: 'inline-block',
     color: '#7483B3',
   });
   const InfoValueDivInline = styled('div')({
@@ -111,7 +111,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     fontStyle: 'normal',
     fontWeight: 'normal',
     color: '#20232C',
-    display: 'inline',
+    display: 'inline-block',
     width: 'fit-content',
     marginLeft: '9px',
     '& a': {
@@ -166,24 +166,31 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     },
   });
 
-  const ActionDiv = styled((props: any) => <div {...props} />)((props: any) => {
-    return {
-      background: '#FFFFFF',
-      border: '2px solid #F5F7FF',
-      boxSizing: 'border-box',
-      boxShadow: '0px 8px 7px rgba(116, 131, 178, 0.2)',
-      borderRadius: '12px',
-      height: props.isExpanded ? 'auto' : '66px',
-      width: '100%',
-      overflow: 'hidden',
-      '& div': {
-        marginTop: 0,
-      },
-    };
+  const ActionDiv = styled(({ isExpanded: boolean }) => (
+    <div className={isExpanded ? 'is-expanded' : ''} />
+  ))({
+    background: '#FFFFFF',
+    border: '2px solid #F5F7FF',
+    boxSizing: 'border-box',
+    boxShadow: '0px 8px 7px rgba(116, 131, 178, 0.2)',
+    borderRadius: '12px',
+    height: '66px',
+    width: '100%',
+    overflow: 'hidden',
+    cursor: 'pointer',
+    '& div': {
+      marginTop: 0,
+      minHeight: '62px !important',
+      verticalAlign: 'middle',
+      lineHeight: '62px',
+    },
+    '& .is-expanded': {
+      height: '200px',
+    },
   });
 
   const CollapsedDiv = styled('div')({
-    height: '66px',
+    height: '62px',
     display: 'block',
     width: '100%',
     paddingLeft: '23px',
@@ -221,11 +228,19 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       updateProposalInfo(proposalDetailsData.container);
     }
   }, [proposalDetailsData]);
+  const toggleDiv = (index: number) => {
+    const cloneObject = { ...isExpanded };
+    if (cloneObject[index]) {
+      cloneObject[index] = false;
+    } else {
+      cloneObject[index] = true;
+    }
+    updateIsExpanded(cloneObject);
+  };
 
   // const getParsedDataFromBytes = (data) => {
 
   // };
-
   return (
     <>
       {isLoadingProposalDetails ? (
@@ -334,16 +349,19 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                   </InfoWrapper>
                   <InfoWrapper>
                     <InfoKeyDiv>Actions:</InfoKeyDiv>
-                    <ActionsWrapper>
+                    <ActionsWrapper id="action-wrapper">
                       {/* Show action accordians */}
                       {proposalInfo.payload.actions.map(
                         (action: any, index: number) => {
                           return (
                             <ActionDiv
                               key={index}
-                              isexpanded={isExpanded[index] || false}
+                              isexpanded={
+                                isExpanded[index] ? isExpanded[index] : false
+                              }
+                              onClick={() => toggleDiv(index)}
                             >
-                              <CollapsedDiv>
+                              <CollapsedDiv id="collapsed-div">
                                 <InfoWrapper>
                                   <InfoKeyDiv>to</InfoKeyDiv>
                                   <InfoValueDivInline>
@@ -352,7 +370,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                                 </InfoWrapper>
                                 {/* <Carat /> */}
                               </CollapsedDiv>
-                              <ExpandedDiv>
+                              <ExpandedDiv id="expanded-div">
                                 <InfoWrapper>
                                   <InfoKeyDiv>value</InfoKeyDiv>
                                   <InfoValueDivInline>

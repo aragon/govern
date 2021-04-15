@@ -20,7 +20,7 @@ const HomePage = ({ ...props }) => {
   const [selectedDao, updateSelectedDao] = React.useState({});
   const updateSelectedDaoAndPushToHistory = React.useCallback(
     (daoDetails: any) => {
-      history.push(`/${daoDetails.name}`, {
+      history.push(`daos/${daoDetails.name}`, {
         daoDetails,
       });
     },

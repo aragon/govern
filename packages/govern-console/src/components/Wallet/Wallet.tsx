@@ -2,49 +2,31 @@ import React from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { styled } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
-import { useWeb3React, UnsupportedChainIdError } from '@web3-react/core';
-import {
-  NoEthereumProviderError,
-  UserRejectedRequestError as UserRejectedRequestErrorInjected,
-} from '@web3-react/injected-connector';
-import { Web3Provider } from '@ethersproject/providers';
-import { injected } from '../../connectors';
+import { useWallet } from 'use-wallet';
+import connectedUserIcon from 'images/connected-user-icon.svg';
+import Typography from '@material-ui/core/Typography';
 
 const Wallet = ({}) => {
-  const context = useWeb3React<Web3Provider>();
+  const context = useWallet();
   const [activatingConnector, setActivatingConnector] = React.useState<any>();
   const {
     connector,
-    library,
-    chainId,
     account,
-    activate,
-    deactivate,
-    active,
+    balance,
+    chainId,
+    connect,
+    connectors,
+    ethereum,
     error,
+    getBlockNumber,
+    networkName,
+    reset,
+    status,
+    type,
   } = context;
 
-  enum ConnectorNames {
-    Injected = 'Injected',
-  }
-  const connectorsByName: { [connectorName in ConnectorNames]: any } = {
-    [ConnectorNames.Injected]: injected,
-  };
-
-  function getErrorMessage(error: Error) {
-    if (error instanceof NoEthereumProviderError) {
-      return 'No Ethereum browser extension detected, install MetaMask on desktop or visit from a dApp browser on mobile.';
-    } else if (error instanceof UnsupportedChainIdError) {
-      return "You're connected to an unsupported network.";
-    } else if (error instanceof UserRejectedRequestErrorInjected) {
-      return 'Please authorize this website to access your Ethereum account.';
-    } else {
-      console.error(error);
-      return 'An unknown error occurred. Check the console for more details.';
-    }
-  }
   const onWalletConnectionError = (error: Error) => {
-    alert(getErrorMessage(error));
+    // alert(getErrorMessage(error));
   };
   // ---- Components ----
 
@@ -62,27 +44,71 @@ const Wallet = ({}) => {
     justifyContent: 'center',
     alignItems: 'center',
   });
-  React.useEffect(() => {
-    if (activatingConnector && activatingConnector === connector) {
-      setActivatingConnector(undefined);
-    }
-  }, [activatingConnector, connector]);
+
+  const ConnectedAccount = styled('div')({
+    height: '48px',
+    width: '174px',
+    background: '#FFFFFF',
+    border: '2px solid #EFF1F7',
+    boxSizing: 'border-box',
+    boxShadow: '0px 3px 3px rgba(180, 193, 228, 0.35)',
+    borderRadius: '8px',
+    padding: '13px 20px',
+    display: 'flex',
+    flexDirection: 'row',
+  });
+  const IconHolder = styled('img')({
+    width: '24px',
+    height: '24px',
+  });
+  const AccountAddress = styled(Typography)({
+    fontFamily: 'Manrope',
+    fontStyle: 'normal',
+    fontWeight: 500,
+    fontSize: '16px',
+    lineHeight: '22px',
+    color: '#20232C',
+    cursor: 'pointer',
+  });
+  // React.useEffect(() => {
+  //   if (activatingConnector && activatingConnector === connector) {
+  //     setActivatingConnector(undefined);
+  //   }
+  // }, [connector]);
+  const getTruncatedAccountAddress = (account: string | null) => {
+    if (account === null) return '';
+    return (
+      account.substring(0, 5) +
+      '...' +
+      account.substring(account.length - 5, account.length - 1)
+    );
+  };
+  debugger;
   return (
     <WalletWrapper>
-      <ANButton
-        type="primary"
-        onClick={() => {
-          setActivatingConnector(ConnectorNames.Injected);
-          activate(
-            connectorsByName[ConnectorNames.Injected],
-            onWalletConnectionError,
-          );
-        }}
-        label={'Connect Account'}
-        height={'48px'}
-        width={'178px'}
-        disabled={activatingConnector === ConnectorNames.Injected}
-      />
+      {status !== 'connected' ? (
+        <ANButton
+          type="primary"
+          onClick={() => {
+            connect('injected');
+            // setActivatingConnector(ConnectorNames.Injected);
+          }}
+          label={'Connect Account'}
+          height={'48px'}
+          width={'174px'}
+          disabled={status === 'connecting'}
+        />
+      ) : (
+        <ConnectedAccount
+          onClick={() => {
+            // connect('injected');
+            // setActivatingConnector(ConnectorNames.Injected);
+          }}
+        >
+          {/* <IconHolder src={connectedUserIcon}> </IconHolder> */}
+          <AccountAddress>{getTruncatedAccountAddress(account)}</AccountAddress>
+        </ConnectedAccount>
+      )}
     </WalletWrapper>
   );
 };

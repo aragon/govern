@@ -3,6 +3,7 @@ import { Web3ReactProvider } from '@web3-react/core';
 import Home from 'containers/HomePage/HomePage';
 import { Web3Provider } from '@ethersproject/providers';
 import { BrowserRouter as Router } from 'react-router-dom';
+import { UseWalletProvider } from 'use-wallet';
 
 function getLibrary(provider: any): Web3Provider {
   const library = new Web3Provider(provider);
@@ -12,10 +13,18 @@ function getLibrary(provider: any): Web3Provider {
 
 export default function App() {
   return (
-    <Web3ReactProvider getLibrary={getLibrary}>
+    <UseWalletProvider
+      chainId={4}
+      connectors={
+        {
+          // This is how connectors get configured
+          // portis: { dAppId: 'my-dapp-id-123-xyz' },
+        }
+      }
+    >
       <Router>
         <Home />
       </Router>
-    </Web3ReactProvider>
+    </UseWalletProvider>
   );
 }
