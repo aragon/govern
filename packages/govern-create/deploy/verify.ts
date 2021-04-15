@@ -9,7 +9,7 @@ const TWO_ADDRR = `0x${'00'.repeat(19)}02`
 const NO_TOKEN = `0x${'00'.repeat(20)}`
 
 const dummyConfig = {
-  executionDelay: 3600, // how many seconds to wait before being able to call `execute`
+  executionDelay: 0, // how many seconds to wait before being able to call `execute`
   scheduleDeposit: [NO_TOKEN, '0'],
   challengeDeposit: [NO_TOKEN, '0'],
   resolver: RESOLVER_ADDRR,
