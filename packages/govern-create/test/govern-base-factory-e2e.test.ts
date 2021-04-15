@@ -29,7 +29,7 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
       baseFactoryDeployment.address
     )) as GovernBaseFactory
 
-    const tx = baseFactoryContract.newGovernWithoutConfig(
+    const tx = baseFactoryContract.newGovern(
       'eagle',
       {
         tokenAddress: `0x${(deployToken ? '00' : '11').repeat(20)}`,
@@ -38,7 +38,18 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
         tokenDecimals: 18
       },
       {
-        resolver: '0x' + '00'.repeat(20)
+        executionDelay: 3600, // how many seconds to wait before being able to call `execute`.
+        scheduleDeposit: {
+          token: '0x' + '00'.repeat(20),
+          amount: 0
+        },
+        challengeDeposit: {
+          token: '0x' + '00'.repeat(20),
+          amount: 0
+        },
+        resolver: '0x' + '00'.repeat(20),
+        rules: "0x",
+        maxCalldataSize: 100000 // initial maxCalldatasize
       },
       useProxies
     )

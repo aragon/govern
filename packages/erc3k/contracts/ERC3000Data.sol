@@ -32,12 +32,12 @@ library ERC3000Data {
     }
 
     struct Config {
-        uint256 executionDelay;
-        Collateral scheduleDeposit;
-        Collateral challengeDeposit;
-        address resolver;
-        bytes rules;
-        uint256 maxCalldataSize;
+        uint256 executionDelay; // how many seconds to wait before being able to call `execute`.
+        Collateral scheduleDeposit; // fees for scheduling
+        Collateral challengeDeposit; // fees for challenging
+        address resolver;  // resolver that will rule the disputes
+        bytes rules; // rules of how DAO should be managed
+        uint256 maxCalldataSize; // max calldatasize for the schedule
     }
 
     struct Collateral {

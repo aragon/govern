@@ -28,10 +28,6 @@ contract GovernBaseFactory {
         string tokenSymbol;
     }
 
-    struct Config {
-        address resolver;
-    }
-
     constructor(
         GovernRegistry _registry,
         GovernFactory _governFactory,
@@ -44,15 +40,15 @@ contract GovernBaseFactory {
         registry = _registry;
     }
 
-    function newGovernWithoutConfig(
+    function newGovern(
         string calldata _name,
         Token calldata _token,
-        Config calldata _config,
+        ERC3000Data.Config calldata _config,
         bool _useProxies
     ) external returns (Govern govern, GovernQueue queue) {
         bytes32 salt = _useProxies ? keccak256(abi.encodePacked(_name)) : bytes32(0);
 
-        queue = queueFactory.newQueue(address(this), initialConfig(_config.resolver), salt);
+        queue = queueFactory.newQueue(address(this), _config, salt);
         govern = governFactory.newGovern(queue, salt);
 
         IERC20 token = _token.tokenAddress;
@@ -80,16 +76,5 @@ contract GovernBaseFactory {
         
         queue.bulk(items);
     }
-
-    function initialConfig(address _resolver) internal pure returns (ERC3000Data.Config memory) {
-        ERC3000Data.Collateral memory noCollateral;
-        return ERC3000Data.Config(
-            3600, // how many seconds to wait before being able to call `execute`.
-            noCollateral, // no collateral by default
-            noCollateral, // no collateral by default
-            _resolver, // the initial resolver for the disputes
-            "", // initial rules property
-            100000 // initial maxCalldatasize
-        );
-    }
+    
 }
