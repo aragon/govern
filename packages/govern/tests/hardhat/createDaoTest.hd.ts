@@ -1,6 +1,10 @@
 import { ethers, network, waffle } from 'hardhat'
 import { expect } from 'chai'
-import { createDao, CreateDaoParams, CreateDaoOptions } from '../../public/createDao'
+import {
+  createDao,
+  CreateDaoParams,
+  CreateDaoOptions,
+} from '../../public/createDao'
 import { TOKEN_STORAGE_PROOF_ADDRESS } from '../../internal/configuration/ConfigDefaults'
 import { TOKEN_STORAGE_PROOF_ABI } from '../../internal/actions/RegisterToken'
 
@@ -10,37 +14,44 @@ const daoFactoryAddress = '0x1791E1D949c21703f49FC2C9a24570FA72ed62Ae'
 const registryAddress = '0x8Adf949ADBAB3614f5340b21d9D9AD928d218096'
 import * as registryAbi from './registryAbi.json'
 
-describe("Create Dao", function() {
-  it("Should create a dao successfully", async function() {
+describe('Create Dao', function () {
+  it('Should create a dao successfully', async function () {
     const params: CreateDaoParams = {
       name: 'magic',
       token: {
         name: 'magical',
-        symbol: 'MAG'
+        symbol: 'MAG',
       },
-      useProxies: false
+      useProxies: false,
     }
 
     const provider = network.provider
     const options: CreateDaoOptions = {
       provider,
-      daoFactoryAddress
+      daoFactoryAddress,
     }
 
     const result = await createDao(params, options)
     const receipt = await result.wait()
-    expect(result).to.have.property('hash');
+    expect(result).to.have.property('hash')
     expect(receipt).to.have.property('transactionHash')
     expect(receipt.status).to.equal(1)
     expect(result.hash).to.equal(receipt.transactionHash)
 
     // make sure register event is emitted
-    const registryContract = new ethers.Contract(registryAddress, registryAbi, ethers.provider)
-    
+    const registryContract = new ethers.Contract(
+      registryAddress,
+      registryAbi,
+      ethers.provider
+    )
+
     const args = receipt.logs
-    .filter(({ address }: { address: string }) => address === registryContract.address)
-    .map((log: any) => registryContract.interface.parseLog(log))
-    .find(({ name }: { name: string }) => name === 'Registered')
+      .filter(
+        ({ address }: { address: string }) =>
+          address === registryContract.address
+      )
+      .map((log: any) => registryContract.interface.parseLog(log))
+      .find(({ name }: { name: string }) => name === 'Registered')
 
     const queueAddress = args?.args[1] as string
     const governAddress = args?.args[0] as string
@@ -53,116 +64,111 @@ describe("Create Dao", function() {
     // make sure the name is used
     const used = await registryContract.nameUsed(params.name)
     expect(used).to.equal(true)
-  });
+  })
 
-  it("Should reject duplicate Dao name", async function() {
+  it('Should reject duplicate Dao name', async function () {
     const params: CreateDaoParams = {
       name: 'sunny',
       token: {
         name: 'magical',
-        symbol: 'MAG'
+        symbol: 'MAG',
       },
-      useProxies: false
+      useProxies: false,
     }
 
     const provider = network.provider
     const options: CreateDaoOptions = {
       provider,
-      daoFactoryAddress
+      daoFactoryAddress,
     }
 
     const result = await createDao(params, options)
     await result.wait()
 
-    await expect(createDao(params, options)).to.be.reverted;
+    await expect(createDao(params, options)).to.be.reverted
   })
 
-  it("Should throw if token address and token symbol are missing", async function() {
+  it('Should throw if token address and token symbol are missing', async function () {
     const params: CreateDaoParams = {
       name: 'moon',
       token: { name: 'moon' },
-      useProxies: false
+      useProxies: false,
     }
 
     const provider = network.provider
     const options: CreateDaoOptions = {
       provider,
-      daoFactoryAddress
+      daoFactoryAddress,
     }
 
     try {
-      const result = await createDao(params, options);
+      const result = await createDao(params, options)
       expect(result).to.be.undefined
-
     } catch (err) {
       expect(err).to.have.property('message')
     }
   })
 
-  it("Should throw if token address and token name are missing", async function() {
+  it('Should throw if token address and token name are missing', async function () {
     const params: CreateDaoParams = {
       name: 'moon2',
       token: { symbol: 'moon' },
-      useProxies: false
+      useProxies: false,
     }
 
     const provider = network.provider
     const options: CreateDaoOptions = {
       provider,
-      daoFactoryAddress
+      daoFactoryAddress,
     }
 
     try {
-      const result = await createDao(params, options);
+      const result = await createDao(params, options)
       expect(result).to.be.undefined
-
     } catch (err) {
       expect(err).to.have.property('message')
     }
   })
 
-  it("Should create a dao successfully if only token address is given", async function() {
+  it('Should create a dao successfully if only token address is given', async function () {
     const params: CreateDaoParams = {
       name: 'awesome',
       token: { address: '0x9fB402A33761b88D5DcbA55439e6668Ec8D4F2E8' },
-      useProxies: false
+      useProxies: false,
     }
 
     const provider = network.provider
     const options: CreateDaoOptions = {
       provider,
-      daoFactoryAddress
+      daoFactoryAddress,
     }
 
-    const result = await createDao(params, options);
+    const result = await createDao(params, options)
     expect(result).to.have.property('hash')
     const receipt = await result.wait()
     expect(receipt.status).to.equal(1)
-
   })
 
-
-  it("Should throw if provider is not provided and window.ethereum is not available", async function() {
+  it('Should throw if provider is not provided and window.ethereum is not available', async function () {
     const params: CreateDaoParams = {
       name: 'spring',
       token: { name: 'spring' },
-      useProxies: false
+      useProxies: false,
     }
 
     const options: CreateDaoOptions = {
-      daoFactoryAddress
+      daoFactoryAddress,
     }
 
     try {
-      const result = await createDao(params, options);
+      const result = await createDao(params, options)
       expect(result).to.be.undefined
-
     } catch (err) {
       expect(err).to.have.property('message')
     }
   })
 
-  it("Should throw if token address is zero and name is missing", async function() {
+  it('Should throw if token address is zero and name is missing', async function () {
     const params: CreateDaoParams = {
       name: 'summer',
       token: { address: ethers.constants.AddressZero },
@@ -170,56 +176,51 @@ describe("Create Dao", function() {
 
     const options: CreateDaoOptions = {
       provider: network.provider,
-      daoFactoryAddress
+      daoFactoryAddress,
     }
 
     try {
-      const result = await createDao(params, options);
+      const result = await createDao(params, options)
       expect(result).to.be.undefined
-
     } catch (err) {
       expect(err).to.have.property('message')
     }
-
   })
 
-  it("Should create a dao successfully if useProxies is true", async function() {
+  it('Should create a dao successfully if useProxies is true', async function () {
     const params: CreateDaoParams = {
       name: 'rainbow',
       token: { address: tokenAddress },
-      useProxies: true
+      useProxies: true,
     }
 
     const options: CreateDaoOptions = {
       provider: network.provider,
-      daoFactoryAddress
+      daoFactoryAddress,
     }
 
-    const result = await createDao(params, options);
+    const result = await createDao(params, options)
     expect(result).to.have.property('hash')
-
   })
 
-  it("Should create a dao successfully if useProxies is missing", async function() {
+  it('Should create a dao successfully if useProxies is missing', async function () {
     const params: CreateDaoParams = {
       name: 'bridge',
-      token: { address: tokenAddress }
+      token: { address: tokenAddress },
     }
 
     const options: CreateDaoOptions = {
       provider: network.provider,
-      daoFactoryAddress
+      daoFactoryAddress,
     }
 
-    const result = await createDao(params, options);
+    const result = await createDao(params, options)
     expect(result).to.have.property('hash')
-
   })
-
 
   it.only('Should create dao successfully and register token in vocdoni contract', async function () {
     const params: CreateDaoParams = {
-      name: 'tree',
+      name: 'jajadao9',
       token: {
         name: 'tree',
         symbol: 'TREE',
@@ -233,9 +234,10 @@ describe("Create Dao", function() {
     }
 
     const result = await createDao(params, options)
+    console.log('CreateDAO transaction being mined...')
     const receipt = await result.wait()
 
-    console.log("DAO has been created")
+    console.log('DAO has been created')
 
     expect(result).to.have.property('hash')
     expect(receipt).to.have.property('transactionHash')
@@ -258,7 +260,6 @@ describe("Create Dao", function() {
       .find(({ name }: { name: string }) => name === 'Registered')
 
     const tokenAddress = args?.args[2] as string
-    console.log("token address ", tokenAddress)
     expect(ethers.utils.isAddress(tokenAddress)).to.equal(true)
     await new Promise((resolve) => {
       setTimeout(resolve, 40000)
@@ -270,11 +271,12 @@ describe("Create Dao", function() {
       ethers.provider
     )
 
-    console.log("This is the token address on test ", tokenAddress)
-    const t= await tokenStorage.isRegistered(tokenAddress)
-    console.log(t)
-
+    console.log('Wait 40 seconds before checking the token is registered')
+    await new Promise((resolve) => {
+      setTimeout(resolve, 40000)
+    })
+    console.log('Checking if is registered...')
+    const t = await tokenStorage.isRegistered(tokenAddress)
+    console.log('Token is registered: ', t)
   })
-
 })
-

@@ -18,6 +18,7 @@
     "test": "jest && yarn e2e && yarn test:hardhat && yarn depcheck",
     "e2e": "./scripts/start.e2e.sh",
     "test:hardhat": "hardhat test",
+    "test:hardhat:rinkeby": "hardhat test --network rinkeby",
     "depcheck": "yarn build && dependency-check ./package.json --missing --verbose",
     "prepublishOnly": "yarn build"
   },

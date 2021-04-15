@@ -59,9 +59,6 @@ export async function createDao(
     options.provider || window.ethereum
   ).getSigner()
 
-  console.log(await signer.getAddress())
-  console.log(address)
-
   if (args.useVocdoni) {
     const GovernRegistry = new Contract(
       config.governRegistry,
@@ -72,24 +69,45 @@ export async function createDao(
     GovernRegistry.on(registerEvent, async (queue, govern, token) => {
       if (token) {
         await new Promise((resolve) => {
-          setTimeout(resolve, 15000)
+          setTimeout(resolve, 5000)
         })
-    
+
         const ERC20 = new Contract(
           token,
-          ['function balanceOf(address)'],
+          [
+            {
+              inputs: [
+                {
+                  name: '',
+                  type: 'address',
+                },
+              ],
+              name: 'balanceOf',
+              outputs: [
+                {
+                  name: '',
+                  type: 'uint256',
+                },
+              ],
+              stateMutability: 'view',
+              type: 'function',
+            },
+          ],
           signer
         )
-        console.log(ERC20.address)
         console.log("There's token! Let's try to register")
-        await registerToken(signer, ERC20)
+        const result = await registerToken(signer, ERC20)
+        if (result) {
+          await result.wait()
+          console.log('Token registered!')
+        }
       }
     })
   }
 
   const factoryAddress = options.daoFactoryAddress || config.daoFactoryAddress
   const contract = new Contract(factoryAddress, FACTORY_ABI, signer)
-  const result = await contract.newGovernWithoutConfig(
+  const result = contract.newGovernWithoutConfig(
     args.name,
     address,
     args.token.name || '',

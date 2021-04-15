@@ -35,13 +35,19 @@ const config: HardhatUserConfig = {
       // Without setting this,tests do fail due to out of gas error
       gas: 10000000,
       forking: {
-        url:
-          'https://eth-rinkeby.alchemyapi.io/v2/Zs10tQqfrIf1s-np9tQB0RV6BijG0zIe',
+        url: 'https://rinkeby.infura.io/v3/b76cba91dc954ceebff27244923224b1',
+      },
+    },
+    rinkeby: {
+      url:
+        'https://eth-rinkeby.alchemyapi.io/v2/Zs10tQqfrIf1s-np9tQB0RV6BijG0zIe',
+      accounts: {
+        mnemonic: process.env.ETH_KEY!,
       },
     },
   },
   mocha: {
-    timeout: 50000,
+    timeout: 2000000,
   },
 }
 
