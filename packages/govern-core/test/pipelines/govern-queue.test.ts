@@ -57,6 +57,7 @@ describe('Govern Queue', function() {
     BAD_CONFIG: 'queue: bad config',
     BAD_DELAY: 'queue: bad delay',
     BAD_SUBMITTER: 'queue: bad submitter',
+    CALLDATASIZE_LIMIT: 'calldatasize: limit exceeded',
     WAIT_MORE: 'queue: wait more',
     BAD_FEE_PULL: 'queue: bad fee pull',
     BAD_APPROVE: 'queue: bad approve',
@@ -84,6 +85,10 @@ describe('Govern Queue', function() {
   const disputeFee = 1000
   const disputeId = 1000
   const zeroByteHash = "0x0000000000000000000000000000000000000000"
+
+  // grab the original, honest values that queue contract gets deployed with.
+  const executionDelay  = container.config.executionDelay
+  const maxCalldataSize = container.config.maxCalldataSize
 
   let executor: ERC3000ExecutorMock
   
@@ -154,7 +159,7 @@ describe('Govern Queue', function() {
   context('GovernQueue.schedule', () => {
 
     before(async () => {
-      container.payload.executionTime = (await ethers.provider.getBlock('latest')).timestamp + 100
+      container.payload.executionTime = (await ethers.provider.getBlock('latest')).timestamp + executionDelay + 100
     })
     
     it('emits the expected events and adds the container to the queue', async () => {
@@ -187,12 +192,26 @@ describe('Govern Queue', function() {
       expect(await testToken.balanceOf(ownerAddr)).to.equal(ownerTokenAmount - container.config.scheduleDeposit.amount)
     })
 
+
+    it('reverts with "calldatasize: limit exceeded"', async () => {
+      container.config.maxCalldataSize = 100
+      
+      await gq.configure(container.config);
+     
+      await expect(gq.schedule(container)).to.be.revertedWith(ERRORS.CALLDATASIZE_LIMIT)
+      
+      container.config.maxCalldataSize = maxCalldataSize
+      await gq.configure(container.config);
+      
+    })
+    
+
     it('reverts with "queue: bad config"', async () => {
       container.config.executionDelay = 100
 
       await expect(gq.schedule(container)).to.be.revertedWith(ERRORS.BAD_CONFIG)
 
-      container.config.executionDelay = 0
+      container.config.executionDelay = executionDelay
     })
 
     it('reverts with "queue: bad delay"', async () => {
@@ -200,7 +219,7 @@ describe('Govern Queue', function() {
 
       await expect(gq.schedule(container)).to.be.revertedWith(ERRORS.BAD_DELAY)
 
-      container.payload.executionTime = (await ethers.provider.getBlock('latest')).timestamp + 1000
+      container.payload.executionTime = (await ethers.provider.getBlock('latest')).timestamp + executionDelay + 100
     })
 
     it('reverts with "queue: bad submitter"', async () => {
@@ -221,14 +240,14 @@ describe('Govern Queue', function() {
   context('GovernQueue.execute', async () => {
 
     before(async () => {
-      container.payload.executionTime = (await ethers.provider.getBlock('latest')).timestamp + 100
+      container.payload.executionTime = (await ethers.provider.getBlock('latest')).timestamp + executionDelay + 100
     })
 
     it('emits the expected events and updates the container state', async () => {
       await testToken.approve(gq.address, container.config.scheduleDeposit.amount)
       await gq.schedule(container)
 
-      await ethers.provider.send('evm_increaseTime', [150])
+      await ethers.provider.send('evm_increaseTime', [executionDelay + 100])
 
       const ownerBalance = (await testToken.balanceOf(ownerAddr)).toNumber()
       const containerHash = getContainerHash(container, gq.address, chainId)
@@ -249,7 +268,11 @@ describe('Govern Queue', function() {
     })
 
     it('reverts with "queue: wait more"', async () => {
-      container.payload.executionTime = container.payload.executionTime * 2
+      await testToken.approve(gq.address, container.config.scheduleDeposit.amount)
+      
+      container.payload.executionTime = (await ethers.provider.getBlock('latest')).timestamp + executionDelay + 100
+
+      await gq.schedule(container)
 
       await expect(gq.execute(container)).to.be.revertedWith(ERRORS.WAIT_MORE)
     })
@@ -259,7 +282,7 @@ describe('Govern Queue', function() {
   context('GovernQueue.challenge', () => {
 
     before(async () => {
-      container.payload.executionTime = (await ethers.provider.getBlock('latest')).timestamp + 100
+      container.payload.executionTime = (await ethers.provider.getBlock('latest')).timestamp + executionDelay + 100
     })
 
     it('executes as expected', async () => {
@@ -282,7 +305,7 @@ describe('Govern Queue', function() {
 
       expect(await gq.challengerCache(containerHash)).to.equal(ownerAddr)
 
-      expect(await gq.disputeItemCache(containerHash, container.config.resolver)).to.equal(disputeId+1)
+      expect(await gq.disputeItemCache(containerHash, container.config.resolver)).to.equal(disputeId + 1)
     
       expect(await testToken.balanceOf(ownerAddr)).to.equal(
         ownerBalance -(container.config.challengeDeposit.amount + container.config.challengeDeposit.amount + disputeFee)
@@ -325,7 +348,7 @@ describe('Govern Queue', function() {
   context('GovernQueue.resolve', () => {
 
     before(async () => {
-      container.payload.executionTime = (await ethers.provider.getBlock('latest')).timestamp + 100
+      container.payload.executionTime = (await ethers.provider.getBlock('latest')).timestamp + executionDelay + 100
     })
 
     it('reverts with bad dispute id wrong dispute id is passed', async () => {
@@ -427,7 +450,7 @@ describe('Govern Queue', function() {
     context('GovernQueue.veto', () => {
 
       before(async () => {
-        container.payload.executionTime = (await ethers.provider.getBlock('latest')).timestamp + 100
+        container.payload.executionTime = (await ethers.provider.getBlock('latest')).timestamp + executionDelay + 100
       })
       
       it('reverts when the container is not scheduled or challenged', async () => {
@@ -514,6 +537,20 @@ describe('Govern Queue', function() {
           )
     
         expect(await gq.configHash()).to.equal(configHash)
+      })
+
+      it("reverts if schedule collateral doesn't have balanceOf", async () => {
+        container.config.scheduleDeposit.amount = 1
+        container.config.scheduleDeposit.token = gq.address
+
+        await expect(gq.configure(container.config)).to.be.revertedWith(ERRORS.BAD_CONFIG)
+      })
+
+      it("reverts if challenge collateral doesn't have balanceOf", async () => {
+        container.config.scheduleDeposit.amount = 1
+        container.config.scheduleDeposit.token = gq.address
+
+        await expect(gq.configure(container.config)).to.be.revertedWith(ERRORS.BAD_CONFIG)
       })
     })
   })

@@ -1,16 +1,17 @@
 export const container: any = {
   'config': {
-    'executionDelay': 0,
+    'executionDelay': 3600, // how many seconds to wait before being able to call `execute`.
     'scheduleDeposit': {
-      'token': '',
+      'token': '0x0000000000000000000000000000000000000000',
       'amount': 100
     },
     'challengeDeposit': {
-      'token': '',
+      'token': '0x0000000000000000000000000000000000000000',
       'amount': 100
     },
     'resolver': '0x0000000000000000000000000000000000000000',
-    'rules': '0x'
+    'rules': '0x',
+    'maxCalldataSize': 100000 // initial maxCalldatasize
   },
   'payload': {
     'nonce': 1,
