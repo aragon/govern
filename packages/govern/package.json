@@ -16,7 +16,7 @@
     "dev:esm": "yarn build:esm --watch",
     "dev:cjs": "yarn build:cjs --watch",
     "test": "jest && yarn e2e && yarn depcheck",
-    "e2e": "./scripts/start.e2e.sh",
+    "e2e": "yarn build && jest -c ./jest.config.e2e.js",
     "depcheck": "yarn build && dependency-check ./package.json --missing --verbose",
     "prepublishOnly": "yarn build"
   },

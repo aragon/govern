@@ -2,11 +2,11 @@ import ClientInterface from '../clients/lib/ClientInterface'
 import GraphQLClient from '../clients/graphql/GraphQLClient'
 
 export interface ConfigurationObject {
-  governURL?: string
+  subgraphURL?: string
 }
 
 let defaultConfig: Configuration
-const governURL = 'https://govern.backend.aragon.org'
+const subgraphURL = 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-mainnet'
 
 /**
  * @class Configuration
@@ -20,7 +20,7 @@ export default class Configuration {
    * @private
    */
   private config: {
-    governURL: string;
+    subgraphURL: string;
     client: ClientInterface
   }
 
@@ -45,27 +45,27 @@ export default class Configuration {
    * @private
    */
   private setConfig(config: any): void {
-    if (!config.governURL) {
-      throw new Error('Missing Govern server URL!')
+    if (!config.subgraphURL) {
+      throw new Error('Missing Govern subgraph URL!')
     }
 
     this.config = {
-      governURL: config.governURL,
-      client: new GraphQLClient(config.governURL)
+      subgraphURL: config.subgraphURL,
+      client: new GraphQLClient(config.subgraphURL)
     }
   }
 
   /**
-   * Getter for governURL
+   * Getter for subgraphURL
    *
-   * @var governURL
+   * @var subgraphURL
    *
    * @returns {string}
    *
    * @public
    */
-  get governURL(): string {
-    return this.config.governURL
+  get subgraphURL(): string {
+    return this.config.subgraphURL
   }
 
   /**
@@ -97,8 +97,8 @@ export default class Configuration {
       config = {}
     }
 
-    if (!config.governURL) {
-      config.governURL = governURL
+    if (!config.subgraphURL) {
+      config.subgraphURL = subgraphURL
     }
 
     defaultConfig = new Configuration(config)

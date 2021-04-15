@@ -14,7 +14,7 @@ describe('query Test', () => {
   it('calls query and executes as expected', async () => {
     await query('quest Test { name }')
 
-    expect(GraphQLClient).toHaveBeenNthCalledWith(1, Configuration.get().governURL)
+    expect(GraphQLClient).toHaveBeenNthCalledWith(1, Configuration.get().subgraphURL)
 
     expect(graphQLClientMock.mock.instances[0].request).toHaveBeenNthCalledWith(1, 'quest Test { name }', {})
   })
