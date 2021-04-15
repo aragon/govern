@@ -35,7 +35,7 @@ describe('ConfigurationTest', () => {
 
   it('initialization factory address to null failed test', () => {
     expect(() => {
-      new Configuration({ governURL: 'localhost', daoFactoryAddress: null })
+      new Configuration({ subgraphURL: 'localhost', daoFactoryAddress: null })
     }).toThrow('Missing Dao factory address!')
   })
 

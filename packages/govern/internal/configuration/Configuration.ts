@@ -58,7 +58,7 @@ export default class Configuration {
 
     this.config = {
       subgraphURL: config.subgraphURL,
-      client: new GraphQLClient(config.subgraphURL)
+      client: new GraphQLClient(config.subgraphURL),
       daoFactoryAddress: config.daoFactoryAddress
     }
   }
