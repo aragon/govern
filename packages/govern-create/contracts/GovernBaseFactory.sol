@@ -73,7 +73,7 @@ contract GovernBaseFactory {
     function dummyConfig() internal pure returns (ERC3000Data.Config memory) {
         ERC3000Data.Collateral memory noCollateral;
         return ERC3000Data.Config(
-            0,
+            3600, // how many seconds to wait before being able to call `execute`.
             noCollateral,
             noCollateral,
             address(0),
