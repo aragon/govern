@@ -14,13 +14,23 @@ import {
 // use rinkeby addresses as the tests run on a hardhat network forked from rinkeby
 const tokenAddress = '0x9fB402A33761b88D5DcbA55439e6668Ec8D4F2E8'
 const registryAddress = '0x8Adf949ADBAB3614f5340b21d9D9AD928d218096'
-const resolver = tokenAddress
-const emptyBytes = '0x00'
+const emptyBytes = '0x'
 
 const noCollateral: CollateralType = {
   token: ethers.constants.AddressZero,
   amount: 0
 }
+
+const DUMMY_CONFIG =
+{
+  executionDelay: 0,
+  scheduleDeposit: noCollateral,
+  challengeDeposit: noCollateral,
+  vetoDeposit: noCollateral,
+  resolver: ethers.constants.AddressZero,
+  rules: emptyBytes
+}
+
 
 
 const buildPayload = ({submitter, executor}: { submitter: string, executor: string}) => {
@@ -38,7 +48,7 @@ const buildPayload = ({submitter, executor}: { submitter: string, executor: stri
 }
 
 
-describe("Proposal", function() {
+describe.only("Proposal", function() {
   let queueAddress: string
   let executor: string
   let config: ConfigType
@@ -50,12 +60,12 @@ describe("Proposal", function() {
       token: {
         name: 'magical',
         symbol: 'MAG'
-        },
-      useProxies: false
       },
-      {
-        provider: network.provider 
-      })
+      useProxies: false
+    },
+    {
+      provider: network.provider
+    })
 
     const receipt = await result.wait()
     expect(receipt.status).to.equal(1)
@@ -73,20 +83,10 @@ describe("Proposal", function() {
 
     executor = registerArgs?.args[0] as string
     queueAddress = registerArgs?.args[1] as string
-    
-    config =
-    {
-      executionDelay: 0,
-      scheduleDeposit: noCollateral,
-      challengeDeposit: noCollateral,
-      vetoDeposit: noCollateral,
-      resolver: ethers.constants.AddressZero,
-      rules: ethers.utils.hexZeroPad('0x0', 32)
-    }
-    
+
   })
 
-  it.only("Should schedule a proposal successfully", async function() {
+  it("Should schedule a proposal successfully", async function() {
     const proposal = new Proposal(queueAddress, { provider: network.provider })
 
     const signers = await ethers.getSigners()
@@ -94,10 +94,9 @@ describe("Proposal", function() {
     const payload = buildPayload({submitter: signers[0].address, executor})
     const data: ProposalParams = {
       payload,
-      config
+      config: DUMMY_CONFIG
     }
 
-    console.log('data', data)
     const result = await proposal.schedule(data)
     const receipt = await result.wait()
     expect(receipt.status).to.equal(1)

@@ -38,19 +38,18 @@ export type CollateralType = {
 
 export type ActionType = {
   to: string
-  value?: ethers.BigNumberish
-  data?: string
+  value: ethers.BigNumberish
+  data: string
 }
 
 
 export class Proposal {
-  private readonly queueAddress: string;
-  private readonly signer: ethers.Signer;
+  private readonly contract: ethers.Contract;
   
   constructor (queueAddress: string, options: ProposalOptions) {
-    this.queueAddress = queueAddress
     const provider = options.provider || window.ethereum
-    this.signer = new ethers.providers.Web3Provider(provider).getSigner()
+    const signer = (new ethers.providers.Web3Provider(provider)).getSigner()
+    this.contract = new ethers.Contract(queueAddress, abi, signer)
   }
 
 /**
@@ -63,8 +62,7 @@ export class Proposal {
 
   async schedule(proposal: ProposalParams): Promise<ethers.providers.TransactionResponse>
   {
-    const contract = new ethers.Contract(this.queueAddress, abi, await this.signer)
-    const result = contract.schedule(proposal)
+    const result = this.contract.schedule(proposal)
     return result
   }
 
