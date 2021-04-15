@@ -1,16 +1,46 @@
-![Aragon Govern header](../../raw/master/.github/govern.png)
+# Getting Started with Create React App
 
-[![](https://img.shields.io/discord/672466989217873929?label=discord)](https://discord.gg/aKAKcf) [![](https://img.shields.io/npm/v/@aragon/govern)](https://www.npmjs.com/package/@aragon/govern) [![](https://img.shields.io/badge/solidity-%3E%3D%200.6.8-lightgrey)](https://img.shields.io/badge/solidity-%3E%3D%200.6.8-lightgrey) [![Actions Status](https://github.com/aragon/govern/workflows/CI/badge.svg)](https://github.com/aragon/govern/actions?query=workflow%3ACI) [![Actions Status](https://github.com/aragon/govern/workflows/CD/badge.svg)](https://github.com/aragon/govern/actions?query=workflow%3ACD)
-[![codecov](https://codecov.io/gh/aragon/govern/branch/master/graph/badge.svg)](https://codecov.io/gh/aragon/govern)
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Govern Console
+## Available Scripts
 
-Govern Console is a minimal frontend to manage your optimistic DAO. You'll be able to manage your DAO configuration, permissions, and actions currently in the queue.
+In the project directory, you can run:
 
-## Quick start
+### `yarn start`
 
-Install with yarn and launch the app with yarn start. By default, the app is configured to connect to the Ethereum Rinkeby testnet, but there's a chain selector so you can change them on the fly.
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-## Contributing
+The page will reload if you make edits.\
+You will also see any lint errors in the console.
 
-Don't be shy to contribute even the smallest tweak. 🐲 There are still some dragons to be aware of, but we'll be here to help you get started!
+### `yarn test`
+
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+
+### `yarn build`
+
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
+
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
+
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+
+### `yarn eject`
+
+**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+
+If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+
+You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+
+## Learn More
+
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+
+To learn React, check out the [React documentation](https://reactjs.org/).

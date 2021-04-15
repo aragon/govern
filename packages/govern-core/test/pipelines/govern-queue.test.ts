@@ -1,10 +1,17 @@
 import { ethers, waffle} from 'hardhat'
-import { expect } from 'chai'
+import chai, { expect } from 'chai'
+import chaiUtils from '../chai-utils'
+chai.use(chaiUtils);
 
 import { GovernQueue } from '../../typechain/GovernQueue'
 import { TestToken } from '../../typechain/TestToken'
 import { ArbitratorMock } from '../../typechain/ArbitratorMock'
 import { ERC3000ExecutorMock } from '../../typechain/ERC3000ExecutorMock'
+
+const { deployMockContract, provider } = waffle;
+
+const  abi = require('../../artifacts/contracts/test/TestToken.sol/TestToken.json');
+const unlockedEventAbi = ["event Unlocked(address indexed token, address indexed to, uint256 amount)"];
 
 import {
   GovernQueue__factory,
@@ -15,8 +22,9 @@ import {
 } from '../../typechain'
 
 import { container as containerJson } from './container'
-import { getConfigHash, getContainerHash, getEncodedContainer } from './helpers'
-import { formatBytes32String } from 'ethers/lib/utils'
+import { getConfigHash, getContainerHash, getEncodedContainer, getPayloadHash } from './helpers'
+import { formatBytes32String, keccak256, toUtf8Bytes } from 'ethers/lib/utils'
+import { BigNumber, Contract } from 'ethers'
 
 // TODO: Create mock contract to check the return values of public methods
 describe('Govern Queue', function() {
@@ -160,7 +168,24 @@ describe('Govern Queue', function() {
       const containerHash = getContainerHash(container, gq.address, chainId)
       await expect(gq.schedule(container))
         .to.emit(gq, EVENTS.SCHEDULED)
-      // .withArgs(containerHash, container.payload) // TODO also check container.payload
+        .withArgs(
+          containerHash,
+          [
+            container.payload.nonce,
+            container.payload.executionTime,
+            container.payload.submitter,
+            container.payload.executor,
+            [
+              [
+                container.payload.actions[0].to,
+                BigNumber.from(container.payload.actions[0].value),
+                container.payload.actions[0].data
+              ]
+            ],
+            container.payload.allowFailuresMap,
+            container.payload.proof
+          ]
+        )
 
       expect(await gq.queue(containerHash)).to.equal(STATE.SCHEDULED)
 
@@ -400,9 +425,14 @@ describe('Govern Queue', function() {
       await gq.schedule(container);
       await gq.challenge(container,  "0x02");
       
+      // workaround for events defined in a library which doesn't get included in the ABI
+      // generated when contract was compiled.  The event was emitted, the `to.emit` just
+      // need a contract interface with event interface to detect the event
+      const eventContract = new Contract(gq.address, unlockedEventAbi, gq.provider);
+
       await expect(gq.resolve(container, disputeId))
-            // .to.emit(gq, 'Unlocked') //TODO:GIORGI Unlock doesn't get emitted
-            // .withArgs(container.config.scheduleDeposit.token, ownerAddr, container.config.scheduleDeposit.amount)
+            .to.emit(eventContract, 'Unlocked')
+            .withArgs(container.config.scheduleDeposit.token, ownerAddr, container.config.scheduleDeposit.amount)
             .to.emit(gq, EVENTS.RESOLVED)
             .withArgs(containerHash, ownerAddr, true)
             .to.emit(gq, EVENTS.EXECUTED)
@@ -437,9 +467,14 @@ describe('Govern Queue', function() {
 
         const containerHash = getContainerHash(container, gq.address, chainId);
         
+        // workaround for events defined in a library which doesn't get included in the ABI
+        // generated when contract was compiled.  The event was emitted, the `to.emit` just
+        // need a contract interface with event interface to detect the event
+        const eventContract = new Contract(gq.address, unlockedEventAbi, gq.provider);
+
         await expect(gq.veto(container, "0x02"))
-            // .to.emit(gq, EVENTS.UNLOCK) TODO:GIORGI
-            // .withArgs(container.config.scheduleDeposit.token, ownerAddr, container.config.scheduleDeposit.amount)
+               .to.emit(eventContract, EVENTS.UNLOCK)
+               .withArgs(container.config.scheduleDeposit.token, ownerAddr, container.config.scheduleDeposit.amount)
                .to.emit(gq, EVENTS.VETOED)
                .withArgs(containerHash, ownerAddr, '0x02')
 
@@ -463,9 +498,13 @@ describe('Govern Queue', function() {
 
         const containerHash = getContainerHash(container, gq.address, chainId);
 
+        // workaround for events defined in a library which doesn't get included in the ABI
+        // generated when contract was compiled.  The event was emitted, the `to.emit` just
+        // need a contract interface with event interface to detect the event
+        const eventContract = new Contract(gq.address, unlockedEventAbi, gq.provider);
         await expect(gq.veto(container, "0x02"))
-            // .to.emit(gq, EVENTS.UNLOCK) TODO:GIORGI
-            // .withArgs(container.config.scheduleDeposit.token, ownerAddr, container.config.scheduleDeposit.amount)
+               .to.emit(eventContract, EVENTS.UNLOCK)
+               .withArgs(container.config.scheduleDeposit.token, ownerAddr, container.config.scheduleDeposit.amount)
                .to.emit(gq, EVENTS.VETOED)
                .withArgs(containerHash, ownerAddr, '0x02')
 
@@ -485,19 +524,19 @@ describe('Govern Queue', function() {
     
         await expect(gq.configure(container.config))
           .to.emit(gq, EVENTS.CONFIGURED)
-          // .withArgs(
-          //   configHash,
-          //   ownerAddr,
-          //   [
-          //     container.config.executionDelay,
-          //     [ container.config.scheduleDeposit.token, BigNumber.from(container.config.scheduleDeposit.amount) ],
-          //     [ container.config.challengeDeposit.token, BigNumber.from(container.config.challengeDeposit.amount) ],
-          //     container.config.resolver,
-          //     container.config.rules,
-          //   ]  //TODO:GIORGI
-          // )
+          .withArgs(
+            configHash,
+            ownerAddr,
+            [
+              container.config.executionDelay,
+              [ container.config.scheduleDeposit.token, BigNumber.from(container.config.scheduleDeposit.amount) ],
+              [ container.config.challengeDeposit.token, BigNumber.from(container.config.challengeDeposit.amount) ],
+              container.config.resolver,
+              container.config.rules,
+            ]
+          )
     
-        // expect(await gq.configHash()).to.equal(configHash)
+        expect(await gq.configHash()).to.equal(configHash)
       })
 
       it("reverts if schedule collateral doesn't have balanceOf", async () => {

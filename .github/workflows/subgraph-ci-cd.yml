@@ -1,10 +1,12 @@
 name: Subgraph CI/CD
 on:
   push:
+    paths:
+    - 'packages/govern-subgraph/**'
     branches:
     - master
-    tags:
-    - v*
+    - develop
+    
 env:
   GRAPHKEY: ${{secrets.GRAPHKEY}}
 
@@ -45,9 +47,9 @@ jobs:
       run: .github/scripts/kubectl-config.sh ${{secrets.KUBE_CA}} ${{secrets.KUBE_SERVER}} ${{secrets.KUBE_TOKEN}}
 
     - name: Deploy rinkeby
-      if: github.ref == 'refs/heads/master'
+      if: github.ref == 'refs/heads/develop'
       run: yarn deploy:subgraph:rinkeby
 
     - name: Deploy mainnet
-      if: startsWith(github.ref, 'refs/tags/v')
+      if: github.ref == 'refs/heads/master'
       run: yarn deploy:subgraph:mainnet

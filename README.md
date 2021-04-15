@@ -33,6 +33,14 @@ The code in this repository has **not** been audited.
 Read the documentation if you have any doubts about the high-level overview of Govern, or if you want to know more about how everything works under the hood.
 
 #### 👋 Get started contributing with a [good first issue](https://github.com/aragon/govern/labels/good%20first%20issue%20%F0%9F%8C%9E)
+
+Before explaining how you can contribute, It's worth mentioning that we use `develop` branch as the default one. This makes it easier for us to
+have all the latest, development changes without affecting the current production version. Though, We don't use `release` branches to make the process a little bit easier !
+ * Pushing to `develop` branch via PR deploys changes to testing environments(currently only rinkeby). 
+ * Pushing to `master` branch via PR from `develop` deploys changes to production servers(mainnet).
+ * Pushing to `master|develop` directly will be restricted to make sure the PR's are reviewed.
+ * Creating PRs end up in relation to `develop` by default.
+
 Don't be shy to contribute even the smallest tweak. Everyone will be especially nice and helpful to beginners to help you get started!
 
 ## Structure
@@ -60,8 +68,8 @@ To use Govern, feel free to deploy your own registries and factories, but using 
 
 #### Rinkeby
 
-- 📜 GovernRegistry: [`0x87eE5EA31dCf1f526f21Bb576131C37890AE65E0`](https://rinkeby.etherscan.io/address/0x87eE5EA31dCf1f526f21Bb576131C37890AE65E0)
-- 🏭 GovernBaseFactory: [`0x615e3d83B8e1403c39F98c7066faA1D9bBF9E867`](https://rinkeby.etherscan.io/address/0x615e3d83B8e1403c39F98c7066faA1D9bBF9E867)
+- 📜 GovernRegistry: [`0x8adf949adbab3614f5340b21d9d9ad928d218096`](https://rinkeby.etherscan.io/address/0x8adf949adbab3614f5340b21d9d9ad928d218096)
+- 🏭 GovernBaseFactory: [`0x1791E1D949c21703f49FC2C9a24570FA72ed62Ae`](https://rinkeby.etherscan.io/address/0x1791E1D949c21703f49FC2C9a24570FA72ed62Ae)
 
 ## Help shape Aragon Govern
 - Discuss in [Aragon Forum](https://forum.aragon.org/tags/aragon-govern)

@@ -1,0 +1,15 @@
+{
+    "site": {
+        "id": "d27cf922-8c3b-40ba-9028-0473992a0eeb",
+        "team": "aragonone-team",
+        "platform": "ipfs",
+        "source": "github",
+        "name": "sparkling-thunder-1223"
+    },
+    "build": {
+        "baseDir": "packages/govern-console",
+        "publicDir": "build",
+        "command": "yarn install --frozen-lockfile && yarn build",
+        "rootDir": ""
+    }
+}

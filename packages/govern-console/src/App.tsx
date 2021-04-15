@@ -1,47 +1,15 @@
-import React, { useEffect } from 'react'
-import { Route, Switch, useLocation } from 'react-router-dom'
-import 'styled-components/macro'
-import SelectDao from './pages/SelectDao'
-import ViewDao from './pages/ViewDao'
-import Header from './components/Header/Header'
-import { useChainId } from './lib/chain-id'
-import env from './environment'
+import React from 'react';
+import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
+import Home from 'containers/HomePage/HomePage';
+// This site has 3 pages, all of which are rendered
+// dynamically in the browser (not server rendered).
+//
+// Although the page does not ever refresh, notice how
+// React Router keeps the URL up to date as you navigate
+// through the site. This preserves the browser history,
+// making sure things like the back button and bookmarks
+// work properly.
 
-function App(): JSX.Element {
-  const location = useLocation()
-  const { chainId, updateChainId } = useChainId()
-
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [location.pathname])
-
-  // If the ChainId doesn’t exist, we redirect
-  // to the default, defined in the environment.
-  useEffect(() => {
-    if (chainId === -1) {
-      updateChainId(env('CHAIN_ID'))
-    }
-  }, [chainId, updateChainId])
-
-  return (
-    <div
-      css={`
-        max-width: 1440px;
-        padding: 8px;
-        margin: 0 auto;
-      `}
-    >
-      <Header />
-      <Switch>
-        <Route exact path="/:network">
-          <SelectDao />
-        </Route>
-        <Route path="/:network/:daoAddress">
-          <ViewDao />
-        </Route>
-      </Switch>
-    </div>
-  )
+export default function App() {
+  return <Home />;
 }
-
-export default App
