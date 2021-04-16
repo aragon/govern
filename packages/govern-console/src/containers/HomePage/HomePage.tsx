@@ -35,6 +35,10 @@ const HomePage = ({ ...props }) => {
     },
     [history],
   );
+  const onClickNewProposal = React.useCallback(() => {
+    history.push(`/new-proposal`);
+  }, [history]);
+
   const onClickBackFromProposalPage = () => {
     history.goBack();
   };
@@ -50,7 +54,10 @@ const HomePage = ({ ...props }) => {
             />
           </Route>
           <Route exact path="/daos/:daoName">
-            <DaoMainPage onClickProposalCard={onClickProposalCard} />
+            <DaoMainPage
+              onClickProposalCard={onClickProposalCard}
+              onClickNewProposal={onClickNewProposal}
+            />
           </Route>
           <Route exact path="/proposals/:id">
             <ProposalDetails onClickBack={onClickBackFromProposalPage} />

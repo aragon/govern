@@ -11,10 +11,10 @@ import { useQuery } from '@apollo/client';
 import { useHistory } from 'react-router-dom';
 import { formatEther } from 'ethers/lib/utils';
 
-export const DaoMainPage: React.FC<{ onClickProposalCard: any }> = ({
-  onClickProposalCard,
-  ...props
-}) => {
+export const DaoMainPage: React.FC<{
+  onClickProposalCard: any;
+  onClickNewProposal: any;
+}> = ({ onClickProposalCard, onClickNewProposal, ...props }) => {
   const theme = useTheme();
   const [isProposalPage, setProposalPage] = useState(true);
   const [visibleProposalList, updateVisibleProposalList] = useState<any>([]);
@@ -158,6 +158,7 @@ export const DaoMainPage: React.FC<{ onClickProposalCard: any }> = ({
                 type="primary"
                 height="46px"
                 width="142px"
+                onClick={onClickNewProposal}
               ></ANButton>
             </div>
             <div
