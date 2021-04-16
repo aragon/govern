@@ -48,6 +48,8 @@ export class Proposal {
    */
   async schedule(proposal: ProposalParams): Promise<ethers.providers.TransactionResponse>
   {
+    const nonce = await this.contract.nonce()
+    proposal.payload.nonce = nonce.add(1)
     const result = this.contract.schedule(proposal)
     return result
   }
