@@ -6,11 +6,16 @@ import {
   CreateDaoOptions,
 } from '../../public/createDao'
 
+export const registryAbi = [
+  `event Registered(address indexed executor, address queue, address indexed token, address indexed registrant, string name)`,
+  `event SetMetadata(address indexed executor, bytes metadata)`,
+  `function nameUsed(string) view returns (bool)`
+]
+
 // use rinkeby addresses as the tests run on a hardhat network forked from rinkeby
 const tokenAddress = '0x9fB402A33761b88D5DcbA55439e6668Ec8D4F2E8'
 const daoFactoryAddress = '0xb75290e69f83b52bfbf9c99b4ae211935e75a851'
 const registryAddress = '0x7714e0a2A2DA090C2bbba9199A54B903bB83A73d'
-import * as registryAbi from './registryAbi.json'
 
 describe('Create Dao', function () {
   const goodConfig = {
