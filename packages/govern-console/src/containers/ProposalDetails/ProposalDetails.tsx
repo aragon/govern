@@ -8,12 +8,18 @@ import { useHistory } from 'react-router-dom';
 import { GET_PROPOSAL_LIST_QUERY } from './queries';
 import { useQuery } from '@apollo/client';
 import { useEffect } from 'react';
+import { ANButton } from 'components/Button/ANButton';
+import { useWallet } from 'use-wallet';
 
+// import { InputField } from 'component/InputField/InputField';
 interface ProposalDetailsProps {
   onClickBack?: any;
 }
 
 const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
+  const context = useWallet();
+  const { ethereum } = context;
+  console.log(ethereum);
   const history: any = useHistory();
   const theme = useTheme();
   const proposal = history.location.state.proposalDetails;
@@ -152,6 +158,9 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     '& :last-child': {
       marginBottom: '0 !important',
     },
+    '& .full-width': {
+      width: '100% !important',
+    },
   });
   const ActionsWrapper = styled('div')({
     display: 'flex',
@@ -166,26 +175,26 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     },
   });
 
-  const ActionDiv = styled(({ isExpanded: boolean }) => (
-    <div className={isExpanded ? 'is-expanded' : ''} />
-  ))({
+  const ActionDiv = styled('div')({
     background: '#FFFFFF',
+    transition: 'all 1s ease-out',
     border: '2px solid #F5F7FF',
     boxSizing: 'border-box',
     boxShadow: '0px 8px 7px rgba(116, 131, 178, 0.2)',
     borderRadius: '12px',
-    height: '66px',
     width: '100%',
     overflow: 'hidden',
     cursor: 'pointer',
-    '& div': {
-      marginTop: 0,
+    '& > div': {
       minHeight: '62px !important',
       verticalAlign: 'middle',
       lineHeight: '62px',
     },
-    '& .is-expanded': {
-      height: '200px',
+    '& div': {
+      marginTop: 0,
+    },
+    '& .full-width': {
+      width: '100%',
     },
   });
 
@@ -206,11 +215,54 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     paddingRight: '38px',
     boxSizing: 'border-box',
     margin: 0,
+    '& #value-div': {
+      height: '27px',
+      lineHeight: '27px',
+      minHeight: '27px !important',
+    },
+    '& #data-div': {
+      lineHeight: '25px',
+      minHeight: '27px !important',
+      // fontSize: '18px',
+      height: 'fit-content',
+    },
+    '& #data-div-block': {
+      // overflowWrap: 'normal',
+      overflowWrap: 'break-word',
+    },
   });
+
+  const Widget = styled('div')({
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    width: '100%',
+    minHeight: '118px',
+    boxSizing: 'border-box',
+    background: '#FFFFFF',
+    border: '2px solid #ECF1F7',
+    boxShadow: '0px 6px 6px rgba(180, 193, 228, 0.35)',
+    borderRadius: '8px',
+    marginBottom: '23px',
+    padding: '36px 27px',
+    '& div': {
+      display: 'block',
+      margin: 'auto',
+      width: '100%',
+      boxSizing: 'border-box',
+      marginBottom: '9px',
+    },
+    '& button': {
+      marginTop: '5px',
+    },
+  });
+
   //* End of styled Components
 
   const [proposalInfo, updateProposalInfo] = React.useState<any>(null);
   const [isExpanded, updateIsExpanded] = React.useState<any>({});
+  // const [challengeReason, updateChallengeReason] = React.useRef('');
+  // const [vetoReason, updateVetoReason] = React.useRef('');
 
   const {
     data: proposalDetailsData,
@@ -356,13 +408,16 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                           return (
                             <ActionDiv
                               key={index}
-                              isexpanded={
-                                isExpanded[index] ? isExpanded[index] : false
-                              }
                               onClick={() => toggleDiv(index)}
+                              id={'action' + index}
+                              style={{
+                                height: isExpanded[index]
+                                  ? 'fit-content !important'
+                                  : '66px',
+                              }}
                             >
                               <CollapsedDiv id="collapsed-div">
-                                <InfoWrapper>
+                                <InfoWrapper id="to-div">
                                   <InfoKeyDiv>to</InfoKeyDiv>
                                   <InfoValueDivInline>
                                     <a>{action.to}</a>
@@ -371,16 +426,19 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                                 {/* <Carat /> */}
                               </CollapsedDiv>
                               <ExpandedDiv id="expanded-div">
-                                <InfoWrapper>
+                                <InfoWrapper id="value-div">
                                   <InfoKeyDiv>value</InfoKeyDiv>
                                   <InfoValueDivInline>
                                     <a>{action.value}</a>
                                   </InfoValueDivInline>
                                 </InfoWrapper>
-                                <InfoWrapper>
+                                <InfoWrapper id="data-div">
                                   <InfoKeyDiv>data</InfoKeyDiv>
-                                  <InfoValueDivBlock>
-                                    <a>{action.data}</a>
+                                  <InfoValueDivBlock
+                                    className="full-width"
+                                    id="data-div-block"
+                                  >
+                                    {action.data}
                                   </InfoValueDivBlock>
                                 </InfoWrapper>
                               </ExpandedDiv>
@@ -391,7 +449,38 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                     </ActionsWrapper>
                   </InfoWrapper>
                 </ProposalDetailsWrapper>
-                <WidgetWrapper id="widget_wrapper"></WidgetWrapper>
+                <WidgetWrapper id="widget_wrapper">
+                  <Widget>
+                    <div>Challenge Reason</div>
+                    <ANButton
+                      label="Challenge"
+                      height="45px"
+                      width="372px"
+                      style={{ margin: 'auto' }}
+                      //  onClick={}
+                    />
+                  </Widget>
+                  <Widget>
+                    <div>Veto Reason</div>
+                    <div>{/* <ANInput /> */}</div>
+                    <ANButton
+                      label="Execute"
+                      height="45px"
+                      width="372px"
+                      style={{ margin: 'auto' }}
+                      //  onClick={}
+                    />
+                  </Widget>
+                  <Widget>
+                    <ANButton
+                      label="Execute"
+                      height="45px"
+                      width="372px"
+                      style={{ margin: 'auto' }}
+                      //  onClick={}
+                    />
+                  </Widget>
+                </WidgetWrapper>
               </DetailsWrapper>
             </StyledPaper>
           ) : null}

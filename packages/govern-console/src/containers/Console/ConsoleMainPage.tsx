@@ -7,6 +7,7 @@ import Paper from '@material-ui/core/Paper';
 import { useQuery } from '@apollo/client';
 import { GET_DAO_LIST, GET_GOVERN_REGISTRY_DATA } from './queries';
 import { Link } from 'react-router-dom';
+import { formatEther } from 'ethers/lib/utils';
 export interface ConsoleMainPageProps {
   /**
    * Callback on selection of Dao
@@ -38,7 +39,7 @@ export const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
   } = useQuery(GET_DAO_LIST, {
     variables: {
       offset: 0,
-      limit: 12,
+      limit: 2,
     },
   });
 
@@ -85,7 +86,7 @@ export const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
             >
               <DaoCard
                 label={dao.name}
-                aumValue={dao.executor.balance}
+                aumValue={formatEther(dao.executor.balance)}
                 numberOfProposals={dao.queue.nonce}
                 daoId={dao.id}
               ></DaoCard>

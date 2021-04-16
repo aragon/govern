@@ -9,6 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import { GET_PROPOSAL_LIST } from './queries';
 import { useQuery } from '@apollo/client';
 import { useHistory } from 'react-router-dom';
+import { formatEther } from 'ethers/lib/utils';
 
 export const DaoMainPage: React.FC<{ onClickProposalCard: any }> = ({
   onClickProposalCard,
@@ -98,7 +99,7 @@ export const DaoMainPage: React.FC<{ onClickProposalCard: any }> = ({
   return (
     <DaoPageMainDiv>
       <DaoHeader
-        ethBalance={'1'}
+        ethBalance={formatEther(daoDetails.executor.balance)}
         usdBalance={'2222'}
         daoName={daoDetails.name}
       />
