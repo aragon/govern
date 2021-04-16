@@ -10,7 +10,7 @@
   "module": "dist/esm/public/index.js",
   "types": "dist/cjs/public/index.d.ts",
   "scripts": {
-    "build": "yarn build:esm && yarn build:cjs && rollup -c && yarn uglify:esm && yarn uglify:umd",
+    "build": "yarn build:esm && yarn build:cjs && rollup -c && yarn uglify:esm",
     "build:esm": "tsc -p ./tsconfig.esm.json",
     "build:cjs": "tsc -p ./tsconfig.cjs.json",
     "dev:esm": "yarn build:esm --watch",

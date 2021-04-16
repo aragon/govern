@@ -3,6 +3,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import injectProcessEnv from 'rollup-plugin-inject-process-env';
 import json from "@rollup/plugin-json";
 
+
 const esmConfig = {
   input: 'dist/esm/public/index.js',
   output: {
@@ -17,7 +18,8 @@ const esmConfig = {
     commonjs(),
     injectProcessEnv({
       NODE_ENV: 'production'
-    })
+    }),
+    json()
   ]
 }
 
@@ -37,13 +39,13 @@ const umdConfig = {
     commonjs(),
     injectProcessEnv({
       NODE_ENV: 'production'
-    })
+    }),
+    json()
   ]
 }
 
 const configs = [
-  esmConfig,
-  umdConfig
+  esmConfig
 ]
 
 export default configs
