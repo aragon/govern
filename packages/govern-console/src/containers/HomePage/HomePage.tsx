@@ -9,6 +9,7 @@ import { ConsoleMainPage } from 'containers/Console/ConsoleMainPage';
 import { DaoMainPage } from 'containers/DAO/DaoMainPage';
 import ProposalDetails from 'containers/ProposalDetails/ProposalDetails';
 import NewProposal from 'containers/NewProposal/NewProposal';
+import NewDaoContainer from 'containers/CreateDAO/CreateDAO';
 
 const HomePage = ({ ...props }) => {
   const AppWrapper = styled('div')({
@@ -20,7 +21,7 @@ const HomePage = ({ ...props }) => {
   const [selectedDao, updateSelectedDao] = React.useState({});
   const updateSelectedDaoAndPushToHistory = React.useCallback(
     (daoDetails: any) => {
-      history.push(`daos/${daoDetails.name}`, {
+      history.push(`/daos/${daoDetails.name}`, {
         daoDetails,
       });
     },
@@ -56,6 +57,9 @@ const HomePage = ({ ...props }) => {
           </Route>
           <Route exact path="/new-proposal">
             <NewProposal />
+          </Route>
+          <Route exact path="/create-dao">
+            <NewDaoContainer />
           </Route>
           {/* <Route path="/about">
         <About />

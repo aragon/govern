@@ -84,7 +84,6 @@ const Wallet = ({}) => {
       account.substring(account.length - 5, account.length - 1)
     );
   };
-
   return (
     <WalletWrapper>
       {status !== 'connected' ? (

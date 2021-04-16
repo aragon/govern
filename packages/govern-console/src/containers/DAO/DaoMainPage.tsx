@@ -21,6 +21,7 @@ export const DaoMainPage: React.FC<{ onClickProposalCard: any }> = ({
   const [isProfilePage, setProfilePage] = useState(false);
   const searchString = useRef('');
   const history: any = useHistory();
+  console.log(history);
   const daoDetails = history.location.state.daoDetails;
 
   // useEffect(() => {
