@@ -3,7 +3,15 @@ import { Web3Provider } from '@ethersproject/providers'
 import { AddressZero } from '@ethersproject/constants'
 import { TransactionResponse } from '@ethersproject/abstract-provider'
 import Configuration from '../internal/configuration/Configuration'
-import * as factoryAbi from '../internal/abi/FactoryAbi.json'
+
+const factoryAbi = [
+  `function newGovern(
+    string _name, 
+    tuple(address tokenAddress, uint8 tokenDecimals, string tokenName, string tokenSymbol) _token, 
+    tuple(uint256 executionDelay, tuple(address token, uint256 amount) scheduleDeposit, tuple(address token, uint256 amount) challengeDeposit, address resolver, bytes rules, uint256 maxCalldataSize) _config, 
+    bool _useProxies
+  )`,
+]
 
 declare let window: any
 
