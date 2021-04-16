@@ -56,6 +56,11 @@
             "internalType": "bytes",
             "name": "rules",
             "type": "bytes"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxCalldataSize",
+            "type": "uint256"
           }
         ],
         "internalType": "struct ERC3000Data.Config",
@@ -180,6 +185,11 @@
             "internalType": "bytes",
             "name": "rules",
             "type": "bytes"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxCalldataSize",
+            "type": "uint256"
           }
         ],
         "indexed": false,
@@ -653,6 +663,11 @@
                 "internalType": "bytes",
                 "name": "rules",
                 "type": "bytes"
+              },
+              {
+                "internalType": "uint256",
+                "name": "maxCalldataSize",
+                "type": "uint256"
               }
             ],
             "internalType": "struct ERC3000Data.Config",
@@ -765,6 +780,11 @@
             "internalType": "bytes",
             "name": "rules",
             "type": "bytes"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxCalldataSize",
+            "type": "uint256"
           }
         ],
         "internalType": "struct ERC3000Data.Config",
@@ -920,6 +940,11 @@
                 "internalType": "bytes",
                 "name": "rules",
                 "type": "bytes"
+              },
+              {
+                "internalType": "uint256",
+                "name": "maxCalldataSize",
+                "type": "uint256"
               }
             ],
             "internalType": "struct ERC3000Data.Config",
@@ -1078,6 +1103,11 @@
             "internalType": "bytes",
             "name": "rules",
             "type": "bytes"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxCalldataSize",
+            "type": "uint256"
           }
         ],
         "internalType": "struct ERC3000Data.Config",
@@ -1254,6 +1284,11 @@
                 "internalType": "bytes",
                 "name": "rules",
                 "type": "bytes"
+              },
+              {
+                "internalType": "uint256",
+                "name": "maxCalldataSize",
+                "type": "uint256"
               }
             ],
             "internalType": "struct ERC3000Data.Config",
@@ -1442,6 +1477,11 @@
                 "internalType": "bytes",
                 "name": "rules",
                 "type": "bytes"
+              },
+              {
+                "internalType": "uint256",
+                "name": "maxCalldataSize",
+                "type": "uint256"
               }
             ],
             "internalType": "struct ERC3000Data.Config",
@@ -1597,6 +1637,11 @@
                 "internalType": "bytes",
                 "name": "rules",
                 "type": "bytes"
+              },
+              {
+                "internalType": "uint256",
+                "name": "maxCalldataSize",
+                "type": "uint256"
               }
             ],
             "internalType": "struct ERC3000Data.Config",

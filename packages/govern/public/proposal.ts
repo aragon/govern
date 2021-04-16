@@ -1,5 +1,6 @@
 import { ethers } from 'ethers'
 import * as abi from '../internal/abi/GovernQueue.json'
+import { DaoConfig } from './createDao'
 
 declare let window: any;
 
@@ -9,7 +10,7 @@ export type ProposalOptions = {
 
 export type ProposalParams = {
   payload: PayloadType
-  config: ConfigType
+  config: DaoConfig
 }
 
 export type PayloadType = {
@@ -20,20 +21,6 @@ export type PayloadType = {
   actions: ActionType[]
   allowFailuresMap: ethers.BytesLike
   proof: ethers.BytesLike
-}
-
-export type ConfigType = {
-  executionDelay: ethers.BigNumberish
-  scheduleDeposit: CollateralType;
-  challengeDeposit: CollateralType;
-  vetoDeposit: CollateralType;
-  resolver: string
-  rules: ethers.BytesLike
-}
-
-export type CollateralType = {
-  token: string
-  amount: ethers.BigNumberish
 }
 
 export type ActionType = {

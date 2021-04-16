@@ -84,41 +84,6 @@ import { createDao } from '@aragon/govern'
 const result = await createDao(args, options);
 ```
 
-For Web:
-After installing `@aragon/govern`, you will find the Govern javascript bundles under `node_modules/@aragon/govern/dist`.
-
-For ES6:
-``` typescript
-<script type="module">
-    import { createDao } from './dist/esm/public/govern-esm.min.js'
-    const btn = document.getElementById('btn-umd')
-    btn.onclick = async (e) => {
-        if (typeof window.ethereum === 'undefined') {
-            alert('MetaMask is not installed!');
-            return;
-        }
-
-        const tx = await createDao({name: "hello", token: { name: 'hello', symbol: 'HLO'}, useProxis: false})
-    }
-</script>
-```
-
-For ES3 (UMD):
-``` typescript
-<script type="application/javascript" src="./dist/umd/public/govern-umd.min.js"></script>
-<script type="application/javascript">
-    const btn = document.getElementById('btn-esm')
-    btn.onclick = async (e) => {
-        if (typeof window.ethereum === 'undefined') {
-            alert('MetaMask is not installed!');
-            return;
-        }
-
-        const tx = await govern.createDao({name: "world", token: { name: 'world', symbol: 'WLD'}, useProxis: false})
-    }
-</script>
-```
-
 
 ### configure(config) ⇒ ``void``
 
