@@ -1,8 +1,39 @@
 import { ethers } from 'ethers'
-import * as DEFAULT_ABI from '../internal/abi/GovernQueue.json'
-import { DaoConfig } from './createDao'
+import { DaoConfig, ContainerConfig } from './createDao'
 
-declare let window: any;
+const Payload = `
+  tuple(
+    uint256 nonce,
+    uint256 executionTime,
+    address submitter,
+    address executor,
+    tuple(
+      address to,
+      uint256 value,
+      bytes data
+    )[] actions,
+    bytes32 allowFailuresMap,
+    bytes proof
+  )
+`
+
+const Container = `
+  tuple(
+    ${Payload} payload,
+    ${ContainerConfig} config
+  )
+`
+
+const queueAbis = [
+  `function nonce() view returns (uint256)`,
+  `function schedule(${Container} _container)`,
+  `function execute(${Container} _container)`,
+  `function challenge(${Container} _container, bytes _reason)`,
+  `function resolve(${Container} _container, uint256 _disputeId)`,
+  `function veto(${Container} _container, bytes _reason)`,
+]
+
+declare let window: any
 
 export type ProposalOptions = {
   provider?: any
@@ -30,15 +61,14 @@ export type ActionType = {
   data: ethers.BytesLike
 }
 
-
 export class Proposal {
   private readonly contract: ethers.Contract
-  
-  constructor (queueAddress: string, options: ProposalOptions) {
-    const abi = options?.abi || DEFAULT_ABI
+
+  constructor(queueAddress: string, options: ProposalOptions) {
+    const abi = options?.abi || queueAbis
 
     const provider = options.provider || window.ethereum
-    const signer = (new ethers.providers.Web3Provider(provider)).getSigner()
+    const signer = new ethers.providers.Web3Provider(provider).getSigner()
     this.contract = new ethers.Contract(queueAddress, abi, signer)
   }
 
@@ -49,11 +79,12 @@ export class Proposal {
    *
    * @returns {Promise<TransactionResponse>} transaction response object
    */
-  async schedule(proposal: ProposalParams): Promise<ethers.providers.TransactionResponse>
-  {
+  async schedule(
+    proposal: ProposalParams
+  ): Promise<ethers.providers.TransactionResponse> {
     const nonce = await this.contract.nonce()
 
-    const proposalWithNonce = Object.assign({},proposal)
+    const proposalWithNonce = Object.assign({}, proposal)
     proposalWithNonce.payload.nonce = nonce.add(1)
     const result = this.contract.schedule(proposalWithNonce)
     return result
@@ -66,8 +97,9 @@ export class Proposal {
    *
    * @returns {Promise<TransactionResponse>} transaction response object
    */
-  async execute(proposal: ProposalParams): Promise<ethers.providers.TransactionResponse>
-  {
+  async execute(
+    proposal: ProposalParams
+  ): Promise<ethers.providers.TransactionResponse> {
     const result = this.contract.execute(proposal)
     return result
   }
@@ -81,8 +113,10 @@ export class Proposal {
    *
    * @returns {Promise<TransactionResponse>} transaction response object
    */
-  async veto(proposal: ProposalParams, reason: string): Promise<ethers.providers.TransactionResponse>
-  {
+  async veto(
+    proposal: ProposalParams,
+    reason: string
+  ): Promise<ethers.providers.TransactionResponse> {
     const reasonBytes = ethers.utils.toUtf8Bytes(reason)
     const result = this.contract.veto(proposal, reasonBytes)
     return result
@@ -97,8 +131,10 @@ export class Proposal {
    *
    * @returns {Promise<TransactionResponse>} transaction response object
    */
-  async resolve(proposal: ProposalParams, disputeId: number) : Promise<ethers.providers.TransactionResponse>
-  {
+  async resolve(
+    proposal: ProposalParams,
+    disputeId: number
+  ): Promise<ethers.providers.TransactionResponse> {
     const result = this.contract.resolve(proposal, disputeId)
     return result
   }
@@ -112,12 +148,12 @@ export class Proposal {
    *
    * @returns {Promise<TransactionResponse>} transaction response object
    */
-  async challenge(proposal: ProposalParams, reason: string): Promise<ethers.providers.TransactionResponse>
-  {
+  async challenge(
+    proposal: ProposalParams,
+    reason: string
+  ): Promise<ethers.providers.TransactionResponse> {
     const reasonBytes = ethers.utils.toUtf8Bytes(reason)
     const result = this.contract.challenge(proposal, reasonBytes)
     return result
   }
-
 }
-

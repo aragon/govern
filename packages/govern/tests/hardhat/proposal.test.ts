@@ -120,7 +120,7 @@ describe("Proposal", function() {
 
   });
 
-  it.skip("veto should work", async function() {
+  it.only("veto should work", async function() {
     const reason = 'veto reason'
     const result = await proposal.veto(proposalData, reason)
     const receipt = await result.wait()
