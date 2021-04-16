@@ -14,13 +14,13 @@ import {
 const zeroAddress   = "0x0000000000000000000000000000000000000000"
 const customAddress = "0x1111111111111111111111111111111111111111"
 
-const DUMMY_CONFIG =  [
-  BigNumber.from(0),
-  [ zeroAddress, BigNumber.from(0) ],
-  [ zeroAddress, BigNumber.from(0) ],
-  "0x0000000000000000000000000000000000000000", 
-  ""
-];
+// const DUMMY_CONFIG =  [
+//   BigNumber.from(0),
+//   [ zeroAddress, BigNumber.from(0) ],
+//   [ zeroAddress, BigNumber.from(0) ],
+//   "0x0000000000000000000000000000000000000000", 
+//   ""
+// ];
 
 describe('Govern Base Factory with mocked contracts', function () {
 
@@ -68,11 +68,28 @@ describe('Govern Base Factory with mocked contracts', function () {
       return useProxies ? keccak256(solidityPack(['string'], [name])) : "0x" + "0".repeat(64)
     }
 
-    const tx = await GovernBaseFactory.newGovernWithoutConfig(
+    const tx = await GovernBaseFactory.newGovern(
       name,
-      deployToken ? zeroAddress : customAddress,
-      'Eagle Token',
-      'EAG',
+      {
+        tokenAddress: deployToken ? zeroAddress : customAddress,
+        tokenName: 'Eagle Token',
+        tokenSymbol: 'EAG',
+        tokenDecimals: 18
+      },
+      {
+        executionDelay: 3600, // how many seconds to wait before being able to call `execute`.
+        scheduleDeposit: {
+          token: '0x' + '00'.repeat(20),
+          amount: 0
+        },
+        challengeDeposit: {
+          token: '0x' + '00'.repeat(20),
+          amount: 0
+        },
+        resolver: '0x' + '00'.repeat(20),
+        rules: "0x",
+        maxCalldataSize: 100000 // initial maxCalldatasize
+      },
       useProxies
     );
 

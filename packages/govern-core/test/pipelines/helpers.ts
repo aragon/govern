@@ -59,7 +59,8 @@ export function getConfigHash(container: any): string {
         'tuple(address token, uint256 amount) scheduleDeposit, ' +
         'tuple(address token, uint256 amount) challengeDeposit, ' +
         'address resolver, ' +
-        'bytes rules' +
+        'bytes rules, ' +
+        'uint256 maxCalldataSize' +
         ')',
       ],
       [container.config]
@@ -120,7 +121,8 @@ export function getEncodedContainer(container: any): string {
             'uint256 amount' +
           ') challengeDeposit, ' +
           'address resolver, ' +
-          'bytes rules' +
+          'bytes rules, ' +
+          'uint256 maxCalldataSize' +
         ') config' +
       ')'
     ],

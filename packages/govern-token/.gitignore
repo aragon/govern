@@ -6,6 +6,7 @@ cache
 artifacts
 typechain
 deployments
+abi
 
 #Coverage
 coverage/

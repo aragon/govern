@@ -1,4 +1,4 @@
-import { Dao } from '../internal/clients/graphql/queries/dao'
+import { Dao } from '../internal/clients/graphql/fragments/dao-entry'
 import DaoAction from '../internal/actions/DaoAction'
 
 export { Dao }
@@ -8,8 +8,8 @@ export { Dao }
  *
  * @param {string} name
  *
- * @returns {Promise<Dao>}
+ * @returns {Promise<Dao|null>}
  */
-export function dao(name: string): Promise<Dao> {
+export function dao(name: string): Promise<Dao|null> {
   return new DaoAction({ name: name }).execute()
 }

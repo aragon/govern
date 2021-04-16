@@ -1,3 +1,10 @@
 dist/
 coverage/
 package/
+node_modules/
+
+#Hardhat files
+cache
+artifacts
+typechain
+deployments

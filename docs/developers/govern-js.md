@@ -66,6 +66,25 @@ import { query } from '@aragon/govern'
 const query = await query(myQuery, {...});
 ```
 
+### createDao(args, options) ⇒ ``Promise<TransactionResponse>``
+
+Create
+
+| Param    | Type                            | Description                             |
+| -------- | ------------------------------- | --------------------------------------- |
+| args     | <code>CreateDaoParams</code>    | Dao name, Dao token, useProxies option  |
+| options  | <code>CreateDaoOptions</code>   | EIP 1193 provider, Dao factory address  |
+
+Examples:
+
+For Node.js:
+``` typescript
+import { createDao } from '@aragon/govern'
+
+const result = await createDao(args, options);
+```
+
+
 ### configure(config) ⇒ ``void``
 
 Overwrites the default configuration of govern.

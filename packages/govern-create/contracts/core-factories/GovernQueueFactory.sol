@@ -32,7 +32,8 @@ contract GovernQueueFactory {
             noCollateral,
             noCollateral,
             address(0),
-            ""
+            "",
+            100000 // initial maxCalldatasize
         );
         base = address(new GovernQueue(address(2), config));
     }

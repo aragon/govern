@@ -2,9 +2,17 @@
  * TODO: Remove index.ts as soon as exports is stable
  **/
 export { configure, ConfigurationObject } from './configure'
-export { dao, Dao } from './dao'
-export { daos, Daos } from './daos'
+export { dao } from './dao'
+export { daos } from './daos'
 export { query } from './query'
+export { createDao, CreateDaoOptions, CreateDaoParams, DaoConfig } from './createDao'
+export {
+  Proposal,
+  ProposalParams,
+  ProposalOptions,
+  ActionType,
+  PayloadType,
+} from './proposal'
 
 // Types
 
@@ -16,8 +24,8 @@ export {
   ContainerEventResolve,
   ContainerEventRule,
   ContainerEventSchedule,
-  ContainerEventSubmitEvidence,
   ContainerEventVeto,
-  RegistryEntry,
+  Dao,
+  Daos,
   Action
-} from '../internal/clients/graphql/fragments/registry-entry'
+} from '../internal/clients/graphql/fragments/dao-entry'
