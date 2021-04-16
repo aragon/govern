@@ -36,7 +36,6 @@ const umdConfig = {
     injectProcessEnv({
       NODE_ENV: 'production'
     }),
-    json()
   ]
 }
 
