@@ -8,17 +8,16 @@ import Typography from '@material-ui/core/Typography';
 import { HelpButton } from '../../components/HelpButton/HelpButton';
 import TextArea from '../../components/TextArea/TextArea';
 import Paper from '@material-ui/core/Paper';
-import Grid from '@material-ui/core/Grid';
-import { NewActionModal } from '../../components/Modal/NewActionModal';
-import { AddActionsModal } from '../../components/Modal/AddActionsModal';
 import { InputField } from '../../components/InputFields/InputField';
 import { useHistory } from 'react-router-dom';
 import CreateDaoImage from '../../images/svgs/CreateDao.svg';
 import CreateDaoInProgressImage from '../../images/svgs/CreateDaoInProgress.svg';
+import GreenTickImage from '../../images/svgs/green_tick.svg';
 import { TwoSidedSwitch } from '../../components/TwoSidedSwitch/TwoSidedSwitch';
 import Switch from '@material-ui/core/Switch';
 import Checkbox from '@material-ui/core/Checkbox';
 import LinearProgress from '@material-ui/core/LinearProgress';
+import { Height } from '@material-ui/icons';
 
 enum CreateDaoStatus {
     PreCreate,
@@ -28,7 +27,29 @@ enum CreateDaoStatus {
 }
 
 interface FormProps {
-    setCreateDaoStatus(status: CreateDaoStatus): void
+    /*
+        change status of DAO creation
+    */
+    setCreateDaoStatus(status: CreateDaoStatus): void;
+
+    /*
+        cancel form and go back
+    */
+    cancelForm(): void;
+}
+
+interface ProgressProps {
+    /*
+        value to be passed to progress bar: range 0-100
+    */
+    progressValue: number;
+}
+
+interface ResultProps {
+    /*
+        value to be passed to progress bar: range 0-100
+    */
+    postResultAction(): void
 }
 
 const BackButton = styled('div')({
@@ -49,8 +70,36 @@ const InputTitle = styled(Typography)({
     color: '#7483AB',
 });
 
+const Title = styled(Typography)({
+    fontFamily: 'Manrope',
+    fontStyle: 'normal',
+    fontWeight: 600,
+    fontSize: 28,
+    lineHeight: '38px',
+    color: '#20232C',
+    marginTop: 17,
+    height: 50,
+    display: 'flex',
+    justifyContent: 'center',
+});
+
+const SubTitle = styled(Typography)({
+    width: '365px',
+    fontFamily: 'Manrope',
+    fontStyle: 'normal',
+    fontWeight: 'normal',
+    fontSize: 18,
+    lineHeight: '25px',
+    color: '#7483AB',
+    display: 'flex',
+    justifyContent: 'center',
+    textAlign: 'center',
+    margin: '0px 50px 0px 50px'
+});
+
 const NewDaoForm: React.FC<FormProps> = ({
-    setCreateDaoStatus
+    setCreateDaoStatus,
+    cancelForm
 }) => {
     const theme = useTheme();
 
@@ -78,7 +127,9 @@ const NewDaoForm: React.FC<FormProps> = ({
                 }}
         >
             <WrapperDiv>
-                <BackButton>
+                <BackButton
+                    onClick={cancelForm}
+                >
                     <img src={backButtonIcon} />
                 </BackButton>
                 <img src={CreateDaoImage} />
@@ -209,7 +260,7 @@ const NewDaoForm: React.FC<FormProps> = ({
                         label="Create new DAO"
                         type="primary"
                         style={{ marginTop: 40 }}
-                        onClick={() => { setCreateDaoStatus(CreateDaoStatus.InProgress)}}
+                        onClick={() => { setCreateDaoStatus(CreateDaoStatus.Successful)}}
                     />
                 </div>
             </WrapperDiv>
@@ -217,16 +268,16 @@ const NewDaoForm: React.FC<FormProps> = ({
     );
 };
 
-// TODO: NewDaoProgress
-const NewDaoProgress: React.FC = () => {
+const NewDaoProgress: React.FC<ProgressProps> = ({
+    progressValue
+}) => {
     const theme = useTheme();
-    const [progressPercent, setProgressPercent] = useState<number>(5);
 
     const WrapperDiv = styled(Paper)({
         width: 'min-content',
         background: theme.custom.white,
         height: 'auto',
-        padding: '50px',
+        padding: '40px 20px 20px 20px',
         display: 'flex',
         flexWrap: 'wrap',
         flexDirection: 'column',
@@ -234,36 +285,79 @@ const NewDaoProgress: React.FC = () => {
         boxShadow: 'none',
     });
 
-    const Title = styled(Typography)({
-        fontFamily: 'Manrope',
-        fontStyle: 'normal',
-        fontWeight: 600,
-        fontSize: 28,
-        lineHeight: '38px',
-        color: '#20232C',
-        marginTop: 17,
-        height: 50,
-        display: 'flex',
-        justifyContent: 'center',
-    });
-
-    const SubTitle = styled(Typography)({
-        width: '454px',
-        fontFamily: 'Manrope',
-        fontStyle: 'normal',
-        fontWeight: 'normal',
-        fontSize: 18,
-        lineHeight: '25px',
-        color: '#7483AB',
-        display: 'flex',
-        justifyContent: 'center',
-    });
-
     return(
         <div
         style={{
+                height: '80vh',
+                justifyContent: 'center',
+                display: 'flex',
+                alignItems: 'center'
+            }}
+        >
+            <WrapperDiv>
+                <div 
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        }}
+                >
+                    <img src={CreateDaoInProgressImage} style={{ width: '242px', marginLeft: 'auto', marginRight: 'auto'}} />
+                    <Title>Creating your DAO</Title>
+                    <div
+                        style={{
+                            justifyContent: 'center',
+                            display: 'flex',
+                            }}
+                    >
+                        <SubTitle>Hold tight your transaction is under process</SubTitle>
+                    </div>
+                    <LinearProgress variant="determinate" value={progressValue} style={{ width: '370px', marginLeft: 'auto', marginRight: 'auto', marginTop: '20px'}}/>
+                    <div
+                        style={{
+                            borderRadius: '10px',
+                            background: '#ECFAFF',
+                            width: '446px',
+                            height: '51px',
+                            lineHeight: '51px',
+                            textAlign: 'center',
+                            marginTop: '50px',
+                            fontFamily: 'Manrope',
+                            fontStyle: 'normal',
+                            fontWeight: 'normal',
+                            fontSize: 14,
+                            color: '#0176FF'
+                        }}
+                    >Please be patient and do not close this window until it finishes.</div>
+                </div>
+            </WrapperDiv>
+        </div>
+    );
+}
+
+const NewDaoCreationResult: React.FC<ResultProps> = ({
+    postResultAction
+}) => {
+    const theme = useTheme();
+
+    const WrapperDiv = styled(Paper)({
+        width: 'min-content',
+        background: theme.custom.white,
+        height: 'min-content',
+        padding: '30px 20px 20px 20px',
+        display: 'flex',
+        flexWrap: 'wrap',
+        flexDirection: 'column',
+        boxSizing: 'border-box',
+        boxShadow: 'none',
+    });
+    return(
+        <div
+        style={{
+            height: '80vh',
             justifyContent: 'center',
             display: 'flex',
+            alignItems: 'center'
             }}
         >
             <WrapperDiv>
@@ -273,43 +367,67 @@ const NewDaoProgress: React.FC = () => {
                         flexDirection: 'column',
                         }}
                 >
-                    <img src={CreateDaoInProgressImage} style={{ width: '242px', marginLeft: 'auto', marginRight: 'auto'}} />
-                    <Title>Creating your DAO</Title>
-                    <SubTitle>Hold tight your transaction is under process</SubTitle>
-                    <LinearProgress variant="determinate" value={progressPercent} style={{ width: '370px', marginLeft: 'auto', marginRight: 'auto', marginTop: '20px'}}/>
+                    <img src={GreenTickImage} style={{ width: '88px', marginLeft: 'auto', marginRight: 'auto', marginTop: '88px'}}/>
+                    <Title>Your DAO is ready</Title>
+                    <SubTitle>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.Lorem ipsum dolor</SubTitle>
+                    <div 
+                        style={{
+                            justifyContent: 'center',
+                            display: 'flex',
+                            }}
+                    >
+                        <ANButton
+                        width={'446px'}
+                        label="Get started"
+                        type="primary"
+                        style={{ marginTop: 40 }}
+                        onClick={() => { postResultAction()}}
+                    />
+                    </div>
                 </div>
             </WrapperDiv>
+
         </div>
     );
 }
 
-// TODO: NewDaoCreationResult
-
 const NewDaoContainer: React.FC = () => {
     const [createDaoStatus, setCreateDaoStatus] = useState<CreateDaoStatus>(CreateDaoStatus.PreCreate);
-    // const history = useHistory();
+    const [progressPercent, setProgressPercent] = useState<number>(5);
+    const history = useHistory();
 
-    // const onClickBackFromCreateDaoPage = () => {
-    //     history.goBack();
-    // };
+    const onClickBackFromCreateDaoPage = () => {
+        history.goBack();
+    };
 
     switch(createDaoStatus) {
         case CreateDaoStatus.PreCreate: {
             return(
                 <NewDaoForm 
                     setCreateDaoStatus={setCreateDaoStatus}
+                    cancelForm={onClickBackFromCreateDaoPage}
                 />
             );
         }
         case CreateDaoStatus.InProgress: {
             return(
-                <NewDaoProgress />
+                <NewDaoProgress 
+                    progressValue={progressPercent}
+                />
+            );
+        }
+        case CreateDaoStatus.Successful: {
+            return(
+                <NewDaoCreationResult 
+                    postResultAction={() => { console.log('should go some where')}}
+                />
             );
         }
         default: {
             return(
                 <NewDaoForm 
                     setCreateDaoStatus={setCreateDaoStatus}
+                    cancelForm={onClickBackFromCreateDaoPage}
                 />
             );
         }
