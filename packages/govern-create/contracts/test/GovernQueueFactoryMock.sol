@@ -17,10 +17,10 @@ contract GovernQueueFactoryMock{
     
     bytes4 public constant ROOT_ROLE = "0x";
 
-    function schedule() public {}
-    function execute() public {}
-    function challenge() public {}
-    function configure() public {}
+    function schedule()  public pure  {}
+    function execute()   public pure  {}
+    function challenge() public pure  {}
+    function configure() public pure  {}
 
 
 

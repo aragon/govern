@@ -4,16 +4,17 @@ import { TASK_ETHERSCAN_VERIFY } from 'hardhat-deploy'
 
 import { verifyContract } from '../utils/etherscan'
 
-const ZERO_ADDR = `0x${'00'.repeat(20)}`
+const RESOLVER_ADDRR = `0x${'00'.repeat(20)}` // the address of the resolver where the disputes happen...
 const TWO_ADDRR = `0x${'00'.repeat(19)}02`
 const NO_TOKEN = `0x${'00'.repeat(20)}`
 
 const dummyConfig = {
-  executionDelay: '0',
+  executionDelay: 0, // how many seconds to wait before being able to call `execute`
   scheduleDeposit: [NO_TOKEN, '0'],
   challengeDeposit: [NO_TOKEN, '0'],
-  resolver: ZERO_ADDR,
+  resolver: RESOLVER_ADDRR,
   rules: '0x',
+  maxCalldataSize: 100000 // initial maxCalldatasize
 }
 
 function delay(ms: number) {

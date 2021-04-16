@@ -14,6 +14,7 @@ let deposit = {
       challengeDeposit: deposit,
       resolver: '0xb794f5ea0ba39494ce839613fffba74279579268',
       rules: '0x00',
+      maxCalldataSize: 100000 // initial maxCalldatasize
     },
     payload: {
       nonce: 1,
@@ -82,7 +83,8 @@ function getConfigHash(): string {
           'tuple(address token, uint256 amount) scheduleDeposit, ' +
           'tuple(address token, uint256 amount) challengeDeposit, ' +
           'address resolver, ' +
-          'bytes rules' +
+          'bytes rules,' +
+          'uint256 maxCalldataSize' +
           ')',
       ],
       [container.config]
