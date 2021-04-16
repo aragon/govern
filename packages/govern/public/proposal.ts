@@ -1,11 +1,12 @@
 import { ethers } from 'ethers'
-import * as abi from '../internal/abi/GovernQueue.json'
+import * as DEFAULT_ABI from '../internal/abi/GovernQueue.json'
 import { DaoConfig } from './createDao'
 
 declare let window: any;
 
 export type ProposalOptions = {
   provider?: any
+  abi?: ethers.ContractInterface
 }
 
 export type ProposalParams = {
@@ -14,7 +15,7 @@ export type ProposalParams = {
 }
 
 export type PayloadType = {
-  nonce: ethers.BigNumberish
+  nonce?: ethers.BigNumberish
   executionTime: ethers.BigNumberish
   submitter: string
   executor: string
@@ -31,9 +32,11 @@ export type ActionType = {
 
 
 export class Proposal {
-  private readonly contract: ethers.Contract;
+  private readonly contract: ethers.Contract
   
   constructor (queueAddress: string, options: ProposalOptions) {
+    const abi = options?.abi || DEFAULT_ABI
+
     const provider = options.provider || window.ethereum
     const signer = (new ethers.providers.Web3Provider(provider)).getSigner()
     this.contract = new ethers.Contract(queueAddress, abi, signer)
@@ -49,8 +52,10 @@ export class Proposal {
   async schedule(proposal: ProposalParams): Promise<ethers.providers.TransactionResponse>
   {
     const nonce = await this.contract.nonce()
-    proposal.payload.nonce = nonce.add(1)
-    const result = this.contract.schedule(proposal)
+
+    const proposalWithNonce = Object.assign({},proposal)
+    proposalWithNonce.payload.nonce = nonce.add(1)
+    const result = this.contract.schedule(proposalWithNonce)
     return result
   }
 
