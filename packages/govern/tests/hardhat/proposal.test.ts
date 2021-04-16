@@ -31,12 +31,16 @@ const DUMMY_CONFIG =
   rules: emptyBytes
 }
 
+type payloadArgs = {
+  submitter: string
+  executor: string
+  nonce: number
+}
 
-
-const buildPayload = ({submitter, executor}: { submitter: string, executor: string}) => {
+const buildPayload = ({submitter, executor, nonce}: payloadArgs) => {
   const payload: PayloadType = {
-    nonce: 1,
-    executionTime: Math.floor(Date.now() / 1000),
+    nonce,
+    executionTime: Math.floor(Date.now() / 1000) + 50,
     submitter,
     executor,
     actions: [ {to: tokenAddress, value: 0, data: emptyBytes}],
@@ -51,7 +55,10 @@ const buildPayload = ({submitter, executor}: { submitter: string, executor: stri
 describe.only("Proposal", function() {
   let queueAddress: string
   let executor: string
-  let config: ConfigType
+  let proposal: Proposal
+  let proposalData: ProposalParams
+  let proposalResult: any
+  let nonce: number = 0
 
   before(async () => {
     // create dao  
@@ -86,22 +93,65 @@ describe.only("Proposal", function() {
 
   })
 
-  it("Should schedule a proposal successfully", async function() {
-    const proposal = new Proposal(queueAddress, { provider: network.provider })
+  beforeEach(async function(){
+    proposal = new Proposal(queueAddress, { provider: network.provider })
 
     const signers = await ethers.getSigners()
     
-    const payload = buildPayload({submitter: signers[0].address, executor})
-    const data: ProposalParams = {
+    nonce++
+    const payload = buildPayload({submitter: signers[0].address, executor, nonce})
+    proposalData = {
       payload,
       config: DUMMY_CONFIG
     }
 
-    const result = await proposal.schedule(data)
+    proposalResult = await proposal.schedule(proposalData)
+    console.log('nonce', nonce)
+  })
+
+  it("schedule should work", async function() {
+    const receipt = await proposalResult.wait()
+    expect(receipt.status).to.equal(1)
+    expect(proposalResult.hash).to.equal(receipt.transactionHash)
+
+  });
+
+  it("veto should work", async function() {
+    const reason = 'veto reason'
+    const result = await proposal.veto(proposalData, reason)
     const receipt = await result.wait()
     expect(receipt.status).to.equal(1)
     expect(result.hash).to.equal(receipt.transactionHash)
+  });
 
+  it("challenge should work", async function() {
+    const reason = 'challenge reason'
+    const result = await proposal.challenge(proposalData, reason)
+    const receipt = await result.wait()
+    expect(receipt.status).to.equal(1)
+    expect(result.hash).to.equal(receipt.transactionHash)
+  });
+
+  it("resolve should work", async function() {
+    const reason = 'challenge reason'
+    const tx = await proposal.challenge(proposalData, reason)
+    await tx.wait()
+
+    const disputeId = 0
+    const result = await proposal.resolve(proposalData, disputeId)
+    const receipt = await result.wait()
+    expect(receipt.status).to.equal(1)
+    expect(result.hash).to.equal(receipt.transactionHash)
+  });
+
+  it("execute should work", async function() {
+    // mine a block so we can execute the proposal
+    await ethers.provider.send('evm_increaseTime', [600])
+
+    const result = await proposal.execute(proposalData)
+    const receipt = await result.wait()
+    expect(receipt.status).to.equal(1)
+    expect(result.hash).to.equal(receipt.transactionHash)
   });
 
 })

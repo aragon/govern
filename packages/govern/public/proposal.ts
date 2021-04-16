@@ -18,8 +18,8 @@ export type PayloadType = {
   submitter: string
   executor: string
   actions: ActionType[]
-  allowFailuresMap: string
-  proof: string
+  allowFailuresMap: ethers.BytesLike
+  proof: ethers.BytesLike
 }
 
 export type ConfigType = {
@@ -28,7 +28,7 @@ export type ConfigType = {
   challengeDeposit: CollateralType;
   vetoDeposit: CollateralType;
   resolver: string
-  rules: string
+  rules: ethers.BytesLike
 }
 
 export type CollateralType = {
@@ -39,7 +39,7 @@ export type CollateralType = {
 export type ActionType = {
   to: string
   value: ethers.BigNumberish
-  data: string
+  data: ethers.BytesLike
 }
 
 
@@ -52,17 +52,76 @@ export class Proposal {
     this.contract = new ethers.Contract(queueAddress, abi, signer)
   }
 
-/**
- * Create and schedule a proposal
- *
- * @param {ProposalParams} proposal for creating and scheduling a DAO proposal
- * 
- * @returns {Promise<TransactionResponse>} transaction response object
- */
-
+  /**
+   * Create and schedule a proposal
+   *
+   * @param {ProposalParams} proposal for creating and scheduling a DAO proposal
+   *
+   * @returns {Promise<TransactionResponse>} transaction response object
+   */
   async schedule(proposal: ProposalParams): Promise<ethers.providers.TransactionResponse>
   {
     const result = this.contract.schedule(proposal)
+    return result
+  }
+
+  /**
+   * Execute a proposal
+   *
+   * @param {ProposalParams} proposal to execute
+   *
+   * @returns {Promise<TransactionResponse>} transaction response object
+   */
+  async execute(proposal: ProposalParams): Promise<ethers.providers.TransactionResponse>
+  {
+    const result = this.contract.execute(proposal)
+    return result
+  }
+
+  /**
+   * Veto a proposal
+   *
+   * @param {ProposalParams} proposal to veto
+   *
+   * @param {string} reason
+   *
+   * @returns {Promise<TransactionResponse>} transaction response object
+   */
+  async veto(proposal: ProposalParams, reason: string): Promise<ethers.providers.TransactionResponse>
+  {
+    const reasonBytes = ethers.utils.toUtf8Bytes(reason)
+    const result = this.contract.veto(proposal, reasonBytes)
+    return result
+  }
+
+  /**
+   * Resolve a proposal
+   *
+   * @param {ProposalParams} proposal to resolve
+   *
+   * @param {number} disputeId
+   *
+   * @returns {Promise<TransactionResponse>} transaction response object
+   */
+  async resolve(proposal: ProposalParams, disputeId: number) : Promise<ethers.providers.TransactionResponse>
+  {
+    const result = this.contract.resolve(proposal, disputeId)
+    return result
+  }
+
+  /**
+   * Challenge a proposal
+   *
+   * @param {ProposalParams} proposal to challenge
+   *
+   * @param {string} reason
+   *
+   * @returns {Promise<TransactionResponse>} transaction response object
+   */
+  async challenge(proposal: ProposalParams, reason: string): Promise<ethers.providers.TransactionResponse>
+  {
+    const reasonBytes = ethers.utils.toUtf8Bytes(reason)
+    const result = this.contract.challenge(proposal, reasonBytes)
     return result
   }
 
