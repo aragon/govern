@@ -109,9 +109,11 @@ const NewDaoForm: React.FC<FormProps> = ({
     boxSizing: 'border-box',
     boxShadow: 'none',
   });
-  const [isExistingToken, setIsExistingToken] = useState(false);
-  const [isUseProxyChecked, setIsUseProxyChecked] = useState(false);
-  const [isUseFreeVotingChecked, setIsUseFreeVotingChecked] = useState(false);
+  const [isExistingToken, updateIsExistingToken] = useState(false);
+  const [isUseProxyChecked, updateIsUseProxyChecked] = useState(true);
+  const [isUseFreeVotingChecked, updateIsUseFreeVotingChecked] = useState(
+    false,
+  );
   const daoName = useRef();
   const tokenName = useRef();
   const tokenSymbol = useRef();
@@ -152,6 +154,7 @@ const NewDaoForm: React.FC<FormProps> = ({
           height="46px"
           width="454px"
           placeholder={'Please insert your DAO name...'}
+          value={daoName.current}
         ></InputField>
         {/* <TwoSidedSwitch 
                     leftSide={'Create new token'}
@@ -171,7 +174,7 @@ const NewDaoForm: React.FC<FormProps> = ({
           <Switch
             checked={isExistingToken}
             onChange={() => {
-              setIsExistingToken(!isExistingToken)
+              updateIsExistingToken(!isExistingToken);
             }}
             name="checked"
             color="primary"
@@ -192,6 +195,7 @@ const NewDaoForm: React.FC<FormProps> = ({
               <InputField
                 label=""
                 onInputChange={onChangeTokenName}
+                value={tokenName.current}
                 height="46px"
                 width="200px"
                 placeholder={"Your Token's Name?"}
@@ -203,6 +207,7 @@ const NewDaoForm: React.FC<FormProps> = ({
                 height="46px"
                 width="200px"
                 placeholder={"Your Token's Symbol?"}
+                value={tokenSymbol.current}
               />
             </div>
           </div>
@@ -217,6 +222,7 @@ const NewDaoForm: React.FC<FormProps> = ({
               placeholder={
                 'Please insert existing token ether address (0x000...)'
               }
+              value={existingTokenAddress.current}
             />
           </div>
         )}
@@ -232,7 +238,7 @@ const NewDaoForm: React.FC<FormProps> = ({
           <Checkbox
             checked={isUseProxyChecked}
             onChange={() => {
-              setIsUseProxyChecked(!isUseProxyChecked)
+              updateIsUseProxyChecked(!isUseProxyChecked);
             }}
             color="primary"
             inputProps={{ 'aria-label': 'primary checkbox' }}
@@ -255,7 +261,7 @@ const NewDaoForm: React.FC<FormProps> = ({
           <Checkbox
             checked={isUseFreeVotingChecked}
             onChange={() => {
-              setIsUseFreeVotingChecked(!isUseFreeVotingChecked);
+              updateIsUseFreeVotingChecked(!isUseFreeVotingChecked);
             }}
             color="primary"
             inputProps={{ 'aria-label': 'primary checkbox' }}
