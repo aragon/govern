@@ -13,6 +13,7 @@ import {
 const tokenAddress = '0x9fB402A33761b88D5DcbA55439e6668Ec8D4F2E8'
 const registryAddress = '0x7714e0a2A2DA090C2bbba9199A54B903bB83A73d'
 const daoFactoryAddress = '0xb75290e69f83b52bfbf9c99b4ae211935e75a851'
+const resolver = '0xC464EB732A1D2f5BbD705727576065C91B2E9f18'
 const emptyBytes = '0x'
 
 const noCollateral = {
@@ -24,7 +25,7 @@ const goodConfig: DaoConfig = {
   executionDelay: 1, // how many seconds to wait before being able to call `execute`.
   scheduleDeposit: noCollateral,
   challengeDeposit: noCollateral,
-  resolver: ethers.constants.AddressZero,
+  resolver,
   rules: emptyBytes,
   maxCalldataSize: 100000, // initial maxCalldatasize
 }
