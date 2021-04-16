@@ -1,23 +1,18 @@
 /* eslint-disable */
-import React, { useState, useRef, memo, useCallback } from 'react';
+import React, { useState, memo } from 'react';
 import { ANButton } from '../../components/Button/ANButton';
-import { useTheme, styled, Theme } from '@material-ui/core/styles';
-import useStyles from '../../ReusableStyles';
+import { useTheme, styled } from '@material-ui/core/styles';
 import backButtonIcon from '../../images/back-btn.svg';
 import Typography from '@material-ui/core/Typography';
-import { HelpButton } from '../../components/HelpButton/HelpButton';
-import TextArea from '../../components/TextArea/TextArea';
 import Paper from '@material-ui/core/Paper';
 import { InputField } from '../../components/InputFields/InputField';
 import { useHistory } from 'react-router-dom';
 import CreateDaoImage from '../../images/svgs/CreateDao.svg';
 import CreateDaoInProgressImage from '../../images/svgs/CreateDaoInProgress.svg';
 import GreenTickImage from '../../images/svgs/green_tick.svg';
-import { TwoSidedSwitch } from '../../components/TwoSidedSwitch/TwoSidedSwitch';
 import Switch from '@material-ui/core/Switch';
 import Checkbox from '@material-ui/core/Checkbox';
 import LinearProgress from '@material-ui/core/LinearProgress';
-import { Height } from '@material-ui/icons';
 
 enum CreateDaoStatus {
     PreCreate,
@@ -260,7 +255,7 @@ const NewDaoForm: React.FC<FormProps> = ({
                         label="Create new DAO"
                         type="primary"
                         style={{ marginTop: 40 }}
-                        onClick={() => { setCreateDaoStatus(CreateDaoStatus.Successful)}}
+                        onClick={() => { setCreateDaoStatus(CreateDaoStatus.InProgress)}}
                     />
                 </div>
             </WrapperDiv>
