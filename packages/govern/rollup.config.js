@@ -1,7 +1,7 @@
-import resolve from '@rollup/plugin-node-resolve'
-import commonjs from '@rollup/plugin-commonjs'
-import injectProcessEnv from 'rollup-plugin-inject-process-env'
-import json from '@rollup/plugin-json'
+import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+import injectProcessEnv from 'rollup-plugin-inject-process-env';
+import json from "@rollup/plugin-json";
 
 const esmConfig = {
   input: 'dist/esm/public/index.js',
@@ -34,6 +34,7 @@ const umdConfig = {
     resolve({
        browser: true
     }),
+    json(),
     commonjs(),
     injectProcessEnv({
       NODE_ENV: 'production'
