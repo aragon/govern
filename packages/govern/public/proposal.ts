@@ -23,6 +23,12 @@ const Container = `
     ${ContainerConfig} config
   )
 `
+const Collateral = `
+  tuple(
+    address token,
+    uint256 amount
+  ) collateral
+`
 
 const queueAbis = [
   `function nonce() view returns (uint256)`,
@@ -31,6 +37,7 @@ const queueAbis = [
   `function challenge(${Container} _container, bytes _reason)`,
   `function resolve(${Container} _container, uint256 _disputeId)`,
   `function veto(${Container} _container, bytes _reason)`,
+  `event Challenged(bytes32 indexed hash, address indexed actor, bytes reason, uint256 resolverId, ${Collateral})`
 ]
 
 declare let window: any
@@ -155,5 +162,26 @@ export class Proposal {
     const reasonBytes = ethers.utils.toUtf8Bytes(reason)
     const result = this.contract.challenge(proposal, reasonBytes)
     return result
+  }
+
+  /**
+   * Get the disputeId from a challenge proposal receipt
+   *
+   * @param {TransactionReceipt} receipt from the challenged proposal
+   *
+   * @returns {number|null>} transaction response object
+   */
+  getDisputeId(
+    receipt: ethers.providers.TransactionReceipt
+  ): number|null {
+    const args = receipt.logs
+    .filter(({ address }) => address === this.contract.address)
+    .map((log: any) => this.contract.interface.parseLog(log))
+    .find(({ name }: { name: string }) => name === 'Challenged')
+
+    const rawDisputeId = args?.args[3]
+    const disputeId = rawDisputeId? rawDisputeId.toNumber() : null
+
+    return disputeId
   }
 }
