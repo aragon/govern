@@ -14,9 +14,22 @@ import { AddActionsModal } from '../../components/Modal/AddActionsModal';
 import { InputField } from '../../components/InputFields/InputField';
 import { useHistory } from 'react-router-dom';
 import CreateDaoImage from '../../images/svgs/CreateDao.svg';
+import CreateDaoInProgressImage from '../../images/svgs/CreateDaoInProgress.svg';
 import { TwoSidedSwitch } from '../../components/TwoSidedSwitch/TwoSidedSwitch';
 import Switch from '@material-ui/core/Switch';
 import Checkbox from '@material-ui/core/Checkbox';
+import LinearProgress from '@material-ui/core/LinearProgress';
+
+enum CreateDaoStatus {
+    PreCreate,
+    InProgress,
+    Successful,
+    Failed,
+}
+
+interface FormProps {
+    setCreateDaoStatus(status: CreateDaoStatus): void
+}
 
 const BackButton = styled('div')({
     height: 25,
@@ -36,7 +49,9 @@ const InputTitle = styled(Typography)({
     color: '#7483AB',
 });
 
-const NewDaoForm: React.FC = () => {
+const NewDaoForm: React.FC<FormProps> = ({
+    setCreateDaoStatus
+}) => {
     const theme = useTheme();
 
     const WrapperDiv = styled(Paper)({
@@ -176,7 +191,7 @@ const NewDaoForm: React.FC = () => {
                 >
                     <Checkbox
                         checked={isUseFreeVotingChecked}
-                        onChange={() => { setIsUseFreeVotingChecked(!isUseFreeVotingChecked)}}
+                        onChange={() => { setIsUseFreeVotingChecked(!isUseFreeVotingChecked); }}
                         color="primary"
                         inputProps={{ 'aria-label': 'primary checkbox' }}
                     />
@@ -194,7 +209,7 @@ const NewDaoForm: React.FC = () => {
                         label="Create new DAO"
                         type="primary"
                         style={{ marginTop: 40 }}
-                        onClick={() => { console.log('should go to progress')}}
+                        onClick={() => { setCreateDaoStatus(CreateDaoStatus.InProgress)}}
                     />
                 </div>
             </WrapperDiv>
@@ -203,21 +218,102 @@ const NewDaoForm: React.FC = () => {
 };
 
 // TODO: NewDaoProgress
+const NewDaoProgress: React.FC = () => {
+    const theme = useTheme();
+    const [progressPercent, setProgressPercent] = useState<number>(5);
+
+    const WrapperDiv = styled(Paper)({
+        width: 'min-content',
+        background: theme.custom.white,
+        height: 'auto',
+        padding: '50px',
+        display: 'flex',
+        flexWrap: 'wrap',
+        flexDirection: 'column',
+        boxSizing: 'border-box',
+        boxShadow: 'none',
+    });
+
+    const Title = styled(Typography)({
+        fontFamily: 'Manrope',
+        fontStyle: 'normal',
+        fontWeight: 600,
+        fontSize: 28,
+        lineHeight: '38px',
+        color: '#20232C',
+        marginTop: 17,
+        height: 50,
+        display: 'flex',
+        justifyContent: 'center',
+    });
+
+    const SubTitle = styled(Typography)({
+        width: '454px',
+        fontFamily: 'Manrope',
+        fontStyle: 'normal',
+        fontWeight: 'normal',
+        fontSize: 18,
+        lineHeight: '25px',
+        color: '#7483AB',
+        display: 'flex',
+        justifyContent: 'center',
+    });
+
+    return(
+        <div
+        style={{
+            justifyContent: 'center',
+            display: 'flex',
+            }}
+        >
+            <WrapperDiv>
+                <div 
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        }}
+                >
+                    <img src={CreateDaoInProgressImage} style={{ width: '242px', marginLeft: 'auto', marginRight: 'auto'}} />
+                    <Title>Creating your DAO</Title>
+                    <SubTitle>Hold tight your transaction is under process</SubTitle>
+                    <LinearProgress variant="determinate" value={progressPercent} style={{ width: '370px', marginLeft: 'auto', marginRight: 'auto', marginTop: '20px'}}/>
+                </div>
+            </WrapperDiv>
+        </div>
+    );
+}
 
 // TODO: NewDaoCreationResult
 
 const NewDaoContainer: React.FC = () => {
+    const [createDaoStatus, setCreateDaoStatus] = useState<CreateDaoStatus>(CreateDaoStatus.PreCreate);
     // const history = useHistory();
 
     // const onClickBackFromCreateDaoPage = () => {
     //     history.goBack();
     // };
 
-    // TODO: the logics to handle render form, progress or result
-
-    return(
-        <NewDaoForm />
-    );
+    switch(createDaoStatus) {
+        case CreateDaoStatus.PreCreate: {
+            return(
+                <NewDaoForm 
+                    setCreateDaoStatus={setCreateDaoStatus}
+                />
+            );
+        }
+        case CreateDaoStatus.InProgress: {
+            return(
+                <NewDaoProgress />
+            );
+        }
+        default: {
+            return(
+                <NewDaoForm 
+                    setCreateDaoStatus={setCreateDaoStatus}
+                />
+            );
+        }
+    }
 
 };
 
