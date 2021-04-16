@@ -28,7 +28,7 @@ contract GovernQueueFactory {
     function setupBase() private {
         ERC3000Data.Collateral memory noCollateral;
         ERC3000Data.Config memory config = ERC3000Data.Config(
-            0,
+            3600,  // how many seconds to wait before being able to call `execute`
             noCollateral,
             noCollateral,
             address(0),

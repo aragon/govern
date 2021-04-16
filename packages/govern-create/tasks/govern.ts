@@ -7,6 +7,8 @@ import {
   animals,
 } from 'unique-names-generator'
 
+import { ERC3000DefaultConfig } from 'erc3k/utils/ERC3000'
+
 function buildName(name: string | null): string {
   const uniqueName =
     name ??
@@ -67,20 +69,7 @@ task('deploy-govern', 'Deploys a Govern instance')
           tokenSymbol: tokenSymbol,
           tokenDecimals: 18
         },
-        {
-          executionDelay: 3600, // how many seconds to wait before being able to call `execute`.
-          scheduleDeposit: {
-            token: '0x' + '00'.repeat(20),
-            amount: 0
-          },
-          challengeDeposit: {
-            token: '0x' + '00'.repeat(20),
-            amount: 0
-          },
-          resolver: '0x' + '00'.repeat(20),
-          rules: "0x",
-          maxCalldataSize: 100000 // initial maxCalldatasize
-        },
+        ERC3000DefaultConfig,
         useProxies,
         {
           gasLimit: useProxies ? 2e6 : 9e6,
