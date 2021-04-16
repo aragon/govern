@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useState, memo } from 'react';
+import React, { useState, memo, useRef } from 'react';
 import { ANButton } from '../../components/Button/ANButton';
 import { useTheme, styled } from '@material-ui/core/styles';
 import backButtonIcon from '../../images/back-btn.svg';
@@ -109,10 +109,29 @@ const NewDaoForm: React.FC<FormProps> = ({
     boxSizing: 'border-box',
     boxShadow: 'none',
   });
+  const isExistingToken = useRef(false);
+  const isUseProxyChecked = useRef(true);
+  const isUseFreeVotingChecked = useRef(true);
+  const daoName = useRef();
+  const tokenName = useRef();
+  const tokenSymbol = useRef();
+  const existingTokenAddress = useRef();
 
-  const [isExistingToken, setIsExistingToken] = useState(false);
-  const [isUseProxyChecked, setIsUseProxyChecked] = useState(true);
-  const [isUseFreeVotingChecked, setIsUseFreeVotingChecked] = useState(true);
+  const onChangeDaoName = (val: any) => {
+    daoName.current = val;
+  };
+
+  const onChangeTokenName = (val: any) => {
+    tokenName.current = val;
+  };
+
+  const onChangeTokenSymbol = (val: any) => {
+    tokenSymbol.current = val;
+  };
+
+  const onChangeExistingTokenAddress = (val: any) => {
+    existingTokenAddress.current = val;
+  };
 
   return (
     <div
@@ -129,9 +148,7 @@ const NewDaoForm: React.FC<FormProps> = ({
         <InputTitle>DAO Name</InputTitle>
         <InputField
           label=""
-          onInputChange={() => {
-            console.log('click');
-          }}
+          onInputChange={onChangeDaoName}
           height="46px"
           width="454px"
           placeholder={'Please insert your DAO name...'}
@@ -152,9 +169,9 @@ const NewDaoForm: React.FC<FormProps> = ({
         >
           <div>{'Create new token'}</div>
           <Switch
-            checked={isExistingToken}
+            checked={isExistingToken.current}
             onChange={() => {
-              setIsExistingToken(!isExistingToken);
+              isExistingToken.current = !isExistingToken.current;
             }}
             name="checked"
             color="primary"
@@ -174,9 +191,7 @@ const NewDaoForm: React.FC<FormProps> = ({
             >
               <InputField
                 label=""
-                onInputChange={() => {
-                  console.log('click');
-                }}
+                onInputChange={onChangeTokenName}
                 height="46px"
                 width="200px"
                 placeholder={"Your Token's Name?"}
@@ -184,9 +199,7 @@ const NewDaoForm: React.FC<FormProps> = ({
 
               <InputField
                 label=""
-                onInputChange={() => {
-                  console.log('click');
-                }}
+                onInputChange={onChangeTokenSymbol}
                 height="46px"
                 width="200px"
                 placeholder={"Your Token's Symbol?"}
@@ -198,9 +211,7 @@ const NewDaoForm: React.FC<FormProps> = ({
             <InputTitle>Token Address</InputTitle>
             <InputField
               label=""
-              onInputChange={() => {
-                console.log('click');
-              }}
+              onInputChange={onChangeExistingTokenAddress}
               height="46px"
               width="451px"
               placeholder={
@@ -219,9 +230,9 @@ const NewDaoForm: React.FC<FormProps> = ({
           }}
         >
           <Checkbox
-            checked={isUseProxyChecked}
+            checked={isUseProxyChecked.current}
             onChange={() => {
-              setIsUseProxyChecked(!isUseProxyChecked);
+              isUseProxyChecked.current = !isUseProxyChecked.current;
             }}
             color="primary"
             inputProps={{ 'aria-label': 'primary checkbox' }}
@@ -242,9 +253,9 @@ const NewDaoForm: React.FC<FormProps> = ({
           }}
         >
           <Checkbox
-            checked={isUseFreeVotingChecked}
+            checked={isUseFreeVotingChecked.current}
             onChange={() => {
-              setIsUseFreeVotingChecked(!isUseFreeVotingChecked);
+              isUseFreeVotingChecked.current = !isUseFreeVotingChecked.current;
             }}
             color="primary"
             inputProps={{ 'aria-label': 'primary checkbox' }}
