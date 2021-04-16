@@ -109,9 +109,9 @@ const NewDaoForm: React.FC<FormProps> = ({
     boxSizing: 'border-box',
     boxShadow: 'none',
   });
-  const isExistingToken = useRef(false);
-  const isUseProxyChecked = useRef(true);
-  const isUseFreeVotingChecked = useRef(true);
+  const [isExistingToken, setIsExistingToken] = useState(false);
+  const [isUseProxyChecked, setIsUseProxyChecked] = useState(false);
+  const [isUseFreeVotingChecked, setIsUseFreeVotingChecked] = useState(false);
   const daoName = useRef();
   const tokenName = useRef();
   const tokenSymbol = useRef();
@@ -169,9 +169,9 @@ const NewDaoForm: React.FC<FormProps> = ({
         >
           <div>{'Create new token'}</div>
           <Switch
-            checked={isExistingToken.current}
+            checked={isExistingToken}
             onChange={() => {
-              isExistingToken.current = !isExistingToken.current;
+              setIsExistingToken(!isExistingToken)
             }}
             name="checked"
             color="primary"
@@ -230,9 +230,9 @@ const NewDaoForm: React.FC<FormProps> = ({
           }}
         >
           <Checkbox
-            checked={isUseProxyChecked.current}
+            checked={isUseProxyChecked}
             onChange={() => {
-              isUseProxyChecked.current = !isUseProxyChecked.current;
+              setIsUseProxyChecked(!isUseProxyChecked)
             }}
             color="primary"
             inputProps={{ 'aria-label': 'primary checkbox' }}
@@ -253,9 +253,9 @@ const NewDaoForm: React.FC<FormProps> = ({
           }}
         >
           <Checkbox
-            checked={isUseFreeVotingChecked.current}
+            checked={isUseFreeVotingChecked}
             onChange={() => {
-              isUseFreeVotingChecked.current = !isUseFreeVotingChecked.current;
+              setIsUseFreeVotingChecked(!isUseFreeVotingChecked);
             }}
             color="primary"
             inputProps={{ 'aria-label': 'primary checkbox' }}

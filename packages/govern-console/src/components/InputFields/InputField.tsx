@@ -24,6 +24,7 @@ export interface InputFieldProps {
    * Width of the input box
    */
   width: string;
+  value?: string;
 }
 
 export const InputField: React.FC<InputFieldProps> = ({
@@ -32,6 +33,7 @@ export const InputField: React.FC<InputFieldProps> = ({
   label,
   height,
   width,
+  value,
   ...props
 }) => {
   const theme = useTheme();
@@ -88,6 +90,7 @@ export const InputField: React.FC<InputFieldProps> = ({
       InputLabelProps={{ shrink: true, classes: inputLabelClasses }}
       InputProps={{ classes: inputBaseClasses, disableUnderline: true }}
       onChange={(e) => onInputChange(e.target.value)}
+      value={value}
     />
   );
 };
