@@ -160,7 +160,7 @@ describe("Proposal", function() {
     expect(result.hash).to.equal(receipt.transactionHash)
   })
 
-  it.skip("challenge should work", async function() {
+  it("challenge should work", async function() {
 
     await generateDisputeTokenAndApprove(network.provider, resolver, queueAddress)
 
@@ -212,7 +212,8 @@ describe("Proposal", function() {
     await txResult.wait()
 
     // advance the time so we can execute the proposal
-    await ethers.provider.send('evm_increaseTime', [600])
+    const currentTimestamp = (await ethers.provider.getBlock('latest')).timestamp
+    await ethers.provider.send('evm_increaseTime', [currentTimestamp + 100])
 
     const result = await proposal.execute(proposalData)
     const receipt = await result.wait()
