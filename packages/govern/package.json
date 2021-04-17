@@ -17,7 +17,7 @@
     "dev:cjs": "yarn build:cjs --watch",
     "uglify:esm": "uglifyjs dist/esm/public/govern-esm.js --output dist/esm/public/govern-esm.min.js",
     "uglify:umd": "uglifyjs dist/umd/public/govern-umd.js --output dist/umd/public/govern-umd.min.js",
-    "test": "hardhat test",
+    "test": "jest && yarn e2e && yarn test:hardhat && yarn depcheck",
     "e2e": "yarn build && jest -c ./jest.config.e2e.js",
     "test:hardhat": "hardhat test",
     "depcheck": "yarn build && dependency-check ./package.json --missing --verbose",
