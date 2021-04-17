@@ -1,7 +1,6 @@
 import { Contract } from '@ethersproject/contracts'
-import { Web3Provider } from '@ethersproject/providers'
+import { Web3Provider, TransactionResponse } from '@ethersproject/providers'
 import { AddressZero } from '@ethersproject/constants'
-import { TransactionResponse } from '@ethersproject/abstract-provider'
 import Configuration from '../internal/configuration/Configuration'
 
 export const ContainerConfig = `tuple(uint256 executionDelay, tuple(address token, uint256 amount) scheduleDeposit, tuple(address token, uint256 amount) challengeDeposit, address resolver, bytes rules, uint256 maxCalldataSize)`

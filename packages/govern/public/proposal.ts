@@ -1,5 +1,10 @@
-import { ethers } from 'ethers'
 import { DaoConfig, ContainerConfig } from './createDao'
+import { ContractInterface, Contract } from '@ethersproject/contracts'
+import { Web3Provider, TransactionResponse, TransactionReceipt } from '@ethersproject/providers'
+import { BigNumberish } from '@ethersproject/bignumber'
+import { BytesLike } from '@ethersproject/bytes'
+import { toUtf8Bytes } from '@ethersproject/strings'
+
 
 const Payload = `
   tuple(
@@ -44,7 +49,7 @@ declare let window: any
 
 export type ProposalOptions = {
   provider?: any
-  abi?: ethers.ContractInterface
+  abi?: ContractInterface
 }
 
 export type ProposalParams = {
@@ -53,30 +58,30 @@ export type ProposalParams = {
 }
 
 export type PayloadType = {
-  nonce?: ethers.BigNumberish
-  executionTime: ethers.BigNumberish
+  nonce?: BigNumberish
+  executionTime: BigNumberish
   submitter: string
   executor: string
   actions: ActionType[]
-  allowFailuresMap: ethers.BytesLike
-  proof: ethers.BytesLike
+  allowFailuresMap: BytesLike
+  proof: BytesLike
 }
 
 export type ActionType = {
   to: string
-  value: ethers.BigNumberish
-  data: ethers.BytesLike
+  value: BigNumberish
+  data: BytesLike
 }
 
 export class Proposal {
-  private readonly contract: ethers.Contract
+  private readonly contract: Contract
 
   constructor(queueAddress: string, options: ProposalOptions) {
     const abi = options?.abi || queueAbis
 
     const provider = options.provider || window.ethereum
-    const signer = new ethers.providers.Web3Provider(provider).getSigner()
-    this.contract = new ethers.Contract(queueAddress, abi, signer)
+    const signer = new Web3Provider(provider).getSigner()
+    this.contract = new Contract(queueAddress, abi, signer)
   }
 
   /**
@@ -86,9 +91,7 @@ export class Proposal {
    *
    * @returns {Promise<TransactionResponse>} transaction response object
    */
-  async schedule(
-    proposal: ProposalParams
-  ): Promise<ethers.providers.TransactionResponse> {
+  async schedule(proposal: ProposalParams): Promise<TransactionResponse> {
     const nonce = await this.contract.nonce()
 
     const proposalWithNonce = Object.assign({}, proposal)
@@ -104,9 +107,7 @@ export class Proposal {
    *
    * @returns {Promise<TransactionResponse>} transaction response object
    */
-  async execute(
-    proposal: ProposalParams
-  ): Promise<ethers.providers.TransactionResponse> {
+  async execute(proposal: ProposalParams): Promise<TransactionResponse> {
     const result = this.contract.execute(proposal)
     return result
   }
@@ -120,11 +121,8 @@ export class Proposal {
    *
    * @returns {Promise<TransactionResponse>} transaction response object
    */
-  async veto(
-    proposal: ProposalParams,
-    reason: string
-  ): Promise<ethers.providers.TransactionResponse> {
-    const reasonBytes = ethers.utils.toUtf8Bytes(reason)
+  async veto(proposal: ProposalParams, reason: string): Promise<TransactionResponse> {
+    const reasonBytes = toUtf8Bytes(reason)
     const result = this.contract.veto(proposal, reasonBytes)
     return result
   }
@@ -138,10 +136,7 @@ export class Proposal {
    *
    * @returns {Promise<TransactionResponse>} transaction response object
    */
-  async resolve(
-    proposal: ProposalParams,
-    disputeId: number
-  ): Promise<ethers.providers.TransactionResponse> {
+  async resolve(proposal: ProposalParams, disputeId: number): Promise<TransactionResponse> {
     const result = this.contract.resolve(proposal, disputeId)
     return result
   }
@@ -155,11 +150,8 @@ export class Proposal {
    *
    * @returns {Promise<TransactionResponse>} transaction response object
    */
-  async challenge(
-    proposal: ProposalParams,
-    reason: string
-  ): Promise<ethers.providers.TransactionResponse> {
-    const reasonBytes = ethers.utils.toUtf8Bytes(reason)
+  async challenge(proposal: ProposalParams, reason: string): Promise<TransactionResponse> {
+    const reasonBytes = toUtf8Bytes(reason)
     const result = this.contract.challenge(proposal, reasonBytes)
     return result
   }
@@ -171,11 +163,9 @@ export class Proposal {
    *
    * @returns {number|null>} transaction response object
    */
-  getDisputeId(
-    receipt: ethers.providers.TransactionReceipt
-  ): number|null {
+  getDisputeId(receipt: TransactionReceipt): number|null {
     const args = receipt.logs
-    .filter(({ address }) => address === this.contract.address)
+    .filter(({ address }: { address : string }) => address === this.contract.address)
     .map((log: any) => this.contract.interface.parseLog(log))
     .find(({ name }: { name: string }) => name === 'Challenged')
 
