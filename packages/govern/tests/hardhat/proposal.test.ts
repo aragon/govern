@@ -160,7 +160,7 @@ describe("Proposal", function() {
     expect(result.hash).to.equal(receipt.transactionHash)
   })
 
-  it("challenge should work", async function() {
+  it.skip("challenge should work", async function() {
 
     await generateDisputeTokenAndApprove(network.provider, resolver, queueAddress)
 
