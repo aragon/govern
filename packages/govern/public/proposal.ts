@@ -22,7 +22,7 @@ const Payload = `
   )
 `
 
-const Container = `
+export const Container = `
   tuple(
     ${Payload} payload,
     ${ContainerConfig} config

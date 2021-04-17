@@ -6,11 +6,18 @@ import {
     Proposal,
     ProposalParams,
     PayloadType,
-    ProposalOptions
-} from '../../public/proposal'
+    ProposalOptions,
+    ActionType
+} from '../../public'
 
-const tokenAbi = ["function generateTokens(address to, uint256 amount)", "function approve(address to, uint256 amount)"]
-const disputeAbi = ["function getDisputeFees() external view returns (address recipient, address feeToken, uint256 feeAmount)"]
+import { Container } from '../../public/proposal'
+
+const vetoAbi = [
+  'function bulk((uint256 op, bytes4 role, address who)[] items)',
+  `function veto(${Container} _container, bytes _reason)`
+]
+const tokenAbi = ['function generateTokens(address to, uint256 amount)', 'function approve(address to, uint256 amount)']
+const disputeAbi = ['function getDisputeFees() external view returns (address recipient, address feeToken, uint256 feeAmount)']
 
 // use rinkeby addresses as the tests run on a hardhat network forked from rinkeby
 const tokenAddress = '0x9fB402A33761b88D5DcbA55439e6668Ec8D4F2E8'
@@ -35,7 +42,48 @@ const goodConfig: DaoConfig = {
 
 type payloadArgs = {
   submitter: string
-  executor: string
+  executor: string,
+  executionTime: number,
+  actions?: ActionType[]
+}
+
+// advance the time in blockchain so we can run test faster
+async function advanceTime(provider: any) {
+  const currentTimestamp = (await provider.getBlock('latest')).timestamp
+  await provider.send('evm_increaseTime', [currentTimestamp + 100])
+}
+
+function encodeDataForVetoRole(who: string): string {
+  const iface = new ethers.utils.Interface(vetoAbi)
+  const role = iface.getSighash('veto')
+  const bulkSighash = iface.getSighash('bulk')
+  const paramData = iface.encodeFunctionData('bulk', [[{op: 0, role, who}]])
+  const encodedData = ethers.utils.hexConcat([bulkSighash, paramData])
+  return encodedData
+}
+
+async function grantVetoPower(provider: any, queueAddress: string, executor: string) {
+  const signer = (new ethers.providers.Web3Provider(provider)).getSigner()
+  const testUser = await signer.getAddress()
+
+  const changeVetoRole = encodeDataForVetoRole(testUser)
+  const actions: ActionType[] = [{ to: queueAddress, value: 0, data: changeVetoRole }]
+
+  const { proposal: vetoProposal, txResult: vetoProposalTx, proposalData: vetoData } = await makeProposal({
+    options: { provider: network.provider },
+    queueAddress,
+    executor,
+    actions
+  })
+  await vetoProposalTx.wait()
+
+  // advance the time so we can execute the proposal immediately
+  await advanceTime(ethers.provider)
+  console.log('before executing veto proposal...')
+  const vetoResult = await vetoProposal.execute(vetoData)
+  const exeResult = await vetoResult.wait()
+
+  console.log('Result from executing veto role change: ', exeResult.status, testUser)
 }
 
 async function generateDisputeTokenAndApprove(recipient: any, court: string, queue: string) {
@@ -55,12 +103,12 @@ async function generateDisputeTokenAndApprove(recipient: any, court: string, que
 
 }
 
-const buildPayload = ({submitter, executor}: payloadArgs) => {
+const buildPayload = ({submitter, executor, actions, executionTime}: payloadArgs) => {
   const payload: PayloadType = {
-    executionTime: Math.floor(Date.now() / 1000) + 50,
+    executionTime,
     submitter,
     executor,
-    actions: [{ to: tokenAddress, value: 0, data: emptyBytes }],
+    actions: actions?? [{ to: tokenAddress, value: 0, data: emptyBytes }],
     allowFailuresMap: ethers.utils.hexZeroPad('0x0', 32),
     proof: emptyBytes,
   }
@@ -77,17 +125,20 @@ type ProposalResult = {
 type makeProposalParams = {
   options: ProposalOptions,
   queueAddress: string,
-  executor: string  
+  executor: string,
+  actions?: ActionType[]
 }
 
 async function makeProposal(args: makeProposalParams): Promise<ProposalResult>
 {
-  const { options, queueAddress, executor} = args
+  const { options, queueAddress, executor, actions } = args
   const proposal = new Proposal(queueAddress, options)
   const web3Provider = new ethers.providers.Web3Provider(options.provider)
   const submitter = await (web3Provider.getSigner()).getAddress()
 
-  const payload = buildPayload({ submitter, executor })
+  const currentTimestamp = (await web3Provider.getBlock('latest')).timestamp
+  const executionTime = currentTimestamp + goodConfig.executionDelay + 100
+  const payload = buildPayload({ submitter, executor, actions, executionTime})
   const proposalData = { payload, config: goodConfig }
   const txResult = await proposal.schedule(proposalData)
 
@@ -146,6 +197,9 @@ describe("Proposal", function() {
   });
 
   it.skip("veto should work", async function() {
+    // submit a proposal to give the test user veto power
+    await grantVetoPower(network.provider, queueAddress, executor)
+
     const { proposal, txResult, proposalData } = await makeProposal({
       options: { provider: network.provider },
       queueAddress,
@@ -153,6 +207,7 @@ describe("Proposal", function() {
     })
     await txResult.wait()
 
+    console.log('before calling veto')
     const reason = 'veto reason'
     const result = await proposal.veto(proposalData, reason)
     const receipt = await result.wait()
@@ -211,10 +266,8 @@ describe("Proposal", function() {
     })
     await txResult.wait()
 
-    // advance the time so we can execute the proposal
-    const currentTimestamp = (await ethers.provider.getBlock('latest')).timestamp
-    await ethers.provider.send('evm_increaseTime', [currentTimestamp + 100])
-
+    // advance the time so we can execute the proposal immediately
+    await advanceTime(ethers.provider)
     const result = await proposal.execute(proposalData)
     const receipt = await result.wait()
     expect(receipt.status).to.equal(1)
