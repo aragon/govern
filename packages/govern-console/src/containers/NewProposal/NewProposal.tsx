@@ -31,6 +31,11 @@ export interface NewProposalProps {
    * callback for click on schedule
    */
   onSchedule?: any;
+
+  /**
+   * onClickBackButton callback
+   */
+  onClickBack: any;
 }
 
 export interface AddedActionsProps {
@@ -120,7 +125,7 @@ const AddedActions: React.FC<AddedActionsProps> = ({
   ));
 };
 
-const NewProposal: React.FC<NewProposalProps> = ({ ...props }) => {
+const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const theme = useTheme();
   const history = useHistory();
   let daoDetails: any = null;
@@ -131,8 +136,6 @@ const NewProposal: React.FC<NewProposalProps> = ({ ...props }) => {
   if (!daoDetails) {
     history.push('/');
   }
-  debugger;
-  const classes = useStyles();
   const justification: { current: string } = useRef('');
   // const [isAddingActions, updateIsAddingActions] = useState(false);
   const [selectedActions, updateSelectedOptions] = useState([]);
@@ -158,6 +161,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ ...props }) => {
     type,
     ethersProvider,
   } = context;
+
   const submitter: string = account;
   const executor = daoDetails.executor.id;
   const nonce: number = daoDetails.queue.nonce;
@@ -323,11 +327,10 @@ const NewProposal: React.FC<NewProposalProps> = ({ ...props }) => {
   };
   const scheduleProposal = async () => {
     const payload = buildPayload({ submitter, executor });
-    debugger;
+
     const config = daoDetails.config;
     const proposalOptions: ProposalOptions = {};
     const proposal = new Proposal(daoDetails.queue.address, proposalOptions);
-    debugger;
     const scheduleResult = await proposal.schedule({
       payload,
       config: goodConfig,
@@ -355,7 +358,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ ...props }) => {
   return (
     <>
       <WrapperDiv>
-        <BackButton>
+        <BackButton onClick={onClickBack}>
           <img src={backButtonIcon} />
         </BackButton>
         <Title>New Proposal</Title>

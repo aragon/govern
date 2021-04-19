@@ -4,27 +4,62 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import backButtonIcon from 'images/back-btn.svg';
 import { Label } from 'components/Labels/Label';
+import { InputField } from 'components/InputFields/InputField';
 import { useHistory } from 'react-router-dom';
 import { GET_PROPOSAL_LIST_QUERY } from './queries';
 import { useQuery } from '@apollo/client';
 import { useEffect } from 'react';
 import { ANButton } from 'components/Button/ANButton';
-import { useWallet } from 'use-wallet';
+import { useWallet } from '../../EthersWallet';
+
+import {
+  Proposal,
+  ProposalOptions,
+  ProposalParams,
+  PayloadType,
+  DaoConfig,
+} from '@aragon/govern';
 
 // import { InputField } from 'component/InputField/InputField';
 interface ProposalDetailsProps {
-  selectedProposal: any;
   onClickBack?: any;
 }
 
-const ProposalDetails: React.FC<ProposalDetailsProps> = ({
-  onClickBack,
-  selectedProposal,
-}) => {
+const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
+  let selectedProposal: any = {};
+  const history = useHistory();
+  const selectedProposalString = sessionStorage.getItem('selectedProposal');
+  if (selectedProposalString) {
+    selectedProposal = JSON.parse(selectedProposalString);
+  } else {
+    history.push('/');
+  }
+  let daoDetails: any = null;
+  const daoDetailsString = sessionStorage.getItem('selectedDao');
+  if (daoDetailsString) {
+    daoDetails = JSON.parse(daoDetailsString);
+  }
+  if (!daoDetails) {
+    history.push('/');
+  }
   const theme = useTheme();
-  const context = useWallet();
-  const { ethereum } = context;
-  console.log(ethereum);
+  const context: any = useWallet();
+  const {
+    connector,
+    account,
+    balance,
+    chainId,
+    connect,
+    connectors,
+    ethereum,
+    error,
+    getBlockNumber,
+    networkName,
+    reset,
+    status,
+    type,
+    ethersProvider,
+  } = context;
 
   //* styled Components
 
@@ -40,6 +75,9 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({
     cursor: 'pointer',
     position: 'relative',
     marginBottom: '36px',
+    '& img': {
+      cursor: 'pointer',
+    },
   });
   const ProposalStatus = styled('div')({
     height: '20px',
@@ -263,8 +301,15 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({
 
   const [proposalInfo, updateProposalInfo] = React.useState<any>(null);
   const [isExpanded, updateIsExpanded] = React.useState<any>({});
-  // const [challengeReason, updateChallengeReason] = React.useRef('');
-  // const [vetoReason, updateVetoReason] = React.useRef('');
+  const challengeReason = React.useRef('');
+  const vetoReason = React.useRef('');
+
+  type ProposalType = {
+    state: string;
+    config: DaoConfig;
+    payload: PayloadType;
+    id: string;
+  };
 
   const {
     data: proposalDetailsData,
@@ -277,11 +322,11 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({
   });
 
   useEffect(() => {
-    debugger;
     if (proposalDetailsData) {
       updateProposalInfo(proposalDetailsData.container);
     }
   }, [proposalDetailsData]);
+
   const toggleDiv = (index: number) => {
     const cloneObject = { ...isExpanded };
     if (cloneObject[index]) {
@@ -290,6 +335,32 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({
       cloneObject[index] = true;
     }
     updateIsExpanded(cloneObject);
+  };
+
+  const proposalInstance = React.useMemo(() => {
+    const proposalOptions: ProposalOptions = {
+      // provider: ethersProvider,
+    };
+    const proposal = new Proposal(daoDetails.queue.address, proposalOptions);
+    return proposal;
+  }, [daoDetails]);
+
+  // const approveCollateralIfNeeded = () => {};
+  const getProposalParams = () => {
+    const params: ProposalParams = {
+      payload: proposalInfo.payload,
+      config: proposalInfo.config,
+    };
+    return params;
+  };
+
+  const challengeProposal = async () => {
+    const proposalParams = getProposalParams();
+    // approveCollateralIfNeeded();
+    const challengeTransaction = await proposalInstance.challenge(
+      proposalParams,
+      challengeReason.current,
+    );
   };
 
   // const getParsedDataFromBytes = (data) => {
@@ -303,7 +374,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({
         <>
           {proposalInfo ? (
             <StyledPaper elevation={0}>
-              <BackButton>
+              <BackButton onClick={onClickBack}>
                 <img src={backButtonIcon} />
               </BackButton>
               <ProposalStatus>
@@ -453,18 +524,58 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({
                 </ProposalDetailsWrapper>
                 <WidgetWrapper id="widget_wrapper">
                   <Widget>
-                    <div>Challenge Reason</div>
+                    <div
+                      style={{
+                        fontFamily: 'Manrope',
+                        fontStyle: 'normal',
+                        fontWeight: 'normal',
+                        fontSize: '18px',
+                        color: '#7483B3',
+                      }}
+                    >
+                      Challenge Reason
+                    </div>
+                    <InputField
+                      onInputChange={(value) => {
+                        challengeReason.current = value;
+                      }}
+                      label={''}
+                      placeholder={''}
+                      height={'46px'}
+                      width={'372px'}
+                      value={challengeReason.current}
+                    />
                     <ANButton
                       label="Challenge"
                       height="45px"
                       width="372px"
                       style={{ margin: 'auto' }}
-                      //  onClick={}
+                      onClick={() => challengeProposal()}
                     />
                   </Widget>
                   <Widget>
-                    <div>Veto Reason</div>
+                    <div
+                      style={{
+                        fontFamily: 'Manrope',
+                        fontStyle: 'normal',
+                        fontWeight: 'normal',
+                        fontSize: '18px',
+                        color: '#7483B3',
+                      }}
+                    >
+                      Veto Reason
+                    </div>
                     <div>{/* <ANInput /> */}</div>
+                    <InputField
+                      onInputChange={(value) => {
+                        vetoReason.current = value;
+                      }}
+                      label={''}
+                      placeholder={''}
+                      height={'46px'}
+                      width={'372px'}
+                      value={vetoReason.current}
+                    />
                     <ANButton
                       label="Execute"
                       height="45px"

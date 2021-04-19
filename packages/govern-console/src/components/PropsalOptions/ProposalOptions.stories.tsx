@@ -14,7 +14,7 @@ const Template: Story<ProposalOptionsProps> = (args) => {
     updateOptions([...options, { value: '' }]);
   };
   const onDeleteOption = (index: number) => {
-    debugger;
+    
     const tempOptions = [...options];
     tempOptions.splice(index, 1);
     updateOptions(tempOptions);

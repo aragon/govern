@@ -9,13 +9,23 @@ import Typography from '@material-ui/core/Typography';
 import { GET_PROPOSAL_LIST } from './queries';
 import { useQuery } from '@apollo/client';
 import { formatEther } from 'ethers/lib/utils';
+import { useHistory } from 'react-router-dom';
 
 const DaoMainPage: React.FC<{
-  daoDetails: any;
   onClickProposalCard: any;
   onClickNewProposal: any;
-}> = ({ onClickProposalCard, onClickNewProposal, daoDetails, ...props }) => {
+}> = ({ onClickProposalCard, onClickNewProposal, ...props }) => {
+  const history = useHistory();
   const theme = useTheme();
+  let daoDetails;
+  const daoDetailsString = sessionStorage.getItem('selectedDao');
+  if (daoDetailsString) {
+    daoDetails = JSON.parse(daoDetailsString);
+  }
+  if (!daoDetails) {
+    history.push('/');
+  }
+
   const [isProposalPage, setProposalPage] = useState(true);
   const [visibleProposalList, updateVisibleProposalList] = useState<any>([]);
   const [isProfilePage, setProfilePage] = useState(false);

@@ -6,7 +6,6 @@ export const GET_PROPOSAL_LIST_QUERY = gql`
       id
       state
       config {
-        id
         executionDelay
         scheduleDeposit {
           token
@@ -18,6 +17,7 @@ export const GET_PROPOSAL_LIST_QUERY = gql`
         }
         resolver
         rules
+        maxCalldataSize
       }
       payload {
         nonce

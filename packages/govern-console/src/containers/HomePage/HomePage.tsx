@@ -17,7 +17,7 @@ const HomePage = ({ ...props }) => {
     margin: 'auto',
   });
   const history = useHistory();
-  debugger;
+
   const [selectedDao, updateSelectedDao] = React.useState<any>({});
   const [selectedProposal, updateSelectedProposal] = React.useState<any>({});
 
@@ -41,7 +41,6 @@ const HomePage = ({ ...props }) => {
     [history],
   );
   const onClickNewProposal = React.useCallback(() => {
-    debugger;
     history.push(`/${selectedDao.name}/new-proposal`);
   }, [history, selectedDao]);
 
@@ -62,19 +61,15 @@ const HomePage = ({ ...props }) => {
           </Route>
           <Route exact path="/daos/:daoName">
             <DaoMainPage
-              daoDetails={selectedDao}
               onClickProposalCard={onClickProposalCard}
               onClickNewProposal={onClickNewProposal}
             />
           </Route>
           <Route exact path="/proposals/:id">
-            <ProposalDetails
-              selectedProposal={selectedProposal}
-              onClickBack={onClickBackFromProposalPage}
-            />
+            <ProposalDetails onClickBack={() => history.goBack()} />
           </Route>
           <Route exact path="/:daoName/new-proposal">
-            <NewProposal />
+            <NewProposal onClickBack={() => history.goBack()} />
           </Route>
           <Route exact path="/create-dao">
             <NewDaoContainer />
