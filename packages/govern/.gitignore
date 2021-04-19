@@ -2,3 +2,5 @@ dist/
 coverage/
 package/
 node_modules/
+cache/
+typechain/
