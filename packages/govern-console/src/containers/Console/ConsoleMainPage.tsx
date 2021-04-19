@@ -97,14 +97,15 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
           // maxWidth: '1408px',
           display: 'grid',
           gridTemplateColumns: 'auto auto auto auto',
-          justifyContent: 'space-between',
+          justifyContent: 'left',
+          gridGap: '0px 32px',
         }}
       >
         {visibleDaoList &&
           visibleDaoList.length > 0 &&
           visibleDaoList.map((dao: any) => (
             <div
-              style={{ marginTop: '32px' }}
+              style={{ marginTop: '32px', width: '328px' }}
               onClick={() => updateSelectedDao(dao)}
               key={dao.name}
             >
