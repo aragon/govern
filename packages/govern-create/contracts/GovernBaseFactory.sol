@@ -67,12 +67,12 @@ contract GovernBaseFactory {
         registry.register(govern, queue, token, _name, "");
 
         ACLData.BulkItem[] memory items = new ACLData.BulkItem[](6);
-        items[0] = ACLData.BulkItem(ACLData.BulkOp.Grant,  queue.schedule.selector, ANY_ADDR);
-        items[1] = ACLData.BulkItem(ACLData.BulkOp.Grant,  queue.execute.selector, ANY_ADDR);
-        items[2] = ACLData.BulkItem(ACLData.BulkOp.Grant,  queue.challenge.selector, ANY_ADDR);
-        items[3] = ACLData.BulkItem(ACLData.BulkOp.Grant,  queue.configure.selector, address(govern));
-        items[4] = ACLData.BulkItem(ACLData.BulkOp.Grant,  queue.ROOT_ROLE(), address(govern));
-        items[5] = ACLData.BulkItem(ACLData.BulkOp.Revoke, queue.ROOT_ROLE(), address(this));
+        items[0] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.schedule.selector, ANY_ADDR);
+        items[1] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.execute.selector, ANY_ADDR);
+        items[2] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.challenge.selector, ANY_ADDR);
+        items[3] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.configure.selector, address(govern));
+        items[4] = ACLData.BulkItem(ACLData.BulkOp.Revoke, queue.ROOT_ROLE(), address(this));
+        items[5] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.ROOT_ROLE(), address(govern));
         
         queue.bulk(items);
     }
