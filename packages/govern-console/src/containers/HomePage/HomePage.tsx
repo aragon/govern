@@ -17,7 +17,6 @@ const HomePage = ({ ...props }) => {
     margin: 'auto',
   });
   const history = useHistory();
-
   const [selectedDao, updateSelectedDao] = React.useState<any>({});
   const [selectedProposal, updateSelectedProposal] = React.useState<any>({});
 
