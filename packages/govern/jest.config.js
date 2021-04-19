@@ -19,6 +19,8 @@ module.exports = {
   bail: true,
   coveragePathIgnorePatterns: [
     'node_modules',
-    'dist'
+    'dist',
+    'createDao.ts',
+    'proposal.ts',
   ]
 }

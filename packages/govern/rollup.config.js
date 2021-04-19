@@ -40,7 +40,8 @@ const umdConfig = {
 }
 
 const configs = [
-  esmConfig
+  esmConfig,
+  umdConfig
 ]
 
 export default configs

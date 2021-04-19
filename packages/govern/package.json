@@ -61,10 +61,10 @@
     "uglify-es": "^3.3.9"
   },
   "dependencies": {
-    "@ethersproject/abstract-provider": "^5.1.0",
     "@ethersproject/constants": "^5.1.0",
     "@ethersproject/contracts": "^5.1.0",
     "@ethersproject/providers": "^5.1.0",
+    "@ethersproject/strings": "^5.1.0",
     "@urql/core": "^1.13.1",
     "graphql": "^15.4.0",
     "graphql-tag": "^2.11.0",
