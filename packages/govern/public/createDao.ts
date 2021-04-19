@@ -76,7 +76,7 @@ export async function createDao(
           token,
           /**
            * @TODO
-           * User human readable ABI
+           * Use human readable ABI
            * Check this example
            * https://github.com/aragon/govern/pull/321/commits/e8a689938ec591c217a0cd3efb0959603cae1a52#diff-a7fe3ac865c70c00b2dc156f26c6323b325d731d15efb06b0f86d8fbc0a517a8R9-R14
            */
