@@ -22,26 +22,23 @@ describe('Create Dao', function () {
   let tokenStorageProof
 
   before(async () => {
-    // const [signer] = await ethers.getSigners()
-    // console.log('creating contract instance...')
-    // const tokenStorageProofFactory = new ContractFactory(
-    //   ERC20StorageProofs.abi,
-    //   ERC20StorageProofs.bytecode,
-    //   signer
-    // )
-    // console.log('deploying contract...')
-    // const c = await tokenStorageProofFactory.deploy()
-    // console.log('contract address: ', c.address)
-    // await c.deployTransaction.wait()
-    // console.log('tx: ', c.deployTransaction)
+    /**
+     * @TODO
+     * Deploy contracts
+     */
+    const [signer] = await ethers.getSigners()
+    console.log('creating contract instance...')
+    const tokenStorageProofFactory = new ContractFactory(
+      ERC20StorageProofs.abi,
+      ERC20StorageProofs.bytecode,
+      signer
+    )
+    console.log('deploying contract...')
+    const c = await tokenStorageProofFactory.deploy()
+    console.log('contract address: ', c.address)
+    await c.deployTransaction.wait()
+    console.log('tx: ', c.deployTransaction)
 
-    const c2 = new Contract('0x1791E1D949c21703f49FC2C9a24570FA72ed62Ae', [
-      'function newGovernWithoutConfig(string,address,string,string,bool)',
-      'function registry() view returns (address)',
-    ])
-
-    const registry = await c2.registry()
-    console.log(registry)
 
     // console.log("before deploying govern registry")
     // const t = (await ethers.getContractFactory(
