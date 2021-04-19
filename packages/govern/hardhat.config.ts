@@ -24,8 +24,12 @@ const config: HardhatUserConfig = {
   paths: {
     tests: './tests/hardhat',
   },
-  defaultNetwork: 'hardhat',
+  defaultNetwork: "development",
   networks: {
+    development: {
+      url: "http://127.0.0.1:8545",
+      gas: 8000000
+    },
     hardhat: {
       throwOnTransactionFailures: true,
       throwOnCallFailures: true,

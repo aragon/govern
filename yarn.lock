@@ -11028,7 +11028,7 @@ dvote-js@1.1.5:
     ws "^7.1.0"
     yup "^0.31.1"
 
-dvote-solidity@^1.0.0:
+dvote-solidity@1.1.0, dvote-solidity@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/dvote-solidity/-/dvote-solidity-1.1.0.tgz#4e204c1936e82a1fda2f950b895ae0887b8a5ed4"
   integrity sha512-9kMM+OZyqcRdLwRoPp1sYWhV8YWSuX5nI8ufzzqzrrChKA8kIUWbq2/4kpGW6QLteIGOOXodcoXfO9p0vEiE5Q==

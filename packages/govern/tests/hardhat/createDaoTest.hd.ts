@@ -1,5 +1,7 @@
 import { ethers, network, waffle } from 'hardhat'
 import { expect } from 'chai'
+import { ContractFactory, Contract } from 'ethers'
+import { GovernRegistry__factory } from '@aragon/govern-core/typechain'
 import {
   createDao,
   CreateDaoParams,
@@ -8,6 +10,8 @@ import {
 import { TOKEN_STORAGE_PROOF_ADDRESS } from '../../internal/configuration/ConfigDefaults'
 import { TOKEN_STORAGE_PROOF_ABI } from '../../internal/actions/RegisterToken'
 
+import { ERC20StorageProofs } from 'dvote-solidity'
+
 // use rinkeby addresses as the tests run on a hardhat network forked from rinkeby
 const tokenAddress = '0x9fB402A33761b88D5DcbA55439e6668Ec8D4F2E8'
 const daoFactoryAddress = '0x1791E1D949c21703f49FC2C9a24570FA72ed62Ae'
@@ -15,6 +19,37 @@ const registryAddress = '0x8Adf949ADBAB3614f5340b21d9D9AD928d218096'
 import * as registryAbi from './registryAbi.json'
 
 describe('Create Dao', function () {
+  let tokenStorageProof
+
+  before(async () => {
+    // const [signer] = await ethers.getSigners()
+    // console.log('creating contract instance...')
+    // const tokenStorageProofFactory = new ContractFactory(
+    //   ERC20StorageProofs.abi,
+    //   ERC20StorageProofs.bytecode,
+    //   signer
+    // )
+    // console.log('deploying contract...')
+    // const c = await tokenStorageProofFactory.deploy()
+    // console.log('contract address: ', c.address)
+    // await c.deployTransaction.wait()
+    // console.log('tx: ', c.deployTransaction)
+
+    const c2 = new Contract('0x1791E1D949c21703f49FC2C9a24570FA72ed62Ae', [
+      'function newGovernWithoutConfig(string,address,string,string,bool)',
+      'function registry() view returns (address)',
+    ])
+
+    const registry = await c2.registry()
+    console.log(registry)
+
+    // console.log("before deploying govern registry")
+    // const t = (await ethers.getContractFactory(
+    //   'GovernRegistry'
+    // )) as GovernRegistry__factory
+    // await t.deploy()
+  })
+
   it('Should create a dao successfully', async function () {
     const params: CreateDaoParams = {
       name: 'magic',
@@ -220,7 +255,7 @@ describe('Create Dao', function () {
 
   it.only('Should create dao successfully and register token in vocdoni contract', async function () {
     const params: CreateDaoParams = {
-      name: 'jajadao9',
+      name: 'Tree DAO',
       token: {
         name: 'tree',
         symbol: 'TREE',
@@ -238,6 +273,7 @@ describe('Create Dao', function () {
     const receipt = await result.wait()
 
     console.log('DAO has been created')
+    console.log(receipt)
 
     expect(result).to.have.property('hash')
     expect(receipt).to.have.property('transactionHash')
@@ -251,6 +287,8 @@ describe('Create Dao', function () {
       ethers.provider
     )
 
+    console.log(receipt.logs)
+
     const args = receipt.logs
       .filter(
         ({ address }: { address: string }) =>
@@ -260,11 +298,13 @@ describe('Create Dao', function () {
       .find(({ name }: { name: string }) => name === 'Registered')
 
     const tokenAddress = args?.args[2] as string
+
+    console.log('this is the token address ', tokenAddress)
     expect(ethers.utils.isAddress(tokenAddress)).to.equal(true)
     await new Promise((resolve) => {
       setTimeout(resolve, 40000)
     })
-
+    
     const tokenStorage = new ethers.Contract(
       TOKEN_STORAGE_PROOF_ADDRESS,
       TOKEN_STORAGE_PROOF_ABI,

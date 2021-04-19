@@ -20,7 +20,11 @@
     "test:hardhat": "hardhat test",
     "test:hardhat:rinkeby": "hardhat test --network rinkeby",
     "depcheck": "yarn build && dependency-check ./package.json --missing --verbose",
-    "prepublishOnly": "yarn build"
+    "prepublishOnly": "yarn build",
+    "geth:pull": "docker pull ethereum/client-go:v1.9.24",
+    "geth:start": "docker run -p 8545:8545 --name geth-test ethereum/client-go:v1.9.24 --http --http.addr 0.0.0.0 --http.port 8545 --http.api personal,eth,net,web3,admin --dev --dev.period 1 --miner.gastarget 80000000 --networkid 1337 --allow-insecure-unlock --verbosity 0 &>/dev/null &",
+    "geth:stop": "docker stop geth-test && docker rm -f geth-test",
+    "test:geth": "npm run geth:pull && npm run geth:start && sleep 10 && hardhat test --network development && npm run geth:stop"
   },
   "files": [
     "dist"
@@ -57,6 +61,7 @@
   "dependencies": {
     "@urql/core": "^1.13.1",
     "dvote-js": "1.1.5",
+    "dvote-solidity": "1.1.0",
     "graphql": "^15.4.0",
     "graphql-tag": "^2.11.0",
     "isomorphic-unfetch": "^3.1.0"

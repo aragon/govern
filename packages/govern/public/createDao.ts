@@ -74,6 +74,12 @@ export async function createDao(
 
         const ERC20 = new Contract(
           token,
+          /**
+           * @TODO
+           * User human readable ABI
+           * Check this example
+           * https://github.com/aragon/govern/pull/321/commits/e8a689938ec591c217a0cd3efb0959603cae1a52#diff-a7fe3ac865c70c00b2dc156f26c6323b325d731d15efb06b0f86d8fbc0a517a8R9-R14
+           */
           [
             {
               inputs: [
@@ -94,8 +100,13 @@ export async function createDao(
             },
           ],
           signer
-        )
-        console.log("There's token! Let's try to register")
+        )        
+
+        /**
+         * @TODO
+         * We should not do this scripts (registerToken) - Instead we should use their library
+         * https://github.com/jordipainan/vocdoni-solidity-hardhat/blob/master/test/TokenStorageProofs.ts#L91-L106
+         */
         const result = await registerToken(signer, ERC20)
         if (result) {
           await result.wait()
