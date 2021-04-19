@@ -18,7 +18,8 @@ import {
   Proposal,
   ProposalOptions,
   PayloadType,
-} from '@aragon/govern/public/proposal';
+  ActionType,
+} from '@aragon/govern';
 // import {
 //   Proposal,
 //   ProposalParams,
@@ -278,23 +279,31 @@ const NewProposal: React.FC<NewProposalProps> = ({ ...props }) => {
     handleInputModalClose();
     handleActionModalOpen();
   };
+
   type payloadArgs = {
     submitter: string;
     executor: string;
-    nonce?: number;
+    executionTime?: number;
+    actions?: ActionType[];
   };
 
-  const buildPayload = ({ submitter, executor, nonce }: payloadArgs) => {
-    const tokenAddress = '0x9fB402A33761b88D5DcbA55439e6668Ec8D4F2E8';
+  const buildPayload = ({
+    submitter,
+    executor,
+    actions,
+    executionTime,
+  }: payloadArgs) => {
     const payload: PayloadType = {
-      nonce,
-      executionTime: Math.floor(Date.now() / 1000) + 50,
+      executionTime: executionTime || 1618843546527,
       submitter,
       executor,
-      actions: [{ to: tokenAddress, value: 0, data: '0x' }],
+      actions: actions ?? [
+        { to: ethers.constants.AddressZero, value: 0, data: '0x' },
+      ],
       allowFailuresMap: ethers.utils.hexZeroPad('0x0', 32),
-      proof: justification.current,
+      proof: '0x',
     };
+
     return payload;
   };
 
@@ -313,13 +322,13 @@ const NewProposal: React.FC<NewProposalProps> = ({ ...props }) => {
     maxCalldataSize: 100000, // initial maxCalldatasize
   };
   const scheduleProposal = async () => {
-    const payload = buildPayload({ submitter, executor, nonce });
+    const payload = buildPayload({ submitter, executor });
+    debugger;
     const config = daoDetails.config;
-    let proposalOptions: ProposalOptions = {
-      provider: ethersProvider,
-    };
-    let proposal = new Proposal(daoDetails.queue.address, proposalOptions);
-    let scheduleResult = await proposal.schedule({
+    const proposalOptions: ProposalOptions = {};
+    const proposal = new Proposal(daoDetails.queue.address, proposalOptions);
+    debugger;
+    const scheduleResult = await proposal.schedule({
       payload,
       config: goodConfig,
     });
