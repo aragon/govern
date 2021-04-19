@@ -15,7 +15,7 @@ export interface ConsoleMainPageProps {
   updateSelectedDao: any;
 }
 
-export const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
+const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
   updateSelectedDao,
   ...props
 }) => {
@@ -44,7 +44,7 @@ export const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
   });
 
   const {
-    data: registryData,
+    data: daoRegistryData,
     loading: isLoadingRegistryData,
     error: errorLoadingRegistryData,
   } = useQuery(GET_GOVERN_REGISTRY_DATA);
@@ -60,10 +60,10 @@ export const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
   }, [daoListData]);
 
   useEffect(() => {
-    if (registryData) {
-      updateTotalDaoCount(registryData.governRegistries[0].count);
+    if (daoRegistryData) {
+      updateTotalDaoCount(daoRegistryData.governRegistries[0].count);
     }
-  }, [registryData]);
+  }, [daoRegistryData]);
 
   return (
     <ConsoleMainDiv>
@@ -124,3 +124,5 @@ export const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
     </ConsoleMainDiv>
   );
 };
+
+export default React.memo(ConsoleMainPage);

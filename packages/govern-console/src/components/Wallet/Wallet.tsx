@@ -9,7 +9,7 @@ import { providers as EthersProviders } from 'ethers';
 import { useEffect } from 'react';
 
 const Wallet = ({}) => {
-  const context = useWallet();
+  const context: any = useWallet();
   const {
     connector,
     account,
@@ -24,6 +24,7 @@ const Wallet = ({}) => {
     reset,
     status,
     type,
+    ethers: ethersProvider,
   } = context;
 
   const onWalletConnectionError = (error: Error) => {

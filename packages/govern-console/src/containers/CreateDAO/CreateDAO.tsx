@@ -334,7 +334,7 @@ const NewDaoProgress: React.FC<ProgressProps> = ({ progressValue }) => {
               display: 'flex',
             }}
           >
-            <SubTitle>Hold tight your transaction is under process</SubTitle>
+            <SubTitle>Transaction is under process</SubTitle>
           </div>
           <LinearProgress
             variant="determinate"

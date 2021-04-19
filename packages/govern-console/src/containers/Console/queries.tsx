@@ -7,10 +7,13 @@ export const GET_DAO_LIST = gql`
       name
       queue {
         id
+        address
         nonce
+        config
       }
       executor {
         id
+        address
         balance
       }
       token

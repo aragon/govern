@@ -5,8 +5,8 @@ import { styled } from '@material-ui/core/styles';
 
 import Header from 'components/Header/Header';
 // import NavigationBar from '../../components/Navigation';
-import { ConsoleMainPage } from 'containers/Console/ConsoleMainPage';
-import { DaoMainPage } from 'containers/DAO/DaoMainPage';
+import ConsoleMainPage from 'containers/Console/ConsoleMainPage';
+import DaoMainPage from 'containers/DAO/DaoMainPage';
 import ProposalDetails from 'containers/ProposalDetails/ProposalDetails';
 import NewProposal from 'containers/NewProposal/NewProposal';
 import NewDaoContainer from 'containers/CreateDAO/CreateDAO';
@@ -19,19 +19,18 @@ const HomePage = ({ ...props }) => {
   const history = useHistory();
   debugger;
   const [selectedDao, updateSelectedDao] = React.useState({});
+  const [selectedProposal, updateSelectedProposal] = React.useState({});
+
   const updateSelectedDaoAndPushToHistory = React.useCallback(
     (daoDetails: any) => {
-      history.push(`/daos/${daoDetails.name}`, {
-        daoDetails,
-      });
+      updateSelectedDao(daoDetails);
+      history.push(`/daos/${daoDetails.name}`);
     },
     [history],
   );
   const onClickProposalCard = React.useCallback(
     (proposalDetails: any) => {
-      history.push(`/proposals/${proposalDetails.id}`, {
-        proposalDetails,
-      });
+      history.push(`/proposals/${proposalDetails.id}`);
     },
     [history],
   );
@@ -42,6 +41,7 @@ const HomePage = ({ ...props }) => {
   const onClickBackFromProposalPage = () => {
     history.goBack();
   };
+
   return (
     <AppWrapper>
       <Header />
@@ -55,15 +55,19 @@ const HomePage = ({ ...props }) => {
           </Route>
           <Route exact path="/daos/:daoName">
             <DaoMainPage
+              daoDetails={selectedDao}
               onClickProposalCard={onClickProposalCard}
               onClickNewProposal={onClickNewProposal}
             />
           </Route>
           <Route exact path="/proposals/:id">
-            <ProposalDetails onClickBack={onClickBackFromProposalPage} />
+            <ProposalDetails
+              selectedProposal={selectedProposal}
+              onClickBack={onClickBackFromProposalPage}
+            />
           </Route>
           <Route exact path="/new-proposal">
-            <NewProposal />
+            <NewProposal daoDetails={selectedDao} />
           </Route>
           <Route exact path="/create-dao">
             <NewDaoContainer />

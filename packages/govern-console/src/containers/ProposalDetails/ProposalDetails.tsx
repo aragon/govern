@@ -13,16 +13,18 @@ import { useWallet } from 'use-wallet';
 
 // import { InputField } from 'component/InputField/InputField';
 interface ProposalDetailsProps {
+  selectedProposal: any;
   onClickBack?: any;
 }
 
-const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
+const ProposalDetails: React.FC<ProposalDetailsProps> = ({
+  onClickBack,
+  selectedProposal: proposal,
+}) => {
+  const theme = useTheme();
   const context = useWallet();
   const { ethereum } = context;
   console.log(ethereum);
-  const history: any = useHistory();
-  const theme = useTheme();
-  const proposal = history.location.state.proposalDetails;
 
   //* styled Components
 

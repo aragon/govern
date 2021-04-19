@@ -10,6 +10,16 @@ import Paper from '@material-ui/core/Paper';
 import { NewActionModal } from '../../components/Modal/NewActionModal';
 import { AddActionsModal } from '../../components/Modal/AddActionsModal';
 import { InputField } from '../../components/InputFields/InputField';
+import { ethers } from 'ethers';
+import { defaultAbiCoder } from 'ethers/lib/utils';
+import { useWallet } from '../../EthersWallet';
+
+// import {
+//   Proposal,
+//   ProposalParams,
+//   PayloadType,
+//   ActionType,
+// } from '@aragon/govern';
 export interface NewProposalProps {
   /**
    * All the details of DAO
@@ -114,13 +124,34 @@ const NewProposal: React.FC<NewProposalProps> = ({
 }) => {
   const theme = useTheme();
   const classes = useStyles();
-  const justification = useRef();
+  const justification: { current: string } = useRef('');
   // const [isAddingActions, updateIsAddingActions] = useState(false);
   const [selectedActions, updateSelectedOptions] = useState([]);
   // const [modalStyle] = React.useState(getModalStyle);
   const [isInputModalOpen, setInputModalOpen] = useState(false);
   const [isActionModalOpen, setActionModalOpen] = useState(false);
   const abiFunctions = useRef([]);
+
+  const context: any = useWallet();
+  const {
+    connector,
+    account,
+    balance,
+    chainId,
+    connect,
+    connectors,
+    ethereum,
+    error,
+    getBlockNumber,
+    networkName,
+    reset,
+    status,
+    type,
+    ethers,
+  } = context;
+  const submitter: string = account;
+  const executor = daoDetails.executor.id;
+  const nonce: number = daoDetails.queue.nonce;
 
   const handleInputModalOpen = () => {
     setInputModalOpen(true);
@@ -204,6 +235,7 @@ const NewProposal: React.FC<NewProposalProps> = ({
       border: 0,
     },
   });
+
   const isProposalValid = () => {
     if (justification.current === '') return false;
     if (selectedActions.length === 0) return false;
@@ -237,6 +269,49 @@ const NewProposal: React.FC<NewProposalProps> = ({
     console.log(abiFunctions);
     handleInputModalClose();
     handleActionModalOpen();
+  };
+  type payloadArgs = {
+    submitter: string;
+    executor: string;
+    nonce?: number;
+  };
+
+  const buildPayload = ({ submitter, executor, nonce }: payloadArgs) => {
+    // const tokenAddress = '0x9fB402A33761b88D5DcbA55439e6668Ec8D4F2E8';
+    // const payload: PayloadType = {
+    //   nonce,
+    //   executionTime: Math.floor(Date.now() / 1000) + 50,
+    //   submitter,
+    //   executor,
+    //   actions: [{ to: tokenAddress, value: 0, data: '0x' }],
+    //   allowFailuresMap: ethers.utils.hexZeroPad('0x0', 32),
+    //   proof: justification.current,
+    // };
+    // return payload;
+  };
+
+  const noCollateral = {
+    id: '-1',
+    token: ethers.constants.AddressZero,
+    amount: 0,
+  };
+  const goodConfig: any = {
+    executionDelay: 1, // how many seconds to wait before being able to call `execute`.
+    scheduleDeposit: noCollateral,
+    challengeDeposit: noCollateral,
+    // resolver: daoDetails.queue.config.resolver,
+    resolver: '0xC464EB732A1D2f5BbD705727576065C91B2E9f18',
+    rules: '0x',
+    maxCalldataSize: 100000, // initial maxCalldatasize
+  };
+  const scheduleProposal = async () => {
+    const payload = buildPayload({ submitter, executor, nonce });
+    const config = daoDetails.config;
+    // let scheduleResult = await getProposalInstance.schedule({
+    //   payload,
+    //   config: goodConfig,
+    // });
+    // console.log(scheduleResult);
   };
 
   return (
@@ -293,6 +368,7 @@ const NewProposal: React.FC<NewProposalProps> = ({
           // color="#00C2FF"
           style={{ marginTop: 16 }}
           disabled={!isProposalValid()}
+          onClick={() => scheduleProposal()}
         />
         <NewActionModal
           onCloseModal={handleInputModalClose}

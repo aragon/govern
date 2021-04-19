@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, memo } from 'react';
 import { styled, useTheme } from '@material-ui/core/styles';
 import { DaoHeader } from '../../components/DaoHeader/DaoHeader';
 import { ProposalCard } from '../../components/ProposalCards/ProposalCard';
@@ -8,21 +8,18 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import { GET_PROPOSAL_LIST } from './queries';
 import { useQuery } from '@apollo/client';
-import { useHistory } from 'react-router-dom';
 import { formatEther } from 'ethers/lib/utils';
 
-export const DaoMainPage: React.FC<{
+const DaoMainPage: React.FC<{
+  daoDetails: any;
   onClickProposalCard: any;
   onClickNewProposal: any;
-}> = ({ onClickProposalCard, onClickNewProposal, ...props }) => {
+}> = ({ onClickProposalCard, onClickNewProposal, daoDetails, ...props }) => {
   const theme = useTheme();
   const [isProposalPage, setProposalPage] = useState(true);
   const [visibleProposalList, updateVisibleProposalList] = useState<any>([]);
   const [isProfilePage, setProfilePage] = useState(false);
   const searchString = useRef('');
-  const history: any = useHistory();
-  console.log(history);
-  const daoDetails = history.location.state.daoDetails;
 
   // useEffect(() => {
   //   if (isProfile) {
@@ -206,3 +203,4 @@ export const DaoMainPage: React.FC<{
     </DaoPageMainDiv>
   );
 };
+export default memo(DaoMainPage);
