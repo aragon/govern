@@ -13,7 +13,12 @@ import { InputField } from '../../components/InputFields/InputField';
 import { ethers } from 'ethers';
 import { defaultAbiCoder } from 'ethers/lib/utils';
 import { useWallet } from '../../EthersWallet';
-
+import { useHistory } from 'react-router-dom';
+import {
+  Proposal,
+  ProposalOptions,
+  PayloadType,
+} from '@aragon/govern/public/proposal';
 // import {
 //   Proposal,
 //   ProposalParams,
@@ -21,10 +26,6 @@ import { useWallet } from '../../EthersWallet';
 //   ActionType,
 // } from '@aragon/govern';
 export interface NewProposalProps {
-  /**
-   * All the details of DAO
-   */
-  daoDetails?: any;
   /**
    * callback for click on schedule
    */
@@ -118,11 +119,18 @@ const AddedActions: React.FC<AddedActionsProps> = ({
   ));
 };
 
-const NewProposal: React.FC<NewProposalProps> = ({
-  daoDetails,
-  onSchedule,
-}) => {
+const NewProposal: React.FC<NewProposalProps> = ({ ...props }) => {
   const theme = useTheme();
+  const history = useHistory();
+  let daoDetails: any = null;
+  const daoDetailsString = sessionStorage.getItem('selectedDao');
+  if (daoDetailsString) {
+    daoDetails = JSON.parse(daoDetailsString);
+  }
+  if (!daoDetails) {
+    history.push('/');
+  }
+  debugger;
   const classes = useStyles();
   const justification: { current: string } = useRef('');
   // const [isAddingActions, updateIsAddingActions] = useState(false);
@@ -147,7 +155,7 @@ const NewProposal: React.FC<NewProposalProps> = ({
     reset,
     status,
     type,
-    ethers,
+    ethersProvider,
   } = context;
   const submitter: string = account;
   const executor = daoDetails.executor.id;
@@ -277,17 +285,17 @@ const NewProposal: React.FC<NewProposalProps> = ({
   };
 
   const buildPayload = ({ submitter, executor, nonce }: payloadArgs) => {
-    // const tokenAddress = '0x9fB402A33761b88D5DcbA55439e6668Ec8D4F2E8';
-    // const payload: PayloadType = {
-    //   nonce,
-    //   executionTime: Math.floor(Date.now() / 1000) + 50,
-    //   submitter,
-    //   executor,
-    //   actions: [{ to: tokenAddress, value: 0, data: '0x' }],
-    //   allowFailuresMap: ethers.utils.hexZeroPad('0x0', 32),
-    //   proof: justification.current,
-    // };
-    // return payload;
+    const tokenAddress = '0x9fB402A33761b88D5DcbA55439e6668Ec8D4F2E8';
+    const payload: PayloadType = {
+      nonce,
+      executionTime: Math.floor(Date.now() / 1000) + 50,
+      submitter,
+      executor,
+      actions: [{ to: tokenAddress, value: 0, data: '0x' }],
+      allowFailuresMap: ethers.utils.hexZeroPad('0x0', 32),
+      proof: justification.current,
+    };
+    return payload;
   };
 
   const noCollateral = {
@@ -307,12 +315,33 @@ const NewProposal: React.FC<NewProposalProps> = ({
   const scheduleProposal = async () => {
     const payload = buildPayload({ submitter, executor, nonce });
     const config = daoDetails.config;
-    // let scheduleResult = await getProposalInstance.schedule({
-    //   payload,
-    //   config: goodConfig,
-    // });
-    // console.log(scheduleResult);
+    let proposalOptions: ProposalOptions = {
+      provider: ethersProvider,
+    };
+    let proposal = new Proposal(daoDetails.queue.address, proposalOptions);
+    let scheduleResult = await proposal.schedule({
+      payload,
+      config: goodConfig,
+    });
+    console.log(scheduleResult);
   };
+
+  // React.useEffect(() => {
+  //   if (!daoDetails.id) {
+  //     let daoDetails: any = sessionStorage.getItem('selectedDao');
+  //     if (!daoDetails.id) {
+  //       let { daoName } = useParams<any>();
+  //       let {
+  //         data: daoDetailsData,
+  //         loading: isLoadingDaoDetails,
+  //         error: daoLoadingError,
+  //       } = useQuery(GET_DAO_BY_NAME, {
+  //         variables: { name: daoName },
+  //       });
+  //       updateDaoDetails(daoDetailsData);
+  //     }
+  //   }
+  // });
 
   return (
     <>
@@ -367,7 +396,7 @@ const NewProposal: React.FC<NewProposalProps> = ({
           type="primary"
           // color="#00C2FF"
           style={{ marginTop: 16 }}
-          disabled={!isProposalValid()}
+          // disabled={!isProposalValid()}
           onClick={() => scheduleProposal()}
         />
         <NewActionModal

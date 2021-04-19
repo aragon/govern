@@ -18,12 +18,13 @@ const HomePage = ({ ...props }) => {
   });
   const history = useHistory();
   debugger;
-  const [selectedDao, updateSelectedDao] = React.useState({});
-  const [selectedProposal, updateSelectedProposal] = React.useState({});
+  const [selectedDao, updateSelectedDao] = React.useState<any>({});
+  const [selectedProposal, updateSelectedProposal] = React.useState<any>({});
 
   const updateSelectedDaoAndPushToHistory = React.useCallback(
     (daoDetails: any) => {
       updateSelectedDao(daoDetails);
+      sessionStorage.setItem('selectedDao', JSON.stringify(daoDetails));
       history.push(`/daos/${daoDetails.name}`);
     },
     [history],
@@ -31,13 +32,18 @@ const HomePage = ({ ...props }) => {
   const onClickProposalCard = React.useCallback(
     (proposalDetails: any) => {
       history.push(`/proposals/${proposalDetails.id}`);
+      sessionStorage.setItem(
+        'selectedProposal',
+        JSON.stringify(proposalDetails),
+      );
       updateSelectedProposal(proposalDetails);
     },
     [history],
   );
   const onClickNewProposal = React.useCallback(() => {
-    history.push(`/new-proposal`);
-  }, [history]);
+    debugger;
+    history.push(`/${selectedDao.name}/new-proposal`);
+  }, [history, selectedDao]);
 
   const onClickBackFromProposalPage = () => {
     history.goBack();
@@ -67,8 +73,8 @@ const HomePage = ({ ...props }) => {
               onClickBack={onClickBackFromProposalPage}
             />
           </Route>
-          <Route exact path="/new-proposal">
-            <NewProposal daoDetails={selectedDao} />
+          <Route exact path="/:daoName/new-proposal">
+            <NewProposal />
           </Route>
           <Route exact path="/create-dao">
             <NewDaoContainer />
