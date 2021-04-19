@@ -37,7 +37,6 @@ const config: HardhatUserConfig = {
       forking: {
         url: "https://eth-rinkeby.alchemyapi.io/v2/E9LWD32GvGvBoNXBcilg7XnjT5riUXjg",
         blockNumber:8441066
-        // 8441074
       }
     }
   },
