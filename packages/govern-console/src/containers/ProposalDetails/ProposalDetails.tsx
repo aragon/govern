@@ -19,7 +19,7 @@ interface ProposalDetailsProps {
 
 const ProposalDetails: React.FC<ProposalDetailsProps> = ({
   onClickBack,
-  selectedProposal: proposal,
+  selectedProposal,
 }) => {
   const theme = useTheme();
   const context = useWallet();
@@ -68,9 +68,9 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({
     boxSizing: 'border-box',
   });
   const getLabelColor = () => {
-    if (proposal.state === 'Scheduled') return 'yellow';
-    if (proposal.state === 'Executed') return 'green';
-    if (proposal.state === 'Challenged') return 'red';
+    if (selectedProposal.state === 'Scheduled') return 'yellow';
+    if (selectedProposal.state === 'Executed') return 'green';
+    if (selectedProposal.state === 'Challenged') return 'red';
   };
   const DetailsWrapper = styled('div')({
     display: 'flex',
@@ -272,7 +272,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({
     error: errorFetchingProposalDetails,
   } = useQuery(GET_PROPOSAL_LIST_QUERY, {
     variables: {
-      id: proposal.id,
+      id: selectedProposal.id,
     },
   });
 
@@ -309,10 +309,10 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({
               <ProposalStatus>
                 <Label
                   labelColor={getLabelColor()}
-                  labelText={proposal.state}
+                  labelText={selectedProposal.state}
                 />
               </ProposalStatus>
-              <ProposalId>{proposal.id}</ProposalId>
+              <ProposalId>{selectedProposal.id}</ProposalId>
               <DateDisplay>3/29/2021</DateDisplay>
               <DetailsWrapper>
                 <ProposalDetailsWrapper id="proposal_wrapper">
