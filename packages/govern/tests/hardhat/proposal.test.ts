@@ -13,16 +13,23 @@ import {
 import { Container } from '../../public/proposal'
 
 const vetoAbi = [
-  'function bulk((uint256 op, bytes4 role, address who)[] items)',
+  'function bulk((uint8 op, bytes4 role, address who)[] items)',
   `function veto(${Container} _container, bytes _reason)`
 ]
-const tokenAbi = ['function generateTokens(address to, uint256 amount)', 'function approve(address to, uint256 amount)']
-const disputeAbi = ['function getDisputeFees() external view returns (address recipient, address feeToken, uint256 feeAmount)']
+
+const tokenAbi = [
+  'function generateTokens(address to, uint256 amount)', 
+  'function approve(address to, uint256 amount)'
+]
+
+const disputeAbi = [
+  'function getDisputeFees() external view returns (address recipient, address feeToken, uint256 feeAmount)'
+]
 
 // use rinkeby addresses as the tests run on a hardhat network forked from rinkeby
 const tokenAddress = '0x9fB402A33761b88D5DcbA55439e6668Ec8D4F2E8'
 const registryAddress = '0x7714e0a2A2DA090C2bbba9199A54B903bB83A73d'
-const daoFactoryAddress = '0xb75290e69f83b52bfbf9c99b4ae211935e75a851'
+const daoFactoryAddress = '0x53B7C20e6e4617FC5f8E1d113F0abFb2FCE1D5E2'
 const resolver = '0xC464EB732A1D2f5BbD705727576065C91B2E9f18'
 const emptyBytes = '0x'
 
@@ -56,10 +63,8 @@ async function advanceTime(provider: any) {
 function encodeDataForVetoRole(who: string): string {
   const iface = new ethers.utils.Interface(vetoAbi)
   const role = iface.getSighash('veto')
-  const bulkSighash = iface.getSighash('bulk')
   const paramData = iface.encodeFunctionData('bulk', [[{op: 0, role, who}]])
-  const encodedData = ethers.utils.hexConcat([bulkSighash, paramData])
-  return encodedData
+  return paramData
 }
 
 async function grantVetoPower(provider: any, queueAddress: string, executor: string) {
@@ -79,11 +84,12 @@ async function grantVetoPower(provider: any, queueAddress: string, executor: str
 
   // advance the time so we can execute the proposal immediately
   await advanceTime(ethers.provider)
-  console.log('before executing veto proposal...')
-  const vetoResult = await vetoProposal.execute(vetoData)
-  const exeResult = await vetoResult.wait()
 
-  console.log('Result from executing veto role change: ', exeResult.status, testUser)
+  const vetoResult = await vetoProposal.execute(vetoData)
+  const execResult = await vetoResult.wait()
+
+  expect(execResult.status).to.equal(1)
+  expect(vetoResult.hash).to.equal(execResult.transactionHash)
 }
 
 async function generateDisputeTokenAndApprove(recipient: any, court: string, queue: string) {
@@ -100,7 +106,6 @@ async function generateDisputeTokenAndApprove(recipient: any, court: string, que
 
   tx = await token.approve(queue, feeAmount)
   await tx.wait()
-
 }
 
 const buildPayload = ({submitter, executor, actions, executionTime}: payloadArgs) => {
@@ -193,10 +198,11 @@ describe("Proposal", function() {
     const receipt = await txResult.wait()
     expect(receipt.status).to.equal(1)
     expect(txResult.hash).to.equal(receipt.transactionHash)
-  
   });
 
-  it.skip("veto should work", async function() {
+  it("veto should work", async function() {
+    // remember the snapshot to move back after this test is finished.
+    const snapshotId = await ethers.provider.send("evm_snapshot", []);
     // submit a proposal to give the test user veto power
     await grantVetoPower(network.provider, queueAddress, executor)
 
@@ -207,16 +213,19 @@ describe("Proposal", function() {
     })
     await txResult.wait()
 
-    console.log('before calling veto')
     const reason = 'veto reason'
     const result = await proposal.veto(proposalData, reason)
     const receipt = await result.wait()
     expect(receipt.status).to.equal(1)
     expect(result.hash).to.equal(receipt.transactionHash)
+    
+    // gets back to the snapshot before time was advanced.
+    // necessary so that other tests can still work with court
+    // without getting CLK_TOO_MANY_TRANSITIONS error.
+    await ethers.provider.send("evm_revert", [snapshotId]);
   })
 
   it("challenge should work", async function() {
-
     await generateDisputeTokenAndApprove(network.provider, resolver, queueAddress)
 
     const { proposal, txResult, proposalData } = await makeProposal({
@@ -231,7 +240,6 @@ describe("Proposal", function() {
     const receipt = await result.wait()
     expect(receipt.status).to.equal(1)
     expect(result.hash).to.equal(receipt.transactionHash)
-
   })
 
   it.skip("resolve should work", async function() {
@@ -289,11 +297,8 @@ describe("Proposal", function() {
         executor
       })
       expect(tx).to.be.undefined
-
     } catch (err) {
-
       expect(err.message).to.eq('Transaction reverted without a reason')
     }
-
   })
 })
