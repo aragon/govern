@@ -9,7 +9,6 @@
     "build": {
         "baseDir": "",
         "publicDir": "build",
-        "command": "yarn install --frozen-lockfile && yarn build",
         "rootDir": ""
     }
 }

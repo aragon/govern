@@ -17,6 +17,24 @@ jobs:
     name: builds and deploys console
     steps:
       - uses: actions/checkout@v2
+
+      - name: Install node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+      - name: Cache yarn modules
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: yarn-${{ hashFiles('yarn.lock') }}
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build the app
+        run: yarn build
+
       - name: activate rinkeby's fleek
         run: mv fleek/console.rinkeby.json .fleek.json
         if: github.ref == 'refs/heads/develop'
@@ -39,6 +57,24 @@ jobs:
     if: github.ref == 'refs/heads/develop'
     steps:
       - uses: actions/checkout@v2
+
+      - name: Install node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+      - name: Cache yarn modules
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: yarn-${{ hashFiles('yarn.lock') }}
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build the app
+        run: yarn build-storybook
+         
       - name: activate rinkeby's fleek
         run: mv fleek/storybook.json .fleek.json
         working-directory: ${{env.working-directory}}
@@ -48,6 +84,4 @@ jobs:
         with:
           apiKey: ${{ secrets.FLEEK_API_KEY }}
           workDir: ${{env.working-directory}}
-
-  
 
