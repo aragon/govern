@@ -6,7 +6,7 @@ import backButtonIcon from 'images/back-btn.svg';
 import { Label } from 'components/Labels/Label';
 import { InputField } from 'components/InputFields/InputField';
 import { useHistory } from 'react-router-dom';
-import { GET_PROPOSAL_LIST_QUERY } from './queries';
+import { GET_PROPOSAL_DETAILS_QUERY } from './queries';
 import { useQuery } from '@apollo/client';
 import { useEffect } from 'react';
 import { ANButton } from 'components/Button/ANButton';
@@ -315,7 +315,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     data: proposalDetailsData,
     loading: isLoadingProposalDetails,
     error: errorFetchingProposalDetails,
-  } = useQuery(GET_PROPOSAL_LIST_QUERY, {
+  } = useQuery(GET_PROPOSAL_DETAILS_QUERY, {
     variables: {
       id: selectedProposal.id,
     },
@@ -347,15 +347,21 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
 
   // const approveCollateralIfNeeded = () => {};
   const getProposalParams = () => {
+    const payload = { ...proposalInfo.payload };
+    const config = { ...proposalInfo.config };
+    config.executionDelay = parseInt(config.executionDelay);
+    payload.executor = payload.executor.address;
     const params: ProposalParams = {
-      payload: proposalInfo.payload,
-      config: proposalInfo.config,
+      payload,
+      config,
     };
     return params;
   };
 
   const challengeProposal = async () => {
+    debugger;
     const proposalParams = getProposalParams();
+    console.log(proposalParams);
     // approveCollateralIfNeeded();
     const challengeTransaction = await proposalInstance.challenge(
       proposalParams,
@@ -544,7 +550,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                       placeholder={''}
                       height={'46px'}
                       width={'372px'}
-                      value={challengeReason.current}
+                      // value={challengeReason.current}
                     />
                     <ANButton
                       label="Challenge"
@@ -575,7 +581,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                       placeholder={''}
                       height={'46px'}
                       width={'372px'}
-                      value={vetoReason.current}
+                      // value={vetoReason.current}
                     />
                     <ANButton
                       label="Execute"
