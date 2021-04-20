@@ -370,6 +370,16 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     console.log(challengeTransaction);
   };
 
+  const executeProposal = async () => {
+    debugger;
+    const proposalParams = getProposalParams();
+    console.log(proposalParams);
+    console.log(proposalParams);
+    // approveCollateralIfNeeded();
+    const challengeTransaction = await proposalInstance.execute(proposalParams);
+    console.log(challengeTransaction);
+  };
+
   // const getParsedDataFromBytes = (data) => {
 
   // };
@@ -597,7 +607,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                       height="45px"
                       width="372px"
                       style={{ margin: 'auto' }}
-                      //  onClick={}
+                      onClick={executeProposal}
                     />
                   </Widget>
                 </WidgetWrapper>
