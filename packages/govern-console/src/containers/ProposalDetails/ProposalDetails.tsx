@@ -359,7 +359,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   };
 
   const challengeProposal = async () => {
-    debugger;
     const proposalParams = getProposalParams();
     console.log(proposalParams);
     // approveCollateralIfNeeded();
@@ -371,7 +370,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   };
 
   const executeProposal = async () => {
-    debugger;
     const proposalParams = getProposalParams();
     console.log(proposalParams);
     console.log(proposalParams);
