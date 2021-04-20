@@ -1,13 +1,13 @@
 {
     "site": {
-        "id": "65babb13-0048-4283-889f-5840ed1dfa09",
+        "id": "15a86cf1-2b97-4c1d-bd70-349a5a60daad",
         "team": "aragonone-team",
         "platform": "ipfs",
-        "source": "github",
-        "name": "steep-king-7764"
+        "source": "ipfs",
+        "name": "dark-butterfly-6166"
     },
     "build": {
-        "baseDir": "packages/govern-console",
+        "baseDir": "",
         "publicDir": "build",
         "command": "yarn install --frozen-lockfile && yarn build",
         "rootDir": ""
