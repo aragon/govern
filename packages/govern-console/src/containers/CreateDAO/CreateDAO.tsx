@@ -20,8 +20,7 @@ import {
   CreateDaoParams,
   CreateDaoOptions,
   Token,
-  getToken,
-  newToken
+  getToken
 } from '@aragon/govern';
 
 enum CreateDaoStatus {
@@ -496,33 +495,14 @@ const NewDaoContainer: React.FC = () => {
         token = await getToken(existingTokenAddress, context.ethersProvider)
       } catch (error) {
         console.log(error)
-        return
+        return false
       }
     } else {
-      // TODO: deploy a new token contract here?
-      try {
-        const DECIMALS = 18
-        const signers: any = await context.ethersProvider.getSigners()
-        const deployToken: any = await newToken(
-          // what params to use?
-          await signers[1].getAddress(),
-          tokenName,
-          tokenSymbol,
-          DECIMALS,
-          await signers[1].getAddress(),
-          100e18,
-          isUseProxyChecked,
-          context.ethersProvider
-        )
-        token = {
-          tokenAddress: deployToken[0], // this should be `GovernToken` return value
-          tokenDecimals: DECIMALS,
-          tokenName: tokenName,
-          tokenSymbol: tokenSymbol
-        }
-      } catch (error) {
-        console.log(error)
-        return
+      token = {
+        tokenAddress: '',
+        tokenDecimals: 18,
+        tokenName: tokenName,
+        tokenSymbol: tokenSymbol
       }
     }
     const createDaoParams: CreateDaoParams = {
@@ -533,8 +513,12 @@ const NewDaoContainer: React.FC = () => {
       useVocdoni: isUseFreeVotingChecked
     }
 
-    // TODO: is second param CreateDaoOptions needed?
-    const result: any = await createDao(createDaoParams)
+    try {
+      const result: any = await createDao(createDaoParams)
+    } catch (error) {
+      console.log(error)
+      return false
+    }
   }
 
   switch (createDaoStatus) {
