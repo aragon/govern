@@ -28,21 +28,26 @@ jobs:
         with:
           path: '**/node_modules'
           key: yarn-${{ hashFiles('yarn.lock') }}
+        working-directory: ${{env.working-directory}}
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+        working-directory: ${{env.working-directory}}
 
       - name: Build the app
         run: yarn build
+        working-directory: ${{env.working-directory}}
 
       - name: activate rinkeby's fleek
         run: mv fleek/console.rinkeby.json .fleek.json
         if: github.ref == 'refs/heads/develop'
         working-directory: ${{env.working-directory}}
+
       - name: activate mainnet's fleek
         run: mv fleek/console.mainnet.json .fleek.json
         if: github.ref == 'refs/heads/master'
         working-directory: ${{env.working-directory}}
+
       - name: builds and deploys console
         id: deploy
         uses: fleekhq/action-deploy@v1
@@ -68,16 +73,20 @@ jobs:
         with:
           path: '**/node_modules'
           key: yarn-${{ hashFiles('yarn.lock') }}
+        working-directory: ${{env.working-directory}}
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+        working-directory: ${{env.working-directory}}
 
-      - name: Build the app
+      - name: Build the storybook
         run: yarn build-storybook
+        working-directory: ${{env.working-directory}}
          
       - name: activate rinkeby's fleek
         run: mv fleek/storybook.json .fleek.json
         working-directory: ${{env.working-directory}}
+
       - name: builds and deploys storybook
         id: deploy
         uses: fleekhq/action-deploy@v1
