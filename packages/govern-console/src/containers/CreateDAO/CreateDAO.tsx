@@ -13,6 +13,16 @@ import GreenTickImage from '../../images/svgs/green_tick.svg';
 import Switch from '@material-ui/core/Switch';
 import Checkbox from '@material-ui/core/Checkbox';
 import LinearProgress from '@material-ui/core/LinearProgress';
+import { goodConfig } from '../../utils/goodConfig'
+import { useWallet } from '../../EthersWallet';
+import {
+  createDao,
+  CreateDaoParams,
+  CreateDaoOptions,
+  Token,
+  getToken,
+  newToken
+} from '@aragon/govern';
 
 enum CreateDaoStatus {
   PreCreate,
@@ -31,6 +41,19 @@ interface FormProps {
         cancel form and go back
     */
   cancelForm(): void;
+
+  /*
+        submit form values to be transacted on chain
+    */
+  submitCreateDao(
+    isExistingToken: boolean,
+    existingTokenAddress: string,
+    tokenName: string,
+    tokenSymbol: string,
+    isUseProxyChecked: boolean,
+    daoName: string,
+    isUseFreeVotingChecked: boolean
+  ): void;
 }
 
 interface ProgressProps {
@@ -95,6 +118,7 @@ const SubTitle = styled(Typography)({
 const NewDaoForm: React.FC<FormProps> = ({
   setCreateDaoStatus,
   cancelForm,
+  submitCreateDao
 }) => {
   const theme = useTheme();
 
@@ -114,24 +138,24 @@ const NewDaoForm: React.FC<FormProps> = ({
   const [isUseFreeVotingChecked, updateIsUseFreeVotingChecked] = useState(
     false,
   );
-  const daoName = useRef();
-  const tokenName = useRef();
-  const tokenSymbol = useRef();
-  const existingTokenAddress = useRef();
+  const daoName = useRef('');
+  const tokenName = useRef('');
+  const tokenSymbol = useRef('');
+  const existingTokenAddress = useRef('');
 
-  const onChangeDaoName = (val: any) => {
+  const onChangeDaoName = (val: string) => {
     daoName.current = val;
   };
 
-  const onChangeTokenName = (val: any) => {
+  const onChangeTokenName = (val: string) => {
     tokenName.current = val;
   };
 
-  const onChangeTokenSymbol = (val: any) => {
+  const onChangeTokenSymbol = (val: string) => {
     tokenSymbol.current = val;
   };
 
-  const onChangeExistingTokenAddress = (val: any) => {
+  const onChangeExistingTokenAddress = (val: string) => {
     existingTokenAddress.current = val;
   };
 
@@ -283,6 +307,15 @@ const NewDaoForm: React.FC<FormProps> = ({
             style={{ marginTop: 40 }}
             onClick={() => {
               setCreateDaoStatus(CreateDaoStatus.InProgress);
+              submitCreateDao(
+                isExistingToken,
+                existingTokenAddress.current,
+                tokenName.current,
+                tokenSymbol.current,
+                isUseProxyChecked,
+                daoName.current,
+                isUseFreeVotingChecked
+              )
             }}
           />
         </div>
@@ -442,10 +475,67 @@ const NewDaoContainer: React.FC = () => {
   );
   const [progressPercent, setProgressPercent] = useState<number>(5);
   const history = useHistory();
+  const context: any = useWallet();
 
   const onClickBackFromCreateDaoPage = () => {
     history.goBack();
   };
+
+  const submitCreateDao = async (
+    isExistingToken: boolean,
+    existingTokenAddress: string,
+    tokenName: string,
+    tokenSymbol: string,
+    isUseProxyChecked: boolean,
+    daoName: string,
+    isUseFreeVotingChecked: boolean
+  ) => {
+    let token: Token
+    if (isExistingToken) {
+      try {
+        token = await getToken(existingTokenAddress, context.ethersProvider)
+      } catch (error) {
+        console.log(error)
+        return
+      }
+    } else {
+      // TODO: deploy a new token contract here?
+      try {
+        const DECIMALS = 18
+        const signers: any = await context.ethersProvider.getSigners()
+        const deployToken: any = await newToken(
+          // what params to use?
+          await signers[1].getAddress(),
+          tokenName,
+          tokenSymbol,
+          DECIMALS,
+          await signers[1].getAddress(),
+          100e18,
+          isUseProxyChecked,
+          context.ethersProvider
+        )
+        token = {
+          tokenAddress: deployToken[0], // this should be `GovernToken` return value
+          tokenDecimals: DECIMALS,
+          tokenName: tokenName,
+          tokenSymbol: tokenSymbol
+        }
+      } catch (error) {
+        console.log(error)
+        return
+      }
+    }
+    const createDaoParams: CreateDaoParams = {
+      name: daoName,
+      token,
+      config: goodConfig,
+      useProxies: isUseProxyChecked,
+      useVocdoni: isUseFreeVotingChecked
+    }
+
+    // TODO: is second param CreateDaoOptions needed?
+    const result: any = await createDao(createDaoParams)
+  }
 
   switch (createDaoStatus) {
     case CreateDaoStatus.PreCreate: {
@@ -453,6 +543,7 @@ const NewDaoContainer: React.FC = () => {
         <NewDaoForm
           setCreateDaoStatus={setCreateDaoStatus}
           cancelForm={onClickBackFromCreateDaoPage}
+          submitCreateDao={submitCreateDao}
         />
       );
     }
@@ -473,6 +564,7 @@ const NewDaoContainer: React.FC = () => {
         <NewDaoForm
           setCreateDaoStatus={setCreateDaoStatus}
           cancelForm={onClickBackFromCreateDaoPage}
+          submitCreateDao={submitCreateDao}
         />
       );
     }

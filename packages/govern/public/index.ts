@@ -5,7 +5,9 @@ export { configure, ConfigurationObject } from './configure'
 export { dao } from './dao'
 export { daos } from './daos'
 export { query } from './query'
-export { createDao, CreateDaoOptions, CreateDaoParams, DaoConfig } from './createDao'
+export { createDao, CreateDaoOptions, CreateDaoParams, DaoConfig, Token } from './createDao'
+export { getToken } from './token'
+export { newToken } from './newToken'
 export {
   Proposal,
   ProposalParams,
