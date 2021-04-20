@@ -36,7 +36,7 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Build the app
-        run: yarn build-storybook
+        run: yarn build
 
       - name: activate rinkeby's fleek
         run: mv fleek/console.rinkeby.json .fleek.json

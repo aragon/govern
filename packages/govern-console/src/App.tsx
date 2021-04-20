@@ -19,7 +19,7 @@ export default function App() {
         {
           // This is how connectors get configured
           // portis: { dAppId: 'my-dapp-id-123-xyz' },
-          // test test
+          // test test test
         }
       }
     >
