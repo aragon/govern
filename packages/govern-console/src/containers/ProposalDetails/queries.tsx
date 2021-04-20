@@ -1,12 +1,11 @@
 import { gql } from '@apollo/client';
 
-export const GET_PROPOSAL_LIST_QUERY = gql`
+export const GET_PROPOSAL_DETAILS_QUERY = gql`
   query proposalDetails($id: ID) {
     container(id: $id) {
       id
       state
       config {
-        id
         executionDelay
         scheduleDeposit {
           token
@@ -18,12 +17,15 @@ export const GET_PROPOSAL_LIST_QUERY = gql`
         }
         resolver
         rules
+        maxCalldataSize
       }
       payload {
         nonce
         executionTime
         submitter
-        executor
+        executor {
+          address
+        }
         actions {
           to
           value

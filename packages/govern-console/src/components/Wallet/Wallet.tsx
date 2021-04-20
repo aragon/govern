@@ -24,7 +24,7 @@ const Wallet = ({}) => {
     reset,
     status,
     type,
-    ethers: ethersProvider,
+    ethersProvider,
   } = context;
 
   const onWalletConnectionError = (error: Error) => {

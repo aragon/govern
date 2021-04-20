@@ -58,6 +58,7 @@ export const InputField: React.FC<InputFieldProps> = ({
     },
     input: {
       padding: '0px 0px 0px 24px',
+      boxSizing: 'border-box',
       margin: '0px',
       color: `${theme.custom.black}`,
       fontSize: 16,

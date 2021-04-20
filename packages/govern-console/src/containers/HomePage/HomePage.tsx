@@ -17,13 +17,13 @@ const HomePage = ({ ...props }) => {
     margin: 'auto',
   });
   const history = useHistory();
-  debugger;
-  const [selectedDao, updateSelectedDao] = React.useState({});
-  const [selectedProposal, updateSelectedProposal] = React.useState({});
+  const [selectedDao, updateSelectedDao] = React.useState<any>({});
+  const [selectedProposal, updateSelectedProposal] = React.useState<any>({});
 
   const updateSelectedDaoAndPushToHistory = React.useCallback(
     (daoDetails: any) => {
       updateSelectedDao(daoDetails);
+      sessionStorage.setItem('selectedDao', JSON.stringify(daoDetails));
       history.push(`/daos/${daoDetails.name}`);
     },
     [history],
@@ -31,13 +31,17 @@ const HomePage = ({ ...props }) => {
   const onClickProposalCard = React.useCallback(
     (proposalDetails: any) => {
       history.push(`/proposals/${proposalDetails.id}`);
+      sessionStorage.setItem(
+        'selectedProposal',
+        JSON.stringify(proposalDetails),
+      );
       updateSelectedProposal(proposalDetails);
     },
     [history],
   );
   const onClickNewProposal = React.useCallback(() => {
-    history.push(`/new-proposal`);
-  }, [history]);
+    history.push(`/${selectedDao.name}/new-proposal`);
+  }, [history, selectedDao]);
 
   const onClickBackFromProposalPage = () => {
     history.goBack();
@@ -56,19 +60,15 @@ const HomePage = ({ ...props }) => {
           </Route>
           <Route exact path="/daos/:daoName">
             <DaoMainPage
-              daoDetails={selectedDao}
               onClickProposalCard={onClickProposalCard}
               onClickNewProposal={onClickNewProposal}
             />
           </Route>
           <Route exact path="/proposals/:id">
-            <ProposalDetails
-              selectedProposal={selectedProposal}
-              onClickBack={onClickBackFromProposalPage}
-            />
+            <ProposalDetails onClickBack={() => history.goBack()} />
           </Route>
-          <Route exact path="/new-proposal">
-            <NewProposal daoDetails={selectedDao} />
+          <Route exact path="/:daoName/new-proposal">
+            <NewProposal onClickBack={() => history.goBack()} />
           </Route>
           <Route exact path="/create-dao">
             <NewDaoContainer />

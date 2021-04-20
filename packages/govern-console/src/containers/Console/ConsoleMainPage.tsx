@@ -4,8 +4,12 @@ import { ConsoleHeader } from '../../components/ConsoleHeader/ConsoleHeader';
 import { DaoCard } from '../../components/DaoCards/DaoCard';
 import { ANButton } from '../../components/Button/ANButton';
 import Paper from '@material-ui/core/Paper';
-import { useQuery } from '@apollo/client';
-import { GET_DAO_LIST, GET_GOVERN_REGISTRY_DATA } from './queries';
+import { useQuery, useLazyQuery } from '@apollo/client';
+import {
+  GET_DAO_LIST,
+  GET_GOVERN_REGISTRY_DATA,
+  GET_DAO_BY_NAME,
+} from './queries';
 import { Link } from 'react-router-dom';
 import { formatEther } from 'ethers/lib/utils';
 export interface ConsoleMainPageProps {
@@ -21,6 +25,11 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
 }) => {
   const theme = useTheme();
   const [visibleDaoList, updateDaoList] = useState<any>([]);
+  const [filteredDaoList, updateFilteredDaoList] = useState<any>([]);
+  const [
+    isShowingFilteredResults,
+    updateIsShowingFilteredResults,
+  ] = useState<boolean>(false);
   const [totalDaoCount, updateTotalDaoCount] = useState<number>();
 
   const ConsoleMainDiv = styled(Paper)({
@@ -39,7 +48,7 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
   } = useQuery(GET_DAO_LIST, {
     variables: {
       offset: 0,
-      limit: 2,
+      limit: 1,
     },
   });
 
@@ -65,6 +74,20 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
     }
   }, [daoRegistryData]);
 
+  const fetchMoreData = async () => {
+    const {
+      data: moreData,
+      loading: loadingMore,
+    }: { data: any; loading: boolean } = await fetchMoreDaos({
+      variables: {
+        offset: visibleDaoList.length,
+      },
+    });
+    if (moreData && moreData.daos.length > 0) {
+      updateDaoList([...visibleDaoList, ...moreData.daos]);
+    }
+  };
+
   return (
     <ConsoleMainDiv>
       <ConsoleHeader />
@@ -74,13 +97,15 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
           // maxWidth: '1408px',
           display: 'grid',
           gridTemplateColumns: 'auto auto auto auto',
-          justifyContent: 'space-between',
+          justifyContent: 'left',
+          gridGap: '0px 32px',
         }}
       >
-        {daoListData &&
-          daoListData.daos.map((dao: any) => (
+        {visibleDaoList &&
+          visibleDaoList.length > 0 &&
+          visibleDaoList.map((dao: any) => (
             <div
-              style={{ marginTop: '32px' }}
+              style={{ marginTop: '32px', width: '328px' }}
               onClick={() => updateSelectedDao(dao)}
               key={dao.name}
             >
@@ -104,6 +129,7 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
         }}
       >
         {totalDaoCount !== visibleDaoList.length ||
+        !isShowingFilteredResults ||
         !(isLoadingRegistryData || isLoadingDaoList) ? (
           <ANButton
             label="Load More DAOs"
@@ -111,13 +137,7 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
             height="46px"
             width="163px"
             color="#00C2FF"
-            onClick={() => {
-              fetchMoreDaos({
-                variables: {
-                  offset: visibleDaoList.length,
-                },
-              });
-            }}
+            onClick={fetchMoreData}
           ></ANButton>
         ) : null}
       </div>
