@@ -188,7 +188,6 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
 
   const submitter: string = account;
   const executor = daoDetails.executor.id;
-  const nonce: number = daoDetails.queue.nonce;
 
   const handleInputModalOpen = () => {
     setInputModalOpen(true);

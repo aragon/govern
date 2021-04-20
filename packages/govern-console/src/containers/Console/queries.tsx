@@ -9,7 +9,20 @@ export const GET_DAO_LIST = gql`
         id
         address
         nonce
-        config
+        config {
+          executionDelay
+          scheduleDeposit {
+            token
+            amount
+          }
+          challengeDeposit {
+            token
+            amount
+          }
+          resolver
+          rules
+          maxCalldataSize
+        }
       }
       executor {
         id
@@ -31,7 +44,20 @@ export const GET_DAO_BY_NAME = gql`
         id
         address
         nonce
-        config
+        config {
+          executionDelay
+          scheduleDeposit {
+            token
+            amount
+          }
+          challengeDeposit {
+            token
+            amount
+          }
+          resolver
+          rules
+          maxCalldataSize
+        }
       }
       executor {
         id

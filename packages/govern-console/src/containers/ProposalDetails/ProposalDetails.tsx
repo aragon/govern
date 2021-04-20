@@ -361,6 +361,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       proposalParams,
       challengeReason.current,
     );
+    console.log(challengeTransaction);
   };
 
   // const getParsedDataFromBytes = (data) => {
