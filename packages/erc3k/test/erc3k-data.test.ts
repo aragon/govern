@@ -2,51 +2,42 @@ import { ethers } from 'hardhat'
 import { expect } from 'chai'
 import { keccak256, defaultAbiCoder, solidityPack } from 'ethers/lib/utils'
 import { ERC3000DataLibTest, ERC3000DataLibTest__factory } from '../typechain'
+import { ERC3000DefaultConfig } from 'erc3k/utils/ERC3000'
 
-let deposit = {
-    token: '0xb794f5ea0ba39494ce839613fffba74279579268',
-    amount: 1000,
+
+let container = {
+  config: ERC3000DefaultConfig,
+  payload: {
+    nonce: 1,
+    executionTime: 1000,
+    submitter: '0xb794f5ea0ba39494ce839613fffba74279579268',
+    executor: '0xb794f5ea0ba39494ce839613fffba74279579268',
+    actions: [
+      {
+        to: '0xb794f5ea0ba39494ce839613fffba74279579268',
+        value: 1000,
+        data: '0x00',
+      },
+    ],
+    allowFailuresMap:
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+    proof: '0x00',
   },
-  container = {
-    config: {
-      executionDelay: 1000,
-      scheduleDeposit: deposit,
-      challengeDeposit: deposit,
-      resolver: '0xb794f5ea0ba39494ce839613fffba74279579268',
-      rules: '0x00',
-      maxCalldataSize: 100000 // initial maxCalldatasize
-    },
-    payload: {
-      nonce: 1,
-      executionTime: 1000,
-      submitter: '0xb794f5ea0ba39494ce839613fffba74279579268',
-      executor: '0xb794f5ea0ba39494ce839613fffba74279579268',
-      actions: [
-        {
-          to: '0xb794f5ea0ba39494ce839613fffba74279579268',
-          value: 1000,
-          data: '0x00',
-        },
-      ],
-      allowFailuresMap:
-        '0x0000000000000000000000000000000000000000000000000000000000000000',
-      proof: '0x00',
-    },
-  }
+}
 
 function getPayloadHash(): string {
   return keccak256(
     defaultAbiCoder.encode(
       [
         'tuple(' +
-          'uint256 nonce, ' +
-          'uint256 executionTime, ' +
-          'address submitter, ' +
-          'address executor, ' +
-          'bytes32 actionHash, ' +
-          'bytes32 allowFailuresMap, ' +
-          'bytes32 proofBytes' +
-          ')',
+        'uint256 nonce, ' +
+        'uint256 executionTime, ' +
+        'address submitter, ' +
+        'address executor, ' +
+        'bytes32 actionHash, ' +
+        'bytes32 allowFailuresMap, ' +
+        'bytes32 proofBytes' +
+        ')',
       ],
       [
         {
@@ -58,10 +49,10 @@ function getPayloadHash(): string {
             defaultAbiCoder.encode(
               [
                 'tuple(' +
-                  'address to, ' +
-                  'uint256 value, ' +
-                  'bytes data' +
-                  ')[]',
+                'address to, ' +
+                'uint256 value, ' +
+                'bytes data' +
+                ')[]',
               ],
               [container.payload.actions]
             )
@@ -79,13 +70,13 @@ function getConfigHash(): string {
     defaultAbiCoder.encode(
       [
         'tuple(' +
-          'uint256 executionDelay, ' +
-          'tuple(address token, uint256 amount) scheduleDeposit, ' +
-          'tuple(address token, uint256 amount) challengeDeposit, ' +
-          'address resolver, ' +
-          'bytes rules,' +
-          'uint256 maxCalldataSize' +
-          ')',
+        'uint256 executionDelay, ' +
+        'tuple(address token, uint256 amount) scheduleDeposit, ' +
+        'tuple(address token, uint256 amount) challengeDeposit, ' +
+        'address resolver, ' +
+        'bytes rules,' +
+        'uint256 maxCalldataSize' +
+        ')',
       ],
       [container.config]
     )

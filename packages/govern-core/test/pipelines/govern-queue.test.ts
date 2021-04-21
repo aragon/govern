@@ -114,9 +114,18 @@ describe('Govern Queue', function() {
     testToken = (await TestToken.deploy(ownerAddr)) as TestToken
     await testToken.mint(ownerAddr, 1000000)
 
-    container.config.scheduleDeposit.token = testToken.address
-    container.config.challengeDeposit.token = testToken.address
-
+    container.config = {
+      ...container.config,
+      scheduleDeposit: {
+        token: testToken.address,
+        amount: 100
+      },
+      challengeDeposit: {
+        token: testToken.address,
+        amount: 100
+      }
+    }
+    
     // add ERC3000 executor
     const ERC3000ExecutorMock = (await ethers.getContractFactory('ERC3000ExecutorMock')) as ERC3000ExecutorMock__factory
     executor = await ERC3000ExecutorMock.deploy()
@@ -431,7 +440,7 @@ describe('Govern Queue', function() {
       const eventContract = new Contract(gq.address, unlockedEventAbi, gq.provider);
 
       await expect(gq.resolve(container, disputeId))
-            .to.emit(eventContract, 'Unlocked')
+            .to.emit(eventContract, EVENTS.UNLOCK)
             .withArgs(container.config.scheduleDeposit.token, ownerAddr, container.config.scheduleDeposit.amount)
             .to.emit(gq, EVENTS.RESOLVED)
             .withArgs(containerHash, ownerAddr, true)
