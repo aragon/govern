@@ -22,7 +22,6 @@ import {
 
 // import { InputField } from 'component/InputField/InputField';
 interface ProposalDetailsProps {
-  selectedProposal: any;
   onClickBack?: any;
 }
 
