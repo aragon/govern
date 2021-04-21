@@ -3,9 +3,10 @@ import { styled, useTheme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import governIcon from 'images/aragon-icon.svg';
 import Wallet from 'components/Wallet/Wallet';
-// import
+import { useHistory } from 'react-router-dom';
 
 const Header = ({}) => {
+  const history = useHistory();
   const HeaderWrapperDiv = styled('div')({
     height: '106px',
     width: '100%',
@@ -43,10 +44,15 @@ const Header = ({}) => {
     justifyContent: 'flex-end',
     alignItems: 'center',
   });
+
+  const redirectToHomePage = () => {
+    history.push('/');
+  };
+
   return (
     <HeaderWrapperDiv id="header">
       <Navbar id="navbar">
-        <Title id="navbar_title">
+        <Title id="navbar_title" onClick={redirectToHomePage}>
           <img src={governIcon} />
           <TitleText>Govern Console</TitleText>
         </Title>

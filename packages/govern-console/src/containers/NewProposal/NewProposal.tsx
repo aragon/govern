@@ -31,6 +31,11 @@ export interface NewProposalProps {
    * callback for click on schedule
    */
   onSchedule?: any;
+
+  /**
+   * onClickBackButton callback
+   */
+  onClickBack: any;
 }
 
 export interface AddedActionsProps {
@@ -38,6 +43,7 @@ export interface AddedActionsProps {
    * Added actions
    */
   selectedActions?: any;
+  onAddInputToAction: any;
 }
 
 const SubTitle = styled(Typography)({
@@ -69,6 +75,7 @@ const ContractAddressText = styled(Typography)({
 
 const AddedActions: React.FC<AddedActionsProps> = ({
   selectedActions,
+  onAddInputToAction,
   ...props
 }) => {
   const actionDivStyle = {
@@ -87,40 +94,60 @@ const AddedActions: React.FC<AddedActionsProps> = ({
     borderBottom: '2px solid #E2ECF5',
   };
 
-  return selectedActions.map((action: any) => (
-    <div style={{ marginTop: '24px' }} key={action.name}>
-      <div>
-        <SubTitle>Contract Address</SubTitle>
-        <ContractAddressText>{action.contractAddress}</ContractAddressText>
-      </div>
-      <div style={actionDivStyle}>
-        <div style={actionNameDivStyle}>
-          <TextBlack>{action.name}</TextBlack>
+  return selectedActions.map((action: any, index: number) => {
+    return (
+      <div style={{ marginTop: '24px' }} key={action.name}>
+        <div>
+          <SubTitle>Contract Address</SubTitle>
+          <ContractAddressText>{action.contractAddress}</ContractAddressText>
         </div>
-        {action.item.inputs.map((input: any) => (
-          <div key={input.name}>
-            <div style={{ marginTop: '20px' }}>
-              <SubTitle>{input.name}</SubTitle>
-            </div>
-            <div style={{ marginTop: '20px' }}>
-              <InputField
-                label=""
-                onInputChange={() => {
-                  console.log('click');
-                }}
-                height="46px"
-                width="814px"
-                placeholder={input.name}
-              ></InputField>
-            </div>
+        <div style={actionDivStyle}>
+          <div style={actionNameDivStyle}>
+            <TextBlack>{action.name}</TextBlack>
           </div>
-        ))}
+          {action.item.inputs.map((input: any, num: number) => {
+            const element = (
+              <div key={input.name}>
+                <div style={{ marginTop: '20px' }}>
+                  <SubTitle>{input.name}</SubTitle>
+                </div>
+                <div style={{ marginTop: '20px' }}>
+                  <InputField
+                    label=""
+                    onInputChange={(val) => {
+                      // console.log(
+                      //   val,
+                      //   action.contractAddress,
+                      //   action.abi,
+                      //   index,
+                      //   num,
+                      //   action.name,
+                      // );
+                      onAddInputToAction(
+                        val,
+                        action.contractAddress,
+                        action.abi,
+                        index,
+                        num,
+                        action.name,
+                      );
+                    }}
+                    height="46px"
+                    width="814px"
+                    placeholder={input.name}
+                  ></InputField>
+                </div>
+              </div>
+            );
+            return element;
+          })}
+        </div>
       </div>
-    </div>
-  ));
+    );
+  });
 };
 
-const NewProposal: React.FC<NewProposalProps> = ({ ...props }) => {
+const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const theme = useTheme();
   const history = useHistory();
   let daoDetails: any = null;
@@ -131,7 +158,6 @@ const NewProposal: React.FC<NewProposalProps> = ({ ...props }) => {
   if (!daoDetails) {
     history.push('/');
   }
-  debugger;
   const classes = useStyles();
   const justification: { current: string } = useRef('');
   // const [isAddingActions, updateIsAddingActions] = useState(false);
@@ -140,6 +166,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ ...props }) => {
   const [isInputModalOpen, setInputModalOpen] = useState(false);
   const [isActionModalOpen, setActionModalOpen] = useState(false);
   const abiFunctions = useRef([]);
+  const actionsToSchedule = useRef([]);
 
   const context: any = useWallet();
   const {
@@ -158,9 +185,9 @@ const NewProposal: React.FC<NewProposalProps> = ({ ...props }) => {
     type,
     ethersProvider,
   } = context;
+
   const submitter: string = account;
   const executor = daoDetails.executor.id;
-  const nonce: number = daoDetails.queue.nonce;
 
   const handleInputModalOpen = () => {
     setInputModalOpen(true);
@@ -178,9 +205,67 @@ const NewProposal: React.FC<NewProposalProps> = ({ ...props }) => {
     setActionModalOpen(false);
   };
 
+  interface abiItem {
+    inputs: [];
+    name: string;
+    type: string;
+    stateMutability: string;
+  }
+
+  interface actionType {
+    item: abiItem;
+    name: string;
+    contractAddress: string;
+    abi: any[];
+    type: string;
+  }
   const onAddNewAction = (action: any) => {
     const newActions = [...selectedActions, action] as any;
     updateSelectedOptions(newActions);
+    const initialActions: ActionToSchedule[] = newActions.map(
+      (actionItem: actionType) => {
+        const { contractAddress, name, item, abi } = actionItem;
+        const { inputs } = item;
+        const numberOfInputs = inputs.length;
+        const params = {};
+        const data = {
+          contractAddress,
+          name,
+          params,
+          abi,
+          numberOfInputs,
+        };
+        return data as ActionToSchedule;
+      },
+    );
+    actionsToSchedule.current = initialActions as [];
+  };
+
+  interface ActionToSchedule {
+    contractAddress: string;
+    name: string;
+    params: [];
+    abi: [];
+    numberOfInputs: number;
+  }
+
+  const onAddInputToAction = (
+    value: string,
+    contractAddress: string,
+    abi: any[],
+    functionIndex: number,
+    inputIndex: number,
+    functionName: string,
+  ) => {
+    const actions: any[] = actionsToSchedule.current;
+    const { params } = actions[functionIndex];
+    params[inputIndex] = value;
+    delete actions[functionIndex].params;
+    actions[functionIndex] = {
+      params,
+      ...actions[functionIndex],
+    };
+    actionsToSchedule.current = actions as [];
   };
   // const onScheduleProposal = () => {};
 
@@ -253,11 +338,10 @@ const NewProposal: React.FC<NewProposalProps> = ({ ...props }) => {
 
   const onGenerateActionsFromAbi = async (
     contractAddress: string,
-    abi: any,
+    abi: any[],
   ) => {
-    console.log(contractAddress, abi);
     const functions = [] as any;
-    await abi.forEach((item: any) => {
+    await abi.forEach((item: abiItem) => {
       const { name, type, stateMutability } = item;
       if (
         type === 'function' &&
@@ -265,6 +349,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ ...props }) => {
         stateMutability !== 'pure'
       ) {
         const data = {
+          abi,
           name,
           type,
           item,
@@ -275,7 +360,6 @@ const NewProposal: React.FC<NewProposalProps> = ({ ...props }) => {
     });
 
     abiFunctions.current = functions;
-    console.log(abiFunctions);
     handleInputModalClose();
     handleActionModalOpen();
   };
@@ -321,13 +405,37 @@ const NewProposal: React.FC<NewProposalProps> = ({ ...props }) => {
     rules: '0x',
     maxCalldataSize: 100000, // initial maxCalldatasize
   };
-  const scheduleProposal = async () => {
-    const payload = buildPayload({ submitter, executor });
-    debugger;
+  const onChangeJustification = (val: string) => {
+    justification.current = val;
+  };
+  const onSchedule = () => {
+    const actions: any[] = actionsToSchedule.current.map((item: any) => {
+      const { abi, contractAddress, name, params, numberOfInputs } = item;
+      const abiInterface = new ethers.utils.Interface(abi);
+      const functionParameters = [];
+      for (const key in params) {
+        functionParameters.push(params[key]);
+      }
+      console.log('functionParams', functionParameters);
+      const calldata = abiInterface.encodeFunctionData(
+        name,
+        functionParameters,
+      );
+      const data = {
+        to: contractAddress,
+        value: '0x',
+        data: calldata,
+      };
+      return data;
+    });
+    scheduleProposal(actions);
+  };
+  const scheduleProposal = async (actions: any[]) => {
+    const payload = buildPayload({ submitter, executor, actions });
+    console.log('payload', payload);
     const config = daoDetails.config;
     const proposalOptions: ProposalOptions = {};
     const proposal = new Proposal(daoDetails.queue.address, proposalOptions);
-    debugger;
     const scheduleResult = await proposal.schedule({
       payload,
       config: goodConfig,
@@ -355,7 +463,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ ...props }) => {
   return (
     <>
       <WrapperDiv>
-        <BackButton>
+        <BackButton onClick={onClickBack}>
           <img src={backButtonIcon} />
         </BackButton>
         <Title>New Proposal</Title>
@@ -371,20 +479,23 @@ const NewProposal: React.FC<NewProposalProps> = ({ ...props }) => {
           </div>
           <div style={{ marginLeft: '10px' }}>{<HelpButton helpText="" />}</div>
         </div>
-        <JustificationTextArea
+        <InputField
           // ref={}
-          value={justification.current}
-          onChange={useCallback((event) => {
-            justification.current = event.target.value;
-          }, [])}
+          onInputChange={onChangeJustification}
           placeholder={'Enter Justification '}
-        ></JustificationTextArea>
+          label=""
+          height={'108px'}
+          width={'700px'}
+        ></InputField>
         <Title>Actions</Title>
         {selectedActions.length === 0 ? (
           <SubTitle>No actions defined Yet</SubTitle>
         ) : (
           <div>
-            <AddedActions selectedActions={selectedActions} />
+            <AddedActions
+              selectedActions={selectedActions}
+              onAddInputToAction={onAddInputToAction}
+            />
           </div>
         )}
         <br />
@@ -406,7 +517,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ ...props }) => {
           // color="#00C2FF"
           style={{ marginTop: 16 }}
           // disabled={!isProposalValid()}
-          onClick={() => scheduleProposal()}
+          onClick={() => onSchedule()}
         />
         <NewActionModal
           onCloseModal={handleInputModalClose}
