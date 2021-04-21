@@ -7,10 +7,26 @@ export const GET_DAO_LIST = gql`
       name
       queue {
         id
+        address
         nonce
+        config {
+          executionDelay
+          scheduleDeposit {
+            token
+            amount
+          }
+          challengeDeposit {
+            token
+            amount
+          }
+          resolver
+          rules
+          maxCalldataSize
+        }
       }
       executor {
         id
+        address
         balance
       }
       token
@@ -18,6 +34,42 @@ export const GET_DAO_LIST = gql`
     }
   }
 `;
+
+export const GET_DAO_BY_NAME = gql`
+  query DAO($name: string) {
+    dao(name: $name) {
+      id
+      name
+      queue {
+        id
+        address
+        nonce
+        config {
+          executionDelay
+          scheduleDeposit {
+            token
+            amount
+          }
+          challengeDeposit {
+            token
+            amount
+          }
+          resolver
+          rules
+          maxCalldataSize
+        }
+      }
+      executor {
+        id
+        address
+        balance
+      }
+      token
+      registrant
+    }
+  }
+`;
+
 export const GET_GOVERN_REGISTRY_DATA = gql`
   {
     governRegistries(limit: 1) {

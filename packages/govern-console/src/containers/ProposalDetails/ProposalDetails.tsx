@@ -4,19 +4,62 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import backButtonIcon from 'images/back-btn.svg';
 import { Label } from 'components/Labels/Label';
+import { InputField } from 'components/InputFields/InputField';
 import { useHistory } from 'react-router-dom';
-import { GET_PROPOSAL_LIST_QUERY } from './queries';
+import { GET_PROPOSAL_DETAILS_QUERY } from './queries';
 import { useQuery } from '@apollo/client';
 import { useEffect } from 'react';
+import { ANButton } from 'components/Button/ANButton';
+import { useWallet } from '../../EthersWallet';
 
+import {
+  Proposal,
+  ProposalOptions,
+  ProposalParams,
+  PayloadType,
+  DaoConfig,
+} from '@aragon/govern';
+
+// import { InputField } from 'component/InputField/InputField';
 interface ProposalDetailsProps {
   onClickBack?: any;
 }
 
 const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
-  const history: any = useHistory();
+  let selectedProposal: any = {};
+  const history = useHistory();
+  const selectedProposalString = sessionStorage.getItem('selectedProposal');
+  if (selectedProposalString) {
+    selectedProposal = JSON.parse(selectedProposalString);
+  } else {
+    history.push('/');
+  }
+  let daoDetails: any = null;
+  const daoDetailsString = sessionStorage.getItem('selectedDao');
+  if (daoDetailsString) {
+    daoDetails = JSON.parse(daoDetailsString);
+  }
+  if (!daoDetails) {
+    history.push('/');
+  }
   const theme = useTheme();
-  const proposal = history.location.state.proposalDetails;
+  const context: any = useWallet();
+  const {
+    connector,
+    account,
+    balance,
+    chainId,
+    connect,
+    connectors,
+    ethereum,
+    error,
+    getBlockNumber,
+    networkName,
+    reset,
+    status,
+    type,
+    ethersProvider,
+  } = context;
 
   //* styled Components
 
@@ -32,6 +75,9 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     cursor: 'pointer',
     position: 'relative',
     marginBottom: '36px',
+    '& img': {
+      cursor: 'pointer',
+    },
   });
   const ProposalStatus = styled('div')({
     height: '20px',
@@ -60,9 +106,9 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     boxSizing: 'border-box',
   });
   const getLabelColor = () => {
-    if (proposal.state === 'Scheduled') return 'yellow';
-    if (proposal.state === 'Executed') return 'green';
-    if (proposal.state === 'Challenged') return 'red';
+    if (selectedProposal.state === 'Scheduled') return 'yellow';
+    if (selectedProposal.state === 'Executed') return 'green';
+    if (selectedProposal.state === 'Challenged') return 'red';
   };
   const DetailsWrapper = styled('div')({
     display: 'flex',
@@ -152,6 +198,9 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     '& :last-child': {
       marginBottom: '0 !important',
     },
+    '& .full-width': {
+      width: '100% !important',
+    },
   });
   const ActionsWrapper = styled('div')({
     display: 'flex',
@@ -166,26 +215,26 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     },
   });
 
-  const ActionDiv = styled(({ isExpanded: boolean }) => (
-    <div className={isExpanded ? 'is-expanded' : ''} />
-  ))({
+  const ActionDiv = styled('div')({
     background: '#FFFFFF',
+    transition: 'all 1s ease-out',
     border: '2px solid #F5F7FF',
     boxSizing: 'border-box',
     boxShadow: '0px 8px 7px rgba(116, 131, 178, 0.2)',
     borderRadius: '12px',
-    height: '66px',
     width: '100%',
     overflow: 'hidden',
     cursor: 'pointer',
-    '& div': {
-      marginTop: 0,
+    '& > div': {
       minHeight: '62px !important',
       verticalAlign: 'middle',
       lineHeight: '62px',
     },
-    '& .is-expanded': {
-      height: '200px',
+    '& div': {
+      marginTop: 0,
+    },
+    '& .full-width': {
+      width: '100%',
     },
   });
 
@@ -206,28 +255,78 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     paddingRight: '38px',
     boxSizing: 'border-box',
     margin: 0,
+    '& #value-div': {
+      height: '27px',
+      lineHeight: '27px',
+      minHeight: '27px !important',
+    },
+    '& #data-div': {
+      lineHeight: '25px',
+      minHeight: '27px !important',
+      // fontSize: '18px',
+      height: 'fit-content',
+    },
+    '& #data-div-block': {
+      // overflowWrap: 'normal',
+      overflowWrap: 'break-word',
+    },
   });
+
+  const Widget = styled('div')({
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    width: '100%',
+    minHeight: '118px',
+    boxSizing: 'border-box',
+    background: '#FFFFFF',
+    border: '2px solid #ECF1F7',
+    boxShadow: '0px 6px 6px rgba(180, 193, 228, 0.35)',
+    borderRadius: '8px',
+    marginBottom: '23px',
+    padding: '36px 27px',
+    '& div': {
+      display: 'block',
+      margin: 'auto',
+      width: '100%',
+      boxSizing: 'border-box',
+      marginBottom: '9px',
+    },
+    '& button': {
+      marginTop: '5px',
+    },
+  });
+
   //* End of styled Components
 
   const [proposalInfo, updateProposalInfo] = React.useState<any>(null);
   const [isExpanded, updateIsExpanded] = React.useState<any>({});
+  const challengeReason = React.useRef('');
+  const vetoReason = React.useRef('');
+
+  type ProposalType = {
+    state: string;
+    config: DaoConfig;
+    payload: PayloadType;
+    id: string;
+  };
 
   const {
     data: proposalDetailsData,
     loading: isLoadingProposalDetails,
     error: errorFetchingProposalDetails,
-  } = useQuery(GET_PROPOSAL_LIST_QUERY, {
+  } = useQuery(GET_PROPOSAL_DETAILS_QUERY, {
     variables: {
-      id: proposal.id,
+      id: selectedProposal.id,
     },
   });
 
   useEffect(() => {
-    debugger;
     if (proposalDetailsData) {
       updateProposalInfo(proposalDetailsData.container);
     }
   }, [proposalDetailsData]);
+
   const toggleDiv = (index: number) => {
     const cloneObject = { ...isExpanded };
     if (cloneObject[index]) {
@@ -236,6 +335,47 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       cloneObject[index] = true;
     }
     updateIsExpanded(cloneObject);
+  };
+
+  const proposalInstance = React.useMemo(() => {
+    const proposalOptions: ProposalOptions = {
+      // provider: ethersProvider,
+    };
+    const proposal = new Proposal(daoDetails.queue.address, proposalOptions);
+    return proposal;
+  }, [daoDetails]);
+
+  // const approveCollateralIfNeeded = () => {};
+  const getProposalParams = () => {
+    const payload = { ...proposalInfo.payload };
+    const config = { ...proposalInfo.config };
+    config.executionDelay = parseInt(config.executionDelay);
+    payload.executor = payload.executor.address;
+    const params: ProposalParams = {
+      payload,
+      config,
+    };
+    return params;
+  };
+
+  const challengeProposal = async () => {
+    const proposalParams = getProposalParams();
+    console.log(proposalParams);
+    // approveCollateralIfNeeded();
+    const challengeTransaction = await proposalInstance.challenge(
+      proposalParams,
+      challengeReason.current,
+    );
+    console.log(challengeTransaction);
+  };
+
+  const executeProposal = async () => {
+    const proposalParams = getProposalParams();
+    console.log(proposalParams);
+    console.log(proposalParams);
+    // approveCollateralIfNeeded();
+    const challengeTransaction = await proposalInstance.execute(proposalParams);
+    console.log(challengeTransaction);
   };
 
   // const getParsedDataFromBytes = (data) => {
@@ -249,16 +389,16 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
         <>
           {proposalInfo ? (
             <StyledPaper elevation={0}>
-              <BackButton>
+              <BackButton onClick={onClickBack}>
                 <img src={backButtonIcon} />
               </BackButton>
               <ProposalStatus>
                 <Label
                   labelColor={getLabelColor()}
-                  labelText={proposal.state}
+                  labelText={selectedProposal.state}
                 />
               </ProposalStatus>
-              <ProposalId>{proposal.id}</ProposalId>
+              <ProposalId>{selectedProposal.id}</ProposalId>
               <DateDisplay>3/29/2021</DateDisplay>
               <DetailsWrapper>
                 <ProposalDetailsWrapper id="proposal_wrapper">
@@ -356,13 +496,16 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                           return (
                             <ActionDiv
                               key={index}
-                              isexpanded={
-                                isExpanded[index] ? isExpanded[index] : false
-                              }
                               onClick={() => toggleDiv(index)}
+                              id={'action' + index}
+                              style={{
+                                height: isExpanded[index]
+                                  ? 'fit-content !important'
+                                  : '66px',
+                              }}
                             >
                               <CollapsedDiv id="collapsed-div">
-                                <InfoWrapper>
+                                <InfoWrapper id="to-div">
                                   <InfoKeyDiv>to</InfoKeyDiv>
                                   <InfoValueDivInline>
                                     <a>{action.to}</a>
@@ -371,16 +514,19 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                                 {/* <Carat /> */}
                               </CollapsedDiv>
                               <ExpandedDiv id="expanded-div">
-                                <InfoWrapper>
+                                <InfoWrapper id="value-div">
                                   <InfoKeyDiv>value</InfoKeyDiv>
                                   <InfoValueDivInline>
                                     <a>{action.value}</a>
                                   </InfoValueDivInline>
                                 </InfoWrapper>
-                                <InfoWrapper>
+                                <InfoWrapper id="data-div">
                                   <InfoKeyDiv>data</InfoKeyDiv>
-                                  <InfoValueDivBlock>
-                                    <a>{action.data}</a>
+                                  <InfoValueDivBlock
+                                    className="full-width"
+                                    id="data-div-block"
+                                  >
+                                    {action.data}
                                   </InfoValueDivBlock>
                                 </InfoWrapper>
                               </ExpandedDiv>
@@ -391,7 +537,78 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                     </ActionsWrapper>
                   </InfoWrapper>
                 </ProposalDetailsWrapper>
-                <WidgetWrapper id="widget_wrapper"></WidgetWrapper>
+                <WidgetWrapper id="widget_wrapper">
+                  <Widget>
+                    <div
+                      style={{
+                        fontFamily: 'Manrope',
+                        fontStyle: 'normal',
+                        fontWeight: 'normal',
+                        fontSize: '18px',
+                        color: '#7483B3',
+                      }}
+                    >
+                      Challenge Reason
+                    </div>
+                    <InputField
+                      onInputChange={(value) => {
+                        challengeReason.current = value;
+                      }}
+                      label={''}
+                      placeholder={''}
+                      height={'46px'}
+                      width={'372px'}
+                      // value={challengeReason.current}
+                    />
+                    <ANButton
+                      label="Challenge"
+                      height="45px"
+                      width="372px"
+                      style={{ margin: 'auto' }}
+                      onClick={() => challengeProposal()}
+                    />
+                  </Widget>
+                  <Widget>
+                    <div
+                      style={{
+                        fontFamily: 'Manrope',
+                        fontStyle: 'normal',
+                        fontWeight: 'normal',
+                        fontSize: '18px',
+                        color: '#7483B3',
+                      }}
+                    >
+                      Veto Reason
+                    </div>
+                    <div>{/* <ANInput /> */}</div>
+                    <InputField
+                      onInputChange={(value) => {
+                        vetoReason.current = value;
+                      }}
+                      label={''}
+                      placeholder={''}
+                      height={'46px'}
+                      width={'372px'}
+                      // value={vetoReason.current}
+                    />
+                    <ANButton
+                      label="Execute"
+                      height="45px"
+                      width="372px"
+                      style={{ margin: 'auto' }}
+                      //  onClick={}
+                    />
+                  </Widget>
+                  <Widget>
+                    <ANButton
+                      label="Execute"
+                      height="45px"
+                      width="372px"
+                      style={{ margin: 'auto' }}
+                      onClick={executeProposal}
+                    />
+                  </Widget>
+                </WidgetWrapper>
               </DetailsWrapper>
             </StyledPaper>
           ) : null}

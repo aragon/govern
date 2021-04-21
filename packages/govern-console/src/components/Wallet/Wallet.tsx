@@ -5,10 +5,11 @@ import Card from '@material-ui/core/Card';
 import { useWallet } from 'use-wallet';
 import connectedUserIcon from 'images/connected-user-icon.svg';
 import Typography from '@material-ui/core/Typography';
+import { providers as EthersProviders } from 'ethers';
+import { useEffect } from 'react';
 
 const Wallet = ({}) => {
-  const context = useWallet();
-  const [activatingConnector, setActivatingConnector] = React.useState<any>();
+  const context: any = useWallet();
   const {
     connector,
     account,
@@ -23,6 +24,7 @@ const Wallet = ({}) => {
     reset,
     status,
     type,
+    ethersProvider,
   } = context;
 
   const onWalletConnectionError = (error: Error) => {
@@ -83,7 +85,6 @@ const Wallet = ({}) => {
       account.substring(account.length - 5, account.length - 1)
     );
   };
-  debugger;
   return (
     <WalletWrapper>
       {status !== 'connected' ? (

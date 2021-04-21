@@ -4,11 +4,13 @@ import { useHistory } from 'react-router-dom';
 import { styled } from '@material-ui/core/styles';
 
 import Header from 'components/Header/Header';
+import Footer from 'components/Footer/Footer';
 // import NavigationBar from '../../components/Navigation';
-import { ConsoleMainPage } from 'containers/Console/ConsoleMainPage';
-import { DaoMainPage } from 'containers/DAO/DaoMainPage';
+import ConsoleMainPage from 'containers/Console/ConsoleMainPage';
+import DaoMainPage from 'containers/DAO/DaoMainPage';
 import ProposalDetails from 'containers/ProposalDetails/ProposalDetails';
 import NewProposal from 'containers/NewProposal/NewProposal';
+import NewDaoContainer from 'containers/CreateDAO/CreateDAO';
 
 const HomePage = ({ ...props }) => {
   const AppWrapper = styled('div')({
@@ -16,27 +18,36 @@ const HomePage = ({ ...props }) => {
     margin: 'auto',
   });
   const history = useHistory();
-  debugger;
-  const [selectedDao, updateSelectedDao] = React.useState({});
+  const [selectedDao, updateSelectedDao] = React.useState<any>({});
+  const [selectedProposal, updateSelectedProposal] = React.useState<any>({});
+
   const updateSelectedDaoAndPushToHistory = React.useCallback(
     (daoDetails: any) => {
-      history.push(`daos/${daoDetails.name}`, {
-        daoDetails,
-      });
+      updateSelectedDao(daoDetails);
+      sessionStorage.setItem('selectedDao', JSON.stringify(daoDetails));
+      history.push(`/daos/${daoDetails.name}`);
     },
     [history],
   );
   const onClickProposalCard = React.useCallback(
     (proposalDetails: any) => {
-      history.push(`/proposals/${proposalDetails.id}`, {
-        proposalDetails,
-      });
+      history.push(`/proposals/${proposalDetails.id}`);
+      sessionStorage.setItem(
+        'selectedProposal',
+        JSON.stringify(proposalDetails),
+      );
+      updateSelectedProposal(proposalDetails);
     },
     [history],
   );
+  const onClickNewProposal = React.useCallback(() => {
+    history.push(`/${selectedDao.name}/new-proposal`);
+  }, [history, selectedDao]);
+
   const onClickBackFromProposalPage = () => {
     history.goBack();
   };
+
   return (
     <AppWrapper>
       <Header />
@@ -49,13 +60,19 @@ const HomePage = ({ ...props }) => {
             />
           </Route>
           <Route exact path="/daos/:daoName">
-            <DaoMainPage onClickProposalCard={onClickProposalCard} />
+            <DaoMainPage
+              onClickProposalCard={onClickProposalCard}
+              onClickNewProposal={onClickNewProposal}
+            />
           </Route>
           <Route exact path="/proposals/:id">
-            <ProposalDetails onClickBack={onClickBackFromProposalPage} />
+            <ProposalDetails onClickBack={() => history.goBack()} />
           </Route>
-          <Route exact path="/new-proposal">
-            <NewProposal />
+          <Route exact path="/:daoName/new-proposal">
+            <NewProposal onClickBack={() => history.goBack()} />
+          </Route>
+          <Route exact path="/create-dao">
+            <NewDaoContainer />
           </Route>
           {/* <Route path="/about">
         <About />
@@ -66,6 +83,7 @@ const HomePage = ({ ...props }) => {
     */}
         </div>
       </Switch>
+      <Footer />
       {/* <Footer /> */}
     </AppWrapper>
   );

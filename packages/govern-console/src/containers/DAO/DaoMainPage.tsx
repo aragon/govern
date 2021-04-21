@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, memo } from 'react';
 import { styled, useTheme } from '@material-ui/core/styles';
 import { DaoHeader } from '../../components/DaoHeader/DaoHeader';
 import { ProposalCard } from '../../components/ProposalCards/ProposalCard';
@@ -8,19 +8,28 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import { GET_PROPOSAL_LIST } from './queries';
 import { useQuery } from '@apollo/client';
+import { formatEther } from 'ethers/lib/utils';
 import { useHistory } from 'react-router-dom';
 
-export const DaoMainPage: React.FC<{ onClickProposalCard: any }> = ({
-  onClickProposalCard,
-  ...props
-}) => {
+const DaoMainPage: React.FC<{
+  onClickProposalCard: any;
+  onClickNewProposal: any;
+}> = ({ onClickProposalCard, onClickNewProposal, ...props }) => {
+  const history = useHistory();
   const theme = useTheme();
+  let daoDetails;
+  const daoDetailsString = sessionStorage.getItem('selectedDao');
+  if (daoDetailsString) {
+    daoDetails = JSON.parse(daoDetailsString);
+  }
+  if (!daoDetails) {
+    history.push('/');
+  }
+
   const [isProposalPage, setProposalPage] = useState(true);
   const [visibleProposalList, updateVisibleProposalList] = useState<any>([]);
   const [isProfilePage, setProfilePage] = useState(false);
   const searchString = useRef('');
-  const history: any = useHistory();
-  const daoDetails = history.location.state.daoDetails;
 
   // useEffect(() => {
   //   if (isProfile) {
@@ -98,7 +107,7 @@ export const DaoMainPage: React.FC<{ onClickProposalCard: any }> = ({
   return (
     <DaoPageMainDiv>
       <DaoHeader
-        ethBalance={'1'}
+        ethBalance={formatEther(daoDetails.executor.balance)}
         usdBalance={'2222'}
         daoName={daoDetails.name}
       />
@@ -156,6 +165,7 @@ export const DaoMainPage: React.FC<{ onClickProposalCard: any }> = ({
                 type="primary"
                 height="46px"
                 width="142px"
+                onClick={onClickNewProposal}
               ></ANButton>
             </div>
             <div
@@ -163,11 +173,15 @@ export const DaoMainPage: React.FC<{ onClickProposalCard: any }> = ({
                 width: '100%',
                 display: 'grid',
                 gridTemplateColumns: 'auto auto auto',
-                justifyContent: 'space-between',
+                justifyContent: 'left',
+                gridGap: '0px 16px',
               }}
             >
               {visibleProposalList.map((proposal: any) => (
-                <div style={{ marginTop: '16px' }} key={proposal.id}>
+                <div
+                  style={{ marginTop: '16px', width: '427px' }}
+                  key={proposal.id}
+                >
                   <ProposalCard
                     transactionHash={proposal.id}
                     proposalDate={'3/29/2021'}
@@ -187,13 +201,13 @@ export const DaoMainPage: React.FC<{ onClickProposalCard: any }> = ({
                 marginBottom: '32px',
               }}
             >
-              <ANButton
+              {/* <ANButton
                 label="Load More Proposals"
                 type="secondary"
                 height="46px"
                 width="196px"
                 color="#00C2FF"
-              ></ANButton>
+              ></ANButton> */}
             </div>
           </div>
         ) : (
@@ -203,3 +217,4 @@ export const DaoMainPage: React.FC<{ onClickProposalCard: any }> = ({
     </DaoPageMainDiv>
   );
 };
+export default memo(DaoMainPage);

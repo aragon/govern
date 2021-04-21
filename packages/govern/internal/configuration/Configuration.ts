@@ -1,8 +1,10 @@
 import ClientInterface from '../clients/lib/ClientInterface'
 import GraphQLClient from '../clients/graphql/GraphQLClient'
+import { DAO_FACTORY_ADDRESS } from './ConfigDefaults'
 
 export interface ConfigurationObject {
   subgraphURL?: string
+  daoFactoryAddress?: string
 }
 
 let defaultConfig: Configuration
@@ -22,6 +24,7 @@ export default class Configuration {
   private config: {
     subgraphURL: string;
     client: ClientInterface
+    daoFactoryAddress: string
   }
 
   /**
@@ -49,9 +52,14 @@ export default class Configuration {
       throw new Error('Missing Govern subgraph URL!')
     }
 
+    if (!config.daoFactoryAddress) {
+      throw new Error('Missing Dao factory address!')
+    }
+
     this.config = {
       subgraphURL: config.subgraphURL,
-      client: new GraphQLClient(config.subgraphURL)
+      client: new GraphQLClient(config.subgraphURL),
+      daoFactoryAddress: config.daoFactoryAddress
     }
   }
 
@@ -82,6 +90,20 @@ export default class Configuration {
   }
 
   /**
+   * Getter for daoFactoryAddress property
+   *
+   * @var daoFactoryAddress
+   *
+   * @returns {string}
+   *
+   * @public
+   */
+   get daoFactoryAddress(): string {
+    return this.config.daoFactoryAddress
+  }
+
+
+  /**
    * Static setter/factory method of the Configuration class
    *
    * @method set
@@ -99,6 +121,10 @@ export default class Configuration {
 
     if (!config.subgraphURL) {
       config.subgraphURL = subgraphURL
+    }
+
+    if (!config.daoFactoryAddress) {
+      config.daoFactoryAddress = DAO_FACTORY_ADDRESS
     }
 
     defaultConfig = new Configuration(config)
