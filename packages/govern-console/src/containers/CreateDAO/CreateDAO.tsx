@@ -14,6 +14,15 @@ import CrossImage from '../../images/svgs/cross.svg';
 import { BlueSwitch } from '../../components/Switchs/BlueSwitch';
 import { BlueCheckbox } from '../../components/Checkboxs/BlueCheckbox';
 import { BlueProgressBar } from '../../components/ProgressBars/BlueProgressBar';
+import { goodConfig } from '../../utils/goodConfig'
+import { useWallet } from '../../EthersWallet';
+import {
+  createDao,
+  CreateDaoParams,
+  CreateDaoOptions,
+  Token,
+  getToken
+} from '@aragon/govern';
 
 enum CreateDaoStatus {
   PreCreate,
@@ -34,6 +43,19 @@ interface FormProps {
         cancel form and go back
     */
   cancelForm(): void;
+
+  /*
+        submit form values to be transacted on chain
+    */
+  submitCreateDao(
+    isExistingToken: boolean,
+    existingTokenAddress: string,
+    tokenName: string,
+    tokenSymbol: string,
+    isUseProxyChecked: boolean,
+    daoName: string,
+    isUseFreeVotingChecked: boolean
+  ): void;
 }
 
 interface ProgressProps {
@@ -107,7 +129,7 @@ const optionTextStyle = {
   fontSize: 18,
 };
 
-const NewDaoForm: React.FC<FormProps> = ({ submitFormAction, cancelForm }) => {
+const NewDaoForm: React.FC<FormProps> = ({ submitFormAction, cancelForm, submitCreateDao }) => {
   const theme = useTheme();
 
   const WrapperDiv = styled(Paper)({
@@ -166,7 +188,6 @@ const NewDaoForm: React.FC<FormProps> = ({ submitFormAction, cancelForm }) => {
           placeholder={'Please insert your DAO name...'}
           value={daoName.current}
         ></InputField>
-
         <div
           style={{
             display: 'flex',
@@ -403,7 +424,6 @@ const NewDaoCreationResult: React.FC<ResultProps> = ({
     boxSizing: 'border-box',
     boxShadow: 'none',
   });
-
   return (
     <div
       style={{
@@ -465,10 +485,52 @@ const NewDaoContainer: React.FC = () => {
   );
   const [progressPercent, setProgressPercent] = useState<number>(5);
   const history = useHistory();
+  const context: any = useWallet();
 
   const onClickBackFromCreateDaoPage = () => {
     history.goBack();
   };
+
+  const submitCreateDao = async (
+    isExistingToken: boolean,
+    existingTokenAddress: string,
+    tokenName: string,
+    tokenSymbol: string,
+    isUseProxyChecked: boolean,
+    daoName: string,
+    isUseFreeVotingChecked: boolean
+  ) => {
+    let token: Token
+    if (isExistingToken) {
+      try {
+        token = await getToken(existingTokenAddress, context.ethersProvider)
+      } catch (error) {
+        console.log(error)
+        return false
+      }
+    } else {
+      token = {
+        tokenAddress: '',
+        tokenDecimals: 18,
+        tokenName: tokenName,
+        tokenSymbol: tokenSymbol
+      }
+    }
+    const createDaoParams: CreateDaoParams = {
+      name: daoName,
+      token,
+      config: goodConfig,
+      useProxies: isUseProxyChecked,
+      useVocdoni: isUseFreeVotingChecked
+    }
+
+    try {
+      const result: any = await createDao(createDaoParams)
+    } catch (error) {
+      console.log(error)
+      return false
+    }
+  }
 
   // TODO: simulateCreation to be removed later and substituted with "CreateDaoFunction"
   const simulateCreation = async () => {
@@ -490,6 +552,7 @@ const NewDaoContainer: React.FC = () => {
         <NewDaoForm
           submitFormAction={simulateCreation}
           cancelForm={onClickBackFromCreateDaoPage}
+          submitCreateDao={submitCreateDao}
         />
       );
     }
@@ -521,6 +584,7 @@ const NewDaoContainer: React.FC = () => {
         <NewDaoForm
           submitFormAction={simulateCreation}
           cancelForm={onClickBackFromCreateDaoPage}
+          submitCreateDao={submitCreateDao}
         />
       );
     }
