@@ -1,19 +1,8 @@
+import { ERC3000DefaultConfig } from 'erc3k/utils/ERC3000'
+
 export const container: any = {
-  'config': {
-    'executionDelay': 3600, // how many seconds to wait before being able to call `execute`.
-    'scheduleDeposit': {
-      'token': '0x0000000000000000000000000000000000000000',
-      'amount': 100
-    },
-    'challengeDeposit': {
-      'token': '0x0000000000000000000000000000000000000000',
-      'amount': 100
-    },
-    'resolver': '0x0000000000000000000000000000000000000000',
-    'rules': '0x',
-    'maxCalldataSize': 100000 // initial maxCalldatasize
-  },
-  'payload': {
+  config: ERC3000DefaultConfig,
+  payload: {
     'nonce': 1,
     'executionTime': 1000,
     'submitter': '0x0000000000000000000000000000000000000000',

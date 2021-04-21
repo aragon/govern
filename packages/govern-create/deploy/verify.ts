@@ -3,19 +3,9 @@ import { DeployFunction } from 'hardhat-deploy/types'
 import { TASK_ETHERSCAN_VERIFY } from 'hardhat-deploy'
 
 import { verifyContract } from '../utils/etherscan'
+import { ERC3000DefaultConfig } from 'erc3k/utils/ERC3000'
 
-const RESOLVER_ADDRR = `0x${'00'.repeat(20)}` // the address of the resolver where the disputes happen...
 const TWO_ADDRR = `0x${'00'.repeat(19)}02`
-const NO_TOKEN = `0x${'00'.repeat(20)}`
-
-const dummyConfig = {
-  executionDelay: 0, // how many seconds to wait before being able to call `execute`
-  scheduleDeposit: [NO_TOKEN, '0'],
-  challengeDeposit: [NO_TOKEN, '0'],
-  resolver: RESOLVER_ADDRR,
-  rules: '0x',
-  maxCalldataSize: 100000 // initial maxCalldatasize
-}
 
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -54,7 +44,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const queueBase = await queueFactoryContract.base()
 
   await verifyContract(governBase, [TWO_ADDRR])
-  await verifyContract(queueBase, [TWO_ADDRR, dummyConfig])
+  await verifyContract(queueBase, [TWO_ADDRR, ERC3000DefaultConfig])
 }
 export default func
 func.runAtTheEnd = true

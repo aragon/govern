@@ -3,6 +3,8 @@ import { expect } from 'chai'
 import { keccak256, solidityPack } from 'ethers/lib/utils'
 import { BigNumber } from 'ethers'
 
+import { ERC3000DefaultConfig } from 'erc3k/utils/ERC3000'
+
 import { 
   GovernRegistryMock__factory, GovernRegistryMock,
   GovernQueueFactoryMock__factory, GovernQueueFactoryMock,
@@ -13,14 +15,6 @@ import {
 
 const zeroAddress   = "0x0000000000000000000000000000000000000000"
 const customAddress = "0x1111111111111111111111111111111111111111"
-
-// const DUMMY_CONFIG =  [
-//   BigNumber.from(0),
-//   [ zeroAddress, BigNumber.from(0) ],
-//   [ zeroAddress, BigNumber.from(0) ],
-//   "0x0000000000000000000000000000000000000000", 
-//   ""
-// ];
 
 describe('Govern Base Factory with mocked contracts', function () {
 
@@ -76,20 +70,7 @@ describe('Govern Base Factory with mocked contracts', function () {
         tokenSymbol: 'EAG',
         tokenDecimals: 18
       },
-      {
-        executionDelay: 3600, // how many seconds to wait before being able to call `execute`.
-        scheduleDeposit: {
-          token: '0x' + '00'.repeat(20),
-          amount: 0
-        },
-        challengeDeposit: {
-          token: '0x' + '00'.repeat(20),
-          amount: 0
-        },
-        resolver: '0x' + '00'.repeat(20),
-        rules: "0x",
-        maxCalldataSize: 100000 // initial maxCalldatasize
-      },
+      ERC3000DefaultConfig,
       useProxies
     );
 

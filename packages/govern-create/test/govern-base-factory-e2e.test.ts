@@ -2,6 +2,8 @@ import { deployments, ethers, network, waffle } from 'hardhat'
 import { expect } from 'chai'
 import { GovernBaseFactory, GovernRegistry } from '../typechain'
 
+import { ERC3000DefaultConfig } from 'erc3k/utils/ERC3000'
+
 const EVENTS = {
   REGISTERED: 'Registered',
   SET_METADATA: 'SetMetadata',
@@ -37,20 +39,7 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
         tokenSymbol: 'EAG',
         tokenDecimals: 18
       },
-      {
-        executionDelay: 3600, // how many seconds to wait before being able to call `execute`.
-        scheduleDeposit: {
-          token: '0x' + '00'.repeat(20),
-          amount: 0
-        },
-        challengeDeposit: {
-          token: '0x' + '00'.repeat(20),
-          amount: 0
-        },
-        resolver: '0x' + '00'.repeat(20),
-        rules: "0x",
-        maxCalldataSize: 100000 // initial maxCalldatasize
-      },
+      ERC3000DefaultConfig,
       useProxies
     )
 

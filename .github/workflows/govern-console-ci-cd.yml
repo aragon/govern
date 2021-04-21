@@ -15,19 +15,34 @@ jobs:
     runs-on: ubuntu-latest
     container: fleek/create-react-app:node-15
     name: builds and deploys console
+    defaults:
+      run:
+        working-directory: ${{env.working-directory}}
     steps:
       - uses: actions/checkout@v2
+      
+      - name: Install node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build the app
+        run: CI='' yarn build
+          
       - name: activate rinkeby's fleek
         run: mv fleek/console.rinkeby.json .fleek.json
         if: github.ref == 'refs/heads/develop'
-        working-directory: ${{env.working-directory}}
+
       - name: activate mainnet's fleek
         run: mv fleek/console.mainnet.json .fleek.json
         if: github.ref == 'refs/heads/master'
-        working-directory: ${{env.working-directory}}
-      - name: builds and deploys console
+
+      - name: deploy console
         id: deploy
-        uses: fleekhq/action-deploy@v1
+        uses: fleekhq/action-deploy@v0.1.4-beta2
         with:
           apiKey: ${{ secrets.FLEEK_API_KEY }}
           workDir: ${{env.working-directory}}
@@ -37,17 +52,29 @@ jobs:
     container: fleek/create-react-app:node-15
     name: builds and deploys storybook
     if: github.ref == 'refs/heads/develop'
+    defaults:
+      run:
+        working-directory: ${{env.working-directory}}
     steps:
       - uses: actions/checkout@v2
+
+      - name: Install node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build the storybook
+        run: CI='' yarn build-storybook
+         
       - name: activate rinkeby's fleek
         run: mv fleek/storybook.json .fleek.json
-        working-directory: ${{env.working-directory}}
-      - name: builds and deploys storybook
+  
+      - name: deploy storybook
         id: deploy
-        uses: fleekhq/action-deploy@v1
+        uses: fleekhq/action-deploy@v0.1.4-beta2
         with:
           apiKey: ${{ secrets.FLEEK_API_KEY }}
           workDir: ${{env.working-directory}}
-
-  
-
