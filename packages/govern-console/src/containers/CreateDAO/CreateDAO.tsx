@@ -34,28 +34,28 @@ enum CreateDaoStatus {
 const aragonFreeVotingUrl = '#';
 
 interface FormProps {
-  /*
-        change status of DAO creation
-    */
-  submitFormAction(): void;
+
+  // /*
+  //       submit form values to be transacted on chain
+  //   */
+  //   submitFormAction(
+  //     isExistingToken: boolean,
+  //     existingTokenAddress: string,
+  //     tokenName: string,
+  //     tokenSymbol: string,
+  //     isUseProxyChecked: boolean,
+  //     daoName: string,
+  //     isUseFreeVotingChecked: boolean
+  //   ): void;
+  setCreateDaoStatus: (status: CreateDaoStatus) => void
+
+  setProgressPercent: (percent: number) => void
 
   /*
         cancel form and go back
     */
   cancelForm(): void;
 
-  /*
-        submit form values to be transacted on chain
-    */
-  submitCreateDao(
-    isExistingToken: boolean,
-    existingTokenAddress: string,
-    tokenName: string,
-    tokenSymbol: string,
-    isUseProxyChecked: boolean,
-    daoName: string,
-    isUseFreeVotingChecked: boolean
-  ): void;
 }
 
 interface ProgressProps {
@@ -129,8 +129,9 @@ const optionTextStyle = {
   fontSize: 18,
 };
 
-const NewDaoForm: React.FC<FormProps> = ({ submitFormAction, cancelForm, submitCreateDao }) => {
+const NewDaoForm: React.FC<FormProps> = ({ setCreateDaoStatus, setProgressPercent, cancelForm }) => {
   const theme = useTheme();
+  const context: any = useWallet();
 
   const WrapperDiv = styled(Paper)({
     width: 'min-content',
@@ -146,10 +147,10 @@ const NewDaoForm: React.FC<FormProps> = ({ submitFormAction, cancelForm, submitC
   const [isExistingToken, updateIsExistingToken] = useState(false);
   const [isUseProxyChecked, updateIsUseProxyChecked] = useState(true);
   const [isUseFreeVotingChecked, updateIsUseFreeVotingChecked] = useState(true);
-  const daoName = useRef();
-  const tokenName = useRef();
-  const tokenSymbol = useRef();
-  const existingTokenAddress = useRef();
+  const daoName = useRef<string>();
+  const tokenName = useRef<string>();
+  const tokenSymbol = useRef<string>();
+  const existingTokenAddress = useRef<string>();
 
   const onChangeDaoName = (val: any) => {
     daoName.current = val;
@@ -165,6 +166,84 @@ const NewDaoForm: React.FC<FormProps> = ({ submitFormAction, cancelForm, submitC
 
   const onChangeExistingTokenAddress = (val: any) => {
     existingTokenAddress.current = val;
+  };
+
+  const createDaoCall = async (
+    isExistingToken: boolean,
+    existingTokenAddress: string,
+    tokenName: string,
+    tokenSymbol: string,
+    isUseProxyChecked: boolean,
+    daoName: string,
+    isUseFreeVotingChecked: boolean,
+    context: any,
+    setProgressPercent: (percent: number) => void
+  ): Promise<boolean> => {
+    let token: Token
+    if (isExistingToken) {
+      try {
+        token = await getToken(existingTokenAddress, context.ethersProvider)
+      } catch (error) {
+        console.log(error)
+        return false
+      }
+    } else {
+      token = {
+        tokenAddress: '',
+        tokenDecimals: 18,
+        tokenName: tokenName,
+        tokenSymbol: tokenSymbol
+      }
+    }
+    const createDaoParams: CreateDaoParams = {
+      name: daoName,
+      token,
+      config: goodConfig,
+      useProxies: isUseProxyChecked,
+      useVocdoni: isUseFreeVotingChecked
+    }
+  
+    try {
+      setProgressPercent(25)
+      const result: any = await createDao(createDaoParams)
+      setProgressPercent(75)
+      console.log('result', result)
+      await result.wait(1);
+      setProgressPercent(100)
+      return true;
+    } catch (error) {
+      console.log(error)
+      return false
+    }
+  }
+
+  const submitCreateDao = async () => {
+    console.log('submitCreateDao, called')
+    function delay(ms: number) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+    
+    setCreateDaoStatus(CreateDaoStatus.InProgress);
+    const callResult = await createDaoCall(
+      isExistingToken,
+      existingTokenAddress.current ? existingTokenAddress.current.toString() : '',
+      tokenName.current ? tokenName.current.toString() : '',
+      tokenSymbol.current ? tokenSymbol.current.toString() : '',
+      isUseProxyChecked,
+      daoName.current ? daoName.current.toString() : '',
+      isUseFreeVotingChecked,
+      context,
+      setProgressPercent
+    );
+    
+    delay(500);
+
+    if (callResult) {
+      setCreateDaoStatus(CreateDaoStatus.Successful);
+    } else {
+      setCreateDaoStatus(CreateDaoStatus.Failed);
+    }
+    
   };
 
   return (
@@ -318,9 +397,9 @@ const NewDaoForm: React.FC<FormProps> = ({ submitFormAction, cancelForm, submitC
             label="Create new DAO"
             type="primary"
             style={{ marginTop: 40 }}
-            onClick={() => {
-              submitFormAction();
-            }}
+            onClick={
+              submitCreateDao
+            }
           />
         </div>
       </WrapperDiv>
@@ -485,74 +564,18 @@ const NewDaoContainer: React.FC = () => {
   );
   const [progressPercent, setProgressPercent] = useState<number>(5);
   const history = useHistory();
-  const context: any = useWallet();
 
   const onClickBackFromCreateDaoPage = () => {
     history.goBack();
-  };
-
-  const submitCreateDao = async (
-    isExistingToken: boolean,
-    existingTokenAddress: string,
-    tokenName: string,
-    tokenSymbol: string,
-    isUseProxyChecked: boolean,
-    daoName: string,
-    isUseFreeVotingChecked: boolean
-  ) => {
-    let token: Token
-    if (isExistingToken) {
-      try {
-        token = await getToken(existingTokenAddress, context.ethersProvider)
-      } catch (error) {
-        console.log(error)
-        return false
-      }
-    } else {
-      token = {
-        tokenAddress: '',
-        tokenDecimals: 18,
-        tokenName: tokenName,
-        tokenSymbol: tokenSymbol
-      }
-    }
-    const createDaoParams: CreateDaoParams = {
-      name: daoName,
-      token,
-      config: goodConfig,
-      useProxies: isUseProxyChecked,
-      useVocdoni: isUseFreeVotingChecked
-    }
-
-    try {
-      const result: any = await createDao(createDaoParams)
-    } catch (error) {
-      console.log(error)
-      return false
-    }
-  }
-
-  // TODO: simulateCreation to be removed later and substituted with "CreateDaoFunction"
-  const simulateCreation = async () => {
-    function delay(ms: number) {
-      return new Promise((resolve) => setTimeout(resolve, ms));
-    }
-    setCreateDaoStatus(CreateDaoStatus.InProgress);
-    for (let index = 5; index < 100; index++) {
-      await delay(10);
-      setProgressPercent(index);
-      console.log('progressPercent', progressPercent);
-    }
-    setCreateDaoStatus(CreateDaoStatus.Failed);
   };
 
   switch (createDaoStatus) {
     case CreateDaoStatus.PreCreate: {
       return (
         <NewDaoForm
-          submitFormAction={simulateCreation}
+          setCreateDaoStatus={setCreateDaoStatus}
+          setProgressPercent={setProgressPercent}
           cancelForm={onClickBackFromCreateDaoPage}
-          submitCreateDao={submitCreateDao}
         />
       );
     }
@@ -582,9 +605,9 @@ const NewDaoContainer: React.FC = () => {
     default: {
       return (
         <NewDaoForm
-          submitFormAction={simulateCreation}
+          setCreateDaoStatus={setCreateDaoStatus}
+          setProgressPercent={setProgressPercent}
           cancelForm={onClickBackFromCreateDaoPage}
-          submitCreateDao={submitCreateDao}
         />
       );
     }
