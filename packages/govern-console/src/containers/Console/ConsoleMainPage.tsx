@@ -128,9 +128,7 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
           marginBottom: '80px',
         }}
       >
-        {totalDaoCount !== visibleDaoList.length ||
-        !isShowingFilteredResults ||
-        !(isLoadingRegistryData || isLoadingDaoList) ? (
+        {totalDaoCount !== visibleDaoList.length ? (
           <ANButton
             label="Load More DAOs"
             type="secondary"

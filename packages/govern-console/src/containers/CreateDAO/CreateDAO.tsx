@@ -44,7 +44,6 @@ interface ProgressProps {
 }
 
 interface ResultProps {
-
   /**
       success of failed result
    */
@@ -108,10 +107,7 @@ const optionTextStyle = {
   fontSize: 18,
 };
 
-const NewDaoForm: React.FC<FormProps> = ({
-  submitFormAction,
-  cancelForm,
-}) => {
+const NewDaoForm: React.FC<FormProps> = ({ submitFormAction, cancelForm }) => {
   const theme = useTheme();
 
   const WrapperDiv = styled(Paper)({
@@ -127,9 +123,7 @@ const NewDaoForm: React.FC<FormProps> = ({
   });
   const [isExistingToken, updateIsExistingToken] = useState(false);
   const [isUseProxyChecked, updateIsUseProxyChecked] = useState(true);
-  const [isUseFreeVotingChecked, updateIsUseFreeVotingChecked] = useState(
-    true,
-  );
+  const [isUseFreeVotingChecked, updateIsUseFreeVotingChecked] = useState(true);
   const daoName = useRef();
   const tokenName = useRef();
   const tokenSymbol = useRef();
@@ -172,7 +166,7 @@ const NewDaoForm: React.FC<FormProps> = ({
           placeholder={'Please insert your DAO name...'}
           value={daoName.current}
         ></InputField>
-        
+
         <div
           style={{
             display: 'flex',
@@ -248,7 +242,7 @@ const NewDaoForm: React.FC<FormProps> = ({
         >
           <div
             style={{
-              marginTop: -5
+              marginTop: -5,
             }}
           >
             <BlueCheckbox
@@ -275,19 +269,22 @@ const NewDaoForm: React.FC<FormProps> = ({
         >
           <div
             style={{
-              marginTop: -5
+              marginTop: -5,
             }}
           >
             <BlueCheckbox
-            checked={isUseFreeVotingChecked}
-            onChange={() => {
-              updateIsUseFreeVotingChecked(!isUseFreeVotingChecked);
-            }}
-          />
+              checked={isUseFreeVotingChecked}
+              onChange={() => {
+                updateIsUseFreeVotingChecked(!isUseFreeVotingChecked);
+              }}
+            />
           </div>
           <div style={optionTextStyle}>
-            Use <a target="_blank" href={aragonFreeVotingUrl}>Aragon Voting</a> - This will enable your DAO to have free voting
-            for you proposals
+            Use{' '}
+            <a target="_blank" href={aragonFreeVotingUrl}>
+              Aragon Voting
+            </a>{' '}
+            - This will enable your DAO to have free voting for you proposals
           </div>
         </div>
         <div
@@ -389,7 +386,10 @@ const NewDaoProgress: React.FC<ProgressProps> = ({ progressValue }) => {
   );
 };
 
-const NewDaoCreationResult: React.FC<ResultProps> = ({ isSuccess, postResultAction }) => {
+const NewDaoCreationResult: React.FC<ResultProps> = ({
+  isSuccess,
+  postResultAction,
+}) => {
   const theme = useTheme();
 
   const WrapperDiv = styled(Paper)({
@@ -429,12 +429,13 @@ const NewDaoCreationResult: React.FC<ResultProps> = ({ isSuccess, postResultActi
               marginTop: '88px',
             }}
           />
-          <Title>{isSuccess ?  'Your DAO is ready' : 'Somthing went wrong'}</Title>
+          <Title>
+            {isSuccess ? 'Your DAO is ready' : 'Somthing went wrong'}
+          </Title>
           <SubTitle>
-            {isSuccess ?  
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.Lorem ipsum dolor'
-            :
-            'An error has occurred during the signature process. Do not worry, you can try again without losing your information.'}
+            {isSuccess
+              ? 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.Lorem ipsum dolor'
+              : 'An error has occurred during the signature process. Do not worry, you can try again without losing your information.'}
           </SubTitle>
           <div
             style={{
@@ -444,7 +445,7 @@ const NewDaoCreationResult: React.FC<ResultProps> = ({ isSuccess, postResultActi
           >
             <ANButton
               width={'446px'}
-              label={isSuccess ? "Get started" : "Ok, let’s try again"}
+              label={isSuccess ? 'Get started' : 'Ok, let’s try again'}
               type="primary"
               style={{ marginTop: 40 }}
               onClick={() => {
@@ -472,16 +473,16 @@ const NewDaoContainer: React.FC = () => {
   // TODO: simulateCreation to be removed later and substituted with "CreateDaoFunction"
   const simulateCreation = async () => {
     function delay(ms: number) {
-      return new Promise( resolve => setTimeout(resolve, ms) );
+      return new Promise((resolve) => setTimeout(resolve, ms));
     }
-    setCreateDaoStatus(CreateDaoStatus.InProgress)
+    setCreateDaoStatus(CreateDaoStatus.InProgress);
     for (let index = 5; index < 100; index++) {
       await delay(10);
-      setProgressPercent(index)
-      console.log('progressPercent', progressPercent)
+      setProgressPercent(index);
+      console.log('progressPercent', progressPercent);
     }
-    setCreateDaoStatus(CreateDaoStatus.Failed)
-  }
+    setCreateDaoStatus(CreateDaoStatus.Failed);
+  };
 
   switch (createDaoStatus) {
     case CreateDaoStatus.PreCreate: {

@@ -13,4 +13,4 @@ export const BlueCheckbox = (props: CheckboxProps) => {
       {...props}
     />
   );
-}
+};

@@ -201,13 +201,13 @@ const DaoMainPage: React.FC<{
                 marginBottom: '32px',
               }}
             >
-              <ANButton
+              {/* <ANButton
                 label="Load More Proposals"
                 type="secondary"
                 height="46px"
                 width="196px"
                 color="#00C2FF"
-              ></ANButton>
+              ></ANButton> */}
             </div>
           </div>
         ) : (

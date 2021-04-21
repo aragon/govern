@@ -4,6 +4,7 @@ import { useHistory } from 'react-router-dom';
 import { styled } from '@material-ui/core/styles';
 
 import Header from 'components/Header/Header';
+import Footer from 'components/Footer/Footer';
 // import NavigationBar from '../../components/Navigation';
 import ConsoleMainPage from 'containers/Console/ConsoleMainPage';
 import DaoMainPage from 'containers/DAO/DaoMainPage';
@@ -82,6 +83,7 @@ const HomePage = ({ ...props }) => {
     */}
         </div>
       </Switch>
+      <Footer />
       {/* <Footer /> */}
     </AppWrapper>
   );

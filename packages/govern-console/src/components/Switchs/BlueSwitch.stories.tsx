@@ -14,7 +14,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<SwitchProps> = (args) => <BlueSwitch {...args}/>;
+const Template: Story<SwitchProps> = (args) => <BlueSwitch {...args} />;
 
 export const Blue_Switch = Template.bind({});
 

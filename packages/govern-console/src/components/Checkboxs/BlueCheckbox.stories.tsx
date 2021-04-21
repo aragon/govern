@@ -14,6 +14,6 @@ export default {
   },
 } as Meta;
 
-const Template: Story = (args) => <BlueCheckbox {...args}/>;
+const Template: Story = (args) => <BlueCheckbox {...args} />;
 
 export const blue_checkbox = Template.bind({});
