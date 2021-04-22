@@ -199,7 +199,10 @@ const DaoMainPage: React.FC<{
               }}
             >
               {visibleProposalList.map((proposal: any) => (
-                <div style={{ marginTop: '16px' }} key={proposal.id}>
+                <div
+                  style={{ marginTop: '16px', width: '427px' }}
+                  key={proposal.id}
+                >
                   <ProposalCard
                     transactionHash={proposal.id}
                     proposalDate={'3/29/2021'}
