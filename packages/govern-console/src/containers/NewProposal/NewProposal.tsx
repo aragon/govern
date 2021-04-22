@@ -21,7 +21,7 @@ import {
   ActionType,
 } from '@aragon/govern';
 // import {
-//   Proposal,
+//   Proposal test,
 //   ProposalParams,
 //   PayloadType,
 //   ActionType,
