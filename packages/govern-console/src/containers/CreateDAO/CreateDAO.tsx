@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useState, memo, useRef } from 'react';
+import React, { useState, memo, useRef, useEffect } from 'react';
 import { ANButton } from '../../components/Button/ANButton';
 import { useTheme, styled } from '@material-ui/core/styles';
 import backButtonIcon from '../../images/back-btn.svg';
@@ -13,7 +13,21 @@ import GreenTickImage from '../../images/svgs/green_tick.svg';
 import CrossImage from '../../images/svgs/cross.svg';
 import { BlueSwitch } from '../../components/Switchs/BlueSwitch';
 import { BlueCheckbox } from '../../components/Checkboxs/BlueCheckbox';
-import { BlueProgressBar } from '../../components/ProgressBars/BlueProgressBar';
+import { ANCircularProgressWithCaption } from '../../components/CircularProgress/ANCircularProgressWithCaption';
+import { ANWrappedPaper } from '../../components/WrapperPaper/ANWrapperPaper';
+import { useWallet } from '../../EthersWallet';
+import {
+  createDao,
+  CreateDaoParams,
+  CreateDaoOptions,
+  Token,
+  getToken
+} from '@aragon/govern';
+// Note: query should not be needed once DAO page is capable of auto query 
+import {
+  GET_DAO_BY_NAME,
+} from '../Console/queries';
+import { useQuery } from '@apollo/client';
 
 enum CreateDaoStatus {
   PreCreate,
@@ -25,34 +39,38 @@ enum CreateDaoStatus {
 const aragonFreeVotingUrl = '#';
 
 interface FormProps {
-  /*
-        change status of DAO creation
-    */
-  submitFormAction(): void;
 
+  /*
+        change create dao process (stage) status
+    */
+  setCreateDaoStatus: (status: CreateDaoStatus) => void
+
+  /*
+        set created dao route
+    */
+  setCreatedDaoRoute: (route: string) => void
   /*
         cancel form and go back
     */
   cancelForm(): void;
-}
 
-interface ProgressProps {
-  /*
-        value to be passed to progress bar: range 0-100
-    */
-  progressValue: number;
 }
 
 interface ResultProps {
   /**
-      success of failed result
+      success or failed result
    */
   isSuccess: boolean;
+
+  /**
+      change/update creating dao status
+   */
+  setCreateDaoStatus(status: CreateDaoStatus): void
 
   /*
         value to be passed to progress bar: range 0-100
     */
-  postResultAction(): void;
+  postResultActionRoute: string;
 }
 
 const BackButton = styled('div')({
@@ -107,42 +125,169 @@ const optionTextStyle = {
   fontSize: 18,
 };
 
-const NewDaoForm: React.FC<FormProps> = ({ submitFormAction, cancelForm }) => {
-  const theme = useTheme();
-
-  const WrapperDiv = styled(Paper)({
-    width: 'min-content',
-    background: theme.custom.white,
-    height: 'auto',
-    padding: '50px',
-    display: 'flex',
-    flexWrap: 'wrap',
-    flexDirection: 'column',
-    boxSizing: 'border-box',
-    boxShadow: 'none',
-  });
+const NewDaoForm: React.FC<FormProps> = ({ setCreateDaoStatus, setCreatedDaoRoute, cancelForm }) => {
+  const context: any = useWallet();
   const [isExistingToken, updateIsExistingToken] = useState(false);
   const [isUseProxyChecked, updateIsUseProxyChecked] = useState(true);
   const [isUseFreeVotingChecked, updateIsUseFreeVotingChecked] = useState(true);
-  const daoName = useRef();
-  const tokenName = useRef();
-  const tokenSymbol = useRef();
-  const existingTokenAddress = useRef();
+  const daoName = useRef<string>();
+  const doaNameError = useRef<string | undefined>();
+  const tokenName = useRef<string>();
+  const tokenNameError = useRef<string | undefined>();
+  const tokenSymbol = useRef<string>();
+  const tokenSymbolError = useRef<string | undefined>();
+  const existingTokenAddress = useRef<string>();
+  const existingTokenAddressError = useRef<string | undefined>();
+  // TODO: dai and court contract should, have a default fetch from an env or constants,
+  // and should be user updatable once UI is ready
+  const executionDelay = useRef<number>(86400); // defaults to one day - how many seconds to wait before being able to call execute.
+  const scheduleContract = useRef<string>('0xb08E32D658700f768f5bADf0679E153ffFEC42e6');
+  const scheduleTokenAmount = useRef<number>(0);
+  const challengeContract = useRef<string>('0xb08E32D658700f768f5bADf0679E153ffFEC42e6');
+  const challengeTokenAmount = useRef<number>(0);
+  const resolverContract = useRef<string>('0xC464EB732A1D2f5BbD705727576065C91B2E9f18');
+  const rules = useRef<string>('0x'); // in hex
+  const maxCalldataSize = useRef<number>(100000);  // initial maxCalldatasize
+
+  const onExecutionDelayChange = (val: any) => {
+    executionDelay.current = val;
+  };
+
+  const onScheduleContractChange = (val: any) => {
+    scheduleContract.current = val;
+  };
+
+  const onScheduleTokenAmountChange = (val: any) => {
+    scheduleTokenAmount.current = val;
+  };
+
+  const onChallengeContractChange = (val: any) => {
+    challengeContract.current = val;
+  };
+
+  const onChallengeTokenAmountChange = (val: any) => {
+    challengeTokenAmount.current = val;
+  };
+
+  const onResolverChange = (val: any) => {
+    rules.current = val;
+  };
+
+  const onRulesChange = (val: any) => {
+    rules.current = val; // should be converted to hex
+  };
+
+  const onMaxCalldataSizeChange = (val: any) => {
+    maxCalldataSize.current = val;
+  };
 
   const onChangeDaoName = (val: any) => {
     daoName.current = val;
+    doaNameError.current = '';
   };
 
   const onChangeTokenName = (val: any) => {
     tokenName.current = val;
+    tokenNameError.current = '';
   };
 
   const onChangeTokenSymbol = (val: any) => {
     tokenSymbol.current = val;
+    tokenSymbolError.current = '';
   };
 
   const onChangeExistingTokenAddress = (val: any) => {
     existingTokenAddress.current = val;
+    existingTokenAddressError.current = '';
+  };
+
+  const createDaoConfig = {
+    executionDelay: executionDelay.current, 
+    scheduleDeposit: {token: scheduleContract.current, amount: scheduleTokenAmount.current},
+    challengeDeposit: {token: challengeContract.current, amount: challengeTokenAmount.current},
+    resolver: resolverContract.current,
+    rules: rules.current,
+    maxCalldataSize: maxCalldataSize.current,
+  }
+
+  const createDaoCall = async (
+    isExistingToken: boolean,
+    existingTokenAddress: string,
+    tokenName: string,
+    tokenSymbol: string,
+    isUseProxyChecked: boolean,
+    daoName: string,
+    isUseFreeVotingChecked: boolean,
+    context: any
+  ): Promise<boolean> => {
+    let token: Token
+    if (isExistingToken) {
+      try {
+        token = await getToken(existingTokenAddress, context.ethersProvider)
+      } catch (error) {
+        console.log(error)
+        return false
+      }
+    } else {
+      token = {
+        tokenAddress: '',
+        tokenDecimals: 18,
+        tokenName: tokenName,
+        tokenSymbol: tokenSymbol
+      }
+    }
+    const createDaoParams: CreateDaoParams = {
+      name: daoName,
+      token,
+      config: createDaoConfig,
+      useProxies: isUseProxyChecked,
+      useVocdoni: isUseFreeVotingChecked
+    }
+  
+    try {
+      const result: any = await createDao(createDaoParams)
+      setCreatedDaoRoute(daoName)
+      await result.wait(1);
+      return true;
+    } catch (error) {
+      console.log(error)
+      return false
+    }
+  }
+
+  // TODO: Create Validation for form, inputField may need further customization 
+  const validateForm = (): boolean =>{
+    if (daoName.current === '' || typeof daoName.current === 'undefined') {
+      doaNameError.current = 'Error'
+      return false;
+    }
+    return true;
+  }
+
+  const submitCreateDao = async () => {
+    // TODO: form validation
+    // if(validateForm() === false) {
+    //   console.log('submitCreateDao, validateForm()', validateForm())
+    //   return null;
+    // }
+    setCreateDaoStatus(CreateDaoStatus.InProgress);
+    const callResult = await createDaoCall(
+      isExistingToken,
+      existingTokenAddress.current ? existingTokenAddress.current.toString() : '',
+      tokenName.current ? tokenName.current.toString() : '',
+      tokenSymbol.current ? tokenSymbol.current.toString() : '',
+      isUseProxyChecked,
+      daoName.current ? daoName.current.toString() : '',
+      isUseFreeVotingChecked,
+      context,
+    );
+
+    if (callResult) {
+      setCreateDaoStatus(CreateDaoStatus.Successful);
+    } else {
+      setCreateDaoStatus(CreateDaoStatus.Failed);
+    }
+    
   };
 
   return (
@@ -152,21 +297,20 @@ const NewDaoForm: React.FC<FormProps> = ({ submitFormAction, cancelForm }) => {
         display: 'flex',
       }}
     >
-      <WrapperDiv>
+      <ANWrappedPaper>
         <BackButton onClick={cancelForm}>
           <img src={backButtonIcon} />
         </BackButton>
         <img src={CreateDaoImage} />
         <InputTitle>DAO Name</InputTitle>
         <InputField
-          label=""
+          label={doaNameError.current === undefined ? '' : doaNameError.current}
           onInputChange={onChangeDaoName}
           height="46px"
           width="454px"
           placeholder={'Please insert your DAO name...'}
           value={daoName.current}
         ></InputField>
-
         <div
           style={{
             display: 'flex',
@@ -282,7 +426,7 @@ const NewDaoForm: React.FC<FormProps> = ({ submitFormAction, cancelForm }) => {
           <div style={optionTextStyle}>
             Use{' '}
             <a target="_blank" href={aragonFreeVotingUrl}>
-              Aragon Voting
+              Aragon Voice
             </a>{' '}
             - This will enable your DAO to have free voting for you proposals
           </div>
@@ -297,30 +441,18 @@ const NewDaoForm: React.FC<FormProps> = ({ submitFormAction, cancelForm }) => {
             label="Create new DAO"
             type="primary"
             style={{ marginTop: 40 }}
-            onClick={() => {
-              submitFormAction();
-            }}
+            onClick={
+              submitCreateDao
+            }
           />
         </div>
-      </WrapperDiv>
+      </ANWrappedPaper>
     </div>
   );
 };
 
-const NewDaoProgress: React.FC<ProgressProps> = ({ progressValue }) => {
+const NewDaoProgress: React.FC = () => {
   const theme = useTheme();
-
-  const WrapperDiv = styled(Paper)({
-    width: 'min-content',
-    background: theme.custom.white,
-    height: 'auto',
-    padding: '40px 20px 20px 20px',
-    display: 'flex',
-    flexWrap: 'wrap',
-    flexDirection: 'column',
-    boxSizing: 'border-box',
-    boxShadow: 'none',
-  });
 
   return (
     <div
@@ -331,7 +463,7 @@ const NewDaoProgress: React.FC<ProgressProps> = ({ progressValue }) => {
         alignItems: 'center',
       }}
     >
-      <WrapperDiv>
+      <ANWrappedPaper>
         <div
           style={{
             display: 'flex',
@@ -352,16 +484,18 @@ const NewDaoProgress: React.FC<ProgressProps> = ({ progressValue }) => {
           >
             <SubTitle>Hold tight your transaction is under process</SubTitle>
           </div>
-          <BlueProgressBar
-            variant="determinate"
-            value={progressValue}
+          <div
             style={{
-              width: '370px',
-              marginLeft: 'auto',
-              marginRight: 'auto',
-              marginTop: '20px',
+              justifyContent: 'center',
+              display: 'flex',
+              marginTop: '10px'
             }}
-          />
+          >
+            <ANCircularProgressWithCaption
+              caption={'Creating DAO'}
+              state={1}
+            />
+          </div>
           <div
             style={{
               borderRadius: '10px',
@@ -370,7 +504,7 @@ const NewDaoProgress: React.FC<ProgressProps> = ({ progressValue }) => {
               height: '51px',
               lineHeight: '51px',
               textAlign: 'center',
-              marginTop: '50px',
+              marginTop: '40px',
               fontFamily: 'Manrope',
               fontStyle: 'normal',
               fontWeight: 'normal',
@@ -381,28 +515,53 @@ const NewDaoProgress: React.FC<ProgressProps> = ({ progressValue }) => {
             Please be patient and do not close this window until it finishes.
           </div>
         </div>
-      </WrapperDiv>
+      </ANWrappedPaper>
     </div>
   );
 };
 
 const NewDaoCreationResult: React.FC<ResultProps> = ({
   isSuccess,
-  postResultAction,
+  setCreateDaoStatus,
+  postResultActionRoute
 }) => {
-  const theme = useTheme();
+  const history = useHistory();
 
-  const WrapperDiv = styled(Paper)({
-    width: 'min-content',
-    background: theme.custom.white,
-    height: 'min-content',
-    padding: '30px 20px 20px 20px',
-    display: 'flex',
-    flexWrap: 'wrap',
-    flexDirection: 'column',
-    boxSizing: 'border-box',
-    boxShadow: 'none',
+  const [daoDetail, setDaoDetail] = useState<any>({});
+
+  const {
+    data: daoDetailData,
+    loading: isLoadingDaoDetail,
+    error: errorLoadingDaoDetail,
+    fetchMore: fetchMoreDetail
+  } = useQuery(GET_DAO_BY_NAME, {
+    variables: {
+      name: postResultActionRoute
+    },
   });
+
+  useEffect(() => {
+    if (daoDetailData && daoDetailData.name) {
+      console.log('daoDetailData', daoDetailData)
+      setDaoDetail(daoDetailData);
+    }
+  }, [daoDetailData]);
+
+  const fetchDetail = async () => {
+    console.log('calling fetchDetail')
+    const {
+      data: moreData,
+      loading: loadingMore,
+    }: { data: any; loading: boolean } = await fetchMoreDetail({
+      variables: {
+        name: postResultActionRoute
+      },
+    });
+    console.log('fetchDetail:', moreData)
+    if (moreData && moreData.name) {
+      setDaoDetail(moreData);
+    }
+  };
 
   return (
     <div
@@ -413,7 +572,7 @@ const NewDaoCreationResult: React.FC<ResultProps> = ({
         alignItems: 'center',
       }}
     >
-      <WrapperDiv>
+      <ANWrappedPaper>
         <div
           style={{
             display: 'flex',
@@ -448,13 +607,19 @@ const NewDaoCreationResult: React.FC<ResultProps> = ({
               label={isSuccess ? 'Get started' : 'Ok, let’s try again'}
               type="primary"
               style={{ marginTop: 40 }}
-              onClick={() => {
-                postResultAction();
+              onClick={async () => {
+                if (isSuccess) {
+                  // await fetchDetail();
+                  // console.log('queried dao detail', daoDetail)
+                  history.push('daos/' + postResultActionRoute);
+                } else {
+                  setCreateDaoStatus(CreateDaoStatus.PreCreate)
+                }
               }}
             />
           </div>
         </div>
-      </WrapperDiv>
+      </ANWrappedPaper>
     </div>
   );
 };
@@ -463,46 +628,32 @@ const NewDaoContainer: React.FC = () => {
   const [createDaoStatus, setCreateDaoStatus] = useState<CreateDaoStatus>(
     CreateDaoStatus.PreCreate,
   );
-  const [progressPercent, setProgressPercent] = useState<number>(5);
+  const [createdDaoRoute, setCreatedDaoRoute] = useState<string>('#');
   const history = useHistory();
 
   const onClickBackFromCreateDaoPage = () => {
     history.goBack();
   };
 
-  // TODO: simulateCreation to be removed later and substituted with "CreateDaoFunction"
-  const simulateCreation = async () => {
-    function delay(ms: number) {
-      return new Promise((resolve) => setTimeout(resolve, ms));
-    }
-    setCreateDaoStatus(CreateDaoStatus.InProgress);
-    for (let index = 5; index < 100; index++) {
-      await delay(10);
-      setProgressPercent(index);
-      console.log('progressPercent', progressPercent);
-    }
-    setCreateDaoStatus(CreateDaoStatus.Failed);
-  };
-
   switch (createDaoStatus) {
     case CreateDaoStatus.PreCreate: {
       return (
         <NewDaoForm
-          submitFormAction={simulateCreation}
+          setCreateDaoStatus={setCreateDaoStatus}
+          setCreatedDaoRoute={setCreatedDaoRoute}
           cancelForm={onClickBackFromCreateDaoPage}
         />
       );
     }
     case CreateDaoStatus.InProgress: {
-      return <NewDaoProgress progressValue={progressPercent} />;
+      return <NewDaoProgress />;
     }
     case CreateDaoStatus.Successful: {
       return (
         <NewDaoCreationResult
           isSuccess={true}
-          postResultAction={() => {
-            console.log('should go some where');
-          }}
+          setCreateDaoStatus={setCreateDaoStatus}
+          postResultActionRoute={createdDaoRoute}
         />
       );
     }
@@ -510,16 +661,16 @@ const NewDaoContainer: React.FC = () => {
       return (
         <NewDaoCreationResult
           isSuccess={false}
-          postResultAction={() => {
-            setCreateDaoStatus(CreateDaoStatus.PreCreate);
-          }}
+          setCreateDaoStatus={setCreateDaoStatus}
+          postResultActionRoute={'#'}
         />
       );
     }
     default: {
       return (
         <NewDaoForm
-          submitFormAction={simulateCreation}
+          setCreateDaoStatus={setCreateDaoStatus}
+          setCreatedDaoRoute={setCreatedDaoRoute}
           cancelForm={onClickBackFromCreateDaoPage}
         />
       );

@@ -16,7 +16,7 @@ const useStyles = makeStyles({
     width: '100%',
     height: '11px',
     borderRadius: '50px',
-    backgroundColor: '#00B3EC',
+    background: 'linear-gradient(107.79deg, #01B9F2 1.46%, #01DBE9 100%)',
   },
 });
 
