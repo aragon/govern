@@ -2,7 +2,14 @@
 import { ANCircularProgress, CiruclarProgressStatus } from './ANCircularProgress'
 
 export interface ANProgressCationPropos {
+    /**
+     * Text Message to be showen along side of the circular progress
+     */
     caption: string;
+
+    /**
+     * Status of the circular progress
+     */
     state: CiruclarProgressStatus;
 } 
 
