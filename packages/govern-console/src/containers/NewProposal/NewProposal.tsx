@@ -10,16 +10,23 @@ import Paper from '@material-ui/core/Paper';
 import { NewActionModal } from '../../components/Modal/NewActionModal';
 import { AddActionsModal } from '../../components/Modal/AddActionsModal';
 import { InputField } from '../../components/InputFields/InputField';
-import { ethers } from 'ethers';
 import { defaultAbiCoder } from 'ethers/lib/utils';
 import { useWallet } from '../../EthersWallet';
 import { useHistory } from 'react-router-dom';
+import { BigNumber, Transaction as EthersTransaction, ethers } from 'ethers';
+import { erc20ApprovalTransaction } from 'utils/transactionHelper';
+
 import {
   Proposal,
   ProposalOptions,
   PayloadType,
   ActionType,
 } from '@aragon/govern';
+
+const courtABI = [
+  'function getDisputeFees() external view returns (address recipient, IERC20 feeToken, uint256 feeAmount)',
+];
+
 // import {
 //   Proposal,
 //   ProposalParams,
@@ -167,6 +174,11 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const [isActionModalOpen, setActionModalOpen] = useState(false);
   const abiFunctions = useRef([]);
   const actionsToSchedule = useRef([]);
+  const proposalOptions: ProposalOptions = {};
+  const proposal = React.useMemo(
+    () => new Proposal(daoDetails.queue.address, proposalOptions),
+    [daoDetails.queue.address],
+  );
 
   const context: any = useWallet();
   const {
@@ -408,6 +420,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const onChangeJustification = (val: string) => {
     justification.current = val;
   };
+
   const onSchedule = () => {
     const actions: any[] = actionsToSchedule.current.map((item: any) => {
       const { abi, contractAddress, name, params, numberOfInputs } = item;
@@ -430,17 +443,39 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     });
     scheduleProposal(actions);
   };
+
   const scheduleProposal = async (actions: any[]) => {
     const payload = buildPayload({ submitter, executor, actions });
     console.log('payload', payload);
-    const config = daoDetails.config;
-    const proposalOptions: ProposalOptions = {};
-    const proposal = new Proposal(daoDetails.queue.address, proposalOptions);
+    const config = daoDetails.queue.config;
+    console.log('config', daoDetails.queue.config);
+    const scheduleDepositApproval = await erc20ApprovalTransaction(
+      daoDetails.queue.config.scheduleDeposit.token,
+      daoDetails.queue.config.scheduleDeposit.amount,
+      daoDetails.queue.address,
+      ethersProvider,
+      account,
+    );
+    if (scheduleDepositApproval) {
+      if (scheduleDepositApproval.isUserBalanceLow) {
+        console.log('UserBalanceLow');
+        return;
+      }
+      if (!scheduleDepositApproval.isCollateralApproved) {
+        try {
+          const transactionResponse: any = await scheduleDepositApproval.transactions[0].tx();
+          await transactionResponse.wait();
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    }
+
+    console.log('schedule call ');
     const scheduleResult = await proposal.schedule({
       payload,
-      config: goodConfig,
+      config,
     });
-    console.log(scheduleResult);
   };
 
   // React.useEffect(() => {

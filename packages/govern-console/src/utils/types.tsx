@@ -32,3 +32,16 @@ export type daoDetails = {
   token: string;
   registrant?: string;
 };
+
+// eslint-disable-next-line
+export type CustomTransaction = {
+  tx: any;
+  msg?: string;
+};
+
+export type Response = {
+  isUserBalanceLow: boolean;
+  isCollateralApproved: boolean;
+  errorMessage: string | undefined;
+  transactions: CustomTransaction[];
+};
