@@ -533,7 +533,8 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                   <InfoWrapper>
                     <InfoKeyDiv>Executor:</InfoKeyDiv>
                     <InfoValueDivInline>
-                      {proposalInfo.payload.executor.address || 'No executor ID'}
+                      {proposalInfo.payload.executor.address ||
+                        'No executor ID'}
                     </InfoValueDivInline>
                   </InfoWrapper>
                   {/* <InfoWrapper>

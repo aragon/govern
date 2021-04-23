@@ -206,9 +206,15 @@ const DaoMainPage: React.FC<{
                     proposalDate={
                       // TODO:Bhanu you can make this work with the dates library you use
                       // I will make sure createdAt can be set on container more easily without this history check
-                      new Date(proposal.history[proposal.history.length-1].createdAt * 1000).toLocaleDateString("en-US") 
-                      + ' ' +
-                      new Date(proposal.history[proposal.history.length-1].createdAt * 1000).toLocaleTimeString("en-US")
+                      new Date(
+                        proposal.history[proposal.history.length - 1]
+                          .createdAt * 1000,
+                      ).toLocaleDateString('en-US') +
+                      ' ' +
+                      new Date(
+                        proposal.history[proposal.history.length - 1]
+                          .createdAt * 1000,
+                      ).toLocaleTimeString('en-US')
                     }
                     proposalStatus={proposal.state}
                     onClickProposalCard={() => onClickProposalCard(proposal)}

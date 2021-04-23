@@ -1,5 +1,8 @@
 /* eslint-disable */
-import { ANCircularProgress, ANCircularProgressProps } from './ANCircularProgress';
+import {
+  ANCircularProgress,
+  ANCircularProgressProps,
+} from './ANCircularProgress';
 
 export default {
   title: 'AN-Circularprogress',
@@ -16,6 +19,5 @@ const Template: Story<ANCircularProgressProps> = (args) => (
 export const an_Circularprogress = Template.bind({});
 
 an_Circularprogress.args = {
-  status: 1 // or import CiruclarProgressStatus enum
+  status: 1, // or import CiruclarProgressStatus enum
 };
-
