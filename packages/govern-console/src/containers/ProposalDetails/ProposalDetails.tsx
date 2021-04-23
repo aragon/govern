@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from 'react';
 import { styled, useTheme } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
@@ -11,6 +12,9 @@ import { useQuery } from '@apollo/client';
 import { useEffect } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { useWallet } from '../../EthersWallet';
+import { erc20ApprovalTransaction } from 'utils/transactionHelper';
+import { ethers } from 'ethers';
+import { CourtABI } from 'utils/abis/court';
 
 import {
   Proposal,
@@ -60,6 +64,17 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     type,
     ethersProvider,
   } = context;
+
+  let signer: any;
+
+  if (ethersProvider) {
+    signer = ethersProvider.getSigner();
+  }
+  useEffect(() => {
+    if (ethersProvider) {
+      signer = ethersProvider.getSigner();
+    }
+  }, [ethersProvider]);
 
   //* styled Components
 
@@ -345,7 +360,61 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     return proposal;
   }, [daoDetails]);
 
-  // const approveCollateralIfNeeded = () => {};
+  const approveChallengeCollateralsIfNeeded = async () => {
+    const contract = new ethers.Contract(
+      proposalInfo.config.resolver,
+      CourtABI,
+      signer,
+    );
+    const challengeDepositApproval = await erc20ApprovalTransaction(
+      daoDetails.queue.config.challengeDeposit.token,
+      daoDetails.queue.config.challengeDeposit.amount,
+      daoDetails.queue.address,
+      ethersProvider,
+      account,
+    );
+    console.log(challengeDepositApproval);
+
+    const [, feeToken, feeAmount] = await contract.getDisputeFees();
+
+    const feeTokenApproval = await erc20ApprovalTransaction(
+      feeToken,
+      feeAmount,
+      daoDetails.queue.address,
+      ethersProvider,
+      account,
+    );
+
+    if (challengeDepositApproval) {
+      if (challengeDepositApproval.isUserBalanceLow) {
+        console.log('UserBalanceLow');
+        return;
+      }
+      if (!challengeDepositApproval.isCollateralApproved) {
+        try {
+          const transactionResponse: any = await challengeDepositApproval.transactions[0].tx();
+          await transactionResponse.wait();
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    }
+    if (feeTokenApproval) {
+      if (feeTokenApproval.isUserBalanceLow) {
+        console.log('Challenge Fee UserBalanceLow');
+        return;
+      }
+      if (!feeTokenApproval.isCollateralApproved) {
+        try {
+          const transactionResponse: any = await feeTokenApproval.transactions[0].tx();
+          await transactionResponse.wait();
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    }
+  };
+
   const getProposalParams = () => {
     const payload = { ...proposalInfo.payload };
     const config = { ...proposalInfo.config };
@@ -361,7 +430,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   const challengeProposal = async () => {
     const proposalParams = getProposalParams();
     console.log(proposalParams);
-    // approveCollateralIfNeeded();
+    await approveChallengeCollateralsIfNeeded();
     const challengeTransaction = await proposalInstance.challenge(
       proposalParams,
       challengeReason.current,
@@ -374,12 +443,12 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     console.log(proposalParams);
     console.log(proposalParams);
     // approveCollateralIfNeeded();
-    const challengeTransaction = await proposalInstance.execute(proposalParams);
-    console.log(challengeTransaction);
+    const executeTransaction = await proposalInstance.execute(proposalParams);
+    console.log(executeTransaction);
   };
 
   // const getParsedDataFromBytes = (data) => {
-
+  console.log(proposalInfo, ' great');
   // };
   return (
     <>
@@ -464,13 +533,13 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                   <InfoWrapper>
                     <InfoKeyDiv>Executor:</InfoKeyDiv>
                     <InfoValueDivInline>
-                      {proposalInfo.payload.executor.id || 'No executor ID'}
+                      {proposalInfo.payload.executor.address || 'No executor ID'}
                     </InfoValueDivInline>
                   </InfoWrapper>
-                  <InfoWrapper>
+                  {/* <InfoWrapper>
                     <InfoKeyDiv>On Chain Actions:</InfoKeyDiv>
                     <InfoValueDivInline>Proof Text</InfoValueDivInline>
-                  </InfoWrapper>
+                  </InfoWrapper> */}
                   <InfoWrapper>
                     <InfoKeyDiv>AllowFailuresMap:</InfoKeyDiv>
                     <InfoValueDivInline>

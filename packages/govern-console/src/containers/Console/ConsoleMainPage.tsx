@@ -48,7 +48,7 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
   } = useQuery(GET_DAO_LIST, {
     variables: {
       offset: 0,
-      limit: 1,
+      limit: 12,
     },
   });
 
