@@ -24,16 +24,6 @@ import {
   ActionType,
 } from '@aragon/govern';
 
-const courtABI = [
-  'function getDisputeFees() external view returns (address recipient, IERC20 feeToken, uint256 feeAmount)',
-];
-
-// import {
-//   Proposal,
-//   ProposalParams,
-//   PayloadType,
-//   ActionType,
-// } from '@aragon/govern';
 export interface NewProposalProps {
   /**
    * callback for click on schedule
