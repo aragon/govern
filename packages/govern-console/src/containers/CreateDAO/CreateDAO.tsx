@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useState, memo, useRef } from 'react';
+import React, { useState, memo, useRef, useEffect } from 'react';
 import { ANButton } from '../../components/Button/ANButton';
 import { useTheme, styled } from '@material-ui/core/styles';
 import backButtonIcon from '../../images/back-btn.svg';
@@ -23,6 +23,11 @@ import {
   Token,
   getToken
 } from '@aragon/govern';
+// Note: query should not be needed once DAO page is capable of auto query 
+import {
+  GET_DAO_BY_NAME,
+} from '../Console/queries';
+import { useQuery } from '@apollo/client';
 
 enum CreateDaoStatus {
   PreCreate,
@@ -241,7 +246,7 @@ const NewDaoForm: React.FC<FormProps> = ({ setCreateDaoStatus, setCreatedDaoRout
   
     try {
       const result: any = await createDao(createDaoParams)
-      setCreatedDaoRoute('daos/' + daoName)
+      setCreatedDaoRoute(daoName)
       await result.wait(1);
       return true;
     } catch (error) {
@@ -421,7 +426,7 @@ const NewDaoForm: React.FC<FormProps> = ({ setCreateDaoStatus, setCreatedDaoRout
           <div style={optionTextStyle}>
             Use{' '}
             <a target="_blank" href={aragonFreeVotingUrl}>
-              Aragon Voting
+              Aragon Voice
             </a>{' '}
             - This will enable your DAO to have free voting for you proposals
           </div>
@@ -518,10 +523,45 @@ const NewDaoProgress: React.FC = () => {
 const NewDaoCreationResult: React.FC<ResultProps> = ({
   isSuccess,
   setCreateDaoStatus,
-  postResultActionRoute,
+  postResultActionRoute
 }) => {
-  const theme = useTheme();
   const history = useHistory();
+
+  const [daoDetail, setDaoDetail] = useState<any>({});
+
+  const {
+    data: daoDetailData,
+    loading: isLoadingDaoDetail,
+    error: errorLoadingDaoDetail,
+    fetchMore: fetchMoreDetail
+  } = useQuery(GET_DAO_BY_NAME, {
+    variables: {
+      name: postResultActionRoute
+    },
+  });
+
+  useEffect(() => {
+    if (daoDetailData && daoDetailData.name) {
+      console.log('daoDetailData', daoDetailData)
+      setDaoDetail(daoDetailData);
+    }
+  }, [daoDetailData]);
+
+  const fetchDetail = async () => {
+    console.log('calling fetchDetail')
+    const {
+      data: moreData,
+      loading: loadingMore,
+    }: { data: any; loading: boolean } = await fetchMoreDetail({
+      variables: {
+        name: postResultActionRoute
+      },
+    });
+    console.log('fetchDetail:', moreData)
+    if (moreData && moreData.name) {
+      setDaoDetail(moreData);
+    }
+  };
 
   return (
     <div
@@ -567,9 +607,11 @@ const NewDaoCreationResult: React.FC<ResultProps> = ({
               label={isSuccess ? 'Get started' : 'Ok, let’s try again'}
               type="primary"
               style={{ marginTop: 40 }}
-              onClick={() => {
+              onClick={async () => {
                 if (isSuccess) {
-                  history.push(postResultActionRoute);
+                  // await fetchDetail();
+                  // console.log('queried dao detail', daoDetail)
+                  history.push('daos/' + postResultActionRoute);
                 } else {
                   setCreateDaoStatus(CreateDaoStatus.PreCreate)
                 }
