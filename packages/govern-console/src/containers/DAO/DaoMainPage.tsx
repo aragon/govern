@@ -65,7 +65,7 @@ const DaoMainPage: React.FC<{
     variables: {
       id: daoDetails.queue.id,
       offset: 0,
-      limit: 1,
+      limit: 16,
     },
   });
 
