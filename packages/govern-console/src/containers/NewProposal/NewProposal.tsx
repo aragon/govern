@@ -20,12 +20,6 @@ import {
   PayloadType,
   ActionType,
 } from '@aragon/govern';
-// import {
-//   Proposal test,
-//   ProposalParams,
-//   PayloadType,
-//   ActionType,
-// } from '@aragon/govern';
 export interface NewProposalProps {
   /**
    * callback for click on schedule
