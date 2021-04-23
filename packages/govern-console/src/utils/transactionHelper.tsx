@@ -8,8 +8,6 @@ export async function erc20ApprovalTransaction(
   spender: string,
   ethersProvider: any,
   account: string,
-  feeTokenFunctionName?: any,
-  // contract?: any,
 ): Promise<Response> {
   const response: Response = {
     isUserBalanceLow: false,
@@ -18,41 +16,35 @@ export async function erc20ApprovalTransaction(
     transactions: [],
   };
   const amountInBigNumber: BigNumber = ethers.BigNumber.from(amount);
-  // if (!contract) {
+
   const contract = new ethers.Contract(
     token,
     erc20TokenABI,
     ethersProvider.getSigner(),
   );
-  // }
-  let allowance: BigNumber;
 
-  if (feeTokenFunctionName) {
-    allowance = await contract.allowed(account, spender);
-  } else {
-    allowance = await contract.allowance(account, spender);
-  }
+  const allowance = await contract.allowance(account, spender);
+
   const userBalance: BigNumber = await contract.balanceOf(account);
-  // const userBalanceInNumber = userBalance.toNumber();
-  console.log('user balance', userBalance);
-  if (userBalance.gt(amountInBigNumber)) {
-    const remainingAmountToApprove: BigNumber = amountInBigNumber.sub(
-      allowance,
-    );
-    if (remainingAmountToApprove.gt(0x00)) {
-      const transaction: CustomTransaction = {
-        tx: () => {
-          return contract.approve(spender, remainingAmountToApprove);
-        },
-        msg: `Approves ${remainingAmountToApprove} Tokens for the ${spender}`,
-      };
-      response.transactions.push(transaction);
-    } else {
-      response.isCollateralApproved = true;
-    }
-  } else {
+  // user balance is less than the amount that needs approval.
+  // this means user won't be able to approve full amount.
+  if (userBalance.lt(amountInBigNumber)) {
     response.isUserBalanceLow = true;
     response.errorMessage = `You need ${amount} to schedule this proposal.`;
+    return response;
   }
+  // user has enough balance, but also already got amountInBigNumber approved for spender
+  if (allowance.gte(amountInBigNumber)) {
+    response.isCollateralApproved = true;
+    return response;
+  }
+  // approve amountInBigNumber for the spender
+  const transaction: CustomTransaction = {
+    tx: () => {
+      return contract.approve(spender, amountInBigNumber);
+    },
+    msg: `Approves ${amountInBigNumber} Tokens for the ${spender}`,
+  };
+  response.transactions.push(transaction);
   return response;
 }

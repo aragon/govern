@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState, useRef, memo, useCallback } from 'react';
 import { ANButton } from '../../components/Button/ANButton';
 import { useTheme, styled, Theme } from '@material-ui/core/styles';
@@ -199,7 +200,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   } = context;
 
   const submitter: string = account;
-  const executor = daoDetails.executor.id;
+  const executor = daoDetails.executor.address;
 
   const handleInputModalOpen = () => {
     setInputModalOpen(true);
@@ -390,7 +391,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     executionTime,
   }: payloadArgs) => {
     const payload: PayloadType = {
-      executionTime: executionTime || 1618843546527,
+      executionTime: executionTime || Math.round(Date.now() / 1000) + parseInt(daoDetails.queue.config.executionDelay) + 30, // add 30 seconds for network latency.
       submitter,
       executor,
       actions: actions ?? [
@@ -463,6 +464,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
       }
       if (!scheduleDepositApproval.isCollateralApproved) {
         try {
+          console.log('coming here 55');
           const transactionResponse: any = await scheduleDepositApproval.transactions[0].tx();
           await transactionResponse.wait();
         } catch (err) {

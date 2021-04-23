@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from 'react';
 import { styled, useTheme } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
@@ -365,8 +366,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       CourtABI,
       signer,
     );
-    console.log('proposalInfo');
-    console.log(proposalInfo);
     const challengeDepositApproval = await erc20ApprovalTransaction(
       daoDetails.queue.config.challengeDeposit.token,
       daoDetails.queue.config.challengeDeposit.amount,
@@ -384,9 +383,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       daoDetails.queue.address,
       ethersProvider,
       account,
-      'allowed',
     );
-    console.log(feeTokenApproval);
 
     if (challengeDepositApproval) {
       if (challengeDepositApproval.isUserBalanceLow) {
@@ -451,7 +448,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   };
 
   // const getParsedDataFromBytes = (data) => {
-
+  console.log(proposalInfo, ' great');
   // };
   return (
     <>
@@ -536,13 +533,13 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                   <InfoWrapper>
                     <InfoKeyDiv>Executor:</InfoKeyDiv>
                     <InfoValueDivInline>
-                      {proposalInfo.payload.executor.id || 'No executor ID'}
+                      {proposalInfo.payload.executor.address || 'No executor ID'}
                     </InfoValueDivInline>
                   </InfoWrapper>
-                  <InfoWrapper>
+                  {/* <InfoWrapper>
                     <InfoKeyDiv>On Chain Actions:</InfoKeyDiv>
                     <InfoValueDivInline>Proof Text</InfoValueDivInline>
-                  </InfoWrapper>
+                  </InfoWrapper> */}
                   <InfoWrapper>
                     <InfoKeyDiv>AllowFailuresMap:</InfoKeyDiv>
                     <InfoValueDivInline>

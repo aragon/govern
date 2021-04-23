@@ -70,7 +70,7 @@ describe('[e2e] dao Test', () => {
     expect(container.payload).toHaveProperty('proof')
     expect(Array.isArray(container.history)).toEqual(true)
 
-    expect(response.executor.id).toBeDefined()
+    expect(response.executor.address).toBeDefined()
 
     expect(isAddress(response.executor.address)).toEqual(true)
 
