@@ -4,6 +4,7 @@ import Typography from '@material-ui/core/Typography';
 import governIcon from 'images/aragon-icon.svg';
 import Wallet from 'components/Wallet/Wallet';
 import { useHistory } from 'react-router-dom';
+import { ANButton } from 'components/Button/ANButton';
 
 const Header = ({}) => {
   const history = useHistory();
@@ -12,16 +13,27 @@ const Header = ({}) => {
     width: '100%',
     display: 'block',
   });
-  const TitleText = styled(Typography)({
+  const TitleTextNormal = styled(Typography)({
     fontFamily: 'Manrope',
     fontStyle: 'normal',
     fontWeight: 'normal',
     fontSize: '18px',
     lineHeight: '25px',
     color: '#7483B2',
-    width: '200px',
     display: 'flex',
-    justifyContent: 'center',
+    justifyContent: 'left',
+    alignItems: 'center',
+    marginRight: '5px',
+  });
+  const TitleTextBold = styled(Typography)({
+    fontFamily: 'Manrope',
+    fontStyle: 'normal',
+    fontWeight: 600,
+    fontSize: '18px',
+    lineHeight: '25px',
+    color: '#20232C',
+    display: 'flex',
+    justifyContent: 'left',
     alignItems: 'center',
   });
   const Navbar = styled('div')({
@@ -49,16 +61,33 @@ const Header = ({}) => {
     history.push('/');
   };
 
+  const goToCreateDaoPage = () => {
+    history.push('/create-dao');
+  };
+
   return (
     <HeaderWrapperDiv id="header">
       <Navbar id="navbar">
         <Title id="navbar_title" onClick={redirectToHomePage}>
           <img src={governIcon} />
-          <TitleText>Govern Console</TitleText>
+          <TitleTextNormal>Govern</TitleTextNormal>
+          <TitleTextBold>Console</TitleTextBold>
         </Title>
         <Account id="account">
           {/* <ChainSelector /> */}
-          <Wallet />
+          <div style={{ marginRight: '20px' }}>
+            <Wallet />
+          </div>
+          <div>
+            <ANButton
+              type="primary"
+              onClick={goToCreateDaoPage}
+              label={'Create DAO'}
+              height={'48px'}
+              width={'174px'}
+              disabled={status === 'connecting'}
+            ></ANButton>
+          </div>
         </Account>
       </Navbar>
     </HeaderWrapperDiv>
