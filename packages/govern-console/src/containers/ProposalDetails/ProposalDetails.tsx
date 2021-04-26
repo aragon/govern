@@ -46,6 +46,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   if (!daoDetails) {
     history.push('/');
   }
+  console.log(selectedProposal, ' proposal')
   const theme = useTheme();
   const context: any = useWallet();
   const {
@@ -468,7 +469,13 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                 />
               </ProposalStatus>
               <ProposalId>{selectedProposal.id}</ProposalId>
-              <DateDisplay>3/29/2021</DateDisplay>
+              <DateDisplay>{
+                  // TODO:Bhanu you can make this work with the dates library you use
+                  new Date(proposalInfo.createdAt * 1000).toLocaleDateString("en-US") 
+                  + ' ' +
+                  new Date(proposalInfo.createdAt * 1000).toLocaleTimeString("en-US")
+              }
+              </DateDisplay>
               <DetailsWrapper>
                 <ProposalDetailsWrapper id="proposal_wrapper">
                   <TitleText>Config</TitleText>
@@ -492,7 +499,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                     <InfoValueDivBlock>
                       <a>{proposalInfo.config.challengeDeposit.token}</a>
                       <div>
-                        {proposalInfo.config.scheduleDeposit.amount} ANT
+                        {proposalInfo.config.challengeDeposit.amount} ANT
                       </div>
                     </InfoValueDivBlock>
                   </InfoWrapper>
@@ -661,7 +668,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                       // value={vetoReason.current}
                     />
                     <ANButton
-                      label="Execute"
+                      label="Veto"
                       height="45px"
                       width="372px"
                       style={{ margin: 'auto' }}
