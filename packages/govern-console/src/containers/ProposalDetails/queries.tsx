@@ -7,6 +7,14 @@ export const GET_PROPOSAL_DETAILS_QUERY = gql`
       id
       state
       createdAt
+      queue {
+        roles {
+          selector
+          who
+          granted
+          frozen
+        }
+      }
       config {
         executionDelay
         scheduleDeposit {

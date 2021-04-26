@@ -46,7 +46,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   if (!daoDetails) {
     history.push('/');
   }
-  console.log(selectedProposal, ' proposal')
   const theme = useTheme();
   const context: any = useWallet();
   const {
@@ -448,8 +447,89 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     console.log(executeTransaction);
   };
 
+  const vetoProposal = async () => {
+    const proposalParams = getProposalParams();
+    console.log(proposalParams);
+    console.log(proposalParams);
+    const vetoTransaction = await proposalInstance.veto(
+      proposalParams, 
+      vetoReason.current
+    );
+    console.log(vetoTransaction, 'nice')
+  }
+
+  const resolveProposal = async () => {
+    
+  }
+
+
+  let proposalStates:any= {};
+  // check if the user has the veto power.
+  if(proposalInfo) {    
+    proposalInfo.history.forEach((item:any) => {
+      proposalStates[item.__typename] = item
+    })
+
+
+    // =============================================
+    // if(proposalStates['ContainerEventChallenge']){ MEANS it was challenged.
+    //     show the followings
+    //   
+    //     proposalStates['ContainerEventChallenge'].reason
+    //     proposalStates['ContainerEventChallenge'].createdAt
+    //     proposalStates['ContainerEventChallenge].challenger
+    //   
+
+    // } else if(proposalInfo.state == 'Scheduled') {{
+    //     show what you were showing before. (challenge reason label + input + button)
+    //  }
+    // =============================================
+
+    // if(proposalStates['ContainerEventExecute']){
+    //   show the following
+    //   proposalStates['ContainerEventExecute'].createdAt
+    //   proposalStates['ContainerEventExecute'].execResults bytes array here.. each member can have arbitrary size.
+    // }else if(proposalInfo.state == 'Scheduled'){
+    //   if({proposalInfo.payload.executionTime - currentTimestamp} > 0) - show the message: You will not be able to execute this action until {proposalInfo.payload.executionTime - proposalInfo.payload.currentTimestamp} in human readable date format
+    //   else show what you were showing before. (execute button)
+    // }
+    // =============================================
+    // if(proposalStates['ContainerEventVeto']){
+    //     show the following
+    //     proposalStates['ContainerEventVeto'].createdAt
+    //     proposalStates['ContainerEventVeto'].reason // This is the array of bytes, where each member can be any size.
+    //  }
+    //  else if(proposalInfo.state == 'Scheduled' || proposalInfo.state == 'Challenged')){
+    //    const vetoRoles = proposalInfo.queue.roles.filter(
+    //       (role: any) => role.selector === proposalInstance.getSigHash('veto') && 
+    //       role.who == "0x94C34FB5025e054B24398220CBDaBE901bd8eE5e" && // TODO: Bhanu instead of address, put signer's address
+    //       role.granted
+    //    )
+    //    if(vetoRoles.length === 0){
+    //        TODO:Bhanu If This comes here, it means user doens't have the veto permission, which means we should be showing 
+    //        the message on the veto card: You don't have the permission to veto the proposal. Otherwise
+    //    }else{
+    //        // show veto reason label + input + veto button as showing previously.
+    //    }
+  
+    //  }
+
+    // =============================================
+    // if(proposalStates['ContainerEventResolve']){
+    //   show the following
+    //   proposalStates['ContainerEventResolve'].createdAt
+    //   proposalStates['ContainerEventResolve'].approved  true or false. (yes | no)
+    // } else if(proposalInfo.state == 'Challenged'){
+    //     show the new card where only button is resolve. 
+    // 
+    // }
+     
+    
+    console.log(proposalInfo, ' proposal info')
+  }
+
   // const getParsedDataFromBytes = (data) => {
-  console.log(proposalInfo, ' great');
+  
   // };
   return (
     <>
@@ -672,7 +752,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                       height="45px"
                       width="372px"
                       style={{ margin: 'auto' }}
-                      //  onClick={}
+                      onClick={() => vetoProposal()}
                     />
                   </Widget>
                   <Widget>
@@ -682,6 +762,15 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                       width="372px"
                       style={{ margin: 'auto' }}
                       onClick={executeProposal}
+                    />
+                  </Widget>
+                  <Widget>
+                    <ANButton
+                      label="Resolve"
+                      height="45px"
+                      width="372px"
+                      style={{ margin: 'auto' }}
+                      // onClick={resolveProposal(disputeId)}
                     />
                   </Widget>
                 </WidgetWrapper>

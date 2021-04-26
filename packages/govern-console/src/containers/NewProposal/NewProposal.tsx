@@ -16,6 +16,7 @@ import { useWallet } from '../../EthersWallet';
 import { useHistory } from 'react-router-dom';
 import { BigNumber, Transaction as EthersTransaction, ethers } from 'ethers';
 import { erc20ApprovalTransaction } from 'utils/transactionHelper';
+import { toUtf8Bytes } from '@ethersproject/strings'
 
 import {
   Proposal,
@@ -388,7 +389,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
         { to: ethers.constants.AddressZero, value: 0, data: '0x' },
       ],
       allowFailuresMap: ethers.utils.hexZeroPad('0x0', 32),
-      proof: '0x',
+      proof: toUtf8Bytes(justification.current)
     };
 
     return payload;
@@ -427,11 +428,12 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
       );
       const data = {
         to: contractAddress,
-        value: '0x',
+        value: 0,
         data: calldata,
       };
       return data;
     });
+    console.log(actions, ' actions here')
     scheduleProposal(actions);
   };
 
