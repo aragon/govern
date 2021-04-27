@@ -127,6 +127,7 @@ const NewDaoForm: React.FC<FormProps> = ({
   cancelForm,
 }) => {
   const context: any = useWallet();
+  console.log('context', context)
   const [isExistingToken, updateIsExistingToken] = useState(false);
   const [isUseProxyChecked, updateIsUseProxyChecked] = useState(true);
   const [isUseFreeVotingChecked, updateIsUseFreeVotingChecked] = useState(true);
@@ -257,6 +258,8 @@ const NewDaoForm: React.FC<FormProps> = ({
     };
 
     try {
+      //TODO this console log to be removed
+      console.log('createDaoParams', createDaoParams)
       const result: any = await createDao(createDaoParams);
       setCreatedDaoRoute(daoName);
       await result.wait(1);
@@ -451,6 +454,7 @@ const NewDaoForm: React.FC<FormProps> = ({
           }}
         >
           <ANButton
+            disabled={context.status !== 'connected'}
             label="Create new DAO"
             type="primary"
             style={{ marginTop: 40 }}
