@@ -48,7 +48,7 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
   } = useQuery(GET_DAO_LIST, {
     variables: {
       offset: 0,
-      limit: 1,
+      limit: 12,
     },
   });
 
@@ -94,11 +94,11 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
       <div
         style={{
           width: '100%',
-          // maxWidth: '1408px',
-          display: 'grid',
-          gridTemplateColumns: 'auto auto auto auto',
+          maxWidth: '100%',
+          display: 'flex',
+          flexWrap: 'wrap',
           justifyContent: 'left',
-          gridGap: '0px 32px',
+          gridGap: '0px 10px',
         }}
       >
         {visibleDaoList &&

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useRef, useState, useEffect, memo } from 'react';
 import { styled, useTheme } from '@material-ui/core/styles';
 import { DaoHeader } from '../../components/DaoHeader/DaoHeader';
@@ -28,6 +29,7 @@ const DaoMainPage: React.FC<{
 
   const [isProposalPage, setProposalPage] = useState(true);
   const [visibleProposalList, updateVisibleProposalList] = useState<any>([]);
+  const [queueNonce, updateQueueNonce] = useState<number>();
   const [isProfilePage, setProfilePage] = useState(false);
   const searchString = useRef('');
 
@@ -62,12 +64,32 @@ const DaoMainPage: React.FC<{
   } = useQuery(GET_PROPOSAL_LIST, {
     variables: {
       id: daoDetails.queue.id,
+      offset: 0,
+      limit: 16,
     },
   });
+
+  const fetchMoreData = async () => {
+    const {
+      data: moreData,
+      loading: loadingMore,
+    }: { data: any; loading: boolean } = await fetchMoreProposals({
+      variables: {
+        offset: visibleProposalList.length,
+      },
+    });
+    if (moreData && moreData.governQueue.containers.length > 0) {
+      updateVisibleProposalList([
+        ...visibleProposalList,
+        ...moreData.governQueue.containers,
+      ]);
+    }
+  };
 
   useEffect(() => {
     if (queueData) {
       updateVisibleProposalList(queueData.governQueue.containers);
+      updateQueueNonce(parseInt(queueData.governQueue.nonce));
     }
   }, [queueData]);
 
@@ -171,20 +193,23 @@ const DaoMainPage: React.FC<{
             <div
               style={{
                 width: '100%',
-                display: 'grid',
-                gridTemplateColumns: 'auto auto auto',
+                display: 'flex',
+                flexWrap: 'wrap',
                 justifyContent: 'left',
-                gridGap: '0px 16px',
+                gridGap: '0px 24px',
               }}
             >
               {visibleProposalList.map((proposal: any) => (
-                <div
-                  style={{ marginTop: '16px', width: '427px' }}
-                  key={proposal.id}
-                >
+                <div style={{ marginTop: '16px' }} key={proposal.id}>
                   <ProposalCard
                     transactionHash={proposal.id}
-                    proposalDate={'3/29/2021'}
+                    proposalDate={
+                      // TODO:Bhanu you can make this work with the dates library you use
+                      // I will make sure createdAt can be set on container more easily without this history check
+                      new Date(proposal.history[proposal.history.length-1].createdAt * 1000).toLocaleDateString("en-US") 
+                      + ' ' +
+                      new Date(proposal.history[proposal.history.length-1].createdAt * 1000).toLocaleTimeString("en-US")
+                    }
                     proposalStatus={proposal.state}
                     onClickProposalCard={() => onClickProposalCard(proposal)}
                   ></ProposalCard>
@@ -201,13 +226,16 @@ const DaoMainPage: React.FC<{
                 marginBottom: '32px',
               }}
             >
-              {/* <ANButton
-                label="Load More Proposals"
-                type="secondary"
-                height="46px"
-                width="196px"
-                color="#00C2FF"
-              ></ANButton> */}
+              {queueNonce !== visibleProposalList.length ? (
+                <ANButton
+                  label="Load More Proposals"
+                  type="secondary"
+                  height="46px"
+                  width="196px"
+                  color="#00C2FF"
+                  onClick={fetchMoreData}
+                ></ANButton>
+              ) : null}
             </div>
           </div>
         ) : (
