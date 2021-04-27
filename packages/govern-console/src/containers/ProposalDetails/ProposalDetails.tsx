@@ -6,9 +6,10 @@ import Typography from '@material-ui/core/Typography';
 import backButtonIcon from 'images/back-btn.svg';
 import { Label } from 'components/Labels/Label';
 import { InputField } from 'components/InputFields/InputField';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { GET_PROPOSAL_DETAILS_QUERY } from './queries';
-import { useQuery } from '@apollo/client';
+import { GET_DAO_BY_NAME } from '../DAO/queries';
+import { useQuery, useLazyQuery } from '@apollo/client';
 import { useEffect } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { useWallet } from '../../EthersWallet';
@@ -32,21 +33,12 @@ interface ProposalDetailsProps {
 const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   let selectedProposal: any = {};
   const history = useHistory();
-  const selectedProposalString = sessionStorage.getItem('selectedProposal');
-  if (selectedProposalString) {
-    selectedProposal = JSON.parse(selectedProposalString);
-  } else {
-    history.push('/');
-  }
-  let daoDetails: any = null;
-  const daoDetailsString = sessionStorage.getItem('selectedDao');
-  if (daoDetailsString) {
-    daoDetails = JSON.parse(daoDetailsString);
-  }
-  if (!daoDetails) {
-    history.push('/');
-  }
   const theme = useTheme();
+  const { daoName, id: proposalId } = useParams<any>();
+  console.log(daoName, proposalId);
+  const { data: daoList } = useQuery(GET_DAO_BY_NAME, {
+    variables: { name: daoName },
+  });
   const context: any = useWallet();
   const {
     connector,
@@ -121,9 +113,9 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     boxSizing: 'border-box',
   });
   const getLabelColor = () => {
-    if (selectedProposal.state === 'Scheduled') return 'yellow';
-    if (selectedProposal.state === 'Executed') return 'green';
-    if (selectedProposal.state === 'Challenged') return 'red';
+    if (proposalInfo.state === 'Scheduled') return 'yellow';
+    if (proposalInfo.state === 'Executed') return 'green';
+    if (proposalInfo.state === 'Challenged') return 'red';
   };
   const DetailsWrapper = styled('div')({
     display: 'flex',
@@ -316,6 +308,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
 
   const [proposalInfo, updateProposalInfo] = React.useState<any>(null);
   const [isExpanded, updateIsExpanded] = React.useState<any>({});
+  const [daoDetails, updateDaoDetails] = React.useState<any>();
   const challengeReason = React.useRef('');
   const vetoReason = React.useRef('');
 
@@ -326,15 +319,14 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     id: string;
   };
 
-  const {
-    data: proposalDetailsData,
-    loading: isLoadingProposalDetails,
-    error: errorFetchingProposalDetails,
-  } = useQuery(GET_PROPOSAL_DETAILS_QUERY, {
-    variables: {
-      id: selectedProposal.id,
+  const [
+    getProposalData,
+    {
+      loading: isLoadingProposalDetails,
+      data: proposalDetailsData,
+      error: errorFetchingProposalDetails,
     },
-  });
+  ] = useLazyQuery(GET_PROPOSAL_DETAILS_QUERY);
 
   useEffect(() => {
     if (proposalDetailsData) {
@@ -352,12 +344,25 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     updateIsExpanded(cloneObject);
   };
 
+  useEffect(() => {
+    if (daoList) {
+      updateDaoDetails(daoList.daos[0]);
+      getProposalData({
+        variables: {
+          id: proposalId,
+        },
+      });
+    }
+  }, [daoList]);
+
   const proposalInstance = React.useMemo(() => {
-    const proposalOptions: ProposalOptions = {
-      // provider: ethersProvider,
-    };
-    const proposal = new Proposal(daoDetails.queue.address, proposalOptions);
-    return proposal;
+    if (daoDetails) {
+      const proposalOptions: ProposalOptions = {
+        // provider: ethersProvider,
+      };
+      const proposal = new Proposal(daoDetails.queue.address, proposalOptions);
+      return proposal;
+    }
   }, [daoDetails]);
 
   const approveChallengeCollateralsIfNeeded = async () => {
@@ -431,11 +436,13 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     const proposalParams = getProposalParams();
     console.log(proposalParams);
     await approveChallengeCollateralsIfNeeded();
-    const challengeTransaction = await proposalInstance.challenge(
-      proposalParams,
-      challengeReason.current,
-    );
-    console.log(challengeTransaction);
+    if (proposalInstance) {
+      const challengeTransaction = await proposalInstance.challenge(
+        proposalParams,
+        challengeReason.current,
+      );
+    }
+    // console.log(challengeTransaction);
   };
 
   const executeProposal = async () => {
@@ -443,42 +450,42 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     console.log(proposalParams);
     console.log(proposalParams);
     // approveCollateralIfNeeded();
-    const executeTransaction = await proposalInstance.execute(proposalParams);
-    console.log(executeTransaction);
+    if (proposalInstance) {
+      const executeTransaction = await proposalInstance.execute(proposalParams);
+      console.log(executeTransaction);
+    }
   };
 
   const vetoProposal = async () => {
     const proposalParams = getProposalParams();
     console.log(proposalParams);
     console.log(proposalParams);
-    const vetoTransaction = await proposalInstance.veto(
-      proposalParams, 
-      vetoReason.current
-    );
-    console.log(vetoTransaction, 'nice')
-  }
+    if (proposalInstance) {
+      const vetoTransaction = await proposalInstance.veto(
+        proposalParams,
+        vetoReason.current,
+      );
+      console.log(vetoTransaction, 'nice');
+    }
+  };
 
-  const resolveProposal = async () => {
-    
-  }
+  const resolveProposal = async () => {};
 
-
-  let proposalStates:any= {};
+  let proposalStates: any = {};
   // check if the user has the veto power.
-  if(proposalInfo) {    
-    proposalInfo.history.forEach((item:any) => {
-      proposalStates[item.__typename] = item
-    })
-
+  if (proposalInfo) {
+    proposalInfo.history.forEach((item: any) => {
+      proposalStates[item.__typename] = item;
+    });
 
     // =============================================
     // if(proposalStates['ContainerEventChallenge']){ MEANS it was challenged.
     //     show the followings
-    //   
+    //
     //     proposalStates['ContainerEventChallenge'].reason
     //     proposalStates['ContainerEventChallenge'].createdAt
     //     proposalStates['ContainerEventChallenge].challenger
-    //   
+    //
 
     // } else if(proposalInfo.state == 'Scheduled') {{
     //     show what you were showing before. (challenge reason label + input + button)
@@ -501,17 +508,17 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     //  }
     //  else if(proposalInfo.state == 'Scheduled' || proposalInfo.state == 'Challenged')){
     //    const vetoRoles = proposalInfo.queue.roles.filter(
-    //       (role: any) => role.selector === proposalInstance.getSigHash('veto') && 
+    //       (role: any) => role.selector === proposalInstance.getSigHash('veto') &&
     //       role.who == "0x94C34FB5025e054B24398220CBDaBE901bd8eE5e" && // TODO: Bhanu instead of address, put signer's address
     //       role.granted
     //    )
     //    if(vetoRoles.length === 0){
-    //        TODO:Bhanu If This comes here, it means user doens't have the veto permission, which means we should be showing 
+    //        TODO:Bhanu If This comes here, it means user doens't have the veto permission, which means we should be showing
     //        the message on the veto card: You don't have the permission to veto the proposal. Otherwise
     //    }else{
     //        // show veto reason label + input + veto button as showing previously.
     //    }
-  
+
     //  }
 
     // =============================================
@@ -520,16 +527,15 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     //   proposalStates['ContainerEventResolve'].createdAt
     //   proposalStates['ContainerEventResolve'].approved  true or false. (yes | no)
     // } else if(proposalInfo.state == 'Challenged'){
-    //     show the new card where only button is resolve. 
-    // 
+    //     show the new card where only button is resolve.
+    //
     // }
-     
-    
-    console.log(proposalInfo, ' proposal info')
+
+    console.log(proposalInfo, ' proposal info');
   }
 
   // const getParsedDataFromBytes = (data) => {
-  
+
   // };
   return (
     <>
@@ -545,16 +551,21 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
               <ProposalStatus>
                 <Label
                   labelColor={getLabelColor()}
-                  labelText={selectedProposal.state}
+                  labelText={proposalInfo.state}
                 />
               </ProposalStatus>
-              <ProposalId>{selectedProposal.id}</ProposalId>
-              <DateDisplay>{
+              <ProposalId>{proposalId}</ProposalId>
+              <DateDisplay>
+                {
                   // TODO:Bhanu you can make this work with the dates library you use
-                  new Date(proposalInfo.createdAt * 1000).toLocaleDateString("en-US") 
-                  + ' ' +
-                  new Date(proposalInfo.createdAt * 1000).toLocaleTimeString("en-US")
-              }
+                  new Date(proposalInfo.createdAt * 1000).toLocaleDateString(
+                    'en-US',
+                  ) +
+                    ' ' +
+                    new Date(proposalInfo.createdAt * 1000).toLocaleTimeString(
+                      'en-US',
+                    )
+                }
               </DateDisplay>
               <DetailsWrapper>
                 <ProposalDetailsWrapper id="proposal_wrapper">
@@ -620,7 +631,8 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                   <InfoWrapper>
                     <InfoKeyDiv>Executor:</InfoKeyDiv>
                     <InfoValueDivInline>
-                      {proposalInfo.payload.executor.address || 'No executor ID'}
+                      {proposalInfo.payload.executor.address ||
+                        'No executor ID'}
                     </InfoValueDivInline>
                   </InfoWrapper>
                   {/* <InfoWrapper>

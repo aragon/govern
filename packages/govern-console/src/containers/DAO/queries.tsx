@@ -6,8 +6,8 @@ export const GET_PROPOSAL_LIST = gql`
     governQueue(id: $id) {
       id
       containers(
-        skip: $offset, 
-        first: $limit, 
+        skip: $offset
+        first: $limit
         orderBy: createdAt
         orderDirection: desc
       ) {
@@ -16,6 +16,41 @@ export const GET_PROPOSAL_LIST = gql`
         createdAt
       }
       nonce
+    }
+  }
+`;
+
+export const GET_DAO_BY_NAME = gql`
+  query DAO($name: String) {
+    daos(where: { name: $name }) {
+      id
+      name
+      queue {
+        id
+        address
+        nonce
+        config {
+          executionDelay
+          scheduleDeposit {
+            token
+            amount
+          }
+          challengeDeposit {
+            token
+            amount
+          }
+          resolver
+          rules
+          maxCalldataSize
+        }
+      }
+      executor {
+        id
+        address
+        balance
+      }
+      token
+      registrant
     }
   }
 `;

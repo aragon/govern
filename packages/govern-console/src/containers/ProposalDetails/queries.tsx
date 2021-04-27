@@ -47,7 +47,7 @@ export const GET_PROPOSAL_DETAILS_QUERY = gql`
       history {
         id
         createdAt
-        ...on ContainerEventChallenge {
+        ... on ContainerEventChallenge {
           disputeId
           challenger
           collateral {
@@ -58,19 +58,19 @@ export const GET_PROPOSAL_DETAILS_QUERY = gql`
           reason
           resolver
         }
-        ...on ContainerEventSchedule {
+        ... on ContainerEventSchedule {
           collateral {
             token
             amount
           }
         }
-        ...on ContainerEventExecute {
+        ... on ContainerEventExecute {
           execResults
         }
-        ...on ContainerEventResolve {
+        ... on ContainerEventResolve {
           approved
         }
-        ...on ContainerEventVeto {
+        ... on ContainerEventVeto {
           reason
         }
       }
