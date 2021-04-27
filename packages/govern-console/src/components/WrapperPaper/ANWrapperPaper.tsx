@@ -6,7 +6,7 @@ const useStyle = makeStyles({
   root: {
     width: 'min-content',
     background: '#FFFFFF',
-    height: 'min-content',
+    height: 'auto',
     padding: '50px',
     display: 'flex',
     flexWrap: 'wrap',

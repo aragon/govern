@@ -12,7 +12,7 @@ import { ANButton } from 'components/Button/ANButton';
 import { SimpleModal } from '../../components/Modal/SimpleModal';
 import { ANCircularProgressWithCaption } from '../../components/CircularProgress/ANCircularProgressWithCaption';
 import { CiruclarProgressStatus } from '../../components/CircularProgress/ANCircularProgress';
-import { GET_DAO_BY_NAME } from '../Console/queries';
+import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { useQuery } from '@apollo/client';
 import { buildPayload } from '../../utils/ERC3000'
 import { useWallet } from '../../EthersWallet';
@@ -181,42 +181,38 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
   };
 
   const { daoName } = useParams<ParamTypes>();
-  let {
-    data: daoDetailsData,
-    loading: isLoadingDaoDetails,
-    error: daoLoadingError,
-  } = useQuery(GET_DAO_BY_NAME, {
+  //TODO daoname empty handling
+  const { data: daoList } = useQuery(GET_DAO_BY_NAME, {
     variables: { name: daoName },
   });
 
-
-  const [daoDetails, setDaoDetails] = useState<any | null>();
+  const [daoDetails, updateDaoDetails] = useState<any>();
   const [proposal, setProposal] =  useState<any | null>();
   const [currentConfig, setCurrentConfig] = useState<any | null>();
 
   useEffect(() => {
-    let _daoDetails: any = sessionStorage.getItem('selectedDao');
-    if (_daoDetails === null) {
-      // TODO: fetch from subgraph if page opened via url
+    if (daoList) {
+      updateDaoDetails(daoList.daos[0]);
     }
-    const details = JSON.parse(_daoDetails);
-    
-    
-    const _config = details.queue.config;
-    setDaoDetails(details)
-    setCurrentConfig(_config)
-    onChangeExecutionDelay(_config.executionDelay);
-    onScheduleDepositContractAddress(_config.scheduleDeposit.token);
-    onChangeScheduleDepositAmount(_config.scheduleDeposit.amount);
-    onChangeChallengeDepositContractAddress(_config.challengeDeposit.token);
-    onChangeChallengeDepositAmount(_config.challengeDeposit.amount);
-    onChangeResolverAddress(_config.resolver);
-    setRules(_config.rules);
+  }, [daoList]);
 
-    const proposalOptions: ProposalOptions = {};
-    const proposal = new Proposal(details.queue.address, proposalOptions)
-    setProposal(proposal)
-  }, []);
+  useEffect(() => {
+    if(daoDetails) {
+      const _config = daoDetails.queue.config;
+      setCurrentConfig(_config)
+      onChangeExecutionDelay(_config.executionDelay);
+      onScheduleDepositContractAddress(_config.scheduleDeposit.token);
+      onChangeScheduleDepositAmount(_config.scheduleDeposit.amount);
+      onChangeChallengeDepositContractAddress(_config.challengeDeposit.token);
+      onChangeChallengeDepositAmount(_config.challengeDeposit.amount);
+      onChangeResolverAddress(_config.resolver);
+      setRules(_config.rules);
+
+      const proposalOptions: ProposalOptions = {};
+      const proposal = new Proposal(daoDetails.queue.address, proposalOptions)
+      setProposal(proposal)
+    }
+  }, [daoDetails]);
 
   const [isOpen, setIsOpen] = useState(false);
   const [txList, setTxList] = useState<string[]>([]);
