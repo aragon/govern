@@ -15,7 +15,7 @@ import { defaultAbiCoder } from 'ethers/lib/utils';
 import { useWallet } from '../../EthersWallet';
 import { useHistory } from 'react-router-dom';
 import { BigNumber, Transaction as EthersTransaction, ethers } from 'ethers';
-import { erc20ApprovalTransaction } from 'utils/transactionHelper';
+import { erc20ApprovalTransaction } from '../../utils/transactionHelper';
 
 import {
   Proposal,
@@ -381,7 +381,11 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     executionTime,
   }: payloadArgs) => {
     const payload: PayloadType = {
-      executionTime: executionTime || Math.round(Date.now() / 1000) + parseInt(daoDetails.queue.config.executionDelay) + 30, // add 30 seconds for network latency.
+      executionTime:
+        executionTime ||
+        Math.round(Date.now() / 1000) +
+          parseInt(daoDetails.queue.config.executionDelay) +
+          30, // add 30 seconds for network latency.
       submitter,
       executor,
       actions: actions ?? [

@@ -1,6 +1,6 @@
 import { CustomTransaction, Response } from 'utils/types';
 import { ethers, BigNumber } from 'ethers';
-import { erc20TokenABI } from 'utils/abis/erc20';
+import { erc20TokenABI } from './abis/erc20';
 
 export async function erc20ApprovalTransaction(
   token: string,
