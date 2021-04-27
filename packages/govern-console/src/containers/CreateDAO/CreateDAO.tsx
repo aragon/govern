@@ -34,7 +34,7 @@ enum CreateDaoStatus {
   Failed,
 }
 
-const aragonFreeVotingUrl = '#';
+const aragonVoiceUrl = 'https://voice.aragon.org';
 
 interface FormProps {
   /*
@@ -438,7 +438,7 @@ const NewDaoForm: React.FC<FormProps> = ({
           </div>
           <div style={optionTextStyle}>
             Use{' '}
-            <a target="_blank" href={aragonFreeVotingUrl}>
+            <a href={aragonVoiceUrl} target="_blank" rel="noreferrer noopener">
               Aragon Voice
             </a>{' '}
             - This will enable your DAO to have free voting for you proposals
