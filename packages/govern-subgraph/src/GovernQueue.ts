@@ -61,6 +61,7 @@ export function handleScheduled(event: ScheduledEvent): void {
 
   container.payload = payload.id
   container.state = SCHEDULED_STATUS
+  container.createdAt = event.block.timestamp
   // This should always be possible, as a queue without a config
   // should be impossible to get at this stage
   container.config = queue.config

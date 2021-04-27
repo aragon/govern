@@ -7,10 +7,10 @@ import { ANButton } from '../../components/Button/ANButton';
 import { InputField } from '../../components/InputFields/InputField';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
-import { GET_PROPOSAL_LIST } from './queries';
-import { useQuery } from '@apollo/client';
+import { GET_PROPOSAL_LIST, GET_DAO_BY_NAME } from './queries';
+import { useQuery, useLazyQuery } from '@apollo/client';
 import { formatEther } from 'ethers/lib/utils';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 
 const DaoMainPage: React.FC<{
   onClickProposalCard: any;
@@ -18,19 +18,19 @@ const DaoMainPage: React.FC<{
 }> = ({ onClickProposalCard, onClickNewProposal, ...props }) => {
   const history = useHistory();
   const theme = useTheme();
-  let daoDetails;
-  const daoDetailsString = sessionStorage.getItem('selectedDao');
-  if (daoDetailsString) {
-    daoDetails = JSON.parse(daoDetailsString);
-  }
-  if (!daoDetails) {
-    history.push('/');
-  }
+  const { daoName } = useParams<any>();
+  //TODO daoname empty handling
+
+  const { data: daoList, loading: loadingDao } = useQuery(GET_DAO_BY_NAME, {
+    variables: { name: daoName },
+  });
 
   const [isProposalPage, setProposalPage] = useState(true);
   const [visibleProposalList, updateVisibleProposalList] = useState<any>([]);
   const [queueNonce, updateQueueNonce] = useState<number>();
+  const [fetchMoreProposal, updateFetchMoreProposals] = useState<any>();
   const [isProfilePage, setProfilePage] = useState(false);
+  const [daoDetails, updateDaoDetails] = useState<any>();
   const searchString = useRef('');
 
   // useEffect(() => {
@@ -56,35 +56,49 @@ const DaoMainPage: React.FC<{
     }
   };
 
-  const {
-    data: queueData,
-    loading: isLoadingProposals,
-    error: errorLoadingProposals,
-    fetchMore: fetchMoreProposals,
-  } = useQuery(GET_PROPOSAL_LIST, {
-    variables: {
-      id: daoDetails.queue.id,
-      offset: 0,
-      limit: 16,
+  const [
+    getQueueData,
+    {
+      loading: loadingProposals,
+      data: queueData,
+      error: proposalErrors,
+      fetchMore: fetchMoreProposals,
     },
-  });
+  ] = useLazyQuery(GET_PROPOSAL_LIST);
 
   const fetchMoreData = async () => {
-    const {
-      data: moreData,
-      loading: loadingMore,
-    }: { data: any; loading: boolean } = await fetchMoreProposals({
-      variables: {
-        offset: visibleProposalList.length,
-      },
-    });
-    if (moreData && moreData.governQueue.containers.length > 0) {
-      updateVisibleProposalList([
-        ...visibleProposalList,
-        ...moreData.governQueue.containers,
-      ]);
+    if (fetchMoreProposals) {
+      const {
+        data: moreData,
+        loading: loadingMore,
+      }: { data: any; loading: boolean } = await fetchMoreProposals({
+        variables: {
+          offset: visibleProposalList.length,
+        },
+      });
+      if (moreData && moreData.governQueue.containers.length > 0) {
+        updateVisibleProposalList([
+          ...visibleProposalList,
+          ...moreData.governQueue.containers,
+        ]);
+      }
     }
   };
+
+  useEffect(() => {
+    if (daoList) {
+      updateDaoDetails(daoList.daos[0]);
+      if (daoList.daos[0] && daoList.daos[0].queue) {
+        getQueueData({
+          variables: {
+            offset: 0,
+            limit: 16,
+            id: daoList.daos[0].queue.id,
+          },
+        });
+      }
+    }
+  }, [daoList]);
 
   useEffect(() => {
     if (queueData) {
@@ -126,8 +140,20 @@ const DaoMainPage: React.FC<{
   });
   //* Styled Components List End
 
-  return (
-    <DaoPageMainDiv>
+  console.log(visibleProposalList, ' good');
+
+  const onClickProposal = (proposal: any) => {
+    history.push(`/proposals/${daoName}/${proposal.id}`);
+  };
+
+  const goToNewProposal = () => {
+    history.push(`/daos/${daoName}/new-proposal`);
+  };
+  if (loadingDao) {
+    return <div>Loading...</div>
+  } 
+
+  if (daoDetails) { return <DaoPageMainDiv>
       <DaoHeader
         ethBalance={formatEther(daoDetails.executor.balance)}
         usdBalance={'2222'}
@@ -187,7 +213,7 @@ const DaoMainPage: React.FC<{
                 type="primary"
                 height="46px"
                 width="142px"
-                onClick={onClickNewProposal}
+                onClick={goToNewProposal}
               ></ANButton>
             </div>
             <div
@@ -205,13 +231,16 @@ const DaoMainPage: React.FC<{
                     transactionHash={proposal.id}
                     proposalDate={
                       // TODO:Bhanu you can make this work with the dates library you use
-                      // I will make sure createdAt can be set on container more easily without this history check
-                      new Date(proposal.history[proposal.history.length-1].createdAt * 1000).toLocaleDateString("en-US") 
-                      + ' ' +
-                      new Date(proposal.history[proposal.history.length-1].createdAt * 1000).toLocaleTimeString("en-US")
+                      new Date(proposal.createdAt * 1000).toLocaleDateString(
+                        'en-US',
+                      ) +
+                      ' ' +
+                      new Date(proposal.createdAt * 1000).toLocaleTimeString(
+                        'en-US',
+                      )
                     }
                     proposalStatus={proposal.state}
-                    onClickProposalCard={() => onClickProposalCard(proposal)}
+                    onClickProposalCard={() => onClickProposal(proposal)}
                   ></ProposalCard>
                 </div>
               ))}
@@ -243,6 +272,7 @@ const DaoMainPage: React.FC<{
         )}
       </div>
     </DaoPageMainDiv>
-  );
+  } 
+  return <div> No Dao with this name. </div>
 };
 export default memo(DaoMainPage);

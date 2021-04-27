@@ -40,7 +40,7 @@ export interface ANButtonProps {
    */
   height?: string;
   /**
-   * Color vlue
+   * Color value
    */
   color?: string;
   /**

@@ -21,12 +21,10 @@ import {
   CreateDaoParams,
   CreateDaoOptions,
   Token,
-  getToken
+  getToken,
 } from '@aragon/govern';
-// Note: query should not be needed once DAO page is capable of auto query 
-import {
-  GET_DAO_BY_NAME,
-} from '../Console/queries';
+// Note: query should not be needed once DAO page is capable of auto query
+import { GET_DAO_BY_NAME } from '../Console/queries';
 import { useQuery } from '@apollo/client';
 
 enum CreateDaoStatus {
@@ -39,21 +37,19 @@ enum CreateDaoStatus {
 const aragonFreeVotingUrl = '#';
 
 interface FormProps {
-
   /*
         change create dao process (stage) status
     */
-  setCreateDaoStatus: (status: CreateDaoStatus) => void
+  setCreateDaoStatus: (status: CreateDaoStatus) => void;
 
   /*
         set created dao route
     */
-  setCreatedDaoRoute: (route: string) => void
+  setCreatedDaoRoute: (route: string) => void;
   /*
         cancel form and go back
     */
   cancelForm(): void;
-
 }
 
 interface ResultProps {
@@ -65,7 +61,7 @@ interface ResultProps {
   /**
       change/update creating dao status
    */
-  setCreateDaoStatus(status: CreateDaoStatus): void
+  setCreateDaoStatus(status: CreateDaoStatus): void;
 
   /*
         value to be passed to progress bar: range 0-100
@@ -125,7 +121,11 @@ const optionTextStyle = {
   fontSize: 18,
 };
 
-const NewDaoForm: React.FC<FormProps> = ({ setCreateDaoStatus, setCreatedDaoRoute, cancelForm }) => {
+const NewDaoForm: React.FC<FormProps> = ({
+  setCreateDaoStatus,
+  setCreatedDaoRoute,
+  cancelForm,
+}) => {
   const context: any = useWallet();
   const [isExistingToken, updateIsExistingToken] = useState(false);
   const [isUseProxyChecked, updateIsUseProxyChecked] = useState(true);
@@ -141,13 +141,19 @@ const NewDaoForm: React.FC<FormProps> = ({ setCreateDaoStatus, setCreatedDaoRout
   // TODO: dai and court contract should, have a default fetch from an env or constants,
   // and should be user updatable once UI is ready
   const executionDelay = useRef<number>(86400); // defaults to one day - how many seconds to wait before being able to call execute.
-  const scheduleContract = useRef<string>('0xb08E32D658700f768f5bADf0679E153ffFEC42e6');
+  const scheduleContract = useRef<string>(
+    '0xb08E32D658700f768f5bADf0679E153ffFEC42e6',
+  );
   const scheduleTokenAmount = useRef<number>(0);
-  const challengeContract = useRef<string>('0xb08E32D658700f768f5bADf0679E153ffFEC42e6');
+  const challengeContract = useRef<string>(
+    '0xb08E32D658700f768f5bADf0679E153ffFEC42e6',
+  );
   const challengeTokenAmount = useRef<number>(0);
-  const resolverContract = useRef<string>('0xC464EB732A1D2f5BbD705727576065C91B2E9f18');
+  const resolverContract = useRef<string>(
+    '0xC464EB732A1D2f5BbD705727576065C91B2E9f18',
+  );
   const rules = useRef<string>('0x'); // in hex
-  const maxCalldataSize = useRef<number>(100000);  // initial maxCalldatasize
+  const maxCalldataSize = useRef<number>(100000); // initial maxCalldatasize
 
   const onExecutionDelayChange = (val: any) => {
     executionDelay.current = val;
@@ -202,13 +208,19 @@ const NewDaoForm: React.FC<FormProps> = ({ setCreateDaoStatus, setCreatedDaoRout
   };
 
   const createDaoConfig = {
-    executionDelay: executionDelay.current, 
-    scheduleDeposit: {token: scheduleContract.current, amount: scheduleTokenAmount.current},
-    challengeDeposit: {token: challengeContract.current, amount: challengeTokenAmount.current},
+    executionDelay: executionDelay.current,
+    scheduleDeposit: {
+      token: scheduleContract.current,
+      amount: scheduleTokenAmount.current,
+    },
+    challengeDeposit: {
+      token: challengeContract.current,
+      amount: challengeTokenAmount.current,
+    },
     resolver: resolverContract.current,
     rules: rules.current,
     maxCalldataSize: maxCalldataSize.current,
-  }
+  };
 
   const createDaoCall = async (
     isExistingToken: boolean,
@@ -218,51 +230,51 @@ const NewDaoForm: React.FC<FormProps> = ({ setCreateDaoStatus, setCreatedDaoRout
     isUseProxyChecked: boolean,
     daoName: string,
     isUseFreeVotingChecked: boolean,
-    context: any
+    context: any,
   ): Promise<boolean> => {
-    let token: Token
+    let token: Token;
     if (isExistingToken) {
       try {
-        token = await getToken(existingTokenAddress, context.ethersProvider)
+        token = await getToken(existingTokenAddress, context.ethersProvider);
       } catch (error) {
-        console.log(error)
-        return false
+        console.log(error);
+        return false;
       }
     } else {
       token = {
         tokenAddress: '',
         tokenDecimals: 18,
         tokenName: tokenName,
-        tokenSymbol: tokenSymbol
-      }
+        tokenSymbol: tokenSymbol,
+      };
     }
     const createDaoParams: CreateDaoParams = {
       name: daoName,
       token,
       config: createDaoConfig,
       useProxies: isUseProxyChecked,
-      useVocdoni: isUseFreeVotingChecked
-    }
-  
+      useVocdoni: isUseFreeVotingChecked,
+    };
+
     try {
-      const result: any = await createDao(createDaoParams)
-      setCreatedDaoRoute(daoName)
+      const result: any = await createDao(createDaoParams);
+      setCreatedDaoRoute(daoName);
       await result.wait(1);
       return true;
     } catch (error) {
-      console.log(error)
-      return false
+      console.log(error);
+      return false;
     }
-  }
+  };
 
-  // TODO: Create Validation for form, inputField may need further customization 
-  const validateForm = (): boolean =>{
+  // TODO: Create Validation for form, inputField may need further customization
+  const validateForm = (): boolean => {
     if (daoName.current === '' || typeof daoName.current === 'undefined') {
-      doaNameError.current = 'Error'
+      doaNameError.current = 'Error';
       return false;
     }
     return true;
-  }
+  };
 
   const submitCreateDao = async () => {
     // TODO: form validation
@@ -273,7 +285,9 @@ const NewDaoForm: React.FC<FormProps> = ({ setCreateDaoStatus, setCreatedDaoRout
     setCreateDaoStatus(CreateDaoStatus.InProgress);
     const callResult = await createDaoCall(
       isExistingToken,
-      existingTokenAddress.current ? existingTokenAddress.current.toString() : '',
+      existingTokenAddress.current
+        ? existingTokenAddress.current.toString()
+        : '',
       tokenName.current ? tokenName.current.toString() : '',
       tokenSymbol.current ? tokenSymbol.current.toString() : '',
       isUseProxyChecked,
@@ -287,7 +301,6 @@ const NewDaoForm: React.FC<FormProps> = ({ setCreateDaoStatus, setCreatedDaoRout
     } else {
       setCreateDaoStatus(CreateDaoStatus.Failed);
     }
-    
   };
 
   return (
@@ -441,9 +454,7 @@ const NewDaoForm: React.FC<FormProps> = ({ setCreateDaoStatus, setCreatedDaoRout
             label="Create new DAO"
             type="primary"
             style={{ marginTop: 40 }}
-            onClick={
-              submitCreateDao
-            }
+            onClick={submitCreateDao}
           />
         </div>
       </ANWrappedPaper>
@@ -488,13 +499,10 @@ const NewDaoProgress: React.FC = () => {
             style={{
               justifyContent: 'center',
               display: 'flex',
-              marginTop: '10px'
+              marginTop: '10px',
             }}
           >
-            <ANCircularProgressWithCaption
-              caption={'Creating DAO'}
-              state={1}
-            />
+            <ANCircularProgressWithCaption caption={'Creating DAO'} state={1} />
           </div>
           <div
             style={{
@@ -523,7 +531,7 @@ const NewDaoProgress: React.FC = () => {
 const NewDaoCreationResult: React.FC<ResultProps> = ({
   isSuccess,
   setCreateDaoStatus,
-  postResultActionRoute
+  postResultActionRoute,
 }) => {
   const history = useHistory();
 
@@ -533,31 +541,31 @@ const NewDaoCreationResult: React.FC<ResultProps> = ({
     data: daoDetailData,
     loading: isLoadingDaoDetail,
     error: errorLoadingDaoDetail,
-    fetchMore: fetchMoreDetail
+    fetchMore: fetchMoreDetail,
   } = useQuery(GET_DAO_BY_NAME, {
     variables: {
-      name: postResultActionRoute
+      name: postResultActionRoute,
     },
   });
 
   useEffect(() => {
     if (daoDetailData && daoDetailData.name) {
-      console.log('daoDetailData', daoDetailData)
+      console.log('daoDetailData', daoDetailData);
       setDaoDetail(daoDetailData);
     }
   }, [daoDetailData]);
 
   const fetchDetail = async () => {
-    console.log('calling fetchDetail')
+    console.log('calling fetchDetail');
     const {
       data: moreData,
       loading: loadingMore,
     }: { data: any; loading: boolean } = await fetchMoreDetail({
       variables: {
-        name: postResultActionRoute
+        name: postResultActionRoute,
       },
     });
-    console.log('fetchDetail:', moreData)
+    console.log('fetchDetail:', moreData);
     if (moreData && moreData.name) {
       setDaoDetail(moreData);
     }
@@ -613,7 +621,7 @@ const NewDaoCreationResult: React.FC<ResultProps> = ({
                   // console.log('queried dao detail', daoDetail)
                   history.push('daos/' + postResultActionRoute);
                 } else {
-                  setCreateDaoStatus(CreateDaoStatus.PreCreate)
+                  setCreateDaoStatus(CreateDaoStatus.PreCreate);
                 }
               }}
             />

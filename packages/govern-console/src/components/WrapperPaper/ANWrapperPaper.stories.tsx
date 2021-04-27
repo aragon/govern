@@ -10,12 +10,10 @@ export default {
   },
 } as Meta;
 
-const Template: Story<PaperProps> = (args) => (
-  <ANWrappedPaper {...args} />
-);
+const Template: Story<PaperProps> = (args) => <ANWrappedPaper {...args} />;
 
 export const an_WrappedPaper = Template.bind({});
 
 an_WrappedPaper.args = {
-    children: 'Some content...'
+  children: 'Some content...',
 };
