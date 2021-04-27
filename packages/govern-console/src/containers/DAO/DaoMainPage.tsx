@@ -21,7 +21,7 @@ const DaoMainPage: React.FC<{
   const { daoName } = useParams<any>();
   //TODO daoname empty handling
 
-  const { data: daoList } = useQuery(GET_DAO_BY_NAME, {
+  const { data: daoList, loading: loadingDao } = useQuery(GET_DAO_BY_NAME, {
     variables: { name: daoName },
   });
 
@@ -88,13 +88,15 @@ const DaoMainPage: React.FC<{
   useEffect(() => {
     if (daoList) {
       updateDaoDetails(daoList.daos[0]);
-      getQueueData({
-        variables: {
-          offset: 0,
-          limit: 16,
-          id: daoList.daos[0].queue.id,
-        },
-      });
+      if (daoList.daos[0] && daoList.daos[0].queue) {
+        getQueueData({
+          variables: {
+            offset: 0,
+            limit: 16,
+            id: daoList.daos[0].queue.id,
+          },
+        });
+      }
     }
   }, [daoList]);
 
@@ -147,8 +149,11 @@ const DaoMainPage: React.FC<{
   const goToNewProposal = () => {
     history.push(`/daos/${daoName}/new-proposal`);
   };
-  return daoDetails ? (
-    <DaoPageMainDiv>
+  if (loadingDao) {
+    return <div>Loading...</div>
+  } 
+
+  if (daoDetails) { return <DaoPageMainDiv>
       <DaoHeader
         ethBalance={formatEther(daoDetails.executor.balance)}
         usdBalance={'2222'}
@@ -267,6 +272,7 @@ const DaoMainPage: React.FC<{
         )}
       </div>
     </DaoPageMainDiv>
-  ) : null;
+  } 
+  return <div> No Dao with this name. </div>
 };
 export default memo(DaoMainPage);
