@@ -40,8 +40,6 @@ export type CustomTransaction = {
 };
 
 export type Response = {
-  isUserBalanceLow: boolean;
-  isCollateralApproved: boolean;
-  errorMessage: string | undefined;
+  error: string | undefined;
   transactions: CustomTransaction[];
 };

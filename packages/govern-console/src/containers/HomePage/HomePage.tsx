@@ -11,6 +11,7 @@ import DaoMainPage from 'containers/DAO/DaoMainPage';
 import ProposalDetails from 'containers/ProposalDetails/ProposalDetails';
 import NewProposal from 'containers/NewProposal/NewProposal';
 import NewDaoContainer from 'containers/CreateDAO/CreateDAO';
+import DaoSettingsContainer from 'containers/DAOSettings/DAOSettings';
 
 const HomePage = ({ ...props }) => {
   const AppWrapper = styled('div')({
@@ -65,11 +66,14 @@ const HomePage = ({ ...props }) => {
               onClickNewProposal={onClickNewProposal}
             />
           </Route>
-          <Route exact path="/proposals/:id">
+          <Route exact path="/proposals/:daoName/:id">
             <ProposalDetails onClickBack={() => history.goBack()} />
           </Route>
-          <Route exact path="/:daoName/new-proposal">
+          <Route exact path="/daos/:daoName/new-proposal">
             <NewProposal onClickBack={() => history.goBack()} />
+          </Route>
+          <Route exact path="/:daoName/dao-settings">
+            <DaoSettingsContainer onClickBack={() => history.goBack()} />
           </Route>
           <Route exact path="/create-dao">
             <NewDaoContainer />

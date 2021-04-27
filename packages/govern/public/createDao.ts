@@ -4,8 +4,31 @@ import { AddressZero } from '@ethersproject/constants'
 import { BigNumberish } from '@ethersproject/bignumber'
 import Configuration from '../internal/configuration/Configuration'
 
-export const ContainerConfig = `tuple(uint256 executionDelay, tuple(address token, uint256 amount) scheduleDeposit, tuple(address token, uint256 amount) challengeDeposit, address resolver, bytes rules, uint256 maxCalldataSize)`
-const token = `tuple(address tokenAddress, uint8 tokenDecimals, string tokenName, string tokenSymbol)`
+export const ContainerConfig = `
+  tuple(
+    uint256 executionDelay, 
+    tuple(
+      address token, 
+      uint256 amount
+    ) scheduleDeposit, 
+    tuple(
+      address token, 
+      uint256 amount
+    ) challengeDeposit, 
+    address resolver, 
+    bytes rules, 
+    uint256 maxCalldataSize
+  )`
+
+const token = `
+  tuple(
+    address tokenAddress, 
+    uint8 tokenDecimals, 
+    string tokenName, 
+    string tokenSymbol
+  )`
+
+
 
 const factoryAbi = [
   `function newGovern(

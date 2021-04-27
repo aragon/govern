@@ -39,6 +39,7 @@ type Container @entity {
   queue: GovernQueue!
   config: Config!
   payload: Payload!
+  createdAt: BigInt!
   history: [ContainerEvent!]! @derivedFrom(field: "container")
 }
 
