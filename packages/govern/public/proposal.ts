@@ -160,6 +160,7 @@ export class Proposal {
     return result
   }
 
+  
   buildAction(name: string, parameters: any, value: number|string): any {
     return {
       data: this.interface.encodeFunctionData(
@@ -169,6 +170,15 @@ export class Proposal {
       to: this.contract.address,
       value: value
     }
+  }
+
+  /**
+   * @param name function name of the govern queue abi
+   * 
+   * @returns {string} the signature of the function
+   */
+  getSigHash(name: string): string {
+    return this.interface.getSighash(name)
   }
 
   /**

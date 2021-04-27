@@ -17,6 +17,8 @@ import { useQuery } from '@apollo/client';
 import { buildPayload } from '../../utils/ERC3000'
 import { useWallet } from '../../EthersWallet';
 import { erc20ApprovalTransaction } from '../../utils/transactionHelper';
+import { toUtf8Bytes } from '@ethersproject/strings'
+
 import {
   Proposal,
   ProposalOptions,
@@ -246,7 +248,9 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
       submitter, 
       executor: daoDetails.executor.address,
       actions: [proposal.buildAction('configure', [newConfig], 0)],
-      executionDelay: daoDetails.queue.config.executionDelay
+      executionDelay: daoDetails.queue.config.executionDelay,
+      // proof: toUtf8Bytes(justification) // TODO Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+      proof: '0x'
     })
 
     // TODO:GIORGI error tracking make it better

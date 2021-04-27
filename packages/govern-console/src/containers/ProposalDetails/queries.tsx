@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { gql } from '@apollo/client';
 
 export const GET_PROPOSAL_DETAILS_QUERY = gql`
@@ -5,6 +6,15 @@ export const GET_PROPOSAL_DETAILS_QUERY = gql`
     container(id: $id) {
       id
       state
+      createdAt
+      queue {
+        roles {
+          selector
+          who
+          granted
+          frozen
+        }
+      }
       config {
         executionDelay
         scheduleDeposit {
@@ -33,6 +43,36 @@ export const GET_PROPOSAL_DETAILS_QUERY = gql`
         }
         allowFailuresMap
         proof
+      }
+      history {
+        id
+        createdAt
+        ...on ContainerEventChallenge {
+          disputeId
+          challenger
+          collateral {
+            token
+            amount
+          }
+          disputeId
+          reason
+          resolver
+        }
+        ...on ContainerEventSchedule {
+          collateral {
+            token
+            amount
+          }
+        }
+        ...on ContainerEventExecute {
+          execResults
+        }
+        ...on ContainerEventResolve {
+          approved
+        }
+        ...on ContainerEventVeto {
+          reason
+        }
       }
     }
   }

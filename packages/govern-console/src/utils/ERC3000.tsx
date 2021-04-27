@@ -15,7 +15,8 @@ type payloadArgs = {
     executor: string;
     executionTime?: number;
     actions?: ActionType[];
-    executionDelay: string
+    executionDelay: string,
+    proof: any // TODO: change it to bytes type
 };
 
 export const buildPayload = ({
@@ -23,7 +24,8 @@ export const buildPayload = ({
     executor,
     actions,
     executionTime,
-    executionDelay
+    executionDelay,
+    proof
 }: payloadArgs): any => {
     const payload: PayloadType = {
         executionTime:
@@ -33,11 +35,9 @@ export const buildPayload = ({
             30, // add 30 seconds for network latency.
         submitter,
         executor,
-        actions: actions ?? [
-            { to: ethers.constants.AddressZero, value: 0, data: '0x' },
-        ],
+        actions: actions || [],
         allowFailuresMap: ethers.utils.hexZeroPad('0x0', 32),
-        proof: '0x',
+        proof: proof
     };
 
     return payload;

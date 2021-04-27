@@ -17,6 +17,7 @@ import { useHistory } from 'react-router-dom';
 import { BigNumber, Transaction as EthersTransaction, ethers } from 'ethers';
 import { erc20ApprovalTransaction } from '../../utils/transactionHelper';
 import { buildPayload } from '../../utils/ERC3000';
+import { toUtf8Bytes } from '@ethersproject/strings'
 
 import {
   Proposal,
@@ -402,16 +403,23 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
       );
       const data = {
         to: contractAddress,
-        value: '0x',
+        value: 0,
         data: calldata,
       };
       return data;
     });
+    console.log(actions, ' actions here')
     scheduleProposal(actions);
   };
 
   const scheduleProposal = async (actions: any[]) => {
-    const payload = buildPayload({ submitter, executor, actions, executionDelay: daoDetails.queue.config.executionDelay });
+    const payload = buildPayload({ 
+      submitter, 
+      executor, 
+      actions, 
+      executionDelay: daoDetails.queue.config.executionDelay,
+      proof: toUtf8Bytes(justification.current)
+    });
     console.log('payload', payload);
     const config = daoDetails.queue.config;
     console.log('config', daoDetails.queue.config);
