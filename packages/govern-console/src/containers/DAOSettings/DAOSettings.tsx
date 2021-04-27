@@ -14,7 +14,15 @@ import { ANCircularProgressWithCaption } from '../../components/CircularProgress
 import { CiruclarProgressStatus } from '../../components/CircularProgress/ANCircularProgress';
 import { GET_DAO_BY_NAME } from '../Console/queries';
 import { useQuery } from '@apollo/client';
-
+import { buildPayload } from '../../utils/ERC3000'
+import { useWallet } from '../../EthersWallet';
+import { erc20ApprovalTransaction } from '../../utils/transactionHelper';
+import {
+  Proposal,
+  ProposalOptions,
+  PayloadType,
+  ActionType,
+} from '@aragon/govern';
 export interface DaoSettingContainerProps {
   /**
    * on click back
@@ -37,6 +45,26 @@ interface ParamTypes {
 }
 
 const DaoSettingsForm: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
+  
+  const context: any = useWallet();
+  const {
+    connector,
+    account,
+    balance,
+    chainId,
+    connect,
+    connectors,
+    ethereum,
+    error,
+    getBlockNumber,
+    networkName,
+    reset,
+    status,
+    type,
+    ethersProvider,
+  } = context;
+
+
   const BackButton = styled('div')({
     height: 25,
     width: 62,
@@ -159,15 +187,22 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
     variables: { name: daoName },
   });
 
-  const [daoDetails, setDaoDetails] = useState<any | null>(null);
+
+  const [daoDetails, setDaoDetails] = useState<any | null>();
+  const [proposal, setProposal] =  useState<any | null>();
+  const [currentConfig, setCurrentConfig] = useState<any | null>();
+
   useEffect(() => {
     let _daoDetails: any = sessionStorage.getItem('selectedDao');
     if (_daoDetails === null) {
       // TODO: fetch from subgraph if page opened via url
     }
     const details = JSON.parse(_daoDetails);
+    
+    
     const _config = details.queue.config;
-    console.log('_config', _config);
+    setDaoDetails(details)
+    setCurrentConfig(_config)
     onChangeExecutionDelay(_config.executionDelay);
     onScheduleDepositContractAddress(_config.scheduleDeposit.token);
     onChangeScheduleDepositAmount(_config.scheduleDeposit.amount);
@@ -175,6 +210,10 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
     onChangeChallengeDepositAmount(_config.challengeDeposit.amount);
     onChangeResolverAddress(_config.resolver);
     setRules(_config.rules);
+
+    const proposalOptions: ProposalOptions = {};
+    const proposal = new Proposal(details.queue.address, proposalOptions)
+    setProposal(proposal)
   }, []);
 
   const [isOpen, setIsOpen] = useState(false);
@@ -185,20 +224,65 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
     setIsOpen(!isOpen);
   };
 
-  const callSaveSetting = () => {
-    const obj = {
+  const callSaveSetting = async () => {
+    const newConfig = {
       executionDelay: executionDelay,
-      scheduleDepositContractAddress: scheduleDepositContractAddress,
-      scheduleDepositAmount: scheduleDepositAmount,
-      challengeDepositContractAddress: challengeDepositContractAddress,
-      challengeDepositAmount: challengeDepositAmount,
-      resolverAddress: resolverAddress,
+      scheduleDeposit: {
+        token: scheduleDepositContractAddress,
+        amount: scheduleDepositAmount
+      },
+      challengeDeposit: {
+        token: challengeDepositContractAddress,
+        amount: challengeDepositAmount
+      },
+      resolver: resolverAddress,
       rules: rules,
-      justification: justification,
+      maxCalldataSize: currentConfig.maxCalldataSize, // TODO: grab it from config subgraph too.
     };
+
+    const submitter: string = account
+
+    const payload = buildPayload({
+      submitter, 
+      executor: daoDetails.executor.address,
+      actions: [proposal.buildAction('configure', [newConfig], 0)],
+      executionDelay: daoDetails.queue.config.executionDelay
+    })
+
+    // TODO:GIORGI error tracking make it better
+    if(daoDetails.queue.config.scheduleDeposit.token !== '0x'+'0'.repeat(20)){
+      const scheduleDepositApproval = await erc20ApprovalTransaction(
+        daoDetails.queue.config.scheduleDeposit.token,
+        daoDetails.queue.config.scheduleDeposit.amount,
+        daoDetails.queue.address,
+        ethersProvider,
+        account,
+      );
+
+      if(scheduleDepositApproval.error) {
+        console.log(scheduleDepositApproval.error, ' approval error')
+      }
+  
+      if(scheduleDepositApproval.transactions.length > 0) {
+        try {
+          const transactionResponse: any = await scheduleDepositApproval.transactions[0].tx();
+          await transactionResponse.wait();
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    }
+    
+    
+    console.log(currentConfig, ' nice one')
+    const scheduleResult = await proposal.schedule({
+      payload: payload,
+      config: currentConfig
+    });
+
     // TODO: create tx object with attribute such as if tx is done using CiruclarProgressStatus
-    console.log('current input obj:', obj);
-    setTxList(['Transaction details 01', 'Transaction details 02']);
+    // console.log('current input obj:', obj);
+    // setTxList(['Transaction details 01', 'Transaction details 02']);
     setIsOpen(true);
   };
 

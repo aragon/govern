@@ -16,6 +16,7 @@ import { useWallet } from '../../EthersWallet';
 import { useHistory } from 'react-router-dom';
 import { BigNumber, Transaction as EthersTransaction, ethers } from 'ethers';
 import { erc20ApprovalTransaction } from '../../utils/transactionHelper';
+import { buildPayload } from '../../utils/ERC3000';
 
 import {
   Proposal,
@@ -367,36 +368,6 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     handleActionModalOpen();
   };
 
-  type payloadArgs = {
-    submitter: string;
-    executor: string;
-    executionTime?: number;
-    actions?: ActionType[];
-  };
-
-  const buildPayload = ({
-    submitter,
-    executor,
-    actions,
-    executionTime,
-  }: payloadArgs) => {
-    const payload: PayloadType = {
-      executionTime:
-        executionTime ||
-        Math.round(Date.now() / 1000) +
-          parseInt(daoDetails.queue.config.executionDelay) +
-          30, // add 30 seconds for network latency.
-      submitter,
-      executor,
-      actions: actions ?? [
-        { to: ethers.constants.AddressZero, value: 0, data: '0x' },
-      ],
-      allowFailuresMap: ethers.utils.hexZeroPad('0x0', 32),
-      proof: '0x',
-    };
-
-    return payload;
-  };
 
   const noCollateral = {
     id: '-1',
@@ -440,25 +411,27 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   };
 
   const scheduleProposal = async (actions: any[]) => {
-    const payload = buildPayload({ submitter, executor, actions });
+    const payload = buildPayload({ submitter, executor, actions, executionDelay: daoDetails.queue.config.executionDelay });
     console.log('payload', payload);
     const config = daoDetails.queue.config;
     console.log('config', daoDetails.queue.config);
-    const scheduleDepositApproval = await erc20ApprovalTransaction(
-      daoDetails.queue.config.scheduleDeposit.token,
-      daoDetails.queue.config.scheduleDeposit.amount,
-      daoDetails.queue.address,
-      ethersProvider,
-      account,
-    );
-    if (scheduleDepositApproval) {
-      if (scheduleDepositApproval.isUserBalanceLow) {
-        console.log('UserBalanceLow');
-        return;
+
+    // TODO:GIORGI error tracking make it better
+    if(daoDetails.queue.config.scheduleDeposit.token !== '0x'+'0'.repeat(20)){
+      const scheduleDepositApproval = await erc20ApprovalTransaction(
+        daoDetails.queue.config.scheduleDeposit.token,
+        daoDetails.queue.config.scheduleDeposit.amount,
+        daoDetails.queue.address,
+        ethersProvider,
+        account,
+      );
+      
+      if(scheduleDepositApproval.error) {
+        console.log(scheduleDepositApproval.error, ' approval error')
       }
-      if (!scheduleDepositApproval.isCollateralApproved) {
+  
+      if(scheduleDepositApproval.transactions.length > 0) {
         try {
-          console.log('coming here 55');
           const transactionResponse: any = await scheduleDepositApproval.transactions[0].tx();
           await transactionResponse.wait();
         } catch (err) {

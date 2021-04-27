@@ -366,31 +366,23 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       CourtABI,
       signer,
     );
-    const challengeDepositApproval = await erc20ApprovalTransaction(
-      daoDetails.queue.config.challengeDeposit.token,
-      daoDetails.queue.config.challengeDeposit.amount,
-      daoDetails.queue.address,
-      ethersProvider,
-      account,
-    );
-    console.log(challengeDepositApproval);
 
-    const [, feeToken, feeAmount] = await contract.getDisputeFees();
+    // TODO:GIORGI error tracking make it better
+    if(daoDetails.queue.config.scheduleDeposit.token !== '0x'+'0'.repeat(20)){
+      const challengeDepositApproval = await erc20ApprovalTransaction(
+        daoDetails.queue.config.challengeDeposit.token,
+        daoDetails.queue.config.challengeDeposit.amount,
+        daoDetails.queue.address,
+        ethersProvider,
+        account,
+      );
 
-    const feeTokenApproval = await erc20ApprovalTransaction(
-      feeToken,
-      feeAmount,
-      daoDetails.queue.address,
-      ethersProvider,
-      account,
-    );
-
-    if (challengeDepositApproval) {
-      if (challengeDepositApproval.isUserBalanceLow) {
-        console.log('UserBalanceLow');
-        return;
+      if(challengeDepositApproval.error) {
+        console.log(challengeDepositApproval.error, ' approval error')
+        // TODO:GIORGI don't continue
       }
-      if (!challengeDepositApproval.isCollateralApproved) {
+  
+      if(challengeDepositApproval.transactions.length > 0) {
         try {
           const transactionResponse: any = await challengeDepositApproval.transactions[0].tx();
           await transactionResponse.wait();
@@ -399,12 +391,24 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
         }
       }
     }
-    if (feeTokenApproval) {
-      if (feeTokenApproval.isUserBalanceLow) {
-        console.log('Challenge Fee UserBalanceLow');
-        return;
+
+
+    const [, feeToken, feeAmount] = await contract.getDisputeFees();
+
+    if(feeToken !== '0x'+'0'.repeat(20)){
+      const feeTokenApproval = await erc20ApprovalTransaction(
+        feeToken,
+        feeAmount,
+        daoDetails.queue.address,
+        ethersProvider,
+        account,
+      );
+      if(feeTokenApproval.error) {
+        console.log(feeTokenApproval.error, ' approval error')
+        // TODO:GIORGI don't continue if this fails.
       }
-      if (!feeTokenApproval.isCollateralApproved) {
+  
+      if(feeTokenApproval.transactions.length > 0) {
         try {
           const transactionResponse: any = await feeTokenApproval.transactions[0].tx();
           await transactionResponse.wait();
@@ -413,6 +417,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
         }
       }
     }
+    
   };
 
   const getProposalParams = () => {
