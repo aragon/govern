@@ -17,7 +17,7 @@ import { useHistory, useParams } from 'react-router-dom';
 import { BigNumber, Transaction as EthersTransaction, ethers } from 'ethers';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
-import { erc20ApprovalTransaction } from 'utils/transactionHelper';
+import { erc20ApprovalTransaction } from '../../utils/transactionHelper';
 import { toUtf8Bytes } from '@ethersproject/strings';
 import { buildPayload } from '../../utils/ERC3000';
 
@@ -379,7 +379,6 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     handleActionModalOpen();
   };
 
-
   const noCollateral = {
     id: '-1',
     token: ethers.constants.AddressZero,
@@ -423,19 +422,22 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   };
 
   const scheduleProposal = async (actions: any[]) => {
-    const payload = buildPayload({ 
-      submitter, 
-      executor, 
-      actions, 
+    const payload = buildPayload({
+      submitter,
+      executor,
+      actions,
       executionDelay: daoDetails.queue.config.executionDelay,
-      proof: toUtf8Bytes(justification.current)
+      proof: toUtf8Bytes(justification.current),
     });
     console.log('payload', payload);
     const config = daoDetails.queue.config;
     console.log('config', daoDetails.queue.config);
 
     // TODO:GIORGI error tracking make it better
-    if(daoDetails.queue.config.scheduleDeposit.token !== '0x'+'0'.repeat(20)){
+    if (
+      daoDetails.queue.config.scheduleDeposit.token !==
+      '0x' + '0'.repeat(20)
+    ) {
       const scheduleDepositApproval = await erc20ApprovalTransaction(
         daoDetails.queue.config.scheduleDeposit.token,
         daoDetails.queue.config.scheduleDeposit.amount,
@@ -443,12 +445,12 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
         ethersProvider,
         account,
       );
-      
-      if(scheduleDepositApproval.error) {
-        console.log(scheduleDepositApproval.error, ' approval error')
+
+      if (scheduleDepositApproval.error) {
+        console.log(scheduleDepositApproval.error, ' approval error');
       }
-  
-      if(scheduleDepositApproval.transactions.length > 0) {
+
+      if (scheduleDepositApproval.transactions.length > 0) {
         try {
           const transactionResponse: any = await scheduleDepositApproval.transactions[0].tx();
           await transactionResponse.wait();

@@ -1,9 +1,9 @@
+/* eslint-disable */
 import React from 'react';
-import { orange, purple } from '@material-ui/core/colors';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
+import TextField, { StandardTextFieldProps } from '@material-ui/core/TextField';
 
-export interface InputFieldProps {
+export interface InputFieldProps extends StandardTextFieldProps {
   /**
    * Label of the field
    */
@@ -43,7 +43,12 @@ export const InputField: React.FC<InputFieldProps> = ({
       //   marginLeft: '0.75rem',
       display: 'none',
     },
-    error: {},
+    // TODO: handle error
+    // error: {
+    //   '&.MuiInputBase-root.MuiInput-root.Mui-error.MuiInputBase-formControl.MuiInput-formControl.MuiInputBase-input.MuiInput-input': {
+    //     border: `2px solid #670AE5`,
+    //   }
+    // },
     focused: {},
     shrink: {
       transform: 'translate(0, 1.5px) scale(1)',
@@ -74,6 +79,12 @@ export const InputField: React.FC<InputFieldProps> = ({
       height: height || '46px',
       width: width || '200px',
     },
+    // TODO: handle error
+    // error: {
+    //   '&.MuiInputBase-root.MuiInput-root.Mui-error.MuiInputBase-formControl.MuiInput-formControl.MuiInputBase-input.MuiInput-input': {
+    //     border: `2px solid #FF6A60`,
+    //   }
+    // },
     formControl: {
       'label + &': {
         padding: '13px 16px',
@@ -83,6 +94,18 @@ export const InputField: React.FC<InputFieldProps> = ({
   });
   const inputBaseClasses = inputBaseStyles();
 
+  const helperTextStyles = makeStyles({
+    root: {
+      // marginTop: -10,
+      marginLeft: 10,
+    },
+    error: {
+      '&.MuiFormHelperText-root.Mui-error': {
+        color: '#FF6A60',
+      },
+    },
+  });
+  const helperTextClasses = helperTextStyles();
   return (
     <TextField
       label={label}
@@ -90,8 +113,11 @@ export const InputField: React.FC<InputFieldProps> = ({
       margin={'none'}
       InputLabelProps={{ shrink: true, classes: inputLabelClasses }}
       InputProps={{ classes: inputBaseClasses, disableUnderline: true }}
+      FormHelperTextProps={{ classes: helperTextClasses }}
       onChange={(e) => onInputChange(e.target.value)}
       value={value}
+      error={props.error}
+      {...props}
     />
   );
 };

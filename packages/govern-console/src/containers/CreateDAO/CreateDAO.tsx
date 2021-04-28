@@ -1,10 +1,9 @@
 /* eslint-disable */
-import React, { useState, memo, useRef, useEffect } from 'react';
+import React, { useState, memo, useRef, useEffect, useMemo } from 'react';
 import { ANButton } from '../../components/Button/ANButton';
 import { useTheme, styled } from '@material-ui/core/styles';
 import backButtonIcon from '../../images/back-btn.svg';
 import Typography from '@material-ui/core/Typography';
-import Paper from '@material-ui/core/Paper';
 import { InputField } from '../../components/InputFields/InputField';
 import { useHistory } from 'react-router-dom';
 import CreateDaoImage from '../../images/svgs/CreateDao.svg';
@@ -34,6 +33,7 @@ enum CreateDaoStatus {
   Failed,
 }
 
+// TODO: to be moved to the constant file
 const aragonVoiceUrl = 'https://voice.aragon.org';
 
 interface FormProps {
@@ -121,350 +121,421 @@ const optionTextStyle = {
   fontSize: 18,
 };
 
-const NewDaoForm: React.FC<FormProps> = ({
-  setCreateDaoStatus,
-  setCreatedDaoRoute,
-  cancelForm,
-}) => {
-  const context: any = useWallet();
-  console.log('context', context)
-  const [isExistingToken, updateIsExistingToken] = useState(false);
-  const [isUseProxyChecked, updateIsUseProxyChecked] = useState(true);
-  const [isUseFreeVotingChecked, updateIsUseFreeVotingChecked] = useState(true);
-  const daoName = useRef<string>();
-  const doaNameError = useRef<string | undefined>();
-  const tokenName = useRef<string>();
-  const tokenNameError = useRef<string | undefined>();
-  const tokenSymbol = useRef<string>();
-  const tokenSymbolError = useRef<string | undefined>();
-  const existingTokenAddress = useRef<string>();
-  const existingTokenAddressError = useRef<string | undefined>();
-  // TODO: dai and court contract should, have a default fetch from an env or constants,
-  // and should be user updatable once UI is ready
-  const executionDelay = useRef<number>(86400); // defaults to one day - how many seconds to wait before being able to call execute.
-  const scheduleContract = useRef<string>(
-    '0xb08E32D658700f768f5bADf0679E153ffFEC42e6',
-  );
-  const scheduleTokenAmount = useRef<number>(0);
-  const challengeContract = useRef<string>(
-    '0xb08E32D658700f768f5bADf0679E153ffFEC42e6',
-  );
-  const challengeTokenAmount = useRef<number>(0);
-  const resolverContract = useRef<string>(
-    '0xC464EB732A1D2f5BbD705727576065C91B2E9f18',
-  );
-  const rules = useRef<string>('0x'); // in hex
-  const maxCalldataSize = useRef<number>(100000); // initial maxCalldatasize
+const NewDaoForm: React.FC<FormProps> = memo(
+  ({ setCreateDaoStatus, setCreatedDaoRoute, cancelForm }) => {
+    const context: any = useWallet();
 
-  const onExecutionDelayChange = (val: any) => {
-    executionDelay.current = val;
-  };
+    const [isExistingToken, updateIsExistingToken] = useState(false);
+    const [isUseProxyChecked, updateIsUseProxyChecked] = useState(true);
+    const [isUseFreeVotingChecked, updateIsUseFreeVotingChecked] = useState(
+      true,
+    );
 
-  const onScheduleContractChange = (val: any) => {
-    scheduleContract.current = val;
-  };
+    const [daoName, setDaoName] = useState<string>('');
+    const [tokenName, setTokenName] = useState<string>('');
+    const [tokenSymbol, setTokenSymbol] = useState<string>('');
+    const [existingTokenAddress, setExistingTokenAddress] = useState<string>(
+      '',
+    );
 
-  const onScheduleTokenAmountChange = (val: any) => {
-    scheduleTokenAmount.current = val;
-  };
+    const mainInputs = useMemo(
+      () => ({
+        daoName: daoName,
+        tokenName: tokenName,
+        tokenSymbol: tokenSymbol,
+        existingTokenAddress: existingTokenAddress,
+      }),
+      [daoName, tokenName, tokenSymbol, existingTokenAddress],
+    );
 
-  const onChallengeContractChange = (val: any) => {
-    challengeContract.current = val;
-  };
+    const [doaNameError, setDoaNameError] = useState<string>('');
+    const [tokenNameError, setTokenNameError] = useState<string>('');
+    const [tokenSymbolError, setTokenSymbolError] = useState<string>('');
+    const [
+      existingTokenAddressError,
+      setExistingTokenAddressError,
+    ] = useState<string>('');
 
-  const onChallengeTokenAmountChange = (val: any) => {
-    challengeTokenAmount.current = val;
-  };
+    const mainInputsErrors = useMemo(
+      () => ({
+        daoNameError: doaNameError,
+        tokenNameError: tokenNameError,
+        tokenSymbolError: tokenSymbolError,
+        existingTokenAddressError: existingTokenAddressError,
+      }),
+      [
+        doaNameError,
+        tokenNameError,
+        tokenSymbolError,
+        existingTokenAddressError,
+      ],
+    );
 
-  const onResolverChange = (val: any) => {
-    rules.current = val;
-  };
+    // TODO: dai and court contract should, have a default fetch from an env or constants,
+    // and should be user updatable once UI is ready
+    const executionDelay = useRef<number>(86400); // defaults to one day - how many seconds to wait before being able to call execute.
+    const scheduleContract = useRef<string>(
+      '0xb08E32D658700f768f5bADf0679E153ffFEC42e6',
+    );
+    const scheduleTokenAmount = useRef<number>(0);
+    const challengeContract = useRef<string>(
+      '0xb08E32D658700f768f5bADf0679E153ffFEC42e6',
+    );
+    const challengeTokenAmount = useRef<number>(0);
+    const resolverContract = useRef<string>(
+      '0xC464EB732A1D2f5BbD705727576065C91B2E9f18',
+    );
+    const rules = useRef<string>('0x'); // in hex
+    const maxCalldataSize = useRef<number>(100000); // initial maxCalldatasize
 
-  const onRulesChange = (val: any) => {
-    rules.current = val; // should be converted to hex
-  };
+    const onExecutionDelayChange = (val: any) => {
+      executionDelay.current = val;
+    };
 
-  const onMaxCalldataSizeChange = (val: any) => {
-    maxCalldataSize.current = val;
-  };
+    const onScheduleContractChange = (val: any) => {
+      scheduleContract.current = val;
+    };
 
-  const onChangeDaoName = (val: any) => {
-    daoName.current = val;
-    doaNameError.current = '';
-  };
+    const onScheduleTokenAmountChange = (val: any) => {
+      scheduleTokenAmount.current = val;
+    };
 
-  const onChangeTokenName = (val: any) => {
-    tokenName.current = val;
-    tokenNameError.current = '';
-  };
+    const onChallengeContractChange = (val: any) => {
+      challengeContract.current = val;
+    };
 
-  const onChangeTokenSymbol = (val: any) => {
-    tokenSymbol.current = val;
-    tokenSymbolError.current = '';
-  };
+    const onChallengeTokenAmountChange = (val: any) => {
+      challengeTokenAmount.current = val;
+    };
 
-  const onChangeExistingTokenAddress = (val: any) => {
-    existingTokenAddress.current = val;
-    existingTokenAddressError.current = '';
-  };
+    const onResolverChange = (val: any) => {
+      rules.current = val;
+    };
 
-  const createDaoConfig = {
-    executionDelay: executionDelay.current,
-    scheduleDeposit: {
-      token: scheduleContract.current,
-      amount: scheduleTokenAmount.current,
-    },
-    challengeDeposit: {
-      token: challengeContract.current,
-      amount: challengeTokenAmount.current,
-    },
-    resolver: resolverContract.current,
-    rules: rules.current,
-    maxCalldataSize: maxCalldataSize.current,
-  };
+    const onRulesChange = (val: any) => {
+      rules.current = val; // should be converted to hex
+    };
 
-  const createDaoCall = async (
-    isExistingToken: boolean,
-    existingTokenAddress: string,
-    tokenName: string,
-    tokenSymbol: string,
-    isUseProxyChecked: boolean,
-    daoName: string,
-    isUseFreeVotingChecked: boolean,
-    context: any,
-  ): Promise<boolean> => {
-    let token: Token;
-    if (isExistingToken) {
+    const onMaxCalldataSizeChange = (val: any) => {
+      maxCalldataSize.current = val;
+    };
+
+    const onChangeDaoName = (val: any) => {
+      setDaoName(val);
+    };
+
+    const onChangeTokenName = (val: any) => {
+      setTokenName(val);
+    };
+
+    const onChangeTokenSymbol = (val: string) => {
+      setTokenSymbol(val.toUpperCase());
+    };
+
+    const onChangeExistingTokenAddress = (val: any) => {
+      console.log(val);
+      setExistingTokenAddress(val);
+    };
+
+    const createDaoConfig = {
+      executionDelay: executionDelay.current,
+      scheduleDeposit: {
+        token: scheduleContract.current,
+        amount: scheduleTokenAmount.current,
+      },
+      challengeDeposit: {
+        token: challengeContract.current,
+        amount: challengeTokenAmount.current,
+      },
+      resolver: resolverContract.current,
+      rules: rules.current,
+      maxCalldataSize: maxCalldataSize.current,
+    };
+
+    const createDaoCall = async (
+      isExistingToken: boolean,
+      existingTokenAddress: string,
+      tokenName: string,
+      tokenSymbol: string,
+      isUseProxyChecked: boolean,
+      daoName: string,
+      isUseFreeVotingChecked: boolean,
+      context: any,
+    ): Promise<boolean> => {
+      let token: Token;
+      if (isExistingToken) {
+        try {
+          token = await getToken(existingTokenAddress, context.ethersProvider);
+        } catch (error) {
+          console.log(error);
+          return false;
+        }
+      } else {
+        token = {
+          tokenAddress: '',
+          tokenDecimals: 18,
+          tokenName: tokenName,
+          tokenSymbol: tokenSymbol,
+        };
+      }
+      const createDaoParams: CreateDaoParams = {
+        name: daoName,
+        token,
+        config: createDaoConfig,
+        useProxies: isUseProxyChecked,
+        useVocdoni: isUseFreeVotingChecked,
+      };
+
       try {
-        token = await getToken(existingTokenAddress, context.ethersProvider);
+        //TODO this console log to be removed
+        console.log('createDaoParams', createDaoParams);
+        const result: any = await createDao(createDaoParams);
+        setCreatedDaoRoute(daoName);
+        await result.wait(1);
+        return true;
       } catch (error) {
         console.log(error);
         return false;
       }
-    } else {
-      token = {
-        tokenAddress: '',
-        tokenDecimals: 18,
-        tokenName: tokenName,
-        tokenSymbol: tokenSymbol,
-      };
-    }
-    const createDaoParams: CreateDaoParams = {
-      name: daoName,
-      token,
-      config: createDaoConfig,
-      useProxies: isUseProxyChecked,
-      useVocdoni: isUseFreeVotingChecked,
     };
 
-    try {
-      //TODO this console log to be removed
-      console.log('createDaoParams', createDaoParams)
-      const result: any = await createDao(createDaoParams);
-      setCreatedDaoRoute(daoName);
-      await result.wait(1);
+    // TODO: use switch to cover more senarions
+    const validateForm = (): boolean => {
+      if (daoName === '' || typeof daoName === 'undefined') {
+        setDoaNameError('Invalid DAO Name');
+        return false;
+      } else {
+        setDoaNameError('');
+      }
+      if (!isExistingToken) {
+        if (tokenName === '' || typeof tokenName === 'undefined') {
+          setTokenNameError('Invalid Token Name');
+          return false;
+        } else {
+          setTokenNameError('');
+        }
+        if (
+          tokenSymbol === '' ||
+          typeof tokenSymbol === 'undefined' ||
+          tokenSymbol.length > 6
+        ) {
+          setTokenSymbolError('Invalid Symbol');
+          return false;
+        } else {
+          setTokenSymbolError('');
+        }
+      } else {
+        if (
+          existingTokenAddress === '' ||
+          typeof existingTokenAddress === 'undefined' ||
+          existingTokenAddress.length !== 42
+        ) {
+          setExistingTokenAddressError('Invalid address');
+          return false;
+        } else {
+          setExistingTokenAddressError('');
+        }
+      }
       return true;
-    } catch (error) {
-      console.log(error);
-      return false;
-    }
-  };
+    };
 
-  // TODO: Create Validation for form, inputField may need further customization
-  const validateForm = (): boolean => {
-    if (daoName.current === '' || typeof daoName.current === 'undefined') {
-      doaNameError.current = 'Error';
-      return false;
-    }
-    return true;
-  };
+    const submitCreateDao = async () => {
+      // TODO: form validation
+      if (validateForm() === false) {
+        console.log('submitCreateDao, validateForm()', validateForm());
+        return null;
+      }
+      setCreateDaoStatus(CreateDaoStatus.InProgress);
+      const callResult = await createDaoCall(
+        isExistingToken,
+        existingTokenAddress ? existingTokenAddress.toString() : '',
+        tokenName ? tokenName.toString() : '',
+        tokenSymbol ? tokenSymbol.toString() : '',
+        isUseProxyChecked,
+        daoName ? daoName.toString() : '',
+        isUseFreeVotingChecked,
+        context,
+      );
 
-  const submitCreateDao = async () => {
-    // TODO: form validation
-    // if(validateForm() === false) {
-    //   console.log('submitCreateDao, validateForm()', validateForm())
-    //   return null;
-    // }
-    setCreateDaoStatus(CreateDaoStatus.InProgress);
-    const callResult = await createDaoCall(
-      isExistingToken,
-      existingTokenAddress.current
-        ? existingTokenAddress.current.toString()
-        : '',
-      tokenName.current ? tokenName.current.toString() : '',
-      tokenSymbol.current ? tokenSymbol.current.toString() : '',
-      isUseProxyChecked,
-      daoName.current ? daoName.current.toString() : '',
-      isUseFreeVotingChecked,
-      context,
-    );
+      if (callResult) {
+        setCreateDaoStatus(CreateDaoStatus.Successful);
+      } else {
+        setCreateDaoStatus(CreateDaoStatus.Failed);
+      }
+    };
 
-    if (callResult) {
-      setCreateDaoStatus(CreateDaoStatus.Successful);
-    } else {
-      setCreateDaoStatus(CreateDaoStatus.Failed);
-    }
-  };
-
-  return (
-    <div
-      style={{
-        justifyContent: 'center',
-        display: 'flex',
-      }}
-    >
-      <ANWrappedPaper>
-        <BackButton onClick={cancelForm}>
-          <img src={backButtonIcon} />
-        </BackButton>
-        <img src={CreateDaoImage} />
-        <InputTitle>DAO Name</InputTitle>
-        <InputField
-          label={doaNameError.current === undefined ? '' : doaNameError.current}
-          onInputChange={onChangeDaoName}
-          height="46px"
-          width="454px"
-          placeholder={'Please insert your DAO name...'}
-          value={daoName.current}
-        ></InputField>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            margin: '25px',
-            verticalAlign: 'middle',
-            lineHeight: '40px',
-          }}
-        >
-          <div style={optionTextStyle}>{'Create new token'}</div>
-          <BlueSwitch
-            checked={isExistingToken}
-            onChange={() => {
-              updateIsExistingToken(!isExistingToken);
+    return (
+      <div
+        style={{
+          justifyContent: 'center',
+          display: 'flex',
+        }}
+      >
+        <ANWrappedPaper>
+          <BackButton onClick={cancelForm}>
+            <img src={backButtonIcon} />
+          </BackButton>
+          <img src={CreateDaoImage} />
+          <InputTitle>DAO Name</InputTitle>
+          <InputField
+            label={''}
+            onInputChange={onChangeDaoName}
+            height="46px"
+            width="454px"
+            placeholder={'Please insert your DAO name...'}
+            value={mainInputs.daoName}
+            error={mainInputsErrors.daoNameError !== ''}
+            helperText={mainInputsErrors.daoNameError}
+          ></InputField>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              margin: '25px',
+              verticalAlign: 'middle',
+              lineHeight: '40px',
             }}
-            name="checked"
-          />
-          <div style={optionTextStyle}>{'Use existing token'}</div>
-        </div>
-        {!isExistingToken ? (
-          <div>
-            <InputTitle>Token</InputTitle>
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
+          >
+            <div style={optionTextStyle}>{'Create new token'}</div>
+            <BlueSwitch
+              checked={isExistingToken}
+              onChange={() => {
+                updateIsExistingToken(!isExistingToken);
               }}
-            >
-              <InputField
-                label=""
-                onInputChange={onChangeTokenName}
-                value={tokenName.current}
-                height="46px"
-                width="200px"
-                placeholder={"Your Token's Name?"}
-              />
+              name="checked"
+            />
+            <div style={optionTextStyle}>{'Use existing token'}</div>
+          </div>
+          {!isExistingToken ? (
+            <div>
+              <InputTitle>Token</InputTitle>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <InputField
+                  label=""
+                  onInputChange={onChangeTokenName}
+                  value={mainInputs.tokenName}
+                  height="46px"
+                  width="200px"
+                  placeholder={"Your Token's Name?"}
+                  error={mainInputsErrors.tokenNameError !== ''}
+                  helperText={mainInputsErrors.tokenNameError}
+                />
 
+                <InputField
+                  label=""
+                  onInputChange={onChangeTokenSymbol}
+                  height="46px"
+                  width="200px"
+                  placeholder={"Your Token's Symbol?"}
+                  value={mainInputs.tokenSymbol}
+                  error={mainInputsErrors.tokenSymbolError !== ''}
+                  helperText={mainInputsErrors.tokenSymbolError}
+                />
+              </div>
+            </div>
+          ) : (
+            <div>
+              <InputTitle>Token Address</InputTitle>
               <InputField
                 label=""
-                onInputChange={onChangeTokenSymbol}
+                onInputChange={onChangeExistingTokenAddress}
                 height="46px"
-                width="200px"
-                placeholder={"Your Token's Symbol?"}
-                value={tokenSymbol.current}
+                width="451px"
+                placeholder={
+                  'Please insert existing token ether address (0x000...)'
+                }
+                value={mainInputs.existingTokenAddress}
+                error={mainInputsErrors.existingTokenAddressError !== ''}
+                helperText={mainInputsErrors.existingTokenAddressError}
               />
             </div>
-          </div>
-        ) : (
-          <div>
-            <InputTitle>Token Address</InputTitle>
-            <InputField
-              label=""
-              onInputChange={onChangeExistingTokenAddress}
-              height="46px"
-              width="451px"
-              placeholder={
-                'Please insert existing token ether address (0x000...)'
-              }
-              value={existingTokenAddress.current}
-            />
-          </div>
-        )}
+          )}
 
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            marginTop: '25px',
-          }}
-        >
           <div
             style={{
-              marginTop: -5,
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              marginTop: '25px',
             }}
           >
-            <BlueCheckbox
-              checked={isUseProxyChecked}
-              onChange={() => {
-                updateIsUseProxyChecked(!isUseProxyChecked);
+            <div
+              style={{
+                marginTop: -5,
               }}
-            />
+            >
+              <BlueCheckbox
+                checked={isUseProxyChecked}
+                onChange={() => {
+                  updateIsUseProxyChecked(!isUseProxyChecked);
+                }}
+              />
+            </div>
+            <div style={optionTextStyle}>
+              Use Govern Agent Proxy - This will enable your DAO to use Aragon
+              Govern main executer queue, and heavily decrease gas costs for
+              your DAO deployment
+            </div>
           </div>
-          <div style={optionTextStyle}>
-            Use Govern Agent Proxy - This will enable your DAO to use Aragon
-            Govern main executer queue, and heavily decrease gas costs for your
-            DAO deployment
-          </div>
-        </div>
 
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            marginTop: '25px',
-          }}
-        >
           <div
             style={{
-              marginTop: -5,
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              marginTop: '25px',
             }}
           >
-            <BlueCheckbox
-              checked={isUseFreeVotingChecked}
-              onChange={() => {
-                updateIsUseFreeVotingChecked(!isUseFreeVotingChecked);
+            <div
+              style={{
+                marginTop: -5,
               }}
+            >
+              <BlueCheckbox
+                checked={isUseFreeVotingChecked}
+                onChange={() => {
+                  updateIsUseFreeVotingChecked(!isUseFreeVotingChecked);
+                }}
+              />
+            </div>
+            <div style={optionTextStyle}>
+              Use{' '}
+              <a
+                href={aragonVoiceUrl}
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                Aragon Voice
+              </a>{' '}
+              - This will enable your DAO to have free voting for you proposals
+            </div>
+          </div>
+          <div
+            style={{
+              justifyContent: 'center',
+              display: 'flex',
+            }}
+          >
+            <ANButton
+              disabled={context.status !== 'connected'}
+              label="Create new DAO"
+              type="primary"
+              style={{ marginTop: 40 }}
+              onClick={submitCreateDao}
             />
           </div>
-          <div style={optionTextStyle}>
-            Use{' '}
-            <a href={aragonVoiceUrl} target="_blank" rel="noreferrer noopener">
-              Aragon Voice
-            </a>{' '}
-            - This will enable your DAO to have free voting for you proposals
-          </div>
-        </div>
-        <div
-          style={{
-            justifyContent: 'center',
-            display: 'flex',
-          }}
-        >
-          <ANButton
-            disabled={context.status !== 'connected'}
-            label="Create new DAO"
-            type="primary"
-            style={{ marginTop: 40 }}
-            onClick={submitCreateDao}
-          />
-        </div>
-      </ANWrappedPaper>
-    </div>
-  );
-};
+        </ANWrappedPaper>
+      </div>
+    );
+  },
+);
 
 const NewDaoProgress: React.FC = () => {
   const theme = useTheme();
@@ -637,11 +708,12 @@ const NewDaoCreationResult: React.FC<ResultProps> = ({
 };
 
 const NewDaoContainer: React.FC = () => {
+  const history = useHistory();
+
   const [createDaoStatus, setCreateDaoStatus] = useState<CreateDaoStatus>(
     CreateDaoStatus.PreCreate,
   );
   const [createdDaoRoute, setCreatedDaoRoute] = useState<string>('#');
-  const history = useHistory();
 
   const onClickBackFromCreateDaoPage = () => {
     history.goBack();
