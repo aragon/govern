@@ -308,18 +308,20 @@ const NewDaoForm: React.FC<FormProps> = memo(
     };
 
     const validateForm = (): boolean => {
-      let validateArray = [false, false, false, false];
+      let validateArray = [];
       if (daoName === '' || typeof daoName === 'undefined') {
+        validateArray.push(false)
         setDoaNameError('Invalid DAO Name');
       } else {
-        validateArray[0] = true
+        validateArray.push(true)
         setDoaNameError('');
       }
       if (!isExistingToken) {
         if (tokenName === '' || typeof tokenName === 'undefined') {
+          validateArray.push(false)
           setTokenNameError('Invalid Token Name');
         } else {
-          validateArray[1] = true
+          validateArray.push(true)
           setTokenNameError('');
         }
         if (
@@ -327,9 +329,10 @@ const NewDaoForm: React.FC<FormProps> = memo(
           typeof tokenSymbol === 'undefined' ||
           tokenSymbol.length > 6
         ) {
+          validateArray.push(false)
           setTokenSymbolError('Invalid Symbol');
         } else {
-          validateArray[2] = true
+          validateArray.push(true)
           setTokenSymbolError('');
         }
       } else {
@@ -338,14 +341,16 @@ const NewDaoForm: React.FC<FormProps> = memo(
           typeof existingTokenAddress === 'undefined' ||
           existingTokenAddress.length !== 42
         ) {
+          validateArray.push(false)
           setExistingTokenAddressError('Invalid address');
         } else {
-          validateArray[3] = true
+          validateArray.push(true)
           setExistingTokenAddressError('');
         }
       }
 
       if (validateArray.includes(false)) {
+        console.log(validateArray)
         return false;
       } else {
         return true;
