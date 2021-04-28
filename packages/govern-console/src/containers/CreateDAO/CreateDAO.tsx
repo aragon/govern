@@ -227,19 +227,22 @@ const NewDaoForm: React.FC<FormProps> = memo(
 
     const onChangeDaoName = (val: any) => {
       setDaoName(val);
+      setDoaNameError('');
     };
 
     const onChangeTokenName = (val: any) => {
       setTokenName(val);
+      setTokenNameError('');
     };
 
     const onChangeTokenSymbol = (val: string) => {
       setTokenSymbol(val.toUpperCase());
+      setTokenSymbolError('')
     };
 
     const onChangeExistingTokenAddress = (val: any) => {
-      console.log(val);
       setExistingTokenAddress(val);
+      setExistingTokenAddressError('')
     };
 
     const createDaoConfig = {
@@ -304,19 +307,19 @@ const NewDaoForm: React.FC<FormProps> = memo(
       }
     };
 
-    // TODO: use switch to cover more senarions
     const validateForm = (): boolean => {
+      let validateArray = [false, false, false, false];
       if (daoName === '' || typeof daoName === 'undefined') {
         setDoaNameError('Invalid DAO Name');
-        return false;
       } else {
+        validateArray[0] = true
         setDoaNameError('');
       }
       if (!isExistingToken) {
         if (tokenName === '' || typeof tokenName === 'undefined') {
           setTokenNameError('Invalid Token Name');
-          return false;
         } else {
+          validateArray[1] = true
           setTokenNameError('');
         }
         if (
@@ -325,8 +328,8 @@ const NewDaoForm: React.FC<FormProps> = memo(
           tokenSymbol.length > 6
         ) {
           setTokenSymbolError('Invalid Symbol');
-          return false;
         } else {
+          validateArray[2] = true
           setTokenSymbolError('');
         }
       } else {
@@ -336,12 +339,18 @@ const NewDaoForm: React.FC<FormProps> = memo(
           existingTokenAddress.length !== 42
         ) {
           setExistingTokenAddressError('Invalid address');
-          return false;
         } else {
+          validateArray[3] = true
           setExistingTokenAddressError('');
         }
       }
-      return true;
+
+      if (validateArray.includes(false)) {
+        return false;
+      } else {
+        return true;
+      }
+      
     };
 
     const submitCreateDao = async () => {
