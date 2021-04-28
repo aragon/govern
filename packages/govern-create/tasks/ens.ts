@@ -2,6 +2,14 @@ import { task } from 'hardhat/config'
 import { Ens } from '../utils/ens'
 import { constants } from 'ethers'
 
+/*
+*  This task is used to set the ENS address record
+*  To run it:
+*  yarn set-ens --name governbasefactory.aragon.eth --address 0xB75290E69F83b52BfbF9C99B4Ae211935E75A851 --network rinkeby
+*
+*  See https://github.com/aragon/govern/tree/develop/packages/govern-create on how to setup .env file with account mnemonic
+*/
+
 task('ens:set-addr', 'Set the ENS address record')
 .addParam("name", "The ENS name to set")
 .addParam("address", "The address to set to")
