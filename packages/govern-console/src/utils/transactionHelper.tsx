@@ -1,6 +1,7 @@
+/* eslint-disable*/
 import { CustomTransaction, Response } from 'utils/types';
 import { ethers, BigNumber } from 'ethers';
-import { erc20TokenABI } from 'utils/abis/erc20';
+import { erc20TokenABI } from './abis/erc20';
 
 export async function erc20ApprovalTransaction(
   token: string,
@@ -10,11 +11,10 @@ export async function erc20ApprovalTransaction(
   account: string,
 ): Promise<Response> {
   const response: Response = {
-    isUserBalanceLow: false,
-    isCollateralApproved: false,
-    errorMessage: undefined,
+    error: undefined,
     transactions: [],
   };
+
   const amountInBigNumber: BigNumber = ethers.BigNumber.from(amount);
 
   const contract = new ethers.Contract(
@@ -23,19 +23,26 @@ export async function erc20ApprovalTransaction(
     ethersProvider.getSigner(),
   );
 
-  const allowance = await contract.allowance(account, spender);
+  let allowance: BigNumber = ethers.BigNumber.from(0);
+  let userBalance: BigNumber = ethers.BigNumber.from(0);
 
-  const userBalance: BigNumber = await contract.balanceOf(account);
+  try {
+    allowance = await contract.allowance(account, spender);
+    userBalance = await contract.balanceOf(account);
+  } catch (err) {
+    // contract address could be 0x0000000..000 or might not have `allowance` or balanceOf on it.
+    // TODO: if it's an address and not 0x000..00.., track it with sentry.
+    response.error = `Contract ${token} doesn't seem to be ERC20 compliant.`;
+  }
+
   // user balance is less than the amount that needs approval.
   // this means user won't be able to approve full amount.
   if (userBalance.lt(amountInBigNumber)) {
-    response.isUserBalanceLow = true;
-    response.errorMessage = `You need ${amount} to schedule this proposal.`;
+    response.error = `You need ${amount} to schedule this proposal.`;
     return response;
   }
   // user has enough balance, but also already got amountInBigNumber approved for spender
   if (allowance.gte(amountInBigNumber)) {
-    response.isCollateralApproved = true;
     return response;
   }
   // approve amountInBigNumber for the spender

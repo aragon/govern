@@ -1,7 +1,11 @@
+/* eslint-disable */
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 import { styled, useTheme } from '@material-ui/core/styles';
 import MUICard, { CardProps } from '@material-ui/core/Card';
 import MUITypography from '@material-ui/core/Typography';
+import { ANButton } from '../Button/ANButton';
+import SettingIconImage from '../../images/svgs/Setting_Icon.svg';
 
 export interface DaoHeaderProps {
   /**
@@ -28,6 +32,7 @@ export const DaoHeader: React.FC<DaoHeaderProps> = ({
   usdBalance,
   ...props
 }) => {
+  const history = useHistory();
   const theme = useTheme();
   const DaoHeaderCard = styled(MUICard)({
     background: theme.custom.daoHeader.background,
@@ -67,12 +72,16 @@ export const DaoHeader: React.FC<DaoHeaderProps> = ({
     fontStyle: 'normal',
   });
 
+  const goToSettingPage = () => {
+    history.push('/' + daoName + '/dao-settings');
+  };
+
   return (
     <DaoHeaderCard>
       <div
         style={{
           display: 'flex',
-          width: '850px',
+          width: '100%',
           flexDirection: 'row',
           justifyContent: 'space-between',
         }}
@@ -89,6 +98,30 @@ export const DaoHeader: React.FC<DaoHeaderProps> = ({
               {'$ ' + usdBalance}
             </HeaderUsdBalance>
           </div>
+        </div>
+        <div
+          style={{
+            marginRight: '60px',
+          }}
+        >
+          <ANButton
+            label={
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-evenly',
+                }}
+              >
+                <img src={SettingIconImage} />
+                <div style={{ marginLeft: '10px' }}>DAO Settings</div>
+              </div>
+            }
+            type={'secondary'}
+            backgroundColor={'#FFFFFF'}
+            color={'#20232C'}
+            onClick={goToSettingPage}
+          />
         </div>
       </div>
     </DaoHeaderCard>

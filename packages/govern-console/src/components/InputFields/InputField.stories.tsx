@@ -1,9 +1,10 @@
+/* eslint-disable */
 import React from 'react';
 // also exported from '@storybook/react' if you can deal with breaking changes in 6.1
 
 import { Story, Meta } from '@storybook/react';
 
-import { InputField } from './InputField';
+import { InputField, InputFieldProps } from './InputField';
 
 export default {
   title: 'AN-TextField',
@@ -13,11 +14,19 @@ export default {
   },
 } as Meta;
 
-const Template: Story = (args) => <InputField {...args} />;
+const Template: Story<InputFieldProps> = (args) => <InputField {...args} />;
 
 export const InputFieldExample = Template.bind({});
 InputFieldExample.args = {
   type: 'primary',
   label: 'New proposal',
   disabled: true,
+};
+
+export const InputFieldExample_Error = Template.bind({});
+InputFieldExample_Error.args = {
+  type: 'primary',
+  label: 'New proposal',
+  error: true,
+  helperText: 'Some error message',
 };

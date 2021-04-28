@@ -4,6 +4,7 @@ import { Web3Provider, TransactionResponse, TransactionReceipt } from '@etherspr
 import { BigNumberish } from '@ethersproject/bignumber'
 import { BytesLike } from '@ethersproject/bytes'
 import { toUtf8Bytes } from '@ethersproject/strings'
+import { ethers } from 'ethers';
 
 
 const Payload = `
@@ -42,6 +43,7 @@ const queueAbis = [
   `function challenge(${Container} _container, bytes _reason)`,
   `function resolve(${Container} _container, uint256 _disputeId)`,
   `function veto(${Container} _container, bytes _reason)`,
+  `function configure(${ContainerConfig} _config)`,
   `event Challenged(bytes32 indexed hash, address indexed actor, bytes reason, uint256 resolverId, ${Collateral})`
 ]
 
@@ -75,13 +77,15 @@ export type ActionType = {
 
 export class Proposal {
   private readonly contract: Contract
+  private readonly interface: any;
 
   constructor(queueAddress: string, options: ProposalOptions) {
-    const abi = options?.abi || queueAbis
-
+    const abi:any = options?.abi || queueAbis // TODO instead of any, put Fragment|JSONFragment from ethers
+     
     const provider = options.provider || window.ethereum
     const signer = new Web3Provider(provider).getSigner()
     this.contract = new Contract(queueAddress, abi, signer)
+    this.interface  = new ethers.utils.Interface(abi);
   }
 
   /**
@@ -154,6 +158,27 @@ export class Proposal {
     const reasonBytes = toUtf8Bytes(reason)
     const result = this.contract.challenge(proposal, reasonBytes)
     return result
+  }
+
+  
+  buildAction(name: string, parameters: any, value: number|string): any {
+    return {
+      data: this.interface.encodeFunctionData(
+        name,
+        parameters,
+      ),
+      to: this.contract.address,
+      value: value
+    }
+  }
+
+  /**
+   * @param name function name of the govern queue abi
+   * 
+   * @returns {string} the signature of the function
+   */
+  getSigHash(name: string): string {
+    return this.interface.getSighash(name)
   }
 
   /**

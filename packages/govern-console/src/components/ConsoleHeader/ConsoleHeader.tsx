@@ -4,6 +4,7 @@ import MUICard, { CardProps } from '@material-ui/core/Card';
 import MUITypography from '@material-ui/core/Typography';
 import { InputField } from '../InputFields/InputField';
 import { ANButton } from '../Button/ANButton';
+import { useHistory } from 'react-router-dom';
 
 export interface ConsoleHeaderProps {
   /**
@@ -16,13 +17,14 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
   onSearch,
   ...props
 }) => {
+  const history = useHistory();
   const theme = useTheme();
   const searchString = useRef('');
   const onInputChange = (val: string) => {
     searchString.current = val;
   };
   const onGotoDao = () => {
-    console.log(searchString.current);
+    history.push(`daos/${searchString.current}`);
   };
   const ConsoleHeaderCard = styled(MUICard)({
     background: theme.custom.daoHeader.background,

@@ -10,7 +10,7 @@ import {
   GET_GOVERN_REGISTRY_DATA,
   GET_DAO_BY_NAME,
 } from './queries';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { formatEther } from 'ethers/lib/utils';
 export interface ConsoleMainPageProps {
   /**
@@ -18,11 +18,11 @@ export interface ConsoleMainPageProps {
    */
   updateSelectedDao: any;
 }
-
 const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
   updateSelectedDao,
   ...props
 }) => {
+  const history = useHistory();
   const theme = useTheme();
   const [visibleDaoList, updateDaoList] = useState<any>([]);
   const [filteredDaoList, updateFilteredDaoList] = useState<any>([]);
@@ -88,6 +88,10 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
     }
   };
 
+  const goToDao = (dao: any) => {
+    history.push(`/daos/${dao.name}`);
+  };
+
   return (
     <ConsoleMainDiv>
       <ConsoleHeader />
@@ -106,7 +110,7 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
           visibleDaoList.map((dao: any) => (
             <div
               style={{ marginTop: '32px', width: '328px' }}
-              onClick={() => updateSelectedDao(dao)}
+              onClick={() => goToDao(dao)}
               key={dao.name}
             >
               <DaoCard
