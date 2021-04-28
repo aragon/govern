@@ -253,7 +253,7 @@ describe('Create Dao', function () {
     expect(result).to.have.property('hash')
   })
 
-  it.only('Should create dao successfully and register token in vocdoni contract', async function () {
+  it.skip('Should create dao successfully and register token in vocdoni contract', async function () {
     const params: CreateDaoParams = {
       name: 'Tree DAO',
       token: {
@@ -269,13 +269,19 @@ describe('Create Dao', function () {
       provider: network.provider,
       daoFactoryAddress,
     }
+    
+    const registerTokenCallback = async (registerToken:Function) => {
+      const result = await registerToken()
+      if(result) {
+        await result.wait()
+        console.log('Token registered!')
+      }
+    }
 
-    const result = await createDao(params, options)
-    console.log('CreateDAO transaction being mined...')
+    const result = await createDao(params, options, registerTokenCallback)
     const receipt = await result.wait()
 
     console.log('DAO has been created')
-    console.log(receipt)
 
     expect(result).to.have.property('hash')
     expect(receipt).to.have.property('transactionHash')
@@ -289,7 +295,6 @@ describe('Create Dao', function () {
       ethers.provider
     )
 
-    console.log(receipt.logs)
 
     const args = receipt.logs
       .filter(
@@ -315,7 +320,7 @@ describe('Create Dao', function () {
 
     console.log('Wait 40 seconds before checking the token is registered')
     await new Promise((resolve) => {
-      setTimeout(resolve, 40000)
+      setTimeout(resolve, 200000)
     })
     console.log('Checking if is registered...')
     const t = await tokenStorage.isRegistered(tokenAddress)

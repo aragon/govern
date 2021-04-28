@@ -75,10 +75,9 @@
     "@urql/core": "^1.13.1",
     "dvote-js": "1.1.5",
     "dvote-solidity": "1.1.0",
+    "ethers": "^5.1.4",
     "graphql": "^15.4.0",
     "graphql-tag": "^2.11.0",
     "isomorphic-unfetch": "^3.1.0"
   }
 }
-
-

@@ -92,7 +92,8 @@ export type CreateDaoOptions = {
  */
 export async function createDao(
   args: CreateDaoParams,
-  options: CreateDaoOptions = {}
+  options: CreateDaoOptions = {},
+  registerTokenCallback?: Function
 ): Promise<TransactionResponse> {
   if (!args.token.tokenAddress) {
     args.token.tokenAddress = AddressZero
@@ -132,12 +133,11 @@ export async function createDao(
       signer
     )        
 
-    console.log("token ", token)
-    const result = await registerToken(signer, ERC20)
-    console.log(result);
-    if (result) {
-      await result.wait()
-      console.log('Token registered!')
+    // send registerToken call to be called by
+    if(typeof registerTokenCallback === 'function') {  
+      registerTokenCallback(() => {
+        registerToken(signer, ERC20)
+      })
     }
   })
 
