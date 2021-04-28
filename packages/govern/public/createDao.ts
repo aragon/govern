@@ -1,8 +1,10 @@
+/* eslint-disable */
 import { Contract } from '@ethersproject/contracts'
 import { Web3Provider, TransactionResponse } from '@ethersproject/providers'
 import { AddressZero } from '@ethersproject/constants'
 import { BigNumberish } from '@ethersproject/bignumber'
 import Configuration from '../internal/configuration/Configuration'
+import { registerToken } from '../internal/actions/RegisterToken'
 
 export const ContainerConfig = `
   tuple(
@@ -20,6 +22,7 @@ export const ContainerConfig = `
     uint256 maxCalldataSize
   )`
 
+
 const token = `
   tuple(
     address tokenAddress, 
@@ -28,7 +31,9 @@ const token = `
     string tokenSymbol
   )`
 
-
+const registryAbi = [
+  "event Registered(address indexed executor, address queue, address indexed token, address indexed registrant, string name)"
+]
 
 const factoryAbi = [
   `function newGovern(
@@ -96,7 +101,7 @@ export async function createDao(
       tokenDecimals: 0,
       tokenName: '',
       tokenSymbol: '',
-      ...args.token,
+      ...args.token
     }
   }
 
@@ -113,6 +118,29 @@ export async function createDao(
     options.provider || window.ethereum
   ).getSigner()
   const contract = new Contract(factoryAddress, factoryAbi, signer)
+
+  const GovernRegistry = new Contract(
+    config.governRegistry,
+    registryAbi,
+    signer
+  )
+
+  GovernRegistry.on('Registered', async (govern, queue, token, registrant, name) => {
+    const ERC20 = new Contract(
+      token,
+      ["function balanceOf(address who) view returns (uint256)"],
+      signer
+    )        
+
+    console.log("token ", token)
+    const result = await registerToken(signer, ERC20)
+    console.log(result);
+    if (result) {
+      await result.wait()
+      console.log('Token registered!')
+    }
+  })
+
   const result = contract.newGovern(
     args.name,
     args.token,

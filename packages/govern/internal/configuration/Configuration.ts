@@ -1,10 +1,12 @@
 import ClientInterface from '../clients/lib/ClientInterface'
 import GraphQLClient from '../clients/graphql/GraphQLClient'
-import { DAO_FACTORY_ADDRESS } from './ConfigDefaults'
+import { DAO_FACTORY_ADDRESS, TOKEN_STORAGE_PROOF_ADDRESS, GOVERN_REGISTRY_ADDRESS } from './ConfigDefaults'
 
 export interface ConfigurationObject {
-  subgraphURL?: string
+  subgraphURL?: string,
   daoFactoryAddress?: string
+  tokenStorageProof?: string
+  governRegistry?: string
 }
 
 let defaultConfig: Configuration
@@ -25,6 +27,8 @@ export default class Configuration {
     subgraphURL: string;
     client: ClientInterface
     daoFactoryAddress: string
+    tokenStorageProof: string
+    governRegistry: string
   }
 
   /**
@@ -49,17 +53,20 @@ export default class Configuration {
    */
   private setConfig(config: any): void {
     if (!config.subgraphURL) {
-      throw new Error('Missing Govern subgraph URL!')
+      throw new Error('Missing subgraph URL!')
     }
 
     if (!config.daoFactoryAddress) {
       throw new Error('Missing Dao factory address!')
     }
 
+
     this.config = {
       subgraphURL: config.subgraphURL,
       client: new GraphQLClient(config.subgraphURL),
-      daoFactoryAddress: config.daoFactoryAddress
+      daoFactoryAddress: config.daoFactoryAddress,
+      tokenStorageProof: config.tokenStorageProof,
+      governRegistry: config.governRegistry
     }
   }
 
@@ -102,6 +109,32 @@ export default class Configuration {
     return this.config.daoFactoryAddress
   }
 
+  /**
+   * Getter for tokenStorageProof property
+   *
+   * @var tokenStorageProof
+   *
+   * @returns {string}
+   *
+   * @public
+   */
+   get tokenStorageProof(): string {
+    return this.config.tokenStorageProof
+  }
+
+  /**
+   * Getter for governRegistry property
+   *
+   * @var governRegistry
+   *
+   * @returns {string}
+   *
+   * @public
+   */
+   get governRegistry(): string {
+    return this.config.governRegistry
+  }
+
 
   /**
    * Static setter/factory method of the Configuration class
@@ -125,6 +158,14 @@ export default class Configuration {
 
     if (!config.daoFactoryAddress) {
       config.daoFactoryAddress = DAO_FACTORY_ADDRESS
+    }
+
+    if (!config.tokenStorageProof) {
+      config.tokenStorageProof = TOKEN_STORAGE_PROOF_ADDRESS
+    }
+
+    if (!config.governRegistry) {
+      config.governRegistry = GOVERN_REGISTRY_ADDRESS
     }
 
     defaultConfig = new Configuration(config)

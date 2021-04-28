@@ -39,6 +39,12 @@ describe('ConfigurationTest', () => {
     }).toThrow('Missing Dao factory address!')
   })
 
+  it('initialization factory address to null failed test', () => {
+    expect(() => {
+      new Configuration({ governURL: 'localhost', daoFactoryAddress: null })
+    }).toThrow('Missing Dao factory address!')
+  })
+
   it('calls Configuration.get and returns the expected default config', () => {
     const config = Configuration.get()
 

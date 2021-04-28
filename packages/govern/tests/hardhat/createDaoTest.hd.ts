@@ -1,10 +1,16 @@
 import { network, ethers } from 'hardhat'
 import { expect } from 'chai'
+import { ContractFactory, Contract } from 'ethers'
+import { GovernRegistry__factory } from '@aragon/govern-core/typechain'
 import {
   createDao,
   CreateDaoParams,
   CreateDaoOptions,
 } from '../../public/createDao'
+import { TOKEN_STORAGE_PROOF_ADDRESS } from '../../internal/configuration/ConfigDefaults'
+import { TOKEN_STORAGE_PROOF_ABI } from '../../internal/actions/RegisterToken'
+import { ERC20StorageProofs } from 'dvote-solidity'
+
 
 export const registryAbi = [
   `event Registered(address indexed executor, address queue, address indexed token, address indexed registrant, string name)`,
@@ -63,6 +69,7 @@ describe('Create Dao', function () {
     // make sure register event is emitted
     const registryContract = new ethers.Contract(
       registryAddress,
+      //TODO: import this from the shared abi, because create dao also uses this.
       registryAbi,
       ethers.provider
     )
@@ -244,5 +251,74 @@ describe('Create Dao', function () {
 
     const result = await createDao(params, options)
     expect(result).to.have.property('hash')
+  })
+
+  it.only('Should create dao successfully and register token in vocdoni contract', async function () {
+    const params: CreateDaoParams = {
+      name: 'Tree DAO',
+      token: {
+        tokenName: 'tree',
+        tokenSymbol: 'TREE',
+        tokenDecimals: 6,
+      },
+      config: goodConfig,
+      useVocdoni: true,
+    }
+
+    const options: CreateDaoOptions = {
+      provider: network.provider,
+      daoFactoryAddress,
+    }
+
+    const result = await createDao(params, options)
+    console.log('CreateDAO transaction being mined...')
+    const receipt = await result.wait()
+
+    console.log('DAO has been created')
+    console.log(receipt)
+
+    expect(result).to.have.property('hash')
+    expect(receipt).to.have.property('transactionHash')
+    expect(receipt.status).to.equal(1)
+    expect(result.hash).to.equal(receipt.transactionHash)
+
+    // make sure register event is emitted
+    const registryContract = new ethers.Contract(
+      registryAddress,
+      registryAbi,
+      ethers.provider
+    )
+
+    console.log(receipt.logs)
+
+    const args = receipt.logs
+      .filter(
+        ({ address }: { address: string }) =>
+          address === registryContract.address
+      )
+      .map((log: any) => registryContract.interface.parseLog(log))
+      .find(({ name }: { name: string }) => name === 'Registered')
+    
+    const tokenAddress = args?.args[2] as string
+
+    console.log('this is the token address ', tokenAddress)
+    expect(ethers.utils.isAddress(tokenAddress)).to.equal(true)
+    await new Promise((resolve) => {
+      setTimeout(resolve, 40000)
+    })
+    
+    const tokenStorage = new ethers.Contract(
+      TOKEN_STORAGE_PROOF_ADDRESS,
+      TOKEN_STORAGE_PROOF_ABI,
+      ethers.provider
+    )
+
+    console.log('Wait 40 seconds before checking the token is registered')
+    await new Promise((resolve) => {
+      setTimeout(resolve, 40000)
+    })
+    console.log('Checking if is registered...')
+    const t = await tokenStorage.isRegistered(tokenAddress)
+    console.log('Token is registered: ', t)
   })
 })
