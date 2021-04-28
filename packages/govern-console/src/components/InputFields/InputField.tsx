@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React from 'react';
+import React, { useState } from 'react';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import TextField, { StandardTextFieldProps } from '@material-ui/core/TextField';
 
@@ -24,6 +24,7 @@ export interface InputFieldProps extends StandardTextFieldProps {
    * Width of the input box
    */
   width: string;
+  isUpperCase?: boolean;
   value?: string;
 }
 
@@ -37,6 +38,16 @@ export const InputField: React.FC<InputFieldProps> = ({
   ...props
 }) => {
   const theme = useTheme();
+  const [inputValue, setInputValue] = useState();
+
+  const onChangeInput = (val: any) => {
+    let valueTobeSent = val;
+    if (props.isUpperCase) {
+      valueTobeSent = val.toUpperCase()
+    }
+    setInputValue(valueTobeSent);
+    onInputChange(valueTobeSent);
+  }
   const inputLabelStyles = makeStyles({
     root: {
       color: `${theme.custom.greyscale.medium}`,
@@ -114,8 +125,8 @@ export const InputField: React.FC<InputFieldProps> = ({
       InputLabelProps={{ shrink: true, classes: inputLabelClasses }}
       InputProps={{ classes: inputBaseClasses, disableUnderline: true }}
       FormHelperTextProps={{ classes: helperTextClasses }}
-      onChange={(e) => onInputChange(e.target.value)}
-      value={value}
+      onChange={(e) => onChangeInput(e.target.value)}
+      value={inputValue}
       error={props.error}
       {...props}
     />

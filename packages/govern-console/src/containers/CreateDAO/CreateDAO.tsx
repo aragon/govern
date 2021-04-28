@@ -136,22 +136,27 @@ const NewDaoForm: React.FC<FormProps> = memo(
       true,
     );
 
-    const [daoName, setDaoName] = useState<string>('');
-    const [tokenName, setTokenName] = useState<string>('');
-    const [tokenSymbol, setTokenSymbol] = useState<string>('');
-    const [existingTokenAddress, setExistingTokenAddress] = useState<string>(
-      '',
-    );
+    const daoName = useRef<string>();
+    const tokenName = useRef<string>();
+    const tokenSymbol = useRef<string>();
+    const existingTokenAddress = useRef<string>();
 
-    const mainInputs = useMemo(
-      () => ({
-        daoName: daoName,
-        tokenName: tokenName,
-        tokenSymbol: tokenSymbol,
-        existingTokenAddress: existingTokenAddress,
-      }),
-      [daoName, tokenName, tokenSymbol, existingTokenAddress],
-    );
+    // const [daoName, setDaoName] = useState<string>('');
+    // const [tokenName, setTokenName] = useState<string>('');
+    // const [tokenSymbol, setTokenSymbol] = useState<string>('');
+    // const [existingTokenAddress, setExistingTokenAddress] = useState<string>(
+    //   '',
+    // );
+
+    // const mainInputs = useMemo(
+    //   () => ({
+    //     daoName: daoName,
+    //     tokenName: tokenName,
+    //     tokenSymbol: tokenSymbol,
+    //     existingTokenAddress: existingTokenAddress,
+    //   }),
+    //   [daoName, tokenName, tokenSymbol, existingTokenAddress],
+    // );
 
     const [doaNameError, setDoaNameError] = useState<string>('');
     const [tokenNameError, setTokenNameError] = useState<string>('');
@@ -224,24 +229,28 @@ const NewDaoForm: React.FC<FormProps> = memo(
     const onMaxCalldataSizeChange = (val: any) => {
       maxCalldataSize.current = val;
     };
-
     const onChangeDaoName = (val: any) => {
-      setDaoName(val);
+      // setDaoName(val);
+      daoName.current = val;
       setDoaNameError('');
     };
 
     const onChangeTokenName = (val: any) => {
-      setTokenName(val);
+      // setTokenName(val);
+      tokenName.current = val;
       setTokenNameError('');
     };
 
-    const onChangeTokenSymbol = (val: string) => {
-      setTokenSymbol(val.toUpperCase());
+    const onChangeTokenSymbol = (val: any) => {
+      // setTokenSymbol(val.toUpperCase());
+      tokenSymbol.current = val;
       setTokenSymbolError('');
     };
 
     const onChangeExistingTokenAddress = (val: any) => {
-      setExistingTokenAddress(val);
+      console.log(val);
+      // setExistingTokenAddress(val);
+      existingTokenAddress.current = val
       setExistingTokenAddressError('');
     };
 
@@ -309,23 +318,23 @@ const NewDaoForm: React.FC<FormProps> = memo(
 
     const validateForm = (): boolean => {
       let validateArray = [];
-      if (daoName === '' || typeof daoName === 'undefined') {
+      if (daoName.current === '' || typeof daoName.current === 'undefined') {
         validateArray.push(false);
         setDoaNameError('Invalid DAO Name');
       } else {
         setDoaNameError('');
       }
       if (!isExistingToken) {
-        if (tokenName === '' || typeof tokenName === 'undefined') {
+        if (tokenName.current === '' || typeof tokenName.current === 'undefined') {
           validateArray.push(false);
           setTokenNameError('Invalid Token Name');
         } else {
           setTokenNameError('');
         }
         if (
-          tokenSymbol === '' ||
-          typeof tokenSymbol === 'undefined' ||
-          tokenSymbol.length > 6
+          tokenSymbol.current === '' ||
+          typeof tokenSymbol.current === 'undefined' ||
+          tokenSymbol.current.length > 6
         ) {
           validateArray.push(false);
           setTokenSymbolError('Invalid Symbol');
@@ -334,9 +343,9 @@ const NewDaoForm: React.FC<FormProps> = memo(
         }
       } else {
         if (
-          existingTokenAddress === '' ||
-          typeof existingTokenAddress === 'undefined' ||
-          existingTokenAddress.length !== 42
+          existingTokenAddress.current === '' ||
+          typeof existingTokenAddress.current === 'undefined' ||
+          existingTokenAddress.current.length !== 42
         ) {
           validateArray.push(false);
           setExistingTokenAddressError('Invalid address');
@@ -397,7 +406,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
             height="46px"
             width="454px"
             placeholder={'Please insert your DAO name...'}
-            value={mainInputs.daoName}
+            value={daoName.current}
             error={mainInputsErrors.daoNameError !== ''}
             helperText={mainInputsErrors.daoNameError}
           ></InputField>
@@ -434,7 +443,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
                 <InputField
                   label=""
                   onInputChange={onChangeTokenName}
-                  value={mainInputs.tokenName}
+                  value={tokenName.current}
                   height="46px"
                   width="200px"
                   placeholder={"Your Token's Name?"}
@@ -445,10 +454,11 @@ const NewDaoForm: React.FC<FormProps> = memo(
                 <InputField
                   label=""
                   onInputChange={onChangeTokenSymbol}
+                  isUpperCase={true}
                   height="46px"
                   width="200px"
                   placeholder={"Your Token's Symbol?"}
-                  value={mainInputs.tokenSymbol}
+                  value={tokenSymbol.current}
                   error={mainInputsErrors.tokenSymbolError !== ''}
                   helperText={mainInputsErrors.tokenSymbolError}
                 />
@@ -465,7 +475,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
                 placeholder={
                   'Please insert existing token ether address (0x000...)'
                 }
-                value={mainInputs.existingTokenAddress}
+                value={existingTokenAddress.current}
                 error={mainInputsErrors.existingTokenAddressError !== ''}
                 helperText={mainInputsErrors.existingTokenAddressError}
               />
