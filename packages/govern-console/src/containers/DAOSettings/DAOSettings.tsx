@@ -14,10 +14,10 @@ import { ANCircularProgressWithCaption } from '../../components/CircularProgress
 import { CiruclarProgressStatus } from '../../components/CircularProgress/ANCircularProgress';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { useQuery } from '@apollo/client';
-import { buildPayload } from '../../utils/ERC3000'
+import { buildPayload } from '../../utils/ERC3000';
 import { useWallet } from '../../EthersWallet';
 import { erc20ApprovalTransaction } from '../../utils/transactionHelper';
-import { toUtf8Bytes } from '@ethersproject/strings'
+import { toUtf8Bytes } from '@ethersproject/strings';
 
 import {
   Proposal,
@@ -47,7 +47,6 @@ interface ParamTypes {
 }
 
 const DaoSettingsForm: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
-  
   const context: any = useWallet();
   const {
     connector,
@@ -65,7 +64,6 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
     type,
     ethersProvider,
   } = context;
-
 
   const BackButton = styled('div')({
     height: 25,
@@ -187,7 +185,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
   });
 
   const [daoDetails, updateDaoDetails] = useState<any>();
-  const [proposal, setProposal] =  useState<any | null>();
+  const [proposal, setProposal] = useState<any | null>();
   const [currentConfig, setCurrentConfig] = useState<any | null>();
 
   useEffect(() => {
@@ -197,9 +195,9 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
   }, [daoList]);
 
   useEffect(() => {
-    if(daoDetails) {
+    if (daoDetails) {
       const _config = daoDetails.queue.config;
-      setCurrentConfig(_config)
+      setCurrentConfig(_config);
       onChangeExecutionDelay(_config.executionDelay);
       onScheduleDepositContractAddress(_config.scheduleDeposit.token);
       onChangeScheduleDepositAmount(_config.scheduleDeposit.amount);
@@ -209,8 +207,8 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
       setRules(_config.rules);
 
       const proposalOptions: ProposalOptions = {};
-      const proposal = new Proposal(daoDetails.queue.address, proposalOptions)
-      setProposal(proposal)
+      const proposal = new Proposal(daoDetails.queue.address, proposalOptions);
+      setProposal(proposal);
     }
   }, [daoDetails]);
 
@@ -227,30 +225,33 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
       executionDelay: executionDelay,
       scheduleDeposit: {
         token: scheduleDepositContractAddress,
-        amount: scheduleDepositAmount
+        amount: scheduleDepositAmount,
       },
       challengeDeposit: {
         token: challengeDepositContractAddress,
-        amount: challengeDepositAmount
+        amount: challengeDepositAmount,
       },
       resolver: resolverAddress,
       rules: rules,
       maxCalldataSize: currentConfig.maxCalldataSize, // TODO: grab it from config subgraph too.
     };
 
-    const submitter: string = account
+    const submitter: string = account;
 
     const payload = buildPayload({
-      submitter, 
+      submitter,
       executor: daoDetails.executor.address,
       actions: [proposal.buildAction('configure', [newConfig], 0)],
       executionDelay: daoDetails.queue.config.executionDelay,
       // proof: toUtf8Bytes(justification) // TODO Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
-      proof: '0x'
-    })
+      proof: '0x',
+    });
 
     // TODO:GIORGI error tracking make it better
-    if(daoDetails.queue.config.scheduleDeposit.token !== '0x'+'0'.repeat(20)){
+    if (
+      daoDetails.queue.config.scheduleDeposit.token !==
+      '0x' + '0'.repeat(20)
+    ) {
       const scheduleDepositApproval = await erc20ApprovalTransaction(
         daoDetails.queue.config.scheduleDeposit.token,
         daoDetails.queue.config.scheduleDeposit.amount,
@@ -259,11 +260,11 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
         account,
       );
 
-      if(scheduleDepositApproval.error) {
-        console.log(scheduleDepositApproval.error, ' approval error')
+      if (scheduleDepositApproval.error) {
+        console.log(scheduleDepositApproval.error, ' approval error');
       }
-  
-      if(scheduleDepositApproval.transactions.length > 0) {
+
+      if (scheduleDepositApproval.transactions.length > 0) {
         try {
           const transactionResponse: any = await scheduleDepositApproval.transactions[0].tx();
           await transactionResponse.wait();
@@ -272,12 +273,11 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
         }
       }
     }
-    
-    
-    console.log(currentConfig, ' nice one')
+
+    console.log(currentConfig, ' nice one');
     const scheduleResult = await proposal.schedule({
       payload: payload,
-      config: currentConfig
+      config: currentConfig,
     });
 
     // TODO: create tx object with attribute such as if tx is done using CiruclarProgressStatus
@@ -367,7 +367,10 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
               marginLeft: '30px',
             }}
           >
-            <ANCircularProgressWithCaption state={CiruclarProgressStatus.Disabled} caption={tx} />
+            <ANCircularProgressWithCaption
+              state={CiruclarProgressStatus.Disabled}
+              caption={tx}
+            />
           </div>
         );
       })}

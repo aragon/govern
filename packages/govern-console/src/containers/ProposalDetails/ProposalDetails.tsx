@@ -372,7 +372,10 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     );
 
     // TODO:GIORGI error tracking make it better
-    if(daoDetails.queue.config.scheduleDeposit.token !== '0x'+'0'.repeat(20)){
+    if (
+      daoDetails.queue.config.scheduleDeposit.token !==
+      '0x' + '0'.repeat(20)
+    ) {
       const challengeDepositApproval = await erc20ApprovalTransaction(
         daoDetails.queue.config.challengeDeposit.token,
         daoDetails.queue.config.challengeDeposit.amount,
@@ -381,12 +384,12 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
         account,
       );
 
-      if(challengeDepositApproval.error) {
-        console.log(challengeDepositApproval.error, ' approval error')
+      if (challengeDepositApproval.error) {
+        console.log(challengeDepositApproval.error, ' approval error');
         // TODO:GIORGI don't continue
       }
-  
-      if(challengeDepositApproval.transactions.length > 0) {
+
+      if (challengeDepositApproval.transactions.length > 0) {
         try {
           const transactionResponse: any = await challengeDepositApproval.transactions[0].tx();
           await transactionResponse.wait();
@@ -396,10 +399,9 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       }
     }
 
-
     const [, feeToken, feeAmount] = await contract.getDisputeFees();
 
-    if(feeToken !== '0x'+'0'.repeat(20)){
+    if (feeToken !== '0x' + '0'.repeat(20)) {
       const feeTokenApproval = await erc20ApprovalTransaction(
         feeToken,
         feeAmount,
@@ -407,12 +409,12 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
         ethersProvider,
         account,
       );
-      if(feeTokenApproval.error) {
-        console.log(feeTokenApproval.error, ' approval error')
+      if (feeTokenApproval.error) {
+        console.log(feeTokenApproval.error, ' approval error');
         // TODO:GIORGI don't continue if this fails.
       }
-  
-      if(feeTokenApproval.transactions.length > 0) {
+
+      if (feeTokenApproval.transactions.length > 0) {
         try {
           const transactionResponse: any = await feeTokenApproval.transactions[0].tx();
           await transactionResponse.wait();
@@ -421,7 +423,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
         }
       }
     }
-    
   };
 
   const getProposalParams = () => {

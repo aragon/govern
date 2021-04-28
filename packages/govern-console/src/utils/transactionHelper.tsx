@@ -10,10 +10,9 @@ export async function erc20ApprovalTransaction(
   ethersProvider: any,
   account: string,
 ): Promise<Response> {
-  
   const response: Response = {
     error: undefined,
-    transactions: []
+    transactions: [],
   };
 
   const amountInBigNumber: BigNumber = ethers.BigNumber.from(amount);
@@ -24,18 +23,18 @@ export async function erc20ApprovalTransaction(
     ethersProvider.getSigner(),
   );
 
-  let allowance: BigNumber = ethers.BigNumber.from(0)
-  let userBalance: BigNumber = ethers.BigNumber.from(0)
+  let allowance: BigNumber = ethers.BigNumber.from(0);
+  let userBalance: BigNumber = ethers.BigNumber.from(0);
 
   try {
     allowance = await contract.allowance(account, spender);
     userBalance = await contract.balanceOf(account);
-  }catch(err) {
+  } catch (err) {
     // contract address could be 0x0000000..000 or might not have `allowance` or balanceOf on it.
     // TODO: if it's an address and not 0x000..00.., track it with sentry.
-    response.error = `Contract ${token} doesn't seem to be ERC20 compliant.`
+    response.error = `Contract ${token} doesn't seem to be ERC20 compliant.`;
   }
-  
+
   // user balance is less than the amount that needs approval.
   // this means user won't be able to approve full amount.
   if (userBalance.lt(amountInBigNumber)) {
