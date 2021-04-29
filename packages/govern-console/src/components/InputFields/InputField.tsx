@@ -92,7 +92,7 @@ export const InputField: React.FC<InputFieldProps> = ({
       border: `2px solid ${getBoarderColor()}`,
       borderRadius: '8px',
       height: height || '46px',
-      width: width || '%100',
+      width: width || '100%',
       minWidth: props.minWidth || 0,
       maxWidth: props.maxWidth || '100%'
     },
