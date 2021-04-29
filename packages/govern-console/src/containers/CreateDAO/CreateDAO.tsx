@@ -25,6 +25,7 @@ import {
 // Note: query should not be needed once DAO page is capable of auto query
 import { GET_DAO_BY_NAME } from '../Console/queries';
 import { useQuery } from '@apollo/client';
+import { ARAGON_VOICE_URL, PROXY_CONTRACT_URL } from '../../utils/constants';
 
 enum CreateDaoStatus {
   PreCreate,
@@ -32,9 +33,6 @@ enum CreateDaoStatus {
   Successful,
   Failed,
 }
-
-// TODO: to be moved to the constant file
-const aragonVoiceUrl = 'https://voice.aragon.org';
 
 interface FormProps {
   /*
@@ -124,6 +122,13 @@ const optionTextStyle = {
 const NewDaoForm: React.FC<FormProps> = memo(
   ({ setCreateDaoStatus, setCreatedDaoRoute, cancelForm }) => {
     const context: any = useWallet();
+    const chainId = useMemo(() => {
+      if (context.chainId === 4 && context.status === 'connected') {
+        return 4;
+      } else {
+        return 1;
+      }
+    }, [context.chainId, context.status]);
 
     const [isExistingToken, updateIsExistingToken] = useState(false);
     const [isUseProxyChecked, updateIsUseProxyChecked] = useState(true);
@@ -131,22 +136,27 @@ const NewDaoForm: React.FC<FormProps> = memo(
       true,
     );
 
-    const [daoName, setDaoName] = useState<string>('');
-    const [tokenName, setTokenName] = useState<string>('');
-    const [tokenSymbol, setTokenSymbol] = useState<string>('');
-    const [existingTokenAddress, setExistingTokenAddress] = useState<string>(
-      '',
-    );
+    const daoName = useRef<string>();
+    const tokenName = useRef<string>();
+    const tokenSymbol = useRef<string>();
+    const existingTokenAddress = useRef<string>();
 
-    const mainInputs = useMemo(
-      () => ({
-        daoName: daoName,
-        tokenName: tokenName,
-        tokenSymbol: tokenSymbol,
-        existingTokenAddress: existingTokenAddress,
-      }),
-      [daoName, tokenName, tokenSymbol, existingTokenAddress],
-    );
+    // const [daoName, setDaoName] = useState<string>('');
+    // const [tokenName, setTokenName] = useState<string>('');
+    // const [tokenSymbol, setTokenSymbol] = useState<string>('');
+    // const [existingTokenAddress, setExistingTokenAddress] = useState<string>(
+    //   '',
+    // );
+
+    // const mainInputs = useMemo(
+    //   () => ({
+    //     daoName: daoName,
+    //     tokenName: tokenName,
+    //     tokenSymbol: tokenSymbol,
+    //     existingTokenAddress: existingTokenAddress,
+    //   }),
+    //   [daoName, tokenName, tokenSymbol, existingTokenAddress],
+    // );
 
     const [doaNameError, setDoaNameError] = useState<string>('');
     const [tokenNameError, setTokenNameError] = useState<string>('');
@@ -219,22 +229,29 @@ const NewDaoForm: React.FC<FormProps> = memo(
     const onMaxCalldataSizeChange = (val: any) => {
       maxCalldataSize.current = val;
     };
-
     const onChangeDaoName = (val: any) => {
-      setDaoName(val);
+      // setDaoName(val);
+      daoName.current = val;
+      setDoaNameError('');
     };
 
     const onChangeTokenName = (val: any) => {
-      setTokenName(val);
+      // setTokenName(val);
+      tokenName.current = val;
+      setTokenNameError('');
     };
 
-    const onChangeTokenSymbol = (val: string) => {
-      setTokenSymbol(val.toUpperCase());
+    const onChangeTokenSymbol = (val: any) => {
+      // setTokenSymbol(val.toUpperCase());
+      tokenSymbol.current = val;
+      setTokenSymbolError('');
     };
 
     const onChangeExistingTokenAddress = (val: any) => {
       console.log(val);
-      setExistingTokenAddress(val);
+      // setExistingTokenAddress(val);
+      existingTokenAddress.current = val
+      setExistingTokenAddressError('');
     };
 
     const createDaoConfig = {
@@ -299,44 +316,50 @@ const NewDaoForm: React.FC<FormProps> = memo(
       }
     };
 
-    // TODO: use switch to cover more senarions
     const validateForm = (): boolean => {
-      if (daoName === '' || typeof daoName === 'undefined') {
+      let validateArray = [];
+      if (daoName.current === '' || typeof daoName.current === 'undefined') {
+        validateArray.push(false);
         setDoaNameError('Invalid DAO Name');
-        return false;
       } else {
         setDoaNameError('');
       }
       if (!isExistingToken) {
-        if (tokenName === '' || typeof tokenName === 'undefined') {
+        if (tokenName.current === '' || typeof tokenName.current === 'undefined') {
+          validateArray.push(false);
           setTokenNameError('Invalid Token Name');
-          return false;
         } else {
           setTokenNameError('');
         }
         if (
-          tokenSymbol === '' ||
-          typeof tokenSymbol === 'undefined' ||
-          tokenSymbol.length > 6
+          tokenSymbol.current === '' ||
+          typeof tokenSymbol.current === 'undefined' ||
+          tokenSymbol.current.length > 6
         ) {
+          validateArray.push(false);
           setTokenSymbolError('Invalid Symbol');
-          return false;
         } else {
           setTokenSymbolError('');
         }
       } else {
         if (
-          existingTokenAddress === '' ||
-          typeof existingTokenAddress === 'undefined' ||
-          existingTokenAddress.length !== 42
+          existingTokenAddress.current === '' ||
+          typeof existingTokenAddress.current === 'undefined' ||
+          existingTokenAddress.current.length !== 42
         ) {
+          validateArray.push(false);
           setExistingTokenAddressError('Invalid address');
-          return false;
         } else {
           setExistingTokenAddressError('');
         }
       }
-      return true;
+
+      if (validateArray.includes(false)) {
+        console.log(validateArray);
+        return false;
+      } else {
+        return true;
+      }
     };
 
     const submitCreateDao = async () => {
@@ -383,7 +406,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
             height="46px"
             width="454px"
             placeholder={'Please insert your DAO name...'}
-            value={mainInputs.daoName}
+            value={daoName.current}
             error={mainInputsErrors.daoNameError !== ''}
             helperText={mainInputsErrors.daoNameError}
           ></InputField>
@@ -420,7 +443,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
                 <InputField
                   label=""
                   onInputChange={onChangeTokenName}
-                  value={mainInputs.tokenName}
+                  value={tokenName.current}
                   height="46px"
                   width="200px"
                   placeholder={"Your Token's Name?"}
@@ -431,10 +454,11 @@ const NewDaoForm: React.FC<FormProps> = memo(
                 <InputField
                   label=""
                   onInputChange={onChangeTokenSymbol}
+                  isUpperCase={true}
                   height="46px"
                   width="200px"
                   placeholder={"Your Token's Symbol?"}
-                  value={mainInputs.tokenSymbol}
+                  value={tokenSymbol.current}
                   error={mainInputsErrors.tokenSymbolError !== ''}
                   helperText={mainInputsErrors.tokenSymbolError}
                 />
@@ -451,7 +475,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
                 placeholder={
                   'Please insert existing token ether address (0x000...)'
                 }
-                value={mainInputs.existingTokenAddress}
+                value={existingTokenAddress.current}
                 error={mainInputsErrors.existingTokenAddressError !== ''}
                 helperText={mainInputsErrors.existingTokenAddressError}
               />
@@ -479,9 +503,17 @@ const NewDaoForm: React.FC<FormProps> = memo(
               />
             </div>
             <div style={optionTextStyle}>
-              Use Govern Agent Proxy - This will enable your DAO to use Aragon
-              Govern main executer queue, and heavily decrease gas costs for
-              your DAO deployment
+              Use{' '}
+              <a
+                href={PROXY_CONTRACT_URL}
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                Proxies
+              </a>{' '}
+              for the deployment - This will enable your DAO to use the already
+              deployed code of the Govern Executer and Queue, and heavily
+              decrease gas costs for your DAO deployment.
             </div>
           </div>
 
@@ -508,7 +540,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
             <div style={optionTextStyle}>
               Use{' '}
               <a
-                href={aragonVoiceUrl}
+                href={ARAGON_VOICE_URL[chainId]}
                 target="_blank"
                 rel="noreferrer noopener"
               >
