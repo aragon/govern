@@ -10660,17 +10660,17 @@ duplexify@^3.4.2, duplexify@^3.6.0:
     readable-stream "^2.0.0"
     stream-shift "^1.0.0"
 
-dvote-js@1.1.5:
-  version "1.1.5"
-  resolved "https://registry.yarnpkg.com/dvote-js/-/dvote-js-1.1.5.tgz#0a47da9b5ebf5a9cf9a910262cc72101eb1c0900"
-  integrity sha512-ECwjEYDDadlYWpLlNZsvBRBC18m5q6GSuCKNABb7lntA/8UEmYh9exJEdQM3R/4tLMVOreycabQ3VQEZRQhu3w==
+dvote-js@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/dvote-js/-/dvote-js-1.2.0.tgz#dc313144d3ec90646a93902297d964a700162e11"
+  integrity sha512-jYfqNJf/Ss0YyiR8jI+xMHkf4A0JOsScQVBJu4nyDo0zpa97g3/wzbIh2pqfwV8iRUR3EckC9I6/y4lujDBG0w==
   dependencies:
     "@vocdoni/storage-proofs-eth" "^0.2.3"
     axios "^0.21.1"
     blindsecp256k1 "0.0.6"
     buffer "^6.0.3"
     circomlib "^0.1.2"
-    dvote-solidity "^1.0.0"
+    dvote-solidity "^1.2.0"
     ethers "^5.0.23"
     google-protobuf "^3.14.0"
     iso-language-codes "^1.0.6"
@@ -10683,10 +10683,10 @@ dvote-js@1.1.5:
     ws "^7.1.0"
     yup "^0.31.1"
 
-dvote-solidity@1.1.0, dvote-solidity@^1.0.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/dvote-solidity/-/dvote-solidity-1.1.0.tgz#4e204c1936e82a1fda2f950b895ae0887b8a5ed4"
-  integrity sha512-9kMM+OZyqcRdLwRoPp1sYWhV8YWSuX5nI8ufzzqzrrChKA8kIUWbq2/4kpGW6QLteIGOOXodcoXfO9p0vEiE5Q==
+dvote-solidity@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/dvote-solidity/-/dvote-solidity-1.2.0.tgz#6ad4bc0a191bc72f2ff3b4c0cc3706866ed8f665"
+  integrity sha512-s48QVj+xFf9+aLVJuCbvlMFyaSEWInDxU0q7j7DG8uGmxhizsFlshT1aH1xZE5nzregpjuRVtCBcYSfzZCdZPQ==
   dependencies:
     "@openzeppelin/contracts" "^3.1.0"
     eth-ens-namehash "^2.0.8"

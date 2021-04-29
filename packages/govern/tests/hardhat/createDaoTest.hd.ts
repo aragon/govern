@@ -1,16 +1,12 @@
 import { network, ethers } from 'hardhat'
 import { expect } from 'chai'
-import { ContractFactory, Contract } from 'ethers'
-import { GovernRegistry__factory } from '@aragon/govern-core/typechain'
 import {
   createDao,
   CreateDaoParams,
   CreateDaoOptions,
 } from '../../public/createDao'
-import { TOKEN_STORAGE_PROOF_ADDRESS } from '../../internal/configuration/ConfigDefaults'
-import { TOKEN_STORAGE_PROOF_ABI } from '../../internal/actions/RegisterToken'
-import { ERC20StorageProofs } from 'dvote-solidity'
-
+import { CensusErc20Api } from 'dvote-js'
+import { getPool } from '../../internal/actions/lib/Gateway'
 
 export const registryAbi = [
   `event Registered(address indexed executor, address queue, address indexed token, address indexed registrant, string name)`,
@@ -22,6 +18,7 @@ export const registryAbi = [
 const tokenAddress = '0x9fB402A33761b88D5DcbA55439e6668Ec8D4F2E8'
 const daoFactoryAddress = '0xb75290e69f83b52bfbf9c99b4ae211935e75a851'
 const registryAddress = '0x7714e0a2A2DA090C2bbba9199A54B903bB83A73d'
+
 
 describe('Create Dao', function () {
   const goodConfig = {
@@ -255,10 +252,10 @@ describe('Create Dao', function () {
 
   it.skip('Should create dao successfully and register token in vocdoni contract', async function () {
     const params: CreateDaoParams = {
-      name: 'Tree DAO',
+      name: 'sunshine',
       token: {
-        tokenName: 'tree',
-        tokenSymbol: 'TREE',
+        tokenName: 'sunshine',
+        tokenSymbol: 'SUN',
         tokenDecimals: 6,
       },
       config: goodConfig,
@@ -281,12 +278,13 @@ describe('Create Dao', function () {
     const result = await createDao(params, options, registerTokenCallback)
     const receipt = await result.wait()
 
-    console.log('DAO has been created')
+    console.log('DAO has been created', receipt.transactionHash, receipt.status)
 
-    expect(result).to.have.property('hash')
-    expect(receipt).to.have.property('transactionHash')
-    expect(receipt.status).to.equal(1)
-    expect(result.hash).to.equal(receipt.transactionHash)
+    const status = receipt.status
+    const receiptHash = receipt.transactionHash
+    const hash = result.hash
+    expect(status).to.equal(1)
+    expect(hash).to.equal(receiptHash, 'result.hash != receipt.transactionHash')
 
     // make sure register event is emitted
     const registryContract = new ethers.Contract(
@@ -308,22 +306,15 @@ describe('Create Dao', function () {
 
     console.log('this is the token address ', tokenAddress)
     expect(ethers.utils.isAddress(tokenAddress)).to.equal(true)
-    await new Promise((resolve) => {
-      setTimeout(resolve, 40000)
-    })
     
-    const tokenStorage = new ethers.Contract(
-      TOKEN_STORAGE_PROOF_ADDRESS,
-      TOKEN_STORAGE_PROOF_ABI,
-      ethers.provider
-    )
 
     console.log('Wait 40 seconds before checking the token is registered')
     await new Promise((resolve) => {
-      setTimeout(resolve, 200000)
+      setTimeout(resolve, 40000)
     })
     console.log('Checking if is registered...')
-    const t = await tokenStorage.isRegistered(tokenAddress)
-    console.log('Token is registered: ', t)
+    const pool = await getPool()
+    const registered = await CensusErc20Api.isRegistered(tokenAddress, pool)
+    expect(registered).to.be.true
   })
 })

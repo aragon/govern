@@ -1,6 +1,6 @@
 import ClientInterface from '../clients/lib/ClientInterface'
 import GraphQLClient from '../clients/graphql/GraphQLClient'
-import { DAO_FACTORY_ADDRESS, TOKEN_STORAGE_PROOF_ADDRESS, GOVERN_REGISTRY_ADDRESS } from './ConfigDefaults'
+import { DAO_FACTORY_ADDRESS, GOVERN_REGISTRY_ADDRESS } from './ConfigDefaults'
 
 export interface ConfigurationObject {
   subgraphURL?: string,
@@ -11,6 +11,7 @@ export interface ConfigurationObject {
 
 let defaultConfig: Configuration
 const subgraphURL = 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-mainnet'
+
 
 /**
  * @class Configuration
@@ -27,7 +28,6 @@ export default class Configuration {
     subgraphURL: string;
     client: ClientInterface
     daoFactoryAddress: string
-    tokenStorageProof: string
     governRegistry: string
   }
 
@@ -65,8 +65,7 @@ export default class Configuration {
       subgraphURL: config.subgraphURL,
       client: new GraphQLClient(config.subgraphURL),
       daoFactoryAddress: config.daoFactoryAddress,
-      tokenStorageProof: config.tokenStorageProof,
-      governRegistry: config.governRegistry
+      governRegistry: config.governRegistry,
     }
   }
 
@@ -110,19 +109,6 @@ export default class Configuration {
   }
 
   /**
-   * Getter for tokenStorageProof property
-   *
-   * @var tokenStorageProof
-   *
-   * @returns {string}
-   *
-   * @public
-   */
-   get tokenStorageProof(): string {
-    return this.config.tokenStorageProof
-  }
-
-  /**
    * Getter for governRegistry property
    *
    * @var governRegistry
@@ -158,10 +144,6 @@ export default class Configuration {
 
     if (!config.daoFactoryAddress) {
       config.daoFactoryAddress = DAO_FACTORY_ADDRESS
-    }
-
-    if (!config.tokenStorageProof) {
-      config.tokenStorageProof = TOKEN_STORAGE_PROOF_ADDRESS
     }
 
     if (!config.governRegistry) {

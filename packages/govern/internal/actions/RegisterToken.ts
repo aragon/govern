@@ -1,75 +1,20 @@
-import { CensusErc20Api } from 'dvote-js'
-import { BigNumber } from 'ethers'
-import { Contract } from '@ethersproject/contracts'
-import { JsonRpcSigner } from '@ethersproject/providers'
-import { TransactionResponse } from '@ethersproject/abstract-provider'
-import { TOKEN_STORAGE_PROOF_ADDRESS } from '../configuration/ConfigDefaults'
+import { CensusErc20Api, GatewayPool } from 'dvote-js'
+import { getPool } from './lib/Gateway'
+import {
+  BigNumber,
+  ContractReceipt,
+  Contract,
+  providers
+} from 'ethers'
 
-//@TODO: Move this
-export const TOKEN_STORAGE_PROOF_ABI = [
-  {
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'ercTokenAddress',
-        type: 'address',
-      },
-    ],
-    name: 'isRegistered',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'tokenAddress',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'balanceMappingPosition',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'blockNumber',
-        type: 'uint256',
-      },
-      {
-        internalType: 'bytes',
-        name: 'blockHeaderRLP',
-        type: 'bytes',
-      },
-      {
-        internalType: 'bytes',
-        name: 'accountStateProof',
-        type: 'bytes',
-      },
-      {
-        internalType: 'bytes',
-        name: 'storageProof',
-        type: 'bytes',
-      },
-    ],
-    name: 'registerToken',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-]
+// currently the only way to find token mapping balance position is
+// by brute force, generally 20 tries will be enough
+const MAX_TRY = 20
 
 export const registerToken = async (
-  signer: JsonRpcSigner,
+  signer: providers.JsonRpcSigner,
   Token: Contract
-): Promise<TransactionResponse | undefined> => {
+): Promise<ContractReceipt | undefined> => {
   const deployer = await signer.getAddress()
   const blockNumber = await signer.provider.getBlockNumber()
   console.log('this is the deployer ', deployer)
@@ -79,18 +24,12 @@ export const registerToken = async (
   console.log('Balance: ', balance)
   console.log('Block number: ', blockNumber)
 
-  let results = {
-    blockHeaderRLP: '',
-    accountProofRLP: '',
-    storageProofsRLP: '',
-  }
 
-  let indexSlot
+  let found = false
+  let position: number
   console.log("Let's look for the balance mapping slot ")
-  for (let i = 0; i < 10; i++) {
-    const hasIndex = Number.isInteger(indexSlot)
-    if (hasIndex) continue
-    const balanceSlot = CensusErc20Api.getHolderBalanceSlot(deployer, i)
+  for (position = 0; position < MAX_TRY; position++) {
+    const balanceSlot = CensusErc20Api.getHolderBalanceSlot(deployer, position)
 
     try {
       const result = await CensusErc20Api.generateProof(
@@ -102,7 +41,6 @@ export const registerToken = async (
       )
 
       if (result == null || !result.proof) continue
-      results = result as any
       const onChainBalance = BigNumber.from(result.proof.storageProof[0].value)
 
       if (!onChainBalance.eq(balance)) {
@@ -114,30 +52,22 @@ export const registerToken = async (
         )
       }
 
-      indexSlot = i
+      found = true
+      break;
     } catch (e) {
       console.log('This is the error ', e.message)
-      console.log('Result not found on index ', i)
+      console.log('Result not found on index ', position)
     }
   }
 
-  if (Number.isInteger(indexSlot)) {
-    const TokenStorageProof = new Contract(
-      TOKEN_STORAGE_PROOF_ADDRESS,
-      TOKEN_STORAGE_PROOF_ABI,
-      signer
-    )
+  if (found) {
+    const pool = await getPool(signer.provider)
     console.log('Registering token...')
-    const result = TokenStorageProof.registerToken(
+    const result = CensusErc20Api.registerToken(
       Token.address,
-      indexSlot,
-      blockNumber,
-      Buffer.from(results.blockHeaderRLP.replace('0x', ''), 'hex'),
-      Buffer.from(results.accountProofRLP.replace('0x', ''), 'hex'),
-      Buffer.from(results.storageProofsRLP[0].replace('0x', ''), 'hex'),
-      {
-        gasLimit: 10_000_000,
-      }
+      position,
+      signer,
+      pool
     )
 
     return result
