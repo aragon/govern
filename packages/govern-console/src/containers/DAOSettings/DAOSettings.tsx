@@ -454,7 +454,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
       </div>
     );
 
-    return (
+    return (proposal ? 
       <>
         <SimpleModal
           modalTitle={'Confirm transactions'}
@@ -734,7 +734,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
             />
           </div>
         </ANWrappedPaper>
-      </>
+      </> : null
     );
   },
 );

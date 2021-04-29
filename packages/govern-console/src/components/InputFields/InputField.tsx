@@ -40,7 +40,7 @@ export const InputField: React.FC<InputFieldProps> = ({
   ...props
 }) => {
   const theme = useTheme();
-  const [inputValue, setInputValue] = useState();
+  const [inputValue, setInputValue] = useState(value);
 
   const onChangeInput = (val: any) => {
     let valueTobeSent = val;
