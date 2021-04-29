@@ -73,7 +73,7 @@ export const DaoHeader: React.FC<DaoHeaderProps> = ({
   });
 
   const goToSettingPage = () => {
-    history.push('/' + daoName + '/dao-settings');
+    history.push('/daos/' + daoName + '/dao-settings');
   };
 
   return (

@@ -1,7 +1,7 @@
 /* eslint-disable */
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Switch from '@material-ui/core/Switch';
+import Switch, { SwitchProps } from '@material-ui/core/Switch';
 
 /**
  * UI Switch component for user interaction
@@ -50,7 +50,7 @@ const useStyles = makeStyles({
   },
 });
 
-export interface SwitchProps {
+export interface BlueSwitchProps extends SwitchProps {
   /**
    * checked status
    */
@@ -72,7 +72,7 @@ export interface SwitchProps {
   disabled?: boolean;
 }
 
-export const BlueSwitch: React.FC<SwitchProps> = ({ ...props }) => {
+export const BlueSwitch: React.FC<BlueSwitchProps> = ({ ...props }) => {
   const classes = useStyles();
 
   return (
@@ -88,6 +88,7 @@ export const BlueSwitch: React.FC<SwitchProps> = ({ ...props }) => {
         track: classes.track,
         thumb: classes.thumb,
       }}
+      {...props}
     />
   );
 };
