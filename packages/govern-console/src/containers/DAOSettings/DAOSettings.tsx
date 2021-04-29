@@ -164,27 +164,6 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
     const rules = useRef<string>();
     const justification = useRef<string>('');
 
-    // const [executionDelay, setExecutionDelay] = useState<string>();
-    // const [
-    //   scheduleDepositContractAddress,
-    //   setScheduleDepositContractAddress,
-    // ] = useState<string>();
-    // const [
-    //   scheduleDepositAmount,
-    //   setScheduleDepositAmount,
-    // ] = useState<string>();
-    // const [
-    //   challengeDepositContractAddress,
-    //   setChallengeDepositContractAddress,
-    // ] = useState<string>();
-    // const [
-    //   challengeDepositAmount,
-    //   setChallengeDepositAmoun,
-    // ] = useState<string>();
-    // const [resolverAddress, setResolverAddress] = useState<string>();
-    // const [rules, setRules] = useState<string>();
-    // const [justification, setJustification] = useState<string>();
-
     const [isRuleFile, setIsRuleFile] = useState(false);
     const [isJustificationFile, setIsJustificationFile] = useState(false);
 
@@ -227,11 +206,6 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
       // setJustification(val)
       justification.current = (val);
     };
-
-    // not even work woth use memo
-    const mainInputs = useMemo( () => ({
-      executionDelay: executionDelay.current
-    }), [executionDelay])
 
     const { daoName } = useParams<ParamTypes>();
     //TODO daoname empty handling
