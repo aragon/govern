@@ -23,7 +23,9 @@ export interface InputFieldProps extends StandardTextFieldProps {
   /**
    * Width of the input box
    */
-  width: string;
+  width?: string;
+  minWidth?: any;
+  maxWidth?: any;
   isUpperCase?: boolean;
   value?: string;
 }
@@ -38,7 +40,7 @@ export const InputField: React.FC<InputFieldProps> = ({
   ...props
 }) => {
   const theme = useTheme();
-  const [inputValue, setInputValue] = useState();
+  const [inputValue, setInputValue] = useState(value);
 
   const onChangeInput = (val: any) => {
     let valueTobeSent = val;
@@ -48,18 +50,20 @@ export const InputField: React.FC<InputFieldProps> = ({
     setInputValue(valueTobeSent);
     onInputChange(valueTobeSent);
   }
+
+  const getBoarderColor = () => {
+    if (props.error) {
+      return '#FF6A60'
+    } else {
+      return '#EFF1F7'
+    }
+  }
   const inputLabelStyles = makeStyles({
     root: {
       color: `${theme.custom.greyscale.medium}`,
       //   marginLeft: '0.75rem',
       display: 'none',
     },
-    // TODO: handle error
-    // error: {
-    //   '&.MuiInputBase-root.MuiInput-root.Mui-error.MuiInputBase-formControl.MuiInput-formControl.MuiInputBase-input.MuiInput-input': {
-    //     border: `2px solid #670AE5`,
-    //   }
-    // },
     focused: {},
     shrink: {
       transform: 'translate(0, 1.5px) scale(1)',
@@ -85,17 +89,13 @@ export const InputField: React.FC<InputFieldProps> = ({
         marginLeft: '24px',
       },
       backgroundColor: theme.custom.white,
-      border: `2px solid #EFF1F7`,
+      border: `2px solid ${getBoarderColor()}`,
       borderRadius: '8px',
       height: height || '46px',
-      width: width || '200px',
+      width: width || '100%',
+      minWidth: props.minWidth || 0,
+      maxWidth: props.maxWidth || '100%'
     },
-    // TODO: handle error
-    // error: {
-    //   '&.MuiInputBase-root.MuiInput-root.Mui-error.MuiInputBase-formControl.MuiInput-formControl.MuiInputBase-input.MuiInput-input': {
-    //     border: `2px solid #FF6A60`,
-    //   }
-    // },
     formControl: {
       'label + &': {
         padding: '13px 16px',

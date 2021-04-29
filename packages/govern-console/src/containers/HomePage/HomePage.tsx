@@ -72,7 +72,7 @@ const HomePage = ({ ...props }) => {
           <Route exact path="/daos/:daoName/new-proposal">
             <NewProposal onClickBack={() => history.goBack()} />
           </Route>
-          <Route exact path="/:daoName/dao-settings">
+          <Route exact path="/daos/:daoName/dao-settings">
             <DaoSettingsContainer onClickBack={() => history.goBack()} />
           </Route>
           <Route exact path="/create-dao">
