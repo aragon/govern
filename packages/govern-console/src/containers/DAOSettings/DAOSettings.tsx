@@ -256,19 +256,21 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
 
     const callSaveSetting = async () => {
       const newConfig = {
-        executionDelay: executionDelay,
+        executionDelay: executionDelay.current,
         scheduleDeposit: {
-          token: scheduleDepositContractAddress,
-          amount: scheduleDepositAmount,
+          token: scheduleDepositContractAddress.current,
+          amount: scheduleDepositAmount.current,
         },
         challengeDeposit: {
-          token: challengeDepositContractAddress,
-          amount: challengeDepositAmount,
+          token: challengeDepositContractAddress.current,
+          amount: challengeDepositAmount.current,
         },
-        resolver: resolverAddress,
-        rules: rules,
+        resolver: resolverAddress.current,
+        rules: rules.current,
         maxCalldataSize: currentConfig.maxCalldataSize, // TODO: grab it from config subgraph too.
       };
+
+      console.log(newConfig, ' config')
 
       const submitter: string = account;
 
@@ -277,9 +279,10 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
         executor: daoDetails.executor.address,
         actions: [proposal.buildAction('configure', [newConfig], 0)],
         executionDelay: daoDetails.queue.config.executionDelay,
-        // proof: toUtf8Bytes(justification) // TODO Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
-        proof: '0x',
+        proof: toUtf8Bytes(justification.current) // TODO Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+        // proof: '0x',
       });
+      console.log(payload, ' payload')
 
       // TODO:GIORGI error tracking make it better
       if (
