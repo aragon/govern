@@ -41,7 +41,7 @@ const config: HardhatUserConfig = {
     },
     rinkeby: {
       url: 'https://eth-rinkeby.alchemyapi.io/v2/E9LWD32GvGvBoNXBcilg7XnjT5riUXjg',
-      accounts: { mnemonic: process.env['MNEMONIC_RINKEBY'] },
+      accounts: { mnemonic: process.env['MNEMONIC_RINKEBY'] || 'test' },
     }
   },
   mocha: {
