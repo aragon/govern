@@ -21,7 +21,7 @@ export const AddActionsModalExample = Template.bind({});
 AddActionsModalExample.args = {
   open: true,
   onCloseModal: () => {
-    console.log('xyz');
+    console.log('closing modal');
   },
   actions: [
     {

@@ -4,15 +4,10 @@ import CircularProgress, {
   CircularProgressProps,
 } from '@material-ui/core/CircularProgress';
 import blueTickImage from '../../images/svgs/Blue_tick.svg';
-
+import { CiruclarProgressStatus } from 'utils/types';
 /**
  * pre-defined status for the circular progress
  */
-export enum CiruclarProgressStatus {
-  Disabled,
-  InProgress,
-  Done,
-}
 
 export interface ANCircularProgressProps extends CircularProgressProps {
   /**

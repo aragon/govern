@@ -11,7 +11,7 @@ import { ANButton } from 'components/Button/ANButton';
 // import Modal from '@material-ui/core/Modal';
 import { SimpleModal } from '../../components/Modal/SimpleModal';
 import { ANCircularProgressWithCaption } from '../../components/CircularProgress/ANCircularProgressWithCaption';
-import { CiruclarProgressStatus } from '../../components/CircularProgress/ANCircularProgress';
+import { CiruclarProgressStatus } from 'utils/types';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { useQuery } from '@apollo/client';
 import { buildPayload } from '../../utils/ERC3000';
@@ -169,42 +169,42 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
 
     const onChangeExecutionDelay = (val: any) => {
       // setExecutionDelay(val)
-      executionDelay.current = (val);
+      executionDelay.current = val;
     };
 
     const onScheduleDepositContractAddress = (val: any) => {
       // setScheduleDepositContractAddress(val)
-      scheduleDepositContractAddress.current = (val);
+      scheduleDepositContractAddress.current = val;
     };
 
     const onChangeScheduleDepositAmount = (val: any) => {
       // setScheduleDepositAmount(val)
-      scheduleDepositAmount.current = (val);
+      scheduleDepositAmount.current = val;
     };
 
     const onChangeChallengeDepositContractAddress = (val: any) => {
       // setChallengeDepositContractAddress(val)
-      challengeDepositContractAddress.current = (val);
+      challengeDepositContractAddress.current = val;
     };
 
     const onChangeChallengeDepositAmount = (val: any) => {
       // setChallengeDepositAmoun(val)
-      challengeDepositAmount.current = (val);
+      challengeDepositAmount.current = val;
     };
 
     const onChangeResolverAddress = (val: any) => {
       // setResolverAddress(val)
-      resolverAddress.current = (val);
+      resolverAddress.current = val;
     };
 
     const onChangeRules = (val: any) => {
       // setRules(val)
-      rules.current = (val);
+      rules.current = val;
     };
 
     const onChangeJustification = (val: any) => {
       // setJustification(val)
-      justification.current = (val);
+      justification.current = val;
     };
 
     const { daoName } = useParams<ParamTypes>();
@@ -224,10 +224,10 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
     }, [daoList]);
 
     useEffect(() => {
-      console.log('daoDetails', daoDetails)
+      console.log('daoDetails', daoDetails);
       if (daoDetails) {
         const _config = daoDetails.queue.config;
-        console.log('_config', _config)
+        console.log('_config', _config);
         setCurrentConfig(_config);
         onChangeExecutionDelay(_config.executionDelay);
         onScheduleDepositContractAddress(_config.scheduleDeposit.token);
@@ -270,7 +270,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
         maxCalldataSize: currentConfig.maxCalldataSize, // TODO: grab it from config subgraph too.
       };
 
-      console.log(newConfig, ' config')
+      console.log(newConfig, ' config');
 
       const submitter: string = account;
 
@@ -279,10 +279,10 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
         executor: daoDetails.executor.address,
         actions: [proposal.buildAction('configure', [newConfig], 0)],
         executionDelay: daoDetails.queue.config.executionDelay,
-        proof: toUtf8Bytes(justification.current) // TODO Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+        proof: toUtf8Bytes(justification.current), // TODO Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
         // proof: '0x',
       });
-      console.log(payload, ' payload')
+      console.log(payload, ' payload');
 
       // TODO:GIORGI error tracking make it better
       if (
@@ -431,7 +431,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
       </div>
     );
 
-    return (proposal ? 
+    return proposal ? (
       <>
         <SimpleModal
           modalTitle={'Confirm transactions'}
@@ -470,8 +470,8 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
             />
           </InputTitle>
 
-          <Grid container spacing={3} >
-            <Grid item  >
+          <Grid container spacing={3}>
+            <Grid item>
               <InputSubTitle>Token contract address</InputSubTitle>
               <InputField
                 label=""
@@ -482,7 +482,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
                 placeholder={'0x0000...'}
               />
             </Grid>
-            <Grid item >
+            <Grid item>
               <InputSubTitle>Amount</InputSubTitle>
               <InputField
                 label=""
@@ -504,7 +504,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
             />
           </InputTitle>
           <Grid container spacing={3}>
-            <Grid item >
+            <Grid item>
               <InputSubTitle>Token contract address</InputSubTitle>
               <InputField
                 label=""
@@ -582,13 +582,13 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
           {!isRuleFile ? (
             // <RuleTextArea onChange={onChangeRules} value={rules.current} />
             <InputField
-                label=""
-                onInputChange={onChangeRules}
-                value={rules.current}
-                height="46px"
-                width="540px"
-                placeholder={'DAO rules and agreement ...'}
-              />
+              label=""
+              onInputChange={onChangeRules}
+              value={rules.current}
+              height="46px"
+              width="540px"
+              placeholder={'DAO rules and agreement ...'}
+            />
           ) : (
             <div
               style={{
@@ -658,13 +658,13 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
             //   value={justification}
             // />
             <InputField
-                label=""
-                onInputChange={onChangeJustification}
-                value={justification.current}
-                height="46px"
-                width="540px"
-                placeholder={'Justification...'}
-              />
+              label=""
+              onInputChange={onChangeJustification}
+              value={justification.current}
+              height="46px"
+              width="540px"
+              placeholder={'Justification...'}
+            />
           ) : (
             <div
               style={{
@@ -711,8 +711,8 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
             />
           </div>
         </ANWrappedPaper>
-      </> : null
-    );
+      </>
+    ) : null;
   },
 );
 
