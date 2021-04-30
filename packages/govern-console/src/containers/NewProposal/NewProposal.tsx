@@ -182,8 +182,8 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
 
   const proposal = React.useMemo(() => {
     if (daoDetails) {
-      return new Proposal(daoDetails.queue.address, proposalOptions);
       executor = daoDetails.executor.address;
+      return new Proposal(daoDetails.queue.address, proposalOptions);
     }
   }, [daoDetails]);
 
