@@ -9,3 +9,4 @@ export async function getPool(provider?: providers.Provider): Promise<GatewayPoo
   const pool = await GatewayPool.discover(options)
   return pool
 }
+
