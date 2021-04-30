@@ -1,4 +1,4 @@
-import { CensusErc20Api, GatewayPool } from 'dvote-js'
+import { CensusErc20Api } from 'dvote-js'
 import { getPool } from './lib/Gateway'
 import {
   BigNumber,
