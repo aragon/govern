@@ -1,13 +1,12 @@
 /* eslint-disable */
 import React, { useState, memo, useRef, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import { ANWrappedPaper } from 'components/WrapperPaper/ANWrapperPaper';
+import { ANWrappedPaper } from '../../components/WrapperPaper/ANWrapperPaper';
 import backButtonIcon from '../../images/back-btn.svg';
 import { useTheme, styled } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { InputField } from '../../components/InputFields/InputField';
-import TextArea from 'components/TextArea/TextArea';
-import { ANButton } from 'components/Button/ANButton';
+import { ANButton } from '../../components/Button/ANButton';
 // import Modal from '@material-ui/core/Modal';
 import { SimpleModal } from '../../components/Modal/SimpleModal';
 import { ANCircularProgressWithCaption } from '../../components/CircularProgress/ANCircularProgressWithCaption';
@@ -81,39 +80,6 @@ const OptionTextStyle = styled('div')({
   fontSize: 18,
 });
 
-const RuleTextArea = styled(TextArea)({
-  background: '#FFFFFF',
-  border: '2px solid #EFF1F7',
-  boxSizing: 'border-box',
-  boxShadow: 'inset 0px 2px 3px 0px rgba(180, 193, 228, 0.35)',
-  borderRadius: '8px',
-  width: '100%',
-  height: 104,
-  padding: '11px 21px',
-  fontSize: 18,
-  fontStyle: 'normal',
-  fontWeight: 400,
-  lineHeight: '25px',
-  letterSpacing: '0em',
-  // border: '0 !important',
-  '& .MuiInputBase-root': {
-    border: 0,
-    width: '100%',
-    input: {
-      width: '100%',
-    },
-  },
-  '& .MuiInput-underline:after': {
-    border: 0,
-  },
-  '& .MuiInput-underline:before': {
-    border: 0,
-  },
-  '& .MuiInput-underline:hover:not(.Mui-disabled):before': {
-    border: 0,
-  },
-});
-
 export interface DaoSettingContainerProps {
   /**
    * on click back
@@ -135,6 +101,20 @@ interface ParamTypes {
   daoName: string;
 }
 
+interface DaoSettingInputError {
+  /**
+   * input fields error messages
+   */
+   executionDelay: string;
+   scheduleDepositContractAddress: string;
+   scheduleDepositAmount: string;
+   challengeDepositContractAddress: string;
+   challengeDepositAmount: string;
+   resolverAddress: string;
+   rules: string;
+   justification: string;
+}
+
 const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
   ({ onClickBack }) => {
     const context: any = useWallet();
@@ -150,7 +130,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
       // getBlockNumber,
       // networkName,
       // reset,
-      // status,
+      status,
       // type,
       ethersProvider,
     } = context;
@@ -167,45 +147,73 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
     const [isRuleFile, setIsRuleFile] = useState(false);
     const [isJustificationFile, setIsJustificationFile] = useState(false);
 
+    const [inputErrors, setInputErrors] = useState<DaoSettingInputError>({
+      executionDelay: '',
+      scheduleDepositContractAddress: '',
+      scheduleDepositAmount: '',
+      challengeDepositContractAddress: '',
+      challengeDepositAmount: '',
+      resolverAddress: '',
+      rules: '',
+      justification: '',
+    })
+
     const onChangeExecutionDelay = (val: any) => {
-      // setExecutionDelay(val)
-      executionDelay.current = (val);
+      executionDelay.current = val;
     };
 
     const onScheduleDepositContractAddress = (val: any) => {
-      // setScheduleDepositContractAddress(val)
-      scheduleDepositContractAddress.current = (val);
+      scheduleDepositContractAddress.current = val;
     };
 
     const onChangeScheduleDepositAmount = (val: any) => {
-      // setScheduleDepositAmount(val)
-      scheduleDepositAmount.current = (val);
+      scheduleDepositAmount.current = val;
     };
 
     const onChangeChallengeDepositContractAddress = (val: any) => {
-      // setChallengeDepositContractAddress(val)
-      challengeDepositContractAddress.current = (val);
+      challengeDepositContractAddress.current = val;
     };
 
     const onChangeChallengeDepositAmount = (val: any) => {
-      // setChallengeDepositAmoun(val)
-      challengeDepositAmount.current = (val);
+      challengeDepositAmount.current = val;
     };
 
     const onChangeResolverAddress = (val: any) => {
-      // setResolverAddress(val)
-      resolverAddress.current = (val);
+      resolverAddress.current = val;
     };
 
     const onChangeRules = (val: any) => {
-      // setRules(val)
-      rules.current = (val);
+      rules.current = val;
     };
 
     const onChangeJustification = (val: any) => {
-      // setJustification(val)
-      justification.current = (val);
+      justification.current = val;
     };
+
+    // TODO: use a validate form lib will be more efficient
+    const validateForm = () => {
+      let validateArray = [];
+      // let onlyNumbers: RegExp = new RegExp(/^[0-9.{0,1}-{0,1}]/); fail to compile
+      const _inputErrors = {...inputErrors}
+      switch (true) {
+        case (executionDelay.current === ''):
+          _inputErrors.executionDelay = 'Input should not be empty';
+          setInputErrors(_inputErrors)
+          validateArray.push(false);
+          break;
+
+        // case (onlyNumbers.test(executionDelay.current)):
+        //   _inputErrors.executionDelay = 'Input should not contain letters';
+        //   setInputErrors(_inputErrors)
+        //   validateArray.push(false);
+        //   break;
+      }
+      if (validateArray.includes(false)) {
+        return false;
+      } else {
+        return true;
+      }
+    }
 
     const { daoName } = useParams<ParamTypes>();
     //TODO daoname empty handling
@@ -214,7 +222,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
     });
 
     const [daoDetails, updateDaoDetails] = useState<any>();
-    const [proposal, setProposal] = useState<any | null>();
+    const [proposal, setProposal] = useState<any>();
     const [currentConfig, setCurrentConfig] = useState<any | null>();
 
     useEffect(() => {
@@ -224,10 +232,8 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
     }, [daoList]);
 
     useEffect(() => {
-      console.log('daoDetails', daoDetails)
       if (daoDetails) {
         const _config = daoDetails.queue.config;
-        console.log('_config', _config)
         setCurrentConfig(_config);
         onChangeExecutionDelay(_config.executionDelay);
         onScheduleDepositContractAddress(_config.scheduleDeposit.token);
@@ -247,7 +253,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
     }, [daoDetails]);
 
     const [isOpen, setIsOpen] = useState(false);
-    const [txList, setTxList] = useState<string[]>([]);
+    const [txList, setTxList] = useState<any[]>([]);
     const [isTrigger, setIsTrigger] = useState<boolean>(false);
 
     const closeModal = () => {
@@ -255,6 +261,10 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
     };
 
     const callSaveSetting = async () => {
+      // const validated = validateForm();
+      // if (!validated) {
+      //   return;
+      // }
       const newConfig = {
         executionDelay: executionDelay.current,
         scheduleDeposit: {
@@ -270,8 +280,6 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
         maxCalldataSize: currentConfig.maxCalldataSize, // TODO: grab it from config subgraph too.
       };
 
-      console.log(newConfig, ' config')
-
       const submitter: string = account;
 
       const payload = buildPayload({
@@ -279,12 +287,12 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
         executor: daoDetails.executor.address,
         actions: [proposal.buildAction('configure', [newConfig], 0)],
         executionDelay: daoDetails.queue.config.executionDelay,
-        proof: toUtf8Bytes(justification.current) // TODO Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+        proof: toUtf8Bytes(justification.current), // TODO Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
         // proof: '0x',
       });
-      console.log(payload, ' payload')
 
       // TODO:GIORGI error tracking make it better
+      let txList = [];
       if (
         daoDetails.queue.config.scheduleDeposit.token !==
         '0x' + '0'.repeat(20)
@@ -299,27 +307,50 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
 
         if (scheduleDepositApproval.error) {
           console.log(scheduleDepositApproval.error, ' approval error');
+          // TODO: perhaps alert user via a toast
         }
 
-        if (scheduleDepositApproval.transactions.length > 0) {
+        const _txAction = async () => {
           try {
             const transactionResponse: any = await scheduleDepositApproval.transactions[0].tx();
-            await transactionResponse.wait();
+            await transactionResponse.wait(1);
+            return true;
           } catch (err) {
             console.log(err);
+            return false;
           }
+        };
+        
+        if (scheduleDepositApproval.transactions.length > 0) {
+          txList.push({
+            txText: txList.length + 1 + '- erc20 approval',
+            txAction: _txAction,
+            status: CiruclarProgressStatus.Disabled,
+          });
         }
       }
 
-      console.log(currentConfig, ' nice one');
-      const scheduleResult = await proposal.schedule({
-        payload: payload,
-        config: currentConfig,
+      const _scheduelAction = async () => {
+        try {
+          const scheduleResult = await proposal.schedule({
+            payload: payload,
+            config: currentConfig,
+          });
+          await scheduleResult.wait(1);
+          return true;
+        } catch (error) {
+          console.log(error);
+          return false;
+        }
+      };
+
+      txList.push({
+        txText: txList.length + 1 + '- proposal schedule',
+        txAction: _scheduelAction,
+        status: CiruclarProgressStatus.Disabled,
       });
 
-      // TODO: create tx object with attribute such as if tx is done using CiruclarProgressStatus
-      // console.log('current input obj:', obj);
-      // setTxList(['Transaction details 01', 'Transaction details 02']);
+      setTxList(txList);
       setIsOpen(true);
     };
 
@@ -360,7 +391,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
                 marginLeft: '30px',
               }}
             >
-              {'● ' + tx}
+              {'● ' + tx.txText}
             </div>
           );
         })}
@@ -405,8 +436,8 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
               }}
             >
               <ANCircularProgressWithCaption
-                state={CiruclarProgressStatus.Disabled}
-                caption={tx}
+                state={tx.status}
+                caption={tx.txText}
               />
             </div>
           );
@@ -414,24 +445,69 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
       </div>
     );
 
+    const [diactivateModalButton, setDiactivateModalButton] = useState<boolean>(
+      false,
+    );
+    const [txIndexToRun, setTxIndexToRun] = useState(0);
+
+    useEffect(() => {
+      txList.forEach((_, index) => {
+        if (txList[index].status === CiruclarProgressStatus.InProgress) {
+          setDiactivateModalButton(true);
+          const txExcutor = async () => {
+            let _txList = [...txList];
+            const result = await txList[txIndexToRun].txAction();
+            if (result) {
+              _txList[txIndexToRun].status = CiruclarProgressStatus.Done;
+              setTxIndexToRun(txIndexToRun + 1);
+            } else {
+              _txList[txIndexToRun].status = CiruclarProgressStatus.Failed;
+            }
+            setTxList(_txList);
+            setDiactivateModalButton(false);
+          };
+          txExcutor();
+        }
+      });
+    }, [txList]);
+
     const modalContainer = (
       <div>
         {isTrigger ? txTrigerContainer : txReviewContainer}
-        <ANButton
-          label={isTrigger ? 'Continue' : 'Get started'}
-          type={'primary'}
-          onClick={
-            isTrigger
-              ? () => console.log('call package')
-              : () => setIsTrigger(true)
-          }
-          style={{ marginTop: '34px' }}
-          width={'100%'}
-        />
+        {isTrigger ? (
+          <ANButton
+            disabled={diactivateModalButton}
+            label={'Continue'}
+            type={'primary'}
+            onClick={async () => {
+              if (txIndexToRun >= txList.length) {
+                closeModal();
+                onClickBack();
+              } else {
+                let _txList = [...txList];
+                _txList[txIndexToRun].status =
+                  CiruclarProgressStatus.InProgress;
+                setTxList(_txList);
+              }
+            }}
+            style={{ marginTop: '34px' }}
+            width={'100%'}
+          />
+        ) : (
+          <ANButton
+            label={'Get started'}
+            type={'primary'}
+            onClick={() => {
+              setIsTrigger(true);
+            }}
+            style={{ marginTop: '34px' }}
+            width={'100%'}
+          />
+        )}
       </div>
     );
 
-    return (proposal ? 
+    return proposal ? (
       <>
         <SimpleModal
           modalTitle={'Confirm transactions'}
@@ -460,6 +536,8 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
             height="46px"
             width={window.innerWidth > 700 ? '50%' : '100%'}
             placeholder={'350s'}
+            error={inputErrors.executionDelay !== ''}
+            helperText={inputErrors.executionDelay}
           />
           <InputTitle>
             Action collateral{' '}
@@ -470,8 +548,8 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
             />
           </InputTitle>
 
-          <Grid container spacing={3} >
-            <Grid item  >
+          <Grid container spacing={3}>
+            <Grid item>
               <InputSubTitle>Token contract address</InputSubTitle>
               <InputField
                 label=""
@@ -480,9 +558,11 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
                 height="46px"
                 minWidth={window.innerWidth > 700 ? '540px' : '100%'}
                 placeholder={'0x0000...'}
+                error={inputErrors.scheduleDepositContractAddress !== ''}
+                helperText={inputErrors.scheduleDepositContractAddress}
               />
             </Grid>
-            <Grid item >
+            <Grid item>
               <InputSubTitle>Amount</InputSubTitle>
               <InputField
                 label=""
@@ -491,6 +571,8 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
                 height="46px"
                 minWidth={window.innerWidth > 700 ? '540px' : '100%'}
                 placeholder={'150'}
+                error={inputErrors.scheduleDepositAmount !== ''}
+                helperText={inputErrors.scheduleDepositAmount}
               />
             </Grid>
           </Grid>
@@ -504,7 +586,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
             />
           </InputTitle>
           <Grid container spacing={3}>
-            <Grid item >
+            <Grid item>
               <InputSubTitle>Token contract address</InputSubTitle>
               <InputField
                 label=""
@@ -513,6 +595,8 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
                 height="46px"
                 width={window.innerWidth > 700 ? '540px' : '100%'}
                 placeholder={'0x4c495F0005171E17c1dd08510g801805eE08E7'}
+                error={inputErrors.challengeDepositContractAddress !== ''}
+                helperText={inputErrors.challengeDepositContractAddress}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -524,6 +608,8 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
                 height="46px"
                 width={window.innerWidth > 700 ? '540px' : '100%'}
                 placeholder={'350'}
+                error={inputErrors.challengeDepositAmount !== ''}
+                helperText={inputErrors.challengeDepositAmount}
               />
             </Grid>
           </Grid>
@@ -544,6 +630,8 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
             height="46px"
             width={window.innerWidth > 700 ? '540px' : '100%'}
             placeholder={'0x4c495F0005171E17c1dd08510g801805eE08E7'}
+            error={inputErrors.resolverAddress !== ''}
+                helperText={inputErrors.resolverAddress}
           />
           <InputTitle>
             DAO rules / agreement{' '}
@@ -582,13 +670,15 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
           {!isRuleFile ? (
             // <RuleTextArea onChange={onChangeRules} value={rules.current} />
             <InputField
-                label=""
-                onInputChange={onChangeRules}
-                value={rules.current}
-                height="46px"
-                width="540px"
-                placeholder={'DAO rules and agreement ...'}
-              />
+              label=""
+              onInputChange={onChangeRules}
+              value={rules.current}
+              height="100px"
+              width="100%"
+              placeholder={'DAO rules and agreement ...'}
+              error={inputErrors.rules !== ''}
+              helperText={inputErrors.rules}
+            />
           ) : (
             <div
               style={{
@@ -655,16 +745,18 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
           {!isJustificationFile ? (
             // <RuleTextArea
             //   onChange={onChangeJustification}
-            //   value={justification}
+            //   value={justification.current}
             // />
             <InputField
-                label=""
-                onInputChange={onChangeJustification}
-                value={justification.current}
-                height="46px"
-                width="540px"
-                placeholder={'Justification...'}
-              />
+              label=""
+              onInputChange={onChangeJustification}
+              value={justification.current}
+              height="100px"
+              width="100%"
+              placeholder={'Justification...'}
+              error={inputErrors.justification !== ''}
+              helperText={inputErrors.justification}
+            />
           ) : (
             <div
               style={{
@@ -704,6 +796,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
           >
             <ANButton
               label={'Save settings'}
+              disabled={status !== 'connected'}
               type={'primary'}
               onClick={callSaveSetting}
               style={{ marginTop: '34px' }}
@@ -711,8 +804,8 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
             />
           </div>
         </ANWrappedPaper>
-      </> : null
-    );
+      </>
+    ) : null;
   },
 );
 

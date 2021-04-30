@@ -187,11 +187,11 @@ const NewDaoForm: React.FC<FormProps> = memo(
     const scheduleContract = useRef<string>(
       '0xb08E32D658700f768f5bADf0679E153ffFEC42e6',
     );
-    const scheduleTokenAmount = useRef<number>(0);
+    const scheduleTokenAmount = useRef<number>(10);
     const challengeContract = useRef<string>(
       '0xb08E32D658700f768f5bADf0679E153ffFEC42e6',
     );
-    const challengeTokenAmount = useRef<number>(0);
+    const challengeTokenAmount = useRef<number>(10);
     const resolverContract = useRef<string>(
       '0xC464EB732A1D2f5BbD705727576065C91B2E9f18',
     );

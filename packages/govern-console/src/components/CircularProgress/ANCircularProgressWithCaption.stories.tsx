@@ -34,3 +34,9 @@ an_Circularprogress_done.args = {
   caption: 'Done...',
   state: 2,
 };
+
+export const an_Circularprogress_fail = Template.bind({});
+an_Circularprogress_fail.args = {
+  caption: 'Failed...',
+  state: 3,
+};

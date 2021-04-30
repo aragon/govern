@@ -160,7 +160,17 @@ export class Proposal {
     return result
   }
 
-  
+  /**
+   * Build an Action
+   *
+   * @param {string} name 
+   *
+   * @param {any} parameters
+   * 
+   * @param {number|string} value
+   *
+   * @returns {any} 
+   */
   buildAction(name: string, parameters: any, value: number|string): any {
     return {
       data: this.interface.encodeFunctionData(
