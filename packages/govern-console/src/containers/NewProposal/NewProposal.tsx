@@ -162,7 +162,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     variables: { name: daoName },
   });
   const classes = useStyles();
-  let executor: any;
+  const executor = useRef('');
   const justification: { current: string } = useRef('');
   // const [isAddingActions, updateIsAddingActions] = useState(false);
   const [selectedActions, updateSelectedOptions] = useState([]);
@@ -180,9 +180,9 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     }
   }, [daoList]);
 
-  const proposal = React.useMemo(() => {
+  const proposal = React.useMemo(() => {  
     if (daoDetails) {
-      executor = daoDetails.executor.address;
+      executor.current = daoDetails.executor.address;
       return new Proposal(daoDetails.queue.address, proposalOptions);
     }
   }, [daoDetails]);
@@ -426,9 +426,10 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   };
 
   const scheduleProposal = async (actions: any[]) => {
+    console.log(executor.current);
     const payload = buildPayload({
       submitter,
-      executor,
+      executor: executor.current,
       actions,
       executionDelay: daoDetails.queue.config.executionDelay,
       proof: toUtf8Bytes(justification.current),
