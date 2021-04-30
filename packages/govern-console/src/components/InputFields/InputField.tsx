@@ -45,19 +45,19 @@ export const InputField: React.FC<InputFieldProps> = ({
   const onChangeInput = (val: any) => {
     let valueTobeSent = val;
     if (props.isUpperCase) {
-      valueTobeSent = val.toUpperCase()
+      valueTobeSent = val.toUpperCase();
     }
     setInputValue(valueTobeSent);
     onInputChange(valueTobeSent);
-  }
+  };
 
   const getBoarderColor = () => {
     if (props.error) {
-      return '#FF6A60'
+      return '#FF6A60';
     } else {
-      return '#EFF1F7'
+      return '#EFF1F7';
     }
-  }
+  };
   const inputLabelStyles = makeStyles({
     root: {
       color: `${theme.custom.greyscale.medium}`,
@@ -94,7 +94,7 @@ export const InputField: React.FC<InputFieldProps> = ({
       height: height || '46px',
       width: width || '100%',
       minWidth: props.minWidth || 0,
-      maxWidth: props.maxWidth || '100%'
+      maxWidth: props.maxWidth || '100%',
     },
     formControl: {
       'label + &': {
