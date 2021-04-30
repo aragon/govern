@@ -44,6 +44,8 @@ const factoryAbi = [
   )`,
 ]
 
+const tokenAbi = ["function balanceOf(address who) view returns (uint256)"]
+
 declare let window: any
 
 export type Token = {
@@ -126,20 +128,15 @@ export async function createDao(
     signer
   )
 
-  GovernRegistry.on('Registered', async (govern, queue, token, registrant, name) => {
-    const ERC20 = new Contract(
-      token,
-      ["function balanceOf(address who) view returns (uint256)"],
-      signer
-    )        
+  if(typeof registerTokenCallback === 'function') {
+    GovernRegistry.on('Registered', async (govern, queue, token, registrant, name) => {
+      // not our DAO, wait for next one
+      if( name !== args.name ) return
 
-    // send registerToken call to be called by
-    if(typeof registerTokenCallback === 'function') {  
-      registerTokenCallback(() => {
-        registerToken(signer, ERC20)
-      })
-    }
-  })
+      const ERC20 = new Contract(token, tokenAbi, signer)
+      registerTokenCallback(() =>  registerToken(signer, ERC20))
+    })
+  }
 
   const result = contract.newGovern(
     args.name,

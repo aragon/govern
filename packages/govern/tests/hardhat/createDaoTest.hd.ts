@@ -252,10 +252,10 @@ describe('Create Dao', function () {
 
   it.skip('Should create dao successfully and register token in vocdoni contract', async function () {
     const params: CreateDaoParams = {
-      name: 'sunshine',
+      name: 'beauty',
       token: {
-        tokenName: 'sunshine',
-        tokenSymbol: 'SUN',
+        tokenName: 'beauty',
+        tokenSymbol: 'BEAU',
         tokenDecimals: 6,
       },
       config: goodConfig,
@@ -270,7 +270,6 @@ describe('Create Dao', function () {
     const registerTokenCallback = async (registerToken:Function) => {
       const result = await registerToken()
       if(result) {
-        await result.wait()
         console.log('Token registered!')
       }
     }
@@ -307,7 +306,6 @@ describe('Create Dao', function () {
     console.log('this is the token address ', tokenAddress)
     expect(ethers.utils.isAddress(tokenAddress)).to.equal(true)
     
-
     console.log('Wait 40 seconds before checking the token is registered')
     await new Promise((resolve) => {
       setTimeout(resolve, 40000)
