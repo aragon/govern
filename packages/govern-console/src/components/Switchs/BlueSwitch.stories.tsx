@@ -4,7 +4,7 @@ import React from 'react';
 
 import { Story, Meta } from '@storybook/react';
 
-import { BlueSwitch, SwitchProps } from './BlueSwitch';
+import { BlueSwitch, BlueSwitchProps } from './BlueSwitch';
 
 export default {
   title: 'Blue-Switch',
@@ -14,7 +14,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<SwitchProps> = (args) => <BlueSwitch {...args} />;
+const Template: Story<BlueSwitchProps> = (args) => <BlueSwitch {...args} />;
 
 export const Blue_Switch = Template.bind({});
 

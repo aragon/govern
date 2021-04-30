@@ -22,7 +22,7 @@ const deepEqual = ( actual: any, expected: any ): boolean => {
   }
 
   // compare BigNumbers
-  if( actual instanceof BigNumber ) {
+  if( BigNumber.isBigNumber(actual) ) {
     return actual.eq(expected);
   }
 
@@ -41,8 +41,9 @@ export function equalOverwrite(Assertion: Chai.AssertionStatic, utils: Chai.Chai
 
       if( Array.isArray(actual) ) {
         this.assert(deepEqual(actual, expected), 
-          `Expected value does not equal actual value`, 
-          actual.toString(), 
+          `Expected ${expected} to equal ${actual}`,
+          '',
+          actual,
           expected
         );
       } else {

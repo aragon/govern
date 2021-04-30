@@ -17,7 +17,7 @@ import { useHistory, useParams } from 'react-router-dom';
 import { BigNumber, Transaction as EthersTransaction, ethers } from 'ethers';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
-import { erc20ApprovalTransaction } from 'utils/transactionHelper';
+import { erc20ApprovalTransaction } from '../../utils/transactionHelper';
 import { toUtf8Bytes } from '@ethersproject/strings';
 import { buildPayload } from '../../utils/ERC3000';
 
@@ -46,6 +46,7 @@ export interface AddedActionsProps {
    */
   selectedActions?: any;
   onAddInputToAction: any;
+  actionsToSchedule: any;
 }
 
 const SubTitle = styled(Typography)({
@@ -78,6 +79,7 @@ const ContractAddressText = styled(Typography)({
 const AddedActions: React.FC<AddedActionsProps> = ({
   selectedActions,
   onAddInputToAction,
+  actionsToSchedule,
   ...props
 }) => {
   const actionDivStyle = {
@@ -134,6 +136,7 @@ const AddedActions: React.FC<AddedActionsProps> = ({
                         action.name,
                       );
                     }}
+                    value={actionsToSchedule[index]?.params[num] || ''}
                     height="46px"
                     width="814px"
                     placeholder={input.name}
@@ -159,7 +162,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     variables: { name: daoName },
   });
   const classes = useStyles();
-  let executor: any;
+  const executor = useRef('');
   const justification: { current: string } = useRef('');
   // const [isAddingActions, updateIsAddingActions] = useState(false);
   const [selectedActions, updateSelectedOptions] = useState([]);
@@ -177,10 +180,10 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     }
   }, [daoList]);
 
-  const proposal = React.useMemo(() => {
+  const proposal = React.useMemo(() => {  
     if (daoDetails) {
+      executor.current = daoDetails.executor.address;
       return new Proposal(daoDetails.queue.address, proposalOptions);
-      executor = daoDetails.executor.address;
     }
   }, [daoDetails]);
 
@@ -234,8 +237,9 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     abi: any[];
     type: string;
   }
-  const onAddNewAction = (action: any) => {
-    const newActions = [...selectedActions, action] as any;
+  const onAddNewActions = (actions: any) => {
+    handleActionModalClose();
+    const newActions = [...selectedActions, ...actions] as any;
     updateSelectedOptions(newActions);
     const initialActions: ActionToSchedule[] = newActions.map(
       (actionItem: actionType) => {
@@ -379,7 +383,6 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     handleActionModalOpen();
   };
 
-
   const noCollateral = {
     id: '-1',
     token: ethers.constants.AddressZero,
@@ -423,19 +426,23 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   };
 
   const scheduleProposal = async (actions: any[]) => {
-    const payload = buildPayload({ 
-      submitter, 
-      executor, 
-      actions, 
+    console.log(executor.current);
+    const payload = buildPayload({
+      submitter,
+      executor: executor.current,
+      actions,
       executionDelay: daoDetails.queue.config.executionDelay,
-      proof: toUtf8Bytes(justification.current)
+      proof: toUtf8Bytes(justification.current),
     });
     console.log('payload', payload);
     const config = daoDetails.queue.config;
     console.log('config', daoDetails.queue.config);
 
     // TODO:GIORGI error tracking make it better
-    if(daoDetails.queue.config.scheduleDeposit.token !== '0x'+'0'.repeat(20)){
+    if (
+      daoDetails.queue.config.scheduleDeposit.token !==
+      '0x' + '0'.repeat(20)
+    ) {
       const scheduleDepositApproval = await erc20ApprovalTransaction(
         daoDetails.queue.config.scheduleDeposit.token,
         daoDetails.queue.config.scheduleDeposit.amount,
@@ -443,12 +450,12 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
         ethersProvider,
         account,
       );
-      
-      if(scheduleDepositApproval.error) {
-        console.log(scheduleDepositApproval.error, ' approval error')
+
+      if (scheduleDepositApproval.error) {
+        console.log(scheduleDepositApproval.error, ' approval error');
       }
-  
-      if(scheduleDepositApproval.transactions.length > 0) {
+
+      if (scheduleDepositApproval.transactions.length > 0) {
         try {
           const transactionResponse: any = await scheduleDepositApproval.transactions[0].tx();
           await transactionResponse.wait();
@@ -508,6 +515,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
           onInputChange={onChangeJustification}
           placeholder={'Enter Justification '}
           label=""
+          value={justification.current}
           height={'108px'}
           width={'700px'}
         ></InputField>
@@ -519,6 +527,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
             <AddedActions
               selectedActions={selectedActions}
               onAddInputToAction={onAddInputToAction}
+              actionsToSchedule={actionsToSchedule.current}
             />
           </div>
         )}
@@ -551,7 +560,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
         <AddActionsModal
           onCloseModal={handleActionModalClose}
           open={isActionModalOpen}
-          onAddAction={onAddNewAction}
+          onAddActions={onAddNewActions}
           actions={abiFunctions.current as any}
         ></AddActionsModal>
       </WrapperDiv>

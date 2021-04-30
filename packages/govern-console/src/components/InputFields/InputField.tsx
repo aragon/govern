@@ -1,9 +1,9 @@
-import React from 'react';
-import { orange, purple } from '@material-ui/core/colors';
+/* eslint-disable */
+import React, { useState } from 'react';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
+import TextField, { StandardTextFieldProps } from '@material-ui/core/TextField';
 
-export interface InputFieldProps {
+export interface InputFieldProps extends StandardTextFieldProps {
   /**
    * Label of the field
    */
@@ -23,7 +23,10 @@ export interface InputFieldProps {
   /**
    * Width of the input box
    */
-  width: string;
+  width?: string;
+  minWidth?: any;
+  maxWidth?: any;
+  isUpperCase?: boolean;
   value?: string;
 }
 
@@ -34,16 +37,34 @@ export const InputField: React.FC<InputFieldProps> = ({
   height,
   width,
   value,
+  isUpperCase,
   ...props
 }) => {
   const theme = useTheme();
+  const [inputValue, setInputValue] = useState(value);
+
+  const onChangeInput = (val: any) => {
+    let valueTobeSent = val;
+    if (isUpperCase) {
+      valueTobeSent = val.toUpperCase();
+    }
+    setInputValue(valueTobeSent);
+    onInputChange(valueTobeSent);
+  };
+
+  const getBoarderColor = () => {
+    if (props.error) {
+      return '#FF6A60';
+    } else {
+      return '#EFF1F7';
+    }
+  };
   const inputLabelStyles = makeStyles({
     root: {
       color: `${theme.custom.greyscale.medium}`,
       //   marginLeft: '0.75rem',
       display: 'none',
     },
-    error: {},
     focused: {},
     shrink: {
       transform: 'translate(0, 1.5px) scale(1)',
@@ -69,10 +90,12 @@ export const InputField: React.FC<InputFieldProps> = ({
         marginLeft: '24px',
       },
       backgroundColor: theme.custom.white,
-      border: `2px solid #EFF1F7`,
+      border: `2px solid ${getBoarderColor()}`,
       borderRadius: '8px',
       height: height || '46px',
-      width: width || '200px',
+      width: width || '100%',
+      minWidth: props.minWidth || 0,
+      maxWidth: props.maxWidth || '100%',
     },
     formControl: {
       'label + &': {
@@ -83,6 +106,18 @@ export const InputField: React.FC<InputFieldProps> = ({
   });
   const inputBaseClasses = inputBaseStyles();
 
+  const helperTextStyles = makeStyles({
+    root: {
+      // marginTop: -10,
+      marginLeft: 10,
+    },
+    error: {
+      '&.MuiFormHelperText-root.Mui-error': {
+        color: '#FF6A60',
+      },
+    },
+  });
+  const helperTextClasses = helperTextStyles();
   return (
     <TextField
       label={label}
@@ -90,8 +125,11 @@ export const InputField: React.FC<InputFieldProps> = ({
       margin={'none'}
       InputLabelProps={{ shrink: true, classes: inputLabelClasses }}
       InputProps={{ classes: inputBaseClasses, disableUnderline: true }}
-      onChange={(e) => onInputChange(e.target.value)}
-      value={value}
+      FormHelperTextProps={{ classes: helperTextClasses }}
+      onChange={(e) => onChangeInput(e.target.value)}
+      value={inputValue}
+      error={props.error}
+      {...props}
     />
   );
 };

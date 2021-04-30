@@ -10,8 +10,9 @@ import 'hardhat-deploy'
 import 'hardhat-typechain'
 import 'solidity-coverage'
 import './tasks/govern'
+import './tasks/ens'
 
-import { node_url, accounts } from './utils/network'
+import { node_url, accounts, RINKEBY_URL } from './utils/network'
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -53,7 +54,7 @@ const config: HardhatUserConfig = {
       accounts: accounts('mainnet'),
     },
     rinkeby: {
-      url: 'https://rinkeby.eth.aragon.network',
+      url: RINKEBY_URL,
       accounts: accounts('rinkeby'),
     },
   },
