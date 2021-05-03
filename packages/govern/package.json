@@ -22,7 +22,11 @@
     "e2e": "yarn build && jest -c ./jest.config.e2e.js",
     "test:hardhat": "yarn build:contracts && hardhat test",
     "depcheck": "yarn build && dependency-check ./package.json --missing --verbose",
-    "prepublishOnly": "yarn build"
+    "prepublishOnly": "yarn build",
+    "geth:pull": "docker pull ethereum/client-go:v1.9.24",
+    "geth:start": "docker run -p 8545:8545 --name geth-test ethereum/client-go:v1.9.24 --http --http.addr 0.0.0.0 --http.port 8545 --http.api personal,eth,net,web3,admin --dev --dev.period 1 --miner.gastarget 80000000 --networkid 1337 --allow-insecure-unlock --verbosity 0 &>/dev/null &",
+    "geth:stop": "docker stop geth-test && docker rm -f geth-test",
+    "test:geth": "npm run geth:pull && npm run geth:start && sleep 10 && hardhat test --network development && npm run geth:stop"
   },
   "files": [
     "dist"
@@ -49,6 +53,7 @@
     "@ethereumjs/config-tsc": "^1.1.1",
     "@ethereumjs/config-tslint": "^1.1.1",
     "@rollup/plugin-commonjs": "^18.0.0",
+    "@types/ecurve": "^1.0.0",
     "@types/jest": "^26.0.15",
     "coveralls": "^3.1.0",
     "dependency-check": "^4.1.0",
@@ -66,7 +71,10 @@
     "@ethersproject/contracts": "^5.1.0",
     "@ethersproject/providers": "^5.1.0",
     "@ethersproject/strings": "^5.1.0",
+    "@types/bigi": "^1.4.2",
     "@urql/core": "^1.13.1",
+    "dvote-js": "^1.2.0",
+    "ethers": "^5.1.4",
     "graphql": "^15.4.0",
     "graphql-tag": "^2.11.0",
     "isomorphic-unfetch": "^3.1.0"

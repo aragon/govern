@@ -2,6 +2,7 @@
   "extends": "@ethereumjs/config-tsc",
   "compilerOptions": {
     "removeComments": true,
+    "strict": false,
     "strictPropertyInitialization": false,
     "sourceRoot": "./",
     "outDir": "./dist/cjs",

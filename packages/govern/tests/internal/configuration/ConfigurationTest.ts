@@ -30,7 +30,13 @@ describe('ConfigurationTest', () => {
   it('initialization failed test', () => {
     expect(() => {
       new Configuration({ subgraphURL: null })
-    }).toThrow('Missing Govern subgraph URL!')
+    }).toThrow('Missing subgraph URL!')
+  })
+
+  it('initialization factory address to null failed test', () => {
+    expect(() => {
+      new Configuration({ subgraphURL: 'localhost', daoFactoryAddress: null })
+    }).toThrow('Missing Dao factory address!')
   })
 
   it('initialization factory address to null failed test', () => {
