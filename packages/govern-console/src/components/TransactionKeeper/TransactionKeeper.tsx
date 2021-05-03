@@ -97,8 +97,9 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
     console.log('Executing transactions');
     updateIsProcessingTransactions(true);
     let index = 0;
+    let isQueueAborted = false;
     for (const transaction of transactions) {
-      debugger;
+      if (isQueueAborted) return;
       try {
         let updatedTransaction = produce(transaction, (draft) => {
           draft.status = CustomTransactionStatus.InProgress;
@@ -110,18 +111,22 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
           draft.status = CustomTransactionStatus.Successful;
         });
         updateTransaction(updatedTransaction, index);
-        // onTransactionSuccess(updatedTransaction, transactionReceipt);
+        onTransactionSuccess(updatedTransaction, transactionReceipt);
       } catch (ex) {
         const updatedTransaction = produce(transaction, (draft) => {
           draft.status = CustomTransactionStatus.Failed;
         });
+        // TODO add a condition to check if we need to stop executing transacctions based on a transaction level propoerty. This propeorty if needed is to be added to CustomTransactions type. CustomTransaction.abortQueueOnFailure = true/false
+        isQueueAborted = true;
         updateTransaction(updatedTransaction, index);
-        // onTransactionFailure(ex.toString(), updatedTransaction);
+        onTransactionFailure(ex.toString(), updatedTransaction);
       }
       index++;
     }
+    if (!isQueueAborted) {
+      updateIsProcessingTransactions(false);
+    }
   }, [transactionList]);
-  debugger;
   return (
     <Wrapper>
       {isProcessingTransactions ? (
