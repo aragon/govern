@@ -30,6 +30,14 @@ export interface InputFieldProps extends StandardTextFieldProps {
   value?: string;
 }
 
+interface InputProps {
+  inputRef: any;
+  // any other props that come into the component
+}
+const CustomInputComponent = ({ inputRef, ...rest }: InputProps) => (
+  <input ref={inputRef} {...rest} type="text" />
+);
+
 export const InputField: React.FC<InputFieldProps> = ({
   onInputChange,
   placeholder,
@@ -40,24 +48,24 @@ export const InputField: React.FC<InputFieldProps> = ({
   ...props
 }) => {
   const theme = useTheme();
-  const [inputValue, setInputValue] = useState(value);
+  // const [inputValue, setInputValue] = useState(value);
 
   const onChangeInput = (val: any) => {
     let valueTobeSent = val;
     if (props.isUpperCase) {
-      valueTobeSent = val.toUpperCase()
+      valueTobeSent = val.toUpperCase();
     }
-    setInputValue(valueTobeSent);
+    // setInputValue(valueTobeSent);
     onInputChange(valueTobeSent);
-  }
+  };
 
   const getBoarderColor = () => {
     if (props.error) {
-      return '#FF6A60'
+      return '#FF6A60';
     } else {
-      return '#EFF1F7'
+      return '#EFF1F7';
     }
-  }
+  };
   const inputLabelStyles = makeStyles({
     root: {
       color: `${theme.custom.greyscale.medium}`,
@@ -94,7 +102,7 @@ export const InputField: React.FC<InputFieldProps> = ({
       height: height || '46px',
       width: width || '100%',
       minWidth: props.minWidth || 0,
-      maxWidth: props.maxWidth || '100%'
+      maxWidth: props.maxWidth || '100%',
     },
     formControl: {
       'label + &': {
@@ -117,16 +125,21 @@ export const InputField: React.FC<InputFieldProps> = ({
     },
   });
   const helperTextClasses = helperTextStyles();
+
   return (
     <TextField
       label={label}
       placeholder={placeholder}
       margin={'none'}
       InputLabelProps={{ shrink: true, classes: inputLabelClasses }}
-      InputProps={{ classes: inputBaseClasses, disableUnderline: true }}
+      InputProps={{
+        classes: inputBaseClasses,
+        disableUnderline: true,
+        // inputComponent: CustomInputComponent,
+      }}
       FormHelperTextProps={{ classes: helperTextClasses }}
       onChange={(e) => onChangeInput(e.target.value)}
-      value={inputValue}
+      value={value}
       error={props.error}
       {...props}
     />

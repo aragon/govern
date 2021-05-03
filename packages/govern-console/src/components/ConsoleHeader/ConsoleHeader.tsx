@@ -19,12 +19,14 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
 }) => {
   const history = useHistory();
   const theme = useTheme();
-  const searchString = useRef('');
+  const [searchString, updateSearchString] = React.useState<string>('');
+  // const searchString = useRef('');
   const onInputChange = (val: string) => {
-    searchString.current = val;
+    updateSearchString(val);
+    // .current = val;
   };
   const onGotoDao = () => {
-    history.push(`daos/${searchString.current}`);
+    history.push(`daos/${searchString}`);
   };
   const ConsoleHeaderCard = styled(MUICard)({
     background: theme.custom.daoHeader.background,
@@ -72,9 +74,7 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
             label=""
             height="46px"
             width="448px"
-          >
-            {' '}
-          </InputField>
+          />
         </div>
         <div>
           <ANButton
