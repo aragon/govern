@@ -46,6 +46,7 @@ export interface AddedActionsProps {
    */
   selectedActions?: any;
   onAddInputToAction: any;
+  actionsToSchedule: any;
 }
 
 const SubTitle = styled(Typography)({
@@ -78,6 +79,7 @@ const ContractAddressText = styled(Typography)({
 const AddedActions: React.FC<AddedActionsProps> = ({
   selectedActions,
   onAddInputToAction,
+  actionsToSchedule,
   ...props
 }) => {
   const actionDivStyle = {
@@ -134,6 +136,7 @@ const AddedActions: React.FC<AddedActionsProps> = ({
                         action.name,
                       );
                     }}
+                    value={actionsToSchedule[index]?.params[num] || ''}
                     height="46px"
                     width="814px"
                     placeholder={input.name}
@@ -159,7 +162,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     variables: { name: daoName },
   });
   const classes = useStyles();
-  let executor: any;
+  const executor = useRef('');
   const justification: { current: string } = useRef('');
   // const [isAddingActions, updateIsAddingActions] = useState(false);
   const [selectedActions, updateSelectedOptions] = useState([]);
@@ -177,10 +180,10 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     }
   }, [daoList]);
 
-  const proposal = React.useMemo(() => {
+  const proposal = React.useMemo(() => {  
     if (daoDetails) {
+      executor.current = daoDetails.executor.address;
       return new Proposal(daoDetails.queue.address, proposalOptions);
-      executor = daoDetails.executor.address;
     }
   }, [daoDetails]);
 
@@ -234,8 +237,9 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     abi: any[];
     type: string;
   }
-  const onAddNewAction = (action: any) => {
-    const newActions = [...selectedActions, action] as any;
+  const onAddNewActions = (actions: any) => {
+    handleActionModalClose();
+    const newActions = [...selectedActions, ...actions] as any;
     updateSelectedOptions(newActions);
     const initialActions: ActionToSchedule[] = newActions.map(
       (actionItem: actionType) => {
@@ -422,9 +426,10 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   };
 
   const scheduleProposal = async (actions: any[]) => {
+    console.log(executor.current);
     const payload = buildPayload({
       submitter,
-      executor,
+      executor: executor.current,
       actions,
       executionDelay: daoDetails.queue.config.executionDelay,
       proof: toUtf8Bytes(justification.current),
@@ -510,6 +515,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
           onInputChange={onChangeJustification}
           placeholder={'Enter Justification '}
           label=""
+          value={justification.current}
           height={'108px'}
           width={'700px'}
         ></InputField>
@@ -521,6 +527,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
             <AddedActions
               selectedActions={selectedActions}
               onAddInputToAction={onAddInputToAction}
+              actionsToSchedule={actionsToSchedule.current}
             />
           </div>
         )}
@@ -553,7 +560,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
         <AddActionsModal
           onCloseModal={handleActionModalClose}
           open={isActionModalOpen}
-          onAddAction={onAddNewAction}
+          onAddActions={onAddNewActions}
           actions={abiFunctions.current as any}
         ></AddActionsModal>
       </WrapperDiv>

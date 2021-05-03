@@ -295,6 +295,15 @@ const NewDaoForm: React.FC<FormProps> = memo(
           tokenSymbol: tokenSymbol,
         };
       }
+      const registerTokenCallback = isUseFreeVotingChecked? 
+        async (registerToken:Function) => {
+          const result = await registerToken()
+          if(result) {
+            await result.wait()
+            console.log('Token registered!')
+          }
+        } : undefined
+
       const createDaoParams: CreateDaoParams = {
         name: daoName,
         token,
@@ -303,10 +312,11 @@ const NewDaoForm: React.FC<FormProps> = memo(
         useVocdoni: isUseFreeVotingChecked,
       };
 
+
       try {
         //TODO this console log to be removed
         console.log('createDaoParams', createDaoParams);
-        const result: any = await createDao(createDaoParams);
+        const result: any = await createDao(createDaoParams, {}, registerTokenCallback );
         setCreatedDaoRoute(daoName);
         await result.wait(1);
         return true;
