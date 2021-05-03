@@ -34,9 +34,6 @@ interface InputProps {
   inputRef: any;
   // any other props that come into the component
 }
-const CustomInputComponent = ({ inputRef, ...rest }: InputProps) => (
-  <input ref={inputRef} {...rest} type="text" />
-);
 
 export const InputField: React.FC<InputFieldProps> = ({
   onInputChange,
@@ -48,8 +45,6 @@ export const InputField: React.FC<InputFieldProps> = ({
   ...props
 }) => {
   const theme = useTheme();
-  // const [inputValue, setInputValue] = useState(value);
-
   const onChangeInput = (val: any) => {
     let valueTobeSent = val;
     if (props.isUpperCase) {

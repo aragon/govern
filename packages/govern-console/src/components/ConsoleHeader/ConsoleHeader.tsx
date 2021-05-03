@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { styled, useTheme } from '@material-ui/core/styles';
+import { styled, useTheme, Theme } from '@material-ui/core/styles';
 import MUICard, { CardProps } from '@material-ui/core/Card';
 import MUITypography from '@material-ui/core/Typography';
 import { InputField } from '../InputFields/InputField';
@@ -12,6 +12,35 @@ export interface ConsoleHeaderProps {
    */
   onSearch?: (val: string) => void;
 }
+
+const ConsoleHeaderCard = styled(MUICard)(({ theme }) => ({
+  background: theme.custom.daoHeader.background,
+  width: '100%',
+  height: '335px',
+  paddingLeft: '76px',
+  paddingTop: '61px',
+  paddingBottom: '82px',
+  boxSizing: 'border-box',
+  boxShadow: 'none',
+}));
+
+const HeaderLabel = styled(MUITypography)(({ theme }) => ({
+  color: theme.custom.daoHeader.labelColor,
+  lineHeight: '27px',
+  fontSize: '18px',
+  fontWeight: theme.custom.daoHeader.labelFontWeight,
+  fontFamily: theme.typography.fontFamily,
+  fontStyle: 'normal',
+}));
+
+const HeaderValue = styled(MUITypography)(({ theme }: any) => ({
+  color: theme.custom.daoHeader.valueColor,
+  lineHeight: '60.1px',
+  fontSize: '44px',
+  fontWeight: theme.custom.daoHeader.valueFontWeight,
+  fontFamily: theme.typography.fontFamily,
+  fontStyle: 'normal',
+}));
 
 export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
   onSearch,
@@ -28,34 +57,6 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
   const onGotoDao = () => {
     history.push(`daos/${searchString}`);
   };
-  const ConsoleHeaderCard = styled(MUICard)({
-    background: theme.custom.daoHeader.background,
-    width: '100%',
-    height: '335px',
-    paddingLeft: '76px',
-    paddingTop: '61px',
-    paddingBottom: '82px',
-    boxSizing: 'border-box',
-    boxShadow: 'none',
-  });
-
-  const HeaderLabel = styled(MUITypography)({
-    color: theme.custom.daoHeader.labelColor,
-    lineHeight: '27px',
-    fontSize: '18px',
-    fontWeight: theme.custom.daoHeader.labelFontWeight,
-    fontFamily: theme.typography.fontFamily,
-    fontStyle: 'normal',
-  });
-
-  const HeaderValue = styled(MUITypography)({
-    color: theme.custom.daoHeader.valueColor,
-    lineHeight: '60.1px',
-    fontSize: '44px',
-    fontWeight: theme.custom.daoHeader.valueFontWeight,
-    fontFamily: theme.typography.fontFamily,
-    fontStyle: 'normal',
-  });
 
   return (
     <ConsoleHeaderCard>
@@ -74,6 +75,7 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
             label=""
             height="46px"
             width="448px"
+            id="search-input"
           />
         </div>
         <div>
@@ -82,10 +84,8 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
             label="Go to DAO"
             height={'46px'}
             width={'116px'}
-            onClick={() => onGotoDao()}
-          >
-            {' '}
-          </ANButton>
+            onClick={onGotoDao}
+          />
         </div>
       </div>
     </ConsoleHeaderCard>
