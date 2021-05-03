@@ -304,6 +304,16 @@ const NewDaoForm: React.FC<FormProps> = memo(
         rules: '0x' + Buffer.from(toUtf8Bytes(rules.current)).toString('hex'),
         maxCalldataSize: maxCalldataSize.current,
       };
+      
+      const registerTokenCallback = isUseFreeVotingChecked? 
+        async (registerToken:Function) => {
+          const result = await registerToken()
+          console.log('result', result)
+          if(result) {
+            // await result.wait()                // commented out for reveiw as result don't have wait() it breaks the UI
+            console.log('Token registered!')
+          }
+        } : undefined
 
       const createDaoParams: CreateDaoParams = {
         name: daoName,
@@ -313,10 +323,11 @@ const NewDaoForm: React.FC<FormProps> = memo(
         useVocdoni: isUseFreeVotingChecked,
       };
 
+
       try {
         //TODO this console log to be removed
         console.log('createDaoParams', createDaoParams);
-        const result: any = await createDao(createDaoParams);
+        const result: any = await createDao(createDaoParams, {}, registerTokenCallback );
         setCreatedDaoRoute(daoName);
         await result.wait(CONFIRMATION_WAIT);                      
         return true;
