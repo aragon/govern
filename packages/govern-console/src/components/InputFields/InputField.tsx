@@ -42,12 +42,13 @@ export const InputField: React.FC<InputFieldProps> = ({
   height,
   width,
   value,
+  isUpperCase,
   ...props
 }) => {
   const theme = useTheme();
   const onChangeInput = (val: any) => {
     let valueTobeSent = val;
-    if (props.isUpperCase) {
+    if (isUpperCase) {
       valueTobeSent = val.toUpperCase();
     }
     // setInputValue(valueTobeSent);
