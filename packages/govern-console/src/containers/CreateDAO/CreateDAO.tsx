@@ -122,6 +122,23 @@ const optionTextStyle = {
 const NewDaoForm: React.FC<FormProps> = memo(
   ({ setCreateDaoStatus, setCreatedDaoRoute, cancelForm }) => {
     const context: any = useWallet();
+    // const {
+    //   // connector,
+    //   // account,
+    //   // balance,
+    //   chainId,
+    //   // connect,
+    //   // connectors,
+    //   // ethereum,
+    //   // error,
+    //   // getBlockNumber,
+    //   // networkName,
+    //   // reset,
+    //   status,
+    //   // type,
+    //   ethersProvider,
+    // } = context;
+
     const chainId = useMemo(() => {
       if (context.chainId === 4 && context.status === 'connected') {
         return 4;
@@ -136,27 +153,10 @@ const NewDaoForm: React.FC<FormProps> = memo(
       true,
     );
 
-    const daoName = useRef<string>();
-    const tokenName = useRef<string>();
-    const tokenSymbol = useRef<string>();
-    const existingTokenAddress = useRef<string>();
-
-    // const [daoName, setDaoName] = useState<string>('');
-    // const [tokenName, setTokenName] = useState<string>('');
-    // const [tokenSymbol, setTokenSymbol] = useState<string>('');
-    // const [existingTokenAddress, setExistingTokenAddress] = useState<string>(
-    //   '',
-    // );
-
-    // const mainInputs = useMemo(
-    //   () => ({
-    //     daoName: daoName,
-    //     tokenName: tokenName,
-    //     tokenSymbol: tokenSymbol,
-    //     existingTokenAddress: existingTokenAddress,
-    //   }),
-    //   [daoName, tokenName, tokenSymbol, existingTokenAddress],
-    // );
+    const daoName = useRef<string>('');
+    const tokenName = useRef<string>('');
+    const tokenSymbol = useRef<string>('');
+    const existingTokenAddress = useRef<string>('');
 
     const [doaNameError, setDoaNameError] = useState<string>('');
     const [tokenNameError, setTokenNameError] = useState<string>('');
@@ -187,11 +187,11 @@ const NewDaoForm: React.FC<FormProps> = memo(
     const scheduleContract = useRef<string>(
       '0xb08E32D658700f768f5bADf0679E153ffFEC42e6',
     );
-    const scheduleTokenAmount = useRef<number>(0);
+    const scheduleTokenAmount = useRef<number>(10);
     const challengeContract = useRef<string>(
       '0xb08E32D658700f768f5bADf0679E153ffFEC42e6',
     );
-    const challengeTokenAmount = useRef<number>(0);
+    const challengeTokenAmount = useRef<number>(10);
     const resolverContract = useRef<string>(
       '0xC464EB732A1D2f5BbD705727576065C91B2E9f18',
     );
@@ -374,11 +374,11 @@ const NewDaoForm: React.FC<FormProps> = memo(
       setCreateDaoStatus(CreateDaoStatus.InProgress);
       const callResult = await createDaoCall(
         isExistingToken,
-        existingTokenAddress ? existingTokenAddress.toString() : '',
-        tokenName ? tokenName.toString() : '',
-        tokenSymbol ? tokenSymbol.toString() : '',
+        existingTokenAddress.current ? existingTokenAddress.current.toString() : '',
+        tokenName.current ? tokenName.current.toString() : '',
+        tokenSymbol.current ? tokenSymbol.current.toString() : '',
         isUseProxyChecked,
-        daoName ? daoName.toString() : '',
+        daoName.current ? daoName.current.toString() : '',
         isUseFreeVotingChecked,
         context,
       );
