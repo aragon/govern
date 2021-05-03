@@ -40,22 +40,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   });
   const context: any = useWallet();
 
-  const {
-    connector,
-    account,
-    balance,
-    chainId,
-    connect,
-    connectors,
-    ethereum,
-    error,
-    getBlockNumber,
-    networkName,
-    reset,
-    status,
-    type,
-    ethersProvider,
-  } = context;
+  const { account, ethersProvider } = context;
 
   const { dispatch } = React.useContext(ModalsContext);
 
@@ -311,14 +296,10 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   const [proposalInfo, updateProposalInfo] = React.useState<any>(null);
   const [isExpanded, updateIsExpanded] = React.useState<any>({});
   const [daoDetails, updateDaoDetails] = React.useState<any>();
-  const [
-    isTransactionModalOpen,
-    setIsTransactionModalOpen,
-  ] = React.useState<boolean>(false);
   const [transactions, updateTransactions] = React.useState<
     CustomTransaction[]
   >([]);
-  const transactionList = React.useRef<CustomTransaction[]>([]);
+  const transactionsQueue = React.useRef<CustomTransaction[]>([]);
   const challengeReason = React.useRef('');
   const vetoReason = React.useRef('');
 
@@ -330,6 +311,13 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       error: errorFetchingProposalDetails,
     },
   ] = useLazyQuery(GET_PROPOSAL_DETAILS_QUERY);
+
+  useEffect(() => {
+    return function cleanUp() {
+      transactionsQueue.current = [];
+    };
+  }, []);
+
   useEffect(() => {
     if (proposalDetailsData) {
       updateProposalInfo(proposalDetailsData.container);
@@ -392,7 +380,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
           return;
         }
         if (challengeDepositApproval.transactions.length > 0) {
-          transactionList.current.push(
+          transactionsQueue.current.push(
             challengeDepositApproval.transactions[0],
           );
           // try {
@@ -421,7 +409,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
           return;
         }
         if (feeTokenApproval.transactions.length > 0) {
-          transactionList.current.push(feeTokenApproval.transactions[0]);
+          transactionsQueue.current.push(feeTokenApproval.transactions[0]);
           // try {
           //   const transactionResponse: any = await feeTokenApproval.transactions[0].tx();
           //   await transactionResponse.wait();
@@ -478,16 +466,16 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
         successMessage: 'Successfully Challenged Proposal',
         status: CustomTransactionStatus.Pending,
       };
-      transactionList.current.push(challengeTransaction);
-      updateTransactions([...transactionList.current]);
+      transactionsQueue.current.push(challengeTransaction);
+      updateTransactions([...transactionsQueue.current]);
     }
-    if (transactionList.current.length > 0) {
+    if (transactionsQueue.current.length > 0) {
       console.log(dispatch);
       // setIsTransactionModalOpen(true);
       dispatch({
         type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
         payload: {
-          transactionList: transactionList.current,
+          transactionList: transactionsQueue.current,
           onTransactionFailure,
           onTransactionSuccess,
           onCompleteAllTransactions,
@@ -775,7 +763,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                       onClick={() => challengeProposal()}
                     />
                   </Widget>
-                  <Widget>
+                  {/* <Widget>
                     <div
                       style={{
                         fontFamily: 'Manrope',
@@ -787,7 +775,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                     >
                       Veto Reason
                     </div>
-                    <div>{/* <ANInput /> */}</div>
                     <InputField
                       onInputChange={(value) => {
                         vetoReason.current = value;
@@ -805,7 +792,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                       style={{ margin: 'auto' }}
                       //  onClick={}
                     />
-                  </Widget>
+                  </Widget> */}
                   <Widget>
                     <ANButton
                       label="Execute"
