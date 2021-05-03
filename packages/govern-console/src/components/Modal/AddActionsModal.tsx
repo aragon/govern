@@ -1,4 +1,4 @@
-import React, { useState, memo } from 'react';
+import React, { useState, memo, useRef } from 'react';
 import MuiDialog from '@material-ui/core/Dialog';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
@@ -6,6 +6,8 @@ import MuiDialogActions from '@material-ui/core/DialogActions';
 import IconButton from '@material-ui/core/IconButton';
 import { ANButton } from '../../components/Button/ANButton';
 import { InputField } from '../../components/InputFields/InputField';
+import Button from '@material-ui/core/Button';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
 import {
   styled,
   useTheme,
@@ -29,7 +31,7 @@ export interface AddActionsModalProps {
   /**
    * What happens when clicked on generate
    */
-  onAddAction: (action: any) => void;
+  onAddActions: (action: any) => void;
   /**
    * What happens when clicked on generate
    */
@@ -105,13 +107,46 @@ export const DialogTitle = withStyles(styles)((props: DialogTitleProps) => {
   );
 });
 
+const IncrementorDecrementorButtons: React.FC<any> = ({
+  onIncrementAction,
+  onDecrementAction,
+  action,
+  ...props
+}) => {
+  const [counter, setCounter] = useState<number>(0);
+  return (
+    <ButtonGroup size="small" aria-label="small outlined button group">
+      {counter > 0 && (
+        <Button
+          onClick={() => {
+            setCounter(counter - 1);
+            onDecrementAction(action);
+          }}
+        >
+          -
+        </Button>
+      )}
+      {counter > 0 && <Button disabled>{counter}</Button>}
+      <Button
+        onClick={() => {
+          setCounter(counter + 1);
+          onIncrementAction(action);
+        }}
+      >
+        +
+      </Button>
+    </ButtonGroup>
+  );
+};
+
 export const AddActionsModal: React.FC<AddActionsModalProps> = ({
   open,
   onCloseModal,
-  onAddAction,
+  onAddActions,
   actions,
 }) => {
   const theme = useTheme();
+  const selectedActions = useRef<any>([]);
   const actionStyle = {
     display: 'flex',
     paddingTop: '23px',
@@ -130,6 +165,26 @@ export const AddActionsModal: React.FC<AddActionsModalProps> = ({
     fontFamily: theme.typography.fontFamily,
     fontStyle: 'normal',
   });
+
+  const onIncrementAction = (action: any) => {
+    selectedActions.current.push(action);
+    console.log(selectedActions.current);
+  };
+
+  const onDecrementAction = (action: any) => {
+    const temp = [];
+    let isNotDeleted = true;
+    for (const actionItem of selectedActions.current) {
+      const { name } = actionItem;
+      if (name === action.name && isNotDeleted) {
+        isNotDeleted = false;
+      } else {
+        temp.push(actionItem);
+      }
+    }
+    selectedActions.current = temp;
+    console.log(selectedActions.current);
+  };
 
   return (
     <MuiDialog open={open}>
@@ -155,24 +210,30 @@ export const AddActionsModal: React.FC<AddActionsModalProps> = ({
             {actions.map((action: any) => (
               <div style={actionStyle} key={action.name}>
                 <ActionText>{action.name}</ActionText>
-                <ANButton
+                <IncrementorDecrementorButtons
+                  action={action}
+                  onIncrementAction={onIncrementAction}
+                  onDecrementAction={onDecrementAction}
+                ></IncrementorDecrementorButtons>
+                {/* <ANButton
                   label="Add"
                   onClick={() => onAddAction(action)}
                   height={'30px'}
                   width="80px"
-                ></ANButton>
+                ></ANButton> */}
               </div>
             ))}
           </div>
         )}
       </DialogContent>
       <DialogActions>
-        {/* <ANButton
+        <ANButton
           type="primary"
           width={'100%'}
           height={'45px'}
+          onClick={() => onAddActions(selectedActions.current)}
           label="Add Action"
-        ></ANButton> */}
+        ></ANButton>
       </DialogActions>
     </MuiDialog>
   );
