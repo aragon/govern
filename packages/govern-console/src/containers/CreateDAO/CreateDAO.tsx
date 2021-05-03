@@ -250,7 +250,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
     const onChangeExistingTokenAddress = (val: any) => {
       console.log(val);
       // setExistingTokenAddress(val);
-      existingTokenAddress.current = val
+      existingTokenAddress.current = val;
       setExistingTokenAddressError('');
     };
 
@@ -325,7 +325,10 @@ const NewDaoForm: React.FC<FormProps> = memo(
         setDoaNameError('');
       }
       if (!isExistingToken) {
-        if (tokenName.current === '' || typeof tokenName.current === 'undefined') {
+        if (
+          tokenName.current === '' ||
+          typeof tokenName.current === 'undefined'
+        ) {
           validateArray.push(false);
           setTokenNameError('Invalid Token Name');
         } else {

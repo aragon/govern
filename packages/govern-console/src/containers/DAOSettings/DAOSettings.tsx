@@ -16,10 +16,12 @@ import { useQuery } from '@apollo/client';
 import { buildPayload } from '../../utils/ERC3000';
 import { useWallet } from '../../EthersWallet';
 import { erc20ApprovalTransaction } from '../../utils/transactionHelper';
-import { toUtf8Bytes } from '@ethersproject/strings';
 import { HelpButton } from '../../components/HelpButton/HelpButton';
 import { BlueSwitch } from '../../components/Switchs/BlueSwitch';
 import Grid from '@material-ui/core/Grid';
+import { toUtf8Bytes, toUtf8String } from '@ethersproject/strings';
+import { ethers, BigNumber } from 'ethers';
+import { Token, getToken } from '@aragon/govern';
 
 import {
   Proposal,
@@ -105,14 +107,14 @@ interface DaoSettingInputError {
   /**
    * input fields error messages
    */
-   executionDelay: string;
-   scheduleDepositContractAddress: string;
-   scheduleDepositAmount: string;
-   challengeDepositContractAddress: string;
-   challengeDepositAmount: string;
-   resolverAddress: string;
-   rules: string;
-   justification: string;
+  executionDelay: string;
+  scheduleDepositContractAddress: string;
+  scheduleDepositAmount: string;
+  challengeDepositContractAddress: string;
+  challengeDepositAmount: string;
+  resolverAddress: string;
+  rules: string;
+  justification: string;
 }
 
 const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
@@ -141,7 +143,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
     const challengeDepositContractAddress = useRef<string>('');
     const challengeDepositAmount = useRef<string>('');
     const resolverAddress = useRef<string>('');
-    const rules = useRef<string>();
+    const rules = useRef<string>('');
     const justification = useRef<string>('');
 
     const [isRuleFile, setIsRuleFile] = useState(false);
@@ -156,7 +158,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
       resolverAddress: '',
       rules: '',
       justification: '',
-    })
+    });
 
     const onChangeExecutionDelay = (val: any) => {
       executionDelay.current = val;
@@ -190,30 +192,59 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
       justification.current = val;
     };
 
-    // TODO: use a validate form lib will be more efficient
-    const validateForm = () => {
-      let validateArray = [];
-      // let onlyNumbers: RegExp = new RegExp(/^[0-9.{0,1}-{0,1}]/); fail to compile
-      const _inputErrors = {...inputErrors}
-      switch (true) {
-        case (executionDelay.current === ''):
-          _inputErrors.executionDelay = 'Input should not be empty';
-          setInputErrors(_inputErrors)
-          validateArray.push(false);
-          break;
+    const getTokenDetail = async (tokenAddress: string) => {
+      try {
+        const token = await getToken(tokenAddress, ethersProvider);
+        return token;
+      } catch (error) {
+        console.log(error);
+        return null;
+      }
+    };
 
-        // case (onlyNumbers.test(executionDelay.current)):
-        //   _inputErrors.executionDelay = 'Input should not contain letters';
-        //   setInputErrors(_inputErrors)
-        //   validateArray.push(false);
-        //   break;
-      }
-      if (validateArray.includes(false)) {
-        return false;
+    const correctDecimal = async (
+      tokenAddress: string,
+      _amount: string,
+      isFormat: boolean,
+    ) => {
+      const token: Token | null = await getTokenDetail(tokenAddress);
+      if (token) {
+        console.log('isFormat', isFormat);
+        if (isFormat) {
+          return ethers.utils.parseUnits(_amount, token.tokenDecimals);
+        } else {
+          console.log('format', _amount, token.tokenDecimals);
+          return ethers.utils.formatUnits(_amount, token.tokenDecimals);
+        }
       } else {
-        return true;
+        return _amount;
       }
-    }
+    };
+
+    // TODO: use a validate form lib will be more efficient
+    // const validateForm = () => {
+    //   let validateArray = [];
+    //   // let onlyNumbers: RegExp = new RegExp(/^[0-9.{0,1}-{0,1}]/); fail to compile
+    //   const _inputErrors = { ...inputErrors };
+    //   switch (true) {
+    //     case executionDelay.current === '':
+    //       _inputErrors.executionDelay = 'Input should not be empty';
+    //       setInputErrors(_inputErrors);
+    //       validateArray.push(false);
+    //       break;
+
+    //     // case (onlyNumbers.test(executionDelay.current)):
+    //     //   _inputErrors.executionDelay = 'Input should not contain letters';
+    //     //   setInputErrors(_inputErrors)
+    //     //   validateArray.push(false);
+    //     //   break;
+    //   }
+    //   if (validateArray.includes(false)) {
+    //     return false;
+    //   } else {
+    //     return true;
+    //   }
+    // };
 
     const { daoName } = useParams<ParamTypes>();
     //TODO daoname empty handling
@@ -232,25 +263,43 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
     }, [daoList]);
 
     useEffect(() => {
-      if (daoDetails) {
-        const _config = daoDetails.queue.config;
-        setCurrentConfig(_config);
-        onChangeExecutionDelay(_config.executionDelay);
-        onScheduleDepositContractAddress(_config.scheduleDeposit.token);
-        onChangeScheduleDepositAmount(_config.scheduleDeposit.amount);
-        onChangeChallengeDepositContractAddress(_config.challengeDeposit.token);
-        onChangeChallengeDepositAmount(_config.challengeDeposit.amount);
-        onChangeResolverAddress(_config.resolver);
-        onChangeRules(_config.rules);
+      const _load = async () => {
+        if (daoDetails) {
+          console.log('called useeffect');
+          const _config = daoDetails.queue.config;
+          setCurrentConfig(_config);
+          onChangeExecutionDelay(_config.executionDelay);
+          onScheduleDepositContractAddress(_config.scheduleDeposit.token);
+          onChangeScheduleDepositAmount(
+            await correctDecimal(
+              _config.scheduleDeposit.token,
+              _config.scheduleDeposit.amount,
+              false,
+            ),
+          );
+          onChangeChallengeDepositContractAddress(
+            _config.challengeDeposit.token,
+          );
+          onChangeChallengeDepositAmount(
+            await correctDecimal(
+              _config.challengeDeposit.token,
+              _config.challengeDeposit.amount,
+              false,
+            ),
+          );
+          onChangeResolverAddress(_config.resolver);
+          onChangeRules(toUtf8String(_config.rules));
 
-        const proposalOptions: ProposalOptions = {};
-        const proposal = new Proposal(
-          daoDetails.queue.address,
-          proposalOptions,
-        );
-        setProposal(proposal);
-      }
-    }, [daoDetails]);
+          const proposalOptions: ProposalOptions = {};
+          const proposal = new Proposal(
+            daoDetails.queue.address,
+            proposalOptions,
+          );
+          setProposal(proposal);
+        }
+      };
+      _load();
+    }, [daoDetails, ethersProvider]);
 
     const [isOpen, setIsOpen] = useState(false);
     const [txList, setTxList] = useState<any[]>([]);
@@ -265,21 +314,31 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
       // if (!validated) {
       //   return;
       // }
+
       const newConfig = {
         executionDelay: executionDelay.current,
         scheduleDeposit: {
           token: scheduleDepositContractAddress.current,
-          amount: scheduleDepositAmount.current,
+          amount: await correctDecimal(
+            scheduleDepositContractAddress.current,
+            scheduleDepositAmount.current,
+            true,
+          ),
         },
         challengeDeposit: {
           token: challengeDepositContractAddress.current,
-          amount: challengeDepositAmount.current,
+          amount: await correctDecimal(
+            challengeDepositContractAddress.current,
+            challengeDepositAmount.current,
+            true,
+          ),
         },
         resolver: resolverAddress.current,
-        rules: rules.current,
+        rules: toUtf8Bytes(rules.current),
         maxCalldataSize: currentConfig.maxCalldataSize, // TODO: grab it from config subgraph too.
       };
 
+      console.log('new config', newConfig);
       const submitter: string = account;
 
       const payload = buildPayload({
@@ -297,6 +356,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
         daoDetails.queue.config.scheduleDeposit.token !==
         '0x' + '0'.repeat(20)
       ) {
+        // approvals
         const scheduleDepositApproval = await erc20ApprovalTransaction(
           daoDetails.queue.config.scheduleDeposit.token,
           daoDetails.queue.config.scheduleDeposit.amount,
@@ -305,9 +365,18 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
           account,
         );
 
+        // TODO: if approval error alert user
         if (scheduleDepositApproval.error) {
           console.log(scheduleDepositApproval.error, ' approval error');
-          // TODO: perhaps alert user via a toast
+          txList.push({
+            txText:
+              txList.length +
+              1 +
+              '- erc20 approval -' +
+              scheduleDepositApproval.error,
+            txAction: () => {}, // on purpose for testing, TODO: find a fix, or use toast
+            status: CiruclarProgressStatus.Failed,
+          });
         }
 
         const _txAction = async () => {
@@ -320,16 +389,18 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
             return false;
           }
         };
-        
+
+        // approval acction to be called
         if (scheduleDepositApproval.transactions.length > 0) {
           txList.push({
-            txText: txList.length + 1 + '- erc20 approval',
+            txText: txList.length + 1 + '- ERC20 approval',
             txAction: _txAction,
             status: CiruclarProgressStatus.Disabled,
           });
         }
       }
 
+      // schedule
       const _scheduelAction = async () => {
         try {
           const scheduleResult = await proposal.schedule({
@@ -344,8 +415,9 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
         }
       };
 
+      // schedule action to be called
       txList.push({
-        txText: txList.length + 1 + '- proposal schedule',
+        txText: txList.length + 1 + '- Proposal schedule',
         txAction: _scheduelAction,
         status: CiruclarProgressStatus.Disabled,
       });
@@ -631,7 +703,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
             width={window.innerWidth > 700 ? '540px' : '100%'}
             placeholder={'0x4c495F0005171E17c1dd08510g801805eE08E7'}
             error={inputErrors.resolverAddress !== ''}
-                helperText={inputErrors.resolverAddress}
+            helperText={inputErrors.resolverAddress}
           />
           <InputTitle>
             DAO rules / agreement{' '}
@@ -731,7 +803,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
             <OptionTextStyle>{'Text'}</OptionTextStyle>
             <div style={{ marginLeft: '20px' }}>
               <BlueSwitch
-                disabled={true}
+                disabled={false}
                 checked={isJustificationFile}
                 onChange={() => {
                   setIsJustificationFile(!isJustificationFile);
