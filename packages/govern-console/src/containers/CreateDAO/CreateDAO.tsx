@@ -29,8 +29,10 @@ import {
   ARAGON_VOICE_URL,
   PROXY_CONTRACT_URL,
   DEFAULT_DAO_CONFIG,
+  CONFIRMATION_WAIT
 } from '../../utils/constants';
 import { toUtf8Bytes } from '@ethersproject/strings';
+import { AddressZero } from '@ethersproject/constants'
 
 enum CreateDaoStatus {
   PreCreate,
@@ -281,7 +283,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
         }
       } else {
         token = {
-          tokenAddress: '',
+          tokenAddress: AddressZero,    // Token does not accept undefined or null, check govern package
           tokenDecimals: 18,
           tokenName: tokenName,
           tokenSymbol: tokenSymbol,
@@ -316,7 +318,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
         console.log('createDaoParams', createDaoParams);
         const result: any = await createDao(createDaoParams);
         setCreatedDaoRoute(daoName);
-        await result.wait(1);
+        await result.wait(CONFIRMATION_WAIT);                      
         return true;
       } catch (error) {
         console.log(error);

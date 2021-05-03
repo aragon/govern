@@ -4,6 +4,8 @@ export const ARAGON_VOICE_URL = {
   4: 'http://voice-rinkeby.aragon.org/', // rinkeby
 };
 
+export const CONFIRMATION_WAIT = 2; // we wait 2 confirmation to make sure subgraph is populated
+
 export const PROXY_CONTRACT_URL = 'https://eips.ethereum.org/EIPS/eip-1167';
 
 export const DEFAULT_DAO_CONFIG = {
