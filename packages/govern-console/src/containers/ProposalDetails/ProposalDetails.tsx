@@ -1,8 +1,8 @@
-/* eslint-disable */
-import React from 'react';
+import React, { useEffect } from 'react';
 import { styled, useTheme } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
+import Dialog from '@material-ui/core/Dialog';
 import backButtonIcon from 'images/back-btn.svg';
 import { Label } from 'components/Labels/Label';
 import { InputField } from 'components/InputFields/InputField';
@@ -10,14 +10,13 @@ import { useHistory, useParams } from 'react-router-dom';
 import { GET_PROPOSAL_DETAILS_QUERY } from './queries';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { useQuery, useLazyQuery } from '@apollo/client';
-import { useEffect } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { useWallet } from '../../EthersWallet';
 import { erc20ApprovalTransaction } from 'utils/transactionHelper';
 import { ethers } from 'ethers';
 import { CourtABI } from 'utils/abis/court';
 import { AddressZero } from '@ethersproject/constants'
-
+import { CustomTransaction, CustomTransactionStatus } from 'utils/types';
 import {
   Proposal,
   ProposalOptions,
@@ -25,6 +24,7 @@ import {
   PayloadType,
   DaoConfig,
 } from '@aragon/govern';
+import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 
 // import { InputField } from 'component/InputField/InputField';
 interface ProposalDetailsProps {
@@ -32,30 +32,18 @@ interface ProposalDetailsProps {
 }
 
 const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
-  let selectedProposal: any = {};
-  const history = useHistory();
+  // const selectedProposal: any = {};
+  // const history = useHistory();
   const theme = useTheme();
   const { daoName, id: proposalId } = useParams<any>();
   const { data: daoList } = useQuery(GET_DAO_BY_NAME, {
     variables: { name: daoName },
   });
   const context: any = useWallet();
-  const {
-    connector,
-    account,
-    balance,
-    chainId,
-    connect,
-    connectors,
-    ethereum,
-    error,
-    getBlockNumber,
-    networkName,
-    reset,
-    status,
-    type,
-    ethersProvider,
-  } = context;
+
+  const { account, ethersProvider } = context;
+
+  const { dispatch } = React.useContext(ModalsContext);
 
   let signer: any;
 
@@ -309,15 +297,10 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   const [proposalInfo, updateProposalInfo] = React.useState<any>(null);
   const [isExpanded, updateIsExpanded] = React.useState<any>({});
   const [daoDetails, updateDaoDetails] = React.useState<any>();
+  const [transactions, updateTransactions] = React.useState<CustomTransaction[]>([]);
+  const transactionsQueue = React.useRef<CustomTransaction[]>([]);
   const challengeReason = React.useRef('');
   const vetoReason = React.useRef('');
-
-  type ProposalType = {
-    state: string;
-    config: DaoConfig;
-    payload: PayloadType;
-    id: string;
-  };
 
   const [
     getProposalData,
@@ -327,6 +310,12 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       error: errorFetchingProposalDetails,
     },
   ] = useLazyQuery(GET_PROPOSAL_DETAILS_QUERY);
+
+  useEffect(() => {
+    return function cleanUp() {
+      transactionsQueue.current = [];
+    };
+  }, []);
 
   useEffect(() => {
     if (proposalDetailsData) {
@@ -343,7 +332,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     }
     updateIsExpanded(cloneObject);
   };
-
   useEffect(() => {
     if (daoList) {
       updateDaoDetails(daoList.daos[0]);
@@ -372,7 +360,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       signer,
     );
 
-    // TODO:GIORGI error tracking make it better
     if (daoDetails.queue.config.scheduleDeposit.token !== AddressZero) {
       const challengeDepositApproval = await erc20ApprovalTransaction(
         daoDetails.queue.config.challengeDeposit.token,
@@ -381,24 +368,20 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
         account,
         ethersProvider,
       );
-
-      if (challengeDepositApproval.error) {
-        console.log(challengeDepositApproval.error, ' approval error');
-        // TODO:GIORGI don't continue
-      }
-
-      if (challengeDepositApproval.transactions.length > 0) {
-        try {
-          const transactionResponse: any = await challengeDepositApproval.transactions[0].tx();
-          await transactionResponse.wait();
-        } catch (err) {
-          console.log(err);
+      console.log(challengeDepositApproval);
+      if (challengeDepositApproval) {
+        if (challengeDepositApproval.error) {
+          console.log(challengeDepositApproval.error);
+          return;
+        }
+        if (challengeDepositApproval.transactions.length > 0) {
+          transactionsQueue.current.push(challengeDepositApproval.transactions[0]);
         }
       }
     }
 
     const [, feeToken, feeAmount] = await contract.getDisputeFees();
-
+    
     if (feeToken !== AddressZero) {
       const feeTokenApproval = await erc20ApprovalTransaction(
         feeToken,
@@ -407,17 +390,13 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
         account,
         ethersProvider,
       );
-      if (feeTokenApproval.error) {
-        console.log(feeTokenApproval.error, ' approval error');
-        // TODO:GIORGI don't continue if this fails.
-      }
-
-      if (feeTokenApproval.transactions.length > 0) {
-        try {
-          const transactionResponse: any = await feeTokenApproval.transactions[0].tx();
-          await transactionResponse.wait();
-        } catch (err) {
-          console.log(err);
+      if (feeTokenApproval) {
+        if (feeTokenApproval.error) {
+          console.log(feeTokenApproval.error);
+          return;
+        }
+        if (feeTokenApproval.transactions.length > 0) {
+          transactionsQueue.current.push(feeTokenApproval.transactions[0]);
         }
       }
     }
@@ -435,17 +414,55 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     return params;
   };
 
+  const onTransactionFailure = (
+    errorMessage: string,
+    transaction: CustomTransaction,
+  ) => {
+    console.log('hi');
+  };
+  const onTransactionSuccess = (
+    transaction: CustomTransaction,
+    transactionReceipt: any,
+  ) => {
+    console.log('hi');
+  };
+  const onCompleteAllTransactions = (transactions: CustomTransaction[]) => {
+    console.log('hi');
+  };
+
   const challengeProposal = async () => {
     const proposalParams = getProposalParams();
-    console.log(proposalParams);
     await approveChallengeCollateralsIfNeeded();
     if (proposalInstance) {
-      const challengeTransaction = await proposalInstance.challenge(
-        proposalParams,
-        challengeReason.current,
-      );
+      const challengeTransaction: CustomTransaction = {
+        tx: () => {
+          return proposalInstance.challenge(
+            proposalParams,
+            challengeReason.current,
+          );
+        },
+        preTransactionMessage: 'Challenge Proposal',
+        transactionMessage: 'Challenging Proposal',
+        errorMessage: 'Error while Challenging Propsal',
+        successMessage: 'Successfully Challenged Proposal',
+        status: CustomTransactionStatus.Pending,
+      };
+      transactionsQueue.current.push(challengeTransaction);
+      updateTransactions([...transactionsQueue.current]);
     }
-    // console.log(challengeTransaction);
+    if (transactionsQueue.current.length > 0) {
+      console.log(dispatch);
+      // setIsTransactionModalOpen(true);
+      dispatch({
+        type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
+        payload: {
+          transactionList: transactionsQueue.current,
+          onTransactionFailure,
+          onTransactionSuccess,
+          onCompleteAllTransactions,
+        },
+      });
+    }
   };
 
   const executeProposal = async () => {
@@ -459,22 +476,9 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     }
   };
 
-  const vetoProposal = async () => {
-    const proposalParams = getProposalParams();
-    console.log(proposalParams);
-    console.log(proposalParams);
-    if (proposalInstance) {
-      const vetoTransaction = await proposalInstance.veto(
-        proposalParams,
-        vetoReason.current,
-      );
-      console.log(vetoTransaction, 'nice');
-    }
-  };
+  // const resolveProposal = async () => {};
 
-  const resolveProposal = async () => {};
-
-  let proposalStates: any = {};
+  const proposalStates: any = {};
   // check if the user has the veto power.
   if (proposalInfo) {
     proposalInfo.history.forEach((item: any) => {
@@ -540,6 +544,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   // const getParsedDataFromBytes = (data) => {
 
   // };
+
   return (
     <>
       {isLoadingProposalDetails ? (
@@ -557,7 +562,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                   labelText={proposalInfo.state}
                 />
               </ProposalStatus>
-              <ProposalId>{proposalId}</ProposalId>
+              <ProposalId>{proposalInfo.id}</ProposalId>
               <DateDisplay>
                 {
                   // TODO:Bhanu you can make this work with the dates library you use
@@ -739,7 +744,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                       onClick={() => challengeProposal()}
                     />
                   </Widget>
-                  <Widget>
+                  {/* <Widget>
                     <div
                       style={{
                         fontFamily: 'Manrope',
@@ -751,7 +756,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                     >
                       Veto Reason
                     </div>
-                    <div>{/* <ANInput /> */}</div>
                     <InputField
                       onInputChange={(value) => {
                         vetoReason.current = value;
@@ -767,9 +771,9 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                       height="45px"
                       width="372px"
                       style={{ margin: 'auto' }}
-                      onClick={() => vetoProposal()}
+                      //  onClick={}
                     />
-                  </Widget>
+                  </Widget> */}
                   <Widget>
                     <ANButton
                       label="Execute"

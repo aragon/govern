@@ -32,14 +32,31 @@ export type daoDetails = {
   token: string;
   registrant?: string;
 };
+export enum CustomTransactionStatus {
+  Successful,
+  Failed,
+  Pending,
+  InProgress,
+}
 
 // eslint-disable-next-line
 export type CustomTransaction = {
   tx: any;
-  msg?: string;
+  preTransactionMessage?: string;
+  transactionMessage?: string;
+  errorMessage?: string;
+  successMessage?: string;
+  status: CustomTransactionStatus;
+  // transactionOrder: number;
 };
 
 export type Response = {
   error: string | undefined;
   transactions: CustomTransaction[];
 };
+
+export enum CiruclarProgressStatus {
+  Disabled,
+  InProgress,
+  Done,
+}

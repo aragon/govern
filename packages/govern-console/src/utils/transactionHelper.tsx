@@ -1,5 +1,9 @@
 /* eslint-disable*/
-import { CustomTransaction, Response } from 'utils/types';
+import {
+  CustomTransaction,
+  Response,
+  CustomTransactionStatus,
+} from 'utils/types';
 import { ethers, BigNumber } from 'ethers';
 import { erc20TokenABI } from './abis/erc20';
 
@@ -61,7 +65,11 @@ export async function erc20ApprovalTransaction(
     tx: () => {
       return contract.approve(spender, amountInBigNumber);
     },
-    msg: `Approves ${amountInBigNumber} Tokens for the ${spender}`,
+    preTransactionMessage: `Approve ${amountInBigNumber} Tokens.`,
+    transactionMessage: `Approving ${amountInBigNumber} Tokens.`,
+    successMessage: `${amountInBigNumber} Tokens Approved`,
+    errorMessage: `Error while approving ${amountInBigNumber} Tokens`,
+    status: CustomTransactionStatus.Pending,
   };
   response.transactions.push(transaction);
   return response;
