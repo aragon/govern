@@ -3,6 +3,7 @@ import { Contract } from '@ethersproject/contracts'
 import { Web3Provider, TransactionResponse } from '@ethersproject/providers'
 import { AddressZero } from '@ethersproject/constants'
 import { BigNumberish } from '@ethersproject/bignumber'
+import { BytesLike } from '@ethersproject/bytes'
 import Configuration from '../internal/configuration/Configuration'
 import { registerToken } from '../internal/actions/RegisterToken'
 
@@ -66,7 +67,7 @@ export type DaoConfig = {
     amount: BigNumberish
   }
   resolver: string
-  rules: string
+  rules: BytesLike,
   maxCalldataSize: number
 }
 
@@ -101,7 +102,7 @@ export async function createDao(
     args.token.tokenAddress = AddressZero
   } else {
     args.token = {
-      tokenDecimals: 0,
+      tokenDecimals: 18,
       tokenName: '',
       tokenSymbol: '',
       ...args.token

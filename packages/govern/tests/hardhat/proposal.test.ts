@@ -14,10 +14,10 @@ import { Container } from '../../public/proposal'
 import {
   TestToken,
   ArbitratorMock
-} from '../../../govern-core/typechain'
+} from '@aragon/govern-core/typechain'
 
-import * as TestTokenArtifact from '../../../govern-core/artifacts/contracts/test/TestToken.sol/TestToken.json'
-import * as ArbitratorMockArtifact from '../../../govern-core/artifacts/contracts/test/ArbitratorMock.sol/ArbitratorMock.json'
+import * as TestTokenArtifact from '@aragon/govern-core/artifacts/contracts/test/TestToken.sol/TestToken.json'
+import * as ArbitratorMockArtifact from '@aragon/govern-core/artifacts/contracts/test/ArbitratorMock.sol/ArbitratorMock.json'
 import { TransactionReceipt } from '@ethersproject/abstract-provider'
 
 const RULES = {

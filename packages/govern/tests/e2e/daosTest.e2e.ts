@@ -41,6 +41,5 @@ describe('[e2e] daos Test', () => {
 
     expect(response[0].executor.metadata).toBeDefined()
     expect(isAddress(response[0].executor.address)).toEqual(true)
-
   })
 })

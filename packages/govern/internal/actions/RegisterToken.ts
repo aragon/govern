@@ -6,7 +6,6 @@ import {
   providers
 } from 'ethers'
 
-
 export const registerToken = async (
   signer: providers.JsonRpcSigner,
   Token: Contract
