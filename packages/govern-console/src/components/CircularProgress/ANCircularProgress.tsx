@@ -4,10 +4,8 @@ import CircularProgress, {
   CircularProgressProps,
 } from '@material-ui/core/CircularProgress';
 import blueTickImage from '../../images/svgs/Blue_tick.svg';
+import crossImage from '../../images/svgs/cross.svg';
 import { CiruclarProgressStatus } from 'utils/types';
-/**
- * pre-defined status for the circular progress
- */
 
 export interface ANCircularProgressProps extends CircularProgressProps {
   /**
@@ -84,6 +82,14 @@ export const ANCircularProgress = (props: ANCircularProgressProps) => {
       return (
         <>
           <img src={blueTickImage} />
+        </>
+      );
+      break;
+
+    case CiruclarProgressStatus.Failed:
+      return (
+        <>
+          <img src={crossImage} style={{ width: 20, height: 20 }} />
         </>
       );
       break;

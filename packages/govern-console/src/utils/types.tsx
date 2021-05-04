@@ -59,4 +59,5 @@ export enum CiruclarProgressStatus {
   Disabled,
   InProgress,
   Done,
+  Failed,
 }

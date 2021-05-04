@@ -18,10 +18,16 @@ export const ANCircularProgressWithCaption = (
   props: ANProgressCationPropos,
 ) => {
   const getTextColor = (state: CiruclarProgressStatus) => {
-    if (state === CiruclarProgressStatus.Disabled) {
-      return '#B4C1E4';
-    } else {
-      return '#00C2FF';
+    switch (state) {
+      case CiruclarProgressStatus.Disabled:
+        return '#B4C1E4';
+        break;
+      case CiruclarProgressStatus.Failed:
+        return '#FF6A60';
+        break;
+      default:
+        return '#00C2FF';
+        break;
     }
   };
 
