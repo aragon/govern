@@ -3,16 +3,15 @@ import React, { useState, useRef, useEffect, memo, useCallback } from 'react';
 import { ANButton } from '../../components/Button/ANButton';
 import { useTheme, styled, Theme } from '@material-ui/core/styles';
 import useStyles from '../../ReusableStyles';
-import backButtonIcon from '../../images/back-btn.svg';
+import backButtonIcon from 'images/back-btn.svg';
 import Typography from '@material-ui/core/Typography';
-import { HelpButton } from '../../components/HelpButton/HelpButton';
-import TextArea from '../../components/TextArea/TextArea';
+import { HelpButton } from 'components/HelpButton/HelpButton';
+import TextArea from 'components/TextArea/TextArea';
 import Paper from '@material-ui/core/Paper';
-import { NewActionModal } from '../../components/Modal/NewActionModal';
-import { AddActionsModal } from '../../components/Modal/AddActionsModal';
-import { InputField } from '../../components/InputFields/InputField';
+import { NewActionModal } from 'components/Modal/NewActionModal';
+import { AddActionsModal } from 'components/Modal/AddActionsModal';
+import { InputField } from 'components/InputFields/InputField';
 import { defaultAbiCoder } from 'ethers/lib/utils';
-import { useWallet } from '../../EthersWallet';
 import { useHistory, useParams } from 'react-router-dom';
 import { BigNumber, Transaction as EthersTransaction, ethers } from 'ethers';
 import { useQuery, useLazyQuery } from '@apollo/client';
@@ -20,6 +19,7 @@ import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { erc20ApprovalTransaction } from '../../utils/transactionHelper';
 import { toUtf8Bytes } from '@ethersproject/strings';
 import { buildPayload } from '../../utils/ERC3000';
+import { useWallet } from 'EthersWallet';
 
 import {
   Proposal,

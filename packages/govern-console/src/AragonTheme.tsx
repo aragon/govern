@@ -85,6 +85,38 @@ interface CustomTheme {
     valueLineHeight: string;
     valueColor: string;
   };
+  transactionKeeper: {
+    wrapper: {
+      background: string;
+    };
+    title: {
+      fontStyle: string;
+      fontFamily: string;
+      fontWeight: number;
+      fontSize: string;
+      lineHeight: string;
+      color: string;
+    };
+    transactionMessagesCard: {
+      background: string;
+      borderRadius: string;
+      color: string;
+      boldText: {
+        fontStyle: string;
+        fontFamily: string;
+        fontWeight: number;
+        fontSize: string;
+        lineHeight: string;
+      };
+      text: {
+        fontStyle: string;
+        fontFamily: string;
+        fontWeight: number;
+        fontSize: string;
+        lineHeight: string;
+      };
+    };
+  };
   black: string;
   white: string;
 }
@@ -233,6 +265,38 @@ const custom = {
     valueFontWeight: 500,
     valueLineHeight: '24.59px',
     valueColor: '#20232C',
+  },
+  transactionKeeper: {
+    wrapper: {
+      background: '#ffffff',
+    },
+    title: {
+      fontWeight: 500,
+      fontSize: '28px',
+      lineHeight: '38px',
+      fontFamily: 'Manrope',
+      fontStyle: 'normal',
+      color: '#20232C',
+    },
+    transactionMessagesCard: {
+      background: '#F6F9FC',
+      borderRadius: '10px',
+      boldText: {
+        fontWeight: 600,
+        fontSize: '14px',
+        lineHeight: '19px',
+        fontFamily: 'Manrope',
+        fontStyle: 'normal',
+      },
+      text: {
+        fontWeight: 500,
+        fontSize: '14px',
+        lineHeight: '22px',
+        fontFamily: 'Manrope',
+        fontStyle: 'normal',
+      },
+      color: '#0176FF',
+    },
   },
   black: '#20232C',
   white: '#FFFFFF',

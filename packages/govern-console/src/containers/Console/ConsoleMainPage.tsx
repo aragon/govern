@@ -17,6 +17,10 @@ export interface ConsoleMainPageProps {
    * Callback on selection of Dao
    */
   updateSelectedDao: any;
+  /**
+   * Callback to navigate the user to the search DAO by name result page
+   */
+  onSearchByDaoName: (daoName: string) => void;
 }
 const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
   updateSelectedDao,

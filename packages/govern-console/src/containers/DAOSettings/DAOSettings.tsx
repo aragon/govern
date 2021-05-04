@@ -11,7 +11,7 @@ import { ANButton } from 'components/Button/ANButton';
 // import Modal from '@material-ui/core/Modal';
 import { SimpleModal } from '../../components/Modal/SimpleModal';
 import { ANCircularProgressWithCaption } from '../../components/CircularProgress/ANCircularProgressWithCaption';
-import { CiruclarProgressStatus } from '../../components/CircularProgress/ANCircularProgress';
+import { CiruclarProgressStatus } from 'utils/types';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { useQuery } from '@apollo/client';
 import { buildPayload } from '../../utils/ERC3000';
@@ -28,6 +28,27 @@ import {
   PayloadType,
   ActionType,
 } from '@aragon/govern';
+
+export interface DaoSettingContainerProps {
+  /**
+   * on click back
+   */
+  onClickBack: () => void;
+}
+
+export interface DaoSettingFormProps {
+  /**
+   * on click back
+   */
+  onClickBack: () => void;
+}
+
+interface ParamTypes {
+  /**
+   * type of path (url) params
+   */
+  daoName: string;
+}
 
 const BackButton = styled('div')({
   height: 25,
@@ -114,27 +135,6 @@ const RuleTextArea = styled(TextArea)({
   },
 });
 
-export interface DaoSettingContainerProps {
-  /**
-   * on click back
-   */
-  onClickBack: () => void;
-}
-
-export interface DaoSettingFormProps {
-  /**
-   * on click back
-   */
-  onClickBack: () => void;
-}
-
-interface ParamTypes {
-  /**
-   * type of path (url) params
-   */
-  daoName: string;
-}
-
 const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
   ({ onClickBack }) => {
     const context: any = useWallet();
@@ -155,7 +155,8 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
       ethersProvider,
     } = context;
 
-    const executionDelay = useRef<string>('');
+    const [executionDelay, updateExecutionDelay] = useState<string>('');
+
     const scheduleDepositContractAddress = useRef<string>('');
     const scheduleDepositAmount = useRef<string>('');
     const challengeDepositContractAddress = useRef<string>('');
@@ -169,7 +170,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
 
     const onChangeExecutionDelay = (val: any) => {
       // setExecutionDelay(val)
-      executionDelay.current = val;
+      updateExecutionDelay(val);
     };
 
     const onScheduleDepositContractAddress = (val: any) => {
@@ -256,7 +257,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
 
     const callSaveSetting = async () => {
       const newConfig = {
-        executionDelay: executionDelay.current,
+        executionDelay: executionDelay,
         scheduleDeposit: {
           token: scheduleDepositContractAddress.current,
           amount: scheduleDepositAmount.current,
@@ -456,7 +457,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
           <InputField
             label=""
             onInputChange={onChangeExecutionDelay}
-            value={executionDelay.current}
+            value={executionDelay}
             height="46px"
             width={window.innerWidth > 700 ? '50%' : '100%'}
             placeholder={'350s'}
