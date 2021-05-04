@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { styled, useTheme } from '@material-ui/core/styles';
+import { styled } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Dialog from '@material-ui/core/Dialog';
@@ -16,13 +16,7 @@ import { erc20ApprovalTransaction } from 'utils/transactionHelper';
 import { ethers } from 'ethers';
 import { CourtABI } from 'utils/abis/court';
 import { CustomTransaction, CustomTransactionStatus } from 'utils/types';
-import {
-  Proposal,
-  ProposalOptions,
-  ProposalParams,
-  PayloadType,
-  DaoConfig,
-} from '@aragon/govern';
+import { Proposal, ProposalOptions, ProposalParams } from '@aragon/govern';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 
 // import { InputField } from 'component/InputField/InputField';
@@ -30,10 +24,247 @@ interface ProposalDetailsProps {
   onClickBack?: any;
 }
 
+//* styled Components
+
+const StyledPaper = styled(Paper)({
+  backgroundColor: '#ffffff',
+  height: 'auto',
+  minHeight: '1000px',
+  padding: '40px 48px 58px 48px',
+});
+const BackButton = styled('div')({
+  height: 25,
+  width: 62,
+  cursor: 'pointer',
+  position: 'relative',
+  marginBottom: '36px',
+  '& img': {
+    cursor: 'pointer',
+  },
+});
+const ProposalStatus = styled('div')({
+  height: '20px',
+  width: '100%',
+  display: 'block',
+  boxSizing: 'border-box',
+});
+const ProposalId = styled('div')(({ theme }) => ({
+  height: '44px',
+  width: '100%',
+  color: theme.custom.black,
+  fontWeight: 600,
+  fontSize: '32px',
+  lineHeight: '44px',
+  marginTop: '11px',
+  textOverflow: 'ellipsis',
+  boxSizing: 'border-box',
+}));
+const DateDisplay = styled('div')({
+  height: '25px',
+  width: '100%',
+  color: '#7483B3',
+  marginTop: '10px',
+  fontStyle: 'normal',
+  fontWeight: 'normal',
+  boxSizing: 'border-box',
+});
+const getLabelColor = (proposalState: string) => {
+  if (proposalState === 'Scheduled') return 'yellow';
+  if (proposalState === 'Executed') return 'green';
+  if (proposalState === 'Challenged') return 'red';
+};
+const DetailsWrapper = styled('div')({
+  display: 'flex',
+  justifyContent: 'space-between',
+  marginTop: '47px',
+});
+const ProposalDetailsWrapper = styled('div')({
+  width: 'calc(100% - 443px)',
+  boxSizing: 'border-box',
+  borderRadius: '16px',
+  minHeight: '900px',
+  border: ' 2px solid #E2ECF5',
+  padding: '32px 30px',
+});
+const WidgetWrapper = styled('div')({
+  width: '427px',
+});
+const TitleText = styled(Typography)({
+  fontWeight: 600,
+  fontSize: '28px',
+  lineHeight: '38px',
+  height: '38px',
+  width: '100%',
+  boxSizing: 'border-box',
+});
+const InfoWrapper = styled('div')({
+  // display: 'flex',
+  // flexDirection: 'column',
+  // justifyContent: 'space-between',
+  marginTop: '9px',
+  width: '100%',
+  boxSizing: 'border-box',
+});
+const InfoKeyDiv = styled('div')({
+  fontFamily: 'Manrope',
+  fontStyle: 'normal',
+  fontWeight: 'normal',
+  fontSize: '18px',
+  height: '25px',
+  width: 'fit-content',
+  display: 'inline-block',
+  color: '#7483B3',
+});
+const InfoValueDivInline = styled('div')({
+  fontFamily: 'Manrope',
+  fontStyle: 'normal',
+  fontWeight: 'normal',
+  color: '#20232C',
+  display: 'inline-block',
+  width: 'fit-content',
+  marginLeft: '9px',
+  '& a': {
+    width: '100%',
+    color: '#0094FF',
+    boxSizing: 'border-box',
+  },
+});
+const InfoValueDivBlock = styled('div')({
+  display: 'flex',
+  flexDirection: 'column',
+  width: '75%',
+  height: 'auto',
+  fontFamily: 'Manrope',
+  fontStyle: 'normal',
+  fontWeight: 'normal',
+  color: '#20232C',
+  fontSize: '18px',
+  marginTop: '9px',
+  paddingLeft: '25px',
+  boxSizing: 'border-box',
+  '& a': {
+    display: 'block',
+    width: '100%',
+    color: '#0094FF',
+    boxSizing: 'border-box',
+  },
+  '& div': {
+    display: 'block',
+    height: 'auto',
+    width: '100%',
+    color: '#20232C',
+    boxSizing: 'border-box',
+  },
+  '& > *': {
+    marginBottom: '9px',
+  },
+  '& :last-child': {
+    marginBottom: '0 !important',
+  },
+  '& .full-width': {
+    width: '100% !important',
+  },
+});
+const ActionsWrapper = styled('div')({
+  display: 'flex',
+  flexDirection: 'column',
+  width: '100%',
+  height: 'auto',
+  '& > *': {
+    marginBottom: '8px',
+  },
+  '& :last-child': {
+    marginBottom: '0 !important',
+  },
+});
+
+const ActionDiv = styled('div')({
+  background: '#FFFFFF',
+  transition: 'all 1s ease-out',
+  border: '2px solid #F5F7FF',
+  boxSizing: 'border-box',
+  boxShadow: '0px 8px 7px rgba(116, 131, 178, 0.2)',
+  borderRadius: '12px',
+  width: '100%',
+  overflow: 'hidden',
+  cursor: 'pointer',
+  '& > div': {
+    minHeight: '62px !important',
+    verticalAlign: 'middle',
+    lineHeight: '62px',
+  },
+  '& div': {
+    marginTop: 0,
+  },
+  '& .full-width': {
+    width: '100%',
+  },
+});
+
+const CollapsedDiv = styled('div')({
+  height: '62px',
+  display: 'block',
+  width: '100%',
+  paddingLeft: '23px',
+  paddingRight: '28px',
+  boxSizing: 'border-box',
+  margin: 0,
+});
+const ExpandedDiv = styled('div')({
+  height: 'auto',
+  display: 'block',
+  width: '100%',
+  paddingLeft: '23px',
+  paddingRight: '38px',
+  boxSizing: 'border-box',
+  margin: 0,
+  '& #value-div': {
+    height: '27px',
+    lineHeight: '27px',
+    minHeight: '27px !important',
+  },
+  '& #data-div': {
+    lineHeight: '25px',
+    minHeight: '27px !important',
+    // fontSize: '18px',
+    height: 'fit-content',
+  },
+  '& #data-div-block': {
+    // overflowWrap: 'normal',
+    overflowWrap: 'break-word',
+  },
+});
+
+const Widget = styled('div')({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  width: '100%',
+  minHeight: '118px',
+  boxSizing: 'border-box',
+  background: '#FFFFFF',
+  border: '2px solid #ECF1F7',
+  boxShadow: '0px 6px 6px rgba(180, 193, 228, 0.35)',
+  borderRadius: '8px',
+  marginBottom: '23px',
+  padding: '36px 27px',
+  '& div': {
+    display: 'block',
+    margin: 'auto',
+    width: '100%',
+    boxSizing: 'border-box',
+    marginBottom: '9px',
+  },
+  '& button': {
+    marginTop: '5px',
+  },
+});
+
+//* End of styled Components
+
 const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   // const selectedProposal: any = {};
   // const history = useHistory();
-  const theme = useTheme();
   const { daoName, id: proposalId } = useParams<any>();
   const { data: daoList } = useQuery(GET_DAO_BY_NAME, {
     variables: { name: daoName },
@@ -54,244 +285,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       signer = ethersProvider.getSigner();
     }
   }, [ethersProvider]);
-
-  //* styled Components
-
-  const StyledPaper = styled(Paper)({
-    backgroundColor: '#ffffff',
-    height: 'auto',
-    minHeight: '1000px',
-    padding: '40px 48px 58px 48px',
-  });
-  const BackButton = styled('div')({
-    height: 25,
-    width: 62,
-    cursor: 'pointer',
-    position: 'relative',
-    marginBottom: '36px',
-    '& img': {
-      cursor: 'pointer',
-    },
-  });
-  const ProposalStatus = styled('div')({
-    height: '20px',
-    width: '100%',
-    display: 'block',
-    boxSizing: 'border-box',
-  });
-  const ProposalId = styled('div')({
-    height: '44px',
-    width: '100%',
-    color: theme.custom.black,
-    fontWeight: 600,
-    fontSize: '32px',
-    lineHeight: '44px',
-    marginTop: '11px',
-    textOverflow: 'ellipsis',
-    boxSizing: 'border-box',
-  });
-  const DateDisplay = styled('div')({
-    height: '25px',
-    width: '100%',
-    color: '#7483B3',
-    marginTop: '10px',
-    fontStyle: 'normal',
-    fontWeight: 'normal',
-    boxSizing: 'border-box',
-  });
-  const getLabelColor = () => {
-    if (proposalInfo.state === 'Scheduled') return 'yellow';
-    if (proposalInfo.state === 'Executed') return 'green';
-    if (proposalInfo.state === 'Challenged') return 'red';
-  };
-  const DetailsWrapper = styled('div')({
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginTop: '47px',
-  });
-  const ProposalDetailsWrapper = styled('div')({
-    width: 'calc(100% - 443px)',
-    boxSizing: 'border-box',
-    borderRadius: '16px',
-    minHeight: '900px',
-    border: ' 2px solid #E2ECF5',
-    padding: '32px 30px',
-  });
-  const WidgetWrapper = styled('div')({
-    width: '427px',
-  });
-  const TitleText = styled(Typography)({
-    fontWeight: 600,
-    fontSize: '28px',
-    lineHeight: '38px',
-    height: '38px',
-    width: '100%',
-    boxSizing: 'border-box',
-  });
-  const InfoWrapper = styled('div')({
-    // display: 'flex',
-    // flexDirection: 'column',
-    // justifyContent: 'space-between',
-    marginTop: '9px',
-    width: '100%',
-    boxSizing: 'border-box',
-  });
-  const InfoKeyDiv = styled('div')({
-    fontFamily: 'Manrope',
-    fontStyle: 'normal',
-    fontWeight: 'normal',
-    fontSize: '18px',
-    height: '25px',
-    width: 'fit-content',
-    display: 'inline-block',
-    color: '#7483B3',
-  });
-  const InfoValueDivInline = styled('div')({
-    fontFamily: 'Manrope',
-    fontStyle: 'normal',
-    fontWeight: 'normal',
-    color: '#20232C',
-    display: 'inline-block',
-    width: 'fit-content',
-    marginLeft: '9px',
-    '& a': {
-      width: '100%',
-      color: '#0094FF',
-      boxSizing: 'border-box',
-    },
-  });
-  const InfoValueDivBlock = styled('div')({
-    display: 'flex',
-    flexDirection: 'column',
-    width: '75%',
-    height: 'auto',
-    fontFamily: 'Manrope',
-    fontStyle: 'normal',
-    fontWeight: 'normal',
-    color: '#20232C',
-    fontSize: '18px',
-    marginTop: '9px',
-    paddingLeft: '25px',
-    boxSizing: 'border-box',
-    '& a': {
-      display: 'block',
-      width: '100%',
-      color: '#0094FF',
-      boxSizing: 'border-box',
-    },
-    '& div': {
-      display: 'block',
-      height: 'auto',
-      width: '100%',
-      color: '#20232C',
-      boxSizing: 'border-box',
-    },
-    '& > *': {
-      marginBottom: '9px',
-    },
-    '& :last-child': {
-      marginBottom: '0 !important',
-    },
-    '& .full-width': {
-      width: '100% !important',
-    },
-  });
-  const ActionsWrapper = styled('div')({
-    display: 'flex',
-    flexDirection: 'column',
-    width: '100%',
-    height: 'auto',
-    '& > *': {
-      marginBottom: '8px',
-    },
-    '& :last-child': {
-      marginBottom: '0 !important',
-    },
-  });
-
-  const ActionDiv = styled('div')({
-    background: '#FFFFFF',
-    transition: 'all 1s ease-out',
-    border: '2px solid #F5F7FF',
-    boxSizing: 'border-box',
-    boxShadow: '0px 8px 7px rgba(116, 131, 178, 0.2)',
-    borderRadius: '12px',
-    width: '100%',
-    overflow: 'hidden',
-    cursor: 'pointer',
-    '& > div': {
-      minHeight: '62px !important',
-      verticalAlign: 'middle',
-      lineHeight: '62px',
-    },
-    '& div': {
-      marginTop: 0,
-    },
-    '& .full-width': {
-      width: '100%',
-    },
-  });
-
-  const CollapsedDiv = styled('div')({
-    height: '62px',
-    display: 'block',
-    width: '100%',
-    paddingLeft: '23px',
-    paddingRight: '28px',
-    boxSizing: 'border-box',
-    margin: 0,
-  });
-  const ExpandedDiv = styled('div')({
-    height: 'auto',
-    display: 'block',
-    width: '100%',
-    paddingLeft: '23px',
-    paddingRight: '38px',
-    boxSizing: 'border-box',
-    margin: 0,
-    '& #value-div': {
-      height: '27px',
-      lineHeight: '27px',
-      minHeight: '27px !important',
-    },
-    '& #data-div': {
-      lineHeight: '25px',
-      minHeight: '27px !important',
-      // fontSize: '18px',
-      height: 'fit-content',
-    },
-    '& #data-div-block': {
-      // overflowWrap: 'normal',
-      overflowWrap: 'break-word',
-    },
-  });
-
-  const Widget = styled('div')({
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    width: '100%',
-    minHeight: '118px',
-    boxSizing: 'border-box',
-    background: '#FFFFFF',
-    border: '2px solid #ECF1F7',
-    boxShadow: '0px 6px 6px rgba(180, 193, 228, 0.35)',
-    borderRadius: '8px',
-    marginBottom: '23px',
-    padding: '36px 27px',
-    '& div': {
-      display: 'block',
-      margin: 'auto',
-      width: '100%',
-      boxSizing: 'border-box',
-      marginBottom: '9px',
-    },
-    '& button': {
-      marginTop: '5px',
-    },
-  });
-
-  //* End of styled Components
 
   const [proposalInfo, updateProposalInfo] = React.useState<any>(null);
   const [isExpanded, updateIsExpanded] = React.useState<any>({});
@@ -354,7 +347,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     }
   }, [daoDetails]);
   const approveChallengeCollateralsIfNeeded = async () => {
-    debugger;
     const contract = new ethers.Contract(
       proposalInfo.config.resolver,
       CourtABI,
@@ -577,7 +569,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
               </BackButton>
               <ProposalStatus>
                 <Label
-                  labelColor={getLabelColor()}
+                  labelColor={getLabelColor(proposalInfo.status)}
                   labelText={proposalInfo.state}
                 />
               </ProposalStatus>
@@ -756,6 +748,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                       // value={challengeReason.current}
                     />
                     <ANButton
+                      buttonType="primary"
                       label="Challenge"
                       height="45px"
                       width="372px"
@@ -800,10 +793,12 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                       width="372px"
                       style={{ margin: 'auto' }}
                       onClick={executeProposal}
+                      buttonType="primary"
                     />
                   </Widget>
                   <Widget>
                     <ANButton
+                      buttonType="primary"
                       label="Resolve"
                       height="45px"
                       width="372px"

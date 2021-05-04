@@ -1,19 +1,19 @@
 /* eslint-disable */
 import React, { useState, memo, useRef, useEffect, useMemo } from 'react';
-import { ANButton } from '../../components/Button/ANButton';
+import { ANButton } from 'components/Button/ANButton';
 import { useTheme, styled } from '@material-ui/core/styles';
 import backButtonIcon from '../../images/back-btn.svg';
 import Typography from '@material-ui/core/Typography';
-import { InputField } from '../../components/InputFields/InputField';
+import { InputField } from 'components/InputFields/InputField';
 import { useHistory } from 'react-router-dom';
 import CreateDaoImage from '../../images/svgs/CreateDao.svg';
 import CreateDaoInProgressImage from '../../images/svgs/CreateDaoInProgress.svg';
 import GreenTickImage from '../../images/svgs/green_tick.svg';
 import CrossImage from '../../images/svgs/cross.svg';
-import { BlueSwitch } from '../../components/Switchs/BlueSwitch';
-import { BlueCheckbox } from '../../components/Checkboxs/BlueCheckbox';
-import { ANCircularProgressWithCaption } from '../../components/CircularProgress/ANCircularProgressWithCaption';
-import { ANWrappedPaper } from '../../components/WrapperPaper/ANWrapperPaper';
+import { BlueSwitch } from 'components/Switchs/BlueSwitch';
+import { BlueCheckbox } from 'components/Checkboxs/BlueCheckbox';
+import { ANCircularProgressWithCaption } from 'components/CircularProgress/ANCircularProgressWithCaption';
+import { ANWrappedPaper } from 'components/WrapperPaper/ANWrapperPaper';
 import { useWallet } from '../../EthersWallet';
 import {
   createDao,
@@ -67,6 +67,13 @@ interface ResultProps {
   postResultActionRoute: string;
 }
 
+const optionTextStyle = {
+  fontFamily: 'Manrope',
+  fontStyle: 'normal',
+  fontWeight: 400,
+  fontSize: 18,
+};
+
 const BackButton = styled('div')({
   height: 25,
   width: 62,
@@ -111,13 +118,6 @@ const SubTitle = styled(Typography)({
   textAlign: 'center',
   margin: '0px 50px 0px 50px',
 });
-
-const optionTextStyle = {
-  fontFamily: 'Manrope',
-  fontStyle: 'normal',
-  fontWeight: 400,
-  fontSize: 18,
-};
 
 const NewDaoForm: React.FC<FormProps> = memo(
   ({ setCreateDaoStatus, setCreatedDaoRoute, cancelForm }) => {
@@ -250,7 +250,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
     const onChangeExistingTokenAddress = (val: any) => {
       console.log(val);
       // setExistingTokenAddress(val);
-      existingTokenAddress.current = val
+      existingTokenAddress.current = val;
       setExistingTokenAddressError('');
     };
 
@@ -325,7 +325,10 @@ const NewDaoForm: React.FC<FormProps> = memo(
         setDoaNameError('');
       }
       if (!isExistingToken) {
-        if (tokenName.current === '' || typeof tokenName.current === 'undefined') {
+        if (
+          tokenName.current === '' ||
+          typeof tokenName.current === 'undefined'
+        ) {
           validateArray.push(false);
           setTokenNameError('Invalid Token Name');
         } else {
@@ -558,7 +561,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
             <ANButton
               disabled={context.status !== 'connected'}
               label="Create new DAO"
-              type="primary"
+              buttonType="primary"
               style={{ marginTop: 40 }}
               onClick={submitCreateDao}
             />
@@ -720,7 +723,7 @@ const NewDaoCreationResult: React.FC<ResultProps> = ({
             <ANButton
               width={'446px'}
               label={isSuccess ? 'Get started' : 'Ok, let’s try again'}
-              type="primary"
+              buttonType="primary"
               style={{ marginTop: 40 }}
               onClick={async () => {
                 if (isSuccess) {

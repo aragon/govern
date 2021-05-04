@@ -4,8 +4,8 @@ import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
 import MuiDialogActions from '@material-ui/core/DialogActions';
 import IconButton from '@material-ui/core/IconButton';
-import { ANButton } from '../../components/Button/ANButton';
-import { InputField } from '../../components/InputFields/InputField';
+import { ANButton } from 'components/Button/ANButton';
+import { InputField } from 'components/InputFields/InputField';
 import {
   styled,
   useTheme,
@@ -156,6 +156,7 @@ export const AddActionsModal: React.FC<AddActionsModalProps> = ({
               <div style={actionStyle} key={action.name}>
                 <ActionText>{action.name}</ActionText>
                 <ANButton
+                  buttonType="primary"
                   label="Add"
                   onClick={() => onAddAction(action)}
                   height={'30px'}

@@ -1,6 +1,6 @@
 /* eslint-disable */
 import React, { useState, useRef, useEffect, memo, useCallback } from 'react';
-import { ANButton } from '../../components/Button/ANButton';
+import { ANButton } from 'components/Button/ANButton';
 import { useTheme, styled, Theme } from '@material-ui/core/styles';
 import useStyles from '../../ReusableStyles';
 import backButtonIcon from 'images/back-btn.svg';
@@ -28,26 +28,6 @@ import {
   ActionType,
 } from '@aragon/govern';
 
-export interface NewProposalProps {
-  /**
-   * callback for click on schedule
-   */
-  onSchedule?: any;
-
-  /**
-   * onClickBackButton callback
-   */
-  onClickBack: any;
-}
-
-export interface AddedActionsProps {
-  /**
-   * Added actions
-   */
-  selectedActions?: any;
-  onAddInputToAction: any;
-}
-
 const SubTitle = styled(Typography)({
   fontFamily: 'Manrope',
   fontStyle: 'normal',
@@ -74,6 +54,85 @@ const ContractAddressText = styled(Typography)({
   lineHeight: '25px',
   color: '0A0B0B',
 });
+const WrapperDiv = styled(Paper)(({ theme }) => ({
+  width: '100%',
+  background: theme.custom.white,
+  height: 'auto',
+  padding: '50px 273px 76px 273px',
+  // display: 'block',
+  boxSizing: 'border-box',
+  boxShadow: 'none',
+  // flexDirection: 'column',
+}));
+const BackButton = styled('div')({
+  height: 25,
+  width: 62,
+  cursor: 'pointer',
+  position: 'relative',
+  left: -6,
+});
+const Title = styled(Typography)({
+  fontFamily: 'Manrope',
+  fontStyle: 'normal',
+  fontWeight: 600,
+  fontSize: 28,
+  lineHeight: '38px',
+  color: '#20232C',
+  marginTop: 17,
+  height: 50,
+  display: 'block',
+});
+const JustificationTextArea = styled(TextArea)({
+  background: '#FFFFFF',
+  border: '2px solid #EFF1F7',
+  boxSizing: 'border-box',
+  boxShadow: 'inset 0px 2px 3px 0px rgba(180, 193, 228, 0.35)',
+  borderRadius: '8px',
+  width: '100%',
+  height: 104,
+  padding: '11px 21px',
+  fontSize: 18,
+  fontStyle: 'normal',
+  fontWeight: 400,
+  lineHeight: '25px',
+  letterSpacing: '0em',
+  // border: '0 !important',
+  '& .MuiInputBase-root': {
+    border: 0,
+    width: '100%',
+    input: {
+      width: '100%',
+    },
+  },
+  '& .MuiInput-underline:after': {
+    border: 0,
+  },
+  '& .MuiInput-underline:before': {
+    border: 0,
+  },
+  '& .MuiInput-underline:hover:not(.Mui-disabled):before': {
+    border: 0,
+  },
+});
+export interface NewProposalProps {
+  /**
+   * callback for click on schedule
+   */
+  onSchedule?: any;
+
+  /**
+   * onClickBackButton callback
+   */
+  onClickBack: any;
+}
+
+export interface AddedActionsProps {
+  /**
+   * Added actions
+   */
+  selectedActions?: any;
+  onAddInputToAction: any;
+}
 
 const AddedActions: React.FC<AddedActionsProps> = ({
   selectedActions,
@@ -284,67 +343,6 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   };
   // const onScheduleProposal = () => {};
 
-  const WrapperDiv = styled(Paper)({
-    width: '100%',
-    background: theme.custom.white,
-    height: 'auto',
-    padding: '50px 273px 76px 273px',
-    // display: 'block',
-    boxSizing: 'border-box',
-    boxShadow: 'none',
-    // flexDirection: 'column',
-  });
-  const BackButton = styled('div')({
-    height: 25,
-    width: 62,
-    cursor: 'pointer',
-    position: 'relative',
-    left: -6,
-  });
-  const Title = styled(Typography)({
-    fontFamily: 'Manrope',
-    fontStyle: 'normal',
-    fontWeight: 600,
-    fontSize: 28,
-    lineHeight: '38px',
-    color: '#20232C',
-    marginTop: 17,
-    height: 50,
-    display: 'block',
-  });
-  const JustificationTextArea = styled(TextArea)({
-    background: '#FFFFFF',
-    border: '2px solid #EFF1F7',
-    boxSizing: 'border-box',
-    boxShadow: 'inset 0px 2px 3px 0px rgba(180, 193, 228, 0.35)',
-    borderRadius: '8px',
-    width: '100%',
-    height: 104,
-    padding: '11px 21px',
-    fontSize: 18,
-    fontStyle: 'normal',
-    fontWeight: 400,
-    lineHeight: '25px',
-    letterSpacing: '0em',
-    // border: '0 !important',
-    '& .MuiInputBase-root': {
-      border: 0,
-      width: '100%',
-      input: {
-        width: '100%',
-      },
-    },
-    '& .MuiInput-underline:after': {
-      border: 0,
-    },
-    '& .MuiInput-underline:before': {
-      border: 0,
-    },
-    '& .MuiInput-underline:hover:not(.Mui-disabled):before': {
-      border: 0,
-    },
-  });
-
   const isProposalValid = () => {
     if (justification.current === '') return false;
     if (selectedActions.length === 0) return false;
@@ -529,8 +527,8 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
           label="Add new action"
           // width={155}
           // height={45}
-          type="secondary"
-          color="#00C2FF"
+          buttonType="secondary"
+          buttonColor="#00C2FF"
           style={{ marginTop: 40 }}
           onClick={handleInputModalOpen}
         />
@@ -539,7 +537,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
           label="Schedule/Submit"
           // width={178}
           // height={45}
-          type="primary"
+          buttonType="primary"
           // color="#00C2FF"
           style={{ marginTop: 16 }}
           // disabled={!isProposalValid()}

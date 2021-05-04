@@ -26,6 +26,44 @@ export interface DaoHeaderProps {
   logoUrl?: string;
 }
 
+const DaoHeaderCard = styled(MUICard)(({ theme }) => ({
+  background: theme.custom.daoHeader.background,
+  width: '100%',
+  height: '197px',
+  paddingLeft: '64px',
+  paddingTop: '54px',
+  paddingBottom: '53px',
+  boxShadow: 'none',
+  boxSizing: 'border-box',
+}));
+
+const HeaderLabel = styled(MUITypography)(({ theme }) => ({
+  color: theme.custom.daoHeader.labelColor,
+  lineHeight: theme.custom.daoHeader.labelLineHeight,
+  fontSize: theme.custom.daoHeader.labelFontSize,
+  fontWeight: theme.custom.daoHeader.labelFontWeight,
+  fontFamily: theme.typography.fontFamily,
+  fontStyle: 'normal',
+}));
+
+const HeaderValue = styled(MUITypography)(({ theme }) => ({
+  color: theme.custom.daoHeader.valueColor,
+  lineHeight: theme.custom.daoHeader.valueLineHeight,
+  fontSize: theme.custom.daoHeader.valueFontSize,
+  fontWeight: theme.custom.daoHeader.valueFontWeight,
+  fontFamily: theme.typography.fontFamily,
+  fontStyle: 'normal',
+}));
+
+const HeaderUsdBalance = styled(MUITypography)(({ theme }) => ({
+  color: theme.custom.daoHeader.valueColor,
+  lineHeight: theme.custom.daoHeader.valueLineHeight,
+  fontSize: theme.custom.daoHeader.labelFontSize,
+  fontWeight: theme.custom.daoHeader.labelFontWeight,
+  fontFamily: theme.typography.fontFamily,
+  fontStyle: 'normal',
+}));
+
 export const DaoHeader: React.FC<DaoHeaderProps> = ({
   daoName,
   ethBalance,
@@ -34,43 +72,6 @@ export const DaoHeader: React.FC<DaoHeaderProps> = ({
 }) => {
   const history = useHistory();
   const theme = useTheme();
-  const DaoHeaderCard = styled(MUICard)({
-    background: theme.custom.daoHeader.background,
-    width: '100%',
-    height: '197px',
-    paddingLeft: '64px',
-    paddingTop: '54px',
-    paddingBottom: '53px',
-    boxShadow: 'none',
-    boxSizing: 'border-box',
-  });
-
-  const HeaderLabel = styled(MUITypography)({
-    color: theme.custom.daoHeader.labelColor,
-    lineHeight: theme.custom.daoHeader.labelLineHeight,
-    fontSize: theme.custom.daoHeader.labelFontSize,
-    fontWeight: theme.custom.daoHeader.labelFontWeight,
-    fontFamily: theme.typography.fontFamily,
-    fontStyle: 'normal',
-  });
-
-  const HeaderValue = styled(MUITypography)({
-    color: theme.custom.daoHeader.valueColor,
-    lineHeight: theme.custom.daoHeader.valueLineHeight,
-    fontSize: theme.custom.daoHeader.valueFontSize,
-    fontWeight: theme.custom.daoHeader.valueFontWeight,
-    fontFamily: theme.typography.fontFamily,
-    fontStyle: 'normal',
-  });
-
-  const HeaderUsdBalance = styled(MUITypography)({
-    color: theme.custom.daoHeader.valueColor,
-    lineHeight: theme.custom.daoHeader.valueLineHeight,
-    fontSize: theme.custom.daoHeader.labelFontSize,
-    fontWeight: theme.custom.daoHeader.labelFontWeight,
-    fontFamily: theme.typography.fontFamily,
-    fontStyle: 'normal',
-  });
 
   const goToSettingPage = () => {
     history.push('/daos/' + daoName + '/dao-settings');
@@ -117,9 +118,9 @@ export const DaoHeader: React.FC<DaoHeaderProps> = ({
                 <div style={{ marginLeft: '10px' }}>DAO Settings</div>
               </div>
             }
-            type={'secondary'}
+            buttonType={'secondary'}
             backgroundColor={'#FFFFFF'}
-            color={'#20232C'}
+            buttonColor={'#20232C'}
             onClick={goToSettingPage}
           />
         </div>
