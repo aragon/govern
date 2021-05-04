@@ -84,6 +84,7 @@ import { createDao } from '@aragon/govern'
 const result = await createDao(args, options);
 ```
 
+
 ### configure(config) ⇒ ``void``
 
 Overwrites the default configuration of govern.

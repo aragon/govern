@@ -14,13 +14,20 @@ export default {
   },
 } as Meta;
 
-const Template: Story<InputFieldProps> = (args) => <InputField {...args} />;
-
+const Template: Story<InputFieldProps> = (args) => {
+  const [value, setValue] = React.useState<string>('');
+  return (
+    <InputField
+      onInputChange={(updatedValue) => setValue(updatedValue)}
+      value={value}
+      {...args}
+    />
+  );
+};
 export const InputFieldExample = Template.bind({});
 InputFieldExample.args = {
   type: 'primary',
   label: 'New proposal',
-  disabled: true,
 };
 
 export const InputFieldExample_Error = Template.bind({});

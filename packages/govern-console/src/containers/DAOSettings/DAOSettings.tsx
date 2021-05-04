@@ -5,19 +5,20 @@ import { ANWrappedPaper } from '../../components/WrapperPaper/ANWrapperPaper';
 import backButtonIcon from '../../images/back-btn.svg';
 import { useTheme, styled } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import { InputField } from '../../components/InputFields/InputField';
-import { ANButton } from '../../components/Button/ANButton';
+import { InputField } from 'components/InputFields/InputField';
+import TextArea from 'components/TextArea/TextArea';
+import { ANButton } from 'components/Button/ANButton';
 // import Modal from '@material-ui/core/Modal';
-import { SimpleModal } from '../../components/Modal/SimpleModal';
-import { ANCircularProgressWithCaption } from '../../components/CircularProgress/ANCircularProgressWithCaption';
-import { CiruclarProgressStatus } from '../../components/CircularProgress/ANCircularProgress';
+import { SimpleModal } from 'components/Modal/SimpleModal';
+import { ANCircularProgressWithCaption } from 'components/CircularProgress/ANCircularProgressWithCaption';
+import { CiruclarProgressStatus } from 'utils/types';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { useQuery } from '@apollo/client';
 import { buildPayload } from '../../utils/ERC3000';
 import { useWallet } from '../../EthersWallet';
 import { erc20ApprovalTransaction } from '../../utils/transactionHelper';
-import { HelpButton } from '../../components/HelpButton/HelpButton';
-import { BlueSwitch } from '../../components/Switchs/BlueSwitch';
+import { HelpButton } from 'components/HelpButton/HelpButton';
+import { BlueSwitch } from 'components/Switchs/BlueSwitch';
 import Grid from '@material-ui/core/Grid';
 import { toUtf8Bytes, toUtf8String } from '@ethersproject/strings';
 import { ethers, BigNumber } from 'ethers';
@@ -29,6 +30,27 @@ import {
   PayloadType,
   ActionType,
 } from '@aragon/govern';
+
+export interface DaoSettingContainerProps {
+  /**
+   * on click back
+   */
+  onClickBack: () => void;
+}
+
+export interface DaoSettingFormProps {
+  /**
+   * on click back
+   */
+  onClickBack: () => void;
+}
+
+interface ParamTypes {
+  /**
+   * type of path (url) params
+   */
+  daoName: string;
+}
 
 const BackButton = styled('div')({
   height: 25,
@@ -82,40 +104,6 @@ const OptionTextStyle = styled('div')({
   fontSize: 18,
 });
 
-export interface DaoSettingContainerProps {
-  /**
-   * on click back
-   */
-  onClickBack: () => void;
-}
-
-export interface DaoSettingFormProps {
-  /**
-   * on click back
-   */
-  onClickBack: () => void;
-}
-
-interface ParamTypes {
-  /**
-   * type of path (url) params
-   */
-  daoName: string;
-}
-
-interface DaoSettingInputError {
-  /**
-   * input fields error messages
-   */
-  executionDelay: string;
-  scheduleDepositContractAddress: string;
-  scheduleDepositAmount: string;
-  challengeDepositContractAddress: string;
-  challengeDepositAmount: string;
-  resolverAddress: string;
-  rules: string;
-  justification: string;
-}
 
 const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
   ({ onClickBack }) => {
@@ -137,7 +125,8 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
       ethersProvider,
     } = context;
 
-    const executionDelay = useRef<string>('');
+    const [executionDelay, updateExecutionDelay] = useState<string>('');
+
     const scheduleDepositContractAddress = useRef<string>('');
     const scheduleDepositAmount = useRef<string>('');
     const challengeDepositContractAddress = useRef<string>('');
@@ -149,19 +138,9 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
     const [isRuleFile, setIsRuleFile] = useState(false);
     const [isJustificationFile, setIsJustificationFile] = useState(false);
 
-    const [inputErrors, setInputErrors] = useState<DaoSettingInputError>({
-      executionDelay: '',
-      scheduleDepositContractAddress: '',
-      scheduleDepositAmount: '',
-      challengeDepositContractAddress: '',
-      challengeDepositAmount: '',
-      resolverAddress: '',
-      rules: '',
-      justification: '',
-    });
-
     const onChangeExecutionDelay = (val: any) => {
-      executionDelay.current = val;
+      // setExecutionDelay(val)
+      updateExecutionDelay(val);
     };
 
     const onScheduleDepositContractAddress = (val: any) => {
@@ -221,30 +200,6 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
       }
     };
 
-    // TODO: use a validate form lib will be more efficient
-    // const validateForm = () => {
-    //   let validateArray = [];
-    //   // let onlyNumbers: RegExp = new RegExp(/^[0-9.{0,1}-{0,1}]/); fail to compile
-    //   const _inputErrors = { ...inputErrors };
-    //   switch (true) {
-    //     case executionDelay.current === '':
-    //       _inputErrors.executionDelay = 'Input should not be empty';
-    //       setInputErrors(_inputErrors);
-    //       validateArray.push(false);
-    //       break;
-
-    //     // case (onlyNumbers.test(executionDelay.current)):
-    //     //   _inputErrors.executionDelay = 'Input should not contain letters';
-    //     //   setInputErrors(_inputErrors)
-    //     //   validateArray.push(false);
-    //     //   break;
-    //   }
-    //   if (validateArray.includes(false)) {
-    //     return false;
-    //   } else {
-    //     return true;
-    //   }
-    // };
 
     const { daoName } = useParams<ParamTypes>();
     //TODO daoname empty handling
@@ -316,7 +271,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
       // }
 
       const newConfig = {
-        executionDelay: executionDelay.current,
+        executionDelay: executionDelay,
         scheduleDeposit: {
           token: scheduleDepositContractAddress.current,
           amount: await correctDecimal(
@@ -550,7 +505,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
           <ANButton
             disabled={diactivateModalButton}
             label={'Continue'}
-            type={'primary'}
+            buttonType={'primary'}
             onClick={async () => {
               if (txIndexToRun >= txList.length) {
                 closeModal();
@@ -568,7 +523,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
         ) : (
           <ANButton
             label={'Get started'}
-            type={'primary'}
+            buttonType={'primary'}
             onClick={() => {
               setIsTrigger(true);
             }}
@@ -604,12 +559,10 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
           <InputField
             label=""
             onInputChange={onChangeExecutionDelay}
-            value={executionDelay.current}
+            value={executionDelay}
             height="46px"
             width={window.innerWidth > 700 ? '50%' : '100%'}
             placeholder={'350s'}
-            error={inputErrors.executionDelay !== ''}
-            helperText={inputErrors.executionDelay}
           />
           <InputTitle>
             Action collateral{' '}
@@ -630,8 +583,6 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
                 height="46px"
                 minWidth={window.innerWidth > 700 ? '540px' : '100%'}
                 placeholder={'0x0000...'}
-                error={inputErrors.scheduleDepositContractAddress !== ''}
-                helperText={inputErrors.scheduleDepositContractAddress}
               />
             </Grid>
             <Grid item>
@@ -643,8 +594,6 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
                 height="46px"
                 minWidth={window.innerWidth > 700 ? '540px' : '100%'}
                 placeholder={'150'}
-                error={inputErrors.scheduleDepositAmount !== ''}
-                helperText={inputErrors.scheduleDepositAmount}
               />
             </Grid>
           </Grid>
@@ -667,8 +616,6 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
                 height="46px"
                 width={window.innerWidth > 700 ? '540px' : '100%'}
                 placeholder={'0x4c495F0005171E17c1dd08510g801805eE08E7'}
-                error={inputErrors.challengeDepositContractAddress !== ''}
-                helperText={inputErrors.challengeDepositContractAddress}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -680,8 +627,6 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
                 height="46px"
                 width={window.innerWidth > 700 ? '540px' : '100%'}
                 placeholder={'350'}
-                error={inputErrors.challengeDepositAmount !== ''}
-                helperText={inputErrors.challengeDepositAmount}
               />
             </Grid>
           </Grid>
@@ -702,8 +647,6 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
             height="46px"
             width={window.innerWidth > 700 ? '540px' : '100%'}
             placeholder={'0x4c495F0005171E17c1dd08510g801805eE08E7'}
-            error={inputErrors.resolverAddress !== ''}
-            helperText={inputErrors.resolverAddress}
           />
           <InputTitle>
             DAO rules / agreement{' '}
@@ -748,8 +691,6 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
               height="100px"
               width="100%"
               placeholder={'DAO rules and agreement ...'}
-              error={inputErrors.rules !== ''}
-              helperText={inputErrors.rules}
             />
           ) : (
             <div
@@ -772,9 +713,9 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
               />
               <ANButton
                 label={'Examine'}
-                type={'secondary'}
+                buttonType={'secondary'}
                 backgroundColor={'#FFFFFF'}
-                color={'#20232C'}
+                buttonColor={'#20232C'}
                 onClick={() => {}}
                 style={{ marginLeft: '10px' }}
                 disabled={true}
@@ -826,8 +767,6 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
               height="100px"
               width="100%"
               placeholder={'Justification...'}
-              error={inputErrors.justification !== ''}
-              helperText={inputErrors.justification}
             />
           ) : (
             <div
@@ -850,9 +789,9 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
               />
               <ANButton
                 label={'Examine'}
-                type={'secondary'}
+                buttonType={'secondary'}
                 backgroundColor={'#FFFFFF'}
-                color={'#20232C'}
+                buttonColor={'#20232C'}
                 onClick={() => {}}
                 style={{ marginLeft: '10px' }}
                 disabled={true}
@@ -869,7 +808,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
             <ANButton
               label={'Save settings'}
               disabled={status !== 'connected'}
-              type={'primary'}
+              buttonType={'primary'}
               onClick={callSaveSetting}
               style={{ marginTop: '34px' }}
               width={'100%'}

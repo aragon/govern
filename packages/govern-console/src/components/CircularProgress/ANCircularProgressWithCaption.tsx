@@ -1,14 +1,12 @@
 /* eslint-disable */
-import {
-  ANCircularProgress,
-  CiruclarProgressStatus,
-} from './ANCircularProgress';
+import { ANCircularProgress } from './ANCircularProgress';
+import { CiruclarProgressStatus } from 'utils/types';
 
 export interface ANProgressCationPropos {
   /**
    * Text Message to be showen along side of the circular progress
    */
-  caption: string;
+  caption?: string;
 
   /**
    * Status of the circular progress

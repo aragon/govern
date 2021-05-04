@@ -1,8 +1,8 @@
-/* eslint-disable */
-import React from 'react';
-import { styled, useTheme } from '@material-ui/core/styles';
+import React, { useEffect } from 'react';
+import { styled } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
+import Dialog from '@material-ui/core/Dialog';
 import backButtonIcon from 'images/back-btn.svg';
 import { Label } from 'components/Labels/Label';
 import { InputField } from 'components/InputFields/InputField';
@@ -10,51 +10,270 @@ import { useHistory, useParams } from 'react-router-dom';
 import { GET_PROPOSAL_DETAILS_QUERY } from './queries';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { useQuery, useLazyQuery } from '@apollo/client';
-import { useEffect } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { useWallet } from '../../EthersWallet';
 import { erc20ApprovalTransaction } from 'utils/transactionHelper';
 import { ethers } from 'ethers';
 import { CourtABI } from 'utils/abis/court';
-
-import {
-  Proposal,
-  ProposalOptions,
-  ProposalParams,
-  PayloadType,
-  DaoConfig,
-} from '@aragon/govern';
+import { CustomTransaction, CustomTransactionStatus } from 'utils/types';
+import { Proposal, ProposalOptions, ProposalParams } from '@aragon/govern';
+import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 
 // import { InputField } from 'component/InputField/InputField';
 interface ProposalDetailsProps {
   onClickBack?: any;
 }
 
+//* styled Components
+
+const StyledPaper = styled(Paper)({
+  backgroundColor: '#ffffff',
+  height: 'auto',
+  minHeight: '1000px',
+  padding: '40px 48px 58px 48px',
+});
+const BackButton = styled('div')({
+  height: 25,
+  width: 62,
+  cursor: 'pointer',
+  position: 'relative',
+  marginBottom: '36px',
+  '& img': {
+    cursor: 'pointer',
+  },
+});
+const ProposalStatus = styled('div')({
+  height: '20px',
+  width: '100%',
+  display: 'block',
+  boxSizing: 'border-box',
+});
+const ProposalId = styled('div')(({ theme }) => ({
+  height: '44px',
+  width: '100%',
+  color: theme.custom.black,
+  fontWeight: 600,
+  fontSize: '32px',
+  lineHeight: '44px',
+  marginTop: '11px',
+  textOverflow: 'ellipsis',
+  boxSizing: 'border-box',
+}));
+const DateDisplay = styled('div')({
+  height: '25px',
+  width: '100%',
+  color: '#7483B3',
+  marginTop: '10px',
+  fontStyle: 'normal',
+  fontWeight: 'normal',
+  boxSizing: 'border-box',
+});
+const getLabelColor = (proposalState: string) => {
+  if (proposalState === 'Scheduled') return 'yellow';
+  if (proposalState === 'Executed') return 'green';
+  if (proposalState === 'Challenged') return 'red';
+};
+const DetailsWrapper = styled('div')({
+  display: 'flex',
+  justifyContent: 'space-between',
+  marginTop: '47px',
+});
+const ProposalDetailsWrapper = styled('div')({
+  width: 'calc(100% - 443px)',
+  boxSizing: 'border-box',
+  borderRadius: '16px',
+  minHeight: '900px',
+  border: ' 2px solid #E2ECF5',
+  padding: '32px 30px',
+});
+const WidgetWrapper = styled('div')({
+  width: '427px',
+});
+const TitleText = styled(Typography)({
+  fontWeight: 600,
+  fontSize: '28px',
+  lineHeight: '38px',
+  height: '38px',
+  width: '100%',
+  boxSizing: 'border-box',
+});
+const InfoWrapper = styled('div')({
+  // display: 'flex',
+  // flexDirection: 'column',
+  // justifyContent: 'space-between',
+  marginTop: '9px',
+  width: '100%',
+  boxSizing: 'border-box',
+});
+const InfoKeyDiv = styled('div')({
+  fontFamily: 'Manrope',
+  fontStyle: 'normal',
+  fontWeight: 'normal',
+  fontSize: '18px',
+  height: '25px',
+  width: 'fit-content',
+  display: 'inline-block',
+  color: '#7483B3',
+});
+const InfoValueDivInline = styled('div')({
+  fontFamily: 'Manrope',
+  fontStyle: 'normal',
+  fontWeight: 'normal',
+  color: '#20232C',
+  display: 'inline-block',
+  width: 'fit-content',
+  marginLeft: '9px',
+  '& a': {
+    width: '100%',
+    color: '#0094FF',
+    boxSizing: 'border-box',
+  },
+});
+const InfoValueDivBlock = styled('div')({
+  display: 'flex',
+  flexDirection: 'column',
+  width: '75%',
+  height: 'auto',
+  fontFamily: 'Manrope',
+  fontStyle: 'normal',
+  fontWeight: 'normal',
+  color: '#20232C',
+  fontSize: '18px',
+  marginTop: '9px',
+  paddingLeft: '25px',
+  boxSizing: 'border-box',
+  '& a': {
+    display: 'block',
+    width: '100%',
+    color: '#0094FF',
+    boxSizing: 'border-box',
+  },
+  '& div': {
+    display: 'block',
+    height: 'auto',
+    width: '100%',
+    color: '#20232C',
+    boxSizing: 'border-box',
+  },
+  '& > *': {
+    marginBottom: '9px',
+  },
+  '& :last-child': {
+    marginBottom: '0 !important',
+  },
+  '& .full-width': {
+    width: '100% !important',
+  },
+});
+const ActionsWrapper = styled('div')({
+  display: 'flex',
+  flexDirection: 'column',
+  width: '100%',
+  height: 'auto',
+  '& > *': {
+    marginBottom: '8px',
+  },
+  '& :last-child': {
+    marginBottom: '0 !important',
+  },
+});
+
+const ActionDiv = styled('div')({
+  background: '#FFFFFF',
+  transition: 'all 1s ease-out',
+  border: '2px solid #F5F7FF',
+  boxSizing: 'border-box',
+  boxShadow: '0px 8px 7px rgba(116, 131, 178, 0.2)',
+  borderRadius: '12px',
+  width: '100%',
+  overflow: 'hidden',
+  cursor: 'pointer',
+  '& > div': {
+    minHeight: '62px !important',
+    verticalAlign: 'middle',
+    lineHeight: '62px',
+  },
+  '& div': {
+    marginTop: 0,
+  },
+  '& .full-width': {
+    width: '100%',
+  },
+});
+
+const CollapsedDiv = styled('div')({
+  height: '62px',
+  display: 'block',
+  width: '100%',
+  paddingLeft: '23px',
+  paddingRight: '28px',
+  boxSizing: 'border-box',
+  margin: 0,
+});
+const ExpandedDiv = styled('div')({
+  height: 'auto',
+  display: 'block',
+  width: '100%',
+  paddingLeft: '23px',
+  paddingRight: '38px',
+  boxSizing: 'border-box',
+  margin: 0,
+  '& #value-div': {
+    height: '27px',
+    lineHeight: '27px',
+    minHeight: '27px !important',
+  },
+  '& #data-div': {
+    lineHeight: '25px',
+    minHeight: '27px !important',
+    // fontSize: '18px',
+    height: 'fit-content',
+  },
+  '& #data-div-block': {
+    // overflowWrap: 'normal',
+    overflowWrap: 'break-word',
+  },
+});
+
+const Widget = styled('div')({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  width: '100%',
+  minHeight: '118px',
+  boxSizing: 'border-box',
+  background: '#FFFFFF',
+  border: '2px solid #ECF1F7',
+  boxShadow: '0px 6px 6px rgba(180, 193, 228, 0.35)',
+  borderRadius: '8px',
+  marginBottom: '23px',
+  padding: '36px 27px',
+  '& div': {
+    display: 'block',
+    margin: 'auto',
+    width: '100%',
+    boxSizing: 'border-box',
+    marginBottom: '9px',
+  },
+  '& button': {
+    marginTop: '5px',
+  },
+});
+
+//* End of styled Components
+
 const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
-  let selectedProposal: any = {};
-  const history = useHistory();
-  const theme = useTheme();
+  // const selectedProposal: any = {};
+  // const history = useHistory();
   const { daoName, id: proposalId } = useParams<any>();
   const { data: daoList } = useQuery(GET_DAO_BY_NAME, {
     variables: { name: daoName },
   });
   const context: any = useWallet();
-  const {
-    connector,
-    account,
-    balance,
-    chainId,
-    connect,
-    connectors,
-    ethereum,
-    error,
-    getBlockNumber,
-    networkName,
-    reset,
-    status,
-    type,
-    ethersProvider,
-  } = context;
+
+  const { account, ethersProvider } = context;
+
+  const { dispatch } = React.useContext(ModalsContext);
 
   let signer: any;
 
@@ -67,256 +286,15 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     }
   }, [ethersProvider]);
 
-  //* styled Components
-
-  const StyledPaper = styled(Paper)({
-    backgroundColor: '#ffffff',
-    height: 'auto',
-    minHeight: '1000px',
-    padding: '40px 48px 58px 48px',
-  });
-  const BackButton = styled('div')({
-    height: 25,
-    width: 62,
-    cursor: 'pointer',
-    position: 'relative',
-    marginBottom: '36px',
-    '& img': {
-      cursor: 'pointer',
-    },
-  });
-  const ProposalStatus = styled('div')({
-    height: '20px',
-    width: '100%',
-    display: 'block',
-    boxSizing: 'border-box',
-  });
-  const ProposalId = styled('div')({
-    height: '44px',
-    width: '100%',
-    color: theme.custom.black,
-    fontWeight: 600,
-    fontSize: '32px',
-    lineHeight: '44px',
-    marginTop: '11px',
-    textOverflow: 'ellipsis',
-    boxSizing: 'border-box',
-  });
-  const DateDisplay = styled('div')({
-    height: '25px',
-    width: '100%',
-    color: '#7483B3',
-    marginTop: '10px',
-    fontStyle: 'normal',
-    fontWeight: 'normal',
-    boxSizing: 'border-box',
-  });
-  const getLabelColor = () => {
-    if (proposalInfo.state === 'Scheduled') return 'yellow';
-    if (proposalInfo.state === 'Executed') return 'green';
-    if (proposalInfo.state === 'Challenged') return 'red';
-  };
-  const DetailsWrapper = styled('div')({
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginTop: '47px',
-  });
-  const ProposalDetailsWrapper = styled('div')({
-    width: 'calc(100% - 443px)',
-    boxSizing: 'border-box',
-    borderRadius: '16px',
-    minHeight: '900px',
-    border: ' 2px solid #E2ECF5',
-    padding: '32px 30px',
-  });
-  const WidgetWrapper = styled('div')({
-    width: '427px',
-  });
-  const TitleText = styled(Typography)({
-    fontWeight: 600,
-    fontSize: '28px',
-    lineHeight: '38px',
-    height: '38px',
-    width: '100%',
-    boxSizing: 'border-box',
-  });
-  const InfoWrapper = styled('div')({
-    // display: 'flex',
-    // flexDirection: 'column',
-    // justifyContent: 'space-between',
-    marginTop: '9px',
-    width: '100%',
-    boxSizing: 'border-box',
-  });
-  const InfoKeyDiv = styled('div')({
-    fontFamily: 'Manrope',
-    fontStyle: 'normal',
-    fontWeight: 'normal',
-    fontSize: '18px',
-    height: '25px',
-    width: 'fit-content',
-    display: 'inline-block',
-    color: '#7483B3',
-  });
-  const InfoValueDivInline = styled('div')({
-    fontFamily: 'Manrope',
-    fontStyle: 'normal',
-    fontWeight: 'normal',
-    color: '#20232C',
-    display: 'inline-block',
-    width: 'fit-content',
-    marginLeft: '9px',
-    '& a': {
-      width: '100%',
-      color: '#0094FF',
-      boxSizing: 'border-box',
-    },
-  });
-  const InfoValueDivBlock = styled('div')({
-    display: 'flex',
-    flexDirection: 'column',
-    width: '75%',
-    height: 'auto',
-    fontFamily: 'Manrope',
-    fontStyle: 'normal',
-    fontWeight: 'normal',
-    color: '#20232C',
-    fontSize: '18px',
-    marginTop: '9px',
-    paddingLeft: '25px',
-    boxSizing: 'border-box',
-    '& a': {
-      display: 'block',
-      width: '100%',
-      color: '#0094FF',
-      boxSizing: 'border-box',
-    },
-    '& div': {
-      display: 'block',
-      height: 'auto',
-      width: '100%',
-      color: '#20232C',
-      boxSizing: 'border-box',
-    },
-    '& > *': {
-      marginBottom: '9px',
-    },
-    '& :last-child': {
-      marginBottom: '0 !important',
-    },
-    '& .full-width': {
-      width: '100% !important',
-    },
-  });
-  const ActionsWrapper = styled('div')({
-    display: 'flex',
-    flexDirection: 'column',
-    width: '100%',
-    height: 'auto',
-    '& > *': {
-      marginBottom: '8px',
-    },
-    '& :last-child': {
-      marginBottom: '0 !important',
-    },
-  });
-
-  const ActionDiv = styled('div')({
-    background: '#FFFFFF',
-    transition: 'all 1s ease-out',
-    border: '2px solid #F5F7FF',
-    boxSizing: 'border-box',
-    boxShadow: '0px 8px 7px rgba(116, 131, 178, 0.2)',
-    borderRadius: '12px',
-    width: '100%',
-    overflow: 'hidden',
-    cursor: 'pointer',
-    '& > div': {
-      minHeight: '62px !important',
-      verticalAlign: 'middle',
-      lineHeight: '62px',
-    },
-    '& div': {
-      marginTop: 0,
-    },
-    '& .full-width': {
-      width: '100%',
-    },
-  });
-
-  const CollapsedDiv = styled('div')({
-    height: '62px',
-    display: 'block',
-    width: '100%',
-    paddingLeft: '23px',
-    paddingRight: '28px',
-    boxSizing: 'border-box',
-    margin: 0,
-  });
-  const ExpandedDiv = styled('div')({
-    height: 'auto',
-    display: 'block',
-    width: '100%',
-    paddingLeft: '23px',
-    paddingRight: '38px',
-    boxSizing: 'border-box',
-    margin: 0,
-    '& #value-div': {
-      height: '27px',
-      lineHeight: '27px',
-      minHeight: '27px !important',
-    },
-    '& #data-div': {
-      lineHeight: '25px',
-      minHeight: '27px !important',
-      // fontSize: '18px',
-      height: 'fit-content',
-    },
-    '& #data-div-block': {
-      // overflowWrap: 'normal',
-      overflowWrap: 'break-word',
-    },
-  });
-
-  const Widget = styled('div')({
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    width: '100%',
-    minHeight: '118px',
-    boxSizing: 'border-box',
-    background: '#FFFFFF',
-    border: '2px solid #ECF1F7',
-    boxShadow: '0px 6px 6px rgba(180, 193, 228, 0.35)',
-    borderRadius: '8px',
-    marginBottom: '23px',
-    padding: '36px 27px',
-    '& div': {
-      display: 'block',
-      margin: 'auto',
-      width: '100%',
-      boxSizing: 'border-box',
-      marginBottom: '9px',
-    },
-    '& button': {
-      marginTop: '5px',
-    },
-  });
-
-  //* End of styled Components
-
   const [proposalInfo, updateProposalInfo] = React.useState<any>(null);
   const [isExpanded, updateIsExpanded] = React.useState<any>({});
   const [daoDetails, updateDaoDetails] = React.useState<any>();
+  const [transactions, updateTransactions] = React.useState<
+    CustomTransaction[]
+  >([]);
+  const transactionsQueue = React.useRef<CustomTransaction[]>([]);
   const challengeReason = React.useRef('');
   const vetoReason = React.useRef('');
-
-  type ProposalType = {
-    state: string;
-    config: DaoConfig;
-    payload: PayloadType;
-    id: string;
-  };
 
   const [
     getProposalData,
@@ -326,6 +304,12 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       error: errorFetchingProposalDetails,
     },
   ] = useLazyQuery(GET_PROPOSAL_DETAILS_QUERY);
+
+  useEffect(() => {
+    return function cleanUp() {
+      transactionsQueue.current = [];
+    };
+  }, []);
 
   useEffect(() => {
     if (proposalDetailsData) {
@@ -342,7 +326,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     }
     updateIsExpanded(cloneObject);
   };
-
   useEffect(() => {
     if (daoList) {
       updateDaoDetails(daoList.daos[0]);
@@ -363,15 +346,14 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       return proposal;
     }
   }, [daoDetails]);
-
   const approveChallengeCollateralsIfNeeded = async () => {
     const contract = new ethers.Contract(
       proposalInfo.config.resolver,
       CourtABI,
       signer,
     );
-
-    // TODO:GIORGI error tracking make it better
+    console.log('proposalInfo');
+    console.log(proposalInfo);
     if (
       daoDetails.queue.config.scheduleDeposit.token !==
       '0x' + '0'.repeat(20)
@@ -383,24 +365,27 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
         ethersProvider,
         account,
       );
-
-      if (challengeDepositApproval.error) {
-        console.log(challengeDepositApproval.error, ' approval error');
-        // TODO:GIORGI don't continue
-      }
-
-      if (challengeDepositApproval.transactions.length > 0) {
-        try {
-          const transactionResponse: any = await challengeDepositApproval.transactions[0].tx();
-          await transactionResponse.wait();
-        } catch (err) {
-          console.log(err);
+      console.log(challengeDepositApproval);
+      if (challengeDepositApproval) {
+        if (challengeDepositApproval.error) {
+          console.log(challengeDepositApproval.error);
+          return;
+        }
+        if (challengeDepositApproval.transactions.length > 0) {
+          transactionsQueue.current.push(
+            challengeDepositApproval.transactions[0],
+          );
+          // try {
+          //   const transactionResponse: any = await challengeDepositApproval.transactions[0].tx();
+          //   await transactionResponse.wait();
+          // } catch (err) {
+          //   console.log(err);
+          // }
         }
       }
     }
 
     const [, feeToken, feeAmount] = await contract.getDisputeFees();
-
     if (feeToken !== '0x' + '0'.repeat(20)) {
       const feeTokenApproval = await erc20ApprovalTransaction(
         feeToken,
@@ -409,17 +394,20 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
         ethersProvider,
         account,
       );
-      if (feeTokenApproval.error) {
-        console.log(feeTokenApproval.error, ' approval error');
-        // TODO:GIORGI don't continue if this fails.
-      }
-
-      if (feeTokenApproval.transactions.length > 0) {
-        try {
-          const transactionResponse: any = await feeTokenApproval.transactions[0].tx();
-          await transactionResponse.wait();
-        } catch (err) {
-          console.log(err);
+      console.log(feeTokenApproval);
+      if (feeTokenApproval) {
+        if (feeTokenApproval.error) {
+          console.log(feeTokenApproval.error);
+          return;
+        }
+        if (feeTokenApproval.transactions.length > 0) {
+          transactionsQueue.current.push(feeTokenApproval.transactions[0]);
+          // try {
+          //   const transactionResponse: any = await feeTokenApproval.transactions[0].tx();
+          //   await transactionResponse.wait();
+          // } catch (err) {
+          //   console.log(err);
+          // }
         }
       }
     }
@@ -437,17 +425,55 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     return params;
   };
 
+  const onTransactionFailure = (
+    errorMessage: string,
+    transaction: CustomTransaction,
+  ) => {
+    console.log('hi');
+  };
+  const onTransactionSuccess = (
+    transaction: CustomTransaction,
+    transactionReceipt: any,
+  ) => {
+    console.log('hi');
+  };
+  const onCompleteAllTransactions = (transactions: CustomTransaction[]) => {
+    console.log('hi');
+  };
+
   const challengeProposal = async () => {
     const proposalParams = getProposalParams();
-    console.log(proposalParams);
     await approveChallengeCollateralsIfNeeded();
     if (proposalInstance) {
-      const challengeTransaction = await proposalInstance.challenge(
-        proposalParams,
-        challengeReason.current,
-      );
+      const challengeTransaction: CustomTransaction = {
+        tx: () => {
+          return proposalInstance.challenge(
+            proposalParams,
+            challengeReason.current,
+          );
+        },
+        preTransactionMessage: 'Challenge Proposal',
+        transactionMessage: 'Challenging Proposal',
+        errorMessage: 'Error while Challenging Propsal',
+        successMessage: 'Successfully Challenged Proposal',
+        status: CustomTransactionStatus.Pending,
+      };
+      transactionsQueue.current.push(challengeTransaction);
+      updateTransactions([...transactionsQueue.current]);
     }
-    // console.log(challengeTransaction);
+    if (transactionsQueue.current.length > 0) {
+      console.log(dispatch);
+      // setIsTransactionModalOpen(true);
+      dispatch({
+        type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
+        payload: {
+          transactionList: transactionsQueue.current,
+          onTransactionFailure,
+          onTransactionSuccess,
+          onCompleteAllTransactions,
+        },
+      });
+    }
   };
 
   const executeProposal = async () => {
@@ -461,22 +487,9 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     }
   };
 
-  const vetoProposal = async () => {
-    const proposalParams = getProposalParams();
-    console.log(proposalParams);
-    console.log(proposalParams);
-    if (proposalInstance) {
-      const vetoTransaction = await proposalInstance.veto(
-        proposalParams,
-        vetoReason.current,
-      );
-      console.log(vetoTransaction, 'nice');
-    }
-  };
+  // const resolveProposal = async () => {};
 
-  const resolveProposal = async () => {};
-
-  let proposalStates: any = {};
+  const proposalStates: any = {};
   // check if the user has the veto power.
   if (proposalInfo) {
     proposalInfo.history.forEach((item: any) => {
@@ -542,6 +555,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   // const getParsedDataFromBytes = (data) => {
 
   // };
+
   return (
     <>
       {isLoadingProposalDetails ? (
@@ -555,11 +569,11 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
               </BackButton>
               <ProposalStatus>
                 <Label
-                  labelColor={getLabelColor()}
+                  labelColor={getLabelColor(proposalInfo.status)}
                   labelText={proposalInfo.state}
                 />
               </ProposalStatus>
-              <ProposalId>{proposalId}</ProposalId>
+              <ProposalId>{proposalInfo.id}</ProposalId>
               <DateDisplay>
                 {
                   // TODO:Bhanu you can make this work with the dates library you use
@@ -734,6 +748,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                       // value={challengeReason.current}
                     />
                     <ANButton
+                      buttonType="primary"
                       label="Challenge"
                       height="45px"
                       width="372px"
@@ -741,7 +756,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                       onClick={() => challengeProposal()}
                     />
                   </Widget>
-                  <Widget>
+                  {/* <Widget>
                     <div
                       style={{
                         fontFamily: 'Manrope',
@@ -753,7 +768,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                     >
                       Veto Reason
                     </div>
-                    <div>{/* <ANInput /> */}</div>
                     <InputField
                       onInputChange={(value) => {
                         vetoReason.current = value;
@@ -769,9 +783,9 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                       height="45px"
                       width="372px"
                       style={{ margin: 'auto' }}
-                      onClick={() => vetoProposal()}
+                      //  onClick={}
                     />
-                  </Widget>
+                  </Widget> */}
                   <Widget>
                     <ANButton
                       label="Execute"
@@ -779,10 +793,12 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                       width="372px"
                       style={{ margin: 'auto' }}
                       onClick={executeProposal}
+                      buttonType="primary"
                     />
                   </Widget>
                   <Widget>
                     <ANButton
+                      buttonType="primary"
                       label="Resolve"
                       height="45px"
                       width="372px"

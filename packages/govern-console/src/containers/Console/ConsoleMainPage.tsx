@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { styled, useTheme } from '@material-ui/core/styles';
-import { ConsoleHeader } from '../../components/ConsoleHeader/ConsoleHeader';
-import { DaoCard } from '../../components/DaoCards/DaoCard';
-import { ANButton } from '../../components/Button/ANButton';
+import { ConsoleHeader } from 'components/ConsoleHeader/ConsoleHeader';
+import { DaoCard } from 'components/DaoCards/DaoCard';
+import { ANButton } from 'components/Button/ANButton';
 import Paper from '@material-ui/core/Paper';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import {
@@ -17,7 +17,20 @@ export interface ConsoleMainPageProps {
    * Callback on selection of Dao
    */
   updateSelectedDao: any;
+  /**
+   * Callback to navigate the user to the search DAO by name result page
+   */
+  onSearchByDaoName: (daoName: string) => void;
 }
+
+const ConsoleMainDiv = styled(Paper)(({ theme }) => ({
+  width: '100%',
+  background: theme.custom.mainBackground,
+  height: 'auto',
+  padding: '0px',
+  boxShadow: 'none',
+}));
+
 const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
   updateSelectedDao,
   ...props
@@ -31,14 +44,6 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
     updateIsShowingFilteredResults,
   ] = useState<boolean>(false);
   const [totalDaoCount, updateTotalDaoCount] = useState<number>();
-
-  const ConsoleMainDiv = styled(Paper)({
-    width: '100%',
-    background: theme.custom.mainBackground,
-    height: 'auto',
-    padding: '0px',
-    boxShadow: 'none',
-  });
 
   const {
     data: daoListData,
@@ -135,10 +140,10 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
         {totalDaoCount !== visibleDaoList.length ? (
           <ANButton
             label="Load More DAOs"
-            type="secondary"
+            buttonType="secondary"
             height="46px"
             width="163px"
-            color="#00C2FF"
+            buttonColor="#00C2FF"
             onClick={fetchMoreData}
           ></ANButton>
         ) : null}

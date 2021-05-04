@@ -3,7 +3,6 @@
   "compilerOptions": {
     "module": "es6",
     "target": "es2018",
-    "strict": false,
     "removeComments": true,
     "strictPropertyInitialization": false,
     "outDir": "./dist/esm",

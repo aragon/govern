@@ -5,8 +5,6 @@ import {
   CreateDaoParams,
   CreateDaoOptions,
 } from '../../public/createDao'
-import { CensusErc20Api } from 'dvote-js'
-import { getPool } from '../../internal/actions/lib/Gateway'
 
 export const registryAbi = [
   `event Registered(address indexed executor, address queue, address indexed token, address indexed registrant, string name)`,
@@ -18,7 +16,6 @@ export const registryAbi = [
 const tokenAddress = '0x9fB402A33761b88D5DcbA55439e6668Ec8D4F2E8'
 const daoFactoryAddress = '0xb75290e69f83b52bfbf9c99b4ae211935e75a851'
 const registryAddress = '0x7714e0a2A2DA090C2bbba9199A54B903bB83A73d'
-
 
 describe('Create Dao', function () {
   const goodConfig = {
@@ -66,7 +63,6 @@ describe('Create Dao', function () {
     // make sure register event is emitted
     const registryContract = new ethers.Contract(
       registryAddress,
-      //TODO: import this from the shared abi, because create dao also uses this.
       registryAbi,
       ethers.provider
     )
@@ -248,71 +244,5 @@ describe('Create Dao', function () {
 
     const result = await createDao(params, options)
     expect(result).to.have.property('hash')
-  })
-
-  it.skip('Should create dao successfully and register token in vocdoni contract', async function () {
-    const params: CreateDaoParams = {
-      name: 'beauty',
-      token: {
-        tokenName: 'beauty',
-        tokenSymbol: 'BEAU',
-        tokenDecimals: 6,
-      },
-      config: goodConfig,
-      useVocdoni: true,
-    }
-
-    const options: CreateDaoOptions = {
-      provider: network.provider,
-      daoFactoryAddress,
-    }
-    
-    const registerTokenCallback = async (registerToken:Function) => {
-      const result = await registerToken()
-      if(result) {
-        console.log('Token registered!')
-      }
-    }
-
-    const result = await createDao(params, options, registerTokenCallback)
-    const receipt = await result.wait()
-
-    console.log('DAO has been created', receipt.transactionHash, receipt.status)
-
-    const status = receipt.status
-    const receiptHash = receipt.transactionHash
-    const hash = result.hash
-    expect(status).to.equal(1)
-    expect(hash).to.equal(receiptHash, 'result.hash != receipt.transactionHash')
-
-    // make sure register event is emitted
-    const registryContract = new ethers.Contract(
-      registryAddress,
-      registryAbi,
-      ethers.provider
-    )
-
-
-    const args = receipt.logs
-      .filter(
-        ({ address }: { address: string }) =>
-          address === registryContract.address
-      )
-      .map((log: any) => registryContract.interface.parseLog(log))
-      .find(({ name }: { name: string }) => name === 'Registered')
-    
-    const tokenAddress = args?.args[2] as string
-
-    console.log('this is the token address ', tokenAddress)
-    expect(ethers.utils.isAddress(tokenAddress)).to.equal(true)
-    
-    console.log('Wait 40 seconds before checking the token is registered')
-    await new Promise((resolve) => {
-      setTimeout(resolve, 40000)
-    })
-    console.log('Checking if is registered...')
-    const pool = await getPool()
-    const registered = await CensusErc20Api.isRegistered(tokenAddress, pool)
-    expect(registered).to.be.true
   })
 })

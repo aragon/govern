@@ -1,5 +1,5 @@
 import React from 'react';
-import { styled, useTheme } from '@material-ui/core/styles';
+import { styled, Theme } from '@material-ui/core/styles';
 import MUICard, { CardProps } from '@material-ui/core/Card';
 import MUITypography from '@material-ui/core/Typography';
 
@@ -18,24 +18,23 @@ export interface AdviceMessageProps extends CardProps {
   onClick?: () => void;
 }
 
-export const AdviceMessage: React.FC<any> = ({ cardColor, messageText }) => {
-  const theme = useTheme();
-  const getBackground = () => {
-    if (cardColor === 'green') return `${theme.custom.light.grass}`;
-    if (cardColor === 'orange') return `${theme.custom.light.cream}`;
-    if (cardColor === 'blue') return `${theme.custom.light.sky}`;
-    if (cardColor === 'grey') return `${theme.custom.greyscale.light}`;
-  };
+const getBackground = (theme: Theme, cardColor: string) => {
+  if (cardColor === 'green') return `${theme.custom.light.grass}`;
+  if (cardColor === 'orange') return `${theme.custom.light.cream}`;
+  if (cardColor === 'blue') return `${theme.custom.light.sky}`;
+  if (cardColor === 'grey') return `${theme.custom.greyscale.light}`;
+};
 
-  const getColor = () => {
-    if (cardColor === 'green') return `${theme.custom.informative.green}`;
-    if (cardColor === 'orange') return `${theme.custom.informative.orange}`;
-    if (cardColor === 'blue') return `${theme.custom.plain.sapphire}`;
-    if (cardColor === 'grey') return `${theme.custom.greyscale.solid}`;
-  };
+const getColor = (theme: Theme, cardColor: string) => {
+  if (cardColor === 'green') return `${theme.custom.informative.green}`;
+  if (cardColor === 'orange') return `${theme.custom.informative.orange}`;
+  if (cardColor === 'blue') return `${theme.custom.plain.sapphire}`;
+  if (cardColor === 'grey') return `${theme.custom.greyscale.solid}`;
+};
 
-  const AdviceMessageCard = styled(MUICard)({
-    backgroundColor: getBackground(),
+const AdviceMessageCard = styled(MUICard)(
+  ({ theme, cardColor }: { theme: Theme; cardColor: string }) => ({
+    backgroundColor: getBackground(theme, cardColor),
     width: '293px',
     height: 'fit-content',
     display: 'flex',
@@ -44,21 +43,25 @@ export const AdviceMessage: React.FC<any> = ({ cardColor, messageText }) => {
     alignItems: 'center',
     padding: '16px 16px',
     borderRadius: '10px',
-  });
+  }),
+);
 
-  const AdviceMessageText = styled(MUITypography)({
-    color: getColor(),
+const AdviceMessageText = styled(MUITypography)(
+  ({ theme, cardColor }: { theme: Theme; cardColor: string }) => ({
+    color: getColor(theme, cardColor),
     lineHeight: '19px',
     fontSize: '14px',
     fontWeight: 500,
     fontFamily: 'Manrope',
     fontStyle: 'normal',
     overflow: 'visible',
-  });
+  }),
+);
 
+export const AdviceMessage: React.FC<any> = ({ cardColor, messageText }) => {
   return (
-    <AdviceMessageCard>
-      <AdviceMessageText>{messageText}</AdviceMessageText>
+    <AdviceMessageCard cardColor={cardColor}>
+      <AdviceMessageText cardColor={cardColor}>{messageText}</AdviceMessageText>
     </AdviceMessageCard>
   );
 };

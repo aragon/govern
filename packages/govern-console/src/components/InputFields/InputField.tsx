@@ -30,6 +30,11 @@ export interface InputFieldProps extends StandardTextFieldProps {
   value?: string;
 }
 
+interface InputProps {
+  inputRef: any;
+  // any other props that come into the component
+}
+
 export const InputField: React.FC<InputFieldProps> = ({
   onInputChange,
   placeholder,
@@ -37,18 +42,15 @@ export const InputField: React.FC<InputFieldProps> = ({
   height,
   width,
   value,
-  isUpperCase,
   ...props
 }) => {
   const theme = useTheme();
-  const [inputValue, setInputValue] = useState(value);
-
   const onChangeInput = (val: any) => {
     let valueTobeSent = val;
-    if (isUpperCase) {
+    if (props.isUpperCase) {
       valueTobeSent = val.toUpperCase();
     }
-    setInputValue(valueTobeSent);
+    // setInputValue(valueTobeSent);
     onInputChange(valueTobeSent);
   };
 
@@ -118,16 +120,21 @@ export const InputField: React.FC<InputFieldProps> = ({
     },
   });
   const helperTextClasses = helperTextStyles();
+
   return (
     <TextField
       label={label}
       placeholder={placeholder}
       margin={'none'}
       InputLabelProps={{ shrink: true, classes: inputLabelClasses }}
-      InputProps={{ classes: inputBaseClasses, disableUnderline: true }}
+      InputProps={{
+        classes: inputBaseClasses,
+        disableUnderline: true,
+        // inputComponent: CustomInputComponent,
+      }}
       FormHelperTextProps={{ classes: helperTextClasses }}
       onChange={(e) => onChangeInput(e.target.value)}
-      value={inputValue}
+      value={value}
       error={props.error}
       {...props}
     />

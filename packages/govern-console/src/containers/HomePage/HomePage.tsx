@@ -5,19 +5,21 @@ import { styled } from '@material-ui/core/styles';
 
 import Header from 'components/Header/Header';
 import Footer from 'components/Footer/Footer';
-// import NavigationBar from '../../components/Navigation';
+// import NavigationBar from 'components/Navigation';
 import ConsoleMainPage from 'containers/Console/ConsoleMainPage';
 import DaoMainPage from 'containers/DAO/DaoMainPage';
 import ProposalDetails from 'containers/ProposalDetails/ProposalDetails';
 import NewProposal from 'containers/NewProposal/NewProposal';
 import NewDaoContainer from 'containers/CreateDAO/CreateDAO';
 import DaoSettingsContainer from 'containers/DAOSettings/DAOSettings';
+import { ModalsProvider } from 'containers/HomePage/ModalsContext';
+
+const AppWrapper = styled('div')({
+  width: 'calc(100vw - 96px)',
+  margin: 'auto',
+});
 
 const HomePage = ({ ...props }) => {
-  const AppWrapper = styled('div')({
-    width: 'calc(100vw - 96px)',
-    margin: 'auto',
-  });
   const history = useHistory();
   const [selectedDao, updateSelectedDao] = React.useState<any>({});
   const [selectedProposal, updateSelectedProposal] = React.useState<any>({});
@@ -48,7 +50,9 @@ const HomePage = ({ ...props }) => {
   const onClickBackFromProposalPage = () => {
     history.goBack();
   };
-
+  const onSearchByDaoName = (daoName: string) => {
+    history.push(`/daos/${daoName}`);
+  };
   return (
     <AppWrapper>
       <Header />
@@ -58,6 +62,7 @@ const HomePage = ({ ...props }) => {
           <Route exact path="/">
             <ConsoleMainPage
               updateSelectedDao={updateSelectedDaoAndPushToHistory}
+              onSearchByDaoName={onSearchByDaoName}
             />
           </Route>
           <Route exact path="/daos/:daoName">
@@ -67,7 +72,9 @@ const HomePage = ({ ...props }) => {
             />
           </Route>
           <Route exact path="/proposals/:daoName/:id">
-            <ProposalDetails onClickBack={() => history.goBack()} />
+            <ModalsProvider>
+              <ProposalDetails onClickBack={() => history.goBack()} />
+            </ModalsProvider>
           </Route>
           <Route exact path="/daos/:daoName/new-proposal">
             <NewProposal onClickBack={() => history.goBack()} />
