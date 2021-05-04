@@ -16,6 +16,7 @@ import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { useQuery } from '@apollo/client';
 import { buildPayload } from '../../utils/ERC3000';
 import { useWallet } from '../../EthersWallet';
+import { AddressZero } from '@ethersproject/constants'
 import { erc20ApprovalTransaction } from '../../utils/transactionHelper';
 import { HelpButton } from 'components/HelpButton/HelpButton';
 import { BlueSwitch } from 'components/Switchs/BlueSwitch';
@@ -302,22 +303,19 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
         actions: [proposal.buildAction('configure', [newConfig], 0)],
         executionDelay: daoDetails.queue.config.executionDelay,
         proof: toUtf8Bytes(justification.current), // TODO Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
-        // proof: '0x',
       });
 
-      // TODO:GIORGI error tracking make it better
+      console.log(payload, ' payload');
+
       let txList = [];
-      if (
-        daoDetails.queue.config.scheduleDeposit.token !==
-        '0x' + '0'.repeat(20)
-      ) {
-        // approvals
+      
+      if (daoDetails.queue.config.scheduleDeposit.token !== AddressZero) {
         const scheduleDepositApproval = await erc20ApprovalTransaction(
           daoDetails.queue.config.scheduleDeposit.token,
           daoDetails.queue.config.scheduleDeposit.amount,
           daoDetails.queue.address,
-          ethersProvider,
           account,
+          ethersProvider,
         );
 
         // TODO: if approval error alert user

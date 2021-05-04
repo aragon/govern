@@ -38,6 +38,7 @@ export enum CustomTransactionStatus {
   Pending,
   InProgress,
 }
+
 // eslint-disable-next-line
 export type CustomTransaction = {
   tx: any;

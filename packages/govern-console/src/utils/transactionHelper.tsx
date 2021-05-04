@@ -7,12 +7,21 @@ import {
 import { ethers, BigNumber } from 'ethers';
 import { erc20TokenABI } from './abis/erc20';
 
+/**
+ * @param token address of the token
+ * @param amount how much to approve
+ * @param spender spender
+ * @param account owner
+ * @param ethersProvider 
+ * 
+ * @returns {Promise<Response>}
+ */
 export async function erc20ApprovalTransaction(
   token: string,
   amount: string,
   spender: string,
-  ethersProvider: any,
   account: string,
+  ethersProvider: any,
 ): Promise<Response> {
   const response: Response = {
     error: undefined,
@@ -45,10 +54,12 @@ export async function erc20ApprovalTransaction(
     response.error = `You need ${amount} to schedule this proposal.`;
     return response;
   }
+
   // user has enough balance, but also already got amountInBigNumber approved for spender
   if (allowance.gte(amountInBigNumber)) {
     return response;
   }
+  
   // approve amountInBigNumber for the spender
   const transaction: CustomTransaction = {
     tx: () => {
