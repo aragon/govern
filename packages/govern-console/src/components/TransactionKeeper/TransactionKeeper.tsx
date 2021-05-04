@@ -5,11 +5,54 @@ import {
   Response,
 } from 'utils/types';
 import { styled, useTheme } from '@material-ui/core/styles';
-import MUICard from '@material-ui/core/card';
-import Typography from '@material-ui/core/typography';
+import MUICard from '@material-ui/core/Card';
+import Typography from '@material-ui/core/Typography';
 import TransactionList from 'components/TransactionKeeper/TransactionList';
 import { ANButton } from 'components/Button/ANButton';
 import produce from 'immer';
+
+//* Styled Components
+const Wrapper = styled(MUICard)(({ theme }) => ({
+  width: '100%',
+  boxSizing: 'border-box',
+  minHeight: '100%',
+  height: 'fit-content',
+  backgroundColor: theme.custom.transactionKeeper.wrapper.background,
+  boxShadow: '0px 13px 9px rgba(180, 193, 228, 0.35)',
+  borderRadius: '16px',
+  padding: '27px 24px 24px 24px',
+}));
+const Title = styled(Typography)(({ theme }) => ({
+  ...theme.custom.transactionKeeper.title,
+  width: '100%',
+  height: 'fit-content',
+  boxSizing: 'border-box',
+  textAlign: 'center',
+  marginBottom: '21px',
+}));
+
+const TransactionMessagesCard = styled(MUICard)(({ theme }) => ({
+  ...theme.custom.transactionKeeper.transactionMessagesCard,
+  padding: '16px',
+  marginBottom: '16px',
+}));
+const BoldText = styled(Typography)(({ theme }) => ({
+  ...theme.custom.transactionKeeper.transactionMessagesCard.boldText,
+}));
+const MessageText = styled(Typography)(({ theme }) => ({
+  ...theme.custom.transactionKeeper.transactionMessagesCard.text,
+}));
+const TransactionStatusWrapper = styled('div')({
+  boxSizing: 'border-box',
+  height: 'fit-content',
+  width: '100%',
+  marginBottom: '30px',
+});
+const CloseButton = styled('img')({
+  height: '18px',
+  width: '18px',
+});
+//* End of Styled Components
 
 export interface TransactionKeeperProps {
   transactionList: CustomTransaction[];
@@ -32,47 +75,6 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
   ...props
 }) => {
   const theme = useTheme();
-  //* Styled Components
-  const Wrapper = styled(MUICard)({
-    width: '100%',
-    boxSizing: 'border-box',
-    minHeight: '100%',
-    height: 'fit-content',
-    backgroundColor: theme.custom.transactionKeeper.wrapper.background,
-    boxShadow: '0px 13px 9px rgba(180, 193, 228, 0.35)',
-    borderRadius: '16px',
-    padding: '27px 24px 24px 24px',
-  });
-  const Title = styled(Typography)({
-    ...theme.custom.transactionKeeper.title,
-    height: 'fit-content',
-    width: '100%',
-    boxSizing: 'border-box',
-    textAlign: 'center',
-    marginBottom: '21px',
-  });
-  const TransactionMessagesCard = styled(MUICard)({
-    ...theme.custom.transactionKeeper.transactionMessagesCard,
-    padding: '16px',
-    marginBottom: '16px',
-  });
-  const BoldText = styled(Typography)({
-    ...theme.custom.transactionKeeper.transactionMessagesCard.boldText,
-  });
-  const MessageText = styled(Typography)({
-    ...theme.custom.transactionKeeper.transactionMessagesCard.text,
-  });
-  const TransactionStatusWrapper = styled('div')({
-    boxSizing: 'border-box',
-    height: 'fit-content',
-    width: '100%',
-    marginBottom: '30px',
-  });
-  const CloseButton = styled('img')({
-    height: '18px',
-    width: '18px',
-  });
-  //* End of Styled Components
 
   const [
     isProcessingTransactions,
@@ -136,7 +138,7 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
             <TransactionList transactions={transactions}></TransactionList>
           </TransactionStatusWrapper>
           <ANButton
-            type="primary"
+            buttonType="primary"
             disabled
             label="Please do not close this window until it finishes"
             width="100%"
@@ -160,7 +162,7 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
             </ul>
           </TransactionMessagesCard>
           <ANButton
-            type="primary"
+            buttonType="primary"
             label="Get Started"
             width="100%"
             height="45px"

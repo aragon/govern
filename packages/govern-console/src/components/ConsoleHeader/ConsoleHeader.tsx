@@ -80,7 +80,7 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
         </div>
         <div>
           <ANButton
-            type="primary"
+            buttonType="primary"
             label="Go to DAO"
             height={'46px'}
             width={'116px'}

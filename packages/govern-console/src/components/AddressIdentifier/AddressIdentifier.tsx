@@ -28,6 +28,18 @@ export interface AddressIdentifierProps extends ChipProps {
   onClick?: () => void;
 }
 
+const StyledAddressIdentifier = styled(MUIChip)(({ theme }) => ({
+  color: theme.custom.black,
+  backgroundColor: theme.custom.white,
+  width: 'fit-content',
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: '6px 8px',
+  borderRadius: '40px',
+}));
+
 export const AddressIdentifier: React.FC<any> = ({
   imageUrl,
   isAddress,
@@ -60,18 +72,6 @@ export const AddressIdentifier: React.FC<any> = ({
     }
   };
 
-  const AddressIdentifier = styled(MUIChip)({
-    color: theme.custom.black,
-    backgroundColor: theme.custom.white,
-    width: 'fit-content',
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: '6px 8px',
-    borderRadius: '40px',
-  });
-
   const getAvatar = () => {
     if (imageUrl) {
       console.log('xyz');
@@ -82,10 +82,10 @@ export const AddressIdentifier: React.FC<any> = ({
   };
 
   return (
-    <AddressIdentifier
+    <StyledAddressIdentifier
       size={componentSize}
       label={getDisplayText()}
       avatar={getAvatar()}
-    ></AddressIdentifier>
+    ></StyledAddressIdentifier>
   );
 };

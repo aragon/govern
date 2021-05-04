@@ -30,20 +30,8 @@ export interface ProposalOptionsProps {
   height: string;
 }
 
-/**
- * Primary UI component for user interaction
- */
-const ProposalOptions: React.FC<ProposalOptionsProps> = ({
-  options,
-  onAddOption,
-  onDeleteOption,
-  onUpdateOption,
-  width,
-  height,
-  ...props
-}) => {
-  // const [val, setVal] = React.useState('0');
-  const StyledTextField = styled(TextField)({
+const StyledTextField = styled(TextField)(
+  ({ width, height }: { width: string; height: string }) => ({
     background: '#FFFFFF',
     border: '1px solid #D9E0F5',
     boxSizing: 'border-box',
@@ -74,7 +62,22 @@ const ProposalOptions: React.FC<ProposalOptionsProps> = ({
         borderBottom: 'none',
       },
     },
-  });
+  }),
+);
+
+/**
+ * Primary UI component for user interaction
+ */
+const ProposalOptions: React.FC<ProposalOptionsProps> = ({
+  options,
+  onAddOption,
+  onDeleteOption,
+  onUpdateOption,
+  width,
+  height,
+  ...props
+}) => {
+  // const [val, setVal] = React.useState('0');
 
   return (
     <>
@@ -86,6 +89,8 @@ const ProposalOptions: React.FC<ProposalOptionsProps> = ({
             onChange={(e) => {
               onUpdateOption(e.target.value, index);
             }}
+            width={width}
+            height={height}
             InputProps={{
               startAdornment: index,
               endAdornment:
@@ -102,7 +107,7 @@ const ProposalOptions: React.FC<ProposalOptionsProps> = ({
       })}
       <ANButton
         onClick={onAddOption}
-        type="secondary"
+        buttonType="secondary"
         label="Add option"
         width={width || '396px'}
         height={height || '46px'}

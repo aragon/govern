@@ -228,7 +228,7 @@ export const AddActionsModal: React.FC<AddActionsModalProps> = ({
       </DialogContent>
       <DialogActions>
         <ANButton
-          type="primary"
+          buttonType="primary"
           width={'100%'}
           height={'45px'}
           onClick={() => onAddActions(selectedActions.current)}

@@ -1,16 +1,49 @@
 /* eslint-disable */
 import React, { useRef, useState, useEffect, memo } from 'react';
 import { styled, useTheme } from '@material-ui/core/styles';
-import { DaoHeader } from '../../components/DaoHeader/DaoHeader';
-import { ProposalCard } from '../../components/ProposalCards/ProposalCard';
-import { ANButton } from '../../components/Button/ANButton';
-import { InputField } from '../../components/InputFields/InputField';
+import { DaoHeader } from 'components/DaoHeader/DaoHeader';
+import { ProposalCard } from 'components/ProposalCards/ProposalCard';
+import { ANButton } from 'components/Button/ANButton';
+import { InputField } from 'components/InputFields/InputField';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import { GET_PROPOSAL_LIST, GET_DAO_BY_NAME } from './queries';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import { formatEther } from 'ethers/lib/utils';
 import { useHistory, useParams } from 'react-router-dom';
+
+//* Styled Components List
+const DaoPageMainDiv = styled(Paper)(({ theme }) => ({
+  width: '100%',
+  background: theme.custom.white,
+  height: 'auto',
+  padding: '0px',
+  boxShadow: 'none',
+}));
+
+const PageLabelSelected = styled(Typography)(({ theme }) => ({
+  background:
+    'linear-gradient(282.07deg, #01E8F7 -5.08%, #01DCFA 21.97%, #00C2FF 81.4%)',
+  lineHeight: '25px',
+  fontSize: '20px',
+  fontWeight: 500,
+  fontFamily: theme.custom.daoCard.fontFamily,
+  fontStyle: theme.custom.daoCard.fontStyle,
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  cursor: 'pointer',
+}));
+
+const PageLabel = styled(Typography)(({ theme }) => ({
+  color: '#7483AB',
+  lineHeight: '25px',
+  fontSize: '20px',
+  fontWeight: 500,
+  fontFamily: theme.custom.daoCard.fontFamily,
+  fontStyle: theme.custom.daoCard.fontStyle,
+  cursor: 'pointer',
+}));
+//* Styled Components List End
 
 const DaoMainPage: React.FC<{
   onClickProposalCard: any;
@@ -107,39 +140,6 @@ const DaoMainPage: React.FC<{
     }
   }, [queueData]);
 
-  //* Styled Components List
-  const DaoPageMainDiv = styled(Paper)({
-    width: '100%',
-    background: theme.custom.white,
-    height: 'auto',
-    padding: '0px',
-    boxShadow: 'none',
-  });
-
-  const PageLabelSelected = styled(Typography)({
-    background:
-      'linear-gradient(282.07deg, #01E8F7 -5.08%, #01DCFA 21.97%, #00C2FF 81.4%)',
-    lineHeight: '25px',
-    fontSize: '20px',
-    fontWeight: 500,
-    fontFamily: theme.custom.daoCard.fontFamily,
-    fontStyle: theme.custom.daoCard.fontStyle,
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    cursor: 'pointer',
-  });
-
-  const PageLabel = styled(Typography)({
-    color: '#7483AB',
-    lineHeight: '25px',
-    fontSize: '20px',
-    fontWeight: 500,
-    fontFamily: theme.custom.daoCard.fontFamily,
-    fontStyle: theme.custom.daoCard.fontStyle,
-    cursor: 'pointer',
-  });
-  //* Styled Components List End
-
   console.log(visibleProposalList, ' good');
 
   const onClickProposal = (proposal: any) => {
@@ -212,7 +212,7 @@ const DaoMainPage: React.FC<{
                 ></InputField>
                 <ANButton
                   label="New Proposal"
-                  type="primary"
+                  buttonType="primary"
                   height="46px"
                   width="142px"
                   onClick={goToNewProposal}
@@ -260,10 +260,10 @@ const DaoMainPage: React.FC<{
                 {queueNonce !== visibleProposalList.length ? (
                   <ANButton
                     label="Load More Proposals"
-                    type="secondary"
+                    buttonType="secondary"
                     height="46px"
                     width="196px"
-                    color="#00C2FF"
+                    buttonColor="#00C2FF"
                     onClick={fetchMoreData}
                   ></ANButton>
                 ) : null}
