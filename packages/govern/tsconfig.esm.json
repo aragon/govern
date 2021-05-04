@@ -6,6 +6,7 @@
     "removeComments": true,
     "strictPropertyInitialization": false,
     "outDir": "./dist/esm",
+    "strict":false,
     "sourceRoot": "./",
     "inlineSources": true,
     "types": [

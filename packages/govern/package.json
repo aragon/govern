@@ -67,6 +67,7 @@
     "@ethersproject/providers": "^5.1.0",
     "@ethersproject/strings": "^5.1.0",
     "@urql/core": "^1.13.1",
+    "dvote-js": "^1.2.0",
     "graphql": "^15.4.0",
     "graphql-tag": "^2.11.0",
     "isomorphic-unfetch": "^3.1.0"
