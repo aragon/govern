@@ -16,6 +16,7 @@ import { useWallet } from '../../EthersWallet';
 import { erc20ApprovalTransaction } from 'utils/transactionHelper';
 import { ethers } from 'ethers';
 import { CourtABI } from 'utils/abis/court';
+import { AddressZero } from '@ethersproject/constants'
 
 import {
   Proposal,
@@ -372,16 +373,13 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     );
 
     // TODO:GIORGI error tracking make it better
-    if (
-      daoDetails.queue.config.scheduleDeposit.token !==
-      '0x' + '0'.repeat(20)
-    ) {
+    if (daoDetails.queue.config.scheduleDeposit.token !== AddressZero) {
       const challengeDepositApproval = await erc20ApprovalTransaction(
         daoDetails.queue.config.challengeDeposit.token,
         daoDetails.queue.config.challengeDeposit.amount,
         daoDetails.queue.address,
-        ethersProvider,
         account,
+        ethersProvider,
       );
 
       if (challengeDepositApproval.error) {
@@ -401,13 +399,13 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
 
     const [, feeToken, feeAmount] = await contract.getDisputeFees();
 
-    if (feeToken !== '0x' + '0'.repeat(20)) {
+    if (feeToken !== AddressZero) {
       const feeTokenApproval = await erc20ApprovalTransaction(
         feeToken,
         feeAmount,
         daoDetails.queue.address,
-        ethersProvider,
         account,
+        ethersProvider,
       );
       if (feeTokenApproval.error) {
         console.log(feeTokenApproval.error, ' approval error');

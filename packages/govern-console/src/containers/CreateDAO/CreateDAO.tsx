@@ -270,8 +270,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
       tokenSymbol: string,
       isUseProxyChecked: boolean,
       daoName: string,
-      isUseFreeVotingChecked: boolean,
-      ethersProvider: any,
+      isUseFreeVotingChecked: boolean
     ): Promise<boolean> => {
       let token: Token;
       if (isExistingToken) {
@@ -283,14 +282,14 @@ const NewDaoForm: React.FC<FormProps> = memo(
         }
       } else {
         token = {
-          tokenAddress: AddressZero,    // Token does not accept undefined or null, check govern package
+          tokenAddress: AddressZero,
           tokenDecimals: 18,
           tokenName: tokenName,
           tokenSymbol: tokenSymbol,
         };
       }
 
-      const createDaoConfig = {
+      const DaoConfig: DaoConfig = {
         executionDelay: executionDelay.current,
         scheduleDeposit: {
           token: scheduleContract.current,
@@ -301,24 +300,24 @@ const NewDaoForm: React.FC<FormProps> = memo(
           amount: challengeTokenAmount.current,
         },
         resolver: resolverContract.current,
-        rules: '0x' + Buffer.from(toUtf8Bytes(rules.current)).toString('hex'),
+        rules: toUtf8Bytes(rules.current),
         maxCalldataSize: maxCalldataSize.current,
       };
+
+      let registerTokenCallback = undefined
       
-      const registerTokenCallback = isUseFreeVotingChecked? 
-        async (registerToken:Function) => {
+      // if the vocdoni is activated, we also register the token in the aragon voice.
+      if(isUseFreeVotingChecked) {
+        registerTokenCallback = async (registerToken:Function) => {
           const result = await registerToken()
           console.log('result', result)
-          if(result) {
-            // await result.wait()                // commented out for reveiw as result don't have wait() it breaks the UI
-            console.log('Token registered!')
-          }
-        } : undefined
+        }
+      }
 
       const createDaoParams: CreateDaoParams = {
         name: daoName,
         token,
-        config: createDaoConfig,
+        config: DaoConfig,
         useProxies: isUseProxyChecked,
         useVocdoni: isUseFreeVotingChecked,
       };
@@ -327,7 +326,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
       try {
         //TODO this console log to be removed
         console.log('createDaoParams', createDaoParams);
-        const result: any = await createDao(createDaoParams, {}, registerTokenCallback );
+        const result: any = await createDao(createDaoParams, {}, registerTokenCallback);
         setCreatedDaoRoute(daoName);
         await result.wait(CONFIRMATION_WAIT);                      
         return true;
@@ -404,7 +403,6 @@ const NewDaoForm: React.FC<FormProps> = memo(
         isUseProxyChecked,
         daoName.current ? daoName.current.toString() : '',
         isUseFreeVotingChecked,
-        ethersProvider,
       );
 
       if (callResult) {
