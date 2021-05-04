@@ -82,7 +82,6 @@ describe('[e2e] dao Test', () => {
 
     expect(isAddress(response.token)).toEqual(true)
     expect(isAddress(response.registrant)).toEqual(true)
-
   })
 
   it('non-existent dao should return null', async () => {

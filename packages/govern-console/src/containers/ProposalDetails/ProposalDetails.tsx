@@ -15,6 +15,7 @@ import { useWallet } from '../../EthersWallet';
 import { erc20ApprovalTransaction } from 'utils/transactionHelper';
 import { ethers } from 'ethers';
 import { CourtABI } from 'utils/abis/court';
+import { AddressZero } from '@ethersproject/constants'
 import { CustomTransaction, CustomTransactionStatus } from 'utils/types';
 import { Proposal, ProposalOptions, ProposalParams } from '@aragon/govern';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
@@ -289,9 +290,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   const [proposalInfo, updateProposalInfo] = React.useState<any>(null);
   const [isExpanded, updateIsExpanded] = React.useState<any>({});
   const [daoDetails, updateDaoDetails] = React.useState<any>();
-  const [transactions, updateTransactions] = React.useState<
-    CustomTransaction[]
-  >([]);
+  const [transactions, updateTransactions] = React.useState<CustomTransaction[]>([]);
   const transactionsQueue = React.useRef<CustomTransaction[]>([]);
   const challengeReason = React.useRef('');
   const vetoReason = React.useRef('');
@@ -346,24 +345,21 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       return proposal;
     }
   }, [daoDetails]);
+
   const approveChallengeCollateralsIfNeeded = async () => {
     const contract = new ethers.Contract(
       proposalInfo.config.resolver,
       CourtABI,
       signer,
     );
-    console.log('proposalInfo');
-    console.log(proposalInfo);
-    if (
-      daoDetails.queue.config.scheduleDeposit.token !==
-      '0x' + '0'.repeat(20)
-    ) {
+
+    if (daoDetails.queue.config.scheduleDeposit.token !== AddressZero) {
       const challengeDepositApproval = await erc20ApprovalTransaction(
         daoDetails.queue.config.challengeDeposit.token,
         daoDetails.queue.config.challengeDeposit.amount,
         daoDetails.queue.address,
-        ethersProvider,
         account,
+        ethersProvider,
       );
       console.log(challengeDepositApproval);
       if (challengeDepositApproval) {
@@ -372,29 +368,21 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
           return;
         }
         if (challengeDepositApproval.transactions.length > 0) {
-          transactionsQueue.current.push(
-            challengeDepositApproval.transactions[0],
-          );
-          // try {
-          //   const transactionResponse: any = await challengeDepositApproval.transactions[0].tx();
-          //   await transactionResponse.wait();
-          // } catch (err) {
-          //   console.log(err);
-          // }
+          transactionsQueue.current.push(challengeDepositApproval.transactions[0]);
         }
       }
     }
 
     const [, feeToken, feeAmount] = await contract.getDisputeFees();
-    if (feeToken !== '0x' + '0'.repeat(20)) {
+    
+    if (feeToken !== AddressZero) {
       const feeTokenApproval = await erc20ApprovalTransaction(
         feeToken,
         feeAmount,
         daoDetails.queue.address,
-        ethersProvider,
         account,
+        ethersProvider,
       );
-      console.log(feeTokenApproval);
       if (feeTokenApproval) {
         if (feeTokenApproval.error) {
           console.log(feeTokenApproval.error);
@@ -402,12 +390,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
         }
         if (feeTokenApproval.transactions.length > 0) {
           transactionsQueue.current.push(feeTokenApproval.transactions[0]);
-          // try {
-          //   const transactionResponse: any = await feeTokenApproval.transactions[0].tx();
-          //   await transactionResponse.wait();
-          // } catch (err) {
-          //   console.log(err);
-          // }
         }
       }
     }

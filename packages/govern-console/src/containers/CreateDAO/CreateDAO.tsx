@@ -18,14 +18,21 @@ import { useWallet } from '../../EthersWallet';
 import {
   createDao,
   CreateDaoParams,
-  CreateDaoOptions,
+  DaoConfig,
   Token,
   getToken,
 } from '@aragon/govern';
 // Note: query should not be needed once DAO page is capable of auto query
 import { GET_DAO_BY_NAME } from '../Console/queries';
 import { useQuery } from '@apollo/client';
-import { ARAGON_VOICE_URL, PROXY_CONTRACT_URL } from '../../utils/constants';
+import {
+  ARAGON_VOICE_URL,
+  PROXY_CONTRACT_URL,
+  DEFAULT_DAO_CONFIG,
+  CONFIRMATION_WAIT
+} from '../../utils/constants';
+import { toUtf8Bytes } from '@ethersproject/strings';
+import { AddressZero } from '@ethersproject/constants'
 
 enum CreateDaoStatus {
   PreCreate,
@@ -122,13 +129,30 @@ const SubTitle = styled(Typography)({
 const NewDaoForm: React.FC<FormProps> = memo(
   ({ setCreateDaoStatus, setCreatedDaoRoute, cancelForm }) => {
     const context: any = useWallet();
-    const chainId = useMemo(() => {
-      if (context.chainId === 4 && context.status === 'connected') {
+    const {
+      // connector,
+      // account,
+      // balance,
+      chainId,
+      // connect,
+      // connectors,
+      // ethereum,
+      // error,
+      // getBlockNumber,
+      // networkName,
+      // reset,
+      status,
+      // type,
+      ethersProvider,
+    } = context;
+
+    const _chainId = useMemo(() => {
+      if (chainId === 4 && status === 'connected') {
         return 4;
       } else {
         return 1;
       }
-    }, [context.chainId, context.status]);
+    }, [chainId, status]);
 
     const [isExistingToken, updateIsExistingToken] = useState(false);
     const [isUseProxyChecked, updateIsUseProxyChecked] = useState(true);
@@ -136,27 +160,10 @@ const NewDaoForm: React.FC<FormProps> = memo(
       true,
     );
 
-    const daoName = useRef<string>();
-    const tokenName = useRef<string>();
-    const tokenSymbol = useRef<string>();
-    const existingTokenAddress = useRef<string>();
-
-    // const [daoName, setDaoName] = useState<string>('');
-    // const [tokenName, setTokenName] = useState<string>('');
-    // const [tokenSymbol, setTokenSymbol] = useState<string>('');
-    // const [existingTokenAddress, setExistingTokenAddress] = useState<string>(
-    //   '',
-    // );
-
-    // const mainInputs = useMemo(
-    //   () => ({
-    //     daoName: daoName,
-    //     tokenName: tokenName,
-    //     tokenSymbol: tokenSymbol,
-    //     existingTokenAddress: existingTokenAddress,
-    //   }),
-    //   [daoName, tokenName, tokenSymbol, existingTokenAddress],
-    // );
+    const daoName = useRef<string>('');
+    const tokenName = useRef<string>('');
+    const tokenSymbol = useRef<string>('');
+    const existingTokenAddress = useRef<string>('');
 
     const [doaNameError, setDoaNameError] = useState<string>('');
     const [tokenNameError, setTokenNameError] = useState<string>('');
@@ -183,20 +190,14 @@ const NewDaoForm: React.FC<FormProps> = memo(
 
     // TODO: dai and court contract should, have a default fetch from an env or constants,
     // and should be user updatable once UI is ready
-    const executionDelay = useRef<number>(86400); // defaults to one day - how many seconds to wait before being able to call execute.
-    const scheduleContract = useRef<string>(
-      '0xb08E32D658700f768f5bADf0679E153ffFEC42e6',
-    );
-    const scheduleTokenAmount = useRef<number>(0);
-    const challengeContract = useRef<string>(
-      '0xb08E32D658700f768f5bADf0679E153ffFEC42e6',
-    );
-    const challengeTokenAmount = useRef<number>(0);
-    const resolverContract = useRef<string>(
-      '0xC464EB732A1D2f5BbD705727576065C91B2E9f18',
-    );
-    const rules = useRef<string>('0x'); // in hex
-    const maxCalldataSize = useRef<number>(100000); // initial maxCalldatasize
+    const executionDelay = useRef<number>(0);
+    const scheduleContract = useRef<string>('');
+    const scheduleTokenAmount = useRef<string>('');
+    const challengeContract = useRef<string>('');
+    const challengeTokenAmount = useRef<string>('');
+    const resolverContract = useRef<string>('');
+    const rules = useRef<string>('');
+    const maxCalldataSize = useRef<number>(0);
 
     const onExecutionDelayChange = (val: any) => {
       executionDelay.current = val;
@@ -219,54 +220,47 @@ const NewDaoForm: React.FC<FormProps> = memo(
     };
 
     const onResolverChange = (val: any) => {
-      rules.current = val;
+      resolverContract.current = val;
     };
 
     const onRulesChange = (val: any) => {
-      rules.current = val; // should be converted to hex
+      rules.current = val;
     };
 
     const onMaxCalldataSizeChange = (val: any) => {
       maxCalldataSize.current = val;
     };
+
+    useEffect(() => {
+      let _config: DaoConfig = DEFAULT_DAO_CONFIG[_chainId];
+      onExecutionDelayChange(_config.executionDelay);
+      onScheduleContractChange(_config.scheduleDeposit.token);
+      onScheduleTokenAmountChange(_config.scheduleDeposit.amount);
+      onChallengeContractChange(_config.challengeDeposit.token);
+      onChallengeTokenAmountChange(_config.challengeDeposit.amount);
+      onResolverChange(_config.resolver);
+      onRulesChange(_config.rules);
+      onMaxCalldataSizeChange(_config.maxCalldataSize);
+    }, [_chainId]);
+
     const onChangeDaoName = (val: any) => {
-      // setDaoName(val);
       daoName.current = val;
       setDoaNameError('');
     };
 
     const onChangeTokenName = (val: any) => {
-      // setTokenName(val);
       tokenName.current = val;
       setTokenNameError('');
     };
 
     const onChangeTokenSymbol = (val: any) => {
-      // setTokenSymbol(val.toUpperCase());
       tokenSymbol.current = val;
       setTokenSymbolError('');
     };
 
     const onChangeExistingTokenAddress = (val: any) => {
-      console.log(val);
-      // setExistingTokenAddress(val);
       existingTokenAddress.current = val;
       setExistingTokenAddressError('');
-    };
-
-    const createDaoConfig = {
-      executionDelay: executionDelay.current,
-      scheduleDeposit: {
-        token: scheduleContract.current,
-        amount: scheduleTokenAmount.current,
-      },
-      challengeDeposit: {
-        token: challengeContract.current,
-        amount: challengeTokenAmount.current,
-      },
-      resolver: resolverContract.current,
-      rules: rules.current,
-      maxCalldataSize: maxCalldataSize.current,
     };
 
     const createDaoCall = async (
@@ -276,29 +270,54 @@ const NewDaoForm: React.FC<FormProps> = memo(
       tokenSymbol: string,
       isUseProxyChecked: boolean,
       daoName: string,
-      isUseFreeVotingChecked: boolean,
-      context: any,
+      isUseFreeVotingChecked: boolean
     ): Promise<boolean> => {
       let token: Token;
       if (isExistingToken) {
         try {
-          token = await getToken(existingTokenAddress, context.ethersProvider);
+          token = await getToken(existingTokenAddress, ethersProvider);
         } catch (error) {
           console.log(error);
           return false;
         }
       } else {
         token = {
-          tokenAddress: '',
+          tokenAddress: AddressZero,
           tokenDecimals: 18,
           tokenName: tokenName,
           tokenSymbol: tokenSymbol,
         };
       }
+
+      const DaoConfig: DaoConfig = {
+        executionDelay: executionDelay.current,
+        scheduleDeposit: {
+          token: scheduleContract.current,
+          amount: scheduleTokenAmount.current,
+        },
+        challengeDeposit: {
+          token: challengeContract.current,
+          amount: challengeTokenAmount.current,
+        },
+        resolver: resolverContract.current,
+        rules: toUtf8Bytes(rules.current),
+        maxCalldataSize: maxCalldataSize.current,
+      };
+
+      let registerTokenCallback = undefined
+      
+      // if the vocdoni is activated, we also register the token in the aragon voice.
+      if(isUseFreeVotingChecked) {
+        registerTokenCallback = async (registerToken:Function) => {
+          const result = await registerToken()
+          console.log('result', result)
+        }
+      }
+
       const createDaoParams: CreateDaoParams = {
         name: daoName,
         token,
-        config: createDaoConfig,
+        config: DaoConfig,
         useProxies: isUseProxyChecked,
         useVocdoni: isUseFreeVotingChecked,
       };
@@ -306,9 +325,9 @@ const NewDaoForm: React.FC<FormProps> = memo(
       try {
         //TODO this console log to be removed
         console.log('createDaoParams', createDaoParams);
-        const result: any = await createDao(createDaoParams);
+        const result: any = await createDao(createDaoParams, {}, registerTokenCallback);
         setCreatedDaoRoute(daoName);
-        await result.wait(1);
+        await result.wait(CONFIRMATION_WAIT);                      
         return true;
       } catch (error) {
         console.log(error);
@@ -316,6 +335,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
       }
     };
 
+    // TODO: use validation lib
     const validateForm = (): boolean => {
       let validateArray = [];
       if (daoName.current === '' || typeof daoName.current === 'undefined') {
@@ -374,13 +394,14 @@ const NewDaoForm: React.FC<FormProps> = memo(
       setCreateDaoStatus(CreateDaoStatus.InProgress);
       const callResult = await createDaoCall(
         isExistingToken,
-        existingTokenAddress ? existingTokenAddress.toString() : '',
-        tokenName ? tokenName.toString() : '',
-        tokenSymbol ? tokenSymbol.toString() : '',
+        existingTokenAddress.current
+          ? existingTokenAddress.current.toString()
+          : '',
+        tokenName.current ? tokenName.current.toString() : '',
+        tokenSymbol.current ? tokenSymbol.current.toString() : '',
         isUseProxyChecked,
-        daoName ? daoName.toString() : '',
+        daoName.current ? daoName.current.toString() : '',
         isUseFreeVotingChecked,
-        context,
       );
 
       if (callResult) {
@@ -543,7 +564,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
             <div style={optionTextStyle}>
               Use{' '}
               <a
-                href={ARAGON_VOICE_URL[chainId]}
+                href={ARAGON_VOICE_URL[_chainId]}
                 target="_blank"
                 rel="noreferrer noopener"
               >
@@ -559,7 +580,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
             }}
           >
             <ANButton
-              disabled={context.status !== 'connected'}
+              disabled={status !== 'connected'}
               label="Create new DAO"
               buttonType="primary"
               style={{ marginTop: 40 }}

@@ -19,6 +19,7 @@ import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { erc20ApprovalTransaction } from '../../utils/transactionHelper';
 import { toUtf8Bytes } from '@ethersproject/strings';
 import { buildPayload } from '../../utils/ERC3000';
+import { AddressZero } from '@ethersproject/constants'
 import { useWallet } from 'EthersWallet';
 
 import {
@@ -400,21 +401,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     handleInputModalClose();
     handleActionModalOpen();
   };
-
-  const noCollateral = {
-    id: '-1',
-    token: ethers.constants.AddressZero,
-    amount: 0,
-  };
-  const goodConfig: any = {
-    executionDelay: 1, // how many seconds to wait before being able to call `execute`.
-    scheduleDeposit: noCollateral,
-    challengeDeposit: noCollateral,
-    // resolver: daoDetails.queue.config.resolver,
-    resolver: '0xC464EB732A1D2f5BbD705727576065C91B2E9f18',
-    rules: '0x',
-    maxCalldataSize: 100000, // initial maxCalldatasize
-  };
+  
   const onChangeJustification = (val: string) => {
     justification.current = val;
   };
@@ -456,17 +443,13 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     const config = daoDetails.queue.config;
     console.log('config', daoDetails.queue.config);
 
-    // TODO:GIORGI error tracking make it better
-    if (
-      daoDetails.queue.config.scheduleDeposit.token !==
-      '0x' + '0'.repeat(20)
-    ) {
+    if (daoDetails.queue.config.scheduleDeposit.token !== AddressZero) {
       const scheduleDepositApproval = await erc20ApprovalTransaction(
         daoDetails.queue.config.scheduleDeposit.token,
         daoDetails.queue.config.scheduleDeposit.amount,
         daoDetails.queue.address,
-        ethersProvider,
         account,
+        ethersProvider,
       );
 
       if (scheduleDepositApproval.error) {
