@@ -1,11 +1,9 @@
-/* eslint-disable */
 import { Contract } from '@ethersproject/contracts'
 import { Web3Provider, TransactionResponse } from '@ethersproject/providers'
 import { AddressZero } from '@ethersproject/constants'
 import { BigNumberish } from '@ethersproject/bignumber'
 import { BytesLike } from '@ethersproject/bytes'
 import Configuration from '../internal/configuration/Configuration'
-import { registerToken } from '../internal/actions/RegisterToken'
 
 export const ContainerConfig = `
   tuple(
@@ -23,7 +21,6 @@ export const ContainerConfig = `
     uint256 maxCalldataSize
   )`
 
-
 const token = `
   tuple(
     address tokenAddress, 
@@ -32,9 +29,7 @@ const token = `
     string tokenSymbol
   )`
 
-const registryAbi = [
-  "event Registered(address indexed executor, address queue, address indexed token, address indexed registrant, string name)"
-]
+
 
 const factoryAbi = [
   `function newGovern(
@@ -44,8 +39,6 @@ const factoryAbi = [
     bool _useProxies
   )`,
 ]
-
-const tokenAbi = ["function balanceOf(address who) view returns (uint256)"]
 
 declare let window: any
 
@@ -95,8 +88,7 @@ export type CreateDaoOptions = {
  */
 export async function createDao(
   args: CreateDaoParams,
-  options: CreateDaoOptions = {},
-  registerTokenCallback?: Function
+  options: CreateDaoOptions = {}
 ): Promise<TransactionResponse> {
   if (!args.token.tokenAddress) {
     args.token.tokenAddress = AddressZero
@@ -105,7 +97,7 @@ export async function createDao(
       tokenDecimals: 18,
       tokenName: '',
       tokenSymbol: '',
-      ...args.token
+      ...args.token,
     }
   }
 
@@ -122,23 +114,6 @@ export async function createDao(
     options.provider || window.ethereum
   ).getSigner()
   const contract = new Contract(factoryAddress, factoryAbi, signer)
-
-  const GovernRegistry = new Contract(
-    config.governRegistry,
-    registryAbi,
-    signer
-  )
-
-  if(typeof registerTokenCallback === 'function') {
-    GovernRegistry.on('Registered', async (govern, queue, token, registrant, name) => {
-      // not our DAO, wait for next one
-      if( name !== args.name ) return
-
-      const ERC20 = new Contract(token, tokenAbi, signer)
-      registerTokenCallback(() =>  registerToken(signer, ERC20))
-    })
-  }
-
   const result = contract.newGovern(
     args.name,
     args.token,

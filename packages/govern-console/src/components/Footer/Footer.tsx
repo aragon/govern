@@ -10,46 +10,47 @@ import youtubeIcon from 'images/svgs/youtube.svg';
 import Wallet from 'components/Wallet/Wallet';
 import { useHistory } from 'react-router-dom';
 
+const HeaderWrapperDiv = styled('div')({
+  height: '106px',
+  width: '100%',
+  display: 'block',
+});
+const TitleText = styled(Typography)({
+  fontFamily: 'Manrope',
+  fontStyle: 'normal',
+  fontWeight: 'normal',
+  fontSize: '18px',
+  lineHeight: '25px',
+  color: '#7483B2',
+  width: '200px',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+});
+const Navbar = styled('div')({
+  display: 'flex',
+  width: '100%',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  height: '100%',
+});
+const Title = styled('div')({
+  display: 'flex',
+  width: 'fit-content',
+  cursor: 'pointer',
+  marginLeft: '50px',
+});
+const Account = styled('div')({
+  display: 'flex',
+  width: '200px',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginRight: '50px',
+});
+
 const Footer = ({}) => {
   const history = useHistory();
-  const HeaderWrapperDiv = styled('div')({
-    height: '106px',
-    width: '100%',
-    display: 'block',
-  });
-  const TitleText = styled(Typography)({
-    fontFamily: 'Manrope',
-    fontStyle: 'normal',
-    fontWeight: 'normal',
-    fontSize: '18px',
-    lineHeight: '25px',
-    color: '#7483B2',
-    width: '200px',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  });
-  const Navbar = styled('div')({
-    display: 'flex',
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    height: '100%',
-  });
-  const Title = styled('div')({
-    display: 'flex',
-    width: 'fit-content',
-    cursor: 'pointer',
-    marginLeft: '50px',
-  });
-  const Account = styled('div')({
-    display: 'flex',
-    width: '200px',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginRight: '50px',
-  });
 
   const redirectToHomePage = () => {
     history.push('/');

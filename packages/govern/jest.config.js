@@ -22,8 +22,5 @@ module.exports = {
     'dist',
     'createDao.ts',
     'proposal.ts',
-    'Gateway.ts',
-    'RegisterToken.ts',
-    'token.ts'
   ]
 }

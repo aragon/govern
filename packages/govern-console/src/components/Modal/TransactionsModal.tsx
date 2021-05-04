@@ -2,7 +2,7 @@ import React, { useContext, useCallback } from 'react';
 import Dialog from '@material-ui/core/Dialog';
 import { styled } from '@material-ui/core/styles';
 import TransactionKeeper from 'components/TransactionKeeper/TransactionKeeper';
-import Paper from '@material-ui/core/paper';
+import Paper from '@material-ui/core/Paper';
 import { ModalsContext, ActionTypes } from 'containers/HomePage/ModalsContext';
 const TransactionsDialog = styled(Dialog)({
   // width: '446px',

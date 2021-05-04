@@ -5,12 +5,12 @@ import { ANWrappedPaper } from 'components/WrapperPaper/ANWrapperPaper';
 import backButtonIcon from '../../images/back-btn.svg';
 import { useTheme, styled } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import { InputField } from '../../components/InputFields/InputField';
+import { InputField } from 'components/InputFields/InputField';
 import TextArea from 'components/TextArea/TextArea';
 import { ANButton } from 'components/Button/ANButton';
 // import Modal from '@material-ui/core/Modal';
-import { SimpleModal } from '../../components/Modal/SimpleModal';
-import { ANCircularProgressWithCaption } from '../../components/CircularProgress/ANCircularProgressWithCaption';
+import { SimpleModal } from 'components/Modal/SimpleModal';
+import { ANCircularProgressWithCaption } from 'components/CircularProgress/ANCircularProgressWithCaption';
 import { CiruclarProgressStatus } from 'utils/types';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { useQuery } from '@apollo/client';
@@ -19,8 +19,8 @@ import { useWallet } from '../../EthersWallet';
 import { AddressZero } from '@ethersproject/constants'
 import { erc20ApprovalTransaction } from '../../utils/transactionHelper';
 import { toUtf8Bytes } from '@ethersproject/strings';
-import { HelpButton } from '../../components/HelpButton/HelpButton';
-import { BlueSwitch } from '../../components/Switchs/BlueSwitch';
+import { HelpButton } from 'components/HelpButton/HelpButton';
+import { BlueSwitch } from 'components/Switchs/BlueSwitch';
 import Grid from '@material-ui/core/Grid';
 
 import {
@@ -417,7 +417,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
         {isTrigger ? txTrigerContainer : txReviewContainer}
         <ANButton
           label={isTrigger ? 'Continue' : 'Get started'}
-          type={'primary'}
+          buttonType={'primary'}
           onClick={
             isTrigger
               ? () => console.log('call package')
@@ -608,9 +608,9 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
               />
               <ANButton
                 label={'Examine'}
-                type={'secondary'}
+                buttonType={'secondary'}
                 backgroundColor={'#FFFFFF'}
-                color={'#20232C'}
+                buttonColor={'#20232C'}
                 onClick={() => {}}
                 style={{ marginLeft: '10px' }}
                 disabled={true}
@@ -684,9 +684,9 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
               />
               <ANButton
                 label={'Examine'}
-                type={'secondary'}
+                buttonType={'secondary'}
                 backgroundColor={'#FFFFFF'}
-                color={'#20232C'}
+                buttonColor={'#20232C'}
                 onClick={() => {}}
                 style={{ marginLeft: '10px' }}
                 disabled={true}
@@ -702,7 +702,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
           >
             <ANButton
               label={'Save settings'}
-              type={'primary'}
+              buttonType={'primary'}
               onClick={callSaveSetting}
               style={{ marginTop: '34px' }}
               width={'100%'}

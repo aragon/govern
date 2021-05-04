@@ -3,6 +3,4 @@ coverage/
 package/
 node_modules/
 cache/
-artifacts/
 typechain/
-deployments/
