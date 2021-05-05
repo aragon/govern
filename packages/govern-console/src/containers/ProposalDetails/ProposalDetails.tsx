@@ -29,7 +29,6 @@ interface ProposalDetailsProps {
 const StyledPaper = styled(Paper)({
   backgroundColor: '#ffffff',
   height: 'auto',
-  minHeight: '1000px',
   padding: '40px 48px 58px 48px',
 });
 const BackButton = styled('div')({

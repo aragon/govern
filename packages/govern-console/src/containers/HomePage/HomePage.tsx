@@ -19,14 +19,15 @@ const AppWrapper = styled('div')({
   margin: 'auto',
   boxSizing: 'border-box',
   position: 'relative',
-  height: '100vh',
+  minHeight: '100vh',
 });
 const MainBodyWrapper = styled('div')({
   width: '100%',
-  height: 'calc(100% - 212px)',
+  minHeight: 'calc(100vh - 212px)',
   boxSizing: 'border-box',
-  position: 'absolute',
   top: '106px',
+  overflowX: 'hidden',
+  overflowY: 'auto',
 });
 
 const HomePage = ({ ...props }) => {
