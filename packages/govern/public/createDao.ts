@@ -1,8 +1,4 @@
-import { Contract } from '@ethersproject/contracts'
-import { Web3Provider, TransactionResponse } from '@ethersproject/providers'
-import { AddressZero } from '@ethersproject/constants'
-import { BigNumberish } from '@ethersproject/bignumber'
-import { BytesLike } from '@ethersproject/bytes'
+import { Contract, utils, providers, BigNumberish, constants } from 'ethers'
 import Configuration from '../internal/configuration/Configuration'
 import { registerToken } from '../internal/actions/RegisterToken'
 
@@ -68,7 +64,7 @@ export type DaoConfig = {
   scheduleDeposit: TokenDeposit
   challengeDeposit: TokenDeposit
   resolver: string
-  rules: BytesLike
+  rules: utils.BytesLike
   maxCalldataSize: number
 }
 
@@ -99,9 +95,9 @@ export async function createDao(
   options: CreateDaoOptions = {},
   registerTokenCallback?: Function,
   bla?: TokenDeposit
-): Promise<TransactionResponse> {
+): Promise<providers.TransactionResponse> {
   if (!args.token.tokenAddress) {
-    args.token.tokenAddress = AddressZero
+    args.token.tokenAddress = constants.AddressZero
   } else {
     args.token = {
       tokenDecimals: 18,
@@ -111,7 +107,7 @@ export async function createDao(
     }
   }
 
-  const addressIsZero = args.token.tokenAddress === AddressZero
+  const addressIsZero = args.token.tokenAddress === constants.AddressZero
   const tokenIsMissingInfo = !args.token.tokenName || !args.token.tokenSymbol
 
   if (addressIsZero && tokenIsMissingInfo) {
@@ -120,7 +116,7 @@ export async function createDao(
 
   const config = Configuration.get()
   const factoryAddress = options.daoFactoryAddress || config.daoFactoryAddress
-  const signer = await new Web3Provider(
+  const signer = await new providers.Web3Provider(
     options.provider || window.ethereum
   ).getSigner()
   const contract = new Contract(factoryAddress, factoryAbi, signer)

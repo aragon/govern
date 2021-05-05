@@ -1,6 +1,7 @@
 import { configure, daos } from '@aragon/govern'
 import { subgraphURL } from './config'
-import { isAddress } from '@ethersproject/address'
+import { utils } from 'ethers'
+const { isAddress } = utils
 
 /**
  * daos e2e test

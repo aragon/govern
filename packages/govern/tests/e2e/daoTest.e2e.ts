@@ -1,8 +1,7 @@
 import { configure, dao, daos } from '@aragon/govern'
 import { subgraphURL } from './config'
-import { isAddress } from '@ethersproject/address'
-import { BigNumber } from '@ethersproject/bignumber'
-
+import { utils, BigNumber } from 'ethers'
+const { isAddress } = utils
 
 /**
  * dao e2e test
