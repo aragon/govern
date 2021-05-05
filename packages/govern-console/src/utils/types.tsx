@@ -1,37 +1,5 @@
-export type Collateral = {
-  id: string;
-  token: string;
-  amount: number;
-};
-export type Config = {
-  id: string;
-  executionDelay: number;
-  scheduleDeposit: Collateral;
-  challengeDeposit: Collateral;
-  resolver: string;
-  rules: string;
-  maxCalldataSize: number;
-};
+/* eslint-disable */
 
-export type GovernQueue = {
-  id: string;
-  address: string;
-  nonce: number;
-  config: Config;
-};
-export type Govern = {
-  id: string;
-  address: string;
-  balance: number;
-};
-export type daoDetails = {
-  id: string;
-  name: string;
-  queue: GovernQueue;
-  executor: Govern;
-  token: string;
-  registrant?: string;
-};
 export enum CustomTransactionStatus {
   Successful,
   Failed,
@@ -39,13 +7,17 @@ export enum CustomTransactionStatus {
   InProgress,
 }
 
+export enum CiruclarProgressStatus {
+  Disabled,
+  InProgress,
+  Done,
+  Failed,
+}
+
 // eslint-disable-next-line
 export type CustomTransaction = {
   tx: any;
-  preTransactionMessage?: string;
-  transactionMessage?: string;
-  errorMessage?: string;
-  successMessage?: string;
+  message: string;
   status: CustomTransactionStatus;
   // transactionOrder: number;
 };
@@ -55,9 +27,25 @@ export type Response = {
   transactions: CustomTransaction[];
 };
 
-export enum CiruclarProgressStatus {
-  Disabled,
-  InProgress,
-  Done,
-  Failed,
+export type abiItem = {
+  inputs: [];
+  name: string;
+  type: string;
+  stateMutability: string;
+} 
+
+export type actionType = {
+  item: abiItem;
+  name: string;
+  contractAddress: string;
+  abi: any[];
+  type: string;
+}
+
+export type ActionToSchedule = {
+  contractAddress: string;
+  name: string;
+  params: [];
+  abi: [];
+  numberOfInputs: number;
 }

@@ -1,8 +1,7 @@
 /* eslint-disable */
-import React, { useState, useRef, useEffect, memo, useCallback } from 'react';
+import React, { useState, useRef, useEffect, memo } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { useTheme, styled, Theme } from '@material-ui/core/styles';
-import useStyles from '../../ReusableStyles';
 import backButtonIcon from 'images/back-btn.svg';
 import Typography from '@material-ui/core/Typography';
 import { HelpButton } from 'components/HelpButton/HelpButton';
@@ -11,22 +10,22 @@ import Paper from '@material-ui/core/Paper';
 import { NewActionModal } from 'components/Modal/NewActionModal';
 import { AddActionsModal } from 'components/Modal/AddActionsModal';
 import { InputField } from 'components/InputFields/InputField';
-import { defaultAbiCoder } from 'ethers/lib/utils';
 import { useHistory, useParams } from 'react-router-dom';
-import { BigNumber, Transaction as EthersTransaction, ethers } from 'ethers';
-import { useQuery, useLazyQuery } from '@apollo/client';
+import {  Transaction as EthersTransaction, ethers } from 'ethers';
+import { useQuery } from '@apollo/client';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
-import { erc20ApprovalTransaction } from '../../utils/transactionHelper';
-import { toUtf8Bytes } from '@ethersproject/strings';
-import { buildPayload } from '../../utils/ERC3000';
-import { AddressZero } from '@ethersproject/constants'
+import { buildPayload } from 'utils/ERC3000';
 import { useWallet } from 'EthersWallet';
+import QueueApprovals from 'services/QueueApprovals'
+import { CustomTransaction, CustomTransactionStatus, abiItem, actionType, ActionToSchedule} from 'utils/types';
+import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
+import  FacadeProposal from 'services/Proposal';
 
 import {
   Proposal,
   ProposalOptions,
   PayloadType,
-  ActionType,
+  ActionType
 } from '@aragon/govern';
 
 export interface NewProposalProps {
@@ -104,7 +103,7 @@ const Title = styled(Typography)({
   height: 50,
   display: 'block',
 });
-const JustificationTextArea = styled(TextArea)({
+const proofTextArea = styled(TextArea)({
   background: '#FFFFFF',
   border: '2px solid #EFF1F7',
   boxSizing: 'border-box',
@@ -237,13 +236,14 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const history = useHistory();
   const { daoName } = useParams<any>();
   //TODO daoname empty handling
-
   const { data: daoList } = useQuery(GET_DAO_BY_NAME, {
     variables: { name: daoName },
   });
-  const classes = useStyles();
+
+  const { dispatch } = React.useContext(ModalsContext);
+
   const executor = useRef('');
-  const justification: { current: string } = useRef('');
+  const proof: { current: string } = useRef('');
   // const [isAddingActions, updateIsAddingActions] = useState(false);
   const [selectedActions, updateSelectedOptions] = useState([]);
   // const [modalStyle] = React.useState(getModalStyle);
@@ -252,20 +252,12 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const [daoDetails, updateDaoDetails] = useState<any>();
   const abiFunctions = useRef([]);
   const actionsToSchedule = useRef([]);
-  const proposalOptions: ProposalOptions = {};
 
   useEffect(() => {
     if (daoList) {
       updateDaoDetails(daoList.daos[0]);
     }
   }, [daoList]);
-
-  const proposal = React.useMemo(() => {
-    if (daoDetails) {
-      executor.current = daoDetails.executor.address;
-      return new Proposal(daoDetails.queue.address, proposalOptions);
-    }
-  }, [daoDetails]);
 
   const context: any = useWallet();
   const {
@@ -287,6 +279,17 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
 
   const submitter: string = account;
 
+  const proposalInstance = React.useMemo(() => {
+    if(ethersProvider && account && daoDetails) {
+      let queueApprovals = new QueueApprovals(ethersProvider.getSigner(), account, daoDetails.queue.address, daoDetails.config.resolver)
+      const proposal =  new Proposal(daoDetails.queue.address, {} as ProposalOptions);
+      return new FacadeProposal(queueApprovals, proposal) as (FacadeProposal & Proposal)
+    }
+  }, [ethersProvider, account, daoDetails])
+
+
+  const transactionsQueue = React.useRef<CustomTransaction[]>([]);
+
   const handleInputModalOpen = () => {
     setInputModalOpen(true);
   };
@@ -302,21 +305,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const handleActionModalClose = () => {
     setActionModalOpen(false);
   };
-
-  interface abiItem {
-    inputs: [];
-    name: string;
-    type: string;
-    stateMutability: string;
-  }
-
-  interface actionType {
-    item: abiItem;
-    name: string;
-    contractAddress: string;
-    abi: any[];
-    type: string;
-  }
+  
   const onAddNewActions = (actions: any) => {
     handleActionModalClose();
     const newActions = [...selectedActions, ...actions] as any;
@@ -340,14 +329,6 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     actionsToSchedule.current = initialActions as [];
   };
 
-  interface ActionToSchedule {
-    contractAddress: string;
-    name: string;
-    params: [];
-    abi: [];
-    numberOfInputs: number;
-  }
-
   const onAddInputToAction = (
     value: string,
     contractAddress: string,
@@ -369,7 +350,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   // const onScheduleProposal = () => {};
 
   const isProposalValid = () => {
-    if (justification.current === '') return false;
+    if (proof.current === '') return false;
     if (selectedActions.length === 0) return false;
     return true;
   };
@@ -402,8 +383,8 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     handleActionModalOpen();
   };
   
-  const onChangeJustification = (val: string) => {
-    justification.current = val;
+  const onChangeProof = (val: string) => {
+    proof.current = val;
   };
 
   const onSchedule = () => {
@@ -430,67 +411,39 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     scheduleProposal(actions);
   };
 
-  const scheduleProposal = async (actions: any[]) => {
-    console.log(executor.current);
+  const scheduleProposal = async (actions: ActionType[]) => {
     const payload = buildPayload({
       submitter,
       executor: executor.current,
       actions,
-      executionDelay: daoDetails.queue.config.executionDelay,
-      proof: toUtf8Bytes(justification.current),
+      proof: proof.current,
+      executionDelay: daoDetails.queue.config.executionDelay
+    })
+
+    const container = {
+      payload: payload,
+      config: daoDetails.queue.config
+    }
+
+    if(proposalInstance) {
+      try {
+        transactionsQueue.current = await proposalInstance.schedule(container);
+      }catch(err) {
+        // TODO: Bhanu show error
+      }
+    }
+  
+    dispatch({
+      type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
+      payload: {
+        transactionList: transactionsQueue.current,
+        onTransactionFailure: () => {},
+        onTransactionSuccess: () => {},
+        onCompleteAllTransactions: () => {}
+      },
     });
-    console.log('payload', payload);
-    const config = daoDetails.queue.config;
-    console.log('config', daoDetails.queue.config);
-
-    if (daoDetails.queue.config.scheduleDeposit.token !== AddressZero) {
-      const scheduleDepositApproval = await erc20ApprovalTransaction(
-        daoDetails.queue.config.scheduleDeposit.token,
-        daoDetails.queue.config.scheduleDeposit.amount,
-        daoDetails.queue.address,
-        account,
-        ethersProvider,
-      );
-
-      if (scheduleDepositApproval.error) {
-        console.log(scheduleDepositApproval.error, ' approval error');
-      }
-
-      if (scheduleDepositApproval.transactions.length > 0) {
-        try {
-          const transactionResponse: any = await scheduleDepositApproval.transactions[0].tx();
-          await transactionResponse.wait();
-        } catch (err) {
-          console.log(err);
-        }
-      }
-    }
-
-    console.log('schedule call ');
-    if (proposal) {
-      const scheduleResult = await proposal.schedule({
-        payload,
-        config,
-      });
-    }
+    
   };
-
-  // React.useEffect(() => {
-  //   if (!daoDetails.id) {
-  //     let daoDetails: any = sessionStorage.getItem('selectedDao');
-  //     if (!daoDetails.id) {
-  //       let { daoName } = useParams<any>();
-  //       let {
-  //         data: daoDetailsData,
-  //         loading: isLoadingDaoDetails,
-  //         error: daoLoadingError,
-  //       } = useQuery(GET_DAO_BY_NAME, {
-  //         variables: { name: daoName },
-  //       });
-  //       updateDaoDetails(daoDetailsData);
-  //     }
-  //   }
-  // });
 
   return (
     <>
@@ -507,16 +460,16 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
           }}
         >
           <div>
-            <SubTitle>Justification</SubTitle>{' '}
+            <SubTitle>Proof</SubTitle>{' '}
           </div>
           <div style={{ marginLeft: '10px' }}>{<HelpButton helpText="" />}</div>
         </div>
         <InputField
           // ref={}
-          onInputChange={onChangeJustification}
-          placeholder={'Enter Justification '}
+          onInputChange={onChangeProof}
+          placeholder={'Enter proof '}
           label=""
-          value={justification.current}
+          value={proof.current}
           height={'108px'}
           width={'700px'}
         ></InputField>

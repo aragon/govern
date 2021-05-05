@@ -1,22 +1,8 @@
 /* eslint-disable */
-import { CustomTransaction, Response } from 'utils/types';
-import { ethers, BigNumber } from 'ethers';
-import { erc20TokenABI } from './abis/erc20';
-import {
-  Proposal,
-  ProposalOptions,
-  PayloadType,
-  ActionType,
-} from '@aragon/govern';
+import { ethers } from 'ethers';
+import { toUtf8Bytes } from '@ethersproject/strings';
 
-type payloadArgs = {
-  submitter: string;
-  executor: string;
-  executionTime?: number;
-  actions?: ActionType[];
-  executionDelay: string;
-  proof: any; // TODO: change it to bytes type
-};
+import { DaoConfig, Proposal, ProposalOptions, ProposalParams, PayloadType } from '@aragon/govern';
 
 export const buildPayload = ({
   submitter,
@@ -25,17 +11,31 @@ export const buildPayload = ({
   executionTime,
   executionDelay,
   proof,
-}: payloadArgs): any => {
+}: any) => {
   const payload: PayloadType = {
-    executionTime:
-      executionTime ||
-      Math.round(Date.now() / 1000) + parseInt(executionDelay) + 30, // add 30 seconds for network latency.
+    executionTime: executionTime || Math.round(Date.now() / 1000) + parseInt(executionDelay) + 30, // add 30 seconds for network latency.
     submitter,
     executor,
     actions: actions || [],
     allowFailuresMap: ethers.utils.hexZeroPad('0x0', 32),
-    proof: proof,
+    proof: toUtf8Bytes(proof),
   };
 
   return payload;
 };
+
+
+export const getProposalParams = (proposalInfo:any) => {
+  const config: DaoConfig = { ...proposalInfo.config }
+
+  const payload: PayloadType = {
+    ...proposalInfo.payload,
+    executor: proposalInfo.payload.executor.address
+  };
+
+  const params: ProposalParams = {
+    payload,
+    config,
+  };
+  return params;
+}

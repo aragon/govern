@@ -1,3 +1,4 @@
+/* eslint-disable*/
 import React from 'react';
 import { CustomTransaction, CustomTransactionStatus } from 'utils/types';
 import { ANCircularProgressWithCaption } from 'components/CircularProgress/ANCircularProgressWithCaption';
@@ -13,21 +14,21 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
       case CustomTransactionStatus.Pending:
         return (
           <ANCircularProgressWithCaption
-            caption={transaction.preTransactionMessage}
+            caption={transaction.message} // TODO: pending
             state={CiruclarProgressStatus.Disabled}
           />
         );
       case CustomTransactionStatus.InProgress:
         return (
           <ANCircularProgressWithCaption
-            caption={transaction.transactionMessage}
+            caption={transaction.message} // TODO: in progress
             state={CiruclarProgressStatus.InProgress}
           />
         );
       case CustomTransactionStatus.Successful:
         return (
           <ANCircularProgressWithCaption
-            caption={transaction.successMessage}
+            caption={transaction.message} // TODO: successfull
             state={CiruclarProgressStatus.Done}
           />
         );
@@ -38,7 +39,7 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
       <ul>
         {transactions.map((transaction) => {
           return (
-            <li key={transaction.successMessage}>{getListItem(transaction)}</li>
+            <li key={transaction.message}>{getListItem(transaction)}</li>
           );
         })}
       </ul>
