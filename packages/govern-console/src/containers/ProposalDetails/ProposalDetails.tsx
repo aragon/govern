@@ -1,24 +1,23 @@
+/* eslint-disable */
 import React, { useEffect } from 'react';
 import { styled } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
-import Dialog from '@material-ui/core/Dialog';
 import backButtonIcon from 'images/back-btn.svg';
 import { Label } from 'components/Labels/Label';
 import { InputField } from 'components/InputFields/InputField';
-import { useHistory, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { GET_PROPOSAL_DETAILS_QUERY } from './queries';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import { ANButton } from 'components/Button/ANButton';
 import { useWallet } from '../../EthersWallet';
-import { erc20ApprovalTransaction } from 'utils/transactionHelper';
-import { ethers } from 'ethers';
-import { CourtABI } from 'utils/abis/court';
-import { AddressZero } from '@ethersproject/constants';
-import { CustomTransaction, CustomTransactionStatus } from 'utils/types';
-import { Proposal, ProposalOptions, ProposalParams } from '@aragon/govern';
+import { CustomTransaction } from 'utils/types';
+import { getProposalParams } from 'utils/ERC3000';
+import { Proposal, ProposalOptions } from '@aragon/govern';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
+import QueueApprovals from 'services/QueueApprovals';
+import FacadeProposal from 'services/Proposal';
 
 // import { InputField } from 'component/InputField/InputField';
 interface ProposalDetailsProps {
@@ -264,8 +263,6 @@ const Widget = styled('div')({
 //* End of styled Components
 
 const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
-  // const selectedProposal: any = {};
-  // const history = useHistory();
   const { daoName, id: proposalId } = useParams<any>();
   const { data: daoList } = useQuery(GET_DAO_BY_NAME, {
     variables: { name: daoName },
@@ -276,26 +273,28 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
 
   const { dispatch } = React.useContext(ModalsContext);
 
-  let signer: any;
-
-  if (ethersProvider) {
-    signer = ethersProvider.getSigner();
-  }
-  useEffect(() => {
-    if (ethersProvider) {
-      signer = ethersProvider.getSigner();
-    }
-  }, [ethersProvider]);
-
   const [proposalInfo, updateProposalInfo] = React.useState<any>(null);
   const [isExpanded, updateIsExpanded] = React.useState<any>({});
   const [daoDetails, updateDaoDetails] = React.useState<any>();
-  const [transactions, updateTransactions] = React.useState<
-    CustomTransaction[]
-  >([]);
+  const [challengeReason, setChallengeReason] = React.useState('');
   const transactionsQueue = React.useRef<CustomTransaction[]>([]);
-  const challengeReason = React.useRef('');
-  const vetoReason = React.useRef('');
+
+  const proposalInstance = React.useMemo(() => {
+    if (ethersProvider && account && daoDetails && proposalInfo) {
+      let queueApprovals = new QueueApprovals(
+        ethersProvider.getSigner(),
+        account,
+        daoDetails.queue.address,
+        proposalInfo.config.resolver,
+      );
+      const proposal = new Proposal(
+        daoDetails.queue.address,
+        {} as ProposalOptions,
+      );
+      return new FacadeProposal(queueApprovals, proposal) as FacadeProposal &
+        Proposal;
+    }
+  }, [ethersProvider, account, daoDetails, proposalInfo]);
 
   const [
     getProposalData,
@@ -327,6 +326,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     }
     updateIsExpanded(cloneObject);
   };
+
   useEffect(() => {
     if (daoList) {
       updateDaoDetails(daoList.daos[0]);
@@ -338,138 +338,37 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     }
   }, [daoList]);
 
-  const proposalInstance = React.useMemo(() => {
-    if (daoDetails) {
-      const proposalOptions: ProposalOptions = {
-        // provider: ethersProvider,
-      };
-      const proposal = new Proposal(daoDetails.queue.address, proposalOptions);
-      return proposal;
-    }
-  }, [daoDetails]);
-
-  const approveChallengeCollateralsIfNeeded = async () => {
-    const contract = new ethers.Contract(
-      proposalInfo.config.resolver,
-      CourtABI,
-      signer,
-    );
-
-    if (daoDetails.queue.config.scheduleDeposit.token !== AddressZero) {
-      const challengeDepositApproval = await erc20ApprovalTransaction(
-        daoDetails.queue.config.challengeDeposit.token,
-        daoDetails.queue.config.challengeDeposit.amount,
-        daoDetails.queue.address,
-        account,
-        ethersProvider,
-      );
-      console.log(challengeDepositApproval);
-      if (challengeDepositApproval) {
-        if (challengeDepositApproval.error) {
-          console.log(challengeDepositApproval.error);
-          return;
-        }
-        if (challengeDepositApproval.transactions.length > 0) {
-          transactionsQueue.current.push(
-            challengeDepositApproval.transactions[0],
-          );
-        }
-      }
-    }
-
-    const [, feeToken, feeAmount] = await contract.getDisputeFees();
-
-    if (feeToken !== AddressZero) {
-      const feeTokenApproval = await erc20ApprovalTransaction(
-        feeToken,
-        feeAmount,
-        daoDetails.queue.address,
-        account,
-        ethersProvider,
-      );
-      if (feeTokenApproval) {
-        if (feeTokenApproval.error) {
-          console.log(feeTokenApproval.error);
-          return;
-        }
-        if (feeTokenApproval.transactions.length > 0) {
-          transactionsQueue.current.push(feeTokenApproval.transactions[0]);
-        }
-      }
-    }
-  };
-
-  const getProposalParams = () => {
-    const payload = { ...proposalInfo.payload };
-    const config = { ...proposalInfo.config };
-    config.executionDelay = parseInt(config.executionDelay);
-    payload.executor = payload.executor.address;
-    const params: ProposalParams = {
-      payload,
-      config,
-    };
-    return params;
-  };
-
-  const onTransactionFailure = (
-    errorMessage: string,
-    transaction: CustomTransaction,
-  ) => {
-    console.log('hi');
-  };
-  const onTransactionSuccess = (
-    transaction: CustomTransaction,
-    transactionReceipt: any,
-  ) => {
-    console.log('hi');
-  };
-  const onCompleteAllTransactions = (transactions: CustomTransaction[]) => {
-    console.log('hi');
-  };
-
   const challengeProposal = async () => {
-    const proposalParams = getProposalParams();
-    await approveChallengeCollateralsIfNeeded();
+    const proposalParams = getProposalParams(proposalInfo);
+
     if (proposalInstance) {
-      const challengeTransaction: CustomTransaction = {
-        tx: () => {
-          return proposalInstance.challenge(
-            proposalParams,
-            challengeReason.current,
-          );
-        },
-        preTransactionMessage: 'Challenge Proposal',
-        transactionMessage: 'Challenging Proposal',
-        errorMessage: 'Error while Challenging Propsal',
-        successMessage: 'Successfully Challenged Proposal',
-        status: CustomTransactionStatus.Pending,
-      };
-      transactionsQueue.current.push(challengeTransaction);
-      updateTransactions([...transactionsQueue.current]);
+      try {
+        transactionsQueue.current = await proposalInstance.challenge(
+          proposalParams,
+          challengeReason,
+        );
+      } catch (error) {
+        // TODO: Bhanu show error
+      }
     }
-    if (transactionsQueue.current.length > 0) {
-      console.log(dispatch);
-      // setIsTransactionModalOpen(true);
-      dispatch({
-        type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
-        payload: {
-          transactionList: transactionsQueue.current,
-          onTransactionFailure,
-          onTransactionSuccess,
-          onCompleteAllTransactions,
-        },
-      });
-    }
+
+    // setIsTransactionModalOpen(true);
+    dispatch({
+      type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
+      payload: {
+        transactionList: transactionsQueue.current, // TODO: Bhanu check if the length is more than 0 in the dispatch..
+        onTransactionFailure: () => {},
+        onTransactionSuccess: () => {},
+        onCompleteAllTransactions: () => {},
+      },
+    });
   };
 
   const executeProposal = async () => {
-    const proposalParams = getProposalParams();
+    const proposalParams = getProposalParams(proposalInfo);
     console.log(proposalParams);
-    console.log(proposalParams);
-    // approveCollateralIfNeeded();
     if (proposalInstance) {
       const executeTransaction = await proposalInstance.execute(proposalParams);
-      console.log(executeTransaction);
     }
   };
 
@@ -725,7 +624,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                     </div>
                     <InputField
                       onInputChange={(value) => {
-                        challengeReason.current = value;
+                        setChallengeReason(value);
                       }}
                       label={''}
                       placeholder={''}

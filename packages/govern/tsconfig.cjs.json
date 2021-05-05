@@ -5,7 +5,7 @@
     "strictPropertyInitialization": false,
     "sourceRoot": "./",
     "outDir": "./dist/cjs",
-    "strict":false,
+    "strict": false,
     "inlineSources": true,
     "types": [
       "jest"

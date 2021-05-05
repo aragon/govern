@@ -10,6 +10,7 @@ import Typography from '@material-ui/core/Typography';
 import { GET_PROPOSAL_LIST, GET_DAO_BY_NAME } from './queries';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import { formatEther } from 'ethers/lib/utils';
+import Grid from '@material-ui/core/Grid';
 import { useHistory, useParams } from 'react-router-dom';
 import MUITypography from '@material-ui/core/Typography';
 import NoDaoFound from './NoDaoFound';
@@ -84,6 +85,12 @@ const DaoNotFoundWrapper = styled('div')(({ theme }) => ({
   position: 'relative',
 }));
 
+const WrapperGrid = styled(Grid)(({ theme }) => ({
+  marginTop: '16px',
+  boxSizing: 'border-box',
+  margin: '0 !important',
+  width: '100% !important',
+}));
 //* Styled Components List End
 
 const DaoMainPage: React.FC<{
@@ -105,8 +112,8 @@ const DaoMainPage: React.FC<{
   const [fetchMoreProposal, updateFetchMoreProposals] = useState<any>();
   const [isProfilePage, setProfilePage] = useState(false);
   const [daoDetails, updateDaoDetails] = useState<any>();
-  const searchString = useRef('');
   const [isAnExistingDao, updateIsAnExistingDao] = useState<boolean>(true);
+  const [searchDaoName, setSearchDaoName] = useState('');
 
   // useEffect(() => {
   //   if (isProfile) {
@@ -116,10 +123,10 @@ const DaoMainPage: React.FC<{
   // }, [isProfile]);
 
   const onInputChange = (val: string) => {
-    searchString.current = val;
+    setSearchDaoName(val);
   };
   const onSearch = () => {
-    console.log(searchString.current);
+    console.log(searchDaoName);
   };
   const onPageChange = (page: string) => {
     if (page === 'profile') {
@@ -269,17 +276,23 @@ const DaoMainPage: React.FC<{
                       onClick={goToNewProposal}
                     ></ANButton>
                   </div>
-                  <div
-                    style={{
-                      width: '100%',
-                      display: 'flex',
-                      flexWrap: 'wrap',
-                      justifyContent: 'left',
-                      gridGap: '0px 24px',
-                    }}
+                  <WrapperGrid
+                    container
+                    spacing={3}
+                    xs={12}
+                    direction="row"
+                    justify="center"
                   >
                     {visibleProposalList.map((proposal: any) => (
-                      <div style={{ marginTop: '16px' }} key={proposal.id}>
+                      <Grid
+                        item
+                        key={proposal.id}
+                        xl={3}
+                        lg={4}
+                        xs={12}
+                        sm={12}
+                        md={6}
+                      >
                         <ProposalCard
                           transactionHash={proposal.id}
                           proposalDate={
@@ -295,9 +308,10 @@ const DaoMainPage: React.FC<{
                           proposalStatus={proposal.state}
                           onClickProposalCard={() => onClickProposal(proposal)}
                         ></ProposalCard>
-                      </div>
+                      </Grid>
                     ))}
-                  </div>
+                  </WrapperGrid>
+
                   <div
                     style={{
                       width: '100%',

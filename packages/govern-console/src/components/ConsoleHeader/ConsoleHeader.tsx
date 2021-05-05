@@ -49,10 +49,9 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
   const history = useHistory();
   const theme = useTheme();
   const [searchString, updateSearchString] = React.useState<string>('');
-  // const searchString = useRef('');
+
   const onInputChange = (val: string) => {
     updateSearchString(val);
-    // .current = val;
   };
   const onGotoDao = () => {
     history.push(`daos/${searchString}`);

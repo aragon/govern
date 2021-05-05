@@ -50,37 +50,11 @@ const useStyles = makeStyles({
   },
 });
 
-export interface BlueSwitchProps extends SwitchProps {
-  /**
-   * checked status
-   */
-  checked?: boolean;
-
-  /**
-   * onChange (toggled)
-   */
-  onChange?: () => void;
-
-  /**
-   * switch name
-   */
-  name?: string;
-
-  /**
-   * is disabled
-   */
-  disabled?: boolean;
-}
-
-export const BlueSwitch: React.FC<BlueSwitchProps> = ({ ...props }) => {
+export const BlueSwitch: React.FC<SwitchProps> = ({ ...props }) => {
   const classes = useStyles();
 
   return (
     <Switch
-      checked={props.checked}
-      onChange={props.onChange}
-      name={props.name}
-      disabled={props.disabled}
       classes={{
         root: classes.root,
         switchBase: classes.switchBase,

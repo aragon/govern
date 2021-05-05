@@ -154,8 +154,8 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
             <ul>
               {transactions.map((tx) => {
                 return (
-                  <li key={tx.preTransactionMessage?.slice(0, 20)}>
-                    <MessageText>{tx.preTransactionMessage}</MessageText>
+                  <li key={tx.message?.slice(0, 20)}>
+                    <MessageText>{tx.message}</MessageText>
                   </li>
                 );
               })}

@@ -4,6 +4,7 @@ import { AddressZero } from '@ethersproject/constants'
 import { BigNumberish } from '@ethersproject/bignumber'
 import { BytesLike } from '@ethersproject/bytes'
 import Configuration from '../internal/configuration/Configuration'
+import { registerToken } from '../internal/actions/RegisterToken'
 
 export const ContainerConfig = `
   tuple(
@@ -40,6 +41,14 @@ const factoryAbi = [
   )`,
 ]
 
+const registryAbi = [
+  "event Registered(address indexed executor, address queue, address indexed token, address indexed registrant, string name)"
+]
+
+const tokenAbi = [
+  "function balanceOf(address who) view returns (uint256)"
+]
+
 declare let window: any
 
 export type Token = {
@@ -49,18 +58,17 @@ export type Token = {
   tokenSymbol: string
 }
 
+export type TokenDeposit = {
+  token: string
+  amount: BigNumberish
+}
+
 export type DaoConfig = {
-  executionDelay: number
-  scheduleDeposit: {
-    token: string
-    amount: BigNumberish
-  }
-  challengeDeposit: {
-    token: string
-    amount: BigNumberish
-  }
+  executionDelay: number|string
+  scheduleDeposit: TokenDeposit
+  challengeDeposit: TokenDeposit
   resolver: string
-  rules: BytesLike,
+  rules: BytesLike
   maxCalldataSize: number
 }
 
@@ -88,7 +96,9 @@ export type CreateDaoOptions = {
  */
 export async function createDao(
   args: CreateDaoParams,
-  options: CreateDaoOptions = {}
+  options: CreateDaoOptions = {},
+  registerTokenCallback?: Function,
+  bla?: TokenDeposit
 ): Promise<TransactionResponse> {
   if (!args.token.tokenAddress) {
     args.token.tokenAddress = AddressZero
@@ -114,6 +124,23 @@ export async function createDao(
     options.provider || window.ethereum
   ).getSigner()
   const contract = new Contract(factoryAddress, factoryAbi, signer)
+
+  const GovernRegistry = new Contract(
+    config.governRegistry,
+    registryAbi,
+    signer
+  )
+
+  if(typeof registerTokenCallback === 'function') {
+    GovernRegistry.on('Registered', async (govern, queue, token, registrant, name) => {
+      // not our DAO, wait for next one
+      if( name !== args.name ) return
+
+      const ERC20 = new Contract(token, tokenAbi, signer)
+      registerTokenCallback(() =>  registerToken(signer, ERC20))
+    })
+  }
+
   const result = contract.newGovern(
     args.name,
     args.token,
