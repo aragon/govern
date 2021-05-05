@@ -16,7 +16,7 @@ import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { useQuery } from '@apollo/client';
 import { buildPayload } from '../../utils/ERC3000';
 import { useWallet } from '../../EthersWallet';
-import { AddressZero } from '@ethersproject/constants'
+import { AddressZero } from '@ethersproject/constants';
 import { erc20ApprovalTransaction } from '../../utils/transactionHelper';
 import { HelpButton } from 'components/HelpButton/HelpButton';
 import { BlueSwitch } from 'components/Switchs/BlueSwitch';
@@ -104,7 +104,6 @@ const OptionTextStyle = styled('div')({
   fontWeight: 400,
   fontSize: 18,
 });
-
 
 const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
   ({ onClickBack }) => {
@@ -200,7 +199,6 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
         return _amount;
       }
     };
-
 
     const { daoName } = useParams<ParamTypes>();
     //TODO daoname empty handling
@@ -308,7 +306,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
       console.log(payload, ' payload');
 
       let txList = [];
-      
+
       if (daoDetails.queue.config.scheduleDeposit.token !== AddressZero) {
         const scheduleDepositApproval = await erc20ApprovalTransaction(
           daoDetails.queue.config.scheduleDeposit.token,

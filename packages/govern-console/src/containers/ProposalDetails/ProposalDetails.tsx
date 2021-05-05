@@ -15,7 +15,7 @@ import { useWallet } from '../../EthersWallet';
 import { erc20ApprovalTransaction } from 'utils/transactionHelper';
 import { ethers } from 'ethers';
 import { CourtABI } from 'utils/abis/court';
-import { AddressZero } from '@ethersproject/constants'
+import { AddressZero } from '@ethersproject/constants';
 import { CustomTransaction, CustomTransactionStatus } from 'utils/types';
 import { Proposal, ProposalOptions, ProposalParams } from '@aragon/govern';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
@@ -290,7 +290,9 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   const [proposalInfo, updateProposalInfo] = React.useState<any>(null);
   const [isExpanded, updateIsExpanded] = React.useState<any>({});
   const [daoDetails, updateDaoDetails] = React.useState<any>();
-  const [transactions, updateTransactions] = React.useState<CustomTransaction[]>([]);
+  const [transactions, updateTransactions] = React.useState<
+    CustomTransaction[]
+  >([]);
   const transactionsQueue = React.useRef<CustomTransaction[]>([]);
   const challengeReason = React.useRef('');
   const vetoReason = React.useRef('');
@@ -368,13 +370,15 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
           return;
         }
         if (challengeDepositApproval.transactions.length > 0) {
-          transactionsQueue.current.push(challengeDepositApproval.transactions[0]);
+          transactionsQueue.current.push(
+            challengeDepositApproval.transactions[0],
+          );
         }
       }
     }
 
     const [, feeToken, feeAmount] = await contract.getDisputeFees();
-    
+
     if (feeToken !== AddressZero) {
       const feeTokenApproval = await erc20ApprovalTransaction(
         feeToken,

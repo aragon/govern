@@ -19,7 +19,7 @@ import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { erc20ApprovalTransaction } from '../../utils/transactionHelper';
 import { toUtf8Bytes } from '@ethersproject/strings';
 import { buildPayload } from '../../utils/ERC3000';
-import { AddressZero } from '@ethersproject/constants'
+import { AddressZero } from '@ethersproject/constants';
 import { useWallet } from 'EthersWallet';
 
 import {
@@ -401,7 +401,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     handleInputModalClose();
     handleActionModalOpen();
   };
-  
+
   const onChangeJustification = (val: string) => {
     justification.current = val;
   };

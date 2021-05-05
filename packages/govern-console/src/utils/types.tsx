@@ -1,3 +1,4 @@
+/* eslint-disable */
 export type Collateral = {
   id: string;
   token: string;
@@ -60,4 +61,9 @@ export enum CiruclarProgressStatus {
   InProgress,
   Done,
   Failed,
+}
+
+export enum ChainId {
+  MAINNET = 1,
+  RINKEBY = 4,
 }
