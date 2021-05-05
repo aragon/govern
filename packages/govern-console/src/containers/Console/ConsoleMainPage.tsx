@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { styled, useTheme } from '@material-ui/core/styles';
+import { styled } from '@material-ui/core/styles';
 import { ConsoleHeader } from 'components/ConsoleHeader/ConsoleHeader';
 import { DaoCard } from 'components/DaoCards/DaoCard';
 import { ANButton } from 'components/Button/ANButton';
@@ -44,13 +44,7 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
   ...props
 }) => {
   const history = useHistory();
-  const theme = useTheme();
   const [visibleDaoList, updateDaoList] = useState<any>([]);
-  const [filteredDaoList, updateFilteredDaoList] = useState<any>([]);
-  const [
-    isShowingFilteredResults,
-    updateIsShowingFilteredResults,
-  ] = useState<boolean>(false);
   const [totalDaoCount, updateTotalDaoCount] = useState<number>();
 
   const {
@@ -70,10 +64,6 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
     loading: isLoadingRegistryData,
     error: errorLoadingRegistryData,
   } = useQuery(GET_GOVERN_REGISTRY_DATA);
-
-  // const getTotalNumberOfDaos = () => {
-  //   updateTotalDaoCount(numberOfDaos);
-  // };
 
   useEffect(() => {
     if (daoListData && daoListData.daos) {

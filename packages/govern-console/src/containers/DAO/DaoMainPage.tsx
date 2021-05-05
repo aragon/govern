@@ -12,14 +12,26 @@ import { useQuery, useLazyQuery } from '@apollo/client';
 import { formatEther } from 'ethers/lib/utils';
 import Grid from '@material-ui/core/Grid';
 import { useHistory, useParams } from 'react-router-dom';
+import MUITypography from '@material-ui/core/Typography';
+import NoDaoFound from './NoDaoFound';
 
 //* Styled Components List
 const DaoPageMainDiv = styled(Paper)(({ theme }) => ({
   width: '100%',
   background: theme.custom.white,
-  height: 'auto',
+  height: 'calc(100% - 60px)',
   padding: '0px',
+  boxSizing: 'border-box',
   boxShadow: 'none',
+}));
+const VerticalAlignWrapper = styled('div')(({ theme }) => ({
+  transform: 'translate(-50%, -50%)',
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  height: 'fit-content',
+  width: 'fit-content',
+  margin: 'auto',
 }));
 
 const PageLabelSelected = styled(Typography)(({ theme }) => ({
@@ -45,6 +57,34 @@ const PageLabel = styled(Typography)(({ theme }) => ({
   cursor: 'pointer',
 }));
 
+const Subtitle = styled(MUITypography)(({ theme }) => ({
+  color: theme.custom.daoHeader.labelColor,
+  lineHeight: '27px',
+  fontSize: '18px',
+  fontWeight: theme.custom.daoHeader.labelFontWeight,
+  fontFamily: theme.typography.fontFamily,
+  fontStyle: 'normal',
+}));
+
+const Title = styled(MUITypography)(({ theme }: any) => ({
+  color: theme.custom.daoHeader.valueColor,
+  lineHeight: '60.1px',
+  fontSize: '44px',
+  fontWeight: theme.custom.daoHeader.valueFontWeight,
+  fontFamily: theme.typography.fontFamily,
+  fontStyle: 'normal',
+}));
+
+const DaoNotFoundWrapper = styled('div')(({ theme }) => ({
+  width: '100%',
+  height: '100%',
+  textAlign: 'center',
+  background: ' linear-gradient(107.79deg, #E4F8FF 1.46%, #F1F1FF 100%)',
+  borderRadius: '16px',
+  boxSizing: 'border-box',
+  position: 'relative',
+}));
+
 const WrapperGrid = styled(Grid)(({ theme }) => ({
   marginTop: '16px',
   boxSizing: 'border-box',
@@ -63,7 +103,7 @@ const DaoMainPage: React.FC<{
   //TODO daoname empty handling
 
   const { data: daoList, loading: loadingDao } = useQuery(GET_DAO_BY_NAME, {
-    variables: { name: daoName },
+    variables: { name: `%${daoName}%` },
   });
 
   const [isProposalPage, setProposalPage] = useState(true);
@@ -72,6 +112,7 @@ const DaoMainPage: React.FC<{
   const [fetchMoreProposal, updateFetchMoreProposals] = useState<any>();
   const [isProfilePage, setProfilePage] = useState(false);
   const [daoDetails, updateDaoDetails] = useState<any>();
+  const [isAnExistingDao, updateIsAnExistingDao] = useState<boolean>(true);
   const [searchDaoName, setSearchDaoName] = useState('');
 
   // useEffect(() => {
@@ -127,7 +168,9 @@ const DaoMainPage: React.FC<{
   };
 
   useEffect(() => {
-    if (daoList) {
+    debugger;
+    if (loadingDao) return;
+    if (daoList.daos.length > 0) {
       updateDaoDetails(daoList.daos[0]);
       if (daoList.daos[0] && daoList.daos[0].queue) {
         getQueueData({
@@ -138,6 +181,8 @@ const DaoMainPage: React.FC<{
           },
         });
       }
+    } else {
+      updateIsAnExistingDao(false);
     }
   }, [daoList]);
 
@@ -161,136 +206,146 @@ const DaoMainPage: React.FC<{
     return <div>Loading...</div>;
   }
 
-  if (daoDetails) {
-    return (
-      <DaoPageMainDiv>
-        <DaoHeader
-          ethBalance={formatEther(daoDetails.executor.balance)}
-          usdBalance={'2222'}
-          daoName={daoDetails.name}
-        />
-        <div
-          style={{
-            paddingTop: '33px',
-            paddingRight: '48px',
-            paddingLeft: '48px',
-            paddingBottom: '52px',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              maxWidth: '250px',
-              justifyContent: 'space-between',
-            }}
-          >
-            {isProposalPage ? (
-              <PageLabelSelected>Proposals</PageLabelSelected>
-            ) : (
-              <PageLabel onClick={() => onPageChange('proposal')}>
-                Proposal
-              </PageLabel>
-            )}
-            {/* {isProfilePage ? (
+  return (
+    <DaoPageMainDiv id="Wrapper">
+      {isAnExistingDao ? (
+        daoDetails === undefined ? (
+          'loading'
+        ) : (
+          <>
+            <DaoHeader
+              ethBalance={formatEther(daoDetails.executor.balance)}
+              usdBalance={'2222'}
+              daoName={daoDetails.name}
+            />
+            <div
+              style={{
+                paddingTop: '33px',
+                paddingRight: '48px',
+                paddingLeft: '48px',
+                paddingBottom: '52px',
+                boxSizing: 'border-box',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  maxWidth: '250px',
+                  justifyContent: 'space-between',
+                }}
+              >
+                {isProposalPage ? (
+                  <PageLabelSelected>Proposals</PageLabelSelected>
+                ) : (
+                  <PageLabel onClick={() => onPageChange('proposal')}>
+                    Proposal
+                  </PageLabel>
+                )}
+                {/* {isProfilePage ? (
             <PageLabelSelected>Profile</PageLabelSelected>
           ) : (
             <PageLabel onClick={() => onPageChange('profile')}>
               Profile
             </PageLabel>
           )} */}
-          </div>
-          {isProposalPage ? (
-            <>
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  width: '100%',
-                  justifyContent: 'space-between',
-                  marginTop: '28px',
-                }}
-              >
-                <InputField
-                  label=""
-                  placeholder="Search"
-                  width="298px"
-                  height="46px"
-                  onInputChange={onInputChange}
-                ></InputField>
-                <ANButton
-                  label="New Proposal"
-                  buttonType="primary"
-                  height="46px"
-                  width="142px"
-                  onClick={goToNewProposal}
-                ></ANButton>
               </div>
-              <WrapperGrid
-                container
-                spacing={3}
-                xs={12}
-                direction="row"
-                justify="center"
-              >
-                {visibleProposalList.map((proposal: any) => (
-                  <Grid
-                    item
-                    key={proposal.id}
-                    xl={3}
-                    lg={4}
-                    xs={12}
-                    sm={12}
-                    md={6}
+              {isProposalPage ? (
+                <div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      width: '100%',
+                      justifyContent: 'space-between',
+                      marginTop: '28px',
+                    }}
                   >
-                    <ProposalCard
-                      transactionHash={proposal.id}
-                      proposalDate={
-                        // TODO:Bhanu you can make this work with the dates library you use
-                        new Date(proposal.createdAt * 1000).toLocaleDateString(
-                          'en-US',
-                        ) +
-                        ' ' +
-                        new Date(proposal.createdAt * 1000).toLocaleTimeString(
-                          'en-US',
-                        )
-                      }
-                      proposalStatus={proposal.state}
-                      onClickProposalCard={() => onClickProposal(proposal)}
-                    ></ProposalCard>
-                  </Grid>
-                ))}
-              </WrapperGrid>
+                    <InputField
+                      label=""
+                      placeholder="Search"
+                      width="298px"
+                      height="46px"
+                      onInputChange={onInputChange}
+                    ></InputField>
+                    <ANButton
+                      label="New Proposal"
+                      buttonType="primary"
+                      height="46px"
+                      width="142px"
+                      onClick={goToNewProposal}
+                    ></ANButton>
+                  </div>
+                  <WrapperGrid
+                    container
+                    spacing={3}
+                    xs={12}
+                    direction="row"
+                    justify="center"
+                  >
+                    {visibleProposalList.map((proposal: any) => (
+                      <Grid
+                        item
+                        key={proposal.id}
+                        xl={3}
+                        lg={4}
+                        xs={12}
+                        sm={12}
+                        md={6}
+                      >
+                        <ProposalCard
+                          transactionHash={proposal.id}
+                          proposalDate={
+                            // TODO:Bhanu you can make this work with the dates library you use
+                            new Date(
+                              proposal.createdAt * 1000,
+                            ).toLocaleDateString('en-US') +
+                            ' ' +
+                            new Date(
+                              proposal.createdAt * 1000,
+                            ).toLocaleTimeString('en-US')
+                          }
+                          proposalStatus={proposal.state}
+                          onClickProposalCard={() => onClickProposal(proposal)}
+                        ></ProposalCard>
+                      </Grid>
+                    ))}
+                  </WrapperGrid>
 
-              <div
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginTop: '32px',
-                  marginBottom: '32px',
-                }}
-              >
-                {queueNonce !== visibleProposalList.length ? (
-                  <ANButton
-                    label="Load More Proposals"
-                    buttonType="secondary"
-                    height="46px"
-                    width="196px"
-                    buttonColor="#00C2FF"
-                    onClick={fetchMoreData}
-                  ></ANButton>
-                ) : null}
-              </div>
-            </>
-          ) : (
-            <></>
-          )}
-        </div>
-      </DaoPageMainDiv>
-    );
-  }
-  return <div> No Dao with this name. </div>;
+                  <div
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginTop: '32px',
+                      marginBottom: '32px',
+                    }}
+                  >
+                    {queueNonce !== visibleProposalList.length ? (
+                      <ANButton
+                        label="Load More Proposals"
+                        buttonType="secondary"
+                        height="46px"
+                        width="196px"
+                        buttonColor="#00C2FF"
+                        onClick={fetchMoreData}
+                      ></ANButton>
+                    ) : null}
+                  </div>
+                </div>
+              ) : (
+                <></>
+              )}
+            </div>
+          </>
+        )
+      ) : (
+        <>
+          <NoDaoFound />
+        </>
+      )}
+    </DaoPageMainDiv>
+  );
 };
 export default memo(DaoMainPage);

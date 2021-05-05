@@ -10,10 +10,13 @@ import youtubeIcon from 'images/svgs/youtube.svg';
 import Wallet from 'components/Wallet/Wallet';
 import { useHistory } from 'react-router-dom';
 
-const HeaderWrapperDiv = styled('div')({
+const FooterWrapperDiv = styled('div')({
   height: '106px',
   width: '100%',
   display: 'block',
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
 });
 const TitleText = styled(Typography)({
   fontFamily: 'Manrope',
@@ -27,14 +30,14 @@ const TitleText = styled(Typography)({
   justifyContent: 'center',
   alignItems: 'center',
 });
-const Navbar = styled('div')({
+const FooterDiv = styled('div')({
   display: 'flex',
   width: '100%',
   flexDirection: 'row',
   justifyContent: 'space-between',
   height: '100%',
 });
-const Title = styled('div')({
+const Logo = styled('div')({
   display: 'flex',
   width: 'fit-content',
   cursor: 'pointer',
@@ -57,23 +60,23 @@ const Footer = ({}) => {
   };
 
   return (
-    <HeaderWrapperDiv id="header">
-      <Navbar id="navbar">
-        <Title id="navbar_title" onClick={redirectToHomePage}>
+    <FooterWrapperDiv id="footer_wrapper">
+      <FooterDiv id="footer">
+        <Logo id="footer_logo" onClick={redirectToHomePage}>
           <img
             src={governIcon}
             style={{ height: '31px', width: '35px', paddingTop: '35px' }}
           />
           <img src={aragonText} />
-        </Title>
+        </Logo>
         <Account id="account">
           <img src={youtubeIcon} />
           <img src={twitterIcon} />
           <img src={discordIcon} />
           <img src={messageIcon} />
         </Account>
-      </Navbar>
-    </HeaderWrapperDiv>
+      </FooterDiv>
+    </FooterWrapperDiv>
   );
 };
 

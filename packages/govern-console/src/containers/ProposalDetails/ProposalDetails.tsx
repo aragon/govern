@@ -16,7 +16,7 @@ import { CustomTransaction } from 'utils/types';
 import { getProposalParams } from 'utils/ERC3000';
 import { Proposal, ProposalOptions } from '@aragon/govern';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
-import QueueApprovals from 'services/QueueApprovals'
+import QueueApprovals from 'services/QueueApprovals';
 import FacadeProposal from 'services/Proposal';
 
 // import { InputField } from 'component/InputField/InputField';
@@ -278,14 +278,23 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   const [daoDetails, updateDaoDetails] = React.useState<any>();
   const [challengeReason, setChallengeReason] = React.useState('');
   const transactionsQueue = React.useRef<CustomTransaction[]>([]);
-  
+
   const proposalInstance = React.useMemo(() => {
-    if(ethersProvider && account && daoDetails && proposalInfo) {
-      let queueApprovals = new QueueApprovals(ethersProvider.getSigner(), account, daoDetails.queue.address, proposalInfo.config.resolver)
-      const proposal =  new Proposal(daoDetails.queue.address, {} as ProposalOptions);
-      return new FacadeProposal(queueApprovals, proposal) as (FacadeProposal & Proposal)
+    if (ethersProvider && account && daoDetails && proposalInfo) {
+      let queueApprovals = new QueueApprovals(
+        ethersProvider.getSigner(),
+        account,
+        daoDetails.queue.address,
+        proposalInfo.config.resolver,
+      );
+      const proposal = new Proposal(
+        daoDetails.queue.address,
+        {} as ProposalOptions,
+      );
+      return new FacadeProposal(queueApprovals, proposal) as FacadeProposal &
+        Proposal;
     }
-  }, [ethersProvider, account, daoDetails, proposalInfo])
+  }, [ethersProvider, account, daoDetails, proposalInfo]);
 
   const [
     getProposalData,
@@ -331,11 +340,14 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
 
   const challengeProposal = async () => {
     const proposalParams = getProposalParams(proposalInfo);
-    
-    if(proposalInstance) {
+
+    if (proposalInstance) {
       try {
-        transactionsQueue.current = await proposalInstance.challenge(proposalParams, challengeReason)
-      }catch(error) {
+        transactionsQueue.current = await proposalInstance.challenge(
+          proposalParams,
+          challengeReason,
+        );
+      } catch (error) {
         // TODO: Bhanu show error
       }
     }
@@ -347,17 +359,16 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
         transactionList: transactionsQueue.current, // TODO: Bhanu check if the length is more than 0 in the dispatch..
         onTransactionFailure: () => {},
         onTransactionSuccess: () => {},
-        onCompleteAllTransactions: () => {}
+        onCompleteAllTransactions: () => {},
       },
     });
-    
   };
 
   const executeProposal = async () => {
     const proposalParams = getProposalParams(proposalInfo);
     console.log(proposalParams);
     if (proposalInstance) {
-      const executeTransaction = await proposalInstance.execute(proposalParams)
+      const executeTransaction = await proposalInstance.execute(proposalParams);
     }
   };
 
