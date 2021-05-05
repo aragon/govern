@@ -13,14 +13,14 @@ import { ethers, BigNumber, BigNumberish } from 'ethers';
  */
 export const correctDecimal = async (
     address: string,
-    amount: string,
+    amount: string | BigNumberish,
     isFormat: boolean,
     ethersProvider: any
 ) => {
     try {
         const token: Token = await getToken(address, ethersProvider);
         return isFormat ? 
-            ethers.utils.parseUnits(amount, token.tokenDecimals) :
+            ethers.utils.parseUnits(amount.toString(), token.tokenDecimals) :
             ethers.utils.formatUnits(amount, token.tokenDecimals);
 
     } catch (err) {

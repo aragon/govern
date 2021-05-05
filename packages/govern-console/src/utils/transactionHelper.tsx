@@ -15,8 +15,8 @@ import { BigNumberish } from '@ethersproject/bignumber'
  * @param amount how much to approve
  * @param spender spender
  * @param account owner
- * @param ethersProvider 
- * 
+ * @param ethersProvider
+ *
  * @returns {Promise<Response>}
  */
 export async function erc20ApprovalTransaction(
@@ -62,7 +62,7 @@ export async function erc20ApprovalTransaction(
   if (allowance.gte(amountInBigNumber)) {
     return [];
   }
-  
+
   // approve amountInBigNumber for the spender
   const transaction: CustomTransaction = {
     tx: () => {

@@ -1,8 +1,7 @@
 /* eslint-disable */
-import { ethers } from 'ethers';
 import { toUtf8Bytes } from '@ethersproject/strings';
-
-import { DaoConfig, Proposal, ProposalOptions, ProposalParams, PayloadType } from '@aragon/govern';
+import { ethers } from 'ethers';
+import { DaoConfig, ProposalParams, PayloadType } from '@aragon/govern';
 
 export const buildPayload = ({
   submitter,
@@ -39,3 +38,28 @@ export const getProposalParams = (proposalInfo:any) => {
   };
   return params;
 }
+
+
+// export const setConfigForm = ({
+//   setValue,
+//   config
+// }: { setValue: Function,  config: DaoConfig}) => {
+  
+//   setValue('daoConfig.executionDelay', config.executionDelay)
+//   setValue('daoConfig.resolver', config.resolver)
+//   setValue('daoConfig.rules', config.rules)
+//   setValue('daoConfig.scheduleDeposit.token', config.scheduleDeposit.token)
+//   setValue('daoConfig.challengeDeposit.token', config.challengeDeposit.token)
+//   setValue('daoConfig.maxCalldataSize', config.maxCalldataSize)
+
+//   // setValue('daoConfig.scheduleDeposit.amount', await correctDecimal(
+//   //   config.scheduleDeposit.token,
+//   //   config.scheduleDeposit.amount,
+//   //   false,
+//   // ))
+//   // setValue('daoConfig.challengeDeposit.amount', await correctDecimal(
+//   //   config.challengeDeposit.token,
+//   //   config.challengeDeposit.amount,
+//   //   false,
+//   // ))
+// }

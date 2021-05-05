@@ -15,11 +15,15 @@ import {  Transaction as EthersTransaction, ethers } from 'ethers';
 import { useQuery } from '@apollo/client';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { buildPayload } from 'utils/ERC3000';
+import { erc20ApprovalTransaction } from '../../utils/transactionHelper';
+import { toUtf8Bytes } from '@ethersproject/strings';
+import { AddressZero } from '@ethersproject/constants';
 import { useWallet } from 'EthersWallet';
 import QueueApprovals from 'services/QueueApprovals'
 import { CustomTransaction, CustomTransactionStatus, abiItem, actionType, ActionToSchedule} from 'utils/types';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import  FacadeProposal from 'services/Proposal';
+// import useStyles from ''
 
 import {
   Proposal,
@@ -215,7 +219,7 @@ const AddedActions: React.FC<AddedActionsProps> = ({
                         action.name,
                       );
                     }}
-                    value={actionsToSchedule[index]?.params[num] || ''}
+                    // value={actionsToSchedule[index]?.params[num] || ''}
                     height="46px"
                     width="814px"
                     placeholder={input.name}
@@ -232,8 +236,6 @@ const AddedActions: React.FC<AddedActionsProps> = ({
 };
 
 const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
-  const theme = useTheme();
-  const history = useHistory();
   const { daoName } = useParams<any>();
   //TODO daoname empty handling
   const { data: daoList } = useQuery(GET_DAO_BY_NAME, {
@@ -242,16 +244,13 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
 
   const { dispatch } = React.useContext(ModalsContext);
 
-  const executor = useRef('');
-  const proof: { current: string } = useRef('');
-  // const [isAddingActions, updateIsAddingActions] = useState(false);
+  const [proof, setProof] = useState('');
   const [selectedActions, updateSelectedOptions] = useState([]);
-  // const [modalStyle] = React.useState(getModalStyle);
   const [isInputModalOpen, setInputModalOpen] = useState(false);
   const [isActionModalOpen, setActionModalOpen] = useState(false);
   const [daoDetails, updateDaoDetails] = useState<any>();
-  const abiFunctions = useRef([]);
-  const actionsToSchedule = useRef([]);
+  const [abiFunctions, setAbiFunctions] = useState([]);
+  const [actionsToSchedule, setActionsToSchedule] = useState([]);
 
   useEffect(() => {
     if (daoList) {
@@ -260,22 +259,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   }, [daoList]);
 
   const context: any = useWallet();
-  const {
-    connector,
-    account,
-    balance,
-    chainId,
-    connect,
-    connectors,
-    ethereum,
-    error,
-    getBlockNumber,
-    networkName,
-    reset,
-    status,
-    type,
-    ethersProvider,
-  } = context;
+  const { account, ethersProvider } = context;
 
   const submitter: string = account;
 
@@ -286,7 +270,6 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
       return new FacadeProposal(queueApprovals, proposal) as (FacadeProposal & Proposal)
     }
   }, [ethersProvider, account, daoDetails])
-
 
   const transactionsQueue = React.useRef<CustomTransaction[]>([]);
 
@@ -326,7 +309,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
         return data as ActionToSchedule;
       },
     );
-    actionsToSchedule.current = initialActions as [];
+    setActionsToSchedule(initialActions as []);
   };
 
   const onAddInputToAction = (
@@ -337,7 +320,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     inputIndex: number,
     functionName: string,
   ) => {
-    const actions: any[] = actionsToSchedule.current;
+    const actions: any[] = actionsToSchedule;
     const { params } = actions[functionIndex];
     params[inputIndex] = value;
     delete actions[functionIndex].params;
@@ -345,15 +328,11 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
       params,
       ...actions[functionIndex],
     };
-    actionsToSchedule.current = actions as [];
+    setActionsToSchedule(actions as []);
+    // actionsToSchedule.current = actions as [];
   };
   // const onScheduleProposal = () => {};
-
-  const isProposalValid = () => {
-    if (proof.current === '') return false;
-    if (selectedActions.length === 0) return false;
-    return true;
-  };
+  
 
   const onGenerateActionsFromAbi = async (
     contractAddress: string,
@@ -378,17 +357,18 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
       }
     });
 
-    abiFunctions.current = functions;
+    setAbiFunctions(functions);
+    // abiFunctions.current = functions;
     handleInputModalClose();
     handleActionModalOpen();
   };
-  
+
   const onChangeProof = (val: string) => {
-    proof.current = val;
+    setProof(val);
   };
 
   const onSchedule = () => {
-    const actions: any[] = actionsToSchedule.current.map((item: any) => {
+    const actions: any[] = actionsToSchedule.map((item: any) => {
       const { abi, contractAddress, name, params, numberOfInputs } = item;
       const abiInterface = new ethers.utils.Interface(abi);
       const functionParameters = [];
@@ -414,9 +394,9 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const scheduleProposal = async (actions: ActionType[]) => {
     const payload = buildPayload({
       submitter,
-      executor: executor.current,
+      executor: daoDetails.executor.address,
       actions,
-      proof: proof.current,
+      proof: proof,
       executionDelay: daoDetails.queue.config.executionDelay
     })
 
@@ -469,7 +449,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
           onInputChange={onChangeProof}
           placeholder={'Enter proof '}
           label=""
-          value={proof.current}
+          value={proof}
           height={'108px'}
           width={'700px'}
         ></InputField>
@@ -481,7 +461,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
             <AddedActions
               selectedActions={selectedActions}
               onAddInputToAction={onAddInputToAction}
-              actionsToSchedule={actionsToSchedule.current}
+              actionsToSchedule={actionsToSchedule}
             />
           </div>
         )}
@@ -515,7 +495,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
           onCloseModal={handleActionModalClose}
           open={isActionModalOpen}
           onAddActions={onAddNewActions}
-          actions={abiFunctions.current as any}
+          actions={abiFunctions as any}
         ></AddActionsModal>
       </WrapperDiv>
     </>

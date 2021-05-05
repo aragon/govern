@@ -17,15 +17,9 @@ export const registerToken = async (
     // already registered, quick return
     return
   }
-
-  // verified position will be set later when providing proof using
-  // - CensusErc20Api.setBalanceMappingPosition to set position
-  // - CensusErc20Api.setVerifiedBalanceMappingPosition to provide proof
-  // registerToken does not require valid position or proof to be provided
-  const position = 2
-  const result = CensusErc20Api.registerToken(
+  
+  const result = CensusErc20Api.registerTokenAuto(
     Token.address,
-    position,
     signer,
     pool
   )

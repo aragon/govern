@@ -7,6 +7,7 @@
     "strictPropertyInitialization": false,
     "strict": false,
     "outDir": "./dist/esm",
+    "strict":false,
     "sourceRoot": "./",
     "inlineSources": true,
     "types": [

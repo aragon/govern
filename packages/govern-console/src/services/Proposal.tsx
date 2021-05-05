@@ -2,9 +2,6 @@
 import QueueApproval from './QueueApprovals'
 import { ProposalParams } from '@aragon/govern'
 import { CustomTransaction, CustomTransactionStatus } from 'utils/types';
-// import 
-// import actions  from 'utils/actions'
-// import radspec from 'utils/radspec'
 
 export default class FacadeProposal  {
 

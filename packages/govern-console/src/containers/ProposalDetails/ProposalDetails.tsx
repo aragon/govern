@@ -12,15 +12,12 @@ import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import { ANButton } from 'components/Button/ANButton';
 import { useWallet } from '../../EthersWallet';
-import { CustomTransaction } from 'utils/types';
-import { DaoConfig, Proposal, ProposalOptions, ProposalParams, PayloadType } from '@aragon/govern';
 import { getProposalParams } from 'utils/ERC3000';
-
+import { CustomTransaction } from 'utils/types';
+import { Proposal, ProposalOptions } from '@aragon/govern';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import QueueApprovals from 'services/QueueApprovals'
 import FacadeProposal from 'services/Proposal';
-
-
 
 // import { InputField } from 'component/InputField/InputField';
 interface ProposalDetailsProps {
@@ -279,9 +276,8 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   const [proposalInfo, updateProposalInfo] = React.useState<any>(null);
   const [isExpanded, updateIsExpanded] = React.useState<any>({});
   const [daoDetails, updateDaoDetails] = React.useState<any>();
+  const [challengeReason, setChallengeReason] = React.useState('');
   const transactionsQueue = React.useRef<CustomTransaction[]>([]);
-  const challengeReason = React.useRef('');
-  const vetoReason = React.useRef('');
   
   const proposalInstance = React.useMemo(() => {
     if(ethersProvider && account && daoDetails && proposalInfo) {
@@ -338,7 +334,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     
     if(proposalInstance) {
       try {
-        transactionsQueue.current = await proposalInstance.challenge(proposalParams, challengeReason.current)
+        transactionsQueue.current = await proposalInstance.challenge(proposalParams, challengeReason)
       }catch(error) {
         // TODO: Bhanu show error
       }
@@ -617,7 +613,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                     </div>
                     <InputField
                       onInputChange={(value) => {
-                        challengeReason.current = value;
+                        setChallengeReason(value);
                       }}
                       label={''}
                       placeholder={''}
