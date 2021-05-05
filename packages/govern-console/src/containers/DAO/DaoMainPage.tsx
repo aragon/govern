@@ -10,6 +10,7 @@ import Typography from '@material-ui/core/Typography';
 import { GET_PROPOSAL_LIST, GET_DAO_BY_NAME } from './queries';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import { formatEther } from 'ethers/lib/utils';
+import Grid from '@material-ui/core/Grid';
 import { useHistory, useParams } from 'react-router-dom';
 
 //* Styled Components List
@@ -42,6 +43,13 @@ const PageLabel = styled(Typography)(({ theme }) => ({
   fontFamily: theme.custom.daoCard.fontFamily,
   fontStyle: theme.custom.daoCard.fontStyle,
   cursor: 'pointer',
+}));
+
+const WrapperGrid = styled(Grid)(({ theme }) => ({
+  marginTop: '16px',
+  boxSizing: 'border-box',
+  margin: '0 !important',
+  width: '100% !important',
 }));
 //* Styled Components List End
 
@@ -193,7 +201,7 @@ const DaoMainPage: React.FC<{
           )} */}
           </div>
           {isProposalPage ? (
-            <div>
+            <>
               <div
                 style={{
                   display: 'flex',
@@ -218,17 +226,23 @@ const DaoMainPage: React.FC<{
                   onClick={goToNewProposal}
                 ></ANButton>
               </div>
-              <div
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  justifyContent: 'left',
-                  gridGap: '0px 24px',
-                }}
+              <WrapperGrid
+                container
+                spacing={3}
+                xs={12}
+                direction="row"
+                justify="center"
               >
                 {visibleProposalList.map((proposal: any) => (
-                  <div style={{ marginTop: '16px' }} key={proposal.id}>
+                  <Grid
+                    item
+                    key={proposal.id}
+                    xl={3}
+                    lg={4}
+                    xs={12}
+                    sm={12}
+                    md={6}
+                  >
                     <ProposalCard
                       transactionHash={proposal.id}
                       proposalDate={
@@ -244,9 +258,10 @@ const DaoMainPage: React.FC<{
                       proposalStatus={proposal.state}
                       onClickProposalCard={() => onClickProposal(proposal)}
                     ></ProposalCard>
-                  </div>
+                  </Grid>
                 ))}
-              </div>
+              </WrapperGrid>
+
               <div
                 style={{
                   width: '100%',
@@ -268,7 +283,7 @@ const DaoMainPage: React.FC<{
                   ></ANButton>
                 ) : null}
               </div>
-            </div>
+            </>
           ) : (
             <></>
           )}

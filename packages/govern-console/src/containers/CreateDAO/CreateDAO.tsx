@@ -220,7 +220,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
         const result: any = await createDao(
           createDaoParams,
           {},
-          // registerTokenCallback,             commented out temporarily
+          registerTokenCallback,
         );
         await result.wait(CONFIRMATION_WAIT);
         setCreatedDaoRoute(params.daoName);

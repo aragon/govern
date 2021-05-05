@@ -318,7 +318,7 @@ export const lightTheme = createMuiTheme({
     },
   },
   typography,
-  breakpoints,
+  // breakpoints,
   overrides: {
     // MuiPickersToolbar: {
     //   toolbar: {
