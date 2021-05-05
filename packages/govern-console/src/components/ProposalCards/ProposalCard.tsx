@@ -26,7 +26,7 @@ export interface ProposalCardProps {
 const ProposalCardWrapper = styled(MUICard)(({ theme }) => ({
   backgroundColor: theme.custom.proposalCard.background,
   height: '150px',
-  width: '400px',
+  // width: '400px',
   border: `2px solid ${theme.custom.proposalCard.border}`,
   paddingLeft: '0px',
   paddingTop: '21px',
@@ -45,6 +45,7 @@ const ProposalHash = styled(MUITypography)(({ theme }) => ({
   fontStyle: theme.custom.proposalCard.fontStyle,
   marginTop: '14px',
   marginLeft: '32px',
+  textAlign: 'center',
 }));
 
 const ProposalDateText = styled(MUITypography)(({ theme }) => ({
@@ -56,6 +57,7 @@ const ProposalDateText = styled(MUITypography)(({ theme }) => ({
   fontStyle: theme.custom.proposalCard.fontStyle,
   marginTop: '14px',
   marginLeft: '32px',
+  textAlign: 'center',
 }));
 
 const getLabelColor = (proposalStatus: string) => {

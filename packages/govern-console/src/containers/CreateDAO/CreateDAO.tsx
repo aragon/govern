@@ -325,9 +325,9 @@ const NewDaoForm: React.FC<FormProps> = memo(
       try {
         //TODO this console log to be removed
         console.log('createDaoParams', createDaoParams);
-        const result: any = await createDao(createDaoParams, {}, registerTokenCallback);
-        setCreatedDaoRoute(daoName);
-        await result.wait(CONFIRMATION_WAIT);                      
+        // const result: any = await createDao(createDaoParams, {}, registerTokenCallback);
+        // setCreatedDaoRoute(daoName);
+        // await result.wait(CONFIRMATION_WAIT);                      
         return true;
       } catch (error) {
         console.log(error);
