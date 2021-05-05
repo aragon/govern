@@ -135,8 +135,7 @@ export const NewActionModal: React.FC<NewActionModalProps> = ({
   };
 
   const onGenerateClick = () => {
-    if (abi === null) return;
-    if (contractAddress === null) return;
+    if (!abi || !contractAddress) return;
     onGenerate(contractAddress, abi);
   };
   return (
