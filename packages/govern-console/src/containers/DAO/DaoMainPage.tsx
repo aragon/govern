@@ -103,7 +103,7 @@ const DaoMainPage: React.FC<{
   //TODO daoname empty handling
 
   const { data: daoList, loading: loadingDao } = useQuery(GET_DAO_BY_NAME, {
-    variables: { name: `%${daoName}%` },
+    variables: { name: daoName },
   });
 
   const [isProposalPage, setProposalPage] = useState(true);
