@@ -169,25 +169,13 @@ const NewDaoForm: React.FC<FormProps> = memo(
       setValue('daoConfig', _config);
     }, [connectedChainId]);
 
-    const getTokenInfo = async (tokenAddress: string) => {
-      //TODO: handle etherProvider in case wallet is not connected
-      try {
-        const token = await getToken(tokenAddress, ethersProvider);
-        return token;
-      } catch (error) {
-        console.log(error);
-        return false;
-      }
-    };
-
     const createDaoCall = async (params: FormInputs): Promise<boolean> => {
       let token: Partial<Token>;
       if (params.isExistingToken) {
-        const tokenInfo = await getTokenInfo(params.tokenAddress);
-        if (tokenInfo !== false) {
-          token = tokenInfo;
-        } else {
-          return false;
+        try {
+          token = await getToken(params.tokenAddress, ethersProvider);
+        }catch(error) {
+          return false
         }
       } else {
         token = {
@@ -220,7 +208,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
         const result: any = await createDao(
           createDaoParams,
           {},
-          // registerTokenCallback,             commented out temporarily
+          registerTokenCallback,
         );
         await result.wait(CONFIRMATION_WAIT);
         setCreatedDaoRoute(params.daoName);

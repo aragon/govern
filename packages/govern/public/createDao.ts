@@ -97,8 +97,7 @@ export type CreateDaoOptions = {
 export async function createDao(
   args: CreateDaoParams,
   options: CreateDaoOptions = {},
-  registerTokenCallback?: Function,
-  bla?: TokenDeposit
+  registerTokenCallback?: Function
 ): Promise<TransactionResponse> {
   if (!args.token.tokenAddress) {
     args.token.tokenAddress = AddressZero

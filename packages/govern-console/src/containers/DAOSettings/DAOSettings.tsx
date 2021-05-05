@@ -128,6 +128,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
       control,
       watch,
       setValue,
+      reset,
       getValues,
     } = useForm<FormInputs>();
 
@@ -148,7 +149,6 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
     
     const proposalInstance = React.useMemo(() => {
       if(ethersProvider && account && daoDetails) {
-        console.log(daoDetails, ' goodone')
         let queueApprovals = new QueueApprovals(ethersProvider.getSigner(), account, daoDetails.queue.address, daoDetails.queue.config.resolver)
         const proposal =  new Proposal(daoDetails.queue.address, {} as ProposalOptions);
         return new FacadeProposal(queueApprovals, proposal) as (FacadeProposal & Proposal)
@@ -164,32 +164,31 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
 
     useEffect(() => {
       const _load = async () => {
-        if (daoDetails) {
-          console.log('called useffect');
-        
+        if (daoDetails) {        
           const _config = daoDetails.queue.config;
-
           setConfig(_config);
 
-          setValue('daoConfig.executionDelay', _config.executionDelay)
-          setValue('daoConfig.resolver', _config.resolver)
-          setValue('daoConfig.rules', _config.rules)
-          setValue('daoConfig.scheduleDeposit.token', _config.scheduleDeposit.token)
-          setValue('daoConfig.challengeDeposit.token', _config.challengeDeposit.token)
-          setValue('daoConfig.maxCalldataSize', _config.maxCalldataSize)
+          // copy the nested objects so we can change the amount values
+          const formConfig: DaoConfig = { 
+            ..._config,
+            scheduleDeposit: {..._config.scheduleDeposit},
+            challengeDeposit: {..._config.challengeDeposit}
+          }
 
-          setValue('daoConfig.scheduleDeposit.amount', await correctDecimal(
+          formConfig.scheduleDeposit.amount = await correctDecimal(
             _config.scheduleDeposit.token,
             _config.scheduleDeposit.amount,
             false,
             ethersProvider
-          ))
-          setValue('daoConfig.challengeDeposit.amount', await correctDecimal(
+          )
+          formConfig.challengeDeposit.amount =  await correctDecimal(
             _config.challengeDeposit.token,
             _config.challengeDeposit.amount,
             false,
             ethersProvider
-          ))
+          )
+
+          setValue('daoConfig', formConfig)
         }
       };
       _load();
