@@ -64,7 +64,7 @@ task('ens:set-addr', 'Set the ENS address record')
  * it's fine to run this command in rinkeby network to print the transaction data
 */
 task('ens:reclaim', 'Reclaim the ownership of an ENS name')
-.addParam("label", "The ENS name")
+.addParam("label", "The ENS label, without .eth")
 .addParam("controller", "The controller of the ENS")
 .addOptionalParam('print', 'Print the transaction data only', true, types.boolean)
 .setAction(async ({label, controller, print}, env) => {
