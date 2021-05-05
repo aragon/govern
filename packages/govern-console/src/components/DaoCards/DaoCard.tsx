@@ -28,14 +28,14 @@ export interface DaoCardProps {
 
 const DaoCardWrapper = styled(MUICard)(({ theme }) => ({
   background: theme.custom.daoCard.background,
-  width: '328px',
+  // width: '328px',
   height: '161px',
   border: `2px ${theme.custom.daoCard.border}`,
   boxSizing: 'border-box',
   boxShadow: '0px 6px 6px rgba(180, 193, 228, 0.35)',
   justifyContent: 'center',
   alignItems: 'center',
-  padding: '0px',
+  padding: '32px',
   borderRadius: '8px',
   display: 'flex',
   flexDirection: 'column',
@@ -68,8 +68,8 @@ export const DaoCard: React.FC<DaoCardProps> = ({
       <div
         style={{
           display: 'flex',
-          width: '202px',
-          justifyContent: 'space-between',
+          width: '100%',
+          justifyContent: 'space-evenly',
         }}
       >
         <div>

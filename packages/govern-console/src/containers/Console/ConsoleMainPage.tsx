@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { styled, useTheme } from '@material-ui/core/styles';
+import { styled } from '@material-ui/core/styles';
 import { ConsoleHeader } from 'components/ConsoleHeader/ConsoleHeader';
 import { DaoCard } from 'components/DaoCards/DaoCard';
 import { ANButton } from 'components/Button/ANButton';
+import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import {
@@ -31,18 +32,19 @@ const ConsoleMainDiv = styled(Paper)(({ theme }) => ({
   boxShadow: 'none',
 }));
 
+const WrapperGrid = styled(Grid)(({ theme }) => ({
+  marginTop: '24px',
+  boxSizing: 'border-box',
+  margin: '0 !important',
+  width: '100% !important',
+}));
+
 const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
   updateSelectedDao,
   ...props
 }) => {
   const history = useHistory();
-  const theme = useTheme();
   const [visibleDaoList, updateDaoList] = useState<any>([]);
-  const [filteredDaoList, updateFilteredDaoList] = useState<any>([]);
-  const [
-    isShowingFilteredResults,
-    updateIsShowingFilteredResults,
-  ] = useState<boolean>(false);
   const [totalDaoCount, updateTotalDaoCount] = useState<number>();
 
   const {
@@ -62,10 +64,6 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
     loading: isLoadingRegistryData,
     error: errorLoadingRegistryData,
   } = useQuery(GET_GOVERN_REGISTRY_DATA);
-
-  // const getTotalNumberOfDaos = () => {
-  //   updateTotalDaoCount(numberOfDaos);
-  // };
 
   useEffect(() => {
     if (daoListData && daoListData.daos) {
@@ -100,23 +98,25 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
   return (
     <ConsoleMainDiv>
       <ConsoleHeader />
-      <div
-        style={{
-          width: '100%',
-          maxWidth: '100%',
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'left',
-          gridGap: '0px 10px',
-        }}
+      <WrapperGrid
+        container
+        spacing={3}
+        xs={12}
+        direction="row"
+        justify="center"
       >
         {visibleDaoList &&
           visibleDaoList.length > 0 &&
           visibleDaoList.map((dao: any) => (
-            <div
-              style={{ marginTop: '32px', width: '328px' }}
+            <Grid
+              item
               onClick={() => goToDao(dao)}
               key={dao.name}
+              xl={2}
+              lg={3}
+              xs={6}
+              sm={4}
+              md={3}
             >
               <DaoCard
                 label={dao.name}
@@ -124,9 +124,10 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
                 numberOfProposals={dao.queue.nonce}
                 daoId={dao.id}
               ></DaoCard>
-            </div>
+            </Grid>
           ))}
-      </div>
+      </WrapperGrid>
+
       <div
         style={{
           width: '100%',

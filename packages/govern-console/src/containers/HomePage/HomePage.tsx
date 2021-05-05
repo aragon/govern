@@ -17,6 +17,16 @@ import { ModalsProvider } from 'containers/HomePage/ModalsContext';
 const AppWrapper = styled('div')({
   width: 'calc(100vw - 96px)',
   margin: 'auto',
+  boxSizing: 'border-box',
+  position: 'relative',
+  height: '100vh',
+});
+const MainBodyWrapper = styled('div')({
+  width: '100%',
+  height: 'calc(100% - 212px)',
+  boxSizing: 'border-box',
+  position: 'absolute',
+  top: '106px',
 });
 
 const HomePage = ({ ...props }) => {
@@ -54,11 +64,11 @@ const HomePage = ({ ...props }) => {
     history.push(`/daos/${daoName}`);
   };
   return (
-    <AppWrapper>
+    <AppWrapper id="app-wrapper">
       <Header />
       {/* add breadcrumbs later */}
       <Switch>
-        <div>
+        <MainBodyWrapper id="main-body-wrapper">
           <Route exact path="/">
             <ConsoleMainPage
               updateSelectedDao={updateSelectedDaoAndPushToHistory}
@@ -92,7 +102,7 @@ const HomePage = ({ ...props }) => {
         <Dashboard />
       </Route>
     */}
-        </div>
+        </MainBodyWrapper>
       </Switch>
       <Footer />
       {/* <Footer /> */}
