@@ -2,6 +2,8 @@
 import { CustomTransaction, Response } from 'utils/types';
 import { ethers, BigNumber } from 'ethers';
 import { erc20TokenABI } from './abis/erc20';
+import { createDao, CreateDaoParams, DaoConfig } from '@aragon/govern';
+
 import {
   Proposal,
   ProposalOptions,
@@ -39,3 +41,28 @@ export const buildPayload = ({
 
   return payload;
 };
+
+
+export const setConfigForm = ({
+  setValue,
+  config
+}: { setValue: Function,  config: DaoConfig}) => {
+  
+  setValue('daoConfig.executionDelay', config.executionDelay)
+  setValue('daoConfig.resolver', config.resolver)
+  setValue('daoConfig.rules', config.rules)
+  setValue('daoConfig.scheduleDeposit.token', config.scheduleDeposit.token)
+  setValue('daoConfig.challengeDeposit.token', config.challengeDeposit.token)
+  setValue('daoConfig.maxCalldataSize', config.maxCalldataSize)
+
+  // setValue('daoConfig.scheduleDeposit.amount', await correctDecimal(
+  //   config.scheduleDeposit.token,
+  //   config.scheduleDeposit.amount,
+  //   false,
+  // ))
+  // setValue('daoConfig.challengeDeposit.amount', await correctDecimal(
+  //   config.challengeDeposit.token,
+  //   config.challengeDeposit.amount,
+  //   false,
+  // ))
+}

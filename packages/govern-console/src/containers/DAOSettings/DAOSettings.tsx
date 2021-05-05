@@ -123,6 +123,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
       handleSubmit,
       watch,
       setValue,
+      reset,
       getValues,
     } = useForm<FormInputs>();
 
@@ -178,27 +179,27 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
       const _load = async () => {
         if (daoDetails) {
           console.log('called useffect');
-          
+        
           const _config = daoDetails.queue.config;
           console.log('_config', _config)
           setCurrentConfig(_config);
-          const _formConfig = {
-            ..._config,
-            [_config.scheduleDeposit.amount]: await correctDecimal(
-              _config.scheduleDeposit.token,
-              _config.scheduleDeposit.amount,
-              false,
-            ),
-            [_config.challengeDeposit.amount]: await correctDecimal(
-              _config.challengeDeposit.token,
-              _config.challengeDeposit.amount,
-              false,
-            ),
-          };
+          setValue('daoConfig.executionDelay', _config.executionDelay)
+          setValue('daoConfig.resolver', _config.resolver)
+          setValue('daoConfig.rules', _config.rules)
+          setValue('daoConfig.scheduleDeposit.token', _config.scheduleDeposit.token)
+          setValue('daoConfig.challengeDeposit.token', _config.challengeDeposit.token)
+          setValue('daoConfig.maxCalldataSize', _config.maxCalldataSize)
 
-          setValue('daoConfig', _formConfig);
-
-          console.log('_formConfig', _formConfig)
+          setValue('daoConfig.scheduleDeposit.amount', await correctDecimal(
+            _config.scheduleDeposit.token,
+            _config.scheduleDeposit.amount,
+            false,
+          ))
+          setValue('daoConfig.challengeDeposit.amount', await correctDecimal(
+            _config.challengeDeposit.token,
+            _config.challengeDeposit.amount,
+            false,
+          ))
 
           const proposalOptions: ProposalOptions = {};
           const proposal = new Proposal(
@@ -230,13 +231,8 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
         newConfig.challengeDeposit.token,
         newConfig.challengeDeposit.amount,
         true,
-      );
+      )
 
-      //   rules: toUtf8Bytes(getValues('rules')),
-      //   maxCalldataSize: currentConfig.maxCalldataSize, // TODO: grab it from config subgraph too.
-      // };
-
-      console.log('new config', newConfig);
       const submitter: string = account;
 
       const payload = buildPayload({
@@ -247,7 +243,6 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
         proof: toUtf8Bytes(getValues('justification')),
       });
 
-      console.log(payload, ' payload');
 
       let txList = [];
 
@@ -321,167 +316,10 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
       setIsOpen(true);
     };
 
-    const txReviewContainer = (
-      <div
-        style={{
-          minWidth: '398px',
-          minHeight: '124px',
-          background: '#F6F9FC',
-          borderRadius: '10px',
-        }}
-      >
-        <div
-          style={{
-            fontFamily: 'Manrope',
-            fontStyle: 'normal',
-            fontWeight: 600,
-            fontSize: '14px',
-            lineHeight: '19px',
-            color: '#0176FF',
-            marginTop: '20px',
-            marginLeft: '20px',
-            marginBottom: '10px',
-          }}
-        >
-          Transactions to be triggered:
-        </div>
-        {txList.map((tx) => {
-          return (
-            <div
-              style={{
-                fontFamily: 'Manrope',
-                fontStyle: 'normal',
-                fontWeight: 500,
-                fontSize: '14px',
-                lineHeight: '22px',
-                color: '#0176FF',
-                marginLeft: '30px',
-              }}
-            >
-              {'● ' + tx.txText}
-            </div>
-          );
-        })}
-      </div>
-    );
 
-    const txTrigerContainer = (
-      <div
-        style={{
-          minWidth: '398px',
-          minHeight: '124px',
-          background: '#F6F9FC',
-          borderRadius: '10px',
-        }}
-      >
-        <div
-          style={{
-            fontFamily: 'Manrope',
-            fontStyle: 'normal',
-            fontWeight: 600,
-            fontSize: '14px',
-            lineHeight: '19px',
-            color: '#0176FF',
-            marginTop: '20px',
-            marginLeft: '20px',
-            marginBottom: '10px',
-          }}
-        >
-          Processing transactions
-        </div>
-        {txList.map((tx) => {
-          return (
-            <div
-              style={{
-                fontFamily: 'Manrope',
-                fontStyle: 'normal',
-                fontWeight: 500,
-                fontSize: '14px',
-                lineHeight: '22px',
-                color: '#0176FF',
-                marginLeft: '30px',
-              }}
-            >
-              <ANCircularProgressWithCaption
-                state={tx.status}
-                caption={tx.txText}
-              />
-            </div>
-          );
-        })}
-      </div>
-    );
-
-    const [diactivateModalButton, setDiactivateModalButton] = useState<boolean>(
-      false,
-    );
-    const [txIndexToRun, setTxIndexToRun] = useState(0);
-
-    useEffect(() => {
-      txList.forEach((_, index) => {
-        if (txList[index].status === CiruclarProgressStatus.InProgress) {
-          setDiactivateModalButton(true);
-          const txExcutor = async () => {
-            let _txList = [...txList];
-            const result = await txList[txIndexToRun].txAction();
-            if (result) {
-              _txList[txIndexToRun].status = CiruclarProgressStatus.Done;
-              setTxIndexToRun(txIndexToRun + 1);
-            } else {
-              _txList[txIndexToRun].status = CiruclarProgressStatus.Failed;
-            }
-            setTxList(_txList);
-            setDiactivateModalButton(false);
-          };
-          txExcutor();
-        }
-      });
-    }, [txList]);
-
-    const modalContainer = (
-      <div>
-        {isTrigger ? txTrigerContainer : txReviewContainer}
-        {isTrigger ? (
-          <ANButton
-            disabled={diactivateModalButton}
-            label={'Continue'}
-            buttonType={'primary'}
-            onClick={async () => {
-              if (txIndexToRun >= txList.length) {
-                closeModal();
-                onClickBack();
-              } else {
-                let _txList = [...txList];
-                _txList[txIndexToRun].status =
-                  CiruclarProgressStatus.InProgress;
-                setTxList(_txList);
-              }
-            }}
-            style={{ marginTop: '34px' }}
-            width={'100%'}
-          />
-        ) : (
-          <ANButton
-            label={'Get started'}
-            buttonType={'primary'}
-            onClick={() => {
-              setIsTrigger(true);
-            }}
-            style={{ marginTop: '34px' }}
-            width={'100%'}
-          />
-        )}
-      </div>
-    );
 
     return proposal ? (
       <>
-        <SimpleModal
-          modalTitle={'Confirm transactions'}
-          open={isOpen}
-          onClose={closeModal}
-          children={modalContainer}
-        />
         <ANWrappedPaper style={{ width: window.innerWidth }}>
           <BackButton onClick={onClickBack}>
             <img src={backButtonIcon} />
