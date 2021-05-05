@@ -1,9 +1,11 @@
-import { Contract, constants, utils, providers, Signer } from 'ethers'
+import { Contract, constants, utils, providers, VoidSigner, Signer } from 'ethers'
 
 const ensAbi = [
   "function resolver(bytes32 node) external view returns (address)",
   "function owner(bytes32 node) external view returns (address)",
   "function setOwner(bytes32 node, address owner) external @500000",
+  "function setRecord(bytes32 node, address owner, address resolver, uint64 ttl) external",
+  "function setSubnodeOwner(bytes32 node, bytes32 label, address owner) public",
   "function setSubnodeRecord(bytes32 node, bytes32 label, address owner, address resolver, uint64 ttl) external"
 ]
 
@@ -12,6 +14,8 @@ const resolverAbi = [
   "function addr(bytes32 nodehash) view returns (address)",
   "function setAddr(bytes32 nodehash, address addr) @500000"
 ]
+
+const ethRegistrarAbi = ['function reclaim(uint256 id, address owner) external']
 
 
 function isSameAddress(address1: string, address2: string): boolean {
@@ -32,22 +36,28 @@ function isValidAddress(address: string) {
 
 export class Ens {
   protected readonly signer: Signer
-  protected readonly ens: Contract
+  readonly ens: Contract
+  private readonly web3Provider: providers.Web3Provider
 
-  constructor(provider: any, network: providers.Network) {
-    const web3Provider = new providers.Web3Provider(provider, network)
-    this.signer = web3Provider.getSigner()
-    this.ens = new Contract(network.ensAddress!, ensAbi, this.signer);
+  constructor(provider: any, network: providers.Network, readonly: boolean = false) {
+    this.web3Provider = new providers.Web3Provider(provider, network)
+    if( readonly ) {
+      this.signer = new VoidSigner(constants.AddressZero, this.web3Provider)
+      this.ens = new Contract(network.ensAddress!, ensAbi, this.web3Provider);
+    } else {
+      this.signer = this.web3Provider.getSigner()
+      this.ens = new Contract(network.ensAddress!, ensAbi, this.signer);
+    }
   }
 
-  static async createEns(provider: any): Promise<Ens> {
+  static async createEns(provider: any, readonly: boolean = false): Promise<Ens> {
     const web3 = new providers.Web3Provider(provider)
     const network = await web3.getNetwork()
     if (!network.ensAddress) {
       throw new Error('ENS is not defined in this environment')
     }
 
-    return new Ens(provider, network)
+    return new Ens(provider, network, readonly)
   }
 
   async getResolver(nodehash: string): Promise<Contract> {
@@ -57,6 +67,11 @@ export class Ens {
     }
 
     return new Contract(address, resolverAbi, this.signer);
+  }
+
+  async getEthRegistrar(signer?: Signer): Promise<Contract> {
+    const address = await this.ens.owner(utils.namehash("eth"));
+    return new Contract(address, ethRegistrarAbi, signer || this.web3Provider);
   }
 
   async setAddr(name: string, address: string): Promise<providers.TransactionResponse> {
