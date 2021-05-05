@@ -64,7 +64,7 @@ const DaoMainPage: React.FC<{
   const [fetchMoreProposal, updateFetchMoreProposals] = useState<any>();
   const [isProfilePage, setProfilePage] = useState(false);
   const [daoDetails, updateDaoDetails] = useState<any>();
-  const searchString = useRef('');
+  const [searchString, setSearchString] = useState('');
 
   // useEffect(() => {
   //   if (isProfile) {
@@ -74,10 +74,10 @@ const DaoMainPage: React.FC<{
   // }, [isProfile]);
 
   const onInputChange = (val: string) => {
-    searchString.current = val;
+    setSearchString(val);
   };
   const onSearch = () => {
-    console.log(searchString.current);
+    console.log(searchString);
   };
   const onPageChange = (page: string) => {
     if (page === 'profile') {

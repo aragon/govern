@@ -216,7 +216,7 @@ const AddedActions: React.FC<AddedActionsProps> = ({
                         action.name,
                       );
                     }}
-                    value={actionsToSchedule[index]?.params[num] || ''}
+                    // value={actionsToSchedule[index]?.params[num] || ''}
                     height="46px"
                     width="814px"
                     placeholder={input.name}
@@ -242,16 +242,16 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     variables: { name: daoName },
   });
   const classes = useStyles();
-  const executor = useRef('');
-  const justification: { current: string } = useRef('');
+  const [executor, setExecutor] = useState('');
+  const [justification, setJustification] = useState('');
   // const [isAddingActions, updateIsAddingActions] = useState(false);
   const [selectedActions, updateSelectedOptions] = useState([]);
   // const [modalStyle] = React.useState(getModalStyle);
   const [isInputModalOpen, setInputModalOpen] = useState(false);
   const [isActionModalOpen, setActionModalOpen] = useState(false);
   const [daoDetails, updateDaoDetails] = useState<any>();
-  const abiFunctions = useRef([]);
-  const actionsToSchedule = useRef([]);
+  const [abiFunctions, setAbiFunctions] = useState([]);
+  const [actionsToSchedule, setActionsToSchedule] = useState([]);
   const proposalOptions: ProposalOptions = {};
 
   useEffect(() => {
@@ -262,7 +262,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
 
   const proposal = React.useMemo(() => {
     if (daoDetails) {
-      executor.current = daoDetails.executor.address;
+      setExecutor(daoDetails.executor.address);
       return new Proposal(daoDetails.queue.address, proposalOptions);
     }
   }, [daoDetails]);
@@ -337,7 +337,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
         return data as ActionToSchedule;
       },
     );
-    actionsToSchedule.current = initialActions as [];
+    setActionsToSchedule(initialActions as []);
   };
 
   interface ActionToSchedule {
@@ -356,7 +356,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     inputIndex: number,
     functionName: string,
   ) => {
-    const actions: any[] = actionsToSchedule.current;
+    const actions: any[] = actionsToSchedule;
     const { params } = actions[functionIndex];
     params[inputIndex] = value;
     delete actions[functionIndex].params;
@@ -364,12 +364,13 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
       params,
       ...actions[functionIndex],
     };
-    actionsToSchedule.current = actions as [];
+    setActionsToSchedule(actions as []);
+    // actionsToSchedule.current = actions as [];
   };
   // const onScheduleProposal = () => {};
 
   const isProposalValid = () => {
-    if (justification.current === '') return false;
+    if (justification === '') return false;
     if (selectedActions.length === 0) return false;
     return true;
   };
@@ -397,17 +398,18 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
       }
     });
 
-    abiFunctions.current = functions;
+    setAbiFunctions(functions);
+    // abiFunctions.current = functions;
     handleInputModalClose();
     handleActionModalOpen();
   };
 
   const onChangeJustification = (val: string) => {
-    justification.current = val;
+    setJustification(val);
   };
 
   const onSchedule = () => {
-    const actions: any[] = actionsToSchedule.current.map((item: any) => {
+    const actions: any[] = actionsToSchedule.map((item: any) => {
       const { abi, contractAddress, name, params, numberOfInputs } = item;
       const abiInterface = new ethers.utils.Interface(abi);
       const functionParameters = [];
@@ -431,13 +433,13 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   };
 
   const scheduleProposal = async (actions: any[]) => {
-    console.log(executor.current);
+    // console.log(executor);
     const payload = buildPayload({
       submitter,
-      executor: executor.current,
+      executor: executor,
       actions,
       executionDelay: daoDetails.queue.config.executionDelay,
-      proof: toUtf8Bytes(justification.current),
+      proof: toUtf8Bytes(justification),
     });
     console.log('payload', payload);
     const config = daoDetails.queue.config;
@@ -475,23 +477,6 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     }
   };
 
-  // React.useEffect(() => {
-  //   if (!daoDetails.id) {
-  //     let daoDetails: any = sessionStorage.getItem('selectedDao');
-  //     if (!daoDetails.id) {
-  //       let { daoName } = useParams<any>();
-  //       let {
-  //         data: daoDetailsData,
-  //         loading: isLoadingDaoDetails,
-  //         error: daoLoadingError,
-  //       } = useQuery(GET_DAO_BY_NAME, {
-  //         variables: { name: daoName },
-  //       });
-  //       updateDaoDetails(daoDetailsData);
-  //     }
-  //   }
-  // });
-
   return (
     <>
       <WrapperDiv>
@@ -516,7 +501,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
           onInputChange={onChangeJustification}
           placeholder={'Enter Justification '}
           label=""
-          value={justification.current}
+          value={justification}
           height={'108px'}
           width={'700px'}
         ></InputField>
@@ -528,7 +513,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
             <AddedActions
               selectedActions={selectedActions}
               onAddInputToAction={onAddInputToAction}
-              actionsToSchedule={actionsToSchedule.current}
+              actionsToSchedule={actionsToSchedule}
             />
           </div>
         )}
@@ -562,7 +547,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
           onCloseModal={handleActionModalClose}
           open={isActionModalOpen}
           onAddActions={onAddNewActions}
-          actions={abiFunctions.current as any}
+          actions={abiFunctions as any}
         ></AddActionsModal>
       </WrapperDiv>
     </>

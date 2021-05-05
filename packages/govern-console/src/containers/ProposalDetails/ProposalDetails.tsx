@@ -294,8 +294,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     CustomTransaction[]
   >([]);
   const transactionsQueue = React.useRef<CustomTransaction[]>([]);
-  const challengeReason = React.useRef('');
-  const vetoReason = React.useRef('');
+  const [challengeReason, setChallengeReason] = React.useState('');
 
   const [
     getProposalData,
@@ -433,10 +432,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     if (proposalInstance) {
       const challengeTransaction: CustomTransaction = {
         tx: () => {
-          return proposalInstance.challenge(
-            proposalParams,
-            challengeReason.current,
-          );
+          return proposalInstance.challenge(proposalParams, challengeReason);
         },
         preTransactionMessage: 'Challenge Proposal',
         transactionMessage: 'Challenging Proposal',
@@ -725,7 +721,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                     </div>
                     <InputField
                       onInputChange={(value) => {
-                        challengeReason.current = value;
+                        setChallengeReason(value);
                       }}
                       label={''}
                       placeholder={''}
