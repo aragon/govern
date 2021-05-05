@@ -1,10 +1,12 @@
 import ClientInterface from '../clients/lib/ClientInterface'
 import GraphQLClient from '../clients/graphql/GraphQLClient'
-import { DAO_FACTORY_ADDRESS } from './ConfigDefaults'
+import { DAO_FACTORY_ADDRESS, GOVERN_REGISTRY_ADDRESS } from './ConfigDefaults'
 
 export interface ConfigurationObject {
   subgraphURL?: string
-  daoFactoryAddress?: string
+  daoFactoryAddress?: string,
+  tokenStorageProof?: string
+  governRegistry?: string
 }
 
 let defaultConfig: Configuration
@@ -24,7 +26,8 @@ export default class Configuration {
   private config: {
     subgraphURL: string;
     client: ClientInterface
-    daoFactoryAddress: string
+    daoFactoryAddress: string,
+    governRegistry: string
   }
 
   /**
@@ -59,7 +62,8 @@ export default class Configuration {
     this.config = {
       subgraphURL: config.subgraphURL,
       client: new GraphQLClient(config.subgraphURL),
-      daoFactoryAddress: config.daoFactoryAddress
+      daoFactoryAddress: config.daoFactoryAddress,
+      governRegistry: config.governRegistry,
     }
   }
 
@@ -102,6 +106,19 @@ export default class Configuration {
     return this.config.daoFactoryAddress
   }
 
+  /**
+   * Getter for governRegistry property
+   *
+   * @var governRegistry
+   *
+   * @returns {string}
+   *
+   * @public
+   */
+  get governRegistry(): string {
+    return this.config.governRegistry
+  }
+
 
   /**
    * Static setter/factory method of the Configuration class
@@ -125,6 +142,10 @@ export default class Configuration {
 
     if (!config.daoFactoryAddress) {
       config.daoFactoryAddress = DAO_FACTORY_ADDRESS
+    }
+
+    if (!config.governRegistry) {
+      config.governRegistry = GOVERN_REGISTRY_ADDRESS
     }
 
     defaultConfig = new Configuration(config)

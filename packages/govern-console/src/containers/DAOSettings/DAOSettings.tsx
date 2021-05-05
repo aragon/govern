@@ -1,12 +1,11 @@
 /* eslint-disable */
-import React, { useState, memo, useRef, useEffect, useMemo } from 'react';
+import React, { useState, memo, useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { ANWrappedPaper } from '../../components/WrapperPaper/ANWrapperPaper';
 import backButtonIcon from '../../images/back-btn.svg';
-import { useTheme, styled } from '@material-ui/core/styles';
+import { styled } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { InputField } from 'components/InputFields/InputField';
-import TextArea from 'components/TextArea/TextArea';
 import { ANButton } from 'components/Button/ANButton';
 // import Modal from '@material-ui/core/Modal';
 import { SimpleModal } from 'components/Modal/SimpleModal';
@@ -16,14 +15,18 @@ import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { useQuery } from '@apollo/client';
 import { buildPayload } from '../../utils/ERC3000';
 import { useWallet } from '../../EthersWallet';
-import { AddressZero } from '@ethersproject/constants'
-import { erc20ApprovalTransaction } from '../../utils/transactionHelper';
 import { HelpButton } from 'components/HelpButton/HelpButton';
 import { BlueSwitch } from 'components/Switchs/BlueSwitch';
 import Grid from '@material-ui/core/Grid';
 import { toUtf8Bytes, toUtf8String } from '@ethersproject/strings';
-import { ethers, BigNumber } from 'ethers';
-import { Token, getToken } from '@aragon/govern';
+import { DaoConfig } from '@aragon/govern';
+import QueueApprovals from 'services/QueueApprovals'
+import { CustomTransaction } from 'utils/types';
+import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
+import { correctDecimal } from 'utils/token'
+import  FacadeProposal from 'services/Proposal';
+import { useForm, Controller } from 'react-hook-form';
+import { BytesLike } from 'ethers'
 
 import {
   Proposal,
@@ -31,6 +34,7 @@ import {
   PayloadType,
   ActionType,
 } from '@aragon/govern';
+import { assertValidName } from 'graphql';
 
 export interface DaoSettingContainerProps {
   /**
@@ -51,6 +55,13 @@ interface ParamTypes {
    * type of path (url) params
    */
   daoName: string;
+}
+
+interface FormInputs {
+  daoConfig: DaoConfig;
+  proof: string;
+  isRuleFile: BytesLike;
+  isProofFile: string;
 }
 
 const BackButton = styled('div')({
@@ -105,441 +116,143 @@ const OptionTextStyle = styled('div')({
   fontSize: 18,
 });
 
-
 const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
   ({ onClickBack }) => {
+    
     const context: any = useWallet();
+    const { account, status, ethersProvider } = context;
+
+    const { dispatch } = React.useContext(ModalsContext);
+
     const {
-      // connector,
-      account,
-      // balance,
-      // chainId,
-      // connect,
-      // connectors,
-      // ethereum,
-      // error,
-      // getBlockNumber,
-      // networkName,
-      // reset,
-      status,
-      // type,
-      ethersProvider,
-    } = context;
-
-    const [executionDelay, updateExecutionDelay] = useState<string>('');
-
-    const scheduleDepositContractAddress = useRef<string>('');
-    const scheduleDepositAmount = useRef<string>('');
-    const challengeDepositContractAddress = useRef<string>('');
-    const challengeDepositAmount = useRef<string>('');
-    const resolverAddress = useRef<string>('');
-    const rules = useRef<string>('');
-    const justification = useRef<string>('');
-
-    const [isRuleFile, setIsRuleFile] = useState(false);
-    const [isJustificationFile, setIsJustificationFile] = useState(false);
-
-    const onChangeExecutionDelay = (val: any) => {
-      // setExecutionDelay(val)
-      updateExecutionDelay(val);
-    };
-
-    const onScheduleDepositContractAddress = (val: any) => {
-      scheduleDepositContractAddress.current = val;
-    };
-
-    const onChangeScheduleDepositAmount = (val: any) => {
-      scheduleDepositAmount.current = val;
-    };
-
-    const onChangeChallengeDepositContractAddress = (val: any) => {
-      challengeDepositContractAddress.current = val;
-    };
-
-    const onChangeChallengeDepositAmount = (val: any) => {
-      challengeDepositAmount.current = val;
-    };
-
-    const onChangeResolverAddress = (val: any) => {
-      resolverAddress.current = val;
-    };
-
-    const onChangeRules = (val: any) => {
-      rules.current = val;
-    };
-
-    const onChangeJustification = (val: any) => {
-      justification.current = val;
-    };
-
-    const getTokenDetail = async (tokenAddress: string) => {
-      try {
-        const token = await getToken(tokenAddress, ethersProvider);
-        return token;
-      } catch (error) {
-        console.log(error);
-        return null;
-      }
-    };
-
-    const correctDecimal = async (
-      tokenAddress: string,
-      _amount: string,
-      isFormat: boolean,
-    ) => {
-      const token: Token | null = await getTokenDetail(tokenAddress);
-      if (token) {
-        console.log('isFormat', isFormat);
-        if (isFormat) {
-          return ethers.utils.parseUnits(_amount, token.tokenDecimals);
-        } else {
-          console.log('format', _amount, token.tokenDecimals);
-          return ethers.utils.formatUnits(_amount, token.tokenDecimals);
-        }
-      } else {
-        return _amount;
-      }
-    };
-
+      control,
+      watch,
+      setValue,
+      getValues,
+    } = useForm<FormInputs>();
 
     const { daoName } = useParams<ParamTypes>();
     //TODO daoname empty handling
     const { data: daoList } = useQuery(GET_DAO_BY_NAME, {
       variables: { name: daoName },
     });
-
+    
     const [daoDetails, updateDaoDetails] = useState<any>();
-    const [proposal, setProposal] = useState<any>();
-    const [currentConfig, setCurrentConfig] = useState<any | null>();
-
+    const [config, setConfig] = useState<any | null>();
+    
     useEffect(() => {
       if (daoList) {
         updateDaoDetails(daoList.daos[0]);
       }
     }, [daoList]);
+    
+    const proposalInstance = React.useMemo(() => {
+      if(ethersProvider && account && daoDetails) {
+        console.log(daoDetails, ' goodone')
+        let queueApprovals = new QueueApprovals(ethersProvider.getSigner(), account, daoDetails.queue.address, daoDetails.queue.config.resolver)
+        const proposal =  new Proposal(daoDetails.queue.address, {} as ProposalOptions);
+        return new FacadeProposal(queueApprovals, proposal) as (FacadeProposal & Proposal)
+      }
+    }, [ethersProvider, account, daoDetails])
+
+    const transactionsQueue = React.useRef<CustomTransaction[]>([]);
+    useEffect(() => {
+      return function cleanUp() {
+        transactionsQueue.current = [];
+      };
+    }, []);
 
     useEffect(() => {
       const _load = async () => {
         if (daoDetails) {
-          console.log('called useeffect');
+          console.log('called useffect');
+        
           const _config = daoDetails.queue.config;
-          setCurrentConfig(_config);
-          onChangeExecutionDelay(_config.executionDelay);
-          onScheduleDepositContractAddress(_config.scheduleDeposit.token);
-          onChangeScheduleDepositAmount(
-            await correctDecimal(
-              _config.scheduleDeposit.token,
-              _config.scheduleDeposit.amount,
-              false,
-            ),
-          );
-          onChangeChallengeDepositContractAddress(
-            _config.challengeDeposit.token,
-          );
-          onChangeChallengeDepositAmount(
-            await correctDecimal(
-              _config.challengeDeposit.token,
-              _config.challengeDeposit.amount,
-              false,
-            ),
-          );
-          onChangeResolverAddress(_config.resolver);
-          onChangeRules(toUtf8String(_config.rules));
 
-          const proposalOptions: ProposalOptions = {};
-          const proposal = new Proposal(
-            daoDetails.queue.address,
-            proposalOptions,
-          );
-          setProposal(proposal);
+          setConfig(_config);
+
+          setValue('daoConfig.executionDelay', _config.executionDelay)
+          setValue('daoConfig.resolver', _config.resolver)
+          setValue('daoConfig.rules', _config.rules)
+          setValue('daoConfig.scheduleDeposit.token', _config.scheduleDeposit.token)
+          setValue('daoConfig.challengeDeposit.token', _config.challengeDeposit.token)
+          setValue('daoConfig.maxCalldataSize', _config.maxCalldataSize)
+
+          setValue('daoConfig.scheduleDeposit.amount', await correctDecimal(
+            _config.scheduleDeposit.token,
+            _config.scheduleDeposit.amount,
+            false,
+            ethersProvider
+          ))
+          setValue('daoConfig.challengeDeposit.amount', await correctDecimal(
+            _config.challengeDeposit.token,
+            _config.challengeDeposit.amount,
+            false,
+            ethersProvider
+          ))
         }
       };
       _load();
     }, [daoDetails, ethersProvider]);
 
-    const [isOpen, setIsOpen] = useState(false);
-    const [txList, setTxList] = useState<any[]>([]);
-    const [isTrigger, setIsTrigger] = useState<boolean>(false);
-
-    const closeModal = () => {
-      setIsOpen(!isOpen);
-    };
-
+    
     const callSaveSetting = async () => {
-      // const validated = validateForm();
-      // if (!validated) {
-      //   return;
-      // }
+      const newConfig: DaoConfig = getValues('daoConfig');
+      newConfig.scheduleDeposit.amount = await correctDecimal(
+        newConfig.scheduleDeposit.token,
+        newConfig.scheduleDeposit.amount,
+        true,
+        ethersProvider
+      );
+      newConfig.challengeDeposit.amount = await correctDecimal(
+        newConfig.challengeDeposit.token,
+        newConfig.challengeDeposit.amount,
+        true,
+        ethersProvider
+      )
 
-      const newConfig = {
-        executionDelay: executionDelay,
-        scheduleDeposit: {
-          token: scheduleDepositContractAddress.current,
-          amount: await correctDecimal(
-            scheduleDepositContractAddress.current,
-            scheduleDepositAmount.current,
-            true,
-          ),
-        },
-        challengeDeposit: {
-          token: challengeDepositContractAddress.current,
-          amount: await correctDecimal(
-            challengeDepositContractAddress.current,
-            challengeDepositAmount.current,
-            true,
-          ),
-        },
-        resolver: resolverAddress.current,
-        rules: toUtf8Bytes(rules.current),
-        maxCalldataSize: currentConfig.maxCalldataSize, // TODO: grab it from config subgraph too.
-      };
-
-      console.log('new config', newConfig);
       const submitter: string = account;
 
       const payload = buildPayload({
         submitter,
         executor: daoDetails.executor.address,
-        actions: [proposal.buildAction('configure', [newConfig], 0)],
+        actions: [
+          proposalInstance?.buildAction('configure', [newConfig], 0)
+        ],
         executionDelay: daoDetails.queue.config.executionDelay,
-        proof: toUtf8Bytes(justification.current), // TODO Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
-      });
+        proof: getValues('proof')
+      })
 
-      console.log(payload, ' payload');
+      const container = {
+        payload,
+        config
+      }
 
-      let txList = [];
+      console.log(container, 'container');
       
-      if (daoDetails.queue.config.scheduleDeposit.token !== AddressZero) {
-        const scheduleDepositApproval = await erc20ApprovalTransaction(
-          daoDetails.queue.config.scheduleDeposit.token,
-          daoDetails.queue.config.scheduleDeposit.amount,
-          daoDetails.queue.address,
-          account,
-          ethersProvider,
-        );
-
-        // TODO: if approval error alert user
-        if (scheduleDepositApproval.error) {
-          console.log(scheduleDepositApproval.error, ' approval error');
-          txList.push({
-            txText:
-              txList.length +
-              1 +
-              '- erc20 approval -' +
-              scheduleDepositApproval.error,
-            txAction: () => {}, // on purpose for testing, TODO: find a fix, or use toast
-            status: CiruclarProgressStatus.Failed,
-          });
-        }
-
-        const _txAction = async () => {
-          try {
-            const transactionResponse: any = await scheduleDepositApproval.transactions[0].tx();
-            await transactionResponse.wait(1);
-            return true;
-          } catch (err) {
-            console.log(err);
-            return false;
-          }
-        };
-
-        // approval acction to be called
-        if (scheduleDepositApproval.transactions.length > 0) {
-          txList.push({
-            txText: txList.length + 1 + '- ERC20 approval',
-            txAction: _txAction,
-            status: CiruclarProgressStatus.Disabled,
-          });
+      if(proposalInstance) {
+        try {
+          transactionsQueue.current = await proposalInstance.schedule(container);
+        }catch(error) {
+          // TODO: Bhanu show error
+          return
         }
       }
 
-      // schedule
-      const _scheduelAction = async () => {
-        try {
-          const scheduleResult = await proposal.schedule({
-            payload: payload,
-            config: currentConfig,
-          });
-          await scheduleResult.wait(1);
-          return true;
-        } catch (error) {
-          console.log(error);
-          return false;
-        }
-      };
-
-      // schedule action to be called
-      txList.push({
-        txText: txList.length + 1 + '- Proposal schedule',
-        txAction: _scheduelAction,
-        status: CiruclarProgressStatus.Disabled,
+      dispatch({
+        type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
+        payload: {
+          transactionList: transactionsQueue.current,
+          onTransactionFailure: () => {},
+          onTransactionSuccess: () => {},
+          onCompleteAllTransactions: () => {}
+        },
       });
 
-      setTxList(txList);
-      setIsOpen(true);
     };
 
-    const txReviewContainer = (
-      <div
-        style={{
-          minWidth: '398px',
-          minHeight: '124px',
-          background: '#F6F9FC',
-          borderRadius: '10px',
-        }}
-      >
-        <div
-          style={{
-            fontFamily: 'Manrope',
-            fontStyle: 'normal',
-            fontWeight: 600,
-            fontSize: '14px',
-            lineHeight: '19px',
-            color: '#0176FF',
-            marginTop: '20px',
-            marginLeft: '20px',
-            marginBottom: '10px',
-          }}
-        >
-          Transactions to be triggered:
-        </div>
-        {txList.map((tx) => {
-          return (
-            <div
-              style={{
-                fontFamily: 'Manrope',
-                fontStyle: 'normal',
-                fontWeight: 500,
-                fontSize: '14px',
-                lineHeight: '22px',
-                color: '#0176FF',
-                marginLeft: '30px',
-              }}
-            >
-              {'● ' + tx.txText}
-            </div>
-          );
-        })}
-      </div>
-    );
-
-    const txTrigerContainer = (
-      <div
-        style={{
-          minWidth: '398px',
-          minHeight: '124px',
-          background: '#F6F9FC',
-          borderRadius: '10px',
-        }}
-      >
-        <div
-          style={{
-            fontFamily: 'Manrope',
-            fontStyle: 'normal',
-            fontWeight: 600,
-            fontSize: '14px',
-            lineHeight: '19px',
-            color: '#0176FF',
-            marginTop: '20px',
-            marginLeft: '20px',
-            marginBottom: '10px',
-          }}
-        >
-          Processing transactions
-        </div>
-        {txList.map((tx) => {
-          return (
-            <div
-              style={{
-                fontFamily: 'Manrope',
-                fontStyle: 'normal',
-                fontWeight: 500,
-                fontSize: '14px',
-                lineHeight: '22px',
-                color: '#0176FF',
-                marginLeft: '30px',
-              }}
-            >
-              <ANCircularProgressWithCaption
-                state={tx.status}
-                caption={tx.txText}
-              />
-            </div>
-          );
-        })}
-      </div>
-    );
-
-    const [diactivateModalButton, setDiactivateModalButton] = useState<boolean>(
-      false,
-    );
-    const [txIndexToRun, setTxIndexToRun] = useState(0);
-
-    useEffect(() => {
-      txList.forEach((_, index) => {
-        if (txList[index].status === CiruclarProgressStatus.InProgress) {
-          setDiactivateModalButton(true);
-          const txExcutor = async () => {
-            let _txList = [...txList];
-            const result = await txList[txIndexToRun].txAction();
-            if (result) {
-              _txList[txIndexToRun].status = CiruclarProgressStatus.Done;
-              setTxIndexToRun(txIndexToRun + 1);
-            } else {
-              _txList[txIndexToRun].status = CiruclarProgressStatus.Failed;
-            }
-            setTxList(_txList);
-            setDiactivateModalButton(false);
-          };
-          txExcutor();
-        }
-      });
-    }, [txList]);
-
-    const modalContainer = (
-      <div>
-        {isTrigger ? txTrigerContainer : txReviewContainer}
-        {isTrigger ? (
-          <ANButton
-            disabled={diactivateModalButton}
-            label={'Continue'}
-            buttonType={'primary'}
-            onClick={async () => {
-              if (txIndexToRun >= txList.length) {
-                closeModal();
-                onClickBack();
-              } else {
-                let _txList = [...txList];
-                _txList[txIndexToRun].status =
-                  CiruclarProgressStatus.InProgress;
-                setTxList(_txList);
-              }
-            }}
-            style={{ marginTop: '34px' }}
-            width={'100%'}
-          />
-        ) : (
-          <ANButton
-            label={'Get started'}
-            buttonType={'primary'}
-            onClick={() => {
-              setIsTrigger(true);
-            }}
-            style={{ marginTop: '34px' }}
-            width={'100%'}
-          />
-        )}
-      </div>
-    );
-
-    return proposal ? (
+    return proposalInstance ? (
       <>
-        <SimpleModal
-          modalTitle={'Confirm transactions'}
-          open={isOpen}
-          onClose={closeModal}
-          children={modalContainer}
-        />
         <ANWrappedPaper style={{ width: window.innerWidth }}>
           <BackButton onClick={onClickBack}>
             <img src={backButtonIcon} />
@@ -554,13 +267,20 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
             />
           </InputTitle>
           <InputSubTitle>In seconds</InputSubTitle>
-          <InputField
-            label=""
-            onInputChange={onChangeExecutionDelay}
-            value={executionDelay}
-            height="46px"
-            width={window.innerWidth > 700 ? '50%' : '100%'}
-            placeholder={'350s'}
+          <Controller
+            name="daoConfig.executionDelay"
+            control={control}
+            defaultValue={''}
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <InputField
+                label=""
+                onInputChange={onChange}
+                value={value.toString()}
+                height="46px"
+                width={window.innerWidth > 700 ? '50%' : '100%'}
+                placeholder={'350s'}
+              />
+            )}
           />
           <InputTitle>
             Action collateral{' '}
@@ -574,24 +294,44 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
           <Grid container spacing={3}>
             <Grid item>
               <InputSubTitle>Token contract address</InputSubTitle>
-              <InputField
-                label=""
-                onInputChange={onScheduleDepositContractAddress}
-                value={scheduleDepositContractAddress.current}
-                height="46px"
-                minWidth={window.innerWidth > 700 ? '540px' : '100%'}
-                placeholder={'0x0000...'}
+              <Controller
+                name="daoConfig.scheduleDeposit.token"
+                control={control}
+                defaultValue=""
+                render={({
+                  field: { onChange, value },
+                  fieldState: { error },
+                }) => (
+                  <InputField
+                    label=""
+                    onInputChange={onChange}
+                    value={value}
+                    height="46px"
+                    width={window.innerWidth > 700 ? '540px' : '100%'}
+                    placeholder={'350s'}
+                  />
+                )}
               />
             </Grid>
             <Grid item>
               <InputSubTitle>Amount</InputSubTitle>
-              <InputField
-                label=""
-                onInputChange={onChangeScheduleDepositAmount}
-                value={scheduleDepositAmount.current}
-                height="46px"
-                minWidth={window.innerWidth > 700 ? '540px' : '100%'}
-                placeholder={'150'}
+              <Controller
+                name="daoConfig.scheduleDeposit.amount"
+                control={control}
+                defaultValue={''}
+                render={({
+                  field: { onChange, value },
+                  fieldState: { error },
+                }) => (
+                  <InputField
+                    label=""
+                    onInputChange={onChange}
+                    value={value.toString()}
+                    height="46px"
+                    width={window.innerWidth > 700 ? '540px' : '100%'}
+                    placeholder={'350s'}
+                  />
+                )}
               />
             </Grid>
           </Grid>
@@ -607,24 +347,44 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
           <Grid container spacing={3}>
             <Grid item>
               <InputSubTitle>Token contract address</InputSubTitle>
-              <InputField
-                label=""
-                onInputChange={onChangeChallengeDepositContractAddress}
-                value={challengeDepositContractAddress.current}
-                height="46px"
-                width={window.innerWidth > 700 ? '540px' : '100%'}
-                placeholder={'0x4c495F0005171E17c1dd08510g801805eE08E7'}
+              <Controller
+                name="daoConfig.challengeDeposit.token"
+                control={control}
+                defaultValue=""
+                render={({
+                  field: { onChange, value },
+                  fieldState: { error },
+                }) => (
+                  <InputField
+                    label=""
+                    onInputChange={onChange}
+                    value={value}
+                    height="46px"
+                    width={window.innerWidth > 700 ? '540px' : '100%'}
+                    placeholder={'350s'}
+                  />
+                )}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
               <InputSubTitle>Amount</InputSubTitle>
-              <InputField
-                label=""
-                onInputChange={onChangeChallengeDepositAmount}
-                value={challengeDepositAmount.current}
-                height="46px"
-                width={window.innerWidth > 700 ? '540px' : '100%'}
-                placeholder={'350'}
+              <Controller
+                name="daoConfig.challengeDeposit.amount"
+                control={control}
+                defaultValue={''}
+                render={({
+                  field: { onChange, value },
+                  fieldState: { error },
+                }) => (
+                  <InputField
+                    label=""
+                    onInputChange={onChange}
+                    value={value.toString()}
+                    height="46px"
+                    width={window.innerWidth > 700 ? '540px' : '100%'}
+                    placeholder={'350s'}
+                  />
+                )}
               />
             </Grid>
           </Grid>
@@ -638,13 +398,28 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
             />
           </InputTitle>
           <InputSubTitle>Token contract address</InputSubTitle>
-          <InputField
+          {/* <InputField
             label=""
             onInputChange={onChangeResolverAddress}
             value={resolverAddress.current}
             height="46px"
             width={window.innerWidth > 700 ? '540px' : '100%'}
             placeholder={'0x4c495F0005171E17c1dd08510g801805eE08E7'}
+          /> */}
+          <Controller
+            name="daoConfig.resolver"
+            control={control}
+            defaultValue={''}
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <InputField
+                label=""
+                onInputChange={onChange}
+                value={value}
+                height="46px"
+                width={window.innerWidth > 700 ? '540px' : '100%'}
+                placeholder={'350s'}
+              />
+            )}
           />
           <InputTitle>
             DAO rules / agreement{' '}
@@ -666,13 +441,21 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
           >
             <OptionTextStyle>{'Text'}</OptionTextStyle>
             <div style={{ marginLeft: '20px' }}>
-              <BlueSwitch
+              {/* <BlueSwitch
                 disabled={true}
                 checked={isRuleFile}
                 onChange={() => {
                   setIsRuleFile(!isRuleFile);
                 }}
                 name="ruleCheck"
+              /> */}
+              <Controller
+                name="isRuleFile"
+                control={control}
+                defaultValue={false}
+                render={({ field: { onChange, value } }) => (
+                  <BlueSwitch onChange={onChange} value={value} />
+                )}
               />
             </div>
             <OptionTextStyle>{'File'}</OptionTextStyle>
@@ -680,15 +463,32 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
           <InputSubTitle>
             Provide the base rules under what your DAO should be ran
           </InputSubTitle>
-          {!isRuleFile ? (
-            // <RuleTextArea onChange={onChangeRules} value={rules.current} />
-            <InputField
-              label=""
-              onInputChange={onChangeRules}
-              value={rules.current}
-              height="100px"
-              width="100%"
-              placeholder={'DAO rules and agreement ...'}
+          {!watch('isRuleFile') ? (
+            // <InputField
+            //   label=""
+            //   onInputChange={onChangeRules}
+            //   value={rules.current}
+            //   height="100px"
+            //   width="100%"
+            //   placeholder={'DAO rules and agreement ...'}
+            // />
+            <Controller
+              name="daoConfig.rules"
+              control={control}
+              defaultValue={''}
+              render={({
+                field: { onChange, value },
+                fieldState: { error },
+              }) => (
+                <InputField
+                  label=""
+                  onInputChange={onChange}
+                  value={value.toString()}
+                  height={'100px'}
+                  width={'100%'}
+                  placeholder={'DAO rules and agreement ...'}
+                />
+              )}
             />
           ) : (
             <div
@@ -722,7 +522,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
           )}
 
           <InputTitle>
-            Justification{' '}
+            Proof{' '}
             <HelpButton
               helpText={
                 'Please provide the reasons for this DAO settings change as this will trigger an action on the executor queue'
@@ -741,30 +541,44 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
           >
             <OptionTextStyle>{'Text'}</OptionTextStyle>
             <div style={{ marginLeft: '20px' }}>
-              <BlueSwitch
+              {/* <BlueSwitch
                 disabled={false}
-                checked={isJustificationFile}
+                checked={isProofFile}
                 onChange={() => {
-                  setIsJustificationFile(!isJustificationFile);
+                  setIsProofFile(!isProofFile);
                 }}
                 name="ruleCheck"
+              /> */}
+              <Controller
+                name="isProofFile"
+                control={control}
+                defaultValue={false}
+                render={({ field: { onChange, value } }) => (
+                  <BlueSwitch onChange={onChange} value={value} />
+                )}
               />
             </div>
             <OptionTextStyle>{'File'}</OptionTextStyle>
           </div>
-          <InputSubTitle>Enter the justification for changes</InputSubTitle>
-          {!isJustificationFile ? (
-            // <RuleTextArea
-            //   onChange={onChangeJustification}
-            //   value={justification.current}
-            // />
-            <InputField
-              label=""
-              onInputChange={onChangeJustification}
-              value={justification.current}
-              height="100px"
-              width="100%"
-              placeholder={'Justification...'}
+          <InputSubTitle>Enter the proof for changes</InputSubTitle>
+          {!watch('isProofFile') ? (
+            <Controller
+              name="proof"
+              control={control}
+              defaultValue={''}
+              render={({
+                field: { onChange, value },
+                fieldState: { error },
+              }) => (
+                <InputField
+                  label=""
+                  onInputChange={onChange}
+                  value={value}
+                  height={'100px'}
+                  width={'100%'}
+                  placeholder={'DAO rules and agreement ...'}
+                />
+              )}
             />
           ) : (
             <div
