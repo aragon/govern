@@ -5,7 +5,7 @@
     "strictPropertyInitialization": false,
     "outDir": "./dist",
     "inlineSources": true,
-    "strict":false,
+    "strict": false,
     "resolveJsonModule": true,
     "types": [
       "jest"

@@ -139,6 +139,15 @@ const IncrementorDecrementorButtons: React.FC<any> = ({
   );
 };
 
+const ActionText = styled(Typography)(({ theme }: any) => ({
+  color: theme.custom.black,
+  lineHeight: theme.custom.modal.labelLineHeight,
+  fontSize: theme.custom.modal.labelFontSize,
+  fontWeight: theme.custom.modal.labelFontWeight,
+  fontFamily: theme.typography.fontFamily,
+  fontStyle: 'normal',
+}));
+
 export const AddActionsModal: React.FC<AddActionsModalProps> = ({
   open,
   onCloseModal,
@@ -146,7 +155,7 @@ export const AddActionsModal: React.FC<AddActionsModalProps> = ({
   actions,
 }) => {
   const theme = useTheme();
-  const selectedActions = useRef<any>([]);
+  const [selectedActions, setSelectedActions] = useState<any>([]);
   const actionStyle = {
     display: 'flex',
     paddingTop: '23px',
@@ -157,24 +166,15 @@ export const AddActionsModal: React.FC<AddActionsModalProps> = ({
     borderBottom: '2px solid #E2ECF5',
   };
 
-  const ActionText = styled(Typography)({
-    color: theme.custom.black,
-    lineHeight: theme.custom.modal.labelLineHeight,
-    fontSize: theme.custom.modal.labelFontSize,
-    fontWeight: theme.custom.modal.labelFontWeight,
-    fontFamily: theme.typography.fontFamily,
-    fontStyle: 'normal',
-  });
-
   const onIncrementAction = (action: any) => {
-    selectedActions.current.push(action);
-    console.log(selectedActions.current);
+    const tempActions = [...selectedActions, action];
+    setSelectedActions(tempActions);
   };
 
   const onDecrementAction = (action: any) => {
     const temp = [];
     let isNotDeleted = true;
-    for (const actionItem of selectedActions.current) {
+    for (const actionItem of selectedActions) {
       const { name } = actionItem;
       if (name === action.name && isNotDeleted) {
         isNotDeleted = false;
@@ -182,8 +182,7 @@ export const AddActionsModal: React.FC<AddActionsModalProps> = ({
         temp.push(actionItem);
       }
     }
-    selectedActions.current = temp;
-    console.log(selectedActions.current);
+    setSelectedActions(temp);
   };
 
   return (
@@ -231,7 +230,7 @@ export const AddActionsModal: React.FC<AddActionsModalProps> = ({
           buttonType="primary"
           width={'100%'}
           height={'45px'}
-          onClick={() => onAddActions(selectedActions.current)}
+          onClick={() => onAddActions(selectedActions)}
           label="Add Action"
         ></ANButton>
       </DialogActions>

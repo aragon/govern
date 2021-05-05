@@ -54,6 +54,16 @@ const styles = (theme: Theme) =>
     },
   });
 
+const InputLabelText = styled(Typography)(({ theme }: any) => ({
+  color: theme.custom.modal.labelColor,
+  lineHeight: theme.custom.modal.labelLineHeight,
+  fontSize: theme.custom.modal.labelFontSize,
+  fontWeight: theme.custom.modal.labelFontWeight,
+  fontFamily: theme.typography.fontFamily,
+  fontStyle: 'normal',
+  marginBottom: '12px',
+}));
+
 export interface DialogTitleProps extends WithStyles<typeof styles> {
   id?: string;
   children: string;
@@ -104,8 +114,8 @@ export const NewActionModal: React.FC<NewActionModalProps> = ({
   onGenerate,
 }) => {
   const theme = useTheme();
-  const contractAddress = useRef();
-  const abi = useRef(null);
+  const [contractAddress, setContractAddress] = useState();
+  const [abi, setAbi] = useState(null);
   const isJsonString = (str: string) => {
     try {
       JSON.parse(str);
@@ -117,28 +127,17 @@ export const NewActionModal: React.FC<NewActionModalProps> = ({
 
   const onInputABI = (val: string) => {
     if (isJsonString(val)) {
-      abi.current = JSON.parse(val);
+      setAbi(JSON.parse(val));
     } else return;
   };
   const onInputContractAddress = (val: any) => {
-    contractAddress.current = val;
+    setContractAddress(val);
   };
-  const onGenerateClick = () => {
-    if (abi.current === null) return;
-    if (contractAddress.current === null) return;
 
-    console.log(abi.current, contractAddress.current);
-    onGenerate(contractAddress.current, abi.current);
+  const onGenerateClick = () => {
+    if (!abi || !contractAddress) return;
+    onGenerate(contractAddress, abi);
   };
-  const InputLabelText = styled(Typography)({
-    color: theme.custom.modal.labelColor,
-    lineHeight: theme.custom.modal.labelLineHeight,
-    fontSize: theme.custom.modal.labelFontSize,
-    fontWeight: theme.custom.modal.labelFontWeight,
-    fontFamily: theme.typography.fontFamily,
-    fontStyle: 'normal',
-    marginBottom: '12px',
-  });
   return (
     <MuiDialog open={open}>
       <DialogTitle onClose={onCloseModal}> New Action </DialogTitle>
