@@ -96,7 +96,7 @@ const DaoMainPage: React.FC<{
   //TODO daoname empty handling
 
   const { data: daoList, loading: loadingDao } = useQuery(GET_DAO_BY_NAME, {
-    variables: { name: daoName },
+    variables: { name: `%${daoName}%` },
   });
 
   const [isProposalPage, setProposalPage] = useState(true);
@@ -161,7 +161,9 @@ const DaoMainPage: React.FC<{
   };
 
   useEffect(() => {
-    if (daoList) {
+    debugger;
+    if (loadingDao) return;
+    if (daoList.daos.length > 0) {
       updateDaoDetails(daoList.daos[0]);
       if (daoList.daos[0] && daoList.daos[0].queue) {
         getQueueData({
@@ -200,126 +202,130 @@ const DaoMainPage: React.FC<{
   return (
     <DaoPageMainDiv id="Wrapper">
       {isAnExistingDao ? (
-        <>
-          <DaoHeader
-            ethBalance={formatEther(daoDetails.executor.balance)}
-            usdBalance={'2222'}
-            daoName={daoDetails.name}
-          />
-          <div
-            style={{
-              paddingTop: '33px',
-              paddingRight: '48px',
-              paddingLeft: '48px',
-              paddingBottom: '52px',
-              boxSizing: 'border-box',
-            }}
-          >
+        daoDetails === undefined ? (
+          'loading'
+        ) : (
+          <>
+            <DaoHeader
+              ethBalance={formatEther(daoDetails.executor.balance)}
+              usdBalance={'2222'}
+              daoName={daoDetails.name}
+            />
             <div
               style={{
-                display: 'flex',
-                flexDirection: 'row',
-                maxWidth: '250px',
-                justifyContent: 'space-between',
+                paddingTop: '33px',
+                paddingRight: '48px',
+                paddingLeft: '48px',
+                paddingBottom: '52px',
+                boxSizing: 'border-box',
               }}
             >
-              {isProposalPage ? (
-                <PageLabelSelected>Proposals</PageLabelSelected>
-              ) : (
-                <PageLabel onClick={() => onPageChange('proposal')}>
-                  Proposal
-                </PageLabel>
-              )}
-              {/* {isProfilePage ? (
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  maxWidth: '250px',
+                  justifyContent: 'space-between',
+                }}
+              >
+                {isProposalPage ? (
+                  <PageLabelSelected>Proposals</PageLabelSelected>
+                ) : (
+                  <PageLabel onClick={() => onPageChange('proposal')}>
+                    Proposal
+                  </PageLabel>
+                )}
+                {/* {isProfilePage ? (
             <PageLabelSelected>Profile</PageLabelSelected>
           ) : (
             <PageLabel onClick={() => onPageChange('profile')}>
               Profile
             </PageLabel>
           )} */}
-            </div>
-            {isProposalPage ? (
-              <div>
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    width: '100%',
-                    justifyContent: 'space-between',
-                    marginTop: '28px',
-                  }}
-                >
-                  <InputField
-                    label=""
-                    placeholder="Search"
-                    width="298px"
-                    height="46px"
-                    onInputChange={onInputChange}
-                  ></InputField>
-                  <ANButton
-                    label="New Proposal"
-                    buttonType="primary"
-                    height="46px"
-                    width="142px"
-                    onClick={goToNewProposal}
-                  ></ANButton>
-                </div>
-                <div
-                  style={{
-                    width: '100%',
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    justifyContent: 'left',
-                    gridGap: '0px 24px',
-                  }}
-                >
-                  {visibleProposalList.map((proposal: any) => (
-                    <div style={{ marginTop: '16px' }} key={proposal.id}>
-                      <ProposalCard
-                        transactionHash={proposal.id}
-                        proposalDate={
-                          // TODO:Bhanu you can make this work with the dates library you use
-                          new Date(
-                            proposal.createdAt * 1000,
-                          ).toLocaleDateString('en-US') +
-                          ' ' +
-                          new Date(
-                            proposal.createdAt * 1000,
-                          ).toLocaleTimeString('en-US')
-                        }
-                        proposalStatus={proposal.state}
-                        onClickProposalCard={() => onClickProposal(proposal)}
-                      ></ProposalCard>
-                    </div>
-                  ))}
-                </div>
-                <div
-                  style={{
-                    width: '100%',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    marginTop: '32px',
-                    marginBottom: '32px',
-                  }}
-                >
-                  {queueNonce !== visibleProposalList.length ? (
-                    <ANButton
-                      label="Load More Proposals"
-                      buttonType="secondary"
-                      height="46px"
-                      width="196px"
-                      buttonColor="#00C2FF"
-                      onClick={fetchMoreData}
-                    ></ANButton>
-                  ) : null}
-                </div>
               </div>
-            ) : (
-              <></>
-            )}
-          </div>
-        </>
+              {isProposalPage ? (
+                <div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      width: '100%',
+                      justifyContent: 'space-between',
+                      marginTop: '28px',
+                    }}
+                  >
+                    <InputField
+                      label=""
+                      placeholder="Search"
+                      width="298px"
+                      height="46px"
+                      onInputChange={onInputChange}
+                    ></InputField>
+                    <ANButton
+                      label="New Proposal"
+                      buttonType="primary"
+                      height="46px"
+                      width="142px"
+                      onClick={goToNewProposal}
+                    ></ANButton>
+                  </div>
+                  <div
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      justifyContent: 'left',
+                      gridGap: '0px 24px',
+                    }}
+                  >
+                    {visibleProposalList.map((proposal: any) => (
+                      <div style={{ marginTop: '16px' }} key={proposal.id}>
+                        <ProposalCard
+                          transactionHash={proposal.id}
+                          proposalDate={
+                            // TODO:Bhanu you can make this work with the dates library you use
+                            new Date(
+                              proposal.createdAt * 1000,
+                            ).toLocaleDateString('en-US') +
+                            ' ' +
+                            new Date(
+                              proposal.createdAt * 1000,
+                            ).toLocaleTimeString('en-US')
+                          }
+                          proposalStatus={proposal.state}
+                          onClickProposalCard={() => onClickProposal(proposal)}
+                        ></ProposalCard>
+                      </div>
+                    ))}
+                  </div>
+                  <div
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginTop: '32px',
+                      marginBottom: '32px',
+                    }}
+                  >
+                    {queueNonce !== visibleProposalList.length ? (
+                      <ANButton
+                        label="Load More Proposals"
+                        buttonType="secondary"
+                        height="46px"
+                        width="196px"
+                        buttonColor="#00C2FF"
+                        onClick={fetchMoreData}
+                      ></ANButton>
+                    ) : null}
+                  </div>
+                </div>
+              ) : (
+                <></>
+              )}
+            </div>
+          </>
+        )
       ) : (
         <>
           <NoDaoFound />
