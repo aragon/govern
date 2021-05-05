@@ -69,11 +69,10 @@ task('ens:reclaim', 'Reclaim the ownership of an ENS name')
 .addOptionalParam('print', 'Print the transaction data only', true, types.boolean)
 .setAction(async ({label, controller, print}, env) => {
   const { network, ethers } = env
-  const ens = await Ens.createEns(network.provider)
+  const ens = await Ens.createEns(network.provider, print)
 
   try {
-    const [ signer ] = print? await ethers.getSigners() : []
-    const registrar = await ens.getEthRegistrar(signer)
+    const registrar = await ens.getEthRegistrar()
     const id = utils.id(label)
     const tx = print?
       await registrar.populateTransaction.reclaim(id, controller) :

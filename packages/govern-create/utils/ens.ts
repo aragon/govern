@@ -69,9 +69,9 @@ export class Ens {
     return new Contract(address, resolverAbi, this.signer);
   }
 
-  async getEthRegistrar(signer?: Signer): Promise<Contract> {
+  async getEthRegistrar(): Promise<Contract> {
     const address = await this.ens.owner(utils.namehash("eth"));
-    return new Contract(address, ethRegistrarAbi, signer || this.web3Provider);
+    return new Contract(address, ethRegistrarAbi, this.signer);
   }
 
   async setAddr(name: string, address: string): Promise<providers.TransactionResponse> {
