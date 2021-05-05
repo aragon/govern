@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useState, memo, useEffect, useMemo } from 'react';
+import React, { useState, memo, useEffect, useMemo, useCallback } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { useTheme, styled } from '@material-ui/core/styles';
 import backButtonIcon from '../../images/back-btn.svg';
@@ -83,8 +83,8 @@ interface FormInputs {
   tokenSymbol: string;
   tokenAddress: string;
   isExistingToken: boolean;
-  isUseProxy: boolean;
-  isUseFreeVoting: boolean;
+  useProxy: boolean;
+  useVocdoni: boolean;
   /**
    * DAO's configs
    */
@@ -157,11 +157,10 @@ const NewDaoForm: React.FC<FormProps> = memo(
     } = useForm<FormInputs>();
 
     const connectedChainId = useMemo(() => {
-      if (chainId === ChainId.RINKEBY && status === 'connected') {
+      if (chainId === ChainId.RINKEBY && status === 'connected')
         return ChainId.RINKEBY;
-      } else {
-        return ChainId.MAINNET;
-      }
+
+      return ChainId.MAINNET;
     }, [chainId, status]);
 
     // use appropriate default config
@@ -170,13 +169,24 @@ const NewDaoForm: React.FC<FormProps> = memo(
       setValue('daoConfig', _config);
     }, [connectedChainId]);
 
+    const getTokenInfo = async (tokenAddress: string) => {
+      //TODO: handle etherProvider in case wallet is not connected
+      try {
+        const token = await getToken(tokenAddress, ethersProvider);
+        return token;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    };
+
     const createDaoCall = async (params: FormInputs): Promise<boolean> => {
       let token: Partial<Token>;
       if (params.isExistingToken) {
-        try {
-          token = await getToken(params.tokenAddress, ethersProvider);
-        } catch (error) {
-          console.log(error);
+        const tokenInfo = await getTokenInfo(params.tokenAddress);
+        if (tokenInfo !== false) {
+          token = tokenInfo;
+        } else {
           return false;
         }
       } else {
@@ -189,7 +199,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
 
       // if the vocdoni is activated, we also register the token in the aragon voice.
       let registerTokenCallback = undefined;
-      if (params.isUseFreeVoting) {
+      if (params.useVocdoni) {
         registerTokenCallback = async (registerToken: Function) => {
           const result = await registerToken();
           console.log('result', result);
@@ -200,8 +210,8 @@ const NewDaoForm: React.FC<FormProps> = memo(
         name: params.daoName,
         token,
         config: params.daoConfig,
-        useProxies: params.isUseProxy,
-        useVocdoni: params.isUseFreeVoting,
+        useProxies: params.useProxy,
+        useVocdoni: params.useVocdoni,
       };
 
       try {
@@ -248,7 +258,6 @@ const NewDaoForm: React.FC<FormProps> = memo(
             name="daoName"
             control={control}
             defaultValue=""
-            rules={{ required: 'This is required' }}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <InputField
                 label={''}
@@ -297,15 +306,6 @@ const NewDaoForm: React.FC<FormProps> = memo(
                   name="tokenName"
                   control={control}
                   defaultValue=""
-                  rules={{
-                    validate: (value) => {
-                      return !getValues('isExistingToken')
-                        ? value === ''
-                          ? 'This is required'
-                          : true
-                        : true;
-                    },
-                  }}
                   render={({
                     field: { onChange, value },
                     fieldState: { error },
@@ -326,15 +326,6 @@ const NewDaoForm: React.FC<FormProps> = memo(
                   name="tokenSymbol"
                   control={control}
                   defaultValue=""
-                  rules={{
-                    validate: (value) => {
-                      return !getValues('isExistingToken')
-                        ? value === ''
-                          ? 'This is required'
-                          : true
-                        : true;
-                    },
-                  }}
                   render={({
                     field: { onChange, value },
                     fieldState: { error },
@@ -360,15 +351,6 @@ const NewDaoForm: React.FC<FormProps> = memo(
                 name="tokenAddress"
                 control={control}
                 defaultValue=""
-                rules={{
-                  validate: (value) => {
-                    return getValues('isExistingToken')
-                      ? value === ''
-                        ? 'This is required'
-                        : true
-                      : true;
-                  },
-                }}
                 render={({
                   field: { onChange, value },
                   fieldState: { error },
@@ -403,7 +385,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
               }}
             >
               <Controller
-                name="isUseProxy"
+                name="useProxy"
                 control={control}
                 defaultValue={true}
                 render={({ field: { onChange, value } }) => (
@@ -440,7 +422,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
               }}
             >
               <Controller
-                name="isUseFreeVoting"
+                name="useVocdoni"
                 control={control}
                 defaultValue={true}
                 render={({ field: { onChange, value } }) => (

@@ -24,13 +24,14 @@ import { toUtf8Bytes, toUtf8String } from '@ethersproject/strings';
 import { ethers, BigNumber, BigNumberish, BytesLike } from 'ethers';
 import { Token, getToken } from '@aragon/govern';
 import { useForm, Controller } from 'react-hook-form';
-
+import { createDao, CreateDaoParams, DaoConfig } from '@aragon/govern';
 import {
   Proposal,
   ProposalOptions,
   PayloadType,
   ActionType,
 } from '@aragon/govern';
+import { assertValidName } from 'graphql';
 
 export interface DaoSettingContainerProps {
   /**
@@ -54,13 +55,7 @@ interface ParamTypes {
 }
 
 interface FormInputs {
-  executionDelay: number;
-  scheduleDepositToken: string;
-  scheduleDepositAmount: BigNumberish;
-  challengeDepositToken: string;
-  challengeDepositAmount: BigNumberish;
-  resolver: string;
-  rules: string;
+  daoConfig: DaoConfig;
   justification: string;
   isRuleFile: BytesLike;
   isJustificationFile: string;
@@ -182,30 +177,28 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
     useEffect(() => {
       const _load = async () => {
         if (daoDetails) {
-          console.log('called useeffect');
+          console.log('called useffect');
+          
           const _config = daoDetails.queue.config;
+          console.log('_config', _config)
           setCurrentConfig(_config);
-          setValue('executionDelay', _config.executionDelay);
-          setValue('scheduleDepositToken', _config.scheduleDeposit.token);
-          setValue(
-            'scheduleDepositAmount',
-            await correctDecimal(
+          const _formConfig = {
+            ..._config,
+            [_config.scheduleDeposit.amount]: await correctDecimal(
               _config.scheduleDeposit.token,
               _config.scheduleDeposit.amount,
               false,
             ),
-          );
-          setValue('challengeDepositToken', _config.challengeDeposit.token);
-          setValue(
-            'challengeDepositAmount',
-            await correctDecimal(
+            [_config.challengeDeposit.amount]: await correctDecimal(
               _config.challengeDeposit.token,
               _config.challengeDeposit.amount,
               false,
             ),
-          );
-          setValue('resolver', _config.resolver);
-          setValue('rules', toUtf8String(_config.rules));
+          };
+
+          setValue('daoConfig', _formConfig);
+
+          console.log('_formConfig', _formConfig)
 
           const proposalOptions: ProposalOptions = {};
           const proposal = new Proposal(
@@ -227,29 +220,21 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
     };
 
     const callSaveSetting = async () => {
+      const newConfig = getValues('daoConfig');
+      newConfig.scheduleDeposit.amount = await correctDecimal(
+        newConfig.scheduleDeposit.token,
+        newConfig.scheduleDeposit.amount,
+        true,
+      );
+      newConfig.challengeDeposit.amount = await correctDecimal(
+        newConfig.challengeDeposit.token,
+        newConfig.challengeDeposit.amount,
+        true,
+      );
 
-      const newConfig = {
-        executionDelay: getValues('executionDelay'),
-        scheduleDeposit: {
-          token: getValues('scheduleDepositToken'),
-          amount: await correctDecimal(
-            getValues('scheduleDepositToken'),
-            getValues('scheduleDepositAmount'),
-            true,
-          ),
-        },
-        challengeDeposit: {
-          token: getValues('challengeDepositToken'),
-          amount: await correctDecimal(
-            getValues('challengeDepositToken'),
-            getValues('challengeDepositAmount'),
-            true,
-          ),
-        },
-        resolver: getValues('resolver'),
-        rules: toUtf8Bytes(getValues('rules')),
-        maxCalldataSize: currentConfig.maxCalldataSize, // TODO: grab it from config subgraph too.
-      };
+      //   rules: toUtf8Bytes(getValues('rules')),
+      //   maxCalldataSize: currentConfig.maxCalldataSize, // TODO: grab it from config subgraph too.
+      // };
 
       console.log('new config', newConfig);
       const submitter: string = account;
@@ -512,7 +497,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
           </InputTitle>
           <InputSubTitle>In seconds</InputSubTitle>
           <Controller
-            name="executionDelay"
+            name="daoConfig.executionDelay"
             control={control}
             defaultValue={''}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
@@ -539,7 +524,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
             <Grid item>
               <InputSubTitle>Token contract address</InputSubTitle>
               <Controller
-                name="scheduleDepositToken"
+                name="daoConfig.scheduleDeposit.token"
                 control={control}
                 defaultValue=""
                 render={({
@@ -560,7 +545,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
             <Grid item>
               <InputSubTitle>Amount</InputSubTitle>
               <Controller
-                name="scheduleDepositAmount"
+                name="daoConfig.scheduleDeposit.amount"
                 control={control}
                 defaultValue={''}
                 render={({
@@ -592,7 +577,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
             <Grid item>
               <InputSubTitle>Token contract address</InputSubTitle>
               <Controller
-                name="challengeDepositToken"
+                name="daoConfig.challengeDeposit.token"
                 control={control}
                 defaultValue=""
                 render={({
@@ -613,7 +598,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
             <Grid item xs={12} sm={6}>
               <InputSubTitle>Amount</InputSubTitle>
               <Controller
-                name="challengeDepositAmount"
+                name="daoConfig.challengeDeposit.amount"
                 control={control}
                 defaultValue={''}
                 render={({
@@ -651,7 +636,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
             placeholder={'0x4c495F0005171E17c1dd08510g801805eE08E7'}
           /> */}
           <Controller
-            name="resolver"
+            name="daoConfig.resolver"
             control={control}
             defaultValue={''}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
@@ -717,7 +702,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
             //   placeholder={'DAO rules and agreement ...'}
             // />
             <Controller
-              name="rules"
+              name="daoConfig.rules"
               control={control}
               defaultValue={''}
               render={({
@@ -727,7 +712,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
                 <InputField
                   label=""
                   onInputChange={onChange}
-                  value={value}
+                  value={value.toString()}
                   height={'100px'}
                   width={'100%'}
                   placeholder={'DAO rules and agreement ...'}
