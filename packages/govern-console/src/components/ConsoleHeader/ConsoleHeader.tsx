@@ -24,7 +24,7 @@ const ConsoleHeaderCard = styled(MUICard)(({ theme }) => ({
   boxShadow: 'none',
 }));
 
-const HeaderLabel = styled(MUITypography)(({ theme }) => ({
+const Subtitle = styled(MUITypography)(({ theme }) => ({
   color: theme.custom.daoHeader.labelColor,
   lineHeight: '27px',
   fontSize: '18px',
@@ -33,7 +33,7 @@ const HeaderLabel = styled(MUITypography)(({ theme }) => ({
   fontStyle: 'normal',
 }));
 
-const HeaderValue = styled(MUITypography)(({ theme }: any) => ({
+const Title = styled(MUITypography)(({ theme }: any) => ({
   color: theme.custom.daoHeader.valueColor,
   lineHeight: '60.1px',
   fontSize: '44px',
@@ -60,12 +60,12 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
 
   return (
     <ConsoleHeaderCard>
-      <HeaderValue> Welcome to Aragon Console</HeaderValue>
+      <Title> Welcome to Aragon Console</Title>
       <div style={{ maxWidth: '480px', marginTop: '7px' }}>
-        <HeaderLabel>
+        <Subtitle>
           Lorem ipsum dolor amet ipsu amet dolores ipsum amet dolor ipsum amet
           ipsum amet dolors ipsum{' '}
-        </HeaderLabel>
+        </Subtitle>
       </div>
       <div style={{ display: 'flex', flexDirection: 'row', marginTop: '22px' }}>
         <div style={{ marginRight: '10px' }}>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { styled, useTheme } from '@material-ui/core/styles';
+import { styled } from '@material-ui/core/styles';
 import { ConsoleHeader } from 'components/ConsoleHeader/ConsoleHeader';
 import { DaoCard } from 'components/DaoCards/DaoCard';
 import { ANButton } from 'components/Button/ANButton';
@@ -36,13 +36,7 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
   ...props
 }) => {
   const history = useHistory();
-  const theme = useTheme();
   const [visibleDaoList, updateDaoList] = useState<any>([]);
-  const [filteredDaoList, updateFilteredDaoList] = useState<any>([]);
-  const [
-    isShowingFilteredResults,
-    updateIsShowingFilteredResults,
-  ] = useState<boolean>(false);
   const [totalDaoCount, updateTotalDaoCount] = useState<number>();
 
   const {
@@ -62,10 +56,6 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
     loading: isLoadingRegistryData,
     error: errorLoadingRegistryData,
   } = useQuery(GET_GOVERN_REGISTRY_DATA);
-
-  // const getTotalNumberOfDaos = () => {
-  //   updateTotalDaoCount(numberOfDaos);
-  // };
 
   useEffect(() => {
     if (daoListData && daoListData.daos) {
@@ -99,55 +89,57 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
 
   return (
     <ConsoleMainDiv>
-      <ConsoleHeader />
-      <div
-        style={{
-          width: '100%',
-          maxWidth: '100%',
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'left',
-          gridGap: '0px 10px',
-        }}
-      >
-        {visibleDaoList &&
-          visibleDaoList.length > 0 &&
-          visibleDaoList.map((dao: any) => (
-            <div
-              style={{ marginTop: '32px', width: '328px' }}
-              onClick={() => goToDao(dao)}
-              key={dao.name}
-            >
-              <DaoCard
-                label={dao.name}
-                aumValue={formatEther(dao.executor.balance)}
-                numberOfProposals={dao.queue.nonce}
-                daoId={dao.id}
-              ></DaoCard>
-            </div>
-          ))}
-      </div>
-      <div
-        style={{
-          width: '100%',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginTop: '46px',
-          marginBottom: '80px',
-        }}
-      >
-        {totalDaoCount !== visibleDaoList.length ? (
-          <ANButton
-            label="Load More DAOs"
-            buttonType="secondary"
-            height="46px"
-            width="163px"
-            buttonColor="#00C2FF"
-            onClick={fetchMoreData}
-          ></ANButton>
-        ) : null}
-      </div>
+      <>
+        <ConsoleHeader />
+        <div
+          style={{
+            width: '100%',
+            maxWidth: '100%',
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'left',
+            gridGap: '0px 10px',
+          }}
+        >
+          {visibleDaoList &&
+            visibleDaoList.length > 0 &&
+            visibleDaoList.map((dao: any) => (
+              <div
+                style={{ marginTop: '32px', width: '328px' }}
+                onClick={() => goToDao(dao)}
+                key={dao.name}
+              >
+                <DaoCard
+                  label={dao.name}
+                  aumValue={formatEther(dao.executor.balance)}
+                  numberOfProposals={dao.queue.nonce}
+                  daoId={dao.id}
+                ></DaoCard>
+              </div>
+            ))}
+        </div>
+        <div
+          style={{
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: '46px',
+            marginBottom: '80px',
+          }}
+        >
+          {totalDaoCount !== visibleDaoList.length ? (
+            <ANButton
+              label="Load More DAOs"
+              buttonType="secondary"
+              height="46px"
+              width="163px"
+              buttonColor="#00C2FF"
+              onClick={fetchMoreData}
+            ></ANButton>
+          ) : null}
+        </div>
+      </>
     </ConsoleMainDiv>
   );
 };
