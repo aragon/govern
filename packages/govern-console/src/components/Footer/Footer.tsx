@@ -14,7 +14,7 @@ const FooterWrapperDiv = styled('div')({
   height: '106px',
   width: '100%',
   display: 'block',
-  position: 'absolute',
+  // position: 'absolute',
   bottom: 0,
   left: 0,
 });

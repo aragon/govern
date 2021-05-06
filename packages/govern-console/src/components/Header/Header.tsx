@@ -10,7 +10,6 @@ const HeaderWrapperDiv = styled('div')({
   height: '106px',
   width: '100%',
   display: 'block',
-  position: 'absolute',
   top: 0,
 });
 const TitleTextNormal = styled(Typography)({

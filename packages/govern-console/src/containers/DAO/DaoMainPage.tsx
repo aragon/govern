@@ -19,19 +19,10 @@ import NoDaoFound from './NoDaoFound';
 const DaoPageMainDiv = styled(Paper)(({ theme }) => ({
   width: '100%',
   background: theme.custom.white,
-  height: 'calc(100% - 60px)',
+  minHeight: 'inherit',
   padding: '0px',
   boxSizing: 'border-box',
   boxShadow: 'none',
-}));
-const VerticalAlignWrapper = styled('div')(({ theme }) => ({
-  transform: 'translate(-50%, -50%)',
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  height: 'fit-content',
-  width: 'fit-content',
-  margin: 'auto',
 }));
 
 const PageLabelSelected = styled(Typography)(({ theme }) => ({
@@ -103,7 +94,7 @@ const DaoMainPage: React.FC<{
   //TODO daoname empty handling
 
   const { data: daoList, loading: loadingDao } = useQuery(GET_DAO_BY_NAME, {
-    variables: { name: `%${daoName}%` },
+    variables: { name: daoName },
   });
 
   const [isProposalPage, setProposalPage] = useState(true);
@@ -207,7 +198,7 @@ const DaoMainPage: React.FC<{
   }
 
   return (
-    <DaoPageMainDiv id="Wrapper">
+    <DaoPageMainDiv id="dao-page-wrapper">
       {isAnExistingDao ? (
         daoDetails === undefined ? (
           'loading'
