@@ -128,7 +128,7 @@ describe("Proposal", function() {
     const submitter = await (web3Provider.getSigner()).getAddress()
 
     const currentTimestamp = (await web3Provider.getBlock('latest')).timestamp
-    const executionTime = currentTimestamp + daoConfig.executionDelay + 100
+    const executionTime = Number(currentTimestamp) + Number(daoConfig.executionDelay) + 100
     const payload = buildPayload({ submitter, executor, actions, executionTime})
     const proposalData = { payload, config: daoConfig }
     const txResult = await proposal.schedule(proposalData)
