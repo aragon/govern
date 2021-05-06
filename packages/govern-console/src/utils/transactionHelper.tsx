@@ -9,13 +9,14 @@ import { erc20TokenABI } from './abis/erc20';
 import { AddressZero } from '@ethersproject/constants'
 import { CourtABI } from 'utils/abis/court';
 import { BigNumberish } from '@ethersproject/bignumber'
+import { Account } from 'utils/types'
 
 /**
  * @param token address of the token
  * @param amount how much to approve
  * @param spender spender
- * @param account owner
- * @param ethersProvider
+ * @param account address and the signer
+ * @param signer
  *
  * @returns {Promise<Response>}
  */
@@ -23,8 +24,7 @@ export async function erc20ApprovalTransaction(
   token: string,
   amount: BigNumberish,
   spender: string,
-  account: string,
-  signer: any,
+  account: Account
 ): Promise<CustomTransaction[]> {
 
   // if the token is zero address, it means there's no need for approval
@@ -37,15 +37,15 @@ export async function erc20ApprovalTransaction(
   const contract = new ethers.Contract(
     token,
     erc20TokenABI,
-    signer,
+    account.signer,
   );
 
   let allowance: BigNumber = ethers.BigNumber.from(0);
   let userBalance: BigNumber = ethers.BigNumber.from(0);
 
   try {
-    allowance = await contract.allowance(account, spender);
-    userBalance = await contract.balanceOf(account);
+    allowance = await contract.allowance(account.address, spender);
+    userBalance = await contract.balanceOf(account.address);
   } catch (err) {
     // contract address might not have `allowance` or balanceOf on it.
     // TODO: track it with sentry
@@ -68,7 +68,7 @@ export async function erc20ApprovalTransaction(
     tx: () => {
       return contract.approve(spender, amountInBigNumber);
     },
-    message: `Approves ${amountInBigNumber} Tokens. `,
+    message: `Approves ${amountInBigNumber} Tokens for ${spender} on ${token}`,
     status: CustomTransactionStatus.Pending,
   };
 

@@ -56,11 +56,11 @@ export type Token = {
 
 export type TokenDeposit = {
   token: string
-  amount: BigNumberish
+  amount: BigNumberish | string
 }
 
 export type DaoConfig = {
-  executionDelay: number|string
+  executionDelay: number | string
   scheduleDeposit: TokenDeposit
   challengeDeposit: TokenDeposit
   resolver: string
@@ -93,9 +93,8 @@ export type CreateDaoOptions = {
 export async function createDao(
   args: CreateDaoParams,
   options: CreateDaoOptions = {},
-  registerTokenCallback?: Function,
-  bla?: TokenDeposit
-): Promise<providers.TransactionResponse> {
+  registerTokenCallback?: Function
+): Promise<TransactionResponse> {
   if (!args.token.tokenAddress) {
     args.token.tokenAddress = constants.AddressZero
   } else {

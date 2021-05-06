@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 import { useHistory } from 'react-router-dom';
@@ -19,14 +20,15 @@ const AppWrapper = styled('div')({
   margin: 'auto',
   boxSizing: 'border-box',
   position: 'relative',
-  height: '100vh',
+  minHeight: '100vh',
 });
 const MainBodyWrapper = styled('div')({
   width: '100%',
-  height: 'calc(100% - 212px)',
+  minHeight: 'calc(100vh - 212px)',
   boxSizing: 'border-box',
-  position: 'absolute',
   top: '106px',
+  overflowX: 'hidden',
+  overflowY: 'auto',
 });
 
 const HomePage = ({ ...props }) => {
@@ -64,49 +66,49 @@ const HomePage = ({ ...props }) => {
     history.push(`/daos/${daoName}`);
   };
   return (
-    <AppWrapper id="app-wrapper">
-      <Header />
-      {/* add breadcrumbs later */}
-      <Switch>
-        <MainBodyWrapper id="main-body-wrapper">
-          <Route exact path="/">
-            <ConsoleMainPage
-              updateSelectedDao={updateSelectedDaoAndPushToHistory}
-              onSearchByDaoName={onSearchByDaoName}
-            />
-          </Route>
-          <Route exact path="/daos/:daoName">
-            <DaoMainPage
-              onClickProposalCard={onClickProposalCard}
-              onClickNewProposal={onClickNewProposal}
-            />
-          </Route>
-          <Route exact path="/proposals/:daoName/:id">
-            <ModalsProvider>
+    <ModalsProvider>
+      <AppWrapper id="app-wrapper">
+        <Header />
+        {/* add breadcrumbs later */}
+        <Switch>
+          <MainBodyWrapper id="main-body-wrapper">
+            <Route exact path="/">
+              <ConsoleMainPage
+                updateSelectedDao={updateSelectedDaoAndPushToHistory}
+                onSearchByDaoName={onSearchByDaoName}
+              />
+            </Route>
+            <Route exact path="/daos/:daoName">
+              <DaoMainPage
+                onClickProposalCard={onClickProposalCard}
+                onClickNewProposal={onClickNewProposal}
+              />
+            </Route>
+            <Route exact path="/proposals/:daoName/:id">
               <ProposalDetails onClickBack={() => history.goBack()} />
-            </ModalsProvider>
-          </Route>
-          <Route exact path="/daos/:daoName/new-proposal">
-            <NewProposal onClickBack={() => history.goBack()} />
-          </Route>
-          <Route exact path="/daos/:daoName/dao-settings">
-            <DaoSettingsContainer onClickBack={() => history.goBack()} />
-          </Route>
-          <Route exact path="/create-dao">
-            <NewDaoContainer />
-          </Route>
-          {/* <Route path="/about">
+            </Route>
+            <Route exact path="/daos/:daoName/new-proposal">
+              <NewProposal onClickBack={() => history.goBack()} />
+            </Route>
+            <Route exact path="/daos/:daoName/dao-settings">
+              <DaoSettingsContainer onClickBack={() => history.goBack()} />
+            </Route>
+            <Route exact path="/create-dao">
+              <NewDaoContainer />
+            </Route>
+            {/* <Route path="/about">
         <About />
       </Route>
       <Route path="/dashboard">
         <Dashboard />
       </Route>
     */}
-        </MainBodyWrapper>
-      </Switch>
-      <Footer />
-      {/* <Footer /> */}
-    </AppWrapper>
+          </MainBodyWrapper>
+        </Switch>
+        <Footer />
+        {/* <Footer /> */}
+      </AppWrapper>
+    </ModalsProvider>
   );
 };
 

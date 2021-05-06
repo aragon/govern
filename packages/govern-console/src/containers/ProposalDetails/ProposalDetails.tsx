@@ -29,7 +29,6 @@ interface ProposalDetailsProps {
 const StyledPaper = styled(Paper)({
   backgroundColor: '#ffffff',
   height: 'auto',
-  minHeight: '1000px',
   padding: '40px 48px 58px 48px',
 });
 const BackButton = styled('div')({
@@ -269,7 +268,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   });
   const context: any = useWallet();
 
-  const { account, ethersProvider } = context;
+  const { account, provider } = context;
 
   const { dispatch } = React.useContext(ModalsContext);
 
@@ -280,9 +279,8 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   const transactionsQueue = React.useRef<CustomTransaction[]>([]);
 
   const proposalInstance = React.useMemo(() => {
-    if (ethersProvider && account && daoDetails && proposalInfo) {
+    if (provider && account && daoDetails && proposalInfo) {
       let queueApprovals = new QueueApprovals(
-        ethersProvider.getSigner(),
         account,
         daoDetails.queue.address,
         proposalInfo.config.resolver,
@@ -294,7 +292,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       return new FacadeProposal(queueApprovals, proposal) as FacadeProposal &
         Proposal;
     }
-  }, [ethersProvider, account, daoDetails, proposalInfo]);
+  }, [provider, account, daoDetails, proposalInfo]);
 
   const [
     getProposalData,
@@ -434,7 +432,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     //
     // }
 
-    console.log(proposalInfo, ' proposal info');
   }
 
   // const getParsedDataFromBytes = (data) => {
@@ -681,7 +678,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                       buttonType="primary"
                     />
                   </Widget>
-                  <Widget>
+                  {/* <Widget>
                     <ANButton
                       buttonType="primary"
                       label="Resolve"
@@ -690,7 +687,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                       style={{ margin: 'auto' }}
                       // onClick={resolveProposal(disputeId)}
                     />
-                  </Widget>
+                  </Widget> */}
                 </WidgetWrapper>
               </DetailsWrapper>
             </StyledPaper>

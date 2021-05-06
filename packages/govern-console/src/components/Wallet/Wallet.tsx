@@ -5,7 +5,6 @@ import Card from '@material-ui/core/Card';
 import { useWallet } from 'use-wallet';
 import connectedUserIcon from 'images/connected-user-icon.svg';
 import Typography from '@material-ui/core/Typography';
-import { providers as EthersProviders } from 'ethers';
 import { useEffect } from 'react';
 
 const WalletWrapper = styled(Card)({
@@ -67,7 +66,7 @@ const Wallet = ({}) => {
     reset,
     status,
     type,
-    ethersProvider,
+    provider,
   } = context;
   const [networkStatus, setNetworkStatus] = useState<string>(status);
   // console.log('status', status, 'account', account, error);
