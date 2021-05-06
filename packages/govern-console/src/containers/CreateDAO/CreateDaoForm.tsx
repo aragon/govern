@@ -1,18 +1,13 @@
 /* eslint-disable */
-import React, { useState, memo, useEffect, useMemo, useCallback } from 'react';
+import React, { memo, useEffect, useMemo } from 'react';
 import { ANButton } from 'components/Button/ANButton';
-import { useTheme, styled } from '@material-ui/core/styles';
+import { styled } from '@material-ui/core/styles';
 import backButtonIcon from '../../images/back-btn.svg';
 import Typography from '@material-ui/core/Typography';
 import { InputField } from 'components/InputFields/InputField';
-import { useHistory } from 'react-router-dom';
 import CreateDaoImage from '../../images/svgs/CreateDao.svg';
-import CreateDaoInProgressImage from '../../images/svgs/CreateDaoInProgress.svg';
-import GreenTickImage from '../../images/svgs/green_tick.svg';
-import CrossImage from '../../images/svgs/cross.svg';
 import { BlueSwitch } from 'components/Switchs/BlueSwitch';
 import { BlueCheckbox } from 'components/Checkboxs/BlueCheckbox';
-import { ANCircularProgressWithCaption } from 'components/CircularProgress/ANCircularProgressWithCaption';
 import { ANWrappedPaper } from 'components/WrapperPaper/ANWrapperPaper';
 import { useWallet } from '../../EthersWallet';
 import {
@@ -22,9 +17,6 @@ import {
   Token,
   getToken,
 } from '@aragon/govern';
-// Note: query should not be needed once DAO page is capable of auto query
-import { GET_DAO_BY_NAME } from '../Console/queries';
-import { useQuery } from '@apollo/client';
 import {
   ARAGON_VOICE_URL,
   PROXY_CONTRACT_URL,
@@ -32,16 +24,33 @@ import {
   CONFIRMATION_WAIT,
 } from '../../utils/constants';
 import { useForm, Controller } from 'react-hook-form';
-import { ChainId } from '../../utils/types';
+import { ChainId, CiruclarProgressStatus } from '../../utils/types';
+import { validateToken } from '../../utils/validations';
+import { CreateDaoStatus } from './CreateDao'
+import { CreateDaoProgressProps } from './CreateDaoProgress'
 
-enum CreateDaoStatus {
-  PreCreate,
-  InProgress,
-  Successful,
-  Failed,
-}
+interface FormInputs {
+    /**
+     * Use's input
+     */
+    daoName: string;
+    tokenName: string;
+    tokenSymbol: string;
+    tokenAddress: string;
+    isExistingToken: boolean;
+    useProxy: boolean;
+    useVocdoni: boolean;
+    /**
+     * DAO's configs
+     */
+    daoConfig: DaoConfig;
+  }
 
 interface FormProps {
+  /**
+   * update creation progress
+   */
+  setProgress: (progress: CreateDaoProgressProps) => void;
   /*
         change create dao process (stage) status
     */
@@ -57,46 +66,36 @@ interface FormProps {
   cancelForm(): void;
 }
 
-interface ResultProps {
-  /**
-      success or failed result
-   */
-  isSuccess: boolean;
+const FormContainer = styled('div')({
+  // height: window.innerHeight * 0.7,
+  justifyContent: 'center',
+  display: 'flex',
+  alignItems: 'center',
+});
 
-  /**
-      change/update creating dao status
-   */
-  setCreateDaoStatus(status: CreateDaoStatus): void;
+const ContentRow = styled('div')({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  verticalAlign: 'middle',
+  lineHeight: '40px',
+});
 
-  /*
-        value to be passed to progress bar: range 0-100
-    */
-  postResultActionRoute: string;
-}
+const SwitchRow = styled('div')({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  verticalAlign: 'middle',
+  lineHeight: '40px',
+  margin: '25px 25px 5px 25px',
+});
 
-interface FormInputs {
-  /**
-   * Use's input
-   */
-  daoName: string;
-  tokenName: string;
-  tokenSymbol: string;
-  tokenAddress: string;
-  isExistingToken: boolean;
-  useProxy: boolean;
-  useVocdoni: boolean;
-  /**
-   * DAO's configs
-   */
-  daoConfig: DaoConfig;
-}
-
-const optionTextStyle = {
+const OptionText = styled('div')({
   fontFamily: 'Manrope',
   fontStyle: 'normal',
   fontWeight: 400,
   fontSize: 18,
-};
+});
 
 const BackButton = styled('div')({
   height: 25,
@@ -114,37 +113,11 @@ const InputTitle = styled(Typography)({
   fontSize: 18,
   lineHeight: '25px',
   color: '#7483AB',
+  marginBottom: '15px',
 });
 
-const Title = styled(Typography)({
-  fontFamily: 'Manrope',
-  fontStyle: 'normal',
-  fontWeight: 600,
-  fontSize: 28,
-  lineHeight: '38px',
-  color: '#20232C',
-  marginTop: 17,
-  height: 50,
-  display: 'flex',
-  justifyContent: 'center',
-});
-
-const SubTitle = styled(Typography)({
-  width: '365px',
-  fontFamily: 'Manrope',
-  fontStyle: 'normal',
-  fontWeight: 'normal',
-  fontSize: 18,
-  lineHeight: '25px',
-  color: '#7483AB',
-  display: 'flex',
-  justifyContent: 'center',
-  textAlign: 'center',
-  margin: '0px 50px 0px 50px',
-});
-
-const NewDaoForm: React.FC<FormProps> = memo(
-  ({ setCreateDaoStatus, setCreatedDaoRoute, cancelForm }) => {
+const CreateDaoForm: React.FC<FormProps> = 
+  ({ setProgress, setCreateDaoStatus, setCreatedDaoRoute, cancelForm }) => {
     const context: any = useWallet();
     const { chainId, status, provider } = context;
 
@@ -153,7 +126,6 @@ const NewDaoForm: React.FC<FormProps> = memo(
       handleSubmit,
       watch,
       setValue,
-      getValues,
     } = useForm<FormInputs>();
 
     const connectedChainId = useMemo(() => {
@@ -171,11 +143,19 @@ const NewDaoForm: React.FC<FormProps> = memo(
 
     const createDaoCall = async (params: FormInputs): Promise<boolean> => {
       let token: Partial<Token>;
+      let progressProps: CreateDaoProgressProps = {
+        isTokenRegister: true,
+        progressStatus: { 
+          create: CiruclarProgressStatus.InProgress,
+          register: CiruclarProgressStatus.Disabled
+        },
+      };
+
       if (params.isExistingToken) {
         try {
           token = await getToken(params.tokenAddress, provider);
-        }catch(error) {
-          return false
+        } catch (error) {
+          return false;
         }
       } else {
         token = {
@@ -188,11 +168,28 @@ const NewDaoForm: React.FC<FormProps> = memo(
       // if the vocdoni is activated, we also register the token in the aragon voice.
       let registerTokenCallback = undefined;
       if (params.useVocdoni) {
+        // update progress
+        setProgress(progressProps);
+
         registerTokenCallback = async (registerToken: Function) => {
+          // update progress
+          progressProps.progressStatus = { create: CiruclarProgressStatus.Done, register: CiruclarProgressStatus.InProgress };
+          setProgress(progressProps);
+
           const result = await registerToken();
-          console.log('result', result);
+          console.log('token register result', result)
+
+          // update progress
+          progressProps.progressStatus.register = CiruclarProgressStatus.Done;
+          setProgress(progressProps);
         };
+      } else {
+        // update progress
+        progressProps.isTokenRegister = false;
+        setProgress(progressProps);
       }
+
+      
 
       const createDaoParams: CreateDaoParams = {
         name: params.daoName,
@@ -230,12 +227,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
     };
 
     return (
-      <div
-        style={{
-          justifyContent: 'center',
-          display: 'flex',
-        }}
-      >
+      <FormContainer>
         <ANWrappedPaper>
           <BackButton onClick={cancelForm}>
             <img src={backButtonIcon} />
@@ -246,6 +238,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
             name="daoName"
             control={control}
             defaultValue=""
+            rules={{ required: 'This is required.' }}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <InputField
                 label={''}
@@ -259,17 +252,8 @@ const NewDaoForm: React.FC<FormProps> = memo(
               />
             )}
           />
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              margin: '25px',
-              verticalAlign: 'middle',
-              lineHeight: '40px',
-            }}
-          >
-            <div style={optionTextStyle}>{'Create new token'}</div>
+          <SwitchRow>
+            <OptionText>{'Create new token'}</OptionText>
             <Controller
               name="isExistingToken"
               control={control}
@@ -278,22 +262,18 @@ const NewDaoForm: React.FC<FormProps> = memo(
                 <BlueSwitch onChange={onChange} value={value} />
               )}
             />
-            <div style={optionTextStyle}>{'Use existing token'}</div>
-          </div>
+            <OptionText>{'Use existing token'}</OptionText>
+          </SwitchRow>
           {!watch('isExistingToken') ? (
             <div>
               <InputTitle>Token</InputTitle>
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                }}
-              >
+              <ContentRow>
                 <Controller
                   name="tokenName"
                   control={control}
                   defaultValue=""
+                  shouldUnregister={!watch('isExistingToken')}
+                  rules={{ required: 'This is required.' }}
                   render={({
                     field: { onChange, value },
                     fieldState: { error },
@@ -302,7 +282,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
                       label={''}
                       onInputChange={onChange}
                       height="46px"
-                      width="200px"
+                      // width="200px"
                       placeholder={"Your Token's Name?"}
                       value={value}
                       error={!!error}
@@ -314,6 +294,14 @@ const NewDaoForm: React.FC<FormProps> = memo(
                   name="tokenSymbol"
                   control={control}
                   defaultValue=""
+                  shouldUnregister={!watch('isExistingToken')}
+                  rules={{
+                    required: 'This is required.',
+                    maxLength: {
+                      value: 6,
+                      message: 'Only 6 character is allowed.',
+                    },
+                  }}
                   render={({
                     field: { onChange, value },
                     fieldState: { error },
@@ -322,7 +310,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
                       label={''}
                       onInputChange={onChange}
                       height="46px"
-                      width="200px"
+                      // width="200px"
                       placeholder={"Your Token's Symbol?"}
                       value={value}
                       error={!!error}
@@ -330,7 +318,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
                     />
                   )}
                 />
-              </div>
+              </ContentRow>
             </div>
           ) : (
             <div>
@@ -339,6 +327,12 @@ const NewDaoForm: React.FC<FormProps> = memo(
                 name="tokenAddress"
                 control={control}
                 defaultValue=""
+                shouldUnregister={watch('isExistingToken')}
+                rules={{
+                  required: 'This is required.',
+                  validate: async (value) =>
+                    await validateToken(value, provider),
+                }}
                 render={({
                   field: { onChange, value },
                   fieldState: { error },
@@ -381,7 +375,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
                 )}
               />
             </div>
-            <div style={optionTextStyle}>
+            <OptionText>
               Use{' '}
               <a
                 href={PROXY_CONTRACT_URL}
@@ -393,7 +387,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
               for the deployment - This will enable your DAO to use the already
               deployed code of the Govern Executer and Queue, and heavily
               decrease gas costs for your DAO deployment.
-            </div>
+            </OptionText>
           </div>
 
           <div
@@ -418,7 +412,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
                 )}
               />
             </div>
-            <div style={optionTextStyle}>
+            <OptionText>
               Use{' '}
               <a
                 href={ARAGON_VOICE_URL[connectedChainId]}
@@ -428,7 +422,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
                 Aragon Voice
               </a>{' '}
               - This will enable your DAO to have free voting for you proposals
-            </div>
+            </OptionText>
           </div>
           <div
             style={{
@@ -445,234 +439,8 @@ const NewDaoForm: React.FC<FormProps> = memo(
             />
           </div>
         </ANWrappedPaper>
-      </div>
+      </FormContainer>
     );
-  },
-);
-
-const NewDaoProgress: React.FC = () => {
-  const theme = useTheme();
-
-  return (
-    <div
-      style={{
-        height: '80vh',
-        justifyContent: 'center',
-        display: 'flex',
-        alignItems: 'center',
-      }}
-    >
-      <ANWrappedPaper>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-          }}
-        >
-          <img
-            src={CreateDaoInProgressImage}
-            style={{ width: '242px', marginLeft: 'auto', marginRight: 'auto' }}
-          />
-          <Title>Creating your DAO</Title>
-          <div
-            style={{
-              justifyContent: 'center',
-              display: 'flex',
-            }}
-          >
-            <SubTitle>Hold tight your transaction is under process</SubTitle>
-          </div>
-          <div
-            style={{
-              justifyContent: 'center',
-              display: 'flex',
-              marginTop: '10px',
-            }}
-          >
-            <ANCircularProgressWithCaption caption={'Creating DAO'} state={1} />
-          </div>
-          <div
-            style={{
-              borderRadius: '10px',
-              background: '#ECFAFF',
-              width: '446px',
-              height: '51px',
-              lineHeight: '51px',
-              textAlign: 'center',
-              marginTop: '40px',
-              fontFamily: 'Manrope',
-              fontStyle: 'normal',
-              fontWeight: 'normal',
-              fontSize: 14,
-              color: '#0176FF',
-            }}
-          >
-            Please be patient and do not close this window until it finishes.
-          </div>
-        </div>
-      </ANWrappedPaper>
-    </div>
-  );
-};
-
-const NewDaoCreationResult: React.FC<ResultProps> = ({
-  isSuccess,
-  setCreateDaoStatus,
-  postResultActionRoute,
-}) => {
-  const history = useHistory();
-
-  const [daoDetail, setDaoDetail] = useState<any>({});
-
-  const {
-    data: daoDetailData,
-    loading: isLoadingDaoDetail,
-    error: errorLoadingDaoDetail,
-    fetchMore: fetchMoreDetail,
-  } = useQuery(GET_DAO_BY_NAME, {
-    variables: {
-      name: postResultActionRoute,
-    },
-  });
-
-  useEffect(() => {
-    if (daoDetailData && daoDetailData.name) {
-      console.log('daoDetailData', daoDetailData);
-      setDaoDetail(daoDetailData);
-    }
-  }, [daoDetailData]);
-
-  const fetchDetail = async () => {
-    console.log('calling fetchDetail');
-    const {
-      data: moreData,
-      loading: loadingMore,
-    }: { data: any; loading: boolean } = await fetchMoreDetail({
-      variables: {
-        name: postResultActionRoute,
-      },
-    });
-    console.log('fetchDetail:', moreData);
-    if (moreData && moreData.name) {
-      setDaoDetail(moreData);
-    }
   };
 
-  return (
-    <div
-      style={{
-        height: '80vh',
-        justifyContent: 'center',
-        display: 'flex',
-        alignItems: 'center',
-      }}
-    >
-      <ANWrappedPaper>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          <img
-            src={isSuccess ? GreenTickImage : CrossImage}
-            style={{
-              width: '88px',
-              marginLeft: 'auto',
-              marginRight: 'auto',
-              marginTop: '88px',
-            }}
-          />
-          <Title>
-            {isSuccess ? 'Your DAO is ready' : 'Somthing went wrong'}
-          </Title>
-          <SubTitle>
-            {isSuccess
-              ? 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.Lorem ipsum dolor'
-              : 'An error has occurred during the signature process. Do not worry, you can try again without losing your information.'}
-          </SubTitle>
-          <div
-            style={{
-              justifyContent: 'center',
-              display: 'flex',
-            }}
-          >
-            <ANButton
-              width={'446px'}
-              label={isSuccess ? 'Get started' : 'Ok, let’s try again'}
-              buttonType="primary"
-              style={{ marginTop: 40 }}
-              onClick={async () => {
-                if (isSuccess) {
-                  // await fetchDetail();
-                  // console.log('queried dao detail', daoDetail)
-                  history.push('daos/' + postResultActionRoute);
-                } else {
-                  setCreateDaoStatus(CreateDaoStatus.PreCreate);
-                }
-              }}
-            />
-          </div>
-        </div>
-      </ANWrappedPaper>
-    </div>
-  );
-};
-
-const NewDaoContainer: React.FC = () => {
-  const history = useHistory();
-
-  const [createDaoStatus, setCreateDaoStatus] = useState<CreateDaoStatus>(
-    CreateDaoStatus.PreCreate,
-  );
-  const [createdDaoRoute, setCreatedDaoRoute] = useState<string>('#');
-
-  const onClickBackFromCreateDaoPage = () => {
-    history.goBack();
-  };
-
-  switch (createDaoStatus) {
-    case CreateDaoStatus.PreCreate: {
-      return (
-        <NewDaoForm
-          setCreateDaoStatus={setCreateDaoStatus}
-          setCreatedDaoRoute={setCreatedDaoRoute}
-          cancelForm={onClickBackFromCreateDaoPage}
-        />
-      );
-    }
-    case CreateDaoStatus.InProgress: {
-      return <NewDaoProgress />;
-    }
-    case CreateDaoStatus.Successful: {
-      return (
-        <NewDaoCreationResult
-          isSuccess={true}
-          setCreateDaoStatus={setCreateDaoStatus}
-          postResultActionRoute={createdDaoRoute}
-        />
-      );
-    }
-    case CreateDaoStatus.Failed: {
-      return (
-        <NewDaoCreationResult
-          isSuccess={false}
-          setCreateDaoStatus={setCreateDaoStatus}
-          postResultActionRoute={'#'}
-        />
-      );
-    }
-    default: {
-      return (
-        <NewDaoForm
-          setCreateDaoStatus={setCreateDaoStatus}
-          setCreatedDaoRoute={setCreatedDaoRoute}
-          cancelForm={onClickBackFromCreateDaoPage}
-        />
-      );
-    }
-  }
-};
-
-export default memo(NewDaoContainer);
+export default memo(CreateDaoForm);

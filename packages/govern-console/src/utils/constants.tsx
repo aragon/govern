@@ -8,7 +8,7 @@ export const ARAGON_VOICE_URL: { [chainId in ChainId]: string } = {
   [ChainId.RINKEBY]: 'http://voice-rinkeby.aragon.org/',
 };
 
-export const CONFIRMATION_WAIT = 2; // we wait 2 confirmation to make sure subgraph is populated
+export const CONFIRMATION_WAIT = 3; // we wait 3 confirmation to make sure subgraph is populated
 
 export const PROXY_CONTRACT_URL = 'https://eips.ethereum.org/EIPS/eip-1167';
 

@@ -11,7 +11,7 @@ import ConsoleMainPage from 'containers/Console/ConsoleMainPage';
 import DaoMainPage from 'containers/DAO/DaoMainPage';
 import ProposalDetails from 'containers/ProposalDetails/ProposalDetails';
 import NewProposal from 'containers/NewProposal/NewProposal';
-import NewDaoContainer from 'containers/CreateDAO/CreateDAO';
+import CreateDao from 'containers/CreateDAO/CreateDao';
 import DaoSettingsContainer from 'containers/DAOSettings/DAOSettings';
 import { ModalsProvider } from 'containers/HomePage/ModalsContext';
 
@@ -94,7 +94,7 @@ const HomePage = ({ ...props }) => {
               <DaoSettingsContainer onClickBack={() => history.goBack()} />
             </Route>
             <Route exact path="/create-dao">
-              <NewDaoContainer />
+              <CreateDao />
             </Route>
             {/* <Route path="/about">
         <About />
