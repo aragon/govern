@@ -50,7 +50,14 @@ export type ActionToSchedule = {
   numberOfInputs: number;
 }
 
+export type Account = {
+  signer: any | undefined;
+  address: string | null;
+}
+
 export enum ChainId {
   MAINNET = 1,
   RINKEBY = 4,
 }
+
+

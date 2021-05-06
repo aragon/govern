@@ -23,7 +23,6 @@ import QueueApprovals from 'services/QueueApprovals'
 import { CustomTransaction, CustomTransactionStatus, abiItem, actionType, ActionToSchedule} from 'utils/types';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import  FacadeProposal from 'services/Proposal';
-// import useStyles from ''
 
 import {
   Proposal,
@@ -261,11 +260,9 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const context: any = useWallet();
   const { account, provider } = context;
 
-  const submitter: string = account;
-
   const proposalInstance = React.useMemo(() => {
     if(provider && account && daoDetails) {
-      let queueApprovals = new QueueApprovals(provider.getSigner(), account, daoDetails.queue.address, daoDetails.config.resolver)
+      let queueApprovals = new QueueApprovals(account, daoDetails.queue.address, daoDetails.queue.config.resolver)
       const proposal =  new Proposal(daoDetails.queue.address, {} as ProposalOptions);
       return new FacadeProposal(queueApprovals, proposal) as (FacadeProposal & Proposal)
     }
@@ -394,7 +391,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const scheduleProposal = async (actions: ActionType[]) => {
     // build the container to schedule.
     const payload = {
-      submitter: account,
+      submitter: account.address,
       executor: daoDetails.executor.address,
       actions: actions,
       proof: proof
