@@ -159,7 +159,6 @@ const DaoMainPage: React.FC<{
   };
 
   useEffect(() => {
-    debugger;
     if (loadingDao) return;
     if (daoList.daos.length > 0) {
       updateDaoDetails(daoList.daos[0]);

@@ -268,7 +268,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   });
   const context: any = useWallet();
 
-  const { account, ethersProvider } = context;
+  const { account, provider } = context;
 
   const { dispatch } = React.useContext(ModalsContext);
 
@@ -279,9 +279,9 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   const transactionsQueue = React.useRef<CustomTransaction[]>([]);
 
   const proposalInstance = React.useMemo(() => {
-    if (ethersProvider && account && daoDetails && proposalInfo) {
+    if (provider && account && daoDetails && proposalInfo) {
       let queueApprovals = new QueueApprovals(
-        ethersProvider.getSigner(),
+        provider.getSigner(),
         account,
         daoDetails.queue.address,
         proposalInfo.config.resolver,
@@ -293,7 +293,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       return new FacadeProposal(queueApprovals, proposal) as FacadeProposal &
         Proposal;
     }
-  }, [ethersProvider, account, daoDetails, proposalInfo]);
+  }, [provider, account, daoDetails, proposalInfo]);
 
   const [
     getProposalData,

@@ -146,7 +146,7 @@ const SubTitle = styled(Typography)({
 const NewDaoForm: React.FC<FormProps> = memo(
   ({ setCreateDaoStatus, setCreatedDaoRoute, cancelForm }) => {
     const context: any = useWallet();
-    const { chainId, status, ethersProvider } = context;
+    const { chainId, status, provider } = context;
 
     const {
       control,
@@ -169,25 +169,13 @@ const NewDaoForm: React.FC<FormProps> = memo(
       setValue('daoConfig', _config);
     }, [connectedChainId]);
 
-    const getTokenInfo = async (tokenAddress: string) => {
-      //TODO: handle etherProvider in case wallet is not connected
-      try {
-        const token = await getToken(tokenAddress, ethersProvider);
-        return token;
-      } catch (error) {
-        console.log(error);
-        return false;
-      }
-    };
-
     const createDaoCall = async (params: FormInputs): Promise<boolean> => {
       let token: Partial<Token>;
       if (params.isExistingToken) {
-        const tokenInfo = await getTokenInfo(params.tokenAddress);
-        if (tokenInfo !== false) {
-          token = tokenInfo;
-        } else {
-          return false;
+        try {
+          token = await getToken(params.tokenAddress, provider);
+        }catch(error) {
+          return false
         }
       } else {
         token = {

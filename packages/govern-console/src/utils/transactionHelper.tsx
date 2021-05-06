@@ -15,7 +15,7 @@ import { BigNumberish } from '@ethersproject/bignumber'
  * @param amount how much to approve
  * @param spender spender
  * @param account owner
- * @param ethersProvider
+ * @param signer
  *
  * @returns {Promise<Response>}
  */

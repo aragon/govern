@@ -13,7 +13,7 @@ import { ANCircularProgressWithCaption } from 'components/CircularProgress/ANCir
 import { CiruclarProgressStatus } from 'utils/types';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { useQuery } from '@apollo/client';
-import { buildPayload } from '../../utils/ERC3000';
+import { buildContainer } from '../../utils/ERC3000';
 import { useWallet } from '../../EthersWallet';
 import { HelpButton } from 'components/HelpButton/HelpButton';
 import { BlueSwitch } from 'components/Switchs/BlueSwitch';
@@ -120,7 +120,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
   ({ onClickBack }) => {
     
     const context: any = useWallet();
-    const { account, status, ethersProvider } = context;
+    const { account, status, provider } = context;
 
     const { dispatch } = React.useContext(ModalsContext);
 
@@ -128,6 +128,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
       control,
       watch,
       setValue,
+      reset,
       getValues,
     } = useForm<FormInputs>();
 
@@ -147,13 +148,12 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
     }, [daoList]);
     
     const proposalInstance = React.useMemo(() => {
-      if(ethersProvider && account && daoDetails) {
-        console.log(daoDetails, ' goodone')
-        let queueApprovals = new QueueApprovals(ethersProvider.getSigner(), account, daoDetails.queue.address, daoDetails.queue.config.resolver)
+      if(provider && account && daoDetails) {
+        let queueApprovals = new QueueApprovals(provider.getSigner(), account, daoDetails.queue.address, daoDetails.queue.config.resolver)
         const proposal =  new Proposal(daoDetails.queue.address, {} as ProposalOptions);
         return new FacadeProposal(queueApprovals, proposal) as (FacadeProposal & Proposal)
       }
-    }, [ethersProvider, account, daoDetails])
+    }, [provider, account, daoDetails])
 
     const transactionsQueue = React.useRef<CustomTransaction[]>([]);
     useEffect(() => {
@@ -164,36 +164,35 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
 
     useEffect(() => {
       const _load = async () => {
-        if (daoDetails) {
-          console.log('called useffect');
-        
+        if (daoDetails) {        
           const _config = daoDetails.queue.config;
-
           setConfig(_config);
 
-          setValue('daoConfig.executionDelay', _config.executionDelay)
-          setValue('daoConfig.resolver', _config.resolver)
-          setValue('daoConfig.rules', _config.rules)
-          setValue('daoConfig.scheduleDeposit.token', _config.scheduleDeposit.token)
-          setValue('daoConfig.challengeDeposit.token', _config.challengeDeposit.token)
-          setValue('daoConfig.maxCalldataSize', _config.maxCalldataSize)
+          // copy the nested objects so we can change the amount values
+          const formConfig: DaoConfig = { 
+            ..._config,
+            scheduleDeposit: {..._config.scheduleDeposit},
+            challengeDeposit: {..._config.challengeDeposit}
+          }
 
-          setValue('daoConfig.scheduleDeposit.amount', await correctDecimal(
+          formConfig.scheduleDeposit.amount = await correctDecimal(
             _config.scheduleDeposit.token,
             _config.scheduleDeposit.amount,
             false,
-            ethersProvider
-          ))
-          setValue('daoConfig.challengeDeposit.amount', await correctDecimal(
+            provider
+          )
+          formConfig.challengeDeposit.amount =  await correctDecimal(
             _config.challengeDeposit.token,
             _config.challengeDeposit.amount,
             false,
-            ethersProvider
-          ))
+            provider
+          )
+          
+          setValue('daoConfig', formConfig)
         }
       };
       _load();
-    }, [daoDetails, ethersProvider]);
+    }, [daoDetails, provider]);
 
     
     const callSaveSetting = async () => {
@@ -202,33 +201,25 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
         newConfig.scheduleDeposit.token,
         newConfig.scheduleDeposit.amount,
         true,
-        ethersProvider
+        provider
       );
       newConfig.challengeDeposit.amount = await correctDecimal(
         newConfig.challengeDeposit.token,
         newConfig.challengeDeposit.amount,
         true,
-        ethersProvider
+        provider
       )
 
-      const submitter: string = account;
-
-      const payload = buildPayload({
-        submitter,
+      // build the container to schedule.
+      const payloadData = {
+        submitter: account,
         executor: daoDetails.executor.address,
-        actions: [
-          proposalInstance?.buildAction('configure', [newConfig], 0)
-        ],
-        executionDelay: daoDetails.queue.config.executionDelay,
+        actions: [ proposalInstance?.buildAction('configure', [newConfig], 0) ],
         proof: getValues('proof')
-      })
-
-      const container = {
-        payload,
-        config
       }
 
-      console.log(container, 'container');
+      // the final container to be sent to schedule.
+      const container = buildContainer(payloadData, config);
       
       if(proposalInstance) {
         try {
