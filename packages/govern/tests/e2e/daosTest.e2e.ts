@@ -1,7 +1,6 @@
 import { configure, daos } from '@aragon/govern'
 import { subgraphURL } from './config'
 import { utils } from 'ethers'
-const { isAddress } = utils
 
 /**
  * daos e2e test
@@ -24,7 +23,7 @@ describe('[e2e] daos Test', () => {
 
     expect(response[0].queue.id).toBeDefined()
 
-    expect(isAddress(response[0].queue.address)).toEqual(true)
+    expect(utils.isAddress(response[0].queue.address)).toEqual(true)
 
     expect(response[0].queue.nonce).toBeDefined()
 
@@ -41,6 +40,6 @@ describe('[e2e] daos Test', () => {
     expect(Array.isArray(response[0].queue.containers)).toEqual(true)
 
     expect(response[0].executor.metadata).toBeDefined()
-    expect(isAddress(response[0].executor.address)).toEqual(true)
+    expect(utils.isAddress(response[0].executor.address)).toEqual(true)
   })
 })
