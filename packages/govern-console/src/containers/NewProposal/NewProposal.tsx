@@ -23,6 +23,7 @@ import QueueApprovals from 'services/QueueApprovals'
 import { CustomTransaction, CustomTransactionStatus, abiItem, actionType, ActionToSchedule} from 'utils/types';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import  FacadeProposal from 'services/Proposal';
+import { settingsUrl } from 'utils/urls'
 
 import {
   Proposal,
@@ -105,6 +106,12 @@ const Title = styled(Typography)({
   marginTop: 17,
   height: 50,
   display: 'block',
+});
+const SettingsLink = styled(Typography)({
+  fontFamily: 'Manrope',
+  fontStyle: 'normal',
+  paddingBottom: 10,
+  color: '#7483AB',
 });
 const proofTextArea = styled(TextArea)({
   background: '#FFFFFF',
@@ -427,6 +434,16 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
           <img src={backButtonIcon} />
         </BackButton>
         <Title>New Proposal</Title>
+        <SettingsLink>
+          This execution will use the current DAO{' '}
+          <a
+            href={`#${settingsUrl(daoName)}`}
+            target='_blank'
+            rel="noreferrer noopener"
+          >
+            Settings
+          </a>
+        </SettingsLink>
         <div
           style={{
             display: 'flex',
