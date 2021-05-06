@@ -60,11 +60,11 @@ export type Token = {
 
 export type TokenDeposit = {
   token: string
-  amount: BigNumberish
+  amount: BigNumberish | string
 }
 
 export type DaoConfig = {
-  executionDelay: number|string
+  executionDelay: number | string
   scheduleDeposit: TokenDeposit
   challengeDeposit: TokenDeposit
   resolver: string

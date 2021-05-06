@@ -146,7 +146,7 @@ const SubTitle = styled(Typography)({
 const NewDaoForm: React.FC<FormProps> = memo(
   ({ setCreateDaoStatus, setCreatedDaoRoute, cancelForm }) => {
     const context: any = useWallet();
-    const { chainId, status, ethersProvider } = context;
+    const { chainId, status, provider } = context;
 
     const {
       control,
@@ -173,7 +173,7 @@ const NewDaoForm: React.FC<FormProps> = memo(
       let token: Partial<Token>;
       if (params.isExistingToken) {
         try {
-          token = await getToken(params.tokenAddress, ethersProvider);
+          token = await getToken(params.tokenAddress, provider);
         }catch(error) {
           return false
         }

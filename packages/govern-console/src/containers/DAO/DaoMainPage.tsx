@@ -103,7 +103,7 @@ const DaoMainPage: React.FC<{
   //TODO daoname empty handling
 
   const { data: daoList, loading: loadingDao } = useQuery(GET_DAO_BY_NAME, {
-    variables: { name: `%${daoName}%` },
+    variables: { name: daoName },
   });
 
   const [isProposalPage, setProposalPage] = useState(true);
@@ -168,7 +168,6 @@ const DaoMainPage: React.FC<{
   };
 
   useEffect(() => {
-    debugger;
     if (loadingDao) return;
     if (daoList.daos.length > 0) {
       updateDaoDetails(daoList.daos[0]);

@@ -1,14 +1,11 @@
 /* eslint-disable */
 import QueueApproval from './QueueApprovals'
-import { ProposalParams } from '@aragon/govern'
+import { ProposalParams, Proposal } from '@aragon/govern'
 import { CustomTransaction, CustomTransactionStatus } from 'utils/types';
 
-export default class FacadeProposal  {
+export default class FacadeProposal {
 
-    constructor(private queueApproval:QueueApproval, private proposal: any) {
-        this.queueApproval = queueApproval
-        this.proposal = proposal
-        
+    constructor(private queueApproval:QueueApproval, private proposal: Proposal) {
         // Copy proposal's functions into this class.
         for (let func of Object.getOwnPropertyNames(this.proposal.constructor.prototype)) {
             // @ts-ignore

@@ -14,7 +14,7 @@ import { useHistory, useParams } from 'react-router-dom';
 import {  Transaction as EthersTransaction, ethers } from 'ethers';
 import { useQuery } from '@apollo/client';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
-import { buildPayload } from 'utils/ERC3000';
+import { buildContainer } from 'utils/ERC3000';
 import { erc20ApprovalTransaction } from '../../utils/transactionHelper';
 import { toUtf8Bytes } from '@ethersproject/strings';
 import { AddressZero } from '@ethersproject/constants';
@@ -259,17 +259,17 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   }, [daoList]);
 
   const context: any = useWallet();
-  const { account, ethersProvider } = context;
+  const { account, provider } = context;
 
   const submitter: string = account;
 
   const proposalInstance = React.useMemo(() => {
-    if(ethersProvider && account && daoDetails) {
-      let queueApprovals = new QueueApprovals(ethersProvider.getSigner(), account, daoDetails.queue.address, daoDetails.config.resolver)
+    if(provider && account && daoDetails) {
+      let queueApprovals = new QueueApprovals(provider.getSigner(), account, daoDetails.queue.address, daoDetails.config.resolver)
       const proposal =  new Proposal(daoDetails.queue.address, {} as ProposalOptions);
       return new FacadeProposal(queueApprovals, proposal) as (FacadeProposal & Proposal)
     }
-  }, [ethersProvider, account, daoDetails])
+  }, [provider, account, daoDetails])
 
   const transactionsQueue = React.useRef<CustomTransaction[]>([]);
 
@@ -392,18 +392,16 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   };
 
   const scheduleProposal = async (actions: ActionType[]) => {
-    const payload = buildPayload({
-      submitter,
+    // build the container to schedule.
+    const payload = {
+      submitter: account,
       executor: daoDetails.executor.address,
-      actions,
-      proof: proof,
-      executionDelay: daoDetails.queue.config.executionDelay
-    })
-
-    const container = {
-      payload: payload,
-      config: daoDetails.queue.config
+      actions: actions,
+      proof: proof
     }
+    
+    // the final container to be sent to schedule.
+    const container = buildContainer(payload, daoDetails.queue.config);
 
     if(proposalInstance) {
       try {
