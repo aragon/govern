@@ -1,6 +1,8 @@
+/* eslint-disable*/
 import React, { useContext, useMemo } from 'react';
 import { providers as EthersProviders } from 'ethers';
 import { UseWalletProvider, useWallet } from 'use-wallet';
+import { Account } from 'utils/types'
 
 const WalletAugmentedContext = React.createContext({});
 
@@ -18,11 +20,19 @@ const WalletAugmented: React.FC<unknown> = ({ children }) => {
     [ethereum],
   );
 
-  const contextValue = useMemo(() => ({ ...wallet, provider }), [
-    wallet,
-    provider,
-  ]);
 
+  const contextValue = useMemo(
+    () => {
+      const account: Account = {
+        address: wallet.account,
+        signer: provider?.getSigner()
+      }
+      
+      return { ...wallet, provider, account }
+    }, 
+    [wallet, provider]
+  );
+  
   return (
     <WalletAugmentedContext.Provider value={contextValue}>
       {children}

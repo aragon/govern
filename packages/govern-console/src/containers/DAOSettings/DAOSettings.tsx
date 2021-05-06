@@ -128,7 +128,6 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
       control,
       watch,
       setValue,
-      reset,
       getValues,
     } = useForm<FormInputs>();
 
@@ -149,7 +148,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
     
     const proposalInstance = React.useMemo(() => {
       if(provider && account && daoDetails) {
-        let queueApprovals = new QueueApprovals(provider.getSigner(), account, daoDetails.queue.address, daoDetails.queue.config.resolver)
+        let queueApprovals = new QueueApprovals(account, daoDetails.queue.address, daoDetails.queue.config.resolver)
         const proposal =  new Proposal(daoDetails.queue.address, {} as ProposalOptions);
         return new FacadeProposal(queueApprovals, proposal) as (FacadeProposal & Proposal)
       }
@@ -211,15 +210,15 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
       )
 
       // build the container to schedule.
-      const payloadData = {
-        submitter: account,
+      const payload = {
+        submitter: account.address,
         executor: daoDetails.executor.address,
         actions: [ proposalInstance?.buildAction('configure', [newConfig], 0) ],
         proof: getValues('proof')
       }
 
       // the final container to be sent to schedule.
-      const container = buildContainer(payloadData, config);
+      const container = buildContainer(payload, config);
       
       if(proposalInstance) {
         try {

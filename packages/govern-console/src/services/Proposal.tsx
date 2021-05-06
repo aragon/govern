@@ -8,15 +8,18 @@ export default class FacadeProposal {
     constructor(private queueApproval:QueueApproval, private proposal: Proposal) {
         // Copy proposal's functions into this class.
         for (let func of Object.getOwnPropertyNames(this.proposal.constructor.prototype)) {
-            // @ts-ignore
-            this[func] = this.proposal.constructor.prototype[func].bind(this.proposal)
+            // make sure we don't override methods from proposal.
+            if(!Object.getOwnPropertyNames(this.constructor.prototype).includes(func)){
+                // @ts-ignore
+                this[func] = this.proposal.constructor.prototype[func].bind(this.proposal)
+            }
         }
     }   
 
-    public async challenge(container:ProposalParams, reason:any) {
+    public async challenge(container:ProposalParams, reason:string) {
         let txs: CustomTransaction[] = [];
         try {
-            txs = await this.queueApproval.scheduleApprovals(
+            txs = await this.queueApproval.challengeApprovals(
                 container.config.challengeDeposit
             )
         }catch(err) {

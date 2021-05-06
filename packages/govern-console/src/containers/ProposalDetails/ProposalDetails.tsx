@@ -281,7 +281,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   const proposalInstance = React.useMemo(() => {
     if (provider && account && daoDetails && proposalInfo) {
       let queueApprovals = new QueueApprovals(
-        provider.getSigner(),
         account,
         daoDetails.queue.address,
         proposalInfo.config.resolver,
@@ -433,7 +432,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     //
     // }
 
-    console.log(proposalInfo, ' proposal info');
   }
 
   // const getParsedDataFromBytes = (data) => {
@@ -680,7 +678,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                       buttonType="primary"
                     />
                   </Widget>
-                  <Widget>
+                  {/* <Widget>
                     <ANButton
                       buttonType="primary"
                       label="Resolve"
@@ -689,7 +687,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                       style={{ margin: 'auto' }}
                       // onClick={resolveProposal(disputeId)}
                     />
-                  </Widget>
+                  </Widget> */}
                 </WidgetWrapper>
               </DetailsWrapper>
             </StyledPaper>

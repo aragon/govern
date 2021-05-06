@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { createContext, Dispatch, useReducer } from 'react';
 import TransctionsModal from 'components/Modal/TransactionsModal';
 import { CustomTransaction } from 'utils/types';

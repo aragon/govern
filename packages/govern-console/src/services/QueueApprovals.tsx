@@ -5,10 +5,11 @@ import { TokenDeposit } from '@aragon/govern'
 
 import { erc20ApprovalTransaction } from 'utils/transactionHelper';
 import { CustomTransaction } from 'utils/types';
+import { Account } from 'utils/types'
 
 export default class QueueApprovals {
 
-    constructor(private _signer: any, private _account: string, private _queue: string, private _resolver: string) {
+    constructor(private account: Account, private queue: string, private resolver: string) {
         
     }
 
@@ -24,9 +25,8 @@ export default class QueueApprovals {
             const approvalTransactions = await erc20ApprovalTransaction(
                 tokenDeposit.token,
                 tokenDeposit.amount,
-                this._queue,
-                this._account,
-                this._signer,
+                this.queue,
+                this.account
             );
             transactionsQueue = [
                 ...transactionsQueue, 
@@ -50,9 +50,9 @@ export default class QueueApprovals {
         let transactionsQueue:CustomTransaction[] = []
 
         const contract = new ethers.Contract(
-            this._resolver,
+            this.resolver,
             CourtABI,
-            this._signer,
+            this.account.signer
         );
           
         // add approval transaction for the challenge deposit token
@@ -60,9 +60,8 @@ export default class QueueApprovals {
             const approvalTransactions = await erc20ApprovalTransaction(
                 tokenDeposit.token,
                 tokenDeposit.amount,
-                this._queue,
-                this._account,
-                this._signer,
+                this.queue,
+                this.account
             );
             
             transactionsQueue = [
@@ -79,9 +78,8 @@ export default class QueueApprovals {
             const approvalTransactions = await erc20ApprovalTransaction(
                 feeToken,
                 feeAmount,
-                this._queue,
-                this._account,
-                this._signer,
+                this.queue,
+                this.account
             );
             transactionsQueue = [
                 ...transactionsQueue, 
