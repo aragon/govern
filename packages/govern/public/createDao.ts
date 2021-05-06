@@ -94,7 +94,7 @@ export async function createDao(
   args: CreateDaoParams,
   options: CreateDaoOptions = {},
   registerTokenCallback?: Function
-): Promise<TransactionResponse> {
+): Promise<providers.TransactionResponse> {
   if (!args.token.tokenAddress) {
     args.token.tokenAddress = constants.AddressZero
   } else {
