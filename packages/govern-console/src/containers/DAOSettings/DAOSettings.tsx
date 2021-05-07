@@ -22,7 +22,8 @@ import { correctDecimal } from 'utils/token';
 import FacadeProposal from 'services/Proposal';
 import { useForm, Controller } from 'react-hook-form';
 import { BytesLike } from 'ethers';
-import { validateToken } from '../../utils/validations';
+import { validateToken, isAddress} from 'utils/validations';
+
 import {
   Proposal,
   ProposalOptions,
@@ -170,6 +171,9 @@ const DaoSettings: React.FC<DaoSettingFormProps> =
             challengeDeposit: { ..._config.challengeDeposit },
           };
 
+          // TODO: We only allow ordinary strings/text types for the rules settings
+          // in the future, toUtf8String won't be correct and need to handle different types
+          // mostly (toUTF8string again + ipfs)
           formConfig.rules = toUtf8String(_config.rules);
 
           formConfig.scheduleDeposit.amount = await correctDecimal(
@@ -194,6 +198,8 @@ const DaoSettings: React.FC<DaoSettingFormProps> =
     const callSaveSetting = async (formData: FormInputs) => {
       console.log('formData', formData)
       const newConfig: DaoConfig = formData.daoConfig;
+      
+      // modify config before sending to schedule.
       newConfig.rules = toUtf8Bytes(newConfig.rules.toString())
       newConfig.scheduleDeposit.amount = await correctDecimal(
         newConfig.scheduleDeposit.token,
@@ -412,7 +418,9 @@ const DaoSettings: React.FC<DaoSettingFormProps> =
             name="daoConfig.resolver"
             control={control}
             defaultValue={''}
-            rules={{ required: 'This is required.'}}
+            rules={{ required: 'This is required.', validate: (value) =>
+              isAddress(value)
+            }}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <InputField
                 label=""
@@ -444,7 +452,8 @@ const DaoSettings: React.FC<DaoSettingFormProps> =
               lineHeight: '40px',
             }}
           >
-            <OptionTextStyle>{'Text'}</OptionTextStyle>
+            {/* <OptionTextStyle>{'Text'}</OptionTextStyle>
+            TODO: add this when the IPFS support kicks in
             <div style={{ marginLeft: '20px' }}>
               <Controller
                 name="isRuleFile"
@@ -455,7 +464,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> =
                 )}
               />
             </div>
-            <OptionTextStyle>{'File'}</OptionTextStyle>
+            <OptionTextStyle>{'File'}</OptionTextStyle> */}
           </div>
           <InputSubTitle>
             Provide the base rules under what your DAO should be ran
@@ -531,7 +540,8 @@ const DaoSettings: React.FC<DaoSettingFormProps> =
               lineHeight: '40px',
             }}
           >
-            <OptionTextStyle>{'Text'}</OptionTextStyle>
+            {/* <OptionTextStyle>{'Text'}</OptionTextStyle>
+            TODO: add this when the IPFS support kicks in
             <div style={{ marginLeft: '20px' }}>
               <Controller
                 name="isProofFile"
@@ -542,7 +552,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> =
                 )}
               />
             </div>
-            <OptionTextStyle>{'File'}</OptionTextStyle>
+            <OptionTextStyle>{'File'}</OptionTextStyle> */}
           </div>
           <InputSubTitle>Enter the proof for changes</InputSubTitle>
           {!watch('isProofFile') ? (
