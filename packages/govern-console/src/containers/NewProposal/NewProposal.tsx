@@ -25,7 +25,7 @@ import {
 } from 'utils/types';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import  FacadeProposal from 'services/Proposal';
-import { fetchAbi } from 'utils/ethersan';
+import AbiFetcher from 'utils/AbiFetcher';
 import { settingsUrl } from 'utils/urls';
 
 import {
@@ -272,7 +272,13 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   }, [daoList]);
 
   const context: any = useWallet();
-  const { account, provider } = context;
+  const { account, provider, networkName } = context;
+
+  const abiFetcher = React.useMemo(() => {
+    if( networkName ) {
+      return new AbiFetcher(networkName)
+    }
+  }, [networkName])
 
   const proposalInstance = React.useMemo(() => {
     if (provider && account && daoDetails) {
@@ -353,19 +359,28 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   };
   // const onScheduleProposal = () => {};
 
-  const onFetchAbi = async (contractAddress: string) => {
-    const abi = await fetchAbi(contractAddress)
-    if (abi) {
-      try {
-        onGenerateActionsFromAbi(contractAddress, JSON.parse(abi))
-      } catch (e) {
-        // unable to generate from abi, try getting abi from user
-        setDoFetch(false)
+  const onFetchAbi = React.useMemo(
+    () => async (contractAddress: string) => {
+      if (!abiFetcher) {
+        // don't know which network, let user input abi
+        setDoFetch(false);
+        return;
       }
-    } else {
-      setDoFetch(false)
-    }
-  }
+      const abi = await abiFetcher.get(contractAddress);
+      if (abi) {
+        try {
+          onGenerateActionsFromAbi(contractAddress, JSON.parse(abi));
+        } catch (e) {
+          // unable to generate from abi, try getting abi from user
+          setDoFetch(false);
+        }
+      } else {
+        // couldn't get abi from etherscan, get it from user
+        setDoFetch(false);
+      }
+    },
+    [doFetch],
+  );
 
   const onGenerateActionsFromAbi = async (
     contractAddress: string,
@@ -466,8 +481,8 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
           This execution will use the current{' '}
           <Link
             to={settingsUrl(daoName)}
-            target='_blank'
-            rel='noreferrer noopener'
+            target="_blank"
+            rel="noreferrer noopener"
           >
             DAO Settings
           </Link>
@@ -530,18 +545,22 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
           // disabled={!isProposalValid()}
           onClick={() => onSchedule()}
         />
-        <NewActionModal
-          onCloseModal={handleInputModalClose}
-          onGenerate={onGenerateActionsFromAbi}
-          open={isInputModalOpen}
-          onFetch={doFetch? onFetchAbi: undefined}
-        ></NewActionModal>
-        <AddActionsModal
-          onCloseModal={handleActionModalClose}
-          open={isActionModalOpen}
-          onAddActions={onAddNewActions}
-          actions={abiFunctions as any}
-        ></AddActionsModal>
+        {isInputModalOpen && (
+          <NewActionModal
+            onCloseModal={handleInputModalClose}
+            onGenerate={onGenerateActionsFromAbi}
+            open={isInputModalOpen}
+            onFetch={onFetchAbi}
+          ></NewActionModal>
+        )}
+        {isActionModalOpen && (
+          <AddActionsModal
+            onCloseModal={handleActionModalClose}
+            open={isActionModalOpen}
+            onAddActions={onAddNewActions}
+            actions={abiFunctions as any}
+          ></AddActionsModal>
+        )}
       </WrapperDiv>
     </>
   );
