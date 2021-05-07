@@ -12,7 +12,7 @@ import DaoMainPage from 'containers/DAO/DaoMainPage';
 import ProposalDetails from 'containers/ProposalDetails/ProposalDetails';
 import NewProposal from 'containers/NewProposal/NewProposal';
 import CreateDao from 'containers/CreateDAO/CreateDao';
-import DaoSettingsContainer from 'containers/DAOSettings/DAOSettings';
+import DaoSettings from 'containers/DAOSettings/DAOSettings';
 import { ModalsProvider } from 'containers/HomePage/ModalsContext';
 
 const AppWrapper = styled('div')({
@@ -91,7 +91,7 @@ const HomePage = ({ ...props }) => {
               <NewProposal onClickBack={() => history.goBack()} />
             </Route>
             <Route exact path="/daos/:daoName/dao-settings">
-              <DaoSettingsContainer onClickBack={() => history.goBack()} />
+              <DaoSettings onClickBack={() => history.goBack()} />
             </Route>
             <Route exact path="/create-dao">
               <CreateDao />
