@@ -193,7 +193,7 @@ const CreateDaoForm: React.FC<FormProps> = ({
           progress.progressStatus.register = CiruclarProgressStatus.Failed;
           setProgress({ ...progress });
 
-          setCreateDaoStatus(CreateDaoStatus.Failed);
+          setCreateDaoStatus(CreateDaoStatus.Successful); 
           // TODO: more clouser should be provided for user
         }
       };
