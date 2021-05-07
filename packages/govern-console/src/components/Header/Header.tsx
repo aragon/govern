@@ -1,6 +1,5 @@
 import React from 'react';
 import { styled, useTheme } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
 import governIcon from 'images/aragon-icon.svg';
 import Wallet from 'components/Wallet/Wallet';
 import { useHistory } from 'react-router-dom';
@@ -11,29 +10,6 @@ const HeaderWrapperDiv = styled('div')({
   width: '100%',
   display: 'block',
   top: 0,
-});
-const TitleTextNormal = styled(Typography)({
-  fontFamily: 'Manrope',
-  fontStyle: 'normal',
-  fontWeight: 'normal',
-  fontSize: '18px',
-  lineHeight: '25px',
-  color: '#7483B2',
-  display: 'flex',
-  justifyContent: 'left',
-  alignItems: 'center',
-  marginRight: '5px',
-});
-const TitleTextBold = styled(Typography)({
-  fontFamily: 'Manrope',
-  fontStyle: 'normal',
-  fontWeight: 600,
-  fontSize: '18px',
-  lineHeight: '25px',
-  color: '#20232C',
-  display: 'flex',
-  justifyContent: 'left',
-  alignItems: 'center',
 });
 const Navbar = styled('div')({
   display: 'flex',
@@ -71,9 +47,7 @@ const Header = ({}) => {
     <HeaderWrapperDiv id="header">
       <Navbar id="navbar">
         <Title id="navbar_title" onClick={redirectToHomePage}>
-          <img src={governIcon} />
-          <TitleTextNormal>Govern</TitleTextNormal>
-          <TitleTextBold>Console</TitleTextBold>
+          <img src={governIcon} width="210px" />
         </Title>
         <Account id="account">
           {/* <ChainSelector /> */}
