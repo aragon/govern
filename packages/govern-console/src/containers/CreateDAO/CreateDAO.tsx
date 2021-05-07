@@ -14,7 +14,7 @@ import { BlueSwitch } from 'components/Switchs/BlueSwitch';
 import { BlueCheckbox } from 'components/Checkboxs/BlueCheckbox';
 import { ANCircularProgressWithCaption } from 'components/CircularProgress/ANCircularProgressWithCaption';
 import { ANWrappedPaper } from 'components/WrapperPaper/ANWrapperPaper';
-import { useWallet } from '../../EthersWallet';
+import { useWallet } from '../../AugmentedWallet';
 import {
   createDao,
   CreateDaoParams,

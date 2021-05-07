@@ -14,19 +14,19 @@ import { CiruclarProgressStatus } from 'utils/types';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { useQuery } from '@apollo/client';
 import { buildContainer } from '../../utils/ERC3000';
-import { useWallet } from '../../EthersWallet';
+import { useWallet } from 'AugmentedWallet';
 import { HelpButton } from 'components/HelpButton/HelpButton';
 import { BlueSwitch } from 'components/Switchs/BlueSwitch';
 import Grid from '@material-ui/core/Grid';
 import { toUtf8Bytes, toUtf8String } from '@ethersproject/strings';
 import { DaoConfig } from '@aragon/govern';
-import QueueApprovals from 'services/QueueApprovals'
+import QueueApprovals from 'services/QueueApprovals';
 import { CustomTransaction } from 'utils/types';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
-import { correctDecimal } from 'utils/token'
-import  FacadeProposal from 'services/Proposal';
+import { correctDecimal } from 'utils/token';
+import FacadeProposal from 'services/Proposal';
 import { useForm, Controller } from 'react-hook-form';
-import { BytesLike } from 'ethers'
+import { BytesLike } from 'ethers';
 
 import {
   Proposal,
@@ -118,41 +118,43 @@ const OptionTextStyle = styled('div')({
 
 const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
   ({ onClickBack }) => {
-    
     const context: any = useWallet();
     const { account, status, provider } = context;
 
     const { dispatch } = React.useContext(ModalsContext);
 
-    const {
-      control,
-      watch,
-      setValue,
-      getValues,
-    } = useForm<FormInputs>();
+    const { control, watch, setValue, getValues } = useForm<FormInputs>();
 
     const { daoName } = useParams<ParamTypes>();
     //TODO daoname empty handling
     const { data: daoList } = useQuery(GET_DAO_BY_NAME, {
       variables: { name: daoName },
     });
-    
+
     const [daoDetails, updateDaoDetails] = useState<any>();
     const [config, setConfig] = useState<any | null>();
-    
+
     useEffect(() => {
       if (daoList) {
         updateDaoDetails(daoList.daos[0]);
       }
     }, [daoList]);
-    
+
     const proposalInstance = React.useMemo(() => {
-      if(provider && account && daoDetails) {
-        let queueApprovals = new QueueApprovals(account, daoDetails.queue.address, daoDetails.queue.config.resolver)
-        const proposal =  new Proposal(daoDetails.queue.address, {} as ProposalOptions);
-        return new FacadeProposal(queueApprovals, proposal) as (FacadeProposal & Proposal)
+      if (provider && account && daoDetails) {
+        let queueApprovals = new QueueApprovals(
+          account,
+          daoDetails.queue.address,
+          daoDetails.queue.config.resolver,
+        );
+        const proposal = new Proposal(
+          daoDetails.queue.address,
+          {} as ProposalOptions,
+        );
+        return new FacadeProposal(queueApprovals, proposal) as FacadeProposal &
+          Proposal;
       }
-    }, [provider, account, daoDetails])
+    }, [provider, account, daoDetails]);
 
     const transactionsQueue = React.useRef<CustomTransaction[]>([]);
     useEffect(() => {
@@ -163,71 +165,74 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
 
     useEffect(() => {
       const _load = async () => {
-        if (daoDetails) {        
+        if (daoDetails) {
           const _config = daoDetails.queue.config;
           setConfig(_config);
 
           // copy the nested objects so we can change the amount values
-          const formConfig: DaoConfig = { 
+          const formConfig: DaoConfig = {
             ..._config,
-            scheduleDeposit: {..._config.scheduleDeposit},
-            challengeDeposit: {..._config.challengeDeposit}
-          }
+            scheduleDeposit: { ..._config.scheduleDeposit },
+            challengeDeposit: { ..._config.challengeDeposit },
+          };
 
           formConfig.scheduleDeposit.amount = await correctDecimal(
             _config.scheduleDeposit.token,
             _config.scheduleDeposit.amount,
             false,
-            provider
-          )
-          formConfig.challengeDeposit.amount =  await correctDecimal(
+            provider,
+          );
+          formConfig.challengeDeposit.amount = await correctDecimal(
             _config.challengeDeposit.token,
             _config.challengeDeposit.amount,
             false,
-            provider
-          )
-          
-          setValue('daoConfig', formConfig)
+            provider,
+          );
+
+          setValue('daoConfig', formConfig);
         }
       };
       _load();
     }, [daoDetails, provider]);
 
-    
     const callSaveSetting = async () => {
       const newConfig: DaoConfig = getValues('daoConfig');
       newConfig.scheduleDeposit.amount = await correctDecimal(
         newConfig.scheduleDeposit.token,
         newConfig.scheduleDeposit.amount,
         true,
-        provider
+        provider,
       );
       newConfig.challengeDeposit.amount = await correctDecimal(
         newConfig.challengeDeposit.token,
         newConfig.challengeDeposit.amount,
         true,
-        provider
-      )
+        provider,
+      );
 
       // build the container to schedule.
       const payload = {
         submitter: account.address,
         executor: daoDetails.executor.address,
-        actions: [ proposalInstance?.buildAction('configure', [newConfig], 0) ],
-        proof: getValues('proof')
-      }
+        actions: [proposalInstance?.buildAction('configure', [newConfig], 0)],
+        proof: getValues('proof'),
+      };
 
       // the final container to be sent to schedule.
       const container = buildContainer(payload, config);
-      
-      if(proposalInstance) {
+
+      if (proposalInstance) {
         try {
-          transactionsQueue.current = await proposalInstance.schedule(container);
-        }catch(error) {
+          transactionsQueue.current = await proposalInstance.schedule(
+            container,
+          );
+          console.log(transactionsQueue.current);
+        } catch (error) {
           // TODO: Bhanu show error
-          return
+          return;
         }
       }
+      console.log(transactionsQueue.current);
 
       dispatch({
         type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
@@ -235,13 +240,12 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
           transactionList: transactionsQueue.current,
           onTransactionFailure: () => {},
           onTransactionSuccess: () => {},
-          onCompleteAllTransactions: () => {}
+          onCompleteAllTransactions: () => {},
         },
       });
-
     };
-
-    return proposalInstance ? (
+    debugger;
+    return true ? (
       <>
         <ANWrappedPaper style={{ width: window.innerWidth }}>
           <BackButton onClick={onClickBack}>
@@ -273,7 +277,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
             )}
           />
           <InputTitle>
-            Action collateral{' '}
+            Action collateral
             <HelpButton
               helpText={
                 'The requested collateral to be staked when anyone is scheduling an action. This is required so if action is challenged, collateral is used in resolver contract. If action passes, collateral returns to owner.'
@@ -380,7 +384,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
           </Grid>
 
           <InputTitle>
-            Resolver contract{' '}
+            Resolver contract
             <HelpButton
               helpText={
                 'A resolver contract is used to handle any disputes of the DAO. This contract needs to implement the AragonCourt interface - https://github.com/aragon/protocol/blob/development/packages/evm/contracts/AragonCourt.sol'

@@ -21,47 +21,6 @@ type TransactionsModalAction = {
     onCompleteAllTransactions: (transactions: CustomTransaction[]) => void;
   };
 };
-// type RegistryTransactionAction = {
-//   type: ActionTypes.OPEN_REGISTRY_TRANSACTION;
-//   payload: {
-//     daoAddress: string;
-//   };
-// };
-
-// type RegistryProposalAction = {
-//   type: ActionTypes.OPEN_REGISTRY_PROPOSAL;
-//   payload: {
-//     isUpdate: boolean;
-//     daoAddress: string;
-//     itemToUpdate?: {
-//       key: string;
-//       value: string;
-//     };
-//   };
-// };
-
-// type TreasuryProposalAction = {
-//   type: ActionTypes.OPEN_TREASURY_PROPOSAL;
-//   payload: {
-//     daoAddress: string;
-//   };
-// };
-
-// type RegistryItemAction = {
-//   type: ActionTypes.OPEN_REGISTRY_ITEM;
-//   payload: {
-//     key: string;
-//     value: string;
-//   };
-// };
-
-// type VoteAction = {
-//   type: ActionTypes.OPEN_VOTE;
-//   payload: {
-//     support: boolean;
-//     daoAddress: string;
-//   };
-// };
 
 type CloseAction = {
   type: ActionTypes.CLOSE;
@@ -128,6 +87,7 @@ const reducer = (
   state: ModalContextState,
   action: ModalsContextAction,
 ): ModalContextState => {
+  debugger;
   switch (action.type) {
     case ActionTypes.OPEN_TRANSACTIONS_MODAL:
       return {
