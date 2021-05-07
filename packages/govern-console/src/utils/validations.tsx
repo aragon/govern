@@ -43,3 +43,19 @@ export const validateAddress = (
   }
   return errorMessage;
 };
+
+export const validateContract = async (
+  address: string,
+  provider: any,
+): Promise<ValidateResult> => {
+  const errorMessage = 'Contract address is not valid.';
+  try {
+    const validAddress = await provider.getCode(address);
+    console.log('validAddress', validAddress)
+    if (validAddress !== '0x') return true;
+  } catch (error) {
+    return errorMessage;
+  }
+  return errorMessage;
+};
+ 

@@ -22,7 +22,7 @@ import { correctDecimal } from 'utils/token';
 import FacadeProposal from 'services/Proposal';
 import { useForm, Controller } from 'react-hook-form';
 import { BytesLike } from 'ethers';
-import { validateToken, validateAddress } from '../../utils/validations';
+import { validateToken, validateContract } from '../../utils/validations';
 import {
   Proposal,
   ProposalOptions,
@@ -420,7 +420,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> =
             name="daoConfig.resolver"
             control={control}
             defaultValue={''}
-            rules={{ required: 'This is required.', validate: (value) => {return validateAddress(value)}}}
+            rules={{ required: 'This is required.', validate: (value) => {return validateContract(value, provider)}}}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <InputField
                 label=""
