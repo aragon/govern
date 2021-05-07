@@ -7,10 +7,6 @@ import { styled } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { InputField } from 'components/InputFields/InputField';
 import { ANButton } from 'components/Button/ANButton';
-// import Modal from '@material-ui/core/Modal';
-import { SimpleModal } from 'components/Modal/SimpleModal';
-import { ANCircularProgressWithCaption } from 'components/CircularProgress/ANCircularProgressWithCaption';
-import { CiruclarProgressStatus } from 'utils/types';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { useQuery } from '@apollo/client';
 import { buildContainer } from '../../utils/ERC3000';
@@ -18,7 +14,6 @@ import { useWallet } from 'AugmentedWallet';
 import { HelpButton } from 'components/HelpButton/HelpButton';
 import { BlueSwitch } from 'components/Switchs/BlueSwitch';
 import Grid from '@material-ui/core/Grid';
-import { toUtf8Bytes, toUtf8String } from '@ethersproject/strings';
 import { DaoConfig } from '@aragon/govern';
 import QueueApprovals from 'services/QueueApprovals';
 import { CustomTransaction } from 'utils/types';
@@ -27,21 +22,14 @@ import { correctDecimal } from 'utils/token';
 import FacadeProposal from 'services/Proposal';
 import { useForm, Controller } from 'react-hook-form';
 import { BytesLike } from 'ethers';
-
+import { validateToken, validateContract } from '../../utils/validations';
 import {
   Proposal,
   ProposalOptions,
   PayloadType,
   ActionType,
 } from '@aragon/govern';
-import { assertValidName } from 'graphql';
-
-export interface DaoSettingContainerProps {
-  /**
-   * on click back
-   */
-  onClickBack: () => void;
-}
+import { toUtf8Bytes, toUtf8String } from '@ethersproject/strings';
 
 export interface DaoSettingFormProps {
   /**
@@ -63,6 +51,12 @@ interface FormInputs {
   isRuleFile: BytesLike;
   isProofFile: string;
 }
+
+const SettingsContainer = styled('div')({
+  justifyContent: 'center',
+  display: 'flex',
+  alignItems: 'center',
+})
 
 const BackButton = styled('div')({
   height: 25,
@@ -116,14 +110,14 @@ const OptionTextStyle = styled('div')({
   fontSize: 18,
 });
 
-const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
+const DaoSettings: React.FC<DaoSettingFormProps> = 
   ({ onClickBack }) => {
     const context: any = useWallet();
     const { account, status, provider } = context;
 
     const { dispatch } = React.useContext(ModalsContext);
 
-    const { control, watch, setValue, getValues } = useForm<FormInputs>();
+    const { control, watch, setValue, getValues, handleSubmit } = useForm<FormInputs>();
 
     const { daoName } = useParams<ParamTypes>();
     //TODO daoname empty handling
@@ -176,6 +170,11 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
             challengeDeposit: { ..._config.challengeDeposit },
           };
 
+          // TODO: We only allow ordinary strings/text types for the rules settings
+          // in the future, toUtf8String won't be correct and need to handle different types
+          // mostly (toUTF8string again + ipfs)
+          formConfig.rules = toUtf8String(_config.rules);
+
           formConfig.scheduleDeposit.amount = await correctDecimal(
             _config.scheduleDeposit.token,
             _config.scheduleDeposit.amount,
@@ -195,8 +194,12 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
       _load();
     }, [daoDetails, provider]);
 
-    const callSaveSetting = async () => {
-      const newConfig: DaoConfig = getValues('daoConfig');
+    const callSaveSetting = async (formData: FormInputs) => {
+      console.log('formData', formData)
+      const newConfig: DaoConfig = formData.daoConfig;
+      
+      // modify config before sending to schedule.
+      newConfig.rules = toUtf8Bytes(newConfig.rules.toString())
       newConfig.scheduleDeposit.amount = await correctDecimal(
         newConfig.scheduleDeposit.token,
         newConfig.scheduleDeposit.amount,
@@ -244,8 +247,10 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
         },
       });
     };
-    return true ? (
+
+    return (
       <>
+      <SettingsContainer >
         <ANWrappedPaper style={{ width: window.innerWidth }}>
           <BackButton onClick={onClickBack}>
             <img src={backButtonIcon} />
@@ -264,14 +269,18 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
             name="daoConfig.executionDelay"
             control={control}
             defaultValue={''}
+            rules={{ required: 'This is required.'}}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <InputField
+                type='number'
                 label=""
                 onInputChange={onChange}
                 value={value.toString()}
                 height="46px"
                 width={window.innerWidth > 700 ? '50%' : '100%'}
                 placeholder={'350s'}
+                error={!!error}
+                helperText={error ? error.message : null}
               />
             )}
           />
@@ -291,6 +300,9 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
                 name="daoConfig.scheduleDeposit.token"
                 control={control}
                 defaultValue=""
+                rules={{ required: 'This is required.', validate: async (value) =>
+                  await validateToken(value, provider),
+                }}
                 render={({
                   field: { onChange, value },
                   fieldState: { error },
@@ -302,6 +314,8 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
                     height="46px"
                     width={window.innerWidth > 700 ? '540px' : '100%'}
                     placeholder={'350s'}
+                    error={!!error}
+                    helperText={error ? error.message : null}
                   />
                 )}
               />
@@ -312,17 +326,21 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
                 name="daoConfig.scheduleDeposit.amount"
                 control={control}
                 defaultValue={''}
+                rules={{ required: 'This is required.'}}
                 render={({
                   field: { onChange, value },
                   fieldState: { error },
                 }) => (
                   <InputField
+                    type='number'
                     label=""
                     onInputChange={onChange}
                     value={value.toString()}
                     height="46px"
                     width={window.innerWidth > 700 ? '540px' : '100%'}
                     placeholder={'350s'}
+                    error={!!error}
+                    helperText={error ? error.message : null}
                   />
                 )}
               />
@@ -344,6 +362,9 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
                 name="daoConfig.challengeDeposit.token"
                 control={control}
                 defaultValue=""
+                rules={{ required: 'This is required.', validate: async (value) =>
+                  await validateToken(value, provider),
+                }}
                 render={({
                   field: { onChange, value },
                   fieldState: { error },
@@ -355,6 +376,8 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
                     height="46px"
                     width={window.innerWidth > 700 ? '540px' : '100%'}
                     placeholder={'350s'}
+                    error={!!error}
+                    helperText={error ? error.message : null}
                   />
                 )}
               />
@@ -365,17 +388,21 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
                 name="daoConfig.challengeDeposit.amount"
                 control={control}
                 defaultValue={''}
+                rules={{ required: 'This is required.'}}
                 render={({
                   field: { onChange, value },
                   fieldState: { error },
                 }) => (
                   <InputField
+                    type='number'
                     label=""
                     onInputChange={onChange}
                     value={value.toString()}
                     height="46px"
                     width={window.innerWidth > 700 ? '540px' : '100%'}
                     placeholder={'350s'}
+                    error={!!error}
+                    helperText={error ? error.message : null}
                   />
                 )}
               />
@@ -390,19 +417,12 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
               }
             />
           </InputTitle>
-          <InputSubTitle>Token contract address</InputSubTitle>
-          {/* <InputField
-            label=""
-            onInputChange={onChangeResolverAddress}
-            value={resolverAddress.current}
-            height="46px"
-            width={window.innerWidth > 700 ? '540px' : '100%'}
-            placeholder={'0x4c495F0005171E17c1dd08510g801805eE08E7'}
-          /> */}
+          <InputSubTitle>Contract address</InputSubTitle>
           <Controller
             name="daoConfig.resolver"
             control={control}
             defaultValue={''}
+            rules={{ required: 'This is required.', validate: (value) => {return validateContract(value, provider)}}}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <InputField
                 label=""
@@ -411,6 +431,8 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
                 height="46px"
                 width={window.innerWidth > 700 ? '540px' : '100%'}
                 placeholder={'350s'}
+                error={!!error}
+                helperText={error ? error.message : null}
               />
             )}
           />
@@ -432,16 +454,9 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
               lineHeight: '40px',
             }}
           >
-            <OptionTextStyle>{'Text'}</OptionTextStyle>
+            {/* <OptionTextStyle>{'Text'}</OptionTextStyle>
+            TODO: add this when the IPFS support kicks in
             <div style={{ marginLeft: '20px' }}>
-              {/* <BlueSwitch
-                disabled={true}
-                checked={isRuleFile}
-                onChange={() => {
-                  setIsRuleFile(!isRuleFile);
-                }}
-                name="ruleCheck"
-              /> */}
               <Controller
                 name="isRuleFile"
                 control={control}
@@ -451,24 +466,17 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
                 )}
               />
             </div>
-            <OptionTextStyle>{'File'}</OptionTextStyle>
+            <OptionTextStyle>{'File'}</OptionTextStyle> */}
           </div>
           <InputSubTitle>
             Provide the base rules under what your DAO should be ran
           </InputSubTitle>
           {!watch('isRuleFile') ? (
-            // <InputField
-            //   label=""
-            //   onInputChange={onChangeRules}
-            //   value={rules.current}
-            //   height="100px"
-            //   width="100%"
-            //   placeholder={'DAO rules and agreement ...'}
-            // />
             <Controller
               name="daoConfig.rules"
               control={control}
               defaultValue={''}
+              rules={{ required: 'This is required.'}}
               render={({
                 field: { onChange, value },
                 fieldState: { error },
@@ -480,6 +488,8 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
                   height={'100px'}
                   width={'100%'}
                   placeholder={'DAO rules and agreement ...'}
+                  error={!!error}
+                  helperText={error ? error.message : null}
                 />
               )}
             />
@@ -532,16 +542,9 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
               lineHeight: '40px',
             }}
           >
-            <OptionTextStyle>{'Text'}</OptionTextStyle>
+            {/* <OptionTextStyle>{'Text'}</OptionTextStyle>
+            TODO: add this when the IPFS support kicks in
             <div style={{ marginLeft: '20px' }}>
-              {/* <BlueSwitch
-                disabled={false}
-                checked={isProofFile}
-                onChange={() => {
-                  setIsProofFile(!isProofFile);
-                }}
-                name="ruleCheck"
-              /> */}
               <Controller
                 name="isProofFile"
                 control={control}
@@ -551,7 +554,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
                 )}
               />
             </div>
-            <OptionTextStyle>{'File'}</OptionTextStyle>
+            <OptionTextStyle>{'File'}</OptionTextStyle> */}
           </div>
           <InputSubTitle>Enter the proof for changes</InputSubTitle>
           {!watch('isProofFile') ? (
@@ -559,6 +562,7 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
               name="proof"
               control={control}
               defaultValue={''}
+              rules={{ required: 'This is required.'}}
               render={({
                 field: { onChange, value },
                 fieldState: { error },
@@ -570,6 +574,8 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
                   height={'100px'}
                   width={'100%'}
                   placeholder={'DAO rules and agreement ...'}
+                  error={!!error}
+                  helperText={error ? error.message : null}
                 />
               )}
             />
@@ -614,31 +620,16 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
               label={'Save settings'}
               disabled={status !== 'connected'}
               buttonType={'primary'}
-              onClick={callSaveSetting}
+              onClick={handleSubmit(callSaveSetting)}
               style={{ marginTop: '34px' }}
               width={'100%'}
             />
           </div>
         </ANWrappedPaper>
+        </SettingsContainer>
       </>
-    ) : null;
-  },
-);
+    )
+  }
 
-const DaoSettingsContainer: React.FC<DaoSettingContainerProps> = ({
-  onClickBack,
-}) => {
-  return (
-    <div
-      style={{
-        justifyContent: 'center',
-        display: 'flex',
-        alignItems: 'center',
-      }}
-    >
-      <DaoSettingsForm onClickBack={onClickBack} />
-    </div>
-  );
-};
 
-export default DaoSettingsContainer;
+export default memo(DaoSettings);
