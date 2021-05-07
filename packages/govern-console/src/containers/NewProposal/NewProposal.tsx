@@ -11,7 +11,7 @@ import { NewActionModal } from 'components/Modal/NewActionModal';
 import { AddActionsModal } from 'components/Modal/AddActionsModal';
 import { InputField } from 'components/InputFields/InputField';
 import { useHistory, useParams } from 'react-router-dom';
-import {  Transaction as EthersTransaction, ethers } from 'ethers';
+import { Transaction as EthersTransaction, utils } from 'ethers';
 import { useQuery } from '@apollo/client';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { buildContainer } from 'utils/ERC3000';
@@ -23,6 +23,8 @@ import QueueApprovals from 'services/QueueApprovals'
 import { CustomTransaction, CustomTransactionStatus, abiItem, actionType, ActionToSchedule} from 'utils/types';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import  FacadeProposal from 'services/Proposal';
+import { fetchAbi } from 'utils/ethersan';
+
 
 import {
   Proposal,
@@ -250,6 +252,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const [daoDetails, updateDaoDetails] = useState<any>();
   const [abiFunctions, setAbiFunctions] = useState([]);
   const [actionsToSchedule, setActionsToSchedule] = useState([]);
+  const [doFetch, setDoFetch] = useState(true)
 
   useEffect(() => {
     if (daoList) {
@@ -271,6 +274,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const transactionsQueue = React.useRef<CustomTransaction[]>([]);
 
   const handleInputModalOpen = () => {
+    setDoFetch(true)
     setInputModalOpen(true);
   };
 
@@ -331,6 +335,20 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   // const onScheduleProposal = () => {};
   
 
+  const onFetchAbi = async (contractAddress: string) => {
+    const abi = await fetchAbi(contractAddress)
+    if (abi) {
+      try {
+        onGenerateActionsFromAbi(contractAddress, JSON.parse(abi))
+      } catch (e) {
+        // unable to generate from abi, try getting abi from user
+        setDoFetch(false)
+      }
+    } else {
+      setDoFetch(false)
+    }
+  }
+
   const onGenerateActionsFromAbi = async (
     contractAddress: string,
     abi: any[],
@@ -367,7 +385,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const onSchedule = () => {
     const actions: any[] = actionsToSchedule.map((item: any) => {
       const { abi, contractAddress, name, params, numberOfInputs } = item;
-      const abiInterface = new ethers.utils.Interface(abi);
+      const abiInterface = new utils.Interface(abi);
       const functionParameters = [];
       for (const key in params) {
         functionParameters.push(params[key]);
@@ -485,6 +503,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
           onCloseModal={handleInputModalClose}
           onGenerate={onGenerateActionsFromAbi}
           open={isInputModalOpen}
+          onFetch={doFetch? onFetchAbi: undefined}
         ></NewActionModal>
         <AddActionsModal
           onCloseModal={handleActionModalClose}

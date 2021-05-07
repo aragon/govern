@@ -30,6 +30,10 @@ export interface NewActionModalProps {
    * What happens when clicked on generate
    */
   onGenerate: (contractAddress: any, abi: any) => void;
+  /**
+   * Handle fetch abi from etherscan
+   */
+  onFetch?: (contractAddress: string) => void;
 }
 
 const styles = (theme: Theme) =>
@@ -112,6 +116,7 @@ export const NewActionModal: React.FC<NewActionModalProps> = ({
   open,
   onCloseModal,
   onGenerate,
+  onFetch,
 }) => {
   const theme = useTheme();
   const [contractAddress, setContractAddress] = useState();
@@ -138,20 +143,16 @@ export const NewActionModal: React.FC<NewActionModalProps> = ({
     if (!abi || !contractAddress) return;
     onGenerate(contractAddress, abi);
   };
+
+  const onFetchClick = () => {
+    if (!contractAddress) return;
+    onFetch!(contractAddress!);
+  };
+
   return (
     <MuiDialog open={open}>
       <DialogTitle onClose={onCloseModal}> New Action </DialogTitle>
       <DialogContent>
-        <InputLabelText>Input ABI</InputLabelText>
-        <div style={{ marginBottom: '26px' }}>
-          <InputField
-            height={'46px'}
-            width={'530px'}
-            onInputChange={onInputABI}
-            placeholder="ABI..."
-            label=""
-          ></InputField>
-        </div>
         <InputLabelText>Input Contract Address</InputLabelText>
         <div style={{ marginBottom: '26px' }}>
           <InputField
@@ -162,15 +163,40 @@ export const NewActionModal: React.FC<NewActionModalProps> = ({
             label=""
           ></InputField>
         </div>
+        {onFetch && (
+          <ANButton
+            buttonType="primary"
+            width={'112px'}
+            height={'45px'}
+            label="Fetch"
+            onClick={() => onFetchClick()}
+          ></ANButton>
+        )}
+        {!onFetch && (
+          <div>
+            <InputLabelText>Input ABI</InputLabelText>
+            <div style={{ marginBottom: '26px' }}>
+              <InputField
+                height={'46px'}
+                width={'530px'}
+                onInputChange={onInputABI}
+                placeholder="ABI..."
+                label=""
+              ></InputField>
+            </div>
+          </div>
+        )}
       </DialogContent>
       <DialogActions>
-        <ANButton
-          buttonType="primary"
-          width={'112px'}
-          height={'45px'}
-          label="Generate"
-          onClick={() => onGenerateClick()}
-        ></ANButton>
+        {!onFetch && (
+          <ANButton
+            buttonType="primary"
+            width={'112px'}
+            height={'45px'}
+            label="Generate"
+            onClick={() => onGenerateClick()}
+          ></ANButton>
+        )}
       </DialogActions>
     </MuiDialog>
   );
