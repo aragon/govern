@@ -437,7 +437,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
           <div>
             <SubTitle>Proof</SubTitle>{' '}
           </div>
-          <div style={{ marginLeft: '10px' }}>{<HelpButton helpText="" />}</div>
+          <div style={{ marginLeft: '10px' }}>{<HelpButton helpText="Please provide the reasons why this proposal deserves to be executed" />}</div>
         </div>
         <InputField
           // ref={}

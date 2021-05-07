@@ -1,13 +1,11 @@
 /* eslint-disable*/
 import {
   CustomTransaction,
-  Response,
   CustomTransactionStatus,
 } from 'utils/types';
 import { ethers, BigNumber } from 'ethers';
 import { erc20TokenABI } from './abis/erc20';
 import { AddressZero } from '@ethersproject/constants'
-import { CourtABI } from 'utils/abis/court';
 import { BigNumberish } from '@ethersproject/bignumber'
 import { Account } from 'utils/types'
 
@@ -16,7 +14,6 @@ import { Account } from 'utils/types'
  * @param amount how much to approve
  * @param spender spender
  * @param account address and the signer
- * @param signer
  *
  * @returns {Promise<Response>}
  */
@@ -42,10 +39,13 @@ export async function erc20ApprovalTransaction(
 
   let allowance: BigNumber = ethers.BigNumber.from(0);
   let userBalance: BigNumber = ethers.BigNumber.from(0);
-
+  let amountForHuman: string;
   try {
     allowance = await contract.allowance(account.address, spender);
     userBalance = await contract.balanceOf(account.address);
+    // transfer from big number(including decimals * 0) to human readable
+    const decimals = await contract.decimals()
+    amountForHuman = ethers.utils.formatUnits(amount, decimals)
   } catch (err) {
     // contract address might not have `allowance` or balanceOf on it.
     // TODO: track it with sentry
@@ -68,7 +68,7 @@ export async function erc20ApprovalTransaction(
     tx: () => {
       return contract.approve(spender, amountInBigNumber);
     },
-    message: `Approves ${amountInBigNumber} Tokens for ${spender} on ${token}`,
+    message: `Approves ${amountForHuman} Tokens for ${spender} on ${token}`,
     status: CustomTransactionStatus.Pending,
   };
 
