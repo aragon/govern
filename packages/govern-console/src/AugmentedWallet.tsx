@@ -47,8 +47,6 @@ const WalletAugmented: React.FC<unknown> = ({ children }) => {
 
     return { ...wallet, provider, account };
   }, [wallet, provider]);
-  debugger;
-
   return (
     <WalletAugmentedContext.Provider value={contextValue}>
       {children}

@@ -244,7 +244,6 @@ const DaoSettingsForm: React.FC<DaoSettingFormProps> = memo(
         },
       });
     };
-    debugger;
     return true ? (
       <>
         <ANWrappedPaper style={{ width: window.innerWidth }}>

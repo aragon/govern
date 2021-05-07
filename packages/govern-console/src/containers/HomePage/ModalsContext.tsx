@@ -87,7 +87,6 @@ const reducer = (
   state: ModalContextState,
   action: ModalsContextAction,
 ): ModalContextState => {
-  debugger;
   switch (action.type) {
     case ActionTypes.OPEN_TRANSACTIONS_MODAL:
       return {
