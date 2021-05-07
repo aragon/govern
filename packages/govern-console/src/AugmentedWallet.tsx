@@ -2,6 +2,7 @@ import React, { useContext, useMemo } from 'react';
 import { ethers, providers as EthersProviders } from 'ethers';
 import { UseWalletProvider, useWallet } from 'use-wallet';
 import { Account } from 'utils/types';
+import { INFURA_PROJECT_ID } from 'utils/constants';
 
 const WalletAugmentedContext = React.createContext({});
 
@@ -13,13 +14,8 @@ function useWalletAugmented() {
 const WalletAugmented: React.FC<unknown> = ({ children }) => {
   const wallet = useWallet();
   const ethereum: any = wallet.ethereum;
-  const RINKEBY_NODE_URL = 'https://rinkeby.eth.aragon.network/';
-  const RinkebyNetwork = {
-    name: 'Rinkeby',
-    chainId: 4,
-  };
   const fallbackProvider = ethers.getDefaultProvider('rinkeby', {
-    infura: '7a03fcb37be7479da06f92c5117afd47',
+    infura: INFURA_PROJECT_ID,
   });
   const [provider, updateProvider] = React.useState(fallbackProvider);
   const injectedProvider = useMemo(
