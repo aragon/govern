@@ -19,8 +19,8 @@ export function handleRegistered(event: RegisteredEvent): void {
   
   queue.save()
   govern.save()
-
-  let dao = new Dao(event.params.name)
+  let lowercaseDaoname = event.params.name.toLowerCase()
+  let dao = new Dao(lowercaseDaoname)
 
   dao.name = event.params.name
   dao.executor = event.params.executor.toHex()
