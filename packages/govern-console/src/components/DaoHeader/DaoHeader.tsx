@@ -6,6 +6,7 @@ import MUICard, { CardProps } from '@material-ui/core/Card';
 import MUITypography from '@material-ui/core/Typography';
 import { ANButton } from '../Button/ANButton';
 import SettingIconImage from '../../images/svgs/Setting_Icon.svg';
+import { settingsUrl } from 'utils/urls'
 
 export interface DaoHeaderProps {
   /**
@@ -74,7 +75,7 @@ export const DaoHeader: React.FC<DaoHeaderProps> = ({
   const theme = useTheme();
 
   const goToSettingPage = () => {
-    history.push('/daos/' + daoName + '/dao-settings');
+    history.push(settingsUrl(daoName));
   };
 
   return (
