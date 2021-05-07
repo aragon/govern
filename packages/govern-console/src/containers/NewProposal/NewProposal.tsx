@@ -10,25 +10,22 @@ import Paper from '@material-ui/core/Paper';
 import { NewActionModal } from 'components/Modal/NewActionModal';
 import { AddActionsModal } from 'components/Modal/AddActionsModal';
 import { InputField } from 'components/InputFields/InputField';
-import { useHistory, useParams } from 'react-router-dom';
-import { Transaction as EthersTransaction, ethers } from 'ethers';
+import { Link, useParams } from 'react-router-dom';
+import { utils } from 'ethers';
 import { useQuery } from '@apollo/client';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { buildContainer } from 'utils/ERC3000';
-import { erc20ApprovalTransaction } from '../../utils/transactionHelper';
-import { toUtf8Bytes } from '@ethersproject/strings';
-import { AddressZero } from '@ethersproject/constants';
 import { useWallet } from 'AugmentedWallet';
 import QueueApprovals from 'services/QueueApprovals';
 import {
   CustomTransaction,
-  CustomTransactionStatus,
   abiItem,
   actionType,
   ActionToSchedule,
 } from 'utils/types';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import FacadeProposal from 'services/Proposal';
+import { settingsUrl } from 'utils/urls';
 
 import {
   Proposal,
@@ -111,6 +108,15 @@ const Title = styled(Typography)({
   marginTop: 17,
   height: 50,
   display: 'block',
+});
+const SettingsLink = styled(Typography)({
+  fontFamily: 'Manrope',
+  fontStyle: 'normal',
+  paddingBottom: 10,
+  color: '0A0B0B',
+  '& a': {
+    color: '#00C2FF'
+  }
 });
 const proofTextArea = styled(TextArea)({
   background: '#FFFFFF',
@@ -380,7 +386,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const onSchedule = () => {
     const actions: any[] = actionsToSchedule.map((item: any) => {
       const { abi, contractAddress, name, params, numberOfInputs } = item;
-      const abiInterface = new ethers.utils.Interface(abi);
+      const abiInterface = new utils.Interface(abi);
       const functionParameters = [];
       for (const key in params) {
         functionParameters.push(params[key]);
@@ -439,6 +445,16 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
           <img src={backButtonIcon} />
         </BackButton>
         <Title>New Proposal</Title>
+        <SettingsLink>
+          This execution will use the current{' '}
+          <Link
+            to={settingsUrl(daoName)}
+            target='_blank'
+            rel='noreferrer noopener'
+          >
+            DAO Settings
+          </Link>
+        </SettingsLink>
         <div
           style={{
             display: 'flex',
