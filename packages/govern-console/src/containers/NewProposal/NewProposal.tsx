@@ -11,24 +11,30 @@ import { NewActionModal } from 'components/Modal/NewActionModal';
 import { AddActionsModal } from 'components/Modal/AddActionsModal';
 import { InputField } from 'components/InputFields/InputField';
 import { useHistory, useParams } from 'react-router-dom';
-import {  Transaction as EthersTransaction, ethers } from 'ethers';
+import { Transaction as EthersTransaction, ethers } from 'ethers';
 import { useQuery } from '@apollo/client';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { buildContainer } from 'utils/ERC3000';
 import { erc20ApprovalTransaction } from '../../utils/transactionHelper';
 import { toUtf8Bytes } from '@ethersproject/strings';
 import { AddressZero } from '@ethersproject/constants';
-import { useWallet } from 'EthersWallet';
-import QueueApprovals from 'services/QueueApprovals'
-import { CustomTransaction, CustomTransactionStatus, abiItem, actionType, ActionToSchedule} from 'utils/types';
+import { useWallet } from 'AugmentedWallet';
+import QueueApprovals from 'services/QueueApprovals';
+import {
+  CustomTransaction,
+  CustomTransactionStatus,
+  abiItem,
+  actionType,
+  ActionToSchedule,
+} from 'utils/types';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
-import  FacadeProposal from 'services/Proposal';
+import FacadeProposal from 'services/Proposal';
 
 import {
   Proposal,
   ProposalOptions,
   PayloadType,
-  ActionType
+  ActionType,
 } from '@aragon/govern';
 
 export interface NewProposalProps {
@@ -261,12 +267,20 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const { account, provider } = context;
 
   const proposalInstance = React.useMemo(() => {
-    if(provider && account && daoDetails) {
-      let queueApprovals = new QueueApprovals(account, daoDetails.queue.address, daoDetails.queue.config.resolver)
-      const proposal =  new Proposal(daoDetails.queue.address, {} as ProposalOptions);
-      return new FacadeProposal(queueApprovals, proposal) as (FacadeProposal & Proposal)
+    if (provider && account && daoDetails) {
+      let queueApprovals = new QueueApprovals(
+        account,
+        daoDetails.queue.address,
+        daoDetails.queue.config.resolver,
+      );
+      const proposal = new Proposal(
+        daoDetails.queue.address,
+        {} as ProposalOptions,
+      );
+      return new FacadeProposal(queueApprovals, proposal) as FacadeProposal &
+        Proposal;
     }
-  }, [provider, account, daoDetails])
+  }, [provider, account, daoDetails]);
 
   const transactionsQueue = React.useRef<CustomTransaction[]>([]);
 
@@ -285,7 +299,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const handleActionModalClose = () => {
     setActionModalOpen(false);
   };
-  
+
   const onAddNewActions = (actions: any) => {
     handleActionModalClose();
     const newActions = [...selectedActions, ...actions] as any;
@@ -329,7 +343,6 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     // actionsToSchedule.current = actions as [];
   };
   // const onScheduleProposal = () => {};
-  
 
   const onGenerateActionsFromAbi = async (
     contractAddress: string,
@@ -394,30 +407,29 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
       submitter: account.address,
       executor: daoDetails.executor.address,
       actions: actions,
-      proof: proof
-    }
-    
+      proof: proof,
+    };
+
     // the final container to be sent to schedule.
     const container = buildContainer(payload, daoDetails.queue.config);
 
-    if(proposalInstance) {
+    if (proposalInstance) {
       try {
         transactionsQueue.current = await proposalInstance.schedule(container);
-      }catch(err) {
+      } catch (err) {
         // TODO: Bhanu show error
       }
     }
-  
+
     dispatch({
       type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
       payload: {
         transactionList: transactionsQueue.current,
         onTransactionFailure: () => {},
         onTransactionSuccess: () => {},
-        onCompleteAllTransactions: () => {}
+        onCompleteAllTransactions: () => {},
       },
     });
-    
   };
 
   return (
@@ -437,7 +449,11 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
           <div>
             <SubTitle>Proof</SubTitle>{' '}
           </div>
-          <div style={{ marginLeft: '10px' }}>{<HelpButton helpText="Please provide the reasons why this proposal deserves to be executed" />}</div>
+          <div style={{ marginLeft: '10px' }}>
+            {
+              <HelpButton helpText="Please provide the reasons why this proposal deserves to be executed" />
+            }
+          </div>
         </div>
         <InputField
           // ref={}
