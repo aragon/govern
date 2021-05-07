@@ -10,7 +10,7 @@ import { ANButton } from 'components/Button/ANButton';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { useQuery } from '@apollo/client';
 import { buildContainer } from '../../utils/ERC3000';
-import { useWallet } from '../../EthersWallet';
+import { useWallet } from 'AugmentedWallet';
 import { HelpButton } from 'components/HelpButton/HelpButton';
 import { BlueSwitch } from 'components/Switchs/BlueSwitch';
 import Grid from '@material-ui/core/Grid';
@@ -229,11 +229,13 @@ const DaoSettings: React.FC<DaoSettingFormProps> =
           transactionsQueue.current = await proposalInstance.schedule(
             container,
           );
+          console.log(transactionsQueue.current);
         } catch (error) {
           // TODO: Bhanu show error
           return;
         }
       }
+      console.log(transactionsQueue.current);
 
       dispatch({
         type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
@@ -283,7 +285,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> =
             )}
           />
           <InputTitle>
-            Action collateral{' '}
+            Action collateral
             <HelpButton
               helpText={
                 'The requested collateral to be staked when anyone is scheduling an action. This is required so if action is challenged, collateral is used in resolver contract. If action passes, collateral returns to owner.'
@@ -408,7 +410,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> =
           </Grid>
 
           <InputTitle>
-            Resolver contract{' '}
+            Resolver contract
             <HelpButton
               helpText={
                 'A resolver contract is used to handle any disputes of the DAO. This contract needs to implement the AragonCourt interface - https://github.com/aragon/protocol/blob/development/packages/evm/contracts/AragonCourt.sol'

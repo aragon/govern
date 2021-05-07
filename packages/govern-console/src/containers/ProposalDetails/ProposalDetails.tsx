@@ -11,7 +11,7 @@ import { GET_PROPOSAL_DETAILS_QUERY } from './queries';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import { ANButton } from 'components/Button/ANButton';
-import { useWallet } from '../../EthersWallet';
+import { useWallet } from '../../AugmentedWallet';
 import { CustomTransaction } from 'utils/types';
 import { getProposalParams } from 'utils/ERC3000';
 import { Proposal, ProposalOptions } from '@aragon/govern';
