@@ -22,7 +22,7 @@ import {
   PROXY_CONTRACT_URL,
   DEFAULT_DAO_CONFIG,
   CONFIRMATION_WAIT,
-} from '../../utils/constants';
+} from 'utils/constants';
 import { useForm, Controller } from 'react-hook-form';
 import { ChainId, CiruclarProgressStatus } from '../../utils/types';
 import { validateToken } from '../../utils/validations';
