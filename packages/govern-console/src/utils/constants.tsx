@@ -8,9 +8,12 @@ export const ARAGON_VOICE_URL: { [chainId in ChainId]: string } = {
   [ChainId.RINKEBY]: 'http://voice-rinkeby.aragon.org/',
 };
 
-export const CONFIRMATION_WAIT = 2; // we wait 2 confirmation to make sure subgraph is populated
+export const CONFIRMATION_WAIT = 3; // we wait 3 confirmation to make sure subgraph is populated
 
 export const PROXY_CONTRACT_URL = 'https://eips.ethereum.org/EIPS/eip-1167';
+
+export const INFURA_PROJECT_ID = '7a03fcb37be7479da06f92c5117afd47';
+export const RINKEBY_NODE_URL = 'https://rinkeby.eth.aragon.network/';
 
 export const DEFAULT_DAO_CONFIG: { [chainId in ChainId]: DaoConfig } = {
   // TODO: "resolver" to be changed once it is available for mainnet
