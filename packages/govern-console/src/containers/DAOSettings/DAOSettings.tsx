@@ -413,7 +413,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> =
               }
             />
           </InputTitle>
-          <InputSubTitle>Token contract address</InputSubTitle>
+          <InputSubTitle>Contract address</InputSubTitle>
           <Controller
             name="daoConfig.resolver"
             control={control}
