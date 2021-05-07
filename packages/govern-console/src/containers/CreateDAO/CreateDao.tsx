@@ -1,10 +1,10 @@
 /* eslint-disable */
-import React, { useState, memo } from 'react';
+import React, { useState, memo, useEffect, useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
 import { CiruclarProgressStatus } from '../../utils/types';
-import CreateDaoProgress, { CreateDaoProgressProps } from './CreateDaoProgress'
-import CreateDaoResult from './CreateDaoResult'
-import CreateDaoForm from './CreateDaoForm'
+import CreateDaoProgress, { CreateDaoProgressProps } from './CreateDaoProgress';
+import CreateDaoResult from './CreateDaoResult';
+import CreateDaoForm from './CreateDaoForm';
 
 export enum CreateDaoStatus {
   PreCreate,
@@ -24,9 +24,9 @@ const CreateDao: React.FC = () => {
   };
   const [progress, setProgress] = useState<CreateDaoProgressProps>({
     isTokenRegister: true,
-    progressStatus: { 
+    progressStatus: {
       create: CiruclarProgressStatus.InProgress,
-      register: CiruclarProgressStatus.Disabled
+      register: CiruclarProgressStatus.Disabled,
     },
   });
 
@@ -80,4 +80,4 @@ const CreateDao: React.FC = () => {
   }
 };
 
-export default memo(CreateDao);
+export default CreateDao;

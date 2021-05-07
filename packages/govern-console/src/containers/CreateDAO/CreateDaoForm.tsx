@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { memo, useEffect, useMemo } from 'react';
+import React, { memo, useEffect, useMemo, useState } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { styled } from '@material-ui/core/styles';
 import backButtonIcon from '../../images/back-btn.svg';
@@ -26,25 +26,25 @@ import {
 import { useForm, Controller } from 'react-hook-form';
 import { ChainId, CiruclarProgressStatus } from '../../utils/types';
 import { validateToken } from '../../utils/validations';
-import { CreateDaoStatus } from './CreateDao'
-import { CreateDaoProgressProps } from './CreateDaoProgress'
+import { CreateDaoStatus } from './CreateDao';
+import { CreateDaoProgressProps } from './CreateDaoProgress';
 
 interface FormInputs {
-    /**
-     * Use's input
-     */
-    daoName: string;
-    tokenName: string;
-    tokenSymbol: string;
-    tokenAddress: string;
-    isExistingToken: boolean;
-    useProxy: boolean;
-    useVocdoni: boolean;
-    /**
-     * DAO's configs
-     */
-    daoConfig: DaoConfig;
-  }
+  /**
+   * Use's input
+   */
+  daoName: string;
+  tokenName: string;
+  tokenSymbol: string;
+  tokenAddress: string;
+  isExistingToken: boolean;
+  useProxy: boolean;
+  useVocdoni: boolean;
+  /**
+   * DAO's configs
+   */
+  daoConfig: DaoConfig;
+}
 
 interface FormProps {
   /**
@@ -116,222 +116,194 @@ const InputTitle = styled(Typography)({
   marginBottom: '15px',
 });
 
-const CreateDaoForm: React.FC<FormProps> = 
-  ({ setProgress, setCreateDaoStatus, setCreatedDaoRoute, cancelForm }) => {
-    const context: any = useWallet();
-    const { chainId, status, provider } = context;
+const CreateDaoForm: React.FC<FormProps> = ({
+  setProgress,
+  setCreateDaoStatus,
+  setCreatedDaoRoute,
+  cancelForm,
+}) => {
+  const context: any = useWallet();
+  const { chainId, status, provider } = context;
 
-    const {
-      control,
-      handleSubmit,
-      watch,
-      setValue,
-    } = useForm<FormInputs>();
+  const { control, handleSubmit, watch, setValue } = useForm<FormInputs>();
 
-    const connectedChainId = useMemo(() => {
-      if (chainId === ChainId.RINKEBY && status === 'connected')
-        return ChainId.RINKEBY;
+  const connectedChainId = useMemo(() => {
+    if (chainId === ChainId.RINKEBY && status === 'connected')
+      return ChainId.RINKEBY;
 
-      return ChainId.MAINNET;
-    }, [chainId, status]);
+    return ChainId.MAINNET;
+  }, [chainId, status]);
 
-    // use appropriate default config
-    useEffect(() => {
-      const _config: DaoConfig = DEFAULT_DAO_CONFIG[connectedChainId];
-      setValue('daoConfig', _config);
-    }, [connectedChainId]);
+  // use appropriate default config
+  useEffect(() => {
+    const _config: DaoConfig = DEFAULT_DAO_CONFIG[connectedChainId];
+    setValue('daoConfig', _config);
+  }, [connectedChainId]);
 
-    const createDaoCall = async (params: FormInputs): Promise<boolean> => {
-      let token: Partial<Token>;
-      let progressProps: CreateDaoProgressProps = {
-        isTokenRegister: true,
-        progressStatus: { 
-          create: CiruclarProgressStatus.InProgress,
-          register: CiruclarProgressStatus.Disabled
-        },
-      };
+  const submitCreateDao = async (params: FormInputs) => {
+    let token: Partial<Token>;
 
-      if (params.isExistingToken) {
-        try {
-          token = await getToken(params.tokenAddress, provider);
-        } catch (error) {
-          return false;
-        }
-      } else {
-        token = {
-          tokenDecimals: 18,
-          tokenName: params.tokenName,
-          tokenSymbol: params.tokenSymbol,
-        };
-      }
+    let progress: CreateDaoProgressProps = {
+      isTokenRegister: true,
+      progressStatus: {
+        create: CiruclarProgressStatus.InProgress,
+        register: CiruclarProgressStatus.Disabled,
+      },
+    };
+    setCreateDaoStatus(CreateDaoStatus.InProgress);
 
-      // if the vocdoni is activated, we also register the token in the aragon voice.
-      let registerTokenCallback = undefined;
-      if (params.useVocdoni) {
-        // update progress
-        setProgress(progressProps);
-
-        registerTokenCallback = async (registerToken: Function) => {
-          // update progress
-          progressProps.progressStatus = { create: CiruclarProgressStatus.Done, register: CiruclarProgressStatus.InProgress };
-          setProgress(progressProps);
-
-          const result = await registerToken();
-          console.log('token register result', result)
-
-          // update progress
-          progressProps.progressStatus.register = CiruclarProgressStatus.Done;
-          setProgress(progressProps);
-        };
-      } else {
-        // update progress
-        progressProps.isTokenRegister = false;
-        setProgress(progressProps);
-      }
-
-      
-
-      const createDaoParams: CreateDaoParams = {
-        name: params.daoName,
-        token,
-        config: params.daoConfig,
-        useProxies: params.useProxy,
-        useVocdoni: params.useVocdoni,
-      };
-
+    if (params.isExistingToken) {
       try {
-        //TODO this console log to be removed
-        console.log('createDaoParams', createDaoParams);
-        const result: any = await createDao(
-          createDaoParams,
-          {},
-          registerTokenCallback,
-        );
-        await result.wait(CONFIRMATION_WAIT);
-        setCreatedDaoRoute(params.daoName);
-        return true;
+        token = await getToken(params.tokenAddress, provider);
       } catch (error) {
-        console.log(error);
         return false;
       }
+    } else {
+      token = {
+        tokenDecimals: 18,
+        tokenName: params.tokenName,
+        tokenSymbol: params.tokenSymbol,
+      };
+    }
+
+    // if the vocdoni is activated, we also register the token in the aragon voice.
+    let registerTokenCallback = undefined;
+    if (params.useVocdoni) {
+      // update progress
+      setProgress({ ...progress });
+
+      registerTokenCallback = async (registerToken: Function) => {
+        // update progress
+        progress.progressStatus = {
+          create: CiruclarProgressStatus.Done,
+          register: CiruclarProgressStatus.InProgress,
+        };
+        setProgress({ ...progress });
+
+        const result = await registerToken();
+        console.log('token register result', result);
+        if (result) {
+          // update progress
+          progress.progressStatus.register = CiruclarProgressStatus.Done;
+          setProgress({ ...progress });
+
+          setCreateDaoStatus(CreateDaoStatus.Successful);
+        } else {
+          // update progress
+          progress.progressStatus.register = CiruclarProgressStatus.Failed;
+          setProgress({ ...progress });
+
+          setCreateDaoStatus(CreateDaoStatus.Failed);
+          // TODO: more clouser should be provided for user
+        }
+      };
+    } else {
+      // update progress
+      progress.isTokenRegister = false;
+      setProgress({ ...progress });
+    }
+
+    const createDaoParams: CreateDaoParams = {
+      name: params.daoName,
+      token,
+      config: params.daoConfig,
+      useProxies: params.useProxy,
+      useVocdoni: params.useVocdoni,
     };
 
-    const submitCreateDao = async (formData: FormInputs) => {
-      setCreateDaoStatus(CreateDaoStatus.InProgress);
-      const callResult = await createDaoCall(formData);
-      if (callResult) {
-        setCreateDaoStatus(CreateDaoStatus.Successful);
-      } else {
-        setCreateDaoStatus(CreateDaoStatus.Failed);
-      }
-    };
+    try {
+      //TODO this console log to be removed
+      console.log('createDaoParams', createDaoParams);
+      const result: any = await createDao(
+        createDaoParams,
+        {},
+        registerTokenCallback,
+      );
+      await result.wait();
+      setCreatedDaoRoute(params.daoName);
+      // set creation successful if Vocdoni not used
+      if (!params.useVocdoni) setCreateDaoStatus(CreateDaoStatus.Successful);
+    } catch (error) {
+      console.log(error);
+      setCreateDaoStatus(CreateDaoStatus.Failed);
+    }
+  };
 
-    return (
-      <FormContainer>
-        <ANWrappedPaper>
-          <BackButton onClick={cancelForm}>
-            <img src={backButtonIcon} />
-          </BackButton>
-          <img src={CreateDaoImage} />
-          <InputTitle>DAO Name</InputTitle>
+  return (
+    <FormContainer>
+      <ANWrappedPaper>
+        <BackButton onClick={cancelForm}>
+          <img src={backButtonIcon} />
+        </BackButton>
+        <img src={CreateDaoImage} />
+        <InputTitle>DAO Name</InputTitle>
+        <Controller
+          name="daoName"
+          control={control}
+          defaultValue=""
+          rules={{ required: 'This is required.' }}
+          render={({ field: { onChange, value }, fieldState: { error } }) => (
+            <InputField
+              label={''}
+              onInputChange={onChange}
+              height="46px"
+              width="454px"
+              placeholder={'Please insert your DAO name...'}
+              value={value}
+              error={!!error}
+              helperText={error ? error.message : null}
+            />
+          )}
+        />
+        <SwitchRow>
+          <OptionText>{'Create new token'}</OptionText>
           <Controller
-            name="daoName"
+            name="isExistingToken"
             control={control}
-            defaultValue=""
-            rules={{ required: 'This is required.' }}
-            render={({ field: { onChange, value }, fieldState: { error } }) => (
-              <InputField
-                label={''}
-                onInputChange={onChange}
-                height="46px"
-                width="454px"
-                placeholder={'Please insert your DAO name...'}
-                value={value}
-                error={!!error}
-                helperText={error ? error.message : null}
-              />
+            defaultValue={false}
+            render={({ field: { onChange, value } }) => (
+              <BlueSwitch onChange={onChange} value={value} />
             )}
           />
-          <SwitchRow>
-            <OptionText>{'Create new token'}</OptionText>
-            <Controller
-              name="isExistingToken"
-              control={control}
-              defaultValue={false}
-              render={({ field: { onChange, value } }) => (
-                <BlueSwitch onChange={onChange} value={value} />
-              )}
-            />
-            <OptionText>{'Use existing token'}</OptionText>
-          </SwitchRow>
-          {!watch('isExistingToken') ? (
-            <div>
-              <InputTitle>Token</InputTitle>
-              <ContentRow>
-                <Controller
-                  name="tokenName"
-                  control={control}
-                  defaultValue=""
-                  shouldUnregister={!watch('isExistingToken')}
-                  rules={{ required: 'This is required.' }}
-                  render={({
-                    field: { onChange, value },
-                    fieldState: { error },
-                  }) => (
-                    <InputField
-                      label={''}
-                      onInputChange={onChange}
-                      height="46px"
-                      // width="200px"
-                      placeholder={"Your Token's Name?"}
-                      value={value}
-                      error={!!error}
-                      helperText={error ? error.message : null}
-                    />
-                  )}
-                />
-                <Controller
-                  name="tokenSymbol"
-                  control={control}
-                  defaultValue=""
-                  shouldUnregister={!watch('isExistingToken')}
-                  rules={{
-                    required: 'This is required.',
-                    maxLength: {
-                      value: 6,
-                      message: 'Only 6 character is allowed.',
-                    },
-                  }}
-                  render={({
-                    field: { onChange, value },
-                    fieldState: { error },
-                  }) => (
-                    <InputField
-                      label={''}
-                      onInputChange={onChange}
-                      height="46px"
-                      // width="200px"
-                      placeholder={"Your Token's Symbol?"}
-                      value={value}
-                      error={!!error}
-                      helperText={error ? error.message : null}
-                    />
-                  )}
-                />
-              </ContentRow>
-            </div>
-          ) : (
-            <div>
-              <InputTitle>Token Address</InputTitle>
+          <OptionText>{'Use existing token'}</OptionText>
+        </SwitchRow>
+        {!watch('isExistingToken') ? (
+          <div>
+            <InputTitle>Token</InputTitle>
+            <ContentRow>
               <Controller
-                name="tokenAddress"
+                name="tokenName"
                 control={control}
                 defaultValue=""
-                shouldUnregister={watch('isExistingToken')}
+                shouldUnregister={!watch('isExistingToken')}
+                rules={{ required: 'This is required.' }}
+                render={({
+                  field: { onChange, value },
+                  fieldState: { error },
+                }) => (
+                  <InputField
+                    label={''}
+                    onInputChange={onChange}
+                    height="46px"
+                    // width="200px"
+                    placeholder={"Your Token's Name?"}
+                    value={value}
+                    error={!!error}
+                    helperText={error ? error.message : null}
+                  />
+                )}
+              />
+              <Controller
+                name="tokenSymbol"
+                control={control}
+                defaultValue=""
+                shouldUnregister={!watch('isExistingToken')}
                 rules={{
                   required: 'This is required.',
-                  validate: async (value) =>
-                    await validateToken(value, provider),
+                  maxLength: {
+                    value: 6,
+                    message: 'Only 6 character is allowed.',
+                  },
                 }}
                 render={({
                   field: { onChange, value },
@@ -341,106 +313,136 @@ const CreateDaoForm: React.FC<FormProps> =
                     label={''}
                     onInputChange={onChange}
                     height="46px"
-                    width="451px"
-                    placeholder={
-                      'Please insert existing token ether address (0x000...)'
-                    }
+                    // width="200px"
+                    placeholder={"Your Token's Symbol?"}
                     value={value}
                     error={!!error}
                     helperText={error ? error.message : null}
                   />
                 )}
               />
-            </div>
-          )}
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              marginTop: '25px',
-            }}
-          >
-            <div
-              style={{
-                marginTop: -5,
-              }}
-            >
-              <Controller
-                name="useProxy"
-                control={control}
-                defaultValue={true}
-                render={({ field: { onChange, value } }) => (
-                  <BlueCheckbox onChange={onChange} checked={value} />
-                )}
-              />
-            </div>
-            <OptionText>
-              Use{' '}
-              <a
-                href={PROXY_CONTRACT_URL}
-                target="_blank"
-                rel="noreferrer noopener"
-              >
-                Proxies
-              </a>{' '}
-              for the deployment - This will enable your DAO to use the already
-              deployed code of the Govern Executer and Queue, and heavily
-              decrease gas costs for your DAO deployment.
-            </OptionText>
+            </ContentRow>
           </div>
-
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              marginTop: '25px',
-            }}
-          >
-            <div
-              style={{
-                marginTop: -5,
+        ) : (
+          <div>
+            <InputTitle>Token Address</InputTitle>
+            <Controller
+              name="tokenAddress"
+              control={control}
+              defaultValue=""
+              shouldUnregister={watch('isExistingToken')}
+              rules={{
+                required: 'This is required.',
+                validate: async (value) => await validateToken(value, provider),
               }}
-            >
-              <Controller
-                name="useVocdoni"
-                control={control}
-                defaultValue={true}
-                render={({ field: { onChange, value } }) => (
-                  <BlueCheckbox onChange={onChange} checked={value} />
-                )}
-              />
-            </div>
-            <OptionText>
-              Use{' '}
-              <a
-                href={ARAGON_VOICE_URL[connectedChainId]}
-                target="_blank"
-                rel="noreferrer noopener"
-              >
-                Aragon Voice
-              </a>{' '}
-              - This will enable your DAO to have free voting for you proposals
-            </OptionText>
-          </div>
-          <div
-            style={{
-              justifyContent: 'center',
-              display: 'flex',
-            }}
-          >
-            <ANButton
-              disabled={status !== 'connected'}
-              label="Create new DAO"
-              buttonType="primary"
-              style={{ marginTop: 40 }}
-              onClick={handleSubmit(submitCreateDao)}
+              render={({
+                field: { onChange, value },
+                fieldState: { error },
+              }) => (
+                <InputField
+                  label={''}
+                  onInputChange={onChange}
+                  height="46px"
+                  width="451px"
+                  placeholder={
+                    'Please insert existing token ether address (0x000...)'
+                  }
+                  value={value}
+                  error={!!error}
+                  helperText={error ? error.message : null}
+                />
+              )}
             />
           </div>
-        </ANWrappedPaper>
-      </FormContainer>
-    );
-  };
+        )}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginTop: '25px',
+          }}
+        >
+          <div
+            style={{
+              marginTop: -5,
+            }}
+          >
+            <Controller
+              name="useProxy"
+              control={control}
+              defaultValue={true}
+              render={({ field: { onChange, value } }) => (
+                <BlueCheckbox onChange={onChange} checked={value} />
+              )}
+            />
+          </div>
+          <OptionText>
+            Use{' '}
+            <a
+              href={PROXY_CONTRACT_URL}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              Proxies
+            </a>{' '}
+            for the deployment - This will enable your DAO to use the already
+            deployed code of the Govern Executer and Queue, and heavily decrease
+            gas costs for your DAO deployment.
+          </OptionText>
+        </div>
+
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginTop: '25px',
+          }}
+        >
+          <div
+            style={{
+              marginTop: -5,
+            }}
+          >
+            <Controller
+              name="useVocdoni"
+              control={control}
+              defaultValue={true}
+              render={({ field: { onChange, value } }) => (
+                <BlueCheckbox onChange={onChange} checked={value} />
+              )}
+            />
+          </div>
+          <OptionText>
+            Use{' '}
+            <a
+              href={ARAGON_VOICE_URL[connectedChainId]}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              Aragon Voice
+            </a>{' '}
+            - This will enable your DAO to have free voting for you proposals
+          </OptionText>
+        </div>
+        <div
+          style={{
+            justifyContent: 'center',
+            display: 'flex',
+          }}
+        >
+          <ANButton
+            disabled={status !== 'connected'}
+            label="Create new DAO"
+            buttonType="primary"
+            style={{ marginTop: 40 }}
+            onClick={handleSubmit(submitCreateDao)}
+          />
+        </div>
+      </ANWrappedPaper>
+    </FormContainer>
+  );
+};
 
 export default memo(CreateDaoForm);

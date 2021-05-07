@@ -22,7 +22,7 @@ import { correctDecimal } from 'utils/token';
 import FacadeProposal from 'services/Proposal';
 import { useForm, Controller } from 'react-hook-form';
 import { BytesLike } from 'ethers';
-import { validateToken } from '../../utils/validations';
+import { validateToken, validateAddress } from '../../utils/validations';
 import {
   Proposal,
   ProposalOptions,
@@ -265,6 +265,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> =
             rules={{ required: 'This is required.'}}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <InputField
+                type='number'
                 label=""
                 onInputChange={onChange}
                 value={value.toString()}
@@ -324,6 +325,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> =
                   fieldState: { error },
                 }) => (
                   <InputField
+                    type='number'
                     label=""
                     onInputChange={onChange}
                     value={value.toString()}
@@ -385,6 +387,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> =
                   fieldState: { error },
                 }) => (
                   <InputField
+                    type='number'
                     label=""
                     onInputChange={onChange}
                     value={value.toString()}
@@ -407,12 +410,12 @@ const DaoSettings: React.FC<DaoSettingFormProps> =
               }
             />
           </InputTitle>
-          <InputSubTitle>Token contract address</InputSubTitle>
+          <InputSubTitle>Contract address</InputSubTitle>
           <Controller
             name="daoConfig.resolver"
             control={control}
             defaultValue={''}
-            rules={{ required: 'This is required.'}}
+            rules={{ required: 'This is required.', validate: (value) => {return validateAddress(value)}}}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <InputField
                 label=""
