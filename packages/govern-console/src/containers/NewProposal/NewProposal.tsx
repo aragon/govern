@@ -15,12 +15,9 @@ import {  Transaction as EthersTransaction, ethers } from 'ethers';
 import { useQuery } from '@apollo/client';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { buildContainer } from 'utils/ERC3000';
-import { erc20ApprovalTransaction } from '../../utils/transactionHelper';
-import { toUtf8Bytes } from '@ethersproject/strings';
-import { AddressZero } from '@ethersproject/constants';
 import { useWallet } from 'EthersWallet';
 import QueueApprovals from 'services/QueueApprovals'
-import { CustomTransaction, CustomTransactionStatus, abiItem, actionType, ActionToSchedule} from 'utils/types';
+import { CustomTransaction, abiItem, actionType, ActionToSchedule} from 'utils/types';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import  FacadeProposal from 'services/Proposal';
 import { settingsUrl } from 'utils/urls'
@@ -111,7 +108,10 @@ const SettingsLink = styled(Typography)({
   fontFamily: 'Manrope',
   fontStyle: 'normal',
   paddingBottom: 10,
-  color: '#7483AB',
+  color: '0A0B0B',
+  '& a': {
+    color: '#00C2FF'
+  }
 });
 const proofTextArea = styled(TextArea)({
   background: '#FFFFFF',
@@ -435,13 +435,13 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
         </BackButton>
         <Title>New Proposal</Title>
         <SettingsLink>
-          This execution will use the current DAO{' '}
+          This execution will use the current{' '}
           <a
             href={`#${settingsUrl(daoName)}`}
             target='_blank'
             rel="noreferrer noopener"
           >
-            Settings
+            DAO Settings
           </a>
         </SettingsLink>
         <div
