@@ -1,8 +1,6 @@
 import { configure, dao, daos } from '@aragon/govern'
 import { subgraphURL } from './config'
-import { isAddress } from '@ethersproject/address'
-import { BigNumber } from '@ethersproject/bignumber'
-
+import { utils, BigNumber } from 'ethers'
 
 /**
  * dao e2e test
@@ -38,7 +36,7 @@ describe('[e2e] dao Test', () => {
 
     expect(response.queue.id).toBeDefined()
 
-    expect(isAddress(response.queue.address)).toEqual(true)
+    expect(utils.isAddress(response.queue.address)).toEqual(true)
 
     expect(BigNumber.from(response.queue.nonce).gte(0)).toEqual(true)
 
@@ -59,11 +57,11 @@ describe('[e2e] dao Test', () => {
     expect(container).toHaveProperty('state')
     expect(container).toHaveProperty('config')
     expect(container).toHaveProperty('payload')
-    expect(isAddress(container.payload.executor.address)).toEqual(true)
-    expect(isAddress(container.payload.submitter)).toEqual(true)
+    expect(utils.isAddress(container.payload.executor.address)).toEqual(true)
+    expect(utils.isAddress(container.payload.submitter)).toEqual(true)
     expect(Array.isArray(container.payload.actions)).toEqual(true)
     expect(container.payload.actions[0]).toHaveProperty('id')
-    expect(isAddress(container.payload.actions[0].to)).toEqual(true)
+    expect(utils.isAddress(container.payload.actions[0].to)).toEqual(true)
     expect(container.payload.actions[0]).toHaveProperty('value')
     expect(container.payload.actions[0]).toHaveProperty('data')
     expect(container.payload).toHaveProperty('allowFailuresMap')
@@ -72,7 +70,7 @@ describe('[e2e] dao Test', () => {
 
     expect(response.executor.address).toBeDefined()
 
-    expect(isAddress(response.executor.address)).toEqual(true)
+    expect(utils.isAddress(response.executor.address)).toEqual(true)
 
     expect(response.executor.metadata).toBeDefined()
 
@@ -80,8 +78,8 @@ describe('[e2e] dao Test', () => {
 
     expect(response.executor.roles[0]).toBeDefined()
 
-    expect(isAddress(response.token)).toEqual(true)
-    expect(isAddress(response.registrant)).toEqual(true)
+    expect(utils.isAddress(response.token)).toEqual(true)
+    expect(utils.isAddress(response.registrant)).toEqual(true)
   })
 
   it('non-existent dao should return null', async () => {

@@ -1,6 +1,6 @@
 import { configure, query } from '@aragon/govern'
 import { subgraphURL } from './config'
-import { ethers } from 'ethers'
+import { utils } from 'ethers'
 
 /**
  * query e2e test
@@ -21,7 +21,7 @@ describe('[e2e] query Test', () => {
       }
     `)
 
-    expect(ethers.utils.isAddress(response.daos[0].token)).toEqual(true)
-    expect(ethers.utils.isAddress(response.daos[0].registrant)).toEqual(true)
+    expect(utils.isAddress(response.daos[0].token)).toEqual(true)
+    expect(utils.isAddress(response.daos[0].registrant)).toEqual(true)
   })
 })

@@ -1,10 +1,11 @@
 import { DaoConfig, ContainerConfig } from './createDao'
-import { ContractInterface, Contract } from '@ethersproject/contracts'
-import { Web3Provider, TransactionResponse, TransactionReceipt } from '@ethersproject/providers'
-import { BigNumberish } from '@ethersproject/bignumber'
-import { BytesLike } from '@ethersproject/bytes'
-import { toUtf8Bytes } from '@ethersproject/strings'
-import { ethers } from 'ethers';
+import {
+  ContractInterface,
+  Contract,
+  providers,
+  BigNumberish,
+  utils
+} from 'ethers'
 
 
 const Payload = `
@@ -65,14 +66,14 @@ export type PayloadType = {
   submitter: string
   executor: string
   actions: ActionType[]
-  allowFailuresMap: BytesLike
-  proof: BytesLike
+  allowFailuresMap: utils.BytesLike
+  proof: utils.BytesLike
 }
 
 export type ActionType = {
   to: string
   value: BigNumberish
-  data: BytesLike
+  data: utils.BytesLike
 }
 
 export class Proposal {
@@ -83,9 +84,9 @@ export class Proposal {
     const abi:any = options?.abi || queueAbis // TODO instead of any, put Fragment|JSONFragment from ethers
      
     const provider = options.provider || window.ethereum
-    const signer = new Web3Provider(provider).getSigner()
+    const signer = new providers.Web3Provider(provider).getSigner()
     this.contract = new Contract(queueAddress, abi, signer)
-    this.interface  = new ethers.utils.Interface(abi);
+    this.interface  = new utils.Interface(abi);
   }
 
   /**
@@ -95,7 +96,7 @@ export class Proposal {
    *
    * @returns {Promise<TransactionResponse>} transaction response object
    */
-  async schedule(proposal: ProposalParams): Promise<TransactionResponse> {
+  async schedule(proposal: ProposalParams): Promise<providers.TransactionResponse> {
     const nonce = await this.contract.nonce()
 
     const proposalWithNonce = Object.assign({}, proposal)
@@ -111,7 +112,7 @@ export class Proposal {
    *
    * @returns {Promise<TransactionResponse>} transaction response object
    */
-  async execute(proposal: ProposalParams): Promise<TransactionResponse> {
+  async execute(proposal: ProposalParams): Promise<providers.TransactionResponse> {
     const result = this.contract.execute(proposal)
     return result
   }
@@ -125,8 +126,8 @@ export class Proposal {
    *
    * @returns {Promise<TransactionResponse>} transaction response object
    */
-  async veto(proposal: ProposalParams, reason: string): Promise<TransactionResponse> {
-    const reasonBytes = toUtf8Bytes(reason)
+  async veto(proposal: ProposalParams, reason: string): Promise<providers.TransactionResponse> {
+    const reasonBytes = utils.toUtf8Bytes(reason)
     const result = this.contract.veto(proposal, reasonBytes)
     return result
   }
@@ -140,7 +141,7 @@ export class Proposal {
    *
    * @returns {Promise<TransactionResponse>} transaction response object
    */
-  async resolve(proposal: ProposalParams, disputeId: number): Promise<TransactionResponse> {
+  async resolve(proposal: ProposalParams, disputeId: number): Promise<providers.TransactionResponse> {
     const result = this.contract.resolve(proposal, disputeId)
     return result
   }
@@ -154,8 +155,8 @@ export class Proposal {
    *
    * @returns {Promise<TransactionResponse>} transaction response object
    */
-  async challenge(proposal: ProposalParams, reason: string): Promise<TransactionResponse> {
-    const reasonBytes = toUtf8Bytes(reason)
+  async challenge(proposal: ProposalParams, reason: string): Promise<providers.TransactionResponse> {
+    const reasonBytes = utils.toUtf8Bytes(reason)
     const result = this.contract.challenge(proposal, reasonBytes)
     return result
   }
@@ -198,7 +199,7 @@ export class Proposal {
    *
    * @returns {number|null>} transaction response object
    */
-  getDisputeId(receipt: TransactionReceipt): number|null {
+  getDisputeId(receipt: providers.TransactionReceipt): number|null {
     const args = receipt.logs
     .filter(({ address }: { address : string }) => address === this.contract.address)
     .map((log: any) => this.contract.interface.parseLog(log))

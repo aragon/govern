@@ -1,5 +1,4 @@
-import { Contract } from '@ethersproject/contracts'
-import { Web3Provider } from '@ethersproject/providers'
+import { Contract, providers } from 'ethers'
 import { Token } from './createDao'
 
 const tokenAbi = [
@@ -8,7 +7,7 @@ const tokenAbi = [
   "function decimals() view returns (uint8)"
 ]
 
-export async function getToken(tokenAddress: string, provider: Web3Provider): Promise<Token> {
+export async function getToken(tokenAddress: string, provider: providers.Web3Provider): Promise<Token> {
   const contract = new Contract(tokenAddress, tokenAbi, provider)
   const [tokenDecimals, tokenName, tokenSymbol]: [number, string, string] = await Promise.all([
     contract.decimals(),

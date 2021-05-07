@@ -52,6 +52,8 @@
     "test": "hardhat test",
     "coverage": "hardhat coverage --temp artifacts",
     "set-ens": "hardhat ens:set-addr",
+    "reclaim-ens": "hardhat ens:reclaim",
+    "ens-subdomain": "hardhat ens:subdomain",
     "deploy": "hardhat deploy",
     "deploy-govern": "hardhat deploy-govern",
     "verify": "hardhat etherscan-verify --license GPL-3.0 --solc-input --api-key process.env.ETHERSCAN_KEY"
