@@ -25,7 +25,6 @@ import {
 } from 'utils/types';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import  FacadeProposal from 'services/Proposal';
-import AbiFetcher from 'utils/AbiFetcher';
 import { settingsUrl } from 'utils/urls';
 
 import {
@@ -263,7 +262,6 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const [daoDetails, updateDaoDetails] = useState<any>();
   const [abiFunctions, setAbiFunctions] = useState([]);
   const [actionsToSchedule, setActionsToSchedule] = useState([]);
-  const [doFetch, setDoFetch] = useState(true)
 
   useEffect(() => {
     if (daoList) {
@@ -272,13 +270,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   }, [daoList]);
 
   const context: any = useWallet();
-  const { account, provider, networkName } = context;
-
-  const abiFetcher = React.useMemo(() => {
-    if( networkName ) {
-      return new AbiFetcher(networkName)
-    }
-  }, [networkName])
+  const { account, provider } = context;
 
   const proposalInstance = React.useMemo(() => {
     if (provider && account && daoDetails) {
@@ -299,7 +291,6 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const transactionsQueue = React.useRef<CustomTransaction[]>([]);
 
   const handleInputModalOpen = () => {
-    setDoFetch(true)
     setInputModalOpen(true);
   };
 
@@ -358,26 +349,6 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     // actionsToSchedule.current = actions as [];
   };
   // const onScheduleProposal = () => {};
-
-  const onFetchAbi = async (contractAddress: string) => {
-    if (!abiFetcher) {
-      // don't know which network, let user input abi
-      setDoFetch(false);
-      return;
-    }
-    const abi = await abiFetcher.get(contractAddress);
-    if (abi) {
-      try {
-        onGenerateActionsFromAbi(contractAddress, JSON.parse(abi));
-      } catch (e) {
-        // unable to generate from abi, try getting abi from user
-        setDoFetch(false);
-      }
-    } else {
-      // couldn't get abi from etherscan, get it from user
-      setDoFetch(false);
-    }
-  };
 
   const onGenerateActionsFromAbi = async (
     contractAddress: string,
@@ -547,7 +518,6 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
             onCloseModal={handleInputModalClose}
             onGenerate={onGenerateActionsFromAbi}
             open={isInputModalOpen}
-            onFetch={doFetch? onFetchAbi : undefined}
           ></NewActionModal>
         )}
         {isActionModalOpen && (

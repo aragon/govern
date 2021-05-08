@@ -1,4 +1,5 @@
 import { ETHERSCAN_API_KEY } from './constants';
+import { validateAbi } from './validations';
 
 export default class AbiFetcher {
   private readonly network: string;
@@ -28,7 +29,9 @@ export default class AbiFetcher {
       if (response.ok) {
         const json = await response.json();
         if (json.message === 'OK') {
-          return json.result;
+          if (validateAbi(json.result) === true) {
+            return json.result;
+          }
         }
       }
     } catch (e) {

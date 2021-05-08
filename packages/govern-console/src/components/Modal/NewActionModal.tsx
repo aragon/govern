@@ -10,6 +10,7 @@ import { useWallet } from 'AugmentedWallet';
 import { validateContract, validateAbi } from 'utils/validations';
 import { Controller, useForm } from 'react-hook-form';
 import { utils } from 'ethers';
+import AbiFetcher from 'utils/AbiFetcher';
 import {
   styled,
   useTheme,
@@ -34,10 +35,6 @@ export interface NewActionModalProps {
    * What happens when clicked on generate
    */
   onGenerate: (contractAddress: any, abi: any) => void;
-  /**
-   * Handle fetch abi from etherscan
-   */
-  onFetch?: (contractAddress: string) => void;
 }
 
 const styles = (theme: Theme) =>
@@ -125,10 +122,16 @@ export const NewActionModal: React.FC<NewActionModalProps> = ({
   open,
   onCloseModal,
   onGenerate,
-  onFetch,
 }) => {
   const theme = useTheme();
-  const { provider }: any = useWallet();
+  const [fetchAbi, setFetchAbi] = useState(true);
+  const { provider, networkName }: any = useWallet();
+
+  const abiFetcher = React.useMemo(() => {
+    if (networkName) {
+      return new AbiFetcher(networkName);
+    }
+  }, [networkName]);
 
   const { control, handleSubmit } = useForm<FormInputs>();
 
@@ -143,7 +146,13 @@ export const NewActionModal: React.FC<NewActionModalProps> = ({
       ? contractAddress
       : await provider.resolveName(contractAddress);
 
-    onFetch!(address);
+    const abi = await abiFetcher?.get(address);
+    if (abi) {
+      onGenerate(address, JSON.parse(abi));
+    } else {
+      // couldn't get abi from etherscan, get it from user
+      setFetchAbi(false);
+    }
   };
 
   return (
@@ -174,7 +183,7 @@ export const NewActionModal: React.FC<NewActionModalProps> = ({
             )}
           />
         </div>
-        {!onFetch && (
+        {!fetchAbi && (
           <div>
             <InputLabelText>Input ABI</InputLabelText>
             <div style={{ marginBottom: '26px', height: '50px' }}>
@@ -202,7 +211,7 @@ export const NewActionModal: React.FC<NewActionModalProps> = ({
         )}
       </DialogContent>
       <DialogActions>
-        {onFetch && (
+        {fetchAbi && (
           <ANButton
             buttonType="primary"
             width={'112px'}
@@ -211,7 +220,7 @@ export const NewActionModal: React.FC<NewActionModalProps> = ({
             onClick={handleSubmit(callFetchAbi)}
           ></ANButton>
         )}
-        {!onFetch && (
+        {!fetchAbi && (
           <ANButton
             buttonType="primary"
             width={'112px'}
