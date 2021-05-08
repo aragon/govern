@@ -359,28 +359,25 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   };
   // const onScheduleProposal = () => {};
 
-  const onFetchAbi = React.useMemo(
-    () => async (contractAddress: string) => {
-      if (!abiFetcher) {
-        // don't know which network, let user input abi
-        setDoFetch(false);
-        return;
-      }
-      const abi = await abiFetcher.get(contractAddress);
-      if (abi) {
-        try {
-          onGenerateActionsFromAbi(contractAddress, JSON.parse(abi));
-        } catch (e) {
-          // unable to generate from abi, try getting abi from user
-          setDoFetch(false);
-        }
-      } else {
-        // couldn't get abi from etherscan, get it from user
+  const onFetchAbi = async (contractAddress: string) => {
+    if (!abiFetcher) {
+      // don't know which network, let user input abi
+      setDoFetch(false);
+      return;
+    }
+    const abi = await abiFetcher.get(contractAddress);
+    if (abi) {
+      try {
+        onGenerateActionsFromAbi(contractAddress, JSON.parse(abi));
+      } catch (e) {
+        // unable to generate from abi, try getting abi from user
         setDoFetch(false);
       }
-    },
-    [doFetch],
-  );
+    } else {
+      // couldn't get abi from etherscan, get it from user
+      setDoFetch(false);
+    }
+  };
 
   const onGenerateActionsFromAbi = async (
     contractAddress: string,
@@ -550,7 +547,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
             onCloseModal={handleInputModalClose}
             onGenerate={onGenerateActionsFromAbi}
             open={isInputModalOpen}
-            onFetch={onFetchAbi}
+            onFetch={doFetch? onFetchAbi : undefined}
           ></NewActionModal>
         )}
         {isActionModalOpen && (
