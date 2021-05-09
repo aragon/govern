@@ -19,6 +19,11 @@ import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import QueueApprovals from 'services/QueueApprovals';
 import FacadeProposal from 'services/Proposal';
 
+// widget components
+import ChallengeWidget from './components/ChallengeWidget'
+import ExecuteWidget from './components/ExecuteWidget'
+import ResolveWidget from './components/ResolveWidget'
+
 // import { InputField } from 'component/InputField/InputField';
 interface ProposalDetailsProps {
   onClickBack?: any;
@@ -234,31 +239,6 @@ const ExpandedDiv = styled('div')({
   },
 });
 
-const Widget = styled('div')({
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  width: '100%',
-  minHeight: '118px',
-  boxSizing: 'border-box',
-  background: '#FFFFFF',
-  border: '2px solid #ECF1F7',
-  boxShadow: '0px 6px 6px rgba(180, 193, 228, 0.35)',
-  borderRadius: '8px',
-  marginBottom: '23px',
-  padding: '36px 27px',
-  '& div': {
-    display: 'block',
-    margin: 'auto',
-    width: '100%',
-    boxSizing: 'border-box',
-    marginBottom: '9px',
-  },
-  '& button': {
-    marginTop: '5px',
-  },
-});
-
 //* End of styled Components
 
 const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
@@ -370,7 +350,9 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     }
   };
 
-  // const resolveProposal = async () => {};
+  const resolveProposal = async (disputeId:number) => {
+
+  };
 
   const proposalStates: any = {};
   // check if the user has the veto power.
@@ -378,6 +360,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     proposalInfo.history.forEach((item: any) => {
       proposalStates[item.__typename] = item;
     });
+    console.log(proposalInfo, ' states')
 
     // =============================================
     // if(proposalStates['ContainerEventChallenge']){ MEANS it was challenged.
@@ -437,6 +420,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   // const getParsedDataFromBytes = (data) => {
 
   // };
+
 
   return (
     <>
@@ -607,37 +591,36 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                   </InfoWrapper>
                 </ProposalDetailsWrapper>
                 <WidgetWrapper id="widget_wrapper">
-                  <Widget>
-                    <div
-                      style={{
-                        fontFamily: 'Manrope',
-                        fontStyle: 'normal',
-                        fontWeight: 'normal',
-                        fontSize: '18px',
-                        color: '#7483B3',
-                      }}
-                    >
-                      Challenge Reason
-                    </div>
-                    <InputField
-                      onInputChange={(value) => {
-                        setChallengeReason(value);
-                      }}
-                      label={''}
-                      placeholder={''}
-                      height={'46px'}
-                      width={'372px'}
-                      // value={challengeReason.current}
+                      
+                  {
+                    <ChallengeWidget
+                      containerEventChallenge={proposalStates['ContainerEventChallenge']}
+                      currentState={proposalInfo.state}
+                      setChallengeReason={setChallengeReason}
+                      onChallengeProposal={challengeProposal}
                     />
-                    <ANButton
-                      buttonType="primary"
-                      label="Challenge"
-                      height="45px"
-                      width="372px"
-                      style={{ margin: 'auto' }}
-                      onClick={() => challengeProposal()}
+                  }
+
+                  {
+                    <ExecuteWidget
+                      containerEventExecute={proposalStates['ContainerEventExecute']}
+                      currentState={proposalInfo.state}
+                      executionTime={proposalInfo.payload.executionTime}
+                      onExecuteProposal={executeProposal}
                     />
-                  </Widget>
+                  }
+                   {
+                    <ResolveWidget
+                      containerEventExecute={proposalStates['ContainerEventExecute']}
+                      currentState={proposalInfo.state}
+                      executionTime={proposalInfo.payload.executionTime}
+                      onExecuteProposal={executeProposal}
+                    />
+                  }
+                  
+
+                  {/* ResolveWidget */}
+
                   {/* <Widget>
                     <div
                       style={{
@@ -668,16 +651,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                       //  onClick={}
                     />
                   </Widget> */}
-                  <Widget>
-                    <ANButton
-                      label="Execute"
-                      height="45px"
-                      width="372px"
-                      style={{ margin: 'auto' }}
-                      onClick={executeProposal}
-                      buttonType="primary"
-                    />
-                  </Widget>
                   {/* <Widget>
                     <ANButton
                       buttonType="primary"
@@ -685,7 +658,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                       height="45px"
                       width="372px"
                       style={{ margin: 'auto' }}
-                      // onClick={resolveProposal(disputeId)}
+                      // onClick={resolveProposal(0)}
                     />
                   </Widget> */}
                 </WidgetWrapper>

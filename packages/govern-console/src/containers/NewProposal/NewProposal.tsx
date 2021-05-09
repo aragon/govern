@@ -207,7 +207,7 @@ const AddedActions: React.FC<AddedActionsProps> = ({
             const element = (
               <div key={input.name}>
                 <div style={{ marginTop: '20px' }}>
-                  <SubTitle>{input.name}</SubTitle>
+                  <SubTitle>{input.name}({input.type})</SubTitle>
                 </div>
                 <div style={{ marginTop: '20px' }}>
                   <InputField
