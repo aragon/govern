@@ -39,3 +39,21 @@ export const validateContract = async (
   }
   return 'Contract address is not valid.';
 };
+
+/**
+ * Check if a contract ABI is in good format
+ *
+ * @param abi <string> abi to be validated
+ * @returns <ValidateResult> true if valid, or error message if invalid
+ */
+ export const validateAbi = (abi: string): ValidateResult => {
+  try {
+    const parsedAbi = JSON.parse(abi)
+    if (!Array.isArray(parsedAbi) || parsedAbi.length === 0 ) {
+      throw new Error()
+    }
+    return true;
+  } catch (e) {
+  }
+  return 'Contract ABI is not valid.';
+}

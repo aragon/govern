@@ -24,7 +24,7 @@ import {
   ActionToSchedule,
 } from 'utils/types';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
-import FacadeProposal from 'services/Proposal';
+import  FacadeProposal from 'services/Proposal';
 import { settingsUrl } from 'utils/urls';
 
 import {
@@ -449,8 +449,8 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
           This execution will use the current{' '}
           <Link
             to={settingsUrl(daoName)}
-            target='_blank'
-            rel='noreferrer noopener'
+            target="_blank"
+            rel="noreferrer noopener"
           >
             DAO Settings
           </Link>
@@ -513,17 +513,21 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
           // disabled={!isProposalValid()}
           onClick={() => onSchedule()}
         />
-        <NewActionModal
-          onCloseModal={handleInputModalClose}
-          onGenerate={onGenerateActionsFromAbi}
-          open={isInputModalOpen}
-        ></NewActionModal>
-        <AddActionsModal
-          onCloseModal={handleActionModalClose}
-          open={isActionModalOpen}
-          onAddActions={onAddNewActions}
-          actions={abiFunctions as any}
-        ></AddActionsModal>
+        {isInputModalOpen && (
+          <NewActionModal
+            onCloseModal={handleInputModalClose}
+            onGenerate={onGenerateActionsFromAbi}
+            open={isInputModalOpen}
+          ></NewActionModal>
+        )}
+        {isActionModalOpen && (
+          <AddActionsModal
+            onCloseModal={handleActionModalClose}
+            open={isActionModalOpen}
+            onAddActions={onAddNewActions}
+            actions={abiFunctions as any}
+          ></AddActionsModal>
+        )}
       </WrapperDiv>
     </>
   );

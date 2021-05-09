@@ -6,6 +6,11 @@ import MuiDialogActions from '@material-ui/core/DialogActions';
 import IconButton from '@material-ui/core/IconButton';
 import { ANButton } from 'components/Button/ANButton';
 import { InputField } from 'components/InputFields/InputField';
+import { useWallet } from 'AugmentedWallet';
+import { validateContract, validateAbi } from 'utils/validations';
+import { Controller, useForm } from 'react-hook-form';
+import { utils } from 'ethers';
+import AbiFetcher from 'utils/AbiFetcher';
 import {
   styled,
   useTheme,
@@ -108,69 +113,122 @@ export const DialogTitle = withStyles(styles)((props: DialogTitleProps) => {
   );
 });
 
+interface FormInputs {
+  contractAddress: string;
+  abi: string;
+}
+
 export const NewActionModal: React.FC<NewActionModalProps> = ({
   open,
   onCloseModal,
   onGenerate,
 }) => {
   const theme = useTheme();
-  const [contractAddress, setContractAddress] = useState();
-  const [abi, setAbi] = useState(null);
-  const isJsonString = (str: string) => {
-    try {
-      JSON.parse(str);
-    } catch (e) {
-      return false;
+  const [fetchAbi, setFetchAbi] = useState(true);
+  const { provider, networkName }: any = useWallet();
+
+  const abiFetcher = React.useMemo(() => {
+    if (networkName) {
+      return new AbiFetcher(networkName);
     }
-    return true;
+  }, [networkName]);
+
+  const { control, handleSubmit } = useForm<FormInputs>();
+
+  const callGenerateAbi = (formData: FormInputs) => {
+    const { contractAddress, abi } = formData;
+    onGenerate(contractAddress, JSON.parse(abi));
   };
 
-  const onInputABI = (val: string) => {
-    if (isJsonString(val)) {
-      setAbi(JSON.parse(val));
-    } else return;
-  };
-  const onInputContractAddress = (val: any) => {
-    setContractAddress(val);
+  const callFetchAbi = async (formData: FormInputs) => {
+    const { contractAddress } = formData;
+    const address = utils.isAddress(contractAddress)
+      ? contractAddress
+      : await provider.resolveName(contractAddress);
+
+    const abi = await abiFetcher?.get(address);
+    if (abi) {
+      onGenerate(address, JSON.parse(abi));
+    } else {
+      // couldn't get abi from etherscan, get it from user
+      setFetchAbi(false);
+    }
   };
 
-  const onGenerateClick = () => {
-    if (!abi || !contractAddress) return;
-    onGenerate(contractAddress, abi);
-  };
   return (
     <MuiDialog open={open}>
       <DialogTitle onClose={onCloseModal}> New Action </DialogTitle>
       <DialogContent>
-        <InputLabelText>Input ABI</InputLabelText>
-        <div style={{ marginBottom: '26px' }}>
-          <InputField
-            height={'46px'}
-            width={'530px'}
-            onInputChange={onInputABI}
-            placeholder="ABI..."
-            label=""
-          ></InputField>
-        </div>
         <InputLabelText>Input Contract Address</InputLabelText>
-        <div style={{ marginBottom: '26px' }}>
-          <InputField
-            height={'46px'}
-            width={'530px'}
-            onInputChange={onInputContractAddress}
-            placeholder="Contract Address"
-            label=""
-          ></InputField>
+        <div style={{ marginBottom: '26px', height: '50px' }}>
+          <Controller
+            name="contractAddress"
+            control={control}
+            rules={{
+              required: 'This is required.',
+              validate: (value) => {
+                return validateContract(value, provider);
+              },
+            }}
+            render={({ field: { onChange }, fieldState: { error } }) => (
+              <InputField
+                height={'46px'}
+                width={'530px'}
+                onInputChange={onChange}
+                placeholder="Contract Address"
+                label=""
+                error={!!error}
+                helperText={error ? error.message : null}
+              ></InputField>
+            )}
+          />
         </div>
+        {!fetchAbi && (
+          <div>
+            <InputLabelText>Input ABI</InputLabelText>
+            <div style={{ marginBottom: '26px', height: '50px' }}>
+              <Controller
+                name="abi"
+                control={control}
+                rules={{
+                  required: 'This is required.',
+                  validate: (value) => validateAbi(value),
+                }}
+                render={({ field: { onChange }, fieldState: { error } }) => (
+                  <InputField
+                    height={'46px'}
+                    width={'530px'}
+                    onInputChange={onChange}
+                    placeholder="ABI..."
+                    label=""
+                    error={!!error}
+                    helperText={error ? error.message : null}
+                  ></InputField>
+                )}
+              />
+            </div>
+          </div>
+        )}
       </DialogContent>
       <DialogActions>
-        <ANButton
-          buttonType="primary"
-          width={'112px'}
-          height={'45px'}
-          label="Generate"
-          onClick={() => onGenerateClick()}
-        ></ANButton>
+        {fetchAbi && (
+          <ANButton
+            buttonType="primary"
+            width={'112px'}
+            height={'45px'}
+            label="Fetch"
+            onClick={handleSubmit(callFetchAbi)}
+          ></ANButton>
+        )}
+        {!fetchAbi && (
+          <ANButton
+            buttonType="primary"
+            width={'112px'}
+            height={'45px'}
+            label="Generate"
+            onClick={handleSubmit(callGenerateAbi)}
+          ></ANButton>
+        )}
       </DialogActions>
     </MuiDialog>
   );
