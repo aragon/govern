@@ -59,7 +59,7 @@ const ResolveWidget: React.FC<any> = ({
 
     if (currentState !== PROPOSAL_STATES.CHALLENGED) {
         return (
-            <p></p>
+            <></>
         )
     }
 

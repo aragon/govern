@@ -61,7 +61,7 @@ const ExecuteWidget: React.FC<any> = ({
 
     if(currentState !== PROPOSAL_STATES.SCHEDULED) {
         return (
-            <p></p>
+            <></>
         )
     }
 
