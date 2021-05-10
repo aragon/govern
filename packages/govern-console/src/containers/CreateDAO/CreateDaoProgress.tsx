@@ -13,6 +13,10 @@ export interface CreateDaoProgressProps {
    */
   isTokenRegister?: boolean;
   /**
+   * Token register caption
+   */
+  registerCaption?: string;
+  /**
    * Status of progress
    */
   progressStatus: {
@@ -88,6 +92,7 @@ const ProgressImage = styled('img')({
 const CreateDaoProgress: React.FC<CreateDaoProgressProps> = ({
   isTokenRegister,
   progressStatus,
+  registerCaption = 'Registering Token'
 }) => {
   return (
     <Container>
@@ -109,7 +114,7 @@ const CreateDaoProgress: React.FC<CreateDaoProgressProps> = ({
           />
           {isTokenRegister ? (
             <ANCircularProgressWithCaption
-              caption={'Registering Token'}
+              caption={registerCaption}
               state={progressStatus.register ?? 0}
             />
           ) : null}
