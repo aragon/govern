@@ -134,6 +134,7 @@ export const InfoValueDivInline = styled('div')({
   maxWidth: '100%',
   textOverflow: 'ellipsis',
   overflow: 'hidden',
+  verticalAlign: 'bottom',
   minHeight: '25px',
   lineHeight: '25px',
   '& a': {
@@ -148,6 +149,7 @@ const InfoValuePre = styled('pre')({
   fontWeight: 'normal',
   color: '#20232C',
   overflow: 'auto',
+  margin: '0',
 })
 
 export const InfoValueDivBlock = styled('div')(
@@ -218,13 +220,9 @@ const ActionDiv = styled('div')({
   overflow: 'hidden',
   cursor: 'pointer',
   '& > div': {
-    display: 'flex',
-    minHeight: '62px !important',
-    alignItems: 'center',
     width: '100%',
     paddingTop: 0,
     paddingBottom: 0,
-
     // lineHeight: '62px',
   },
   '& div': {
@@ -236,7 +234,6 @@ const ActionDiv = styled('div')({
 });
 
 const CollapsedDiv = styled('div')({
-  height: '62px',
   display: 'block',
   width: '100%',
   paddingLeft: '23px',
@@ -253,7 +250,7 @@ const ExpandedDiv = styled('div')({
   boxSizing: 'border-box',
   margin: 0,
   '& #value-div': {
-    height: '27px',
+    height: '30px',
     lineHeight: '27px',
     minHeight: '27px !important',
   },
@@ -569,6 +566,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                                   {decoding && <div>Decoding data....</div>}
                                   {!decoding && !decodedData[index] && (
                                     <InfoWrapper id="data-div">
+                                      <InfoKeyDiv>data</InfoKeyDiv>
                                       <InfoValueDivBlock
                                         className="full-width"
                                         id="data-div-block"
@@ -578,7 +576,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                                     </InfoWrapper>
                                   )}
                                   {!decoding && decodedData[index] && (
-                                    <div>
+                                    <React.Fragment>
                                       <InfoWrapper id="function-div">
                                         <InfoKeyDiv>function</InfoKeyDiv>
                                         <InfoValueDivInline>
@@ -599,7 +597,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                                           </InfoValuePre>
                                         )}
                                       </InfoWrapper>
-                                    </div>
+                                    </React.Fragment>
                                   )}
                                 </ExpandedDiv>
                               )}
