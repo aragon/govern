@@ -15,7 +15,7 @@ export const validateToken = async (
   provider: any,
 ): Promise<ValidateResult> => {
   try {
-    const tokenInfo = await getToken(address, provider);
+    await getToken(address, provider);
     return true;
   } catch (error) {}
   return 'Token adress is not valid.';
@@ -33,9 +33,9 @@ export const validateContract = async (
   provider: any,
 ): Promise<ValidateResult> => {
   try {
-    const validAddress = await provider.getCode(address);
-    return true;
-  } catch (error) {}
+    await provider.getCode(address);
+  } catch (error) {
+  }
   return 'Contract address is not valid.';
 };
 

@@ -207,7 +207,7 @@ const AddedActions: React.FC<AddedActionsProps> = ({
             const element = (
               <div key={input.name}>
                 <div style={{ marginTop: '20px' }}>
-                  <SubTitle>{input.name}</SubTitle>
+                  <SubTitle>{input.name}({input.type})</SubTitle>
                 </div>
                 <div style={{ marginTop: '20px' }}>
                   <InputField
@@ -270,7 +270,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   }, [daoList]);
 
   const context: any = useWallet();
-  const { account, provider } = context;
+  const { account, provider, isConnected } = context;
 
   const proposalInstance = React.useMemo(() => {
     if (provider && account && daoDetails) {
@@ -505,6 +505,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
         <br />
         <ANButton
           label="Schedule/Submit"
+          disabled={!isConnected}
           // width={178}
           // height={45}
           buttonType="primary"

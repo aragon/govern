@@ -120,7 +120,7 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
             >
               <DaoCard
                 label={dao.name}
-                aumValue={formatEther(dao.executor.balance)}
+                aumValue={formatEther(0)}
                 numberOfProposals={dao.queue.nonce}
                 daoId={dao.id}
               ></DaoCard>

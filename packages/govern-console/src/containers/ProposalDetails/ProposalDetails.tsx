@@ -5,7 +5,6 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import backButtonIcon from 'images/back-btn.svg';
 import { Label } from 'components/Labels/Label';
-import { InputField } from 'components/InputFields/InputField';
 import { useParams } from 'react-router-dom';
 import { GET_PROPOSAL_DETAILS_QUERY } from './queries';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
@@ -20,6 +19,12 @@ import QueueApprovals from 'services/QueueApprovals';
 import FacadeProposal from 'services/Proposal';
 import AbiHandler from 'utils/AbiHandler'
 import { toUtf8String } from '@ethersproject/strings';
+import { formatDate} from 'utils/date';
+
+// widget components
+import ChallengeWidget from './components/ChallengeWidget';
+import ExecuteWidget from './components/ExecuteWidget';
+import ResolveWidget from './components/ResolveWidget';
 
 // import { InputField } from 'component/InputField/InputField';
 interface ProposalDetailsProps {
@@ -98,25 +103,27 @@ const TitleText = styled(Typography)({
   width: '100%',
   boxSizing: 'border-box',
 });
-const InfoWrapper = styled('div')({
+export const InfoWrapper = styled('div')({
   // display: 'flex',
   // flexDirection: 'column',
   // justifyContent: 'space-between',
   marginTop: '9px',
   width: '100%',
   boxSizing: 'border-box',
+  height: 'fit-content',
 });
-const InfoKeyDiv = styled('div')({
+export const InfoKeyDiv = styled('div')({
   fontFamily: 'Manrope',
   fontStyle: 'normal',
   fontWeight: 'normal',
   fontSize: '18px',
-  height: '25px',
+  minHeight: '25px',
+  height: 'fit-content',
   width: 'fit-content',
   display: 'inline-block',
   color: '#7483B3',
 });
-const InfoValueDivInline = styled('div')({
+export const InfoValueDivInline = styled('div')({
   fontFamily: 'Manrope',
   fontStyle: 'normal',
   fontWeight: 'normal',
@@ -124,6 +131,12 @@ const InfoValueDivInline = styled('div')({
   display: 'inline-block',
   width: 'fit-content',
   marginLeft: '9px',
+  maxWidth: '100%',
+  textOverflow: 'ellipsis',
+  overflow: 'hidden',
+  verticalAlign: 'bottom',
+  minHeight: '25px',
+  lineHeight: '25px',
   '& a': {
     width: '100%',
     color: '#0094FF',
@@ -136,43 +149,53 @@ const InfoValuePre = styled('pre')({
   fontWeight: 'normal',
   color: '#20232C',
   overflow: 'auto',
+  margin: '0',
 })
-const InfoValueDivBlock = styled('div')({
-  display: 'flex',
-  flexDirection: 'column',
-  width: '75%',
-  height: 'auto',
-  fontFamily: 'Manrope',
-  fontStyle: 'normal',
-  fontWeight: 'normal',
-  color: '#20232C',
-  fontSize: '18px',
-  marginTop: '9px',
-  paddingLeft: '25px',
-  boxSizing: 'border-box',
-  '& a': {
-    display: 'block',
-    width: '100%',
-    color: '#0094FF',
-    boxSizing: 'border-box',
-  },
-  '& div': {
-    display: 'block',
+
+export const InfoValueDivBlock = styled('div')(
+  ({ maxlines }: { maxlines?: number }) => ({
+    display: 'flex',
+    flexDirection: 'column',
+    minWidth: '75%',
     height: 'auto',
-    width: '100%',
+    fontFamily: 'Manrope',
+    fontStyle: 'normal',
+    fontWeight: 'normal',
     color: '#20232C',
+    fontSize: '18px',
+    marginTop: '9px',
+    paddingLeft: '25px',
     boxSizing: 'border-box',
-  },
-  '& > *': {
-    marginBottom: '9px',
-  },
-  '& :last-child': {
-    marginBottom: '0 !important',
-  },
-  '& .full-width': {
-    width: '100% !important',
-  },
-});
+    maxWidth: '100%',
+    textOverflow: 'ellipsis',
+    overflow: 'hidden',
+    WebkitLineClamp: maxlines || 'none',
+    boxOrientation: 'vertical',
+    // wordBreak:'break-all',
+    '& a': {
+      display: 'block',
+      width: 'fit-content',
+      color: '#0094FF',
+      boxSizing: 'border-box',
+    },
+    '& div': {
+      display: 'block',
+      height: 'auto',
+      width: '100%',
+      color: '#20232C',
+      boxSizing: 'border-box',
+    },
+    '& > *': {
+      marginBottom: '9px',
+    },
+    '& :last-child': {
+      marginBottom: '0 !important',
+    },
+    '& .full-width': {
+      width: '100% !important',
+    },
+  }),
+);
 const ActionsWrapper = styled('div')({
   display: 'flex',
   flexDirection: 'column',
@@ -197,9 +220,10 @@ const ActionDiv = styled('div')({
   overflow: 'hidden',
   cursor: 'pointer',
   '& > div': {
-    minHeight: '62px !important',
-    verticalAlign: 'middle',
-    lineHeight: '62px',
+    width: '100%',
+    paddingTop: 0,
+    paddingBottom: 0,
+    // lineHeight: '62px',
   },
   '& div': {
     marginTop: 0,
@@ -210,7 +234,6 @@ const ActionDiv = styled('div')({
 });
 
 const CollapsedDiv = styled('div')({
-  height: '62px',
   display: 'block',
   width: '100%',
   paddingLeft: '23px',
@@ -227,7 +250,7 @@ const ExpandedDiv = styled('div')({
   boxSizing: 'border-box',
   margin: 0,
   '& #value-div': {
-    height: '27px',
+    height: '30px',
     lineHeight: '27px',
     minHeight: '27px !important',
   },
@@ -243,31 +266,6 @@ const ExpandedDiv = styled('div')({
   },
 });
 
-const Widget = styled('div')({
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  width: '100%',
-  minHeight: '118px',
-  boxSizing: 'border-box',
-  background: '#FFFFFF',
-  border: '2px solid #ECF1F7',
-  boxShadow: '0px 6px 6px rgba(180, 193, 228, 0.35)',
-  borderRadius: '8px',
-  marginBottom: '23px',
-  padding: '36px 27px',
-  '& div': {
-    display: 'block',
-    margin: 'auto',
-    width: '100%',
-    boxSizing: 'border-box',
-    marginBottom: '9px',
-  },
-  '& button': {
-    marginTop: '5px',
-  },
-});
-
 //* End of styled Components
 
 const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
@@ -277,7 +275,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   });
   const context: any = useWallet();
 
-  const { account, provider, networkName } = context;
+  const { account, provider, networkName, isConnected } = context;
 
   const { dispatch } = React.useContext(ModalsContext);
 
@@ -383,7 +381,8 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
           challengeReason,
         );
       } catch (error) {
-        // TODO: Bhanu show error
+        // TODO:Bhanu show this error.
+        // error.error.message
       }
     }
 
@@ -401,79 +400,35 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
 
   const executeProposal = async () => {
     const proposalParams = getProposalParams(proposalInfo);
-    console.log(proposalParams);
     if (proposalInstance) {
-      const executeTransaction = await proposalInstance.execute(proposalParams);
+      try {
+        await proposalInstance.execute(proposalParams);
+      }catch(error){ 
+        // TODO:Bhanu show this error.
+        // error.error.message
+      }
     }
   };
 
-  // const resolveProposal = async () => {};
+  const resolveProposal = async (disputeId: number) => {
+    if(proposalInstance) {
+      const proposalParams = getProposalParams(proposalInfo);
+      try {
+        await proposalInstance.resolve(proposalParams,disputeId);
+      }catch(error) {
+        // TODO:Bhanu show this error.
+        // error.error.message
+      }
+    }
+  };
 
   const proposalStates: any = {};
-  // check if the user has the veto power.
   if (proposalInfo) {
     proposalInfo.history.forEach((item: any) => {
       proposalStates[item.__typename] = item;
     });
-
-    // =============================================
-    // if(proposalStates['ContainerEventChallenge']){ MEANS it was challenged.
-    //     show the followings
-    //
-    //     proposalStates['ContainerEventChallenge'].reason
-    //     proposalStates['ContainerEventChallenge'].createdAt
-    //     proposalStates['ContainerEventChallenge].challenger
-    //
-
-    // } else if(proposalInfo.state == 'Scheduled') {{
-    //     show what you were showing before. (challenge reason label + input + button)
-    //  }
-    // =============================================
-
-    // if(proposalStates['ContainerEventExecute']){
-    //   show the following
-    //   proposalStates['ContainerEventExecute'].createdAt
-    //   proposalStates['ContainerEventExecute'].execResults bytes array here.. each member can have arbitrary size.
-    // }else if(proposalInfo.state == 'Scheduled'){
-    //   if({proposalInfo.payload.executionTime - currentTimestamp} > 0) - show the message: You will not be able to execute this action until {proposalInfo.payload.executionTime - proposalInfo.payload.currentTimestamp} in human readable date format
-    //   else show what you were showing before. (execute button)
-    // }
-    // =============================================
-    // if(proposalStates['ContainerEventVeto']){
-    //     show the following
-    //     proposalStates['ContainerEventVeto'].createdAt
-    //     proposalStates['ContainerEventVeto'].reason // This is the array of bytes, where each member can be any size.
-    //  }
-    //  else if(proposalInfo.state == 'Scheduled' || proposalInfo.state == 'Challenged')){
-    //    const vetoRoles = proposalInfo.queue.roles.filter(
-    //       (role: any) => role.selector === proposalInstance.getSigHash('veto') &&
-    //       role.who == "0x94C34FB5025e054B24398220CBDaBE901bd8eE5e" && // TODO: Bhanu instead of address, put signer's address
-    //       role.granted
-    //    )
-    //    if(vetoRoles.length === 0){
-    //        TODO:Bhanu If This comes here, it means user doens't have the veto permission, which means we should be showing
-    //        the message on the veto card: You don't have the permission to veto the proposal. Otherwise
-    //    }else{
-    //        // show veto reason label + input + veto button as showing previously.
-    //    }
-
-    //  }
-
-    // =============================================
-    // if(proposalStates['ContainerEventResolve']){
-    //   show the following
-    //   proposalStates['ContainerEventResolve'].createdAt
-    //   proposalStates['ContainerEventResolve'].approved  true or false. (yes | no)
-    // } else if(proposalInfo.state == 'Challenged'){
-    //     show the new card where only button is resolve.
-    //
-    // }
-
   }
 
-  // const getParsedDataFromBytes = (data) => {
-
-  // };
 
   return (
     <>
@@ -494,16 +449,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
               </ProposalStatus>
               <ProposalId>{proposalInfo.id}</ProposalId>
               <DateDisplay>
-                {
-                  // TODO:Bhanu you can make this work with the dates library you use
-                  new Date(proposalInfo.createdAt * 1000).toLocaleDateString(
-                    'en-US',
-                  ) +
-                    ' ' +
-                    new Date(proposalInfo.createdAt * 1000).toLocaleTimeString(
-                      'en-US',
-                    )
-                }
+                { formatDate(proposalInfo.createdAt) }
               </DateDisplay>
               <DetailsWrapper>
                 <ProposalDetailsWrapper id="proposal_wrapper">
@@ -573,10 +519,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                         'No executor ID'}
                     </InfoValueDivInline>
                   </InfoWrapper>
-                  {/* <InfoWrapper>
-                    <InfoKeyDiv>On Chain Actions:</InfoKeyDiv>
-                    <InfoValueDivInline>Proof Text</InfoValueDivInline>
-                  </InfoWrapper> */}
                   <InfoWrapper>
                     <InfoKeyDiv>AllowFailuresMap:</InfoKeyDiv>
                     <InfoValueDivInline>
@@ -587,10 +529,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                     <InfoKeyDiv>Proof:</InfoKeyDiv>
                     <InfoValueDivBlock>
                       {toUtf8String(proposalInfo.payload.proof)}
-                      {/* Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                  laboris nisi ut aliquip ex ea commodo consequat. */}
                     </InfoValueDivBlock>
                   </InfoWrapper>
                   <InfoWrapper>
@@ -628,6 +566,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                                   {decoding && <div>Decoding data....</div>}
                                   {!decoding && !decodedData[index] && (
                                     <InfoWrapper id="data-div">
+                                      <InfoKeyDiv>data</InfoKeyDiv>
                                       <InfoValueDivBlock
                                         className="full-width"
                                         id="data-div-block"
@@ -637,7 +576,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                                     </InfoWrapper>
                                   )}
                                   {!decoding && decodedData[index] && (
-                                    <div>
+                                    <React.Fragment>
                                       <InfoWrapper id="function-div">
                                         <InfoKeyDiv>function</InfoKeyDiv>
                                         <InfoValueDivInline>
@@ -658,7 +597,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                                           </InfoValuePre>
                                         )}
                                       </InfoWrapper>
-                                    </div>
+                                    </React.Fragment>
                                   )}
                                 </ExpandedDiv>
                               )}
@@ -670,87 +609,45 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                   </InfoWrapper>
                 </ProposalDetailsWrapper>
                 <WidgetWrapper id="widget_wrapper">
-                  <Widget>
-                    <div
-                      style={{
-                        fontFamily: 'Manrope',
-                        fontStyle: 'normal',
-                        fontWeight: 'normal',
-                        fontSize: '18px',
-                        color: '#7483B3',
-                      }}
-                    >
-                      Challenge Reason
-                    </div>
-                    <InputField
-                      onInputChange={(value) => {
-                        setChallengeReason(value);
-                      }}
-                      label={''}
-                      placeholder={''}
-                      height={'46px'}
-                      width={'372px'}
-                      // value={challengeReason.current}
+                  {
+                    <ChallengeWidget
+                      disabled={!isConnected}
+                      containerEventChallenge={
+                        proposalStates['ContainerEventChallenge']
+                      }
+                      currentState={proposalInfo.state}
+                      setChallengeReason={setChallengeReason}
+                      onChallengeProposal={challengeProposal}
                     />
-                    <ANButton
-                      buttonType="primary"
-                      label="Challenge"
-                      height="45px"
-                      width="372px"
-                      style={{ margin: 'auto' }}
-                      onClick={() => challengeProposal()}
+                  }
+
+                  {
+                    <ExecuteWidget
+                      disabled={!isConnected}
+                      containerEventExecute={
+                        proposalStates['ContainerEventExecute']
+                      }
+                      currentState={proposalInfo.state}
+                      executionTime={proposalInfo.payload.executionTime}
+                      onExecuteProposal={executeProposal}
                     />
-                  </Widget>
-                  {/* <Widget>
-                    <div
-                      style={{
-                        fontFamily: 'Manrope',
-                        fontStyle: 'normal',
-                        fontWeight: 'normal',
-                        fontSize: '18px',
-                        color: '#7483B3',
-                      }}
-                    >
-                      Veto Reason
-                    </div>
-                    <InputField
-                      onInputChange={(value) => {
-                        vetoReason.current = value;
-                      }}
-                      label={''}
-                      placeholder={''}
-                      height={'46px'}
-                      width={'372px'}
-                      // value={vetoReason.current}
+                  }
+                  {
+                    <ResolveWidget
+                      disabled={!isConnected}
+                      containerEventExecute={
+                        proposalStates['ContainerEventResolve']
+                      }
+                      disputeId={
+                        proposalStates['ContainerEventChallenge'] 
+                        ? proposalStates['ContainerEventChallenge'].disputeId 
+                        : null
+                      }
+                      currentState={proposalInfo.state}
+                      executionTime={proposalInfo.payload.executionTime}
+                      onResolveProposal={resolveProposal}
                     />
-                    <ANButton
-                      label="Veto"
-                      height="45px"
-                      width="372px"
-                      style={{ margin: 'auto' }}
-                      //  onClick={}
-                    />
-                  </Widget> */}
-                  <Widget>
-                    <ANButton
-                      label="Execute"
-                      height="45px"
-                      width="372px"
-                      style={{ margin: 'auto' }}
-                      onClick={executeProposal}
-                      buttonType="primary"
-                    />
-                  </Widget>
-                  {/* <Widget>
-                    <ANButton
-                      buttonType="primary"
-                      label="Resolve"
-                      height="45px"
-                      width="372px"
-                      style={{ margin: 'auto' }}
-                      // onClick={resolveProposal(disputeId)}
-                    />
-                  </Widget> */}
+                  }
                 </WidgetWrapper>
               </DetailsWrapper>
             </StyledPaper>
