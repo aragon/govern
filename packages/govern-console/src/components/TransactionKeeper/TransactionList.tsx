@@ -38,9 +38,7 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
     <>
       <ul>
         {transactions.map((transaction) => {
-          return (
-            <li key={transaction.message}>{getListItem(transaction)}</li>
-          );
+          return <li key={transaction.message}>{getListItem(transaction)}</li>;
         })}
       </ul>
     </>

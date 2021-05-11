@@ -18,7 +18,7 @@ import { Proposal, ProposalOptions } from '@aragon/govern';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import QueueApprovals from 'services/QueueApprovals';
 import FacadeProposal from 'services/Proposal';
-import AbiHandler from 'utils/AbiHandler'
+import AbiHandler from 'utils/AbiHandler';
 import { toUtf8String } from '@ethersproject/strings';
 
 // import { InputField } from 'component/InputField/InputField';
@@ -136,7 +136,7 @@ const InfoValuePre = styled('pre')({
   fontWeight: 'normal',
   color: '#20232C',
   overflow: 'auto',
-})
+});
 const InfoValueDivBlock = styled('div')({
   display: 'flex',
   flexDirection: 'column',
@@ -468,7 +468,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     //     show the new card where only button is resolve.
     //
     // }
-
   }
 
   // const getParsedDataFromBytes = (data) => {

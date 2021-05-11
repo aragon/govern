@@ -4,8 +4,10 @@ import { styled } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import { useWallet } from 'use-wallet';
 import connectedUserIcon from 'images/connected-user-icon.svg';
+import { AddressIdentifier } from 'components/AddressIdentifier/AddressIdentifier';
 import Typography from '@material-ui/core/Typography';
 import { useEffect } from 'react';
+import Toast from 'components/Toasts/Toast';
 
 const WalletWrapper = styled(Card)({
   background: '#FFFFFF',
@@ -29,7 +31,9 @@ const ConnectedAccount = styled('div')({
   boxSizing: 'border-box',
   boxShadow: '0px 3px 3px rgba(180, 193, 228, 0.35)',
   borderRadius: '8px',
-  padding: '13px 20px',
+  justifyContent: 'center',
+  alignItems: 'center',
+  // padding: '13px 20px',
   display: 'flex',
   flexDirection: 'row',
 });
@@ -74,16 +78,34 @@ const Wallet = ({}) => {
   const onWalletConnectionError = (error: Error) => {
     // alert(getErrorMessage(error));
   };
+
+  const handleCloseToast = () => {
+    setOpenToast(false);
+  };
+
   useEffect(() => {
-    console.log(status, chainId, error);
+    connectWalletAndSetStatus('injected');
+  }, []);
+  useEffect(() => {
+    console.log(status, account, chainId, error);
     if (chainId !== 4) {
+      console.log('chainId', chainId);
       setNetworkStatus('unsupported');
+      setOpenToast(true);
     } else if (error) {
-      setNetworkStatus('connection-error');
+      // console.log('error11111', error.message, typeof error.message);
+      if (error.message.includes('Unsupported chain')) {
+        setNetworkStatus('unsupported');
+      } else {
+        setNetworkStatus('connection-error');
+      }
+      setOpenToast(true);
     } else if (status === 'connected') {
       setNetworkStatus('connected');
+      setOpenToast(true);
     } else {
       setNetworkStatus('disconnected');
+      setOpenToast(true);
     }
   }, [status, error, chainId]);
   // ---- Components ----
@@ -111,6 +133,8 @@ const Wallet = ({}) => {
       console.log('error', error);
     }
   };
+
+  const [openToast, setOpenToast] = useState(false);
   if (networkStatus === 'connected') {
     return (
       <WalletWrapper>
@@ -121,36 +145,70 @@ const Wallet = ({}) => {
           }}
         >
           {/* <IconHolder src={connectedUserIcon} /> */}
-          <AccountAddress>{getTruncatedAccountAddress(account)}</AccountAddress>
+          <AddressIdentifier
+            isAddress={true}
+            displayText={account || ''}
+            componentSize={'medium'}
+          />
         </ConnectedAccount>
+        <Toast
+          message={'Wallet Connected.'}
+          isOpen={openToast}
+          onClose={handleCloseToast}
+          type={'success'}
+          verticalPosition={'bottom'}
+          horizontalPosition={'right'}
+        />
       </WalletWrapper>
     );
   } else if (networkStatus === 'unsupported') {
     return (
       <WalletWrapper>
-        <ConnectedAccount
+        <ANButton
+          buttonType="primary"
           onClick={() => {
+            connectWalletAndSetStatus('injected');
             // connect('injected');
             // setActivatingConnector(ConnectorNames.Injected);
           }}
-        >
-          {/* <IconHolder src={connectedUserIcon}> </IconHolder> */}
-          <AccountAddress>Invalid Chain</AccountAddress>
-        </ConnectedAccount>
+          label={'Connect Account'}
+          height={'48px'}
+          width={'174px'}
+          disabled={status === 'connecting'}
+        />
+        <Toast
+          message={'Please select the correct chain in your wallet.'}
+          isOpen={openToast}
+          type={'error'}
+          onClose={handleCloseToast}
+          verticalPosition={'bottom'}
+          horizontalPosition={'right'}
+        />
       </WalletWrapper>
     );
   } else if (networkStatus === 'connection-error') {
     return (
       <WalletWrapper>
-        <ConnectedAccount
+        <ANButton
+          buttonType="primary"
           onClick={() => {
+            connectWalletAndSetStatus('injected');
             // connect('injected');
             // setActivatingConnector(ConnectorNames.Injected);
           }}
-        >
-          {/* <IconHolder src={connectedUserIcon}> </IconHolder> */}
-          <AccountAddress>Invalid Chain</AccountAddress>
-        </ConnectedAccount>
+          label={'Connect Account'}
+          height={'48px'}
+          width={'174px'}
+          disabled={status === 'connecting'}
+        />
+        <Toast
+          message={'Connection Error. Please Try Again.'}
+          isOpen={openToast}
+          type={'error'}
+          onClose={handleCloseToast}
+          verticalPosition={'bottom'}
+          horizontalPosition={'right'}
+        />
       </WalletWrapper>
     );
   } else {

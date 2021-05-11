@@ -27,7 +27,7 @@ import { ChainId, CiruclarProgressStatus } from '../../utils/types';
 import { validateToken } from '../../utils/validations';
 import { CreateDaoStatus } from './CreateDao';
 import { CreateDaoProgressProps } from './CreateDaoProgress';
-import { ContractReceipt } from 'ethers'
+import { ContractReceipt } from 'ethers';
 
 interface FormInputs {
   /**
@@ -179,17 +179,21 @@ const CreateDaoForm: React.FC<FormProps> = ({
         };
         setProgress({ ...progress });
 
-        const result: ContractReceipt | undefined  = await registerToken();
+        const result: ContractReceipt | undefined = await registerToken();
         if (typeof result === 'undefined' || result.status === 1) {
           // handle token already registed
           progress.progressStatus.register = CiruclarProgressStatus.Done;
           setProgress({ ...progress });
-          setTimeout( () => { setCreateDaoStatus(CreateDaoStatus.Successful) }, 2000 ); // delay 2 seconds, so user can obeserve each progress result.
+          setTimeout(() => {
+            setCreateDaoStatus(CreateDaoStatus.Successful);
+          }, 2000); // delay 2 seconds, so user can obeserve each progress result.
         } else {
           // update progress
           progress.progressStatus.register = CiruclarProgressStatus.Failed;
           setProgress({ ...progress });
-          setTimeout( () => { setCreateDaoStatus(CreateDaoStatus.Failed) }, 2000 );
+          setTimeout(() => {
+            setCreateDaoStatus(CreateDaoStatus.Failed);
+          }, 2000);
         }
       };
     } else {
@@ -216,15 +220,18 @@ const CreateDaoForm: React.FC<FormProps> = ({
       );
 
       await result.wait();
-      
+
       setCreatedDaoRoute(params.daoName);
-      
+
       // update progress
       progress.progressStatus.create = CiruclarProgressStatus.Done;
       setProgress({ ...progress });
-      
+
       // set creation successful if Vocdoni not used
-      if (!params.useVocdoni) setTimeout( () => { setCreateDaoStatus(CreateDaoStatus.Successful) }, 2000 );
+      if (!params.useVocdoni)
+        setTimeout(() => {
+          setCreateDaoStatus(CreateDaoStatus.Successful);
+        }, 2000);
     } catch (error) {
       console.log(error);
       setCreateDaoStatus(CreateDaoStatus.Failed);

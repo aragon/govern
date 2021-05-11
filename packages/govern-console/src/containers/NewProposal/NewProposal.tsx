@@ -24,7 +24,7 @@ import {
   ActionToSchedule,
 } from 'utils/types';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
-import  FacadeProposal from 'services/Proposal';
+import FacadeProposal from 'services/Proposal';
 import { settingsUrl } from 'utils/urls';
 
 import {
@@ -115,8 +115,8 @@ const SettingsLink = styled(Typography)({
   paddingBottom: 10,
   color: '0A0B0B',
   '& a': {
-    color: '#00C2FF'
-  }
+    color: '#00C2FF',
+  },
 });
 const proofTextArea = styled(TextArea)({
   background: '#FFFFFF',

@@ -6,7 +6,7 @@ import MUICard, { CardProps } from '@material-ui/core/Card';
 import MUITypography from '@material-ui/core/Typography';
 import { ANButton } from '../Button/ANButton';
 import SettingIconImage from '../../images/svgs/Setting_Icon.svg';
-import { settingsUrl } from 'utils/urls'
+import { settingsUrl } from 'utils/urls';
 
 export interface DaoHeaderProps {
   /**
