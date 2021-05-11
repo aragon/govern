@@ -109,7 +109,7 @@ const CreateDaoProgress: React.FC<CreateDaoProgressProps> = ({
           />
           {isTokenRegister ? (
             <ANCircularProgressWithCaption
-              caption={'Registering Token'}
+              caption={'Registering token'}
               state={progressStatus.register ?? 0}
             />
           ) : null}

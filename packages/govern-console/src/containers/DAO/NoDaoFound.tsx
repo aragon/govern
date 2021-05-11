@@ -17,12 +17,9 @@ import daoNoutFound from 'images/dao-not-found.svg';
 //* Styled Components List
 
 const VerticalAlignWrapper = styled('div')(({ theme }) => ({
-  transform: 'translate(-50%, -50%)',
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
   height: 'fit-content',
   width: 'fit-content',
+  padding: '120px',
   margin: 'auto',
 }));
 
