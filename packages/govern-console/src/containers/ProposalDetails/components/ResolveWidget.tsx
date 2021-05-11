@@ -9,9 +9,9 @@ import {
 } from '../ProposalDetails';
 import { Widget, WidgetRow, InfoWrapper, TitleText } from './SharedStyles';
 import {
-  getTruncatedAccountAddress,
   getFormattedDate,
-} from 'utils/HelperFunctions';
+} from 'utils/date';
+import { getTruncatedAccountAddress } from 'utils/account'
 
 const ResolveWidget: React.FC<any> = ({
   containerEventResolve,

@@ -6,7 +6,7 @@ import { useWallet } from 'use-wallet';
 import connectedUserIcon from 'images/connected-user-icon.svg';
 import Typography from '@material-ui/core/Typography';
 import { useEffect } from 'react';
-import { getTruncatedAccountAddress } from 'utils/HelperFunctions';
+import { getTruncatedAccountAddress } from 'utils/account';
 
 const WalletWrapper = styled(Card)({
   background: '#FFFFFF',

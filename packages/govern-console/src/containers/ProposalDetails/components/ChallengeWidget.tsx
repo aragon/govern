@@ -3,6 +3,8 @@ import React, { memo, useEffect, useMemo, useState } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { InputField } from 'components/InputFields/InputField';
 import { PROPOSAL_STATES } from 'utils/states';
+import { Link } from 'react-router-dom';
+
 import {
   InfoKeyDiv,
   InfoValueDivInline,
@@ -10,10 +12,9 @@ import {
 } from '../ProposalDetails';
 import { Widget, WidgetRow, InfoWrapper, TitleText } from './SharedStyles';
 
-import {
-  getTruncatedAccountAddress,
-  getFormattedDate,
-} from 'utils/HelperFunctions';
+import { getFormattedDate} from 'utils/date';
+import { getTruncatedAccountAddress } from 'utils/account'
+import { getIpfsCidFromUri } from 'utils/ipfs'
 
 const ChallengeWidget: React.FC<any> = ({
   containerEventChallenge,
@@ -22,7 +23,12 @@ const ChallengeWidget: React.FC<any> = ({
   onChallengeProposal,
 }) => {
   const [isExpanded, updateIsExpanded] = React.useState<boolean>(false);
-
+  const bla = (showing: any) => {
+    const isIPFS = getIpfsCidFromUri(showing);
+    if(isIPFS) {
+      
+    }
+  }
   if (containerEventChallenge) {
     return (
       <Widget>
@@ -51,7 +57,18 @@ const ChallengeWidget: React.FC<any> = ({
             marginTop: 0,
           }}
         >
-          {(containerEventChallenge.reason + ' ').repeat(20)}
+          
+          {/* getIpfsCidFromUri(containerEventChallenge.reason) 
+          ?
+            <Link
+                to={""}
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                DAO Settings
+            </Link> */}
+            
+          
         </InfoValueDivBlock>
       </Widget>
     );

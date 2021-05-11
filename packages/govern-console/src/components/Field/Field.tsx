@@ -1,6 +1,6 @@
 import React from 'react';
 import { styled } from '@material-ui/core/styles';
-import { isIPFShash } from 'utils/HelperFunctions';
+// import { isIPFShash } from 'utils/ipfs';
 interface FieldProps {
   value: string;
   inline: boolean;
@@ -25,7 +25,7 @@ const StyledLink = styled('a')({
 const Field: React.FC<FieldProps> = ({ value, inline }) => {
   return (
     <>
-      {inline ? (
+      {/* {inline ? (
         <InlineField>
           {isIPFShash(value) ? (
             <StyledLink href={value} target="_blank" rel="noopener noreferrer">
@@ -44,8 +44,8 @@ const Field: React.FC<FieldProps> = ({ value, inline }) => {
           ) : (
             value
           )}
-        </BlockField>
-      )}
+        </BlockField> */}
+      )
     </>
   );
 };
