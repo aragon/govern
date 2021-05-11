@@ -9,6 +9,13 @@ import youtubeIcon from 'images/svgs/youtube.svg';
 import { useHistory } from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
 
+const FooterWrapperDiv = styled('div')({
+  width: 'auto',
+  height: '60px',
+  marginTop: '30px',
+  // background: '#FFFFFF'
+});
+
 const Logo = styled('div')({
   display: 'flex',
   flexDirection: 'row',
@@ -32,49 +39,51 @@ const Footer = ({}) => {
   };
 
   return (
-    <Grid container spacing={5}>
-      <Grid item xs={12} sm={6}>
-        <Logo onClick={redirectToHomePage}>
-          <img src={AragonIcon} style={{ height: '31px', width: '35px' }} />
-          <img src={aragonText} />
-        </Logo>
+    <FooterWrapperDiv>
+      <Grid container spacing={5}>
+        <Grid item xs={12} sm={6}>
+          <Logo onClick={redirectToHomePage}>
+            <img src={AragonIcon} style={{ height: '31px', width: '35px' }} />
+            <img src={aragonText} />
+          </Logo>
+        </Grid>
+        <Grid item xs={12} sm={6} key="social">
+          <Social>
+            <a
+              href={'https://www.youtube.com/channel/UCODiU_-FWhr4SVOoBlm-qaQ'}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <img src={youtubeIcon} />
+            </a>
+            <a
+              style={{ marginLeft: '28px' }}
+              href={'https://twitter.com/AragonProject'}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <img src={twitterIcon} />
+            </a>
+            <a
+              style={{ marginLeft: '28px' }}
+              href={'https://discord.com/invite/eqQJkdp'}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <img src={discordIcon} />
+            </a>
+            <a
+              style={{ marginLeft: '28px' }}
+              href={'https://forum.aragon.org/'}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <img src={messageIcon} />
+            </a>
+          </Social>
+        </Grid>
       </Grid>
-      <Grid item xs={12} sm={6} key="social">
-        <Social>
-          <a
-            href={'https://www.youtube.com/channel/UCODiU_-FWhr4SVOoBlm-qaQ'}
-            target="_blank"
-            rel="noreferrer noopener"
-          >
-            <img src={youtubeIcon} />
-          </a>
-          <a
-            style={{ marginLeft: '28px' }}
-            href={'https://twitter.com/AragonProject'}
-            target="_blank"
-            rel="noreferrer noopener"
-          >
-            <img src={twitterIcon} />
-          </a>
-          <a
-            style={{ marginLeft: '28px' }}
-            href={'https://discord.com/invite/eqQJkdp'}
-            target="_blank"
-            rel="noreferrer noopener"
-          >
-            <img src={discordIcon} />
-          </a>
-          <a
-            style={{ marginLeft: '28px' }}
-            href={'https://forum.aragon.org/'}
-            target="_blank"
-            rel="noreferrer noopener"
-          >
-            <img src={messageIcon} />
-          </a>
-        </Social>
-      </Grid>
-    </Grid>
+    </FooterWrapperDiv>
   );
 };
 
