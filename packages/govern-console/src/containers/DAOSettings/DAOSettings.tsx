@@ -126,8 +126,8 @@ const DaoSettings: React.FC<DaoSettingFormProps> =
     });
 
     const [daoDetails, updateDaoDetails] = useState<any>();
-    const [config, setConfig] = useState<any | null>();
-
+    const [config, setConfig] = useState<any>(undefined);
+    
     useEffect(() => {
       if (daoList) {
         updateDaoDetails(daoList.daos[0]);
@@ -159,7 +159,9 @@ const DaoSettings: React.FC<DaoSettingFormProps> =
 
     useEffect(() => {
       const _load = async () => {
-        if (daoDetails) {
+         // config is also used as a check in order to set and populate
+        // the UI with current Dao's config only once
+        if (daoDetails && provider && !config) {
           const _config = daoDetails.queue.config;
           setConfig(_config);
 
