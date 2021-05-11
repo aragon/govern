@@ -43,7 +43,7 @@ export const ANCircularProgress = (props: ANCircularProgressProps) => {
         <CircularProgress
           variant={'indeterminate'}
           value={80}
-          size={20}
+          size={40}
           thickness={8}
           classes={{
             root: classes.root,
