@@ -18,6 +18,7 @@ import { Proposal, ProposalOptions } from '@aragon/govern';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import QueueApprovals from 'services/QueueApprovals';
 import FacadeProposal from 'services/Proposal';
+import AbiHandler from 'utils/AbiHandler'
 import { toUtf8String } from '@ethersproject/strings';
 
 // import { InputField } from 'component/InputField/InputField';
@@ -129,6 +130,13 @@ const InfoValueDivInline = styled('div')({
     boxSizing: 'border-box',
   },
 });
+const InfoValuePre = styled('pre')({
+  fontFamily: 'Manrope',
+  fontStyle: 'normal',
+  fontWeight: 'normal',
+  color: '#20232C',
+  overflow: 'auto',
+})
 const InfoValueDivBlock = styled('div')({
   display: 'flex',
   flexDirection: 'column',
@@ -269,15 +277,24 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   });
   const context: any = useWallet();
 
-  const { account, provider } = context;
+  const { account, provider, networkName } = context;
 
   const { dispatch } = React.useContext(ModalsContext);
 
   const [proposalInfo, updateProposalInfo] = React.useState<any>(null);
+  const [abiCache, updateAbiCache] = React.useState<any>({});
+  const [decodedData, updateDecodedData] = React.useState<any>({});
+  const [decoding, setDecoding] = React.useState(false);
   const [isExpanded, updateIsExpanded] = React.useState<any>({});
   const [daoDetails, updateDaoDetails] = React.useState<any>();
   const [challengeReason, setChallengeReason] = React.useState('');
   const transactionsQueue = React.useRef<CustomTransaction[]>([]);
+
+  const abiHandler = React.useMemo(() => {
+    if (networkName) {
+      return new AbiHandler(networkName);
+    }
+  }, [networkName]);
 
   const proposalInstance = React.useMemo(() => {
     if (provider && account && daoDetails && proposalInfo) {
@@ -316,7 +333,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     }
   }, [proposalDetailsData]);
 
-  const toggleDiv = (index: number) => {
+  const toggleDiv = async (index: number) => {
     const cloneObject = { ...isExpanded };
     if (cloneObject[index]) {
       cloneObject[index] = false;
@@ -324,6 +341,25 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       cloneObject[index] = true;
     }
     updateIsExpanded(cloneObject);
+
+    // try to decode action data if the div was expanded for the first time
+    if (cloneObject[index] && !decodedData[index] && abiHandler) {
+      setDecoding(true);
+      const action = proposalInfo.payload.actions[index];
+      let abi = abiCache[index];
+      if (abi === undefined) {
+        abi = await abiHandler.get(action.to);
+        updateAbiCache({ ...abiCache, [action.to]: abi });
+      }
+
+      if (abi) {
+        const data = AbiHandler.decode(abi, action.data);
+        if (data) {
+          updateDecodedData({ ...decodedData, [index]: data });
+        }
+      }
+      setDecoding(false);
+    }
   };
 
   useEffect(() => {
@@ -569,9 +605,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                               onClick={() => toggleDiv(index)}
                               id={'action' + index}
                               style={{
-                                height: isExpanded[index]
-                                  ? 'fit-content !important'
-                                  : '66px',
+                                height: 'auto',
                               }}
                             >
                               <CollapsedDiv id="collapsed-div">
@@ -583,23 +617,51 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                                 </InfoWrapper>
                                 {/* <Carat /> */}
                               </CollapsedDiv>
-                              <ExpandedDiv id="expanded-div">
-                                <InfoWrapper id="value-div">
-                                  <InfoKeyDiv>value</InfoKeyDiv>
-                                  <InfoValueDivInline>
-                                    <a>{action.value}</a>
-                                  </InfoValueDivInline>
-                                </InfoWrapper>
-                                <InfoWrapper id="data-div">
-                                  <InfoKeyDiv>data</InfoKeyDiv>
-                                  <InfoValueDivBlock
-                                    className="full-width"
-                                    id="data-div-block"
-                                  >
-                                    {action.data}
-                                  </InfoValueDivBlock>
-                                </InfoWrapper>
-                              </ExpandedDiv>
+                              {isExpanded[index] && (
+                                <ExpandedDiv id="expanded-div">
+                                  <InfoWrapper id="value-div">
+                                    <InfoKeyDiv>value</InfoKeyDiv>
+                                    <InfoValueDivInline>
+                                      <a>{action.value}</a>
+                                    </InfoValueDivInline>
+                                  </InfoWrapper>
+                                  {decoding && <div>Decoding data....</div>}
+                                  {!decoding && !decodedData[index] && (
+                                    <InfoWrapper id="data-div">
+                                      <InfoValueDivBlock
+                                        className="full-width"
+                                        id="data-div-block"
+                                      >
+                                        {action.data}
+                                      </InfoValueDivBlock>
+                                    </InfoWrapper>
+                                  )}
+                                  {!decoding && decodedData[index] && (
+                                    <div>
+                                      <InfoWrapper id="function-div">
+                                        <InfoKeyDiv>function</InfoKeyDiv>
+                                        <InfoValueDivInline>
+                                          <a>
+                                            {decodedData[index].functionName}
+                                          </a>
+                                        </InfoValueDivInline>
+                                      </InfoWrapper>
+                                      <InfoWrapper id="data-div">
+                                        <InfoKeyDiv>arguments</InfoKeyDiv>
+                                        {decodedData[index] && (
+                                          <InfoValuePre>
+                                            {JSON.stringify(
+                                              decodedData[index].inputData,
+                                              null,
+                                              2,
+                                            )}
+                                          </InfoValuePre>
+                                        )}
+                                      </InfoWrapper>
+                                    </div>
+                                  )}
+                                </ExpandedDiv>
+                              )}
                             </ActionDiv>
                           );
                         },
