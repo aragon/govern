@@ -14,6 +14,7 @@ import Grid from '@material-ui/core/Grid';
 import { useHistory, useParams } from 'react-router-dom';
 import MUITypography from '@material-ui/core/Typography';
 import NoDaoFound from './NoDaoFound';
+import { formatDate } from 'utils/date'
 
 //* Styled Components List
 const DaoPageMainDiv = styled(Paper)(({ theme }) => ({
@@ -204,7 +205,7 @@ const DaoMainPage: React.FC<{
         ) : (
           <>
             <DaoHeader
-              ethBalance={formatEther(daoDetails.executor.balance)}
+              ethBalance={formatEther(0)}
               usdBalance={'2222'}
               daoName={daoDetails.name}
             />
@@ -285,16 +286,7 @@ const DaoMainPage: React.FC<{
                       >
                         <ProposalCard
                           transactionHash={proposal.id}
-                          proposalDate={
-                            // TODO:Bhanu you can make this work with the dates library you use
-                            new Date(
-                              proposal.createdAt * 1000,
-                            ).toLocaleDateString('en-US') +
-                            ' ' +
-                            new Date(
-                              proposal.createdAt * 1000,
-                            ).toLocaleTimeString('en-US')
-                          }
+                          proposalDate={formatDate(proposal.createdAt)}
                           proposalStatus={proposal.state}
                           onClickProposalCard={() => onClickProposal(proposal)}
                         ></ProposalCard>

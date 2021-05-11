@@ -93,12 +93,12 @@ export const DaoHeader: React.FC<DaoHeaderProps> = ({
           <HeaderValue>{daoName}</HeaderValue>
         </div>
         <div>
-          <HeaderLabel>ETH DAO Balance</HeaderLabel>
+          <HeaderLabel>DAO Balance</HeaderLabel>
           <div style={{ display: 'flex', flexDirection: 'row' }}>
-            <HeaderValue>{ethBalance}</HeaderValue>
-            <HeaderUsdBalance style={{ marginLeft: '15px' }}>
+            <HeaderValue>{ethBalance} ETH</HeaderValue>
+            {/* <HeaderUsdBalance style={{ marginLeft: '15px' }}>
               {'$ ' + usdBalance}
-            </HeaderUsdBalance>
+            </HeaderUsdBalance> */}
           </div>
         </div>
         <div

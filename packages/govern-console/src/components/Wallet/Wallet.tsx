@@ -8,6 +8,7 @@ import { AddressIdentifier } from 'components/AddressIdentifier/AddressIdentifie
 import Typography from '@material-ui/core/Typography';
 import { useEffect } from 'react';
 import Toast from 'components/Toasts/Toast';
+import { getTruncatedAccountAddress } from 'utils/account';
 
 const WalletWrapper = styled(Card)({
   background: '#FFFFFF',
@@ -115,14 +116,6 @@ const Wallet = ({}) => {
   //     setActivatingConnector(undefined);
   //   }
   // }, [connector]);
-  const getTruncatedAccountAddress = (account: string | null) => {
-    if (account === null) return '';
-    return (
-      account.substring(0, 5) +
-      '...' +
-      account.substring(account.length - 5, account.length - 1)
-    );
-  };
 
   const connectWalletAndSetStatus = async (type: string) => {
     try {
@@ -213,20 +206,20 @@ const Wallet = ({}) => {
     );
   } else {
     return (
-      <WalletWrapper>
-        <ANButton
-          buttonType="primary"
-          onClick={() => {
-            connectWalletAndSetStatus('injected');
-            // connect('injected');
-            // setActivatingConnector(ConnectorNames.Injected);
-          }}
-          label={'Connect Account'}
-          height={'48px'}
-          width={'174px'}
-          disabled={status === 'connecting'}
-        />
-      </WalletWrapper>
+      // <WalletWrapper>
+      <ANButton
+        buttonType="primary"
+        onClick={() => {
+          connectWalletAndSetStatus('injected');
+          // connect('injected');
+          // setActivatingConnector(ConnectorNames.Injected);
+        }}
+        label={'Connect Account'}
+        height={'48px'}
+        width={'174px'}
+        disabled={status === 'connecting'}
+      />
+      // </WalletWrapper>
     );
   }
 };

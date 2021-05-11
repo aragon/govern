@@ -19,14 +19,15 @@ export function handleRegistered(event: RegisteredEvent): void {
   
   queue.save()
   govern.save()
-  let dao = new Dao(event.params.name.toLowerCase())
+  let dao = new Dao(event.params.name)
 
   dao.name = event.params.name
   dao.executor = event.params.executor.toHex()
   dao.queue = event.params.queue.toHex()
   dao.token = event.params.token.toHex()
   dao.registrant = event.params.registrant.toHex()
-  
+  dao.createdAt = event.block.timestamp
+
   // add dao to the registry
   let currentDAOs = registry.daos
   currentDAOs.push(dao.id)
