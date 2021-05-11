@@ -52,6 +52,12 @@ const CloseButton = styled('img')({
   height: '18px',
   width: '18px',
 });
+const TransactionListWrapper = styled('ul')(({ theme }) => ({
+  paddingInlineStart: '30px',
+}));
+const TransactionListItem = styled('li')(({ theme }) => ({
+  padding: 0,
+}));
 //* End of Styled Components
 
 export interface TransactionKeeperProps {
@@ -74,8 +80,6 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
   onCompleteAllTransactions,
   ...props
 }) => {
-  const theme = useTheme();
-
   const [
     isProcessingTransactions,
     updateIsProcessingTransactions,
@@ -151,15 +155,15 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
           <Title>Processing transactions</Title>
           <TransactionMessagesCard>
             <BoldText>Transactions to be triggered</BoldText>
-            <ul>
+            <TransactionListWrapper>
               {transactions.map((tx) => {
                 return (
-                  <li key={tx.message?.slice(0, 20)}>
+                  <TransactionListItem key={tx.message?.slice(0, 20)}>
                     <MessageText>{tx.message}</MessageText>
-                  </li>
+                  </TransactionListItem>
                 );
               })}
-            </ul>
+            </TransactionListWrapper>
           </TransactionMessagesCard>
           <ANButton
             buttonType="primary"

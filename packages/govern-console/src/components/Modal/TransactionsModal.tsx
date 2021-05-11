@@ -48,7 +48,7 @@ const TransactionsModal = ({}) => {
         onClose={handleClose}
         aria-labelledby="transactions-dialog-title"
         open={open}
-        maxWidth="lg"
+        maxWidth="sm"
         PaperComponent={StyledModalPaper}
       >
         <TransactionKeeper
