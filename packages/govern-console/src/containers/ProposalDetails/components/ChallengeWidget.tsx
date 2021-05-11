@@ -2,103 +2,100 @@
 import React, { memo, useEffect, useMemo, useState } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { InputField } from 'components/InputFields/InputField';
-import { PROPOSAL_STATES } from 'utils/states'
+import { PROPOSAL_STATES } from 'utils/states';
+import {
+  InfoKeyDiv,
+  InfoValueDivInline,
+  InfoValueDivBlock,
+} from '../ProposalDetails';
+import { Widget, WidgetRow, InfoWrapper, TitleText } from './SharedStyles';
 
-import { styled } from '@material-ui/core/styles';
-
-const Widget = styled('div')({
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    width: '100%',
-    minHeight: '118px',
-    boxSizing: 'border-box',
-    background: '#FFFFFF',
-    border: '2px solid #ECF1F7',
-    boxShadow: '0px 6px 6px rgba(180, 193, 228, 0.35)',
-    borderRadius: '8px',
-    marginBottom: '23px',
-    padding: '36px 27px',
-    '& div': {
-        display: 'block',
-        margin: 'auto',
-        width: '100%',
-        boxSizing: 'border-box',
-        marginBottom: '9px',
-    },
-    '& button': {
-        marginTop: '5px',
-    },
-});
-
+import {
+  getTruncatedAccountAddress,
+  getFormattedDate,
+} from 'utils/HelperFunctions';
 
 const ChallengeWidget: React.FC<any> = ({
-    containerEventChallenge,
-    currentState,
-    setChallengeReason,
-    onChallengeProposal
+  containerEventChallenge,
+  currentState,
+  setChallengeReason,
+  onChallengeProposal,
 }) => {
+  const [isExpanded, updateIsExpanded] = React.useState<boolean>(false);
 
-    if (containerEventChallenge) {
-        return (
-            <Widget>
-                <div
-                    style={{
-                        fontFamily: 'Manrope',
-                        fontStyle: 'normal',
-                        fontWeight: 'normal',
-                        fontSize: '18px',
-                        color: '#7483B3',
-                    }}
-                >
-                    <strong>Reason:</strong>{containerEventChallenge.reason} <br></br>
-                    <strong>Challenger:</strong>{containerEventChallenge.challenger} <br></br>
-                    <strong>Challenged At:</strong>{containerEventChallenge.createdAt} <br></br>
-                </div>
-            </Widget>
-        )
-    }
-    
-    if(currentState !== PROPOSAL_STATES.SCHEDULED) {
-        return (
-            <></>
-        )
-    }
-
+  if (containerEventChallenge) {
     return (
-        <Widget>
-            <div
-                style={{
-                    fontFamily: 'Manrope',
-                    fontStyle: 'normal',
-                    fontWeight: 'normal',
-                    fontSize: '18px',
-                    color: '#7483B3',
-                }}
-            >
-                Challenge Reason
-          </div>
-            <InputField
-                onInputChange={(value) => {
-                    setChallengeReason(value);
-                }}
-                label={''}
-                placeholder={''}
-                height={'46px'}
-                width={'372px'}
-            // value={challengeReason.current}
-            />
-            <ANButton
-                buttonType="primary"
-                label="Challenge"
-                height="45px"
-                width="372px"
-                style={{ margin: 'auto' }}
-                onClick={() => onChallengeProposal()}
-            />
-        </Widget>
-    )
+      <Widget>
+        <WidgetRow>
+          <TitleText>Challenge Details</TitleText>
+        </WidgetRow>
+        <InfoWrapper>
+          <InfoKeyDiv>Challenged At</InfoKeyDiv>
+          <InfoValueDivInline id="challenged-date__value">
+            {getFormattedDate(containerEventChallenge.createdAt)}
+          </InfoValueDivInline>
+        </InfoWrapper>
+        <InfoWrapper>
+          <InfoKeyDiv>Challenger</InfoKeyDiv>
+          <InfoValueDivInline id="challenger__value">
+            {getTruncatedAccountAddress(containerEventChallenge.challenger)}
+          </InfoValueDivInline>
+        </InfoWrapper>
+        <InfoKeyDiv>Challenge Reason</InfoKeyDiv>
+        <InfoValueDivBlock
+          maxlines={isExpanded ? undefined : 4}
+          style={{
+            padding: 0,
+            WebkitBoxOrient: 'vertical',
+            display: '-webkit-box',
+            marginTop: 0,
+          }}
+        >
+          {(containerEventChallenge.reason + ' ').repeat(20)}
+        </InfoValueDivBlock>
+      </Widget>
+    );
+  }
 
-}
+  if (currentState !== PROPOSAL_STATES.SCHEDULED) {
+    return <></>;
+  }
+
+  return (
+    <Widget>
+      <WidgetRow
+        style={{
+          fontSize: '18px',
+          color: '#7483B3',
+        }}
+        marginBottom="9px"
+      >
+        Challenge Reason
+      </WidgetRow>
+      <WidgetRow marginBottom="9px">
+        <InputField
+          onInputChange={(value) => {
+            setChallengeReason(value);
+          }}
+          label={''}
+          placeholder={''}
+          height={'46px'}
+          width={'372px'}
+          // value={challengeReason.current}
+        />
+      </WidgetRow>
+      <WidgetRow marginBottom="9px">
+        <ANButton
+          buttonType="primary"
+          label="Challenge"
+          height="45px"
+          width="372px"
+          style={{ margin: 'auto' }}
+          onClick={() => onChallengeProposal()}
+        />
+      </WidgetRow>
+    </Widget>
+  );
+};
 
 export default memo(ChallengeWidget);

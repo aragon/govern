@@ -2,107 +2,102 @@
 import React, { memo, useEffect, useMemo, useState } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { InputField } from 'components/InputFields/InputField';
-import { PROPOSAL_STATES } from 'utils/states'
-
-import { styled } from '@material-ui/core/styles';
-
-const Widget = styled('div')({
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    width: '100%',
-    minHeight: '118px',
-    boxSizing: 'border-box',
-    background: '#FFFFFF',
-    border: '2px solid #ECF1F7',
-    boxShadow: '0px 6px 6px rgba(180, 193, 228, 0.35)',
-    borderRadius: '8px',
-    marginBottom: '23px',
-    padding: '36px 27px',
-    '& div': {
-        display: 'block',
-        margin: 'auto',
-        width: '100%',
-        boxSizing: 'border-box',
-        marginBottom: '9px',
-    },
-    '& button': {
-        marginTop: '5px',
-    },
-});
-
+import { PROPOSAL_STATES } from 'utils/states';
+import { getTruncatedAccountAddress } from 'utils/HelperFunctions';
+import {
+  InfoKeyDiv,
+  InfoValueDivInline,
+  InfoValueDivBlock,
+} from '../ProposalDetails';
+import { Widget, WidgetRow, InfoWrapper, TitleText } from './SharedStyles';
 
 const ExecuteWidget: React.FC<any> = ({
-    containerEventExecute,
-    currentState,
-    executionTime,
-    onExecuteProposal    
+  containerEventExecute,
+  currentState,
+  executionTime,
+  onExecuteProposal,
 }) => {
-
-    if (containerEventExecute) {
-        return (
-            <Widget>
-                <div
-                    style={{
-                        fontFamily: 'Manrope',
-                        fontStyle: 'normal',
-                        fontWeight: 'normal',
-                        fontSize: '18px',
-                        color: '#7483B3',
-                    }}
-                >
-                    <strong>Executed At:</strong>{containerEventExecute.createdAt} <br></br>
-                    <strong>Results:</strong>{containerEventExecute.execResults} <br></br>
-                </div>
-            </Widget>
-        )
-    }
-    
-
-    if(currentState !== PROPOSAL_STATES.SCHEDULED) {
-        return (
-            <></>
-        )
-    }
-
+  if (containerEventExecute) {
     return (
-        <Widget>
-            <div
-                style={{
-                    fontFamily: 'Manrope',
-                    fontStyle: 'normal',
-                    fontWeight: 'normal',
-                    fontSize: '18px',
-                    color: '#7483B3',
-                }}
-            >
-                {Date.now() - executionTime * 1000 >= 15000 // 15 seconds latency due to block.timestamp sometimes 15 seconds wrong.
-                    ?
-                    <ANButton
-                        label="Execute"
-                        height="45px"
-                        width="372px"
-                        style={{ margin: 'auto' }}
-                        onClick={onExecuteProposal}
-                        buttonType="primary"
-                    />
-                    :
-                    <h2>
-                        Proposal can't be executed until {new Date(executionTime * 1000 + 15000).toLocaleDateString(
-                        'en-US',
-                    ) + ' ' + new Date(executionTime * 1000 + 15000).toLocaleTimeString(
-                        'en-US',
-                    )}
-                    </h2>
-                }
-            </div>
-        </Widget>
-    )
+      <Widget>
+        {/* <WidgetRow>
+          <strong>Executed At:</strong>
+          {containerEventExecute.createdAt} <br></br>
+          <strong>Results:</strong>
+          {containerEventExecute.execResults} <br></br>
+        </WidgetRow> */}
+        <WidgetRow>
+          <TitleText>Executed</TitleText>
+        </WidgetRow>
+        <InfoWrapper>
+          <InfoKeyDiv>Executed At</InfoKeyDiv>
+          <InfoValueDivInline id="executed-date__value">
+            {containerEventExecute.createdAt}
+          </InfoValueDivInline>
+        </InfoWrapper>
+        <InfoKeyDiv>ExecuteResults</InfoKeyDiv>
+        <InfoValueDivBlock
+          id="executed__value"
+          maxlines={4}
+          style={{
+            padding: 0,
+            WebkitBoxOrient: 'vertical',
+            display: '-webkit-box',
+            marginTop: 0,
+          }}
+        >
+          {containerEventExecute.execResults}
+        </InfoValueDivBlock>
+      </Widget>
+    );
+  }
 
-    return (
-        <p></p>
-    )
+  if (currentState !== PROPOSAL_STATES.SCHEDULED) {
+    return <></>;
+  }
 
-}
+  const isEligibleToBeExecuted = () => {
+    // 15 seconds latency due to block.timestamp sometimes 15 seconds wrong.
+    return Date.now() - executionTime * 1000 >= 15000;
+  };
+
+  return (
+    <>
+      <Widget>
+        {isEligibleToBeExecuted() ? (
+          <>
+            <WidgetRow marginBottom="9px">
+              <ANButton
+                buttonType="primary"
+                label="Execute"
+                height="45px"
+                width="372px"
+                style={{ margin: 'auto' }}
+                onClick={() => onExecuteProposal()}
+              />
+            </WidgetRow>
+          </>
+        ) : (
+          <WidgetRow>
+            <InfoWrapper>
+              <InfoKeyDiv>Execute available at</InfoKeyDiv>
+              <InfoValueDivInline>
+                {new Date(executionTime * 1000 + 15000).toLocaleDateString(
+                  'en-US',
+                ) +
+                  ' ' +
+                  new Date(executionTime * 1000 + 15000).toLocaleTimeString(
+                    'en-US',
+                  )}
+              </InfoValueDivInline>
+            </InfoWrapper>
+          </WidgetRow>
+        )}
+      </Widget>
+    </>
+  );
+
+  return <p></p>;
+};
 
 export default memo(ExecuteWidget);
