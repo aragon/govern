@@ -30,18 +30,6 @@ const ExecuteWidget: React.FC<any> = ({
             {getFormattedDate(containerEventExecute.createdAt)}
           </InfoValueDivInline>
         </InfoWrapper>
-        <InfoKeyDiv>ExecuteResults</InfoKeyDiv>
-        <InfoValueDivBlock
-          id="executed__value"
-          maxlines={4}
-          style={{
-            padding: 0,
-            WebkitBoxOrient: 'vertical',
-            display: '-webkit-box',
-            marginTop: 0,
-          }}
-        >
-        </InfoValueDivBlock>
       </Widget>
     );
   }
@@ -84,8 +72,7 @@ const ExecuteWidget: React.FC<any> = ({
       </Widget>
     </>
   );
-
-  return <p></p>;
+  
 };
 
 export default memo(ExecuteWidget);

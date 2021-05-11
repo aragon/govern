@@ -4,6 +4,7 @@ import { ANButton } from 'components/Button/ANButton';
 import { InputField } from 'components/InputFields/InputField';
 import { PROPOSAL_STATES } from 'utils/states';
 import { Link } from 'react-router-dom';
+import { toUtf8String } from '@ethersproject/strings';
 
 import {
   InfoKeyDiv,
@@ -14,7 +15,7 @@ import { Widget, WidgetRow, InfoWrapper, TitleText } from './SharedStyles';
 
 import { getFormattedDate} from 'utils/date';
 import { getTruncatedAccountAddress } from 'utils/account'
-import { getIpfsCidFromUri } from 'utils/ipfs'
+import { getIpfsCid, getIpfsURI } from 'utils/ipfs'
 
 const ChallengeWidget: React.FC<any> = ({
   containerEventChallenge,
@@ -23,13 +24,9 @@ const ChallengeWidget: React.FC<any> = ({
   onChallengeProposal,
 }) => {
   const [isExpanded, updateIsExpanded] = React.useState<boolean>(false);
-  const bla = (showing: any) => {
-    const isIPFS = getIpfsCidFromUri(showing);
-    if(isIPFS) {
-      
-    }
-  }
+
   if (containerEventChallenge) {
+    const challengeReasonCid = getIpfsCid(containerEventChallenge.reason)
     return (
       <Widget>
         <WidgetRow>
@@ -56,19 +53,20 @@ const ChallengeWidget: React.FC<any> = ({
             display: '-webkit-box',
             marginTop: 0,
           }}
-        >
-          
-          {/* getIpfsCidFromUri(containerEventChallenge.reason) 
-          ?
-            <Link
-                to={""}
-                target="_blank"
-                rel="noreferrer noopener"
-              >
-                DAO Settings
-            </Link> */}
-            
-          
+        >       
+          { 
+            challengeReasonCid
+            ?
+              <Link
+                  to={getIpfsURI(challengeReasonCid)}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  View file
+              </Link>
+            : 
+            toUtf8String(containerEventChallenge.reason)
+          }    
         </InfoValueDivBlock>
       </Widget>
     );

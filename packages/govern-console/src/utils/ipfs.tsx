@@ -1,9 +1,27 @@
 /* eslint-disable */
 import CID from 'cids'
 import { toUtf8String } from '@ethersproject/strings';
+import { IPFS_GATEWAY} from './constants'
 
-export const getIpfsCidFromUri = (uri: string) => {
-    const cidString = uri.replace(/^ipfs:/, '')
+/**
+ * @param uriOrCid Cid or the complete uri of ipfs
+ * 
+ * @returns {string} the gateway url of the cid
+ */
+export const getIpfsURI = (uriOrCid: string) => {
+    const cid = uriOrCid.replace(/^ipfs:/, '')
+    return `${IPFS_GATEWAY}/${cid}`
+}
+
+
+/**
+ * checks with different combinations if the passed string is cid
+ * 
+ * @param uriOrCid Cid or the complete uri of ipfs
+ * @returns {string|null} cid if it's the actual cid or null
+ */
+export const getIpfsCid = (uriOrCid: string) => {
+    const cidString = uriOrCid.replace(/^ipfs:/, '')
     // if cidString can be passed to CID class without throwing
     // it means it's the actual cid
     try {
@@ -28,7 +46,5 @@ export const getIpfsCidFromUri = (uri: string) => {
         new CID(cid)
         return cid
     } catch (err) { }
-    
-
-    return null
+       
 }
