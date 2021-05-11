@@ -4,8 +4,8 @@ import { gql } from '@apollo/client';
 export const GET_DAO_LIST = gql`
   query DAOs($offset: Int, $limit: Int) {
     daos(
-      skip: $offset, 
-      first: $limit,
+      skip: $offset
+      first: $limit
       orderBy: createdAt
       orderDirection: desc
     ) {

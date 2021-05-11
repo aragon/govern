@@ -88,12 +88,13 @@ const Toast: React.FC<ToastProps> = ({
   return (
     <Snackbar
       open={isOpen}
-      autoHideDuration={4000}
+      autoHideDuration={5000}
       onClose={onClose}
       anchorOrigin={{
         vertical: verticalPosition,
         horizontal: horizontalPosition,
       }}
+      transitionDuration={{ exit: 500 }}
     >
       <ToastCard type={type}>
         <ToastMessage type={type}>{message}</ToastMessage>

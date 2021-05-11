@@ -34,12 +34,12 @@ const ExecuteWidget: React.FC<any> = ({
   }
 
   const postponeTime = (time: number) => {
-    return time * 1000 
+    return time * 1000;
     // return time * 1000 + 15000 // block.timestamp latency
-  }
+  };
 
   const isEligibleToBeExecuted = () => {
-    return Date.now()  >= postponeTime(executionTime)
+    return Date.now() >= postponeTime(executionTime);
   };
 
   return (
@@ -72,7 +72,6 @@ const ExecuteWidget: React.FC<any> = ({
       </Widget>
     </>
   );
-  
 };
 
 export default memo(ExecuteWidget);

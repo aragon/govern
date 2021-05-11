@@ -35,8 +35,7 @@ export const validateContract = async (
   try {
     await provider.getCode(address);
     return true;
-  } catch (error) {
-  }
+  } catch (error) {}
   return 'Contract address is not valid.';
 };
 

@@ -14,7 +14,7 @@ import Grid from '@material-ui/core/Grid';
 import { useHistory, useParams } from 'react-router-dom';
 import MUITypography from '@material-ui/core/Typography';
 import NoDaoFound from './NoDaoFound';
-import { formatDate } from 'utils/date'
+import { formatDate } from 'utils/date';
 
 //* Styled Components List
 const DaoPageMainDiv = styled(Paper)(({ theme }) => ({

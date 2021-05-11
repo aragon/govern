@@ -19,7 +19,7 @@ import QueueApprovals from 'services/QueueApprovals';
 import FacadeProposal from 'services/Proposal';
 import AbiHandler from 'utils/AbiHandler';
 import { toUtf8String } from '@ethersproject/strings';
-import { formatDate} from 'utils/date';
+import { formatDate } from 'utils/date';
 
 // widget components
 import ChallengeWidget from './components/ChallengeWidget';
@@ -150,7 +150,7 @@ const InfoValuePre = styled('pre')({
   color: '#20232C',
   overflow: 'auto',
   margin: '0',
-})
+});
 
 export const InfoValueDivBlock = styled('div')(
   ({ maxlines }: { maxlines?: number }) => ({
@@ -403,7 +403,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     if (proposalInstance) {
       try {
         await proposalInstance.execute(proposalParams);
-      }catch(error){ 
+      } catch (error) {
         // TODO:Bhanu show this error.
         // error.error.message
       }
@@ -411,11 +411,11 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   };
 
   const resolveProposal = async (disputeId: number) => {
-    if(proposalInstance) {
+    if (proposalInstance) {
       const proposalParams = getProposalParams(proposalInfo);
       try {
-        await proposalInstance.resolve(proposalParams,disputeId);
-      }catch(error) {
+        await proposalInstance.resolve(proposalParams, disputeId);
+      } catch (error) {
         // TODO:Bhanu show this error.
         // error.error.message
       }
@@ -428,7 +428,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       proposalStates[item.__typename] = item;
     });
   }
-
 
   return (
     <>
@@ -448,9 +447,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                 />
               </ProposalStatus>
               <ProposalId>{proposalInfo.id}</ProposalId>
-              <DateDisplay>
-                { formatDate(proposalInfo.createdAt) }
-              </DateDisplay>
+              <DateDisplay>{formatDate(proposalInfo.createdAt)}</DateDisplay>
               <DetailsWrapper>
                 <ProposalDetailsWrapper id="proposal_wrapper">
                   <TitleText>Config</TitleText>
@@ -639,9 +636,9 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                         proposalStates['ContainerEventResolve']
                       }
                       disputeId={
-                        proposalStates['ContainerEventChallenge'] 
-                        ? proposalStates['ContainerEventChallenge'].disputeId 
-                        : null
+                        proposalStates['ContainerEventChallenge']
+                          ? proposalStates['ContainerEventChallenge'].disputeId
+                          : null
                       }
                       currentState={proposalInfo.state}
                       executionTime={proposalInfo.payload.executionTime}

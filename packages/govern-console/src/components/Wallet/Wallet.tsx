@@ -7,8 +7,8 @@ import connectedUserIcon from 'images/connected-user-icon.svg';
 import { AddressIdentifier } from 'components/AddressIdentifier/AddressIdentifier';
 import Typography from '@material-ui/core/Typography';
 import { useEffect } from 'react';
-import Toast from 'components/Toasts/Toast';
 import { getTruncatedAccountAddress } from 'utils/account';
+import { useSnackbar } from 'notistack';
 
 const WalletWrapper = styled(Card)({
   background: '#FFFFFF',
@@ -37,6 +37,7 @@ const ConnectedAccount = styled('div')({
   // padding: '13px 20px',
   display: 'flex',
   flexDirection: 'row',
+  cursor: 'pointer',
 });
 //TODO add the icon for logged in users
 const IconHolder = styled('img')({
@@ -58,64 +59,63 @@ const AccountAddress = styled(Typography)({
 const Wallet = ({}) => {
   const context: any = useWallet();
   const {
-    connector,
     account,
     balance,
     chainId,
     connect,
-    connectors,
-    ethereum,
     error,
-    getBlockNumber,
-    networkName,
     reset,
     status,
-    type,
     provider,
   } = context;
   const [networkStatus, setNetworkStatus] = useState<string>(status);
-  // console.log('status', status, 'account', account, error);
+  const [userAccount, setUserAccount] = useState<string>(status);
+  const { enqueueSnackbar } = useSnackbar();
 
-  const onWalletConnectionError = (error: Error) => {
-    // alert(getErrorMessage(error));
-  };
-
-  const handleCloseToast = () => {
-    setOpenToast(false);
-  };
-
+  // useEffect(() => {
+  //   connectWalletAndSetStatus('injected');
+  // }, []);
   useEffect(() => {
-    connectWalletAndSetStatus('injected');
-  }, []);
-  useEffect(() => {
-    console.log(status, account, chainId, error);
     if (chainId !== 4) {
-      console.log('chainId', chainId);
       setNetworkStatus('unsupported');
-      setOpenToast(true);
     } else if (error) {
-      // console.log('error11111', error.message, typeof error.message);
       if (error.message.includes('Unsupported chain')) {
         setNetworkStatus('unsupported');
       } else {
         setNetworkStatus('connection-error');
       }
-      setOpenToast(true);
     } else if (status === 'connected') {
       setNetworkStatus('connected');
-      setOpenToast(true);
+      enqueueSnackbar('Your wallet is successfully connected.', {
+        variant: 'success',
+      });
     } else {
       setNetworkStatus('disconnected');
-      setOpenToast(true);
     }
-  }, [status, error, chainId]);
-  // ---- Components ----
+  }, [status]);
 
-  // React.useEffect(() => {
-  //   if (activatingConnector && activatingConnector === connector) {
-  //     setActivatingConnector(undefined);
-  //   }
-  // }, [connector]);
+  useEffect(() => {
+    if (status === 'disconnected') {
+      return;
+    }
+    if (error) {
+      if (error.message.includes('Unsupported chain')) {
+        enqueueSnackbar('Please select the correct chain in your wallet.', {
+          variant: 'error',
+        });
+      } else {
+        enqueueSnackbar(error.message, {
+          variant: 'error',
+        });
+      }
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (account) {
+      setUserAccount(account);
+    }
+  }, [account]);
 
   const connectWalletAndSetStatus = async (type: string) => {
     try {
@@ -127,31 +127,21 @@ const Wallet = ({}) => {
     }
   };
 
-  const [openToast, setOpenToast] = useState(false);
   if (networkStatus === 'connected') {
     return (
       <WalletWrapper>
         <ConnectedAccount
           onClick={() => {
-            // connect('injected');
-            // setActivatingConnector(ConnectorNames.Injected);
+            reset();
           }}
         >
           {/* <IconHolder src={connectedUserIcon} /> */}
           <AddressIdentifier
             isAddress={true}
-            displayText={account || ''}
+            displayText={userAccount || ''}
             componentSize={'medium'}
           />
         </ConnectedAccount>
-        <Toast
-          message={'Wallet Connected.'}
-          isOpen={openToast}
-          onClose={handleCloseToast}
-          type={'success'}
-          verticalPosition={'bottom'}
-          horizontalPosition={'right'}
-        />
       </WalletWrapper>
     );
   } else if (networkStatus === 'unsupported') {
@@ -169,14 +159,6 @@ const Wallet = ({}) => {
           width={'174px'}
           disabled={status === 'connecting'}
         />
-        <Toast
-          message={'Please select the correct chain in your wallet.'}
-          isOpen={openToast}
-          type={'error'}
-          onClose={handleCloseToast}
-          verticalPosition={'bottom'}
-          horizontalPosition={'right'}
-        />
       </WalletWrapper>
     );
   } else if (networkStatus === 'connection-error') {
@@ -193,14 +175,6 @@ const Wallet = ({}) => {
           height={'48px'}
           width={'174px'}
           disabled={status === 'connecting'}
-        />
-        <Toast
-          message={'Connection Error. Please Try Again.'}
-          isOpen={openToast}
-          type={'error'}
-          onClose={handleCloseToast}
-          verticalPosition={'bottom'}
-          horizontalPosition={'right'}
         />
       </WalletWrapper>
     );
