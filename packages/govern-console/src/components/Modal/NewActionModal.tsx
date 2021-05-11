@@ -10,7 +10,7 @@ import { useWallet } from 'AugmentedWallet';
 import { validateContract, validateAbi } from 'utils/validations';
 import { Controller, useForm } from 'react-hook-form';
 import { utils } from 'ethers';
-import AbiFetcher from 'utils/AbiFetcher';
+import AbiHandler from 'utils/AbiHandler';
 import {
   styled,
   useTheme,
@@ -127,9 +127,9 @@ export const NewActionModal: React.FC<NewActionModalProps> = ({
   const [fetchAbi, setFetchAbi] = useState(true);
   const { provider, networkName }: any = useWallet();
 
-  const abiFetcher = React.useMemo(() => {
+  const abiHandler = React.useMemo(() => {
     if (networkName) {
-      return new AbiFetcher(networkName);
+      return new AbiHandler(networkName);
     }
   }, [networkName]);
 
@@ -146,7 +146,7 @@ export const NewActionModal: React.FC<NewActionModalProps> = ({
       ? contractAddress
       : await provider.resolveName(contractAddress);
 
-    const abi = await abiFetcher?.get(address);
+    const abi = await abiHandler?.get(address);
     if (abi) {
       onGenerate(address, JSON.parse(abi));
     } else {

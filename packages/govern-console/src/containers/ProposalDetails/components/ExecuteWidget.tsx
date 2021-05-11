@@ -1,15 +1,9 @@
 /* eslint-disable */
 import React, { memo, useEffect, useMemo, useState } from 'react';
 import { ANButton } from 'components/Button/ANButton';
-import { InputField } from 'components/InputFields/InputField';
 import { PROPOSAL_STATES } from 'utils/states';
-import { getFormattedDate } from 'utils/date';
-import Field from 'components/Field/Field';
-import {
-  InfoKeyDiv,
-  InfoValueDivInline,
-  InfoValueDivBlock,
-} from '../ProposalDetails';
+import { formatDate } from 'utils/date';
+import { InfoKeyDiv, InfoValueDivInline } from '../ProposalDetails';
 import { Widget, WidgetRow, InfoWrapper, TitleText } from './SharedStyles';
 
 const ExecuteWidget: React.FC<any> = ({
@@ -27,7 +21,7 @@ const ExecuteWidget: React.FC<any> = ({
         <InfoWrapper>
           <InfoKeyDiv>Executed At</InfoKeyDiv>
           <InfoValueDivInline id="executed-date__value">
-            {getFormattedDate(containerEventExecute.createdAt)}
+            {formatDate(containerEventExecute.createdAt)}
           </InfoValueDivInline>
         </InfoWrapper>
       </Widget>
@@ -38,9 +32,13 @@ const ExecuteWidget: React.FC<any> = ({
     return <></>;
   }
 
+  const postponeTime = (time: number) => {
+    return time * 1000 
+    // return time * 1000 + 15000 // block.timestamp latency
+  }
+
   const isEligibleToBeExecuted = () => {
-    // 15 seconds latency due to block.timestamp sometimes 15 seconds wrong.
-    return Date.now() - executionTime * 1000 >= 15000;
+    return Date.now()  >= postponeTime(executionTime)
   };
 
   return (
@@ -64,7 +62,7 @@ const ExecuteWidget: React.FC<any> = ({
             <InfoWrapper>
               <InfoKeyDiv>Execute available at</InfoKeyDiv>
               <InfoValueDivInline>
-                {getFormattedDate(executionTime)}
+                {formatDate(executionTime)}
               </InfoValueDivInline>
             </InfoWrapper>
           </WidgetRow>

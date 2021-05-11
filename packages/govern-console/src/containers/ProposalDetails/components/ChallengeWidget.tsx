@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { memo, useEffect, useMemo, useState } from 'react';
+import React, { memo } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { InputField } from 'components/InputFields/InputField';
 import { PROPOSAL_STATES } from 'utils/states';
@@ -13,7 +13,7 @@ import {
 } from '../ProposalDetails';
 import { Widget, WidgetRow, InfoWrapper, TitleText } from './SharedStyles';
 
-import { getFormattedDate} from 'utils/date';
+import { formatDate} from 'utils/date';
 import { getTruncatedAccountAddress } from 'utils/account'
 import { getIpfsCid, getIpfsURI } from 'utils/ipfs'
 
@@ -35,7 +35,7 @@ const ChallengeWidget: React.FC<any> = ({
         <InfoWrapper>
           <InfoKeyDiv>Challenged At</InfoKeyDiv>
           <InfoValueDivInline id="challenged-date__value">
-            {getFormattedDate(containerEventChallenge.createdAt)}
+            {formatDate(containerEventChallenge.createdAt)}
           </InfoValueDivInline>
         </InfoWrapper>
         <InfoWrapper>
@@ -96,7 +96,6 @@ const ChallengeWidget: React.FC<any> = ({
           placeholder={''}
           height={'46px'}
           width={'372px'}
-          // value={challengeReason.current}
         />
       </WidgetRow>
       <WidgetRow marginBottom="9px">

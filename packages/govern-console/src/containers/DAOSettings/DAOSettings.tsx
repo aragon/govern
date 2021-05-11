@@ -231,7 +231,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> =
           );
           console.log(transactionsQueue.current);
         } catch (error) {
-          // TODO: Bhanu show error
+          // TODO: Bhanu show (error.error.message)
           return;
         }
       }

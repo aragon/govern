@@ -1,6 +1,7 @@
 /* eslint-disable */
 import { getToken } from '@aragon/govern';
 import { ValidateResult } from 'react-hook-form';
+import Abi from './AbiHandler'
 
 /**
  * Validate if address is an ERC20 token
@@ -46,13 +47,5 @@ export const validateContract = async (
  * @returns <ValidateResult> true if valid, or error message if invalid
  */
  export const validateAbi = (abi: string): ValidateResult => {
-  try {
-    const parsedAbi = JSON.parse(abi)
-    if (!Array.isArray(parsedAbi) || parsedAbi.length === 0 ) {
-      throw new Error()
-    }
-    return true;
-  } catch (e) {
-  }
-  return 'Contract ABI is not valid.';
-}
+   return Abi.isValidAbi(abi) ? true : 'Contract ABI is not valid.';
+ };

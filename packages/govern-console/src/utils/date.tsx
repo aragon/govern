@@ -1,16 +1,13 @@
 /* eslint-disable */
 import { format } from 'date-fns';
 
-export function getFormattedDate(date?: number | string) {
+export function formatDate(date: number | string) {
     try {
-        if (!date) {
-            date = Date.now();
-        }
         if (typeof date === 'string') {
-            date = parseInt(date, 10) * 1000;
+            date = parseInt(date, 10)
         }
-        return format(date, 'MMM dd yyyy HH:mm', {});
+        return format(date * 1000, 'MMM dd yyyy HH:mm', {});
     } catch (e) {
-        return date;
+        return date
     }
 }
