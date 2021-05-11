@@ -19,6 +19,7 @@ import QueueApprovals from 'services/QueueApprovals';
 import FacadeProposal from 'services/Proposal';
 import AbiHandler from 'utils/AbiHandler'
 import { toUtf8String } from '@ethersproject/strings';
+import { formatDate} from 'utils/date';
 
 // widget components
 import ChallengeWidget from './components/ChallengeWidget';
@@ -277,7 +278,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   });
   const context: any = useWallet();
 
-  const { account, provider, networkName } = context;
+  const { account, provider, networkName, isConnected } = context;
 
   const { dispatch } = React.useContext(ModalsContext);
 
@@ -451,16 +452,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
               </ProposalStatus>
               <ProposalId>{proposalInfo.id}</ProposalId>
               <DateDisplay>
-                {
-                  // TODO:Bhanu you can make this work with the dates library you use
-                  new Date(proposalInfo.createdAt * 1000).toLocaleDateString(
-                    'en-US',
-                  ) +
-                    ' ' +
-                    new Date(proposalInfo.createdAt * 1000).toLocaleTimeString(
-                      'en-US',
-                    )
-                }
+                { formatDate(proposalInfo.createdAt) }
               </DateDisplay>
               <DetailsWrapper>
                 <ProposalDetailsWrapper id="proposal_wrapper">
@@ -530,10 +522,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                         'No executor ID'}
                     </InfoValueDivInline>
                   </InfoWrapper>
-                  {/* <InfoWrapper>
-                    <InfoKeyDiv>On Chain Actions:</InfoKeyDiv>
-                    <InfoValueDivInline>Proof Text</InfoValueDivInline>
-                  </InfoWrapper> */}
                   <InfoWrapper>
                     <InfoKeyDiv>AllowFailuresMap:</InfoKeyDiv>
                     <InfoValueDivInline>
@@ -544,10 +532,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                     <InfoKeyDiv>Proof:</InfoKeyDiv>
                     <InfoValueDivBlock>
                       {toUtf8String(proposalInfo.payload.proof)}
-                      {/* Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                  laboris nisi ut aliquip ex ea commodo consequat. */}
                     </InfoValueDivBlock>
                   </InfoWrapper>
                   <InfoWrapper>
@@ -629,6 +613,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                 <WidgetWrapper id="widget_wrapper">
                   {
                     <ChallengeWidget
+                      disabled={!isConnected}
                       containerEventChallenge={
                         proposalStates['ContainerEventChallenge']
                       }
@@ -640,6 +625,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
 
                   {
                     <ExecuteWidget
+                      disabled={!isConnected}
                       containerEventExecute={
                         proposalStates['ContainerEventExecute']
                       }
@@ -650,6 +636,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                   }
                   {
                     <ResolveWidget
+                      disabled={!isConnected}
                       containerEventExecute={
                         proposalStates['ContainerEventResolve']
                       }
@@ -663,49 +650,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                       onResolveProposal={resolveProposal}
                     />
                   }
-
-                  {/* ResolveWidget */}
-
-                  {/* <Widget>
-                    <div
-                      style={{
-                        fontFamily: 'Manrope',
-                        fontStyle: 'normal',
-                        fontWeight: 'normal',
-                        fontSize: '18px',
-                        color: '#7483B3',
-                      }}
-                    >
-                      Veto Reason
-                    </div>
-                    <InputField
-                      onInputChange={(value) => {
-                        vetoReason.current = value;
-                      }}
-                      label={''}
-                      placeholder={''}
-                      height={'46px'}
-                      width={'372px'}
-                      // value={vetoReason.current}
-                    />
-                    <ANButton
-                      label="Veto"
-                      height="45px"
-                      width="372px"
-                      style={{ margin: 'auto' }}
-                      //  onClick={}
-                    />
-                  </Widget> */}
-                  {/* <Widget>
-                    <ANButton
-                      buttonType="primary"
-                      label="Resolve"
-                      height="45px"
-                      width="372px"
-                      style={{ margin: 'auto' }}
-                      // onClick={resolveProposal(0)}
-                    />
-                  </Widget> */}
                 </WidgetWrapper>
               </DetailsWrapper>
             </StyledPaper>

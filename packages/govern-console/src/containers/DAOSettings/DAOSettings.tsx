@@ -113,7 +113,7 @@ const OptionTextStyle = styled('div')({
 const DaoSettings: React.FC<DaoSettingFormProps> = 
   ({ onClickBack }) => {
     const context: any = useWallet();
-    const { account, status, provider } = context;
+    const { account, status, isConnected, provider } = context;
 
     const { dispatch } = React.useContext(ModalsContext);
 
@@ -618,7 +618,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> =
           >
             <ANButton
               label={'Save settings'}
-              disabled={status !== 'connected'}
+              disabled={!isConnected}
               buttonType={'primary'}
               onClick={handleSubmit(callSaveSetting)}
               style={{ marginTop: '34px' }}

@@ -18,6 +18,7 @@ import { getTruncatedAccountAddress } from 'utils/account'
 import { getIpfsCid, getIpfsURI } from 'utils/ipfs'
 
 const ChallengeWidget: React.FC<any> = ({
+  disabled,
   containerEventChallenge,
   currentState,
   setChallengeReason,
@@ -102,6 +103,7 @@ const ChallengeWidget: React.FC<any> = ({
         <ANButton
           buttonType="primary"
           label="Challenge"
+          disabled={disabled}
           height="45px"
           width="372px"
           style={{ margin: 'auto' }}

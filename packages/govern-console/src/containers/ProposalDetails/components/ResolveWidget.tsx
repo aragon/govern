@@ -7,6 +7,7 @@ import { Widget, WidgetRow, InfoWrapper, TitleText } from './SharedStyles';
 import { formatDate } from 'utils/date';
 
 const ResolveWidget: React.FC<any> = ({
+  disabled,
   containerEventResolve,
   currentState,
   disputeId,
@@ -51,6 +52,7 @@ const ResolveWidget: React.FC<any> = ({
       >
         <ANButton
           label="Resolve"
+          disabled={disabled}
           height="45px"
           width="372px"
           style={{ margin: 'auto' }}
@@ -60,7 +62,7 @@ const ResolveWidget: React.FC<any> = ({
       </div>
     </Widget>
   );
-  
+
 };
 
 export default memo(ResolveWidget);

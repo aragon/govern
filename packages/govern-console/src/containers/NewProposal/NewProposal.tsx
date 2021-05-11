@@ -270,7 +270,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   }, [daoList]);
 
   const context: any = useWallet();
-  const { account, provider } = context;
+  const { account, provider, isConnected } = context;
 
   const proposalInstance = React.useMemo(() => {
     if (provider && account && daoDetails) {
@@ -505,6 +505,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
         <br />
         <ANButton
           label="Schedule/Submit"
+          disabled={!isConnected}
           // width={178}
           // height={45}
           buttonType="primary"

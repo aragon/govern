@@ -7,6 +7,7 @@ import { InfoKeyDiv, InfoValueDivInline } from '../ProposalDetails';
 import { Widget, WidgetRow, InfoWrapper, TitleText } from './SharedStyles';
 
 const ExecuteWidget: React.FC<any> = ({
+  disabled,
   containerEventExecute,
   currentState,
   executionTime,
@@ -50,6 +51,7 @@ const ExecuteWidget: React.FC<any> = ({
               <ANButton
                 buttonType="primary"
                 label="Execute"
+                disabled={disabled}
                 height="45px"
                 width="372px"
                 style={{ margin: 'auto' }}
