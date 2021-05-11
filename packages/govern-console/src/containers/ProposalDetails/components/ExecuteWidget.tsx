@@ -3,7 +3,7 @@ import React, { memo, useEffect, useMemo, useState } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { InputField } from 'components/InputFields/InputField';
 import { PROPOSAL_STATES } from 'utils/states';
-import { getTruncatedAccountAddress } from 'utils/HelperFunctions';
+import { getFormattedDate } from 'utils/HelperFunctions';
 import {
   InfoKeyDiv,
   InfoValueDivInline,
@@ -32,7 +32,7 @@ const ExecuteWidget: React.FC<any> = ({
         <InfoWrapper>
           <InfoKeyDiv>Executed At</InfoKeyDiv>
           <InfoValueDivInline id="executed-date__value">
-            {containerEventExecute.createdAt}
+            {getFormattedDate(containerEventExecute.createdAt)}
           </InfoValueDivInline>
         </InfoWrapper>
         <InfoKeyDiv>ExecuteResults</InfoKeyDiv>
@@ -82,13 +82,7 @@ const ExecuteWidget: React.FC<any> = ({
             <InfoWrapper>
               <InfoKeyDiv>Execute available at</InfoKeyDiv>
               <InfoValueDivInline>
-                {new Date(executionTime * 1000 + 15000).toLocaleDateString(
-                  'en-US',
-                ) +
-                  ' ' +
-                  new Date(executionTime * 1000 + 15000).toLocaleTimeString(
-                    'en-US',
-                  )}
+                {getFormattedDate(executionTime)}
               </InfoValueDivInline>
             </InfoWrapper>
           </WidgetRow>

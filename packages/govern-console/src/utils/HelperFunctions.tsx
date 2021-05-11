@@ -11,7 +11,7 @@ export function getTruncatedAccountAddress(account: string | null) {
 export function getFormattedDate(date?: number | string) {
   try {
     if (!date) date = Date.now();
-    if (typeof date === 'string') date = parseInt(date, 10);
+    if (typeof date === 'string') date = parseInt(date, 10) * 1000;
     const formattedDate = format(date, 'MMM dd yyyy HH:mm', {});
     return formattedDate;
   } catch (e) {
