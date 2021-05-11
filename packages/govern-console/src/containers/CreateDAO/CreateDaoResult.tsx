@@ -80,7 +80,7 @@ const CreateDaoResult: React.FC<ResultProps> = ({
         <Title>{isSuccess ? 'Your DAO is ready' : 'Somthing went wrong'}</Title>
         <SubTitle>
           {isSuccess
-            ? 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.Lorem ipsum dolor'
+            ? 'Congratulations. Your DAO is created and you can start interacting with it'
             : 'An error has occurred during the signature process. Do not worry, you can try again without losing your information.'}
         </SubTitle>
         <div
