@@ -20,6 +20,11 @@ import QueueApprovals from 'services/QueueApprovals';
 import FacadeProposal from 'services/Proposal';
 import { toUtf8String } from '@ethersproject/strings';
 
+// widget components
+import ChallengeWidget from './components/ChallengeWidget';
+import ExecuteWidget from './components/ExecuteWidget';
+import ResolveWidget from './components/ResolveWidget';
+
 // import { InputField } from 'component/InputField/InputField';
 interface ProposalDetailsProps {
   onClickBack?: any;
@@ -97,25 +102,27 @@ const TitleText = styled(Typography)({
   width: '100%',
   boxSizing: 'border-box',
 });
-const InfoWrapper = styled('div')({
+export const InfoWrapper = styled('div')({
   // display: 'flex',
   // flexDirection: 'column',
   // justifyContent: 'space-between',
   marginTop: '9px',
   width: '100%',
   boxSizing: 'border-box',
+  height: 'fit-content',
 });
-const InfoKeyDiv = styled('div')({
+export const InfoKeyDiv = styled('div')({
   fontFamily: 'Manrope',
   fontStyle: 'normal',
   fontWeight: 'normal',
   fontSize: '18px',
-  height: '25px',
+  minHeight: '25px',
+  height: 'fit-content',
   width: 'fit-content',
   display: 'inline-block',
   color: '#7483B3',
 });
-const InfoValueDivInline = styled('div')({
+export const InfoValueDivInline = styled('div')({
   fontFamily: 'Manrope',
   fontStyle: 'normal',
   fontWeight: 'normal',
@@ -123,48 +130,65 @@ const InfoValueDivInline = styled('div')({
   display: 'inline-block',
   width: 'fit-content',
   marginLeft: '9px',
-  '& a': {
-    width: '100%',
-    color: '#0094FF',
-    boxSizing: 'border-box',
-  },
-});
-const InfoValueDivBlock = styled('div')({
-  display: 'flex',
-  flexDirection: 'column',
-  width: '75%',
-  height: 'auto',
-  fontFamily: 'Manrope',
-  fontStyle: 'normal',
-  fontWeight: 'normal',
-  color: '#20232C',
+  maxWidth: '100%',
+  textOverflow: 'ellipsis',
+  overflow: 'hidden',
+  minHeight: '25px',
+  lineHeight: '25px',
   fontSize: '18px',
-  marginTop: '9px',
-  paddingLeft: '25px',
-  boxSizing: 'border-box',
   '& a': {
-    display: 'block',
     width: '100%',
     color: '#0094FF',
     boxSizing: 'border-box',
-  },
-  '& div': {
+    height: '25px',
     display: 'block',
-    height: 'auto',
-    width: '100%',
-    color: '#20232C',
-    boxSizing: 'border-box',
-  },
-  '& > *': {
-    marginBottom: '9px',
-  },
-  '& :last-child': {
-    marginBottom: '0 !important',
-  },
-  '& .full-width': {
-    width: '100% !important',
+    lineHeight: '25px',
   },
 });
+export const InfoValueDivBlock = styled('div')(
+  ({ maxlines }: { maxlines?: number }) => ({
+    display: 'flex',
+    flexDirection: 'column',
+    minWidth: '75%',
+    height: 'auto',
+    fontFamily: 'Manrope',
+    fontStyle: 'normal',
+    fontWeight: 'normal',
+    color: '#20232C',
+    fontSize: '18px',
+    marginTop: '9px',
+    paddingLeft: '25px',
+    boxSizing: 'border-box',
+    maxWidth: '100%',
+    textOverflow: 'ellipsis',
+    overflow: 'hidden',
+    WebkitLineClamp: maxlines || 'none',
+    boxOrientation: 'vertical',
+    // wordBreak:'break-all',
+    '& a': {
+      display: 'block',
+      width: 'fit-content',
+      color: '#0094FF',
+      boxSizing: 'border-box',
+    },
+    '& div': {
+      display: 'block',
+      height: 'auto',
+      width: '100%',
+      color: '#20232C',
+      boxSizing: 'border-box',
+    },
+    '& > *': {
+      marginBottom: '9px',
+    },
+    '& :last-child': {
+      marginBottom: '0 !important',
+    },
+    '& .full-width': {
+      width: '100% !important',
+    },
+  }),
+);
 const ActionsWrapper = styled('div')({
   display: 'flex',
   flexDirection: 'column',
@@ -189,9 +213,14 @@ const ActionDiv = styled('div')({
   overflow: 'hidden',
   cursor: 'pointer',
   '& > div': {
+    display: 'flex',
     minHeight: '62px !important',
-    verticalAlign: 'middle',
-    lineHeight: '62px',
+    alignItems: 'center',
+    width: '100%',
+    paddingTop: 0,
+    paddingBottom: 0,
+
+    // lineHeight: '62px',
   },
   '& div': {
     marginTop: 0,
@@ -232,31 +261,6 @@ const ExpandedDiv = styled('div')({
   '& #data-div-block': {
     // overflowWrap: 'normal',
     overflowWrap: 'break-word',
-  },
-});
-
-const Widget = styled('div')({
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  width: '100%',
-  minHeight: '118px',
-  boxSizing: 'border-box',
-  background: '#FFFFFF',
-  border: '2px solid #ECF1F7',
-  boxShadow: '0px 6px 6px rgba(180, 193, 228, 0.35)',
-  borderRadius: '8px',
-  marginBottom: '23px',
-  padding: '36px 27px',
-  '& div': {
-    display: 'block',
-    margin: 'auto',
-    width: '100%',
-    boxSizing: 'border-box',
-    marginBottom: '9px',
-  },
-  '& button': {
-    marginTop: '5px',
   },
 });
 
@@ -371,7 +375,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     }
   };
 
-  // const resolveProposal = async () => {};
+  const resolveProposal = async (disputeId: number) => {};
 
   const proposalStates: any = {};
   // check if the user has the veto power.
@@ -379,6 +383,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     proposalInfo.history.forEach((item: any) => {
       proposalStates[item.__typename] = item;
     });
+    console.log(proposalInfo, ' states');
 
     // =============================================
     // if(proposalStates['ContainerEventChallenge']){ MEANS it was challenged.
@@ -432,7 +437,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     //     show the new card where only button is resolve.
     //
     // }
-
   }
 
   // const getParsedDataFromBytes = (data) => {
@@ -608,37 +612,40 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                   </InfoWrapper>
                 </ProposalDetailsWrapper>
                 <WidgetWrapper id="widget_wrapper">
-                  <Widget>
-                    <div
-                      style={{
-                        fontFamily: 'Manrope',
-                        fontStyle: 'normal',
-                        fontWeight: 'normal',
-                        fontSize: '18px',
-                        color: '#7483B3',
-                      }}
-                    >
-                      Challenge Reason
-                    </div>
-                    <InputField
-                      onInputChange={(value) => {
-                        setChallengeReason(value);
-                      }}
-                      label={''}
-                      placeholder={''}
-                      height={'46px'}
-                      width={'372px'}
-                      // value={challengeReason.current}
+                  {
+                    <ChallengeWidget
+                      containerEventChallenge={
+                        proposalStates['ContainerEventChallenge']
+                      }
+                      currentState={proposalInfo.state}
+                      setChallengeReason={setChallengeReason}
+                      onChallengeProposal={challengeProposal}
                     />
-                    <ANButton
-                      buttonType="primary"
-                      label="Challenge"
-                      height="45px"
-                      width="372px"
-                      style={{ margin: 'auto' }}
-                      onClick={() => challengeProposal()}
+                  }
+
+                  {
+                    <ExecuteWidget
+                      containerEventExecute={
+                        proposalStates['ContainerEventExecute']
+                      }
+                      currentState={proposalInfo.state}
+                      executionTime={proposalInfo.payload.executionTime}
+                      onExecuteProposal={executeProposal}
                     />
-                  </Widget>
+                  }
+                  {
+                    <ResolveWidget
+                      containerEventExecute={
+                        proposalStates['ContainerEventExecute']
+                      }
+                      currentState={proposalInfo.state}
+                      executionTime={proposalInfo.payload.executionTime}
+                      onExecuteProposal={executeProposal}
+                    />
+                  }
+
+                  {/* ResolveWidget */}
+
                   {/* <Widget>
                     <div
                       style={{
@@ -669,16 +676,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                       //  onClick={}
                     />
                   </Widget> */}
-                  <Widget>
-                    <ANButton
-                      label="Execute"
-                      height="45px"
-                      width="372px"
-                      style={{ margin: 'auto' }}
-                      onClick={executeProposal}
-                      buttonType="primary"
-                    />
-                  </Widget>
                   {/* <Widget>
                     <ANButton
                       buttonType="primary"
@@ -686,7 +683,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                       height="45px"
                       width="372px"
                       style={{ margin: 'auto' }}
-                      // onClick={resolveProposal(disputeId)}
+                      // onClick={resolveProposal(0)}
                     />
                   </Widget> */}
                 </WidgetWrapper>

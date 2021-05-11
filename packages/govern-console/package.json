@@ -21,6 +21,7 @@
     "@types/react-router-dom": "^5.1.7",
     "@web3-react/core": "^6.1.9",
     "@web3-react/injected-connector": "^6.0.7",
+    "date-fns": "^2.21.3",
     "env-cmd": "^10.1.0",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-plugin-import": "^2.22.1",
