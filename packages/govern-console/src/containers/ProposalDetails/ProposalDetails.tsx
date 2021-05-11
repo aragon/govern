@@ -166,7 +166,7 @@ export const InfoValueDivBlock = styled('div')(
     // wordBreak:'break-all',
     '& a': {
       display: 'block',
-      width: '100%',
+      width: 'fit-content',
       color: '#0094FF',
       boxSizing: 'border-box',
     },

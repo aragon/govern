@@ -1,4 +1,7 @@
+import React from 'react';
 import { format } from 'date-fns';
+import { Link } from 'react-router-dom';
+
 export function getTruncatedAccountAddress(account: string | null) {
   if (account === null) return '';
   return (
@@ -16,5 +19,23 @@ export function getFormattedDate(date?: number | string) {
     return formattedDate;
   } catch (e) {
     return date;
+  }
+}
+
+function isIPFShash(value: string): boolean {
+  // check for value being an ipfs hash
+  return true;
+}
+export function getFormattedValue(value: string) {
+  try {
+    if (isIPFShash(value)) {
+      return (
+        <Link to={value} target="_blank" rel="noopener noreferrer">
+          value
+        </Link>
+      );
+    }
+  } catch (e) {
+    return value;
   }
 }
