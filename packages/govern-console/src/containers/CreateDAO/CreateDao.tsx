@@ -44,7 +44,6 @@ const CreateDao: React.FC = () => {
     case CreateDaoStatus.InProgress: {
       return (
         <CreateDaoProgress
-          registerCaption={progress?.registerCaption}
           progressStatus={progress.progressStatus}
           isTokenRegister={progress.isTokenRegister}
         />

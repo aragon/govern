@@ -180,18 +180,12 @@ const CreateDaoForm: React.FC<FormProps> = ({
         setProgress({ ...progress });
 
         const result: ContractReceipt | undefined  = await registerToken();
-        if (typeof result === 'undefined') {
+        if (typeof result === 'undefined' || result.status === 1) {
           // handle token already registed
-          progress.registerCaption = 'Token already registered.';
           progress.progressStatus.register = CiruclarProgressStatus.Done;
           setProgress({ ...progress });
           setTimeout( () => { setCreateDaoStatus(CreateDaoStatus.Successful) }, 2000 ); // delay 2 seconds, so user can obeserve each progress result.
-        } else if(result && result.status === 1) {
-          // update progress
-          progress.progressStatus.register = CiruclarProgressStatus.Done;
-          setProgress({ ...progress });
-          setTimeout( () => { setCreateDaoStatus(CreateDaoStatus.Successful) }, 2000 );
-        } else if(result && result.status === 0) {
+        } else {
           // update progress
           progress.progressStatus.register = CiruclarProgressStatus.Failed;
           setProgress({ ...progress });
