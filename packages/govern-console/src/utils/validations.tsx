@@ -5,9 +5,9 @@ import Abi from './AbiHandler'
 
 /**
  * Validate if address is an ERC20 token
- * 
+ *
  * @param address <string> address to be validated
- * @param provider <rpc-provider> 
+ * @param provider <rpc-provider>
  * @returns <ValidateResult> true if valid, or error message if invalid
  */
 export const validateToken = async (
@@ -17,16 +17,15 @@ export const validateToken = async (
   try {
     const tokenInfo = await getToken(address, provider);
     return true;
-  } catch (error) {
-  }
-  return 'Token adress is not valid.'
+  } catch (error) {}
+  return 'Token adress is not valid.';
 };
 
 /**
  * Check if contract is a contract
- * 
+ *
  * @param address <string> address to be validated
- * @param provider <rpc-provider> 
+ * @param provider <rpc-provider>
  * @returns <ValidateResult> true if valid, or error message if invalid
  */
 export const validateContract = async (
@@ -36,8 +35,7 @@ export const validateContract = async (
   try {
     const validAddress = await provider.getCode(address);
     return true;
-  } catch (error) {
-  }
+  } catch (error) {}
   return 'Contract address is not valid.';
 };
 
