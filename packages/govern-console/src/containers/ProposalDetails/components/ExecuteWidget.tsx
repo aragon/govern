@@ -3,7 +3,8 @@ import React, { memo, useEffect, useMemo, useState } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { InputField } from 'components/InputFields/InputField';
 import { PROPOSAL_STATES } from 'utils/states';
-import { getFormattedDate, getFormattedValue } from 'utils/HelperFunctions';
+import { getFormattedDate } from 'utils/HelperFunctions';
+import Field from 'components/Field/Field';
 import {
   InfoKeyDiv,
   InfoValueDivInline,
@@ -40,7 +41,7 @@ const ExecuteWidget: React.FC<any> = ({
             marginTop: 0,
           }}
         >
-          {getFormattedValue(containerEventExecute.execResults)}
+          <Field value={containerEventExecute.execResults} inline />
         </InfoValueDivBlock>
       </Widget>
     );

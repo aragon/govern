@@ -22,20 +22,21 @@ export function getFormattedDate(date?: number | string) {
   }
 }
 
-function isIPFShash(value: string): boolean {
+export function isIPFShash(value: string): boolean {
   // check for value being an ipfs hash
-  return true;
+  return false;
 }
-export function getFormattedValue(value: string) {
-  try {
-    if (isIPFShash(value)) {
-      return (
-        <Link to={value} target="_blank" rel="noopener noreferrer">
-          value
-        </Link>
-      );
-    }
-  } catch (e) {
-    return value;
-  }
-}
+
+// export function getFormattedValue(value: string) {
+//   try {
+//     if (isIPFShash(value)) {
+//       return (
+//         <Link to={value} target="_blank" rel="noopener noreferrer">
+//           value
+//         </Link>
+//       );
+//     } else return value;
+//   } catch (e) {
+//     return value;
+//   }
+// }
