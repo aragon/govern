@@ -196,10 +196,10 @@ const DaoMainPage: React.FC<{
     return <div>Loading...</div>;
   }
 
-  return (
-    <DaoPageMainDiv id="dao-page-wrapper">
-      {isAnExistingDao ? (
-        daoDetails === undefined ? (
+  if (isAnExistingDao) {
+    return (
+      <DaoPageMainDiv id="dao-page-wrapper">
+        {daoDetails === undefined ? (
           'loading'
         ) : (
           <>
@@ -329,13 +329,11 @@ const DaoMainPage: React.FC<{
               )}
             </div>
           </>
-        )
-      ) : (
-        <>
-          <NoDaoFound />
-        </>
-      )}
-    </DaoPageMainDiv>
-  );
+        )}
+      </DaoPageMainDiv>
+    );
+  } else {
+    return <NoDaoFound />;
+  }
 };
 export default memo(DaoMainPage);
