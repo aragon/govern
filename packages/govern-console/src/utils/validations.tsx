@@ -4,9 +4,9 @@ import { ValidateResult } from 'react-hook-form';
 
 /**
  * Validate if address is an ERC20 token
- * 
+ *
  * @param address <string> address to be validated
- * @param provider <rpc-provider> 
+ * @param provider <rpc-provider>
  * @returns <ValidateResult> true if valid, or error message if invalid
  */
 export const validateToken = async (
@@ -16,16 +16,15 @@ export const validateToken = async (
   try {
     const tokenInfo = await getToken(address, provider);
     return true;
-  } catch (error) {
-  }
-  return 'Token adress is not valid.'
+  } catch (error) {}
+  return 'Token adress is not valid.';
 };
 
 /**
  * Check if contract is a contract
- * 
+ *
  * @param address <string> address to be validated
- * @param provider <rpc-provider> 
+ * @param provider <rpc-provider>
  * @returns <ValidateResult> true if valid, or error message if invalid
  */
 export const validateContract = async (
@@ -35,8 +34,7 @@ export const validateContract = async (
   try {
     const validAddress = await provider.getCode(address);
     return true;
-  } catch (error) {
-  }
+  } catch (error) {}
   return 'Contract address is not valid.';
 };
 
@@ -46,14 +44,13 @@ export const validateContract = async (
  * @param abi <string> abi to be validated
  * @returns <ValidateResult> true if valid, or error message if invalid
  */
- export const validateAbi = (abi: string): ValidateResult => {
+export const validateAbi = (abi: string): ValidateResult => {
   try {
-    const parsedAbi = JSON.parse(abi)
-    if (!Array.isArray(parsedAbi) || parsedAbi.length === 0 ) {
-      throw new Error()
+    const parsedAbi = JSON.parse(abi);
+    if (!Array.isArray(parsedAbi) || parsedAbi.length === 0) {
+      throw new Error();
     }
     return true;
-  } catch (e) {
-  }
+  } catch (e) {}
   return 'Contract ABI is not valid.';
-}
+};

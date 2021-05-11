@@ -22,10 +22,7 @@ import FacadeProposal from 'services/Proposal';
 import { useForm, Controller } from 'react-hook-form';
 import { BytesLike } from 'ethers';
 import { validateToken, validateContract } from '../../utils/validations';
-import {
-  Proposal,
-  ProposalOptions,
-} from '@aragon/govern';
+import { Proposal, ProposalOptions } from '@aragon/govern';
 import { toUtf8Bytes, toUtf8String } from '@ethersproject/strings';
 
 export interface DaoSettingFormProps {
@@ -161,7 +158,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
 
   useEffect(() => {
     const _load = async () => {
-      // config is also ussed as a check in order to set and populate
+      // config is also used as a check in order to set and populate
       // the UI with current Dao's config only once
       if (daoDetails && provider && !config) {
         const _config = daoDetails.queue.config;
