@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { memo, useEffect, useMemo, useState } from 'react';
+import React, { memo, useEffect, useMemo } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { styled } from '@material-ui/core/styles';
 import backButtonIcon from '../../images/back-btn.svg';
@@ -9,7 +9,7 @@ import CreateDaoImage from '../../images/svgs/CreateDao.svg';
 import { BlueSwitch } from 'components/Switchs/BlueSwitch';
 import { BlueCheckbox } from 'components/Checkboxs/BlueCheckbox';
 import { ANWrappedPaper } from 'components/WrapperPaper/ANWrapperPaper';
-import { useWallet } from '../../EthersWallet';
+import { useWallet } from '../../AugmentedWallet';
 import {
   createDao,
   CreateDaoParams,
@@ -21,13 +21,13 @@ import {
   ARAGON_VOICE_URL,
   PROXY_CONTRACT_URL,
   DEFAULT_DAO_CONFIG,
-  CONFIRMATION_WAIT,
 } from 'utils/constants';
 import { useForm, Controller } from 'react-hook-form';
 import { ChainId, CiruclarProgressStatus } from '../../utils/types';
 import { validateToken } from '../../utils/validations';
 import { CreateDaoStatus } from './CreateDao';
 import { CreateDaoProgressProps } from './CreateDaoProgress';
+import { ContractReceipt } from 'ethers'
 
 interface FormInputs {
   /**
@@ -150,7 +150,6 @@ const CreateDaoForm: React.FC<FormProps> = ({
         register: CiruclarProgressStatus.Disabled,
       },
     };
-    setCreateDaoStatus(CreateDaoStatus.InProgress);
 
     if (params.isExistingToken) {
       try {
@@ -180,21 +179,17 @@ const CreateDaoForm: React.FC<FormProps> = ({
         };
         setProgress({ ...progress });
 
-        const result = await registerToken();
-        console.log('token register result', result);
-        if (result) {
-          // update progress
+        const result: ContractReceipt | undefined  = await registerToken();
+        if (typeof result === 'undefined' || result.status === 1) {
+          // handle token already registed
           progress.progressStatus.register = CiruclarProgressStatus.Done;
           setProgress({ ...progress });
-
-          setCreateDaoStatus(CreateDaoStatus.Successful);
+          setTimeout( () => { setCreateDaoStatus(CreateDaoStatus.Successful) }, 2000 ); // delay 2 seconds, so user can obeserve each progress result.
         } else {
           // update progress
           progress.progressStatus.register = CiruclarProgressStatus.Failed;
           setProgress({ ...progress });
-
-          setCreateDaoStatus(CreateDaoStatus.Successful); 
-          // TODO: more clouser should be provided for user
+          setTimeout( () => { setCreateDaoStatus(CreateDaoStatus.Failed) }, 2000 );
         }
       };
     } else {
@@ -212,17 +207,24 @@ const CreateDaoForm: React.FC<FormProps> = ({
     };
 
     try {
-      //TODO this console log to be removed
-      console.log('createDaoParams', createDaoParams);
+      setCreateDaoStatus(CreateDaoStatus.InProgress);
+
       const result: any = await createDao(
         createDaoParams,
         {},
         registerTokenCallback,
       );
+
       await result.wait();
+      
       setCreatedDaoRoute(params.daoName);
+      
+      // update progress
+      progress.progressStatus.create = CiruclarProgressStatus.Done;
+      setProgress({ ...progress });
+      
       // set creation successful if Vocdoni not used
-      if (!params.useVocdoni) setCreateDaoStatus(CreateDaoStatus.Successful);
+      if (!params.useVocdoni) setTimeout( () => { setCreateDaoStatus(CreateDaoStatus.Successful) }, 2000 );
     } catch (error) {
       console.log(error);
       setCreateDaoStatus(CreateDaoStatus.Failed);

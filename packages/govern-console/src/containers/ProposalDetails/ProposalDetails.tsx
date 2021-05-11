@@ -18,6 +18,7 @@ import { Proposal, ProposalOptions } from '@aragon/govern';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import QueueApprovals from 'services/QueueApprovals';
 import FacadeProposal from 'services/Proposal';
+import { toUtf8String } from '@ethersproject/strings';
 
 // import { InputField } from 'component/InputField/InputField';
 interface ProposalDetailsProps {
@@ -505,7 +506,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                     <InfoKeyDiv>Rules:</InfoKeyDiv>
                     {/* <InfoValueDivInline>{getParsedDataFromBytes(proposalInfo.config.rules)}</InfoValueDivInline> */}
                     <InfoValueDivInline>
-                      {proposalInfo.config.rules}
+                      {toUtf8String(proposalInfo.config.rules)}
                     </InfoValueDivInline>
                   </InfoWrapper>
                   <div style={{ height: '32px', width: '100%' }} />
@@ -549,7 +550,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                   <InfoWrapper>
                     <InfoKeyDiv>Proof:</InfoKeyDiv>
                     <InfoValueDivBlock>
-                      {proposalInfo.payload.proof}
+                      {toUtf8String(proposalInfo.payload.proof)}
                       {/* Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
                   do eiusmod tempor incididunt ut labore et dolore magna aliqua.
                   Ut enim ad minim veniam, quis nostrud exercitation ullamco
