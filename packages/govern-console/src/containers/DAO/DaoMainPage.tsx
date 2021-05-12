@@ -139,7 +139,7 @@ const DaoMainPage: React.FC<{
       error: proposalErrors,
       fetchMore: fetchMoreProposals,
     },
-  ] = useLazyQuery(GET_PROPOSAL_LIST);
+  ] = useLazyQuery(GET_PROPOSAL_LIST, { fetchPolicy: 'no-cache' });
 
   const fetchMoreData = async () => {
     if (fetchMoreProposals) {
