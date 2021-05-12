@@ -85,6 +85,15 @@ interface CustomTheme {
     valueLineHeight: string;
     valueColor: string;
   };
+  labels: {
+    grey: string;
+    orange: string;
+    purple: string;
+    green: string;
+    red: string;
+    black: string;
+    lightBlue: string;
+  };
   transactionKeeper: {
     wrapper: {
       background: string;
@@ -265,6 +274,15 @@ const custom = {
     valueFontWeight: 500,
     valueLineHeight: '24.59px',
     valueColor: '#20232C',
+  },
+  labels: {
+    grey: '#7483AB',
+    orange: 'linear-gradient(107.79deg, #FF7984 1.46%, #FFEB94 100%)',
+    purple: '#635BFF',
+    green: '#4BDD7C',
+    red: '#FF6A60',
+    black: '#20232C',
+    lightBlue: '#00C2FF',
   },
   transactionKeeper: {
     wrapper: {

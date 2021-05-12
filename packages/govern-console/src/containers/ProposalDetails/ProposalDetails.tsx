@@ -74,11 +74,26 @@ const DateDisplay = styled('div')({
   fontWeight: 'normal',
   boxSizing: 'border-box',
 });
-const getLabelColor = (proposalState: string) => {
-  if (proposalState === 'Scheduled') return 'yellow';
-  if (proposalState === 'Executed') return 'green';
-  if (proposalState === 'Challenged') return 'red';
+const getLabelColor = (proposalStatus: string) => {
+  if (proposalStatus === 'Scheduled') return 'grey';
+  if (proposalStatus === 'Executed') return 'purple';
+  if (proposalStatus === 'Challenged') return 'orange';
+  if (proposalStatus === 'Rejected') return 'red';
+  if (proposalStatus === 'Approved') return 'green';
+  if (proposalStatus === 'Executable') return 'lightBlue';
+  if (proposalStatus === 'Vetoed') return 'black';
 };
+
+const getLabelText = (proposalStatus: string) => {
+  if (proposalStatus === 'Scheduled') return 'Scheduled';
+  if (proposalStatus === 'Executed') return 'Executed';
+  if (proposalStatus === 'Challenged') return 'Challenged';
+  if (proposalStatus === 'Rejected') return 'Ruled Negetively';
+  if (proposalStatus === 'Approved') return 'Ruled Positively';
+  if (proposalStatus === 'Executable') return 'Executable';
+  if (proposalStatus === 'Vetoed') return 'Vetoed';
+};
+
 const DetailsWrapper = styled('div')({
   display: 'flex',
   justifyContent: 'space-between',
@@ -278,7 +293,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   const { account, provider, networkName, isConnected } = context;
 
   const { dispatch } = React.useContext(ModalsContext);
-
   const [proposalInfo, updateProposalInfo] = React.useState<any>(null);
   const [abiCache, updateAbiCache] = React.useState<any>({});
   const [decodedData, updateDecodedData] = React.useState<any>({});
@@ -428,7 +442,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       proposalStates[item.__typename] = item;
     });
   }
-
   return (
     <>
       {isLoadingProposalDetails ? (
@@ -442,8 +455,8 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
               </BackButton>
               <ProposalStatus>
                 <Label
-                  labelColor={getLabelColor(proposalInfo.status)}
-                  labelText={proposalInfo.state}
+                  labelColor={getLabelColor(proposalInfo.state)}
+                  labelText={getLabelText(proposalInfo.state)}
                 />
               </ProposalStatus>
               <ProposalId>{proposalInfo.id}</ProposalId>

@@ -61,9 +61,23 @@ const ProposalDateText = styled(MUITypography)(({ theme }) => ({
 }));
 
 const getLabelColor = (proposalStatus: string) => {
-  if (proposalStatus === 'Scheduled') return 'yellow';
-  if (proposalStatus === 'Executed') return 'green';
-  if (proposalStatus === 'Challenged') return 'red';
+  if (proposalStatus === 'Scheduled') return 'grey';
+  if (proposalStatus === 'Executed') return 'purple';
+  if (proposalStatus === 'Challenged') return 'orange';
+  if (proposalStatus === 'Rejected') return 'red';
+  if (proposalStatus === 'Approved') return 'green';
+  if (proposalStatus === 'Executable') return 'lightBlue';
+  if (proposalStatus === 'Vetoed') return 'black';
+};
+
+const getLabelText = (proposalStatus: string) => {
+  if (proposalStatus === 'Scheduled') return 'Scheduled';
+  if (proposalStatus === 'Executed') return 'Executed';
+  if (proposalStatus === 'Challenged') return 'Challenged';
+  if (proposalStatus === 'Rejected') return 'Ruled Negetively';
+  if (proposalStatus === 'Approved') return 'Ruled Positively';
+  if (proposalStatus === 'Executable') return 'Executable';
+  if (proposalStatus === 'Vetoed') return 'Vetoed';
 };
 
 const LabelWrapper = styled('div')({
@@ -95,7 +109,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
       <LabelWrapper>
         <Label
           labelColor={getLabelColor(proposalStatus)}
-          labelText={proposalStatus}
+          labelText={getLabelText(proposalStatus)}
         />
       </LabelWrapper>
       <ProposalHash>{getSlicedTransactionHash()}</ProposalHash>
