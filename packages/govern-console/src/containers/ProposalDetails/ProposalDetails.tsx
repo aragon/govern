@@ -370,6 +370,13 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   }, [daoList]);
 
   const challengeProposal = async () => {
+    // if the reason's length is less than 10 words, it's highly unlikely
+    // to specify the actual valid reason in less than 10 words
+    if(challengeReason.length < 10) {
+      enqueueSnackbar("Challenge reason must be at least 10 letters", { variant: 'error' });
+      return;
+    }
+
     const proposalParams = getProposalParams(proposalInfo);
 
     if (proposalInstance) {
