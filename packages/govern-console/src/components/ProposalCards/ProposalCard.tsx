@@ -1,8 +1,10 @@
+/* eslint-disable */
 import React from 'react';
 import { styled, useTheme } from '@material-ui/core/styles';
 import MUICard, { CardProps } from '@material-ui/core/Card';
 import MUITypography from '@material-ui/core/Typography';
 import { Label } from '../Labels/Label';
+import { getState, getStateColor } from 'utils/states'
 
 export interface ProposalCardProps {
   /**
@@ -17,6 +19,10 @@ export interface ProposalCardProps {
    * Status of the proposal
    */
   proposalStatus: string;
+  /**
+   * Status of the proposal
+   */
+  proposalStatusColor: string;
   /**
    * Optional Function Handler
    */
@@ -74,6 +80,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
   transactionHash,
   proposalDate,
   proposalStatus,
+  proposalStatusColor,
   onClickProposalCard,
   ...props
 }) => {
@@ -94,7 +101,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
     <ProposalCardWrapper onClick={onClickProposalCard}>
       <LabelWrapper>
         <Label
-          labelColor={getLabelColor(proposalStatus)}
+          labelColor={proposalStatusColor}
           labelText={proposalStatus}
         />
       </LabelWrapper>
