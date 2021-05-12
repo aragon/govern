@@ -19,7 +19,7 @@ interface payload extends optionalPayload {
 
 export const buildContainer = (payload: payload, config:DaoConfig): ProposalParams => {
   const containerPayload: PayloadType = {
-    executionTime: payload.executionTime || Math.round(Date.now() / 1000) + parseInt(config.executionDelay.toString()) + 30, // add 30 seconds for network latency.
+    executionTime: payload.executionTime || Math.round(Date.now() / 1000) + parseInt(config.executionDelay.toString()) + 300, // add 5 minutes for network latency.
     submitter: payload.submitter,
     executor: payload.executor,
     actions: payload.actions || [],
