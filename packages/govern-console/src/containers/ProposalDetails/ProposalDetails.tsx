@@ -19,7 +19,8 @@ import QueueApprovals from 'services/QueueApprovals';
 import FacadeProposal from 'services/Proposal';
 import AbiHandler from 'utils/AbiHandler';
 import { toUtf8String } from '@ethersproject/strings';
-import { formatDate } from 'utils/date';
+import { formatDate} from 'utils/date';
+import { getState, getStateColor } from 'utils/states'
 import { useSnackbar } from 'notistack';
 
 // widget components
@@ -75,11 +76,6 @@ const DateDisplay = styled('div')({
   fontWeight: 'normal',
   boxSizing: 'border-box',
 });
-const getLabelColor = (proposalState: string) => {
-  if (proposalState === 'Scheduled') return 'yellow';
-  if (proposalState === 'Executed') return 'green';
-  if (proposalState === 'Challenged') return 'red';
-};
 const DetailsWrapper = styled('div')({
   display: 'flex',
   justifyContent: 'space-between',
@@ -443,8 +439,8 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
               </BackButton>
               <ProposalStatus>
                 <Label
-                  labelColor={getLabelColor(proposalInfo.status)}
-                  labelText={proposalInfo.state}
+                  labelColor={getStateColor(proposalInfo.state, proposalInfo.payload.executionTime)}
+                  labelText={getState(proposalInfo.state, proposalInfo.payload.executionTime)}
                 />
               </ProposalStatus>
               <ProposalId>{proposalInfo.id}</ProposalId>

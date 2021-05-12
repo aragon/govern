@@ -238,7 +238,6 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
     if (proposalInstance) {
       try {
         transactionsQueue.current = await proposalInstance.schedule(container);
-        console.log(transactionsQueue.current);
       } catch (error) {
         enqueueSnackbar(error.message, { variant: 'error' });
         return;
