@@ -1,6 +1,6 @@
 /* eslint-disable */
 import React, { useState, memo, useRef, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { ANWrappedPaper } from '../../components/WrapperPaper/ANWrapperPaper';
 import backButtonIcon from '../../images/back-btn.svg';
 import { styled } from '@material-ui/core/styles';
@@ -17,19 +17,23 @@ import Grid from '@material-ui/core/Grid';
 import { DaoConfig } from '@aragon/govern';
 import QueueApprovals from 'services/QueueApprovals';
 import { CustomTransaction } from 'utils/types';
-import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
+import {
+  ActionTypes,
+  ModalsContext,
+  closeTransactionsModalAction,
+} from 'containers/HomePage/ModalsContext';
 import { correctDecimal } from 'utils/token';
 import FacadeProposal from 'services/Proposal';
 import { useForm, Controller } from 'react-hook-form';
-import { BytesLike } from 'ethers';
+import { BytesLike, ContractReceipt } from 'ethers';
 import { validateToken, validateContract } from '../../utils/validations';
 import {
   Proposal,
   ProposalOptions,
-  PayloadType,
-  ActionType,
+  ReceiptType,
 } from '@aragon/govern';
 import { toUtf8Bytes, toUtf8String } from '@ethersproject/strings';
+import { proposalDetailsUrl } from 'utils/urls';
 
 export interface DaoSettingFormProps {
   /**
@@ -112,6 +116,8 @@ const OptionTextStyle = styled('div')({
 
 const DaoSettings: React.FC<DaoSettingFormProps> = 
   ({ onClickBack }) => {
+    const history = useHistory();
+
     const context: any = useWallet();
     const { account, status, isConnected, provider } = context;
 
@@ -199,6 +205,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> =
     const callSaveSetting = async (formData: FormInputs) => {
       console.log('formData', formData)
       const newConfig: DaoConfig = formData.daoConfig;
+      let containerHash: string | undefined;
       
       // modify config before sending to schedule.
       newConfig.rules = toUtf8Bytes(newConfig.rules.toString())
@@ -244,8 +251,15 @@ const DaoSettings: React.FC<DaoSettingFormProps> =
         payload: {
           transactionList: transactionsQueue.current,
           onTransactionFailure: () => {},
-          onTransactionSuccess: () => {},
-          onCompleteAllTransactions: () => {},
+          onTransactionSuccess: (_, receipt: ContractReceipt) => {
+            containerHash = Proposal.getContainerHashFromReceipt(receipt, ReceiptType.Scheduled);
+          },
+          onCompleteAllTransactions: () => {
+            dispatch(closeTransactionsModalAction);
+            if (containerHash) {
+              history.push(proposalDetailsUrl(daoName, containerHash));
+            }
+          },
         },
       });
     };

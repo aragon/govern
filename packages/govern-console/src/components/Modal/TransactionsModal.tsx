@@ -3,7 +3,11 @@ import Dialog from '@material-ui/core/Dialog';
 import { styled } from '@material-ui/core/styles';
 import TransactionKeeper from 'components/TransactionKeeper/TransactionKeeper';
 import Paper from '@material-ui/core/Paper';
-import { ModalsContext, ActionTypes } from 'containers/HomePage/ModalsContext';
+import {
+  ModalsContext,
+  ActionTypes,
+  closeTransactionsModalAction,
+} from 'containers/HomePage/ModalsContext';
 const TransactionsDialog = styled(Dialog)({
   // width: '446px',
   // height: '294px',
@@ -35,12 +39,7 @@ const TransactionsModal = ({}) => {
     dispatch,
   } = useContext(ModalsContext);
   const handleClose = useCallback(() => {
-    dispatch({
-      type: ActionTypes.CLOSE,
-      payload: {
-        modal: 'transactionsModal',
-      },
-    });
+    dispatch(closeTransactionsModalAction);
   }, [dispatch]);
   return (
     <>

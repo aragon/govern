@@ -10,7 +10,7 @@ import Paper from '@material-ui/core/Paper';
 import { NewActionModal } from 'components/Modal/NewActionModal';
 import { AddActionsModal } from 'components/Modal/AddActionsModal';
 import { InputField } from 'components/InputFields/InputField';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useHistory } from 'react-router-dom';
 import { utils } from 'ethers';
 import { useQuery } from '@apollo/client';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
@@ -23,14 +23,14 @@ import {
   actionType,
   ActionToSchedule,
 } from 'utils/types';
-import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
+import { ActionTypes, ModalsContext, closeTransactionsModalAction } from 'containers/HomePage/ModalsContext';
 import  FacadeProposal from 'services/Proposal';
-import { settingsUrl } from 'utils/urls';
+import { proposalDetailsUrl, settingsUrl } from 'utils/urls';
 
 import {
   Proposal,
   ProposalOptions,
-  PayloadType,
+  ReceiptType,
   ActionType,
 } from '@aragon/govern';
 
@@ -247,6 +247,8 @@ const AddedActions: React.FC<AddedActionsProps> = ({
 };
 
 const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
+  const history = useHistory();
+
   const { daoName } = useParams<any>();
   //TODO daoname empty handling
   const { data: daoList } = useQuery(GET_DAO_BY_NAME, {
@@ -408,6 +410,8 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   };
 
   const scheduleProposal = async (actions: ActionType[]) => {
+    let containerHash: string | undefined;
+
     // build the container to schedule.
     const payload = {
       submitter: account.address,
@@ -432,8 +436,15 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
       payload: {
         transactionList: transactionsQueue.current,
         onTransactionFailure: () => {},
-        onTransactionSuccess: () => {},
-        onCompleteAllTransactions: () => {},
+        onTransactionSuccess: (_, receipt) => {
+          containerHash = Proposal.getContainerHashFromReceipt(receipt, ReceiptType.Scheduled)
+        },
+        onCompleteAllTransactions: () => {
+          dispatch(closeTransactionsModalAction);
+          if( containerHash ) {
+            history.push(proposalDetailsUrl(daoName, containerHash));
+          }
+      },
       },
     });
   };

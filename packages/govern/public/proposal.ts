@@ -4,7 +4,9 @@ import {
   Contract,
   providers,
   BigNumberish,
-  utils
+  utils,
+  ContractTransaction,
+  ContractReceipt,
 } from 'ethers'
 
 
@@ -45,7 +47,12 @@ const queueAbis = [
   `function resolve(${Container} _container, uint256 _disputeId)`,
   `function veto(${Container} _container, bytes _reason)`,
   `function configure(${ContainerConfig} _config)`,
-  `event Challenged(bytes32 indexed hash, address indexed actor, bytes reason, uint256 resolverId, ${Collateral})`
+  `event Challenged(bytes32 indexed containerHash, address indexed actor, bytes reason, uint256 resolverId, ${Collateral})`,
+  `event Scheduled(bytes32 indexed containerHash, ${Payload} payload)`,
+  `event Executed(bytes32 indexed containerHash, address indexed actor)`,
+  `event Resolved(bytes32 indexed containerHash, address indexed actor, bool approved)`,
+  `event Vetoed(bytes32 indexed containerHash, address indexed actor, bytes reason)`,
+  `event Configured(bytes32 indexed configHash, address indexed actor, ${ContainerConfig} config)`
 ]
 
 declare let window: any
@@ -76,6 +83,14 @@ export type ActionType = {
   data: utils.BytesLike
 }
 
+export enum ReceiptType {
+  Scheduled = 'Scheduled',
+  Challenged = 'Challenged',
+  Executed = 'Executed',
+  Resolved = 'Resolved',
+  Vetoed = 'Vetoed'
+}
+
 export class Proposal {
   private readonly contract: Contract
   private readonly interface: any;
@@ -94,9 +109,9 @@ export class Proposal {
    *
    * @param {ProposalParams} proposal for creating and scheduling a DAO proposal
    *
-   * @returns {Promise<TransactionResponse>} transaction response object
+   * @returns {Promise<ContractTransaction>} transaction response object
    */
-  async schedule(proposal: ProposalParams): Promise<providers.TransactionResponse> {
+  async schedule(proposal: ProposalParams): Promise<ContractTransaction> {
     const nonce = await this.contract.nonce()
 
     const proposalWithNonce = Object.assign({}, proposal)
@@ -110,9 +125,9 @@ export class Proposal {
    *
    * @param {ProposalParams} proposal to execute
    *
-   * @returns {Promise<TransactionResponse>} transaction response object
+   * @returns {Promise<ContractTransaction>} constract response object
    */
-  async execute(proposal: ProposalParams): Promise<providers.TransactionResponse> {
+  async execute(proposal: ProposalParams): Promise<ContractTransaction> {
     const result = this.contract.execute(proposal)
     return result
   }
@@ -124,9 +139,9 @@ export class Proposal {
    *
    * @param {string} reason
    *
-   * @returns {Promise<TransactionResponse>} transaction response object
+   * @returns {Promise<ContractTransaction>} constract response object
    */
-  async veto(proposal: ProposalParams, reason: string): Promise<providers.TransactionResponse> {
+  async veto(proposal: ProposalParams, reason: string): Promise<ContractTransaction> {
     const reasonBytes = utils.toUtf8Bytes(reason)
     const result = this.contract.veto(proposal, reasonBytes)
     return result
@@ -139,9 +154,9 @@ export class Proposal {
    *
    * @param {number} disputeId
    *
-   * @returns {Promise<TransactionResponse>} transaction response object
+   * @returns {Promise<ContractTransaction>} constract response object
    */
-  async resolve(proposal: ProposalParams, disputeId: number): Promise<providers.TransactionResponse> {
+  async resolve(proposal: ProposalParams, disputeId: number): Promise<ContractTransaction> {
     const result = this.contract.resolve(proposal, disputeId)
     return result
   }
@@ -153,9 +168,9 @@ export class Proposal {
    *
    * @param {string} reason
    *
-   * @returns {Promise<TransactionResponse>} transaction response object
+   * @returns {Promise<ContractTransaction>} constract response object
    */
-  async challenge(proposal: ProposalParams, reason: string): Promise<providers.TransactionResponse> {
+  async challenge(proposal: ProposalParams, reason: string): Promise<ContractTransaction> {
     const reasonBytes = utils.toUtf8Bytes(reason)
     const result = this.contract.challenge(proposal, reasonBytes)
     return result
@@ -209,5 +224,16 @@ export class Proposal {
     const disputeId = rawDisputeId? rawDisputeId.toNumber() : null
 
     return disputeId
+  }
+
+  /**
+   * Get the container hash from the receipt for the given receipt type
+   *
+   * @param {ContractReceipt} receipt from the contract transaction call
+   * @param {ReceiptType} receiptType the type of receipt, i.e. Scheduled, Challenged, Executed
+   * @returns {string | undefined} containerHash
+   */
+  static getContainerHashFromReceipt(receipt: ContractReceipt, receiptType: ReceiptType): string | undefined {
+    return receipt.events?.find(e => e.event === receiptType)?.args?.containerHash
   }
 }
