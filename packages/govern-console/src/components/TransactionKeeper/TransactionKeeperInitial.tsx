@@ -20,9 +20,6 @@ const TransactionMessagesCard = styled(MUICard)(({ theme }) => ({
 const BoldText = styled(Typography)(({ theme }) => ({
   ...theme.custom.transactionKeeper.transactionMessagesCard.boldText,
 }));
-const MessageText = styled(Typography)(({ theme }) => ({
-  ...theme.custom.transactionKeeper.transactionMessagesCard.text,
-}));
 
 export interface TranasctionKeeperInitialProps extends TransactionListProps {
   onClick: () => void;
@@ -40,17 +37,6 @@ const TransactionKeeperInitial: React.FC<TranasctionKeeperInitialProps> = ({
         <TransactionStatusWrapper>
           <TransactionList transactions={transactions}></TransactionList>
         </TransactionStatusWrapper>
-        {/*
-        <ul>
-        {transactions.map((tx, index) => {
-          return (
-            <li key={index}>
-              <MessageText>{tx.message}</MessageText>
-            </li>
-          );
-        })}
-      </ul>
-*/}
       </TransactionMessagesCard>
       <ANButton
         buttonType="primary"

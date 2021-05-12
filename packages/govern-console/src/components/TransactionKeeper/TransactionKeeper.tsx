@@ -31,23 +31,25 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
   onTransactionFailure,
   onTransactionSuccess,
   onCompleteAllTransactions,
-  ...props
 }) => {
   const [state, setState] = React.useState(TransactionKeeperState.Initial);
   const [transactions, updateTransactions] = React.useState<
     CustomTransaction[]
   >([...transactionList]);
 
-  const updateTransaction = (
-    updatedTransaction: CustomTransaction,
-    updatedTransactionIndex: number,
-  ) => {
-    console.log('updating transaction' + updatedTransactionIndex);
-    const updatedTransactions = transactions.map((transaction, index) =>
-      index === updatedTransactionIndex ? updatedTransaction : transaction,
-    );
-    updateTransactions([...updatedTransactions]);
-  };
+  const updateTransaction = React.useCallback(
+    (
+      updatedTransaction: CustomTransaction,
+      updatedTransactionIndex: number,
+    ) => {
+      console.log('updating transaction' + updatedTransactionIndex);
+      const updatedTransactions = transactions.map((transaction, index) =>
+        index === updatedTransactionIndex ? updatedTransaction : transaction,
+      );
+      updateTransactions([...updatedTransactions]);
+    },
+    [transactions],
+  );
 
   const executeTransactions = React.useCallback(async () => {
     console.log('Executing transactions');
@@ -83,7 +85,12 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
     if (!isQueueAborted) {
       setState(TransactionKeeperState.Success);
     }
-  }, [transactionList]);
+  }, [
+    transactions,
+    onTransactionFailure,
+    onTransactionSuccess,
+    updateTransaction,
+  ]);
 
   switch (state) {
     case TransactionKeeperState.Initial: {
