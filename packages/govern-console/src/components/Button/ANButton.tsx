@@ -137,8 +137,8 @@ const StyledButton = styled(MUIButton)(
     lineHeight: '22px',
     textTransform: 'none',
     animation: 'none',
-    transition: 'none',
     cursor: 'pointer',
+    transition: 'background 0.5s, color 0.5s',
     '&:hover': {
       background: getBackgroundForHoveredState(
         buttonType,

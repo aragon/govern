@@ -63,9 +63,11 @@ const ProposalId = styled('div')(({ theme }) => ({
   marginTop: '11px',
   textOverflow: 'ellipsis',
   boxSizing: 'border-box',
+  fontFamily: 'Manrope',
 }));
 const DateDisplay = styled('div')({
   height: '25px',
+  fontFamily: 'Manrope',
   width: '100%',
   color: '#7483B3',
   marginTop: '10px',
@@ -82,6 +84,7 @@ const DetailsWrapper = styled('div')({
   display: 'flex',
   justifyContent: 'space-between',
   marginTop: '47px',
+  fontFamily: 'Manrope',
 });
 const ProposalDetailsWrapper = styled('div')({
   width: 'calc(100% - 443px)',
@@ -90,6 +93,7 @@ const ProposalDetailsWrapper = styled('div')({
   minHeight: '900px',
   border: ' 2px solid #E2ECF5',
   padding: '32px 30px',
+  fontFamily: 'Manrope',
 });
 const WidgetWrapper = styled('div')({
   width: '427px',
@@ -101,6 +105,7 @@ const TitleText = styled(Typography)({
   height: '38px',
   width: '100%',
   boxSizing: 'border-box',
+  fontFamily: 'Manrope',
 });
 export const InfoWrapper = styled('div')({
   // display: 'flex',
@@ -110,6 +115,7 @@ export const InfoWrapper = styled('div')({
   width: '100%',
   boxSizing: 'border-box',
   height: 'fit-content',
+  fontFamily: 'Manrope',
 });
 export const InfoKeyDiv = styled('div')({
   fontFamily: 'Manrope',

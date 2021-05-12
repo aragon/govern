@@ -51,7 +51,7 @@ const ChallengeWidget: React.FC<any> = ({
             marginTop: 0,
           }}
         >
-          {(containerEventChallenge.reason + ' ').repeat(20)}
+          {containerEventChallenge.reason + ' '}
         </InfoValueDivBlock>
       </Widget>
     );

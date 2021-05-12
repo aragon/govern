@@ -47,7 +47,7 @@ export const GET_DAO_BY_NAME = gql`
       executor {
         id
         address
-        balance
+        # balance
       }
       token
       registrant

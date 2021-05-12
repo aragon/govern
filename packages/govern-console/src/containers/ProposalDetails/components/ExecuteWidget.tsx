@@ -12,6 +12,11 @@ import {
 } from '../ProposalDetails';
 import { Widget, WidgetRow, InfoWrapper, TitleText } from './SharedStyles';
 
+const isEligibleToBeExecuted = (executionTime: number) => {
+  // 15 seconds latency due to block.timestamp sometimes 15 seconds wrong.
+  return Date.now() - executionTime * 1000 >= 15000;
+};
+
 const ExecuteWidget: React.FC<any> = ({
   containerEventExecute,
   currentState,
@@ -36,12 +41,12 @@ const ExecuteWidget: React.FC<any> = ({
           maxlines={4}
           style={{
             padding: 0,
-            WebkitBoxOrient: 'vertical',
+            WebkitBoxOrient: 'vertical', //added as inline styling because makeStyles does not wupport webkit orientation needed for line clamp propoerty.
             display: '-webkit-box',
             marginTop: 0,
           }}
         >
-          <Field value={containerEventExecute.execResults} inline />
+          <Field value={containerEventExecute.execResults} inline={false} />
         </InfoValueDivBlock>
       </Widget>
     );
@@ -51,15 +56,10 @@ const ExecuteWidget: React.FC<any> = ({
     return <></>;
   }
 
-  const isEligibleToBeExecuted = () => {
-    // 15 seconds latency due to block.timestamp sometimes 15 seconds wrong.
-    return Date.now() - executionTime * 1000 >= 15000;
-  };
-
   return (
     <>
       <Widget>
-        {isEligibleToBeExecuted() ? (
+        {isEligibleToBeExecuted(executionTime) ? (
           <>
             <WidgetRow marginBottom="9px">
               <ANButton

@@ -204,7 +204,7 @@ const DaoMainPage: React.FC<{
         ) : (
           <>
             <DaoHeader
-              ethBalance={formatEther(daoDetails.executor.balance)}
+              // ethBalance={formatEther(daoDetails.executor.balance)}
               usdBalance={'2222'}
               daoName={daoDetails.name}
             />
@@ -271,7 +271,7 @@ const DaoMainPage: React.FC<{
                     spacing={3}
                     xs={12}
                     direction="row"
-                    justify="center"
+                    justify="flex-start"
                   >
                     {visibleProposalList.map((proposal: any) => (
                       <Grid

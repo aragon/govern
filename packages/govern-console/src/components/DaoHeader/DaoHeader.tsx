@@ -6,7 +6,7 @@ import MUICard, { CardProps } from '@material-ui/core/Card';
 import MUITypography from '@material-ui/core/Typography';
 import { ANButton } from '../Button/ANButton';
 import SettingIconImage from '../../images/svgs/Setting_Icon.svg';
-import { settingsUrl } from 'utils/urls'
+import { settingsUrl } from 'utils/urls';
 
 export interface DaoHeaderProps {
   /**
@@ -16,7 +16,7 @@ export interface DaoHeaderProps {
   /**
    * Value in Ether
    */
-  ethBalance: string | number;
+  // ethBalance: string | number;
   /**
    * Value in USD
    */
@@ -67,7 +67,7 @@ const HeaderUsdBalance = styled(MUITypography)(({ theme }) => ({
 
 export const DaoHeader: React.FC<DaoHeaderProps> = ({
   daoName,
-  ethBalance,
+  // ethBalance,
   usdBalance,
   ...props
 }) => {
@@ -92,15 +92,7 @@ export const DaoHeader: React.FC<DaoHeaderProps> = ({
           <HeaderLabel>DAO Name</HeaderLabel>
           <HeaderValue>{daoName}</HeaderValue>
         </div>
-        <div>
-          <HeaderLabel>DAO Balance</HeaderLabel>
-          <div style={{ display: 'flex', flexDirection: 'row' }}>
-            <HeaderValue>{ethBalance} ETH</HeaderValue>
-            {/* <HeaderUsdBalance style={{ marginLeft: '15px' }}>
-              {'$ ' + usdBalance}
-            </HeaderUsdBalance> */}
-          </div>
-        </div>
+
         <div
           style={{
             marginRight: '60px',

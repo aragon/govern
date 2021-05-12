@@ -103,7 +103,7 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
         spacing={3}
         xs={12}
         direction="row"
-        justify="center"
+        justify="flex-start"
       >
         {visibleDaoList &&
           visibleDaoList.length > 0 &&
@@ -112,15 +112,15 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
               item
               onClick={() => goToDao(dao)}
               key={dao.name}
-              xl={2}
+              xl={3}
               lg={3}
-              xs={6}
-              sm={4}
-              md={3}
+              md={4}
+              sm={6}
+              xs={12}
             >
               <DaoCard
                 label={dao.name}
-                aumValue={formatEther(dao.executor.balance)}
+                // aumValue={formatEther(dao.executor.balance)}
                 numberOfProposals={dao.queue.nonce}
                 daoId={dao.id}
               ></DaoCard>

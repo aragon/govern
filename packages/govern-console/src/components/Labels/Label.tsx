@@ -51,7 +51,7 @@ const StyledLabel = styled(MUIChip)(
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: '1px 8px 2px',
+    padding: '1px 3px',
     borderRadius: '40px',
     border: getBorder(labelColor, theme),
     '& .MuiChip-label': {
