@@ -13,6 +13,18 @@ enum TransactionKeeperState {
   Failure,
 }
 
+const getErrorFromException = (ex: any): string => {
+  let errorMessage = ex.error?.message || ex.message;
+  if (!errorMessage) {
+    try {
+      errorMessage = JSON.stringify(ex);
+    } catch {
+      errorMessage = 'Unknown error';
+    }
+  }
+  return errorMessage;
+};
+
 export interface TransactionKeeperProps {
   transactionList: CustomTransaction[];
   onTransactionFailure: (
@@ -78,7 +90,8 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
         isQueueAborted = true;
         updateTransaction(updatedTransaction, index);
         setState(TransactionKeeperState.Failure);
-        onTransactionFailure(ex.error.message, updatedTransaction);
+        const errorMessage = getErrorFromException(ex);
+        onTransactionFailure(errorMessage, updatedTransaction);
       }
       index++;
     }
