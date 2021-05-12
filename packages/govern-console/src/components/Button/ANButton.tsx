@@ -47,6 +47,7 @@ export interface ANButtonProps {
    * style
    */
   style?: any;
+  type?: 'button' | 'submit';
 }
 
 const getBackground = (

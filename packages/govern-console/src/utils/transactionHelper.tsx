@@ -1,13 +1,10 @@
 /* eslint-disable*/
-import {
-  CustomTransaction,
-  CustomTransactionStatus,
-} from 'utils/types';
+import { CustomTransaction, CustomTransactionStatus } from 'utils/types';
 import { ethers, BigNumber } from 'ethers';
 import { erc20TokenABI } from './abis/erc20';
-import { AddressZero } from '@ethersproject/constants'
-import { BigNumberish } from '@ethersproject/bignumber'
-import { Account } from 'utils/types'
+import { AddressZero } from '@ethersproject/constants';
+import { BigNumberish } from '@ethersproject/bignumber';
+import { Account } from 'utils/types';
 
 /**
  * @param token address of the token
@@ -21,21 +18,16 @@ export async function erc20ApprovalTransaction(
   token: string,
   amount: BigNumberish,
   spender: string,
-  account: Account
+  account: Account,
 ): Promise<CustomTransaction[]> {
-
   // if the token is zero address, it means there's no need for approval
   if (token === AddressZero) {
-    return []
+    return [];
   }
 
   const amountInBigNumber: BigNumber = ethers.BigNumber.from(amount);
 
-  const contract = new ethers.Contract(
-    token,
-    erc20TokenABI,
-    account.signer,
-  );
+  const contract = new ethers.Contract(token, erc20TokenABI, account.signer);
 
   let allowance: BigNumber = ethers.BigNumber.from(0);
   let userBalance: BigNumber = ethers.BigNumber.from(0);
@@ -44,18 +36,18 @@ export async function erc20ApprovalTransaction(
     allowance = await contract.allowance(account.address, spender);
     userBalance = await contract.balanceOf(account.address);
     // transfer from big number(including decimals * 0) to human readable
-    const decimals = await contract.decimals()
-    amountForHuman = ethers.utils.formatUnits(amount, decimals)
+    const decimals = await contract.decimals();
+    amountForHuman = ethers.utils.formatUnits(amount, decimals);
   } catch (err) {
     // contract address might not have `allowance` or balanceOf on it.
     // TODO: track it with sentry
-    throw new Error(`Contract ${token} doesn't seem to be ERC20 compliant.`)
+    throw new Error(`Contract ${token} doesn't seem to be ERC20 compliant.`);
   }
 
   // user balance is less than the amount that needs approval.
   // this means user won't be able to approve full amount.
   if (userBalance.lt(amountInBigNumber)) {
-    throw new Error(`You need ${amount} to schedule this proposal.`)
+    throw new Error(`You need ${amount} to schedule this proposal.`);
   }
 
   // user has enough balance, but also already got amountInBigNumber approved for spender
@@ -74,5 +66,5 @@ export async function erc20ApprovalTransaction(
 
   // we currently only return 1 transaction, though it might be needed that this function takes care
   // of zero approval first and then the amount approval.
-  return [transaction]
+  return [transaction];
 }

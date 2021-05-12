@@ -26,7 +26,7 @@ import { buildId, buildIndexedId } from './utils/ids'
 import {
   ZERO_ADDRESS,
   APPROVED_STATUS,
-  CANCELLED_STATUS,
+  VETOED_STATUS,
   CHALLENGED_STATUS,
   EXECUTED_STATUS,
   NONE_STATUS,
@@ -111,7 +111,7 @@ export function handleVetoed(event: VetoedEvent): void {
   let queue = loadOrCreateQueue(event.address)
   let container = loadOrCreateContainer(event.params.containerHash)
 
-  container.state = CANCELLED_STATUS
+  container.state = VETOED_STATUS
 
   handleContainerEventVeto(container, event)
 

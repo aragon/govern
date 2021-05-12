@@ -38,6 +38,7 @@ const StyledAddressIdentifier = styled(MUIChip)(({ theme }) => ({
   alignItems: 'center',
   padding: '6px 8px',
   borderRadius: '40px',
+  cursor: 'pointer',
 }));
 
 export const AddressIdentifier: React.FC<any> = ({

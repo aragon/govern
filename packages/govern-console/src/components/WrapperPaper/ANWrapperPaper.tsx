@@ -14,7 +14,7 @@ const useStyle = makeStyles({
     boxSizing: 'border-box',
     boxShadow: '0px 9px 6px rgba(180, 193, 228, 0.35)',
     borderRadius: '16px',
-    marginBottom: '32px'
+    marginBottom: '32px',
   },
 });
 

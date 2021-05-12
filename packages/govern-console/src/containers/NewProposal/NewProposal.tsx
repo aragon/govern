@@ -1,7 +1,7 @@
 /* eslint-disable */
-import React, { useState, useRef, useEffect, memo } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { ANButton } from 'components/Button/ANButton';
-import { useTheme, styled, Theme } from '@material-ui/core/styles';
+import { styled } from '@material-ui/core/styles';
 import backButtonIcon from 'images/back-btn.svg';
 import Typography from '@material-ui/core/Typography';
 import { HelpButton } from 'components/HelpButton/HelpButton';
@@ -10,8 +10,8 @@ import Paper from '@material-ui/core/Paper';
 import { NewActionModal } from 'components/Modal/NewActionModal';
 import { AddActionsModal } from 'components/Modal/AddActionsModal';
 import { InputField } from 'components/InputFields/InputField';
-import { Link, useParams, useHistory } from 'react-router-dom';
-import { utils } from 'ethers';
+import { useParams, useHistory } from 'react-router-dom';
+import { ContractReceipt, utils } from 'ethers';
 import { useQuery } from '@apollo/client';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { buildContainer } from 'utils/ERC3000';
@@ -23,9 +23,11 @@ import {
   actionType,
   ActionToSchedule,
 } from 'utils/types';
-import { ActionTypes, ModalsContext, closeTransactionsModalAction } from 'containers/HomePage/ModalsContext';
+import { useSnackbar } from 'notistack';
+
+import { ActionTypes, closeTransactionsModalAction, ModalsContext } from 'containers/HomePage/ModalsContext';
 import  FacadeProposal from 'services/Proposal';
-import { proposalDetailsUrl, settingsUrl } from 'utils/urls';
+import { useForm, Controller } from 'react-hook-form';
 
 import {
   Proposal,
@@ -33,6 +35,7 @@ import {
   ReceiptType,
   ActionType,
 } from '@aragon/govern';
+import { proposalDetailsUrl } from 'utils/urls';
 
 export interface NewProposalProps {
   /**
@@ -115,8 +118,8 @@ const SettingsLink = styled(Typography)({
   paddingBottom: 10,
   color: '0A0B0B',
   '& a': {
-    color: '#00C2FF'
-  }
+    color: '#00C2FF',
+  },
 });
 const proofTextArea = styled(TextArea)({
   background: '#FFFFFF',
@@ -207,7 +210,9 @@ const AddedActions: React.FC<AddedActionsProps> = ({
             const element = (
               <div key={input.name}>
                 <div style={{ marginTop: '20px' }}>
-                  <SubTitle>{input.name}({input.type})</SubTitle>
+                  <SubTitle>
+                    {input.name}({input.type})
+                  </SubTitle>
                 </div>
                 <div style={{ marginTop: '20px' }}>
                   <InputField
@@ -248,16 +253,15 @@ const AddedActions: React.FC<AddedActionsProps> = ({
 
 const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const history = useHistory();
-
+  const { control, getValues, handleSubmit } = useForm<{ proof: string }>();
   const { daoName } = useParams<any>();
   //TODO daoname empty handling
   const { data: daoList } = useQuery(GET_DAO_BY_NAME, {
     variables: { name: daoName },
   });
-
+  const { enqueueSnackbar } = useSnackbar();
   const { dispatch } = React.useContext(ModalsContext);
 
-  const [proof, setProof] = useState('');
   const [selectedActions, updateSelectedOptions] = useState([]);
   const [isInputModalOpen, setInputModalOpen] = useState(false);
   const [isActionModalOpen, setActionModalOpen] = useState(false);
@@ -382,10 +386,21 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   };
 
   const onChangeProof = (val: string) => {
-    setProof(val);
+    // setProof(val);
+  };
+
+  const validate = () => {
+    if (actionsToSchedule.length === 0) {
+      enqueueSnackbar('Atleast one action is needed to schedule a proposal.', {
+        variant: 'error',
+      });
+      return false;
+    }
+    return true;
   };
 
   const onSchedule = () => {
+    if (!validate()) return;
     const actions: any[] = actionsToSchedule.map((item: any) => {
       const { abi, contractAddress, name, params, numberOfInputs } = item;
       const abiInterface = new utils.Interface(abi);
@@ -417,7 +432,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
       submitter: account.address,
       executor: daoDetails.executor.address,
       actions: actions,
-      proof: proof,
+      proof: getValues('proof'),
     };
 
     // the final container to be sent to schedule.
@@ -426,8 +441,8 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     if (proposalInstance) {
       try {
         transactionsQueue.current = await proposalInstance.schedule(container);
-      } catch (err) {
-        // TODO: Bhanu show error
+      } catch (error) {
+        enqueueSnackbar(error.message, { variant: 'error' });
       }
     }
 
@@ -435,16 +450,21 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
       type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
       payload: {
         transactionList: transactionsQueue.current,
-        onTransactionFailure: () => {},
-        onTransactionSuccess: (_, receipt) => {
-          containerHash = Proposal.getContainerHashFromReceipt(receipt, ReceiptType.Scheduled)
+        onTransactionFailure: (error) => {
+          enqueueSnackbar(error, { variant: 'error' });
+        },
+        onTransactionSuccess: (_, receipt: ContractReceipt) => {
+          containerHash = Proposal.getContainerHashFromReceipt(
+            receipt,
+            ReceiptType.Scheduled,
+          );
         },
         onCompleteAllTransactions: () => {
           dispatch(closeTransactionsModalAction);
-          if( containerHash ) {
+          if (containerHash) {
             history.push(proposalDetailsUrl(daoName, containerHash));
           }
-      },
+        },
       },
     });
   };
@@ -458,13 +478,12 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
         <Title>New Proposal</Title>
         <SettingsLink>
           This execution will use the current{' '}
-          <Link
-            to={settingsUrl(daoName)}
-            target="_blank"
-            rel="noreferrer noopener"
+          <a
+            style={{cursor:'pointer'}}
+            onClick={()=> history.push(`/daos/${daoName}/dao-settings`)}
           >
             DAO Settings
-          </Link>
+          </a>
         </SettingsLink>
         <div
           style={{
@@ -482,15 +501,23 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
             }
           </div>
         </div>
-        <InputField
-          // ref={}
-          onInputChange={onChangeProof}
-          placeholder={'Enter proof '}
-          label=""
-          value={proof}
-          height={'108px'}
-          width={'700px'}
-        ></InputField>
+        <Controller
+            name="proof"
+            control={control}
+            defaultValue={''}
+            rules={{ required: 'This is required.'}}
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <InputField
+                onInputChange={onChange}
+                placeholder={'Enter proof'}
+                label=""
+                value={value}
+                height={'108px'}
+                width={'700px'}
+                error={!!error}
+                helperText={error ? error.message : null}
+              />)}
+        />
         <Title>Actions</Title>
         {selectedActions.length === 0 ? (
           <SubTitle>No actions defined Yet</SubTitle>
@@ -523,7 +550,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
           // color="#00C2FF"
           style={{ marginTop: 16 }}
           // disabled={!isProposalValid()}
-          onClick={() => onSchedule()}
+          onClick={handleSubmit(() => onSchedule())}
         />
         {isInputModalOpen && (
           <NewActionModal

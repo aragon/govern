@@ -62,7 +62,6 @@ const ResolveWidget: React.FC<any> = ({
       </div>
     </Widget>
   );
-
 };
 
 export default memo(ResolveWidget);

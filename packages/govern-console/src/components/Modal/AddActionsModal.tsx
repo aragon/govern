@@ -76,6 +76,16 @@ const DialogContent = withStyles((theme: Theme) => ({
   },
 }))(MuiDialogContent);
 
+const DialogContentSearch = withStyles((theme: Theme) => ({
+  root: {
+    paddingTop: '20px',
+    paddingLeft: '40px',
+    paddingRight: '40px',
+    paddingBottom: '20px',
+    maxHeight: '424px',
+  },
+}))(MuiDialogContent);
+
 const DialogActions = withStyles((theme: Theme) => ({
   root: {
     margin: 0,
@@ -155,6 +165,7 @@ export const AddActionsModal: React.FC<AddActionsModalProps> = ({
   actions,
 }) => {
   const theme = useTheme();
+  const [shownActions, setShownActions] = useState<any>(actions);
   const [selectedActions, setSelectedActions] = useState<any>([]);
   const actionStyle = {
     display: 'flex',
@@ -185,20 +196,37 @@ export const AddActionsModal: React.FC<AddActionsModalProps> = ({
     setSelectedActions(temp);
   };
 
+  const searchActions = (value: string) => {
+    if (value === '') {
+      setShownActions(actions);
+      return;
+    }
+    const searchedActions = [];
+    for (const action of shownActions) {
+      const functionName = action.name.toLowerCase();
+      if (functionName.includes(value)) {
+        searchedActions.push(action);
+      }
+    }
+    setShownActions(searchedActions);
+  };
+
   return (
     <MuiDialog open={open}>
       <DialogTitle onClose={onCloseModal}> Actions </DialogTitle>
-      <DialogContent>
+      <DialogContentSearch>
         <div style={{ marginBottom: '26px' }}>
           <InputField
             height={'46px'}
-            width={'604px'}
-            onInputChange={() => console.log('xyz')}
+            width={'520px'}
+            onInputChange={searchActions}
             placeholder="Search Actions"
             label=""
           ></InputField>
         </div>
-        {actions && actions.length > 0 && (
+      </DialogContentSearch>
+      <DialogContent>
+        {shownActions && shownActions.length > 0 && (
           <div
             style={{
               width: '100%',
@@ -206,7 +234,7 @@ export const AddActionsModal: React.FC<AddActionsModalProps> = ({
               border: '2px solid #E2ECF5',
             }}
           >
-            {actions.map((action: any) => (
+            {shownActions.map((action: any) => (
               <div style={actionStyle} key={action.name}>
                 <ActionText>{action.name}</ActionText>
                 <IncrementorDecrementorButtons

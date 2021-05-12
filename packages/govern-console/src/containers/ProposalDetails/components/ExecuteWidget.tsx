@@ -5,6 +5,7 @@ import { PROPOSAL_STATES } from 'utils/states';
 import { formatDate } from 'utils/date';
 import { InfoKeyDiv, InfoValueDivInline } from '../ProposalDetails';
 import { Widget, WidgetRow, InfoWrapper, TitleText } from './SharedStyles';
+import { isEligibleForExecution } from 'utils/states'
 
 const ExecuteWidget: React.FC<any> = ({
   disabled,
@@ -33,19 +34,10 @@ const ExecuteWidget: React.FC<any> = ({
     return <></>;
   }
 
-  const postponeTime = (time: number) => {
-    return time * 1000 
-    // return time * 1000 + 15000 // block.timestamp latency
-  }
-
-  const isEligibleToBeExecuted = () => {
-    return Date.now()  >= postponeTime(executionTime)
-  };
-
   return (
     <>
       <Widget>
-        {isEligibleToBeExecuted() ? (
+        {isEligibleForExecution(executionTime) ? (
           <>
             <WidgetRow marginBottom="9px">
               <ANButton
@@ -72,7 +64,6 @@ const ExecuteWidget: React.FC<any> = ({
       </Widget>
     </>
   );
-  
 };
 
 export default memo(ExecuteWidget);

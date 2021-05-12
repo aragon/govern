@@ -96,7 +96,7 @@ enum ContainerState {
   Approved
   Challenged
   Rejected
-  Cancelled
+  Vetoed
   Executed
 }
 

@@ -32,7 +32,7 @@ export type abiItem = {
   name: string;
   type: string;
   stateMutability: string;
-} 
+};
 
 export type actionType = {
   item: abiItem;
@@ -40,7 +40,7 @@ export type actionType = {
   contractAddress: string;
   abi: any[];
   type: string;
-}
+};
 
 export type ActionToSchedule = {
   contractAddress: string;
@@ -48,16 +48,14 @@ export type ActionToSchedule = {
   params: [];
   abi: [];
   numberOfInputs: number;
-}
+};
 
 export type Account = {
   signer: any | undefined;
   address: string | null;
-}
+};
 
 export enum ChainId {
   MAINNET = 1,
   RINKEBY = 4,
 }
-
-

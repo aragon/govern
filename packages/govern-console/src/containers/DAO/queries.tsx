@@ -14,6 +14,9 @@ export const GET_PROPOSAL_LIST = gql`
         id
         state
         createdAt
+        payload {
+          executionTime
+        }
       }
       nonce
     }

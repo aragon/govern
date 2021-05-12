@@ -13,9 +13,9 @@ import {
 } from '../ProposalDetails';
 import { Widget, WidgetRow, InfoWrapper, TitleText } from './SharedStyles';
 
-import { formatDate} from 'utils/date';
-import { getTruncatedAccountAddress } from 'utils/account'
-import { getIpfsCid, getIpfsURI } from 'utils/ipfs'
+import { formatDate } from 'utils/date';
+import { getTruncatedAccountAddress } from 'utils/account';
+import { getIpfsCid, getIpfsURI } from 'utils/ipfs';
 
 const ChallengeWidget: React.FC<any> = ({
   disabled,
@@ -27,7 +27,7 @@ const ChallengeWidget: React.FC<any> = ({
   const [isExpanded, updateIsExpanded] = React.useState<boolean>(false);
 
   if (containerEventChallenge) {
-    const challengeReasonCid = getIpfsCid(containerEventChallenge.reason)
+    const challengeReasonCid = getIpfsCid(containerEventChallenge.reason);
     return (
       <Widget>
         <WidgetRow>
@@ -54,20 +54,18 @@ const ChallengeWidget: React.FC<any> = ({
             display: '-webkit-box',
             marginTop: 0,
           }}
-        >       
-          { 
-            challengeReasonCid
-            ?
-              <Link
-                  to={getIpfsURI(challengeReasonCid)}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
-                  View file
-              </Link>
-            : 
+        >
+          {challengeReasonCid ? (
+            <Link
+              to={getIpfsURI(challengeReasonCid)}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              View file
+            </Link>
+          ) : (
             toUtf8String(containerEventChallenge.reason)
-          }    
+          )}
         </InfoValueDivBlock>
       </Widget>
     );
