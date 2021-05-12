@@ -15,6 +15,7 @@ import { useHistory, useParams } from 'react-router-dom';
 import MUITypography from '@material-ui/core/Typography';
 import NoDaoFound from './NoDaoFound';
 import { formatDate } from 'utils/date'
+import { getState, getStateColor } from 'utils/states'
 
 //* Styled Components List
 const DaoPageMainDiv = styled(Paper)(({ theme }) => ({
@@ -184,8 +185,6 @@ const DaoMainPage: React.FC<{
     }
   }, [queueData]);
 
-  console.log(visibleProposalList, ' good');
-
   const onClickProposal = (proposal: any) => {
     history.push(`/proposals/${daoName}/${proposal.id}`);
   };
@@ -287,7 +286,8 @@ const DaoMainPage: React.FC<{
                         <ProposalCard
                           transactionHash={proposal.id}
                           proposalDate={formatDate(proposal.createdAt)}
-                          proposalStatus={proposal.state}
+                          proposalStatus={getState(proposal.state, proposal.payload.executionTime)}
+                          proposalStatusColor={getStateColor(proposal.state, proposal.payload.executionTime)}
                           onClickProposalCard={() => onClickProposal(proposal)}
                         ></ProposalCard>
                       </Grid>
