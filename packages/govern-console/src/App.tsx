@@ -41,8 +41,8 @@ const App = () => {
   return (
     <SnackbarProvider
       anchorOrigin={{
-        vertical: 'bottom',
-        horizontal: 'right',
+        vertical: 'top',
+        horizontal: 'center',
       }}
       classes={{
         variantSuccess: toastClasses.success,

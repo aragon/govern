@@ -17,13 +17,14 @@ import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { buildContainer } from 'utils/ERC3000';
 import { useWallet } from 'AugmentedWallet';
 import QueueApprovals from 'services/QueueApprovals';
-import { useSnackbar } from 'notistack';
 import {
   CustomTransaction,
   abiItem,
   actionType,
   ActionToSchedule,
 } from 'utils/types';
+import { useSnackbar } from 'notistack';
+
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import FacadeProposal from 'services/Proposal';
 import { settingsUrl } from 'utils/urls';
@@ -440,8 +441,8 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     if (proposalInstance) {
       try {
         transactionsQueue.current = await proposalInstance.schedule(container);
-      } catch (err) {
-        // TODO: Bhanu show error
+      } catch (error) {
+        enqueueSnackbar(error.message, { variant: 'error' });
       }
     }
 
@@ -449,7 +450,9 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
       type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
       payload: {
         transactionList: transactionsQueue.current,
-        onTransactionFailure: () => {},
+        onTransactionFailure: (error) => {
+          enqueueSnackbar(error, { variant: 'error' });
+        },
         onTransactionSuccess: () => {},
         onCompleteAllTransactions: () => {},
       },

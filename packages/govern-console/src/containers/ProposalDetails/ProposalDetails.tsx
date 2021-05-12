@@ -20,6 +20,7 @@ import FacadeProposal from 'services/Proposal';
 import AbiHandler from 'utils/AbiHandler';
 import { toUtf8String } from '@ethersproject/strings';
 import { formatDate } from 'utils/date';
+import { useSnackbar } from 'notistack';
 
 // widget components
 import ChallengeWidget from './components/ChallengeWidget';
@@ -278,6 +279,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   const { account, provider, networkName, isConnected } = context;
 
   const { dispatch } = React.useContext(ModalsContext);
+  const { enqueueSnackbar } = useSnackbar();
 
   const [proposalInfo, updateProposalInfo] = React.useState<any>(null);
   const [abiCache, updateAbiCache] = React.useState<any>({});
@@ -381,8 +383,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
           challengeReason,
         );
       } catch (error) {
-        // TODO:Bhanu show this error.
-        // error.error.message
+        enqueueSnackbar(error.message, { variant: 'error' });
       }
     }
 
@@ -390,8 +391,10 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     dispatch({
       type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
       payload: {
-        transactionList: transactionsQueue.current, // TODO: Bhanu check if the length is more than 0 in the dispatch..
-        onTransactionFailure: () => {},
+        transactionList: transactionsQueue.current,
+        onTransactionFailure: (error) => {
+          enqueueSnackbar(error, { variant: 'error' });
+        },
         onTransactionSuccess: () => {},
         onCompleteAllTransactions: () => {},
       },
@@ -404,20 +407,18 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       try {
         await proposalInstance.execute(proposalParams);
       } catch (error) {
-        // TODO:Bhanu show this error.
-        // error.error.message
+        enqueueSnackbar(error.error.message, { variant: 'error' });
       }
     }
   };
 
   const resolveProposal = async (disputeId: number) => {
+    const proposalParams = getProposalParams(proposalInfo);
     if (proposalInstance) {
-      const proposalParams = getProposalParams(proposalInfo);
       try {
         await proposalInstance.resolve(proposalParams, disputeId);
       } catch (error) {
-        // TODO:Bhanu show this error.
-        // error.error.message
+        enqueueSnackbar(error.error.message, { variant: 'error' });
       }
     }
   };

@@ -29,6 +29,9 @@ import {
   PayloadType,
   ActionType,
 } from '@aragon/govern';
+import { useSnackbar } from 'notistack';
+
+
 import { toUtf8Bytes, toUtf8String } from '@ethersproject/strings';
 
 export interface DaoSettingFormProps {
@@ -115,6 +118,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
   const { account, status, isConnected, provider } = context;
 
   const { dispatch } = React.useContext(ModalsContext);
+  const { enqueueSnackbar } = useSnackbar();
 
   const {
     control,
@@ -236,17 +240,18 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
         transactionsQueue.current = await proposalInstance.schedule(container);
         console.log(transactionsQueue.current);
       } catch (error) {
-        // TODO: Bhanu show (error.error.message)
+        enqueueSnackbar(error.message, { variant: 'error' });
         return;
       }
     }
-    console.log(transactionsQueue.current);
 
     dispatch({
       type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
       payload: {
         transactionList: transactionsQueue.current,
-        onTransactionFailure: () => {},
+        onTransactionFailure: (error) => {
+          enqueueSnackbar(error, { variant: 'error' });
+        },
         onTransactionSuccess: () => {},
         onCompleteAllTransactions: () => {},
       },
