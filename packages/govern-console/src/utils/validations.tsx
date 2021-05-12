@@ -1,5 +1,6 @@
 /* eslint-disable */
 import { getToken } from '@aragon/govern';
+import { ethers } from 'ethers';
 import { ValidateResult } from 'react-hook-form';
 import Abi from './AbiHandler';
 
@@ -33,9 +34,10 @@ export const validateContract = async (
   provider: any,
 ): Promise<ValidateResult> => {
   try {
-    await provider.getCode(address);
-    return true;
-  } catch (error) {}
+    const code = await provider.getCode(address);
+    if (code !== '0x') return true;
+  } catch (error) {
+  }
   return 'Contract address is not valid.';
 };
 
