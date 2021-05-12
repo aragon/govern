@@ -1,6 +1,5 @@
 /* eslint-disable */
 import { getToken } from '@aragon/govern';
-import { ethers } from 'ethers';
 import { ValidateResult } from 'react-hook-form';
 import Abi from './AbiHandler';
 
