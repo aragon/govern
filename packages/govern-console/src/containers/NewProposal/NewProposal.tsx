@@ -23,8 +23,10 @@ import {
   actionType,
   ActionToSchedule,
 } from 'utils/types';
+import { useSnackbar } from 'notistack';
+
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
-import  FacadeProposal from 'services/Proposal';
+import FacadeProposal from 'services/Proposal';
 import { settingsUrl } from 'utils/urls';
 
 import {
@@ -115,8 +117,8 @@ const SettingsLink = styled(Typography)({
   paddingBottom: 10,
   color: '0A0B0B',
   '& a': {
-    color: '#00C2FF'
-  }
+    color: '#00C2FF',
+  },
 });
 const proofTextArea = styled(TextArea)({
   background: '#FFFFFF',
@@ -207,7 +209,9 @@ const AddedActions: React.FC<AddedActionsProps> = ({
             const element = (
               <div key={input.name}>
                 <div style={{ marginTop: '20px' }}>
-                  <SubTitle>{input.name}({input.type})</SubTitle>
+                  <SubTitle>
+                    {input.name}({input.type})
+                  </SubTitle>
                 </div>
                 <div style={{ marginTop: '20px' }}>
                   <InputField
@@ -252,7 +256,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const { data: daoList } = useQuery(GET_DAO_BY_NAME, {
     variables: { name: daoName },
   });
-
+  const { enqueueSnackbar } = useSnackbar();
   const { dispatch } = React.useContext(ModalsContext);
 
   const [proof, setProof] = useState('');
@@ -382,8 +386,23 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const onChangeProof = (val: string) => {
     setProof(val);
   };
-
+  const validate = () => {
+    if (!proof || proof.length === 0) {
+      enqueueSnackbar('Proof is required to schedule a proposal.', {
+        variant: 'error',
+      });
+      return false;
+    }
+    if (actionsToSchedule.length === 0) {
+      enqueueSnackbar('Atleast one action is needed to schedule a proposal.', {
+        variant: 'error',
+      });
+      return false;
+    }
+    return true;
+  };
   const onSchedule = () => {
+    if (!validate()) return;
     const actions: any[] = actionsToSchedule.map((item: any) => {
       const { abi, contractAddress, name, params, numberOfInputs } = item;
       const abiInterface = new utils.Interface(abi);
@@ -422,8 +441,8 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     if (proposalInstance) {
       try {
         transactionsQueue.current = await proposalInstance.schedule(container);
-      } catch (err) {
-        // TODO: Bhanu show error
+      } catch (error) {
+        enqueueSnackbar(error.message, { variant: 'error' });
       }
     }
 
@@ -431,7 +450,9 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
       type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
       payload: {
         transactionList: transactionsQueue.current,
-        onTransactionFailure: () => {},
+        onTransactionFailure: (error) => {
+          enqueueSnackbar(error, { variant: 'error' });
+        },
         onTransactionSuccess: () => {},
         onCompleteAllTransactions: () => {},
       },

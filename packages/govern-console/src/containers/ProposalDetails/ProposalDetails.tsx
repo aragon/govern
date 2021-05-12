@@ -17,10 +17,11 @@ import { Proposal, ProposalOptions } from '@aragon/govern';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import QueueApprovals from 'services/QueueApprovals';
 import FacadeProposal from 'services/Proposal';
-import AbiHandler from 'utils/AbiHandler'
+import AbiHandler from 'utils/AbiHandler';
 import { toUtf8String } from '@ethersproject/strings';
 import { formatDate} from 'utils/date';
 import { getState, getStateColor } from 'utils/states'
+import { useSnackbar } from 'notistack';
 
 // widget components
 import ChallengeWidget from './components/ChallengeWidget';
@@ -146,7 +147,7 @@ const InfoValuePre = styled('pre')({
   color: '#20232C',
   overflow: 'auto',
   margin: '0',
-})
+});
 
 export const InfoValueDivBlock = styled('div')(
   ({ maxlines }: { maxlines?: number }) => ({
@@ -274,6 +275,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   const { account, provider, networkName, isConnected } = context;
 
   const { dispatch } = React.useContext(ModalsContext);
+  const { enqueueSnackbar } = useSnackbar();
 
   const [proposalInfo, updateProposalInfo] = React.useState<any>(null);
   const [abiCache, updateAbiCache] = React.useState<any>({});
@@ -368,6 +370,13 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   }, [daoList]);
 
   const challengeProposal = async () => {
+    // if the reason's length is less than 10 words, it's highly unlikely
+    // to specify the actual valid reason in less than 10 words
+    if(challengeReason.length < 10) {
+      enqueueSnackbar("Challenge reason must be at least 10 letters", { variant: 'error' });
+      return;
+    }
+
     const proposalParams = getProposalParams(proposalInfo);
 
     if (proposalInstance) {
@@ -377,8 +386,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
           challengeReason,
         );
       } catch (error) {
-        // TODO:Bhanu show this error.
-        // error.error.message
+        enqueueSnackbar(error.message, { variant: 'error' });
       }
     }
 
@@ -386,8 +394,10 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     dispatch({
       type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
       payload: {
-        transactionList: transactionsQueue.current, // TODO: Bhanu check if the length is more than 0 in the dispatch..
-        onTransactionFailure: () => {},
+        transactionList: transactionsQueue.current,
+        onTransactionFailure: (error) => {
+          enqueueSnackbar(error, { variant: 'error' });
+        },
         onTransactionSuccess: () => {},
         onCompleteAllTransactions: () => {},
       },
@@ -399,21 +409,19 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     if (proposalInstance) {
       try {
         await proposalInstance.execute(proposalParams);
-      }catch(error){ 
-        // TODO:Bhanu show this error.
-        // error.error.message
+      } catch (error) {
+        enqueueSnackbar(error.error.message, { variant: 'error' });
       }
     }
   };
 
   const resolveProposal = async (disputeId: number) => {
-    if(proposalInstance) {
-      const proposalParams = getProposalParams(proposalInfo);
+    const proposalParams = getProposalParams(proposalInfo);
+    if (proposalInstance) {
       try {
-        await proposalInstance.resolve(proposalParams,disputeId);
-      }catch(error) {
-        // TODO:Bhanu show this error.
-        // error.error.message
+        await proposalInstance.resolve(proposalParams, disputeId);
+      } catch (error) {
+        enqueueSnackbar(error.error.message, { variant: 'error' });
       }
     }
   };
@@ -424,8 +432,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       proposalStates[item.__typename] = item;
     });
   }
-
-  // console.log(getStateColor(proposalInfo.state, proposalInfo.payload.executionTime), ' haime')
 
   return (
     <>
@@ -445,9 +451,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                 />
               </ProposalStatus>
               <ProposalId>{proposalInfo.id}</ProposalId>
-              <DateDisplay>
-                { formatDate(proposalInfo.createdAt) }
-              </DateDisplay>
+              <DateDisplay>{formatDate(proposalInfo.createdAt)}</DateDisplay>
               <DetailsWrapper>
                 <ProposalDetailsWrapper id="proposal_wrapper">
                   <TitleText>Config</TitleText>
@@ -636,9 +640,9 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                         proposalStates['ContainerEventResolve']
                       }
                       disputeId={
-                        proposalStates['ContainerEventChallenge'] 
-                        ? proposalStates['ContainerEventChallenge'].disputeId 
-                        : null
+                        proposalStates['ContainerEventChallenge']
+                          ? proposalStates['ContainerEventChallenge'].disputeId
+                          : null
                       }
                       currentState={proposalInfo.state}
                       executionTime={proposalInfo.payload.executionTime}

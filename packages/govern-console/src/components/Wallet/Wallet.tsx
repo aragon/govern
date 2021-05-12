@@ -4,9 +4,11 @@ import { styled } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import { useWallet } from 'use-wallet';
 import connectedUserIcon from 'images/connected-user-icon.svg';
+import { AddressIdentifier } from 'components/AddressIdentifier/AddressIdentifier';
 import Typography from '@material-ui/core/Typography';
 import { useEffect } from 'react';
 import { getTruncatedAccountAddress } from 'utils/account';
+import { useSnackbar } from 'notistack';
 
 const WalletWrapper = styled(Card)({
   background: '#FFFFFF',
@@ -30,9 +32,12 @@ const ConnectedAccount = styled('div')({
   boxSizing: 'border-box',
   boxShadow: '0px 3px 3px rgba(180, 193, 228, 0.35)',
   borderRadius: '8px',
-  padding: '13px 20px',
+  justifyContent: 'center',
+  alignItems: 'center',
+  // padding: '13px 20px',
   display: 'flex',
   flexDirection: 'row',
+  cursor: 'pointer',
 });
 //TODO add the icon for logged in users
 const IconHolder = styled('img')({
@@ -54,46 +59,63 @@ const AccountAddress = styled(Typography)({
 const Wallet = ({}) => {
   const context: any = useWallet();
   const {
-    connector,
     account,
     balance,
     chainId,
     connect,
-    connectors,
-    ethereum,
     error,
-    getBlockNumber,
-    networkName,
     reset,
     status,
-    type,
     provider,
   } = context;
   const [networkStatus, setNetworkStatus] = useState<string>(status);
-  // console.log('status', status, 'account', account, error);
+  const [userAccount, setUserAccount] = useState<string>(status);
+  const { enqueueSnackbar } = useSnackbar();
 
-  const onWalletConnectionError = (error: Error) => {
-    // alert(getErrorMessage(error));
-  };
+  // useEffect(() => {
+  //   connectWalletAndSetStatus('injected');
+  // }, []);
   useEffect(() => {
-    console.log(status, chainId, error);
     if (chainId !== 4) {
       setNetworkStatus('unsupported');
     } else if (error) {
-      setNetworkStatus('connection-error');
+      if (error.message.includes('Unsupported chain')) {
+        setNetworkStatus('unsupported');
+      } else {
+        setNetworkStatus('connection-error');
+      }
     } else if (status === 'connected') {
       setNetworkStatus('connected');
+      enqueueSnackbar('Your wallet is successfully connected.', {
+        variant: 'success',
+      });
     } else {
       setNetworkStatus('disconnected');
     }
-  }, [status, error, chainId]);
-  // ---- Components ----
+  }, [status]);
 
-  // React.useEffect(() => {
-  //   if (activatingConnector && activatingConnector === connector) {
-  //     setActivatingConnector(undefined);
-  //   }
-  // }, [connector]);
+  useEffect(() => {
+    if (status === 'disconnected') {
+      return;
+    }
+    if (error) {
+      if (error.message.includes('Unsupported chain')) {
+        enqueueSnackbar('Please select the correct chain in your wallet.', {
+          variant: 'error',
+        });
+      } else {
+        enqueueSnackbar(error.message, {
+          variant: 'error',
+        });
+      }
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (account) {
+      setUserAccount(account);
+    }
+  }, [account]);
 
   const connectWalletAndSetStatus = async (type: string) => {
     try {
@@ -104,46 +126,56 @@ const Wallet = ({}) => {
       console.log('error', error);
     }
   };
+
   if (networkStatus === 'connected') {
     return (
       <WalletWrapper>
         <ConnectedAccount
           onClick={() => {
-            // connect('injected');
-            // setActivatingConnector(ConnectorNames.Injected);
+            reset();
           }}
         >
           {/* <IconHolder src={connectedUserIcon} /> */}
-          <AccountAddress>{getTruncatedAccountAddress(account)}</AccountAddress>
+          <AddressIdentifier
+            isAddress={true}
+            displayText={userAccount || ''}
+            componentSize={'medium'}
+          />
         </ConnectedAccount>
       </WalletWrapper>
     );
   } else if (networkStatus === 'unsupported') {
     return (
       <WalletWrapper>
-        <ConnectedAccount
+        <ANButton
+          buttonType="primary"
           onClick={() => {
+            connectWalletAndSetStatus('injected');
             // connect('injected');
             // setActivatingConnector(ConnectorNames.Injected);
           }}
-        >
-          {/* <IconHolder src={connectedUserIcon}> </IconHolder> */}
-          <AccountAddress>Invalid Chain</AccountAddress>
-        </ConnectedAccount>
+          label={'Connect Account'}
+          height={'48px'}
+          width={'174px'}
+          disabled={status === 'connecting'}
+        />
       </WalletWrapper>
     );
   } else if (networkStatus === 'connection-error') {
     return (
       <WalletWrapper>
-        <ConnectedAccount
+        <ANButton
+          buttonType="primary"
           onClick={() => {
+            connectWalletAndSetStatus('injected');
             // connect('injected');
             // setActivatingConnector(ConnectorNames.Injected);
           }}
-        >
-          {/* <IconHolder src={connectedUserIcon}> </IconHolder> */}
-          <AccountAddress>Invalid Chain</AccountAddress>
-        </ConnectedAccount>
+          label={'Connect Account'}
+          height={'48px'}
+          width={'174px'}
+          disabled={status === 'connecting'}
+        />
       </WalletWrapper>
     );
   } else {

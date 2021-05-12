@@ -42,7 +42,12 @@ const WalletAugmented: React.FC<unknown> = ({ children }) => {
       signer,
     };
 
-    return { ...wallet, isConnected: wallet.status === 'connected', provider, account };
+    return {
+      ...wallet,
+      isConnected: wallet.status === 'connected',
+      provider,
+      account,
+    };
   }, [wallet, provider]);
   return (
     <WalletAugmentedContext.Provider value={contextValue}>

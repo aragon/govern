@@ -64,7 +64,6 @@ const ExecuteWidget: React.FC<any> = ({
       </Widget>
     </>
   );
-  
 };
 
 export default memo(ExecuteWidget);
