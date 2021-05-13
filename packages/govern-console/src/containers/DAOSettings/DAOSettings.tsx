@@ -143,7 +143,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
   }, [daoList]);
 
   const proposalInstance = React.useMemo(() => {
-    if (provider && daoDetails && account.address && account.signer) {
+    if (provider && daoDetails && account) {
       let queueApprovals = new QueueApprovals(
         account,
         daoDetails.queue.address,

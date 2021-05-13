@@ -128,8 +128,7 @@ const CreateDaoForm: React.FC<FormProps> = ({
   const { control, handleSubmit, watch, setValue } = useForm<FormInputs>();
 
   const connectedChainId = useMemo(() => {
-    if (chainId === ChainId.RINKEBY && isConnected)
-      return ChainId.RINKEBY;
+    if (chainId === ChainId.RINKEBY && isConnected) return ChainId.RINKEBY;
 
     return ChainId.MAINNET;
   }, [chainId, isConnected]);
@@ -137,7 +136,6 @@ const CreateDaoForm: React.FC<FormProps> = ({
   // use appropriate default config
   useEffect(() => {
     const _config: DaoConfig = DEFAULT_DAO_CONFIG[connectedChainId];
-    console.log('defultconfig:', _config)
     setValue('daoConfig', _config);
   }, [connectedChainId]);
 

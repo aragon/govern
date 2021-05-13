@@ -278,7 +278,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const { account, provider, isConnected } = context;
 
   const proposalInstance = React.useMemo(() => {
-    if (provider && daoDetails && account.address && account.signer) {
+    if (provider && daoDetails && account) {
       let queueApprovals = new QueueApprovals(
         account,
         daoDetails.queue.address,

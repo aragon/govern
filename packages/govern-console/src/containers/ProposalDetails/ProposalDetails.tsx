@@ -293,13 +293,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   }, [networkName]);
 
   const proposalInstance = React.useMemo(() => {
-    if (
-      provider &&
-      daoDetails &&
-      proposalInfo &&
-      account.address &&
-      account.signer
-    ) {
+    if (provider && daoDetails && proposalInfo && account) {
       let queueApprovals = new QueueApprovals(
         account,
         daoDetails.queue.address,
