@@ -17,25 +17,15 @@ import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { buildContainer } from 'utils/ERC3000';
 import { useWallet } from 'AugmentedWallet';
 import QueueApprovals from 'services/QueueApprovals';
-import {
-  CustomTransaction,
-  abiItem,
-  actionType,
-  ActionToSchedule,
-} from 'utils/types';
+import { CustomTransaction, abiItem, actionType, ActionToSchedule } from 'utils/types';
 import { useSnackbar } from 'notistack';
 
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
-import  FacadeProposal from 'services/Proposal';
+import FacadeProposal from 'services/Proposal';
 import { useForm, Controller } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
 
-import {
-  Proposal,
-  ProposalOptions,
-  PayloadType,
-  ActionType,
-} from '@aragon/govern';
+import { Proposal, ProposalOptions, PayloadType, ActionType } from '@aragon/govern';
 
 export interface NewProposalProps {
   /**
@@ -285,12 +275,8 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
         daoDetails.queue.address,
         daoDetails.queue.config.resolver,
       );
-      const proposal = new Proposal(
-        daoDetails.queue.address,
-        {} as ProposalOptions,
-      );
-      return new FacadeProposal(queueApprovals, proposal) as FacadeProposal &
-        Proposal;
+      const proposal = new Proposal(daoDetails.queue.address, {} as ProposalOptions);
+      return new FacadeProposal(queueApprovals, proposal) as FacadeProposal & Proposal;
     }
   }, [provider, account, daoDetails]);
 
@@ -316,22 +302,20 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     handleActionModalClose();
     const newActions = [...selectedActions, ...actions] as any;
     updateSelectedOptions(newActions);
-    const initialActions: ActionToSchedule[] = newActions.map(
-      (actionItem: actionType) => {
-        const { contractAddress, name, item, abi } = actionItem;
-        const { inputs } = item;
-        const numberOfInputs = inputs.length;
-        const params = {};
-        const data = {
-          contractAddress,
-          name,
-          params,
-          abi,
-          numberOfInputs,
-        };
-        return data as ActionToSchedule;
-      },
-    );
+    const initialActions: ActionToSchedule[] = newActions.map((actionItem: actionType) => {
+      const { contractAddress, name, item, abi } = actionItem;
+      const { inputs } = item;
+      const numberOfInputs = inputs.length;
+      const params = {};
+      const data = {
+        contractAddress,
+        name,
+        params,
+        abi,
+        numberOfInputs,
+      };
+      return data as ActionToSchedule;
+    });
     setActionsToSchedule(initialActions as []);
   };
 
@@ -356,18 +340,11 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   };
   // const onScheduleProposal = () => {};
 
-  const onGenerateActionsFromAbi = async (
-    contractAddress: string,
-    abi: any[],
-  ) => {
+  const onGenerateActionsFromAbi = async (contractAddress: string, abi: any[]) => {
     const functions = [] as any;
     await abi.forEach((item: abiItem) => {
       const { name, type, stateMutability } = item;
-      if (
-        type === 'function' &&
-        stateMutability !== 'view' &&
-        stateMutability !== 'pure'
-      ) {
+      if (type === 'function' && stateMutability !== 'view' && stateMutability !== 'pure') {
         const data = {
           abi,
           name,
@@ -409,10 +386,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
         functionParameters.push(params[key]);
       }
       console.log('functionParams', functionParameters);
-      const calldata = abiInterface.encodeFunctionData(
-        name,
-        functionParameters,
-      );
+      const calldata = abiInterface.encodeFunctionData(name, functionParameters);
       const data = {
         to: contractAddress,
         value: 0,
@@ -467,8 +441,8 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
         <SettingsLink>
           This execution will use the current{' '}
           <a
-            style={{cursor:'pointer'}}
-            onClick={()=> history.push(`/daos/${daoName}/dao-settings`)}
+            style={{ cursor: 'pointer' }}
+            onClick={() => history.push(`/daos/${daoName}/dao-settings`)}
           >
             DAO Settings
           </a>
@@ -490,21 +464,22 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
           </div>
         </div>
         <Controller
-            name="proof"
-            control={control}
-            defaultValue={''}
-            rules={{ required: 'This is required.'}}
-            render={({ field: { onChange, value }, fieldState: { error } }) => (
-              <InputField
-                onInputChange={onChange}
-                placeholder={'Enter proof'}
-                label=""
-                value={value}
-                height={'108px'}
-                width={'700px'}
-                error={!!error}
-                helperText={error ? error.message : null}
-              />)}
+          name="proof"
+          control={control}
+          defaultValue={''}
+          rules={{ required: 'This is required.' }}
+          render={({ field: { onChange, value }, fieldState: { error } }) => (
+            <InputField
+              onInputChange={onChange}
+              placeholder={'Enter proof'}
+              label=""
+              value={value}
+              height={'108px'}
+              width={'700px'}
+              error={!!error}
+              helperText={error ? error.message : null}
+            />
+          )}
         />
         <Title>Actions</Title>
         {selectedActions.length === 0 ? (

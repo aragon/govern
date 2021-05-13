@@ -103,10 +103,7 @@ const CreateDaoProgress: React.FC<CreateDaoProgressProps> = ({
           <SubTitle>Hold tight your transaction is under process</SubTitle>
         </div>
         <ProgressContainer>
-          <ANCircularProgressWithCaption
-            caption={'Creating DAO'}
-            state={progressStatus.create}
-          />
+          <ANCircularProgressWithCaption caption={'Creating DAO'} state={progressStatus.create} />
           {isTokenRegister ? (
             <ANCircularProgressWithCaption
               caption={'Registering token'}

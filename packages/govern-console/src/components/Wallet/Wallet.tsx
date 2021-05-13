@@ -58,16 +58,7 @@ const AccountAddress = styled(Typography)({
 
 const Wallet = ({}) => {
   const context: any = useWallet();
-  const {
-    account,
-    balance,
-    chainId,
-    connect,
-    error,
-    reset,
-    status,
-    provider,
-  } = context;
+  const { account, balance, chainId, connect, error, reset, status, provider } = context;
   const [networkStatus, setNetworkStatus] = useState<string>(status);
   const [userAccount, setUserAccount] = useState<string>(status);
   const { enqueueSnackbar } = useSnackbar();

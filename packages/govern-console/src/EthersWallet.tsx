@@ -15,10 +15,9 @@ const WalletAugmented: React.FC<unknown> = ({ children }) => {
   const wallet = useWallet();
   const ethereum: any = wallet.ethereum;
 
-  const provider = useMemo(
-    () => (ethereum ? new EthersProviders.Web3Provider(ethereum) : null),
-    [ethereum],
-  );
+  const provider = useMemo(() => (ethereum ? new EthersProviders.Web3Provider(ethereum) : null), [
+    ethereum,
+  ]);
 
   const contextValue = useMemo(() => {
     const account: Account = {

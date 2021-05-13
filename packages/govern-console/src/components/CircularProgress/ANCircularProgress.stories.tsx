@@ -4,10 +4,7 @@ import React from 'react';
 
 import { Story, Meta } from '@storybook/react';
 
-import {
-  ANCircularProgress,
-  ANCircularProgressProps,
-} from './ANCircularProgress';
+import { ANCircularProgress, ANCircularProgressProps } from './ANCircularProgress';
 
 export default {
   title: 'AN-Circularprogress',
@@ -17,9 +14,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<ANCircularProgressProps> = (args) => (
-  <ANCircularProgress {...args} />
-);
+const Template: Story<ANCircularProgressProps> = (args) => <ANCircularProgress {...args} />;
 
 export const an_Circularprogress = Template.bind({});
 

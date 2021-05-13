@@ -11,9 +11,7 @@ export default {
   argTypes: {},
 } as Meta;
 
-const Template: Story<ConsoleHeaderProps> = (args) => (
-  <ConsoleHeader {...args} />
-);
+const Template: Story<ConsoleHeaderProps> = (args) => <ConsoleHeader {...args} />;
 
 export const ANConsoleHeader = Template.bind({});
 ANConsoleHeader.args = {};

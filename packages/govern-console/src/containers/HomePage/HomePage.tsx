@@ -47,10 +47,7 @@ const HomePage = ({ ...props }) => {
   const onClickProposalCard = React.useCallback(
     (proposalDetails: any) => {
       history.push(`/proposals/${proposalDetails.id}`);
-      sessionStorage.setItem(
-        'selectedProposal',
-        JSON.stringify(proposalDetails),
-      );
+      sessionStorage.setItem('selectedProposal', JSON.stringify(proposalDetails));
       updateSelectedProposal(proposalDetails);
     },
     [history],

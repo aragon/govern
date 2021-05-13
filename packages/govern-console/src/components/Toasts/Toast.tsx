@@ -50,31 +50,27 @@ const getColor = (theme: Theme, type: string) => {
   return `${theme.custom.greyscale.solid}`;
 };
 
-const ToastCard = styled(MUICard)(
-  ({ theme, type }: { theme: Theme; type: string }) => ({
-    backgroundColor: getBackground(theme, type),
-    width: '293px',
-    height: 'fit-content',
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: '16px 16px',
-    borderRadius: '10px',
-  }),
-);
+const ToastCard = styled(MUICard)(({ theme, type }: { theme: Theme; type: string }) => ({
+  backgroundColor: getBackground(theme, type),
+  width: '293px',
+  height: 'fit-content',
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: '16px 16px',
+  borderRadius: '10px',
+}));
 
-const ToastMessage = styled(MUITypography)(
-  ({ theme, type }: { theme: Theme; type: string }) => ({
-    color: getColor(theme, type),
-    lineHeight: '19px',
-    fontSize: '14px',
-    fontWeight: 500,
-    fontFamily: 'Manrope',
-    fontStyle: 'normal',
-    overflow: 'visible',
-  }),
-);
+const ToastMessage = styled(MUITypography)(({ theme, type }: { theme: Theme; type: string }) => ({
+  color: getColor(theme, type),
+  lineHeight: '19px',
+  fontSize: '14px',
+  fontWeight: 500,
+  fontFamily: 'Manrope',
+  fontStyle: 'normal',
+  overflow: 'visible',
+}));
 
 const Toast: React.FC<ToastProps> = ({
   type,

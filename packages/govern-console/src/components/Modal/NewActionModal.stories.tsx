@@ -13,9 +13,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<NewActionModalProps> = (args) => (
-  <NewActionModal {...args} />
-);
+const Template: Story<NewActionModalProps> = (args) => <NewActionModal {...args} />;
 
 export const NewActionModalExample = Template.bind({});
 NewActionModalExample.args = {

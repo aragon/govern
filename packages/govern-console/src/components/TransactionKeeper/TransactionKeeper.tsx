@@ -1,9 +1,5 @@
 import React from 'react';
-import {
-  CustomTransaction,
-  CustomTransactionStatus,
-  Response,
-} from 'utils/types';
+import { CustomTransaction, CustomTransactionStatus, Response } from 'utils/types';
 import { styled, useTheme } from '@material-ui/core/styles';
 import MUICard from '@material-ui/core/Card';
 import Typography from '@material-ui/core/Typography';
@@ -56,14 +52,8 @@ const CloseButton = styled('img')({
 
 export interface TransactionKeeperProps {
   transactionList: CustomTransaction[];
-  onTransactionFailure: (
-    errorMessage: string,
-    transaction: CustomTransaction,
-  ) => void;
-  onTransactionSuccess: (
-    updatedTransaction: CustomTransaction,
-    transactionReceipt: any,
-  ) => void;
+  onTransactionFailure: (errorMessage: string, transaction: CustomTransaction) => void;
+  onTransactionSuccess: (updatedTransaction: CustomTransaction, transactionReceipt: any) => void;
   onCompleteAllTransactions: (transactions: CustomTransaction[]) => void;
 }
 
@@ -76,13 +66,10 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
 }) => {
   const theme = useTheme();
 
-  const [
-    isProcessingTransactions,
-    updateIsProcessingTransactions,
-  ] = React.useState<boolean>(false);
-  const [transactions, updateTransactions] = React.useState<
-    CustomTransaction[]
-  >([...transactionList]);
+  const [isProcessingTransactions, updateIsProcessingTransactions] = React.useState<boolean>(false);
+  const [transactions, updateTransactions] = React.useState<CustomTransaction[]>([
+    ...transactionList,
+  ]);
 
   const updateTransaction = (
     updatedTransaction: CustomTransaction,

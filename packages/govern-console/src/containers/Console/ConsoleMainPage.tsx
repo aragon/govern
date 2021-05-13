@@ -6,11 +6,7 @@ import { ANButton } from 'components/Button/ANButton';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import { useQuery, useLazyQuery } from '@apollo/client';
-import {
-  GET_DAO_LIST,
-  GET_GOVERN_REGISTRY_DATA,
-  GET_DAO_BY_NAME,
-} from './queries';
+import { GET_DAO_LIST, GET_GOVERN_REGISTRY_DATA, GET_DAO_BY_NAME } from './queries';
 import { Link, useHistory } from 'react-router-dom';
 import { formatEther } from 'ethers/lib/utils';
 export interface ConsoleMainPageProps {
@@ -39,10 +35,7 @@ const WrapperGrid = styled(Grid)(({ theme }) => ({
   width: '100% !important',
 }));
 
-const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
-  updateSelectedDao,
-  ...props
-}) => {
+const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({ updateSelectedDao, ...props }) => {
   const history = useHistory();
   const [visibleDaoList, updateDaoList] = useState<any>([]);
   const [totalDaoCount, updateTotalDaoCount] = useState<number>();
@@ -98,13 +91,7 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
   return (
     <ConsoleMainDiv>
       <ConsoleHeader />
-      <WrapperGrid
-        container
-        spacing={3}
-        xs={12}
-        direction="row"
-        justify="center"
-      >
+      <WrapperGrid container spacing={3} xs={12} direction="row" justify="center">
         {visibleDaoList &&
           visibleDaoList.length > 0 &&
           visibleDaoList.map((dao: any) => (

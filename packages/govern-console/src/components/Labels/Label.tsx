@@ -67,11 +67,6 @@ const StyledLabel = styled(MUIChip)(
   }),
 );
 
-export const Label: React.FC<any> = ({
-  labelColor,
-  labelText,
-  onClick,
-  ...props
-}) => {
+export const Label: React.FC<any> = ({ labelColor, labelText, onClick, ...props }) => {
   return <StyledLabel label={labelText} labelColor={labelColor} />;
 };

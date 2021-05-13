@@ -11,8 +11,7 @@ import { lightTheme } from './AragonTheme';
 import './index.css';
 
 // move to env files.
-const subgraphUri =
-  'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby';
+const subgraphUri = 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby';
 
 const client = new ApolloClient({
   uri: subgraphUri,

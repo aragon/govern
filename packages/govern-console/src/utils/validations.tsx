@@ -10,10 +10,7 @@ import Abi from './AbiHandler';
  * @param provider <rpc-provider>
  * @returns <ValidateResult> true if valid, or error message if invalid
  */
-export const validateToken = async (
-  address: string,
-  provider: any,
-): Promise<ValidateResult> => {
+export const validateToken = async (address: string, provider: any): Promise<ValidateResult> => {
   try {
     await getToken(address, provider);
     return true;
@@ -28,15 +25,11 @@ export const validateToken = async (
  * @param provider <rpc-provider>
  * @returns <ValidateResult> true if valid, or error message if invalid
  */
-export const validateContract = async (
-  address: string,
-  provider: any,
-): Promise<ValidateResult> => {
+export const validateContract = async (address: string, provider: any): Promise<ValidateResult> => {
   try {
     const code = await provider.getCode(address);
     if (code !== '0x') return true;
-  } catch (error) {
-  }
+  } catch (error) {}
   return 'Contract address is not valid.';
 };
 

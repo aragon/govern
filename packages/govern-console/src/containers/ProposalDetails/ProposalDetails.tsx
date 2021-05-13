@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { useEffect } from 'react';
 import { styled } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
@@ -292,7 +291,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
 
   const proposalInstance = React.useMemo(() => {
     if (provider && account && daoDetails && proposalInfo) {
-      let queueApprovals = new QueueApprovals(
+      const queueApprovals = new QueueApprovals(
         account,
         daoDetails.queue.address,
         proposalInfo.config.resolver,
@@ -392,8 +391,12 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
         onTransactionFailure: (error) => {
           enqueueSnackbar(error, { variant: 'error' });
         },
-        onTransactionSuccess: () => {},
-        onCompleteAllTransactions: () => {},
+        onTransactionSuccess: () => {
+          //
+        },
+        onCompleteAllTransactions: () => {
+          //
+        },
       },
     });
   };

@@ -14,8 +14,8 @@ import Grid from '@material-ui/core/Grid';
 import { useHistory, useParams } from 'react-router-dom';
 import MUITypography from '@material-ui/core/Typography';
 import NoDaoFound from './NoDaoFound';
-import { formatDate } from 'utils/date'
-import { getState, getStateColor } from 'utils/states'
+import { formatDate } from 'utils/date';
+import { getState, getStateColor } from 'utils/states';
 
 //* Styled Components List
 const DaoPageMainDiv = styled(Paper)(({ theme }) => ({
@@ -28,8 +28,7 @@ const DaoPageMainDiv = styled(Paper)(({ theme }) => ({
 }));
 
 const PageLabelSelected = styled(Typography)(({ theme }) => ({
-  background:
-    'linear-gradient(282.07deg, #01E8F7 -5.08%, #01DCFA 21.97%, #00C2FF 81.4%)',
+  background: 'linear-gradient(282.07deg, #01E8F7 -5.08%, #01DCFA 21.97%, #00C2FF 81.4%)',
   lineHeight: '25px',
   fontSize: '20px',
   fontWeight: 500,
@@ -152,10 +151,7 @@ const DaoMainPage: React.FC<{
         },
       });
       if (moreData && moreData.governQueue.containers.length > 0) {
-        updateVisibleProposalList([
-          ...visibleProposalList,
-          ...moreData.governQueue.containers,
-        ]);
+        updateVisibleProposalList([...visibleProposalList, ...moreData.governQueue.containers]);
       }
     }
   };
@@ -203,11 +199,7 @@ const DaoMainPage: React.FC<{
           'loading'
         ) : (
           <>
-            <DaoHeader
-              ethBalance={formatEther(0)}
-              usdBalance={'2222'}
-              daoName={daoDetails.name}
-            />
+            <DaoHeader ethBalance={formatEther(0)} usdBalance={'2222'} daoName={daoDetails.name} />
             <div
               style={{
                 paddingTop: '33px',
@@ -228,9 +220,7 @@ const DaoMainPage: React.FC<{
                 {isProposalPage ? (
                   <PageLabelSelected>Proposals</PageLabelSelected>
                 ) : (
-                  <PageLabel onClick={() => onPageChange('proposal')}>
-                    Proposal
-                  </PageLabel>
+                  <PageLabel onClick={() => onPageChange('proposal')}>Proposal</PageLabel>
                 )}
                 {/* {isProfilePage ? (
             <PageLabelSelected>Profile</PageLabelSelected>
@@ -266,28 +256,17 @@ const DaoMainPage: React.FC<{
                       onClick={goToNewProposal}
                     ></ANButton>
                   </div>
-                  <WrapperGrid
-                    container
-                    spacing={3}
-                    xs={12}
-                    direction="row"
-                    justify="center"
-                  >
+                  <WrapperGrid container spacing={3} xs={12} direction="row" justify="center">
                     {visibleProposalList.map((proposal: any) => (
-                      <Grid
-                        item
-                        key={proposal.id}
-                        xl={3}
-                        lg={4}
-                        xs={12}
-                        sm={12}
-                        md={6}
-                      >
+                      <Grid item key={proposal.id} xl={3} lg={4} xs={12} sm={12} md={6}>
                         <ProposalCard
                           transactionHash={proposal.id}
                           proposalDate={formatDate(proposal.createdAt)}
                           proposalStatus={getState(proposal.state, proposal.payload.executionTime)}
-                          proposalStatusColor={getStateColor(proposal.state, proposal.payload.executionTime)}
+                          proposalStatusColor={getStateColor(
+                            proposal.state,
+                            proposal.payload.executionTime,
+                          )}
                           onClickProposalCard={() => onClickProposal(proposal)}
                         ></ProposalCard>
                       </Grid>

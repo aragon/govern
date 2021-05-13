@@ -224,8 +224,7 @@ const custom = {
   daoCard: {
     background: '#FFFFFF',
     border: '#ECF1F7',
-    labelColor:
-      '-webkit-linear-gradient(107.79deg, #87E0FF 1.46%, #7A7AF7 100%)',
+    labelColor: '-webkit-linear-gradient(107.79deg, #87E0FF 1.46%, #7A7AF7 100%)',
     fontFamily: 'Manrope',
     fontStyle: 'normal',
     labeFontSize: '24px',

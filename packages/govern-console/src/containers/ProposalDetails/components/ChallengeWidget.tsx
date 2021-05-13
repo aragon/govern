@@ -6,11 +6,7 @@ import { PROPOSAL_STATES } from 'utils/states';
 import { Link } from 'react-router-dom';
 import { toUtf8String } from '@ethersproject/strings';
 
-import {
-  InfoKeyDiv,
-  InfoValueDivInline,
-  InfoValueDivBlock,
-} from '../ProposalDetails';
+import { InfoKeyDiv, InfoValueDivInline, InfoValueDivBlock } from '../ProposalDetails';
 import { Widget, WidgetRow, InfoWrapper, TitleText } from './SharedStyles';
 
 import { formatDate } from 'utils/date';
@@ -56,11 +52,7 @@ const ChallengeWidget: React.FC<any> = ({
           }}
         >
           {challengeReasonCid ? (
-            <Link
-              to={getIpfsURI(challengeReasonCid)}
-              target="_blank"
-              rel="noreferrer noopener"
-            >
+            <Link to={getIpfsURI(challengeReasonCid)} target="_blank" rel="noreferrer noopener">
               View file
             </Link>
           ) : (

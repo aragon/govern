@@ -23,14 +23,8 @@ import FacadeProposal from 'services/Proposal';
 import { useForm, Controller } from 'react-hook-form';
 import { BytesLike } from 'ethers';
 import { validateToken, validateContract } from '../../utils/validations';
-import {
-  Proposal,
-  ProposalOptions,
-  PayloadType,
-  ActionType,
-} from '@aragon/govern';
+import { Proposal, ProposalOptions, PayloadType, ActionType } from '@aragon/govern';
 import { useSnackbar } from 'notistack';
-
 
 import { toUtf8Bytes, toUtf8String } from '@ethersproject/strings';
 
@@ -120,13 +114,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
   const { dispatch } = React.useContext(ModalsContext);
   const { enqueueSnackbar } = useSnackbar();
 
-  const {
-    control,
-    watch,
-    setValue,
-    getValues,
-    handleSubmit,
-  } = useForm<FormInputs>();
+  const { control, watch, setValue, getValues, handleSubmit } = useForm<FormInputs>();
 
   const { daoName } = useParams<ParamTypes>();
   //TODO daoname empty handling
@@ -150,12 +138,8 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
         daoDetails.queue.address,
         daoDetails.queue.config.resolver,
       );
-      const proposal = new Proposal(
-        daoDetails.queue.address,
-        {} as ProposalOptions,
-      );
-      return new FacadeProposal(queueApprovals, proposal) as FacadeProposal &
-        Proposal;
+      const proposal = new Proposal(daoDetails.queue.address, {} as ProposalOptions);
+      return new FacadeProposal(queueApprovals, proposal) as FacadeProposal & Proposal;
     }
   }, [provider, account, daoDetails]);
 
@@ -311,13 +295,9 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
                 defaultValue=""
                 rules={{
                   required: 'This is required.',
-                  validate: async (value) =>
-                    await validateToken(value, provider),
+                  validate: async (value) => await validateToken(value, provider),
                 }}
-                render={({
-                  field: { onChange, value },
-                  fieldState: { error },
-                }) => (
+                render={({ field: { onChange, value }, fieldState: { error } }) => (
                   <InputField
                     label=""
                     onInputChange={onChange}
@@ -338,10 +318,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
                 control={control}
                 defaultValue={''}
                 rules={{ required: 'This is required.' }}
-                render={({
-                  field: { onChange, value },
-                  fieldState: { error },
-                }) => (
+                render={({ field: { onChange, value }, fieldState: { error } }) => (
                   <InputField
                     type="number"
                     label=""
@@ -375,13 +352,9 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
                 defaultValue=""
                 rules={{
                   required: 'This is required.',
-                  validate: async (value) =>
-                    await validateToken(value, provider),
+                  validate: async (value) => await validateToken(value, provider),
                 }}
-                render={({
-                  field: { onChange, value },
-                  fieldState: { error },
-                }) => (
+                render={({ field: { onChange, value }, fieldState: { error } }) => (
                   <InputField
                     label=""
                     onInputChange={onChange}
@@ -402,10 +375,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
                 control={control}
                 defaultValue={''}
                 rules={{ required: 'This is required.' }}
-                render={({
-                  field: { onChange, value },
-                  fieldState: { error },
-                }) => (
+                render={({ field: { onChange, value }, fieldState: { error } }) => (
                   <InputField
                     type="number"
                     label=""
@@ -486,19 +456,14 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
             </div>
             <OptionTextStyle>{'File'}</OptionTextStyle> */}
           </div>
-          <InputSubTitle>
-            Provide the base rules under what your DAO should be ran
-          </InputSubTitle>
+          <InputSubTitle>Provide the base rules under what your DAO should be ran</InputSubTitle>
           {!watch('isRuleFile') ? (
             <Controller
               name="daoConfig.rules"
               control={control}
               defaultValue={''}
               rules={{ required: 'This is required.' }}
-              render={({
-                field: { onChange, value },
-                fieldState: { error },
-              }) => (
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
                 <InputField
                   label=""
                   onInputChange={onChange}
@@ -581,10 +546,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
               control={control}
               defaultValue={''}
               rules={{ required: 'This is required.' }}
-              render={({
-                field: { onChange, value },
-                fieldState: { error },
-              }) => (
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
                 <InputField
                   label=""
                   onInputChange={onChange}

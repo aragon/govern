@@ -73,16 +73,10 @@ export const DaoCard: React.FC<DaoCardProps> = ({
         }}
       >
         <div>
-          <DaoProperty
-            propertyLabel="AUM(USD)"
-            propertyText={'$' + aumValue + 'M'}
-          />
+          <DaoProperty propertyLabel="AUM(USD)" propertyText={'$' + aumValue + 'M'} />
         </div>
         <div>
-          <DaoProperty
-            propertyLabel="PROPOSALS"
-            propertyText={numberOfProposals}
-          />
+          <DaoProperty propertyLabel="PROPOSALS" propertyText={numberOfProposals} />
         </div>
       </div>
     </DaoCardWrapper>

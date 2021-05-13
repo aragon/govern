@@ -9,10 +9,7 @@ module.exports = {
   ],
   webpackFinal: async (config) => {
     // do mutation to the config
-    config.resolve.modules = [
-      ...(config.resolve.modules || []),
-      path.resolve(__dirname, '../src'),
-    ];
+    config.resolve.modules = [...(config.resolve.modules || []), path.resolve(__dirname, '../src')];
     return config;
   },
 };

@@ -10,14 +10,8 @@ type TransactionsModalAction = {
   type: ActionTypes.OPEN_TRANSACTIONS_MODAL;
   payload: {
     transactionList: CustomTransaction[];
-    onTransactionFailure: (
-      errorMessage: string,
-      transaction: CustomTransaction,
-    ) => void;
-    onTransactionSuccess: (
-      updatedTransaction: CustomTransaction,
-      transactionReceipt: any,
-    ) => void;
+    onTransactionFailure: (errorMessage: string, transaction: CustomTransaction) => void;
+    onTransactionSuccess: (updatedTransaction: CustomTransaction, transactionReceipt: any) => void;
     onCompleteAllTransactions: (transactions: CustomTransaction[]) => void;
   };
 };
@@ -36,10 +30,7 @@ interface ModalContextState {
     open: boolean;
     params: {
       transactionList: CustomTransaction[];
-      onTransactionFailure: (
-        errorMessage: string,
-        transaction: CustomTransaction,
-      ) => void;
+      onTransactionFailure: (errorMessage: string, transaction: CustomTransaction) => void;
       onTransactionSuccess: (
         updatedTransaction: CustomTransaction,
         transactionReceipt: any,
@@ -59,16 +50,10 @@ const INITIAL_STATE: ModalContextState = {
     open: false,
     params: {
       transactionList: [],
-      onTransactionFailure: (
-        errorMessage: string,
-        transaction: CustomTransaction,
-      ) => {
+      onTransactionFailure: (errorMessage: string, transaction: CustomTransaction) => {
         // do nothing
       },
-      onTransactionSuccess: (
-        updatedTransaction: CustomTransaction,
-        transactionReceipt: any,
-      ) => {
+      onTransactionSuccess: (updatedTransaction: CustomTransaction, transactionReceipt: any) => {
         // do nothing
       },
       onCompleteAllTransactions: (transactions: CustomTransaction[]) => {
@@ -83,10 +68,7 @@ export const ModalsContext = createContext<Context>({
   dispatch: () => null,
 });
 
-const reducer = (
-  state: ModalContextState,
-  action: ModalsContextAction,
-): ModalContextState => {
+const reducer = (state: ModalContextState, action: ModalsContextAction): ModalContextState => {
   switch (action.type) {
     case ActionTypes.OPEN_TRANSACTIONS_MODAL:
       return {

@@ -69,10 +69,9 @@ const NoDaoFound: React.FC<{}> = ({ ...props }) => {
     if (daoSearchText.length > 0) {
       history.push(`${daoSearchText}`);
     } else {
-      enqueueSnackbar(
-        'Invalid Dao Name. Atleast one letter should be entered.',
-        { variant: 'error' },
-      );
+      enqueueSnackbar('Invalid Dao Name. Atleast one letter should be entered.', {
+        variant: 'error',
+      });
     }
   };
 

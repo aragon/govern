@@ -9,8 +9,6 @@ export default {
 } as Meta;
 
 const Template: Story = () => (
-  <DAOSetting
-    onClickBack={() => console.log('goBack function should be passed')}
-  />
+  <DAOSetting onClickBack={() => console.log('goBack function should be passed')} />
 );
 export const Dao_Setting_Container = Template.bind({});

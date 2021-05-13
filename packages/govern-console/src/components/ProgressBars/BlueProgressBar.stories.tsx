@@ -15,9 +15,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<LinearProgressProps> = (args) => (
-  <BlueProgressBar {...args} />
-);
+const Template: Story<LinearProgressProps> = (args) => <BlueProgressBar {...args} />;
 
 export const blue_progress_bar = Template.bind({});
 

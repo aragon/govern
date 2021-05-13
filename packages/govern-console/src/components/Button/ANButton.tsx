@@ -58,10 +58,8 @@ const getBackground = (
 ) => {
   if (disabled) return `${theme.custom.greyscale.light} !important`;
   if (backgroundColor) return backgroundColor;
-  if (buttonType === 'primary')
-    return 'linear-gradient(107.79deg, #00C2FF 1.46%, #01E8F7 100%)';
-  if (buttonType === 'challenge')
-    return 'linear-gradient(107.79deg, #F7B201 1.46%, #FF7A00 100%)';
+  if (buttonType === 'primary') return 'linear-gradient(107.79deg, #00C2FF 1.46%, #01E8F7 100%)';
+  if (buttonType === 'challenge') return 'linear-gradient(107.79deg, #F7B201 1.46%, #FF7A00 100%)';
   return '#ffffff';
 };
 const getBackgroundForHoveredState = (
@@ -72,10 +70,8 @@ const getBackgroundForHoveredState = (
 ) => {
   if (disabled) return '#D9E0F5 !important';
   if (backgroundColor) return backgroundColor;
-  if (buttonType === 'primary')
-    return 'linear-gradient(107.79deg, #82E1FF 1.46%, #3CF3FF 100%)';
-  if (buttonType === 'challenge')
-    return 'linear-gradient(107.79deg, #FFD056 1.46%, #FF9636 100%)';
+  if (buttonType === 'primary') return 'linear-gradient(107.79deg, #82E1FF 1.46%, #3CF3FF 100%)';
+  if (buttonType === 'challenge') return 'linear-gradient(107.79deg, #FFD056 1.46%, #FF9636 100%)';
   return '#ffffff';
 };
 const getBackgroundForPressedState = (
@@ -86,10 +82,8 @@ const getBackgroundForPressedState = (
 ) => {
   if (disabled) return '#D9E0F5 !important';
   if (backgroundColor) return backgroundColor;
-  if (buttonType === 'primary')
-    return 'linear-gradient(107.79deg, #01B9F2 1.46%, #01DBE9 100%)';
-  if (buttonType === 'challenge')
-    return 'linear-gradient(107.79deg, #EBA900 1.46%, #ED7100 100%)';
+  if (buttonType === 'primary') return 'linear-gradient(107.79deg, #01B9F2 1.46%, #01DBE9 100%)';
+  if (buttonType === 'challenge') return 'linear-gradient(107.79deg, #EBA900 1.46%, #ED7100 100%)';
   return '#EFF1F7;';
 };
 
@@ -127,9 +121,7 @@ const StyledButton = styled(MUIButton)(
     width: width || 154,
     background: getBackground(buttonType, theme, disabled, backgroundColor),
     boxSizing: 'border-box',
-    boxShadow: disabled
-      ? 'none !important'
-      : '0px 3px 3px rgba(116, 131, 178, 0.2)',
+    boxShadow: disabled ? 'none !important' : '0px 3px 3px rgba(116, 131, 178, 0.2)',
     borderRadius: '8px',
     fontFamily: 'Manrope',
     fontStyle: 'normal',
@@ -141,22 +133,12 @@ const StyledButton = styled(MUIButton)(
     transition: 'none',
     cursor: 'pointer',
     '&:hover': {
-      background: getBackgroundForHoveredState(
-        buttonType,
-        theme,
-        disabled,
-        backgroundColor,
-      ),
+      background: getBackgroundForHoveredState(buttonType, theme, disabled, backgroundColor),
       boxShadow: '0px 4px 4px rgba(116, 131, 178, 0.25)',
       color: buttonType === 'secondary' ? '#7483B2' : 'white',
     },
     '&:active': {
-      background: getBackgroundForPressedState(
-        buttonType,
-        theme,
-        disabled,
-        backgroundColor,
-      ),
+      background: getBackgroundForPressedState(buttonType, theme, disabled, backgroundColor),
       boxShadow: '0px 1px 1px rgba(116, 131, 178, 0.35)',
     },
     '& .MuiTouchRipple-root': {

@@ -43,10 +43,7 @@ const Title = styled(MUITypography)(({ theme }: any) => ({
   fontStyle: 'normal',
 }));
 
-export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
-  onSearch,
-  ...props
-}) => {
+export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({ onSearch, ...props }) => {
   const { enqueueSnackbar } = useSnackbar();
   const history = useHistory();
   const theme = useTheme();
@@ -66,10 +63,9 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
     if (searchString.length > 0) {
       history.push(`daos/${searchString}`);
     } else {
-      enqueueSnackbar(
-        'Invalid Dao Name. Atleast one letter should be entered.',
-        { variant: 'error' },
-      );
+      enqueueSnackbar('Invalid Dao Name. Atleast one letter should be entered.', {
+        variant: 'error',
+      });
     }
   };
 
@@ -78,8 +74,8 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
       <Title> Welcome to Aragon Console</Title>
       <div style={{ maxWidth: '480px', marginTop: '7px' }}>
         <Subtitle>
-          Lorem ipsum dolor amet ipsu amet dolores ipsum amet dolor ipsum amet
-          ipsum amet dolors ipsum{' '}
+          Lorem ipsum dolor amet ipsu amet dolores ipsum amet dolor ipsum amet ipsum amet dolors
+          ipsum{' '}
         </Subtitle>
       </div>
       <div style={{ display: 'flex', flexDirection: 'row', marginTop: '22px' }}>

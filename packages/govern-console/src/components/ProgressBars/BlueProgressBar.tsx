@@ -1,7 +1,5 @@
 /* eslint-disable */
-import LinearProgress, {
-  LinearProgressProps,
-} from '@material-ui/core/LinearProgress';
+import LinearProgress, { LinearProgressProps } from '@material-ui/core/LinearProgress';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({

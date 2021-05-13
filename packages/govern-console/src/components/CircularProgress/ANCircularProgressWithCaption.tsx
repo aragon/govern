@@ -14,9 +14,7 @@ export interface ANProgressCationPropos {
   state: CiruclarProgressStatus;
 }
 
-export const ANCircularProgressWithCaption = (
-  props: ANProgressCationPropos,
-) => {
+export const ANCircularProgressWithCaption = (props: ANProgressCationPropos) => {
   const getTextColor = (state: CiruclarProgressStatus) => {
     switch (state) {
       case CiruclarProgressStatus.Disabled:
