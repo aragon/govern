@@ -5,7 +5,7 @@ import aragonText from 'images/svgs/Aragon.svg';
 import discordIcon from 'images/svgs/discord.svg';
 import messageIcon from 'images/svgs/message.svg';
 import twitterIcon from 'images/svgs/twitter.svg';
-import youtubeIcon from 'images/svgs/youtube.svg';
+import telegramIcon from 'images/svgs/telegrama.svg';
 import { useHistory } from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
 
@@ -50,14 +50,6 @@ const Footer = ({}) => {
         <Grid item xs={12} sm={6} key="social">
           <Social>
             <a
-              href={'https://www.youtube.com/channel/UCODiU_-FWhr4SVOoBlm-qaQ'}
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              <img src={youtubeIcon} />
-            </a>
-            <a
-              style={{ marginLeft: '28px' }}
               href={'https://twitter.com/AragonProject'}
               target="_blank"
               rel="noreferrer noopener"
@@ -71,6 +63,17 @@ const Footer = ({}) => {
               rel="noreferrer noopener"
             >
               <img src={discordIcon} />
+            </a>
+            <a
+              style={{ marginLeft: '28px' }}
+              href={'https://t.me/AragonProject'}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <img
+                style={{ width: '25px', height: '25px' }}
+                src={telegramIcon}
+              />
             </a>
             <a
               style={{ marginLeft: '28px' }}

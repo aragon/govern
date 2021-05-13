@@ -24,9 +24,8 @@ import {
   ActionToSchedule,
 } from 'utils/types';
 import { useSnackbar } from 'notistack';
-
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
-import  FacadeProposal from 'services/Proposal';
+import FacadeProposal from 'services/Proposal';
 import { useForm, Controller } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
 
@@ -279,7 +278,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const { account, provider, isConnected } = context;
 
   const proposalInstance = React.useMemo(() => {
-    if (provider && account && daoDetails) {
+    if (provider && daoDetails && account.address && account.signer) {
       let queueApprovals = new QueueApprovals(
         account,
         daoDetails.queue.address,
@@ -467,8 +466,8 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
         <SettingsLink>
           This execution will use the current{' '}
           <a
-            style={{cursor:'pointer'}}
-            onClick={()=> history.push(`/daos/${daoName}/dao-settings`)}
+            style={{ cursor: 'pointer' }}
+            onClick={() => history.push(`/daos/${daoName}/dao-settings`)}
           >
             DAO Settings
           </a>
@@ -490,21 +489,22 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
           </div>
         </div>
         <Controller
-            name="proof"
-            control={control}
-            defaultValue={''}
-            rules={{ required: 'This is required.'}}
-            render={({ field: { onChange, value }, fieldState: { error } }) => (
-              <InputField
-                onInputChange={onChange}
-                placeholder={'Enter proof'}
-                label=""
-                value={value}
-                height={'108px'}
-                width={'700px'}
-                error={!!error}
-                helperText={error ? error.message : null}
-              />)}
+          name="proof"
+          control={control}
+          defaultValue={''}
+          rules={{ required: 'This is required.' }}
+          render={({ field: { onChange, value }, fieldState: { error } }) => (
+            <InputField
+              onInputChange={onChange}
+              placeholder={'Enter proof'}
+              label=""
+              value={value}
+              height={'108px'}
+              width={'700px'}
+              error={!!error}
+              helperText={error ? error.message : null}
+            />
+          )}
         />
         <Title>Actions</Title>
         {selectedActions.length === 0 ? (

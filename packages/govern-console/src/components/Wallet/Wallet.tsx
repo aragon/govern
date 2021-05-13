@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { styled } from '@material-ui/core/styles';
@@ -101,6 +102,10 @@ const Wallet = ({}) => {
     if (error) {
       if (error.message.includes('Unsupported chain')) {
         enqueueSnackbar('Please select the correct chain in your wallet.', {
+          variant: 'error',
+        });
+      } else if(error.message.includes('window.ethereum')) {
+        enqueueSnackbar('Please install a wallet.', {
           variant: 'error',
         });
       } else {

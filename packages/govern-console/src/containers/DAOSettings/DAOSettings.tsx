@@ -31,7 +31,6 @@ import {
 } from '@aragon/govern';
 import { useSnackbar } from 'notistack';
 
-
 import { toUtf8Bytes, toUtf8String } from '@ethersproject/strings';
 
 export interface DaoSettingFormProps {
@@ -115,7 +114,7 @@ const OptionTextStyle = styled('div')({
 
 const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
   const context: any = useWallet();
-  const { account, status, isConnected, provider } = context;
+  const { account, isConnected, provider } = context;
 
   const { dispatch } = React.useContext(ModalsContext);
   const { enqueueSnackbar } = useSnackbar();
@@ -144,7 +143,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
   }, [daoList]);
 
   const proposalInstance = React.useMemo(() => {
-    if (provider && account && daoDetails) {
+    if (provider && daoDetails && account.address && account.signer) {
       let queueApprovals = new QueueApprovals(
         account,
         daoDetails.queue.address,
@@ -206,7 +205,13 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
   }, [daoDetails, provider]);
 
   const callSaveSetting = async (formData: FormInputs) => {
-    console.log('formData', formData);
+    if (!isConnected) {
+      enqueueSnackbar('Wallet not connected.', {
+        variant: 'error',
+      });
+      return;
+    }
+
     const newConfig: DaoConfig = formData.daoConfig;
 
     // modify config before sending to schedule.
@@ -636,7 +641,6 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
           >
             <ANButton
               label={'Save settings'}
-              disabled={!isConnected}
               buttonType={'primary'}
               onClick={handleSubmit(callSaveSetting)}
               style={{ marginTop: '34px' }}
