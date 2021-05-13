@@ -108,7 +108,7 @@ const OptionTextStyle = styled('div')({
 
 const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
   const context: any = useWallet();
-  const { account, status, isConnected, provider } = context;
+  const { account, isConnected, provider } = context;
 
   const { dispatch } = React.useContext(ModalsContext);
   const { enqueueSnackbar } = useSnackbar();
@@ -189,7 +189,6 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
   }, [daoDetails, provider]);
 
   const callSaveSetting = async (formData: FormInputs) => {
-    console.log('formData', formData);
     const newConfig: DaoConfig = formData.daoConfig;
 
     // modify config before sending to schedule.
@@ -608,8 +607,8 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
             }}
           >
             <ANButton
-              label={'Save settings'}
               disabled={!isConnected}
+              label={'Save settings'}
               buttonType={'primary'}
               onClick={handleSubmit(callSaveSetting)}
               style={{ marginTop: '34px' }}

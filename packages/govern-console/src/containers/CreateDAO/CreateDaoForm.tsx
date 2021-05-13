@@ -75,7 +75,6 @@ const SwitchRow = styled('div')({
   flexDirection: 'row',
   justifyContent: 'space-between',
   verticalAlign: 'middle',
-  lineHeight: '40px',
   margin: '25px 25px 5px 25px',
 });
 
@@ -84,6 +83,7 @@ const OptionText = styled('div')({
   fontStyle: 'normal',
   fontWeight: 400,
   fontSize: 18,
+  lineHeight: '22.08px',
 });
 
 const BackButton = styled('div')({
@@ -112,15 +112,15 @@ const CreateDaoForm: React.FC<FormProps> = ({
   cancelForm,
 }) => {
   const context: any = useWallet();
-  const { chainId, status, provider } = context;
+  const { chainId, provider, isConnected } = context;
 
   const { control, handleSubmit, watch, setValue } = useForm<FormInputs>();
 
   const connectedChainId = useMemo(() => {
-    if (chainId === ChainId.RINKEBY && status === 'connected') return ChainId.RINKEBY;
+    if (chainId === ChainId.RINKEBY && isConnected) return ChainId.RINKEBY;
 
     return ChainId.MAINNET;
-  }, [chainId, status]);
+  }, [chainId, isConnected]);
 
   // use appropriate default config
   useEffect(() => {
@@ -251,14 +251,16 @@ const CreateDaoForm: React.FC<FormProps> = ({
         />
         <SwitchRow>
           <OptionText>{'Create new token'}</OptionText>
-          <Controller
-            name="isExistingToken"
-            control={control}
-            defaultValue={false}
-            render={({ field: { onChange, value } }) => (
-              <BlueSwitch onChange={onChange} value={value} />
-            )}
-          />
+          <div style={{ marginTop: '-12px' }}>
+            <Controller
+              name="isExistingToken"
+              control={control}
+              defaultValue={false}
+              render={({ field: { onChange, value } }) => (
+                <BlueSwitch onChange={onChange} value={value} />
+              )}
+            />
+          </div>
           <OptionText>{'Use existing token'}</OptionText>
         </SwitchRow>
         {!watch('isExistingToken') ? (
@@ -407,7 +409,7 @@ const CreateDaoForm: React.FC<FormProps> = ({
           }}
         >
           <ANButton
-            disabled={status !== 'connected'}
+            disabled={!isConnected}
             label="Create new DAO"
             buttonType="primary"
             style={{ marginTop: 40 }}

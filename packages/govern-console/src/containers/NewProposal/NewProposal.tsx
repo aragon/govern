@@ -18,7 +18,6 @@ import { useWallet } from 'AugmentedWallet';
 import QueueApprovals from 'services/QueueApprovals';
 import { CustomTransaction, abiItem, actionType, ActionToSchedule } from 'utils/types';
 import { useSnackbar } from 'notistack';
-
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import FacadeProposal from 'services/Proposal';
 import { useForm, Controller } from 'react-hook-form';

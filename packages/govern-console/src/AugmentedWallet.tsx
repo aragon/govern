@@ -32,14 +32,13 @@ const WalletAugmented: React.FC<unknown> = ({ children }) => {
   }, [injectedProvider]);
 
   const contextValue = useMemo(() => {
-    let signer = undefined;
-    if (injectedProvider) {
-      signer = injectedProvider.getSigner();
+    let account: Account | undefined = undefined;
+    if (injectedProvider && wallet.account) {
+      account = {
+        address: wallet.account,
+        signer: injectedProvider.getSigner(),
+      };
     }
-    const account: Account = {
-      address: wallet.account,
-      signer,
-    };
 
     return {
       ...wallet,
