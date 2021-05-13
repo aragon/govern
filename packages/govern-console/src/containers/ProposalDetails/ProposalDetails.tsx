@@ -19,8 +19,8 @@ import QueueApprovals from 'services/QueueApprovals';
 import FacadeProposal from 'services/Proposal';
 import AbiHandler from 'utils/AbiHandler';
 import { toUtf8String } from '@ethersproject/strings';
-import { formatDate} from 'utils/date';
-import { getState, getStateColor } from 'utils/states'
+import { formatDate } from 'utils/date';
+import { getState, getStateColor } from 'utils/states';
 import { useSnackbar } from 'notistack';
 
 // widget components
@@ -293,7 +293,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   }, [networkName]);
 
   const proposalInstance = React.useMemo(() => {
-    if (provider && account && daoDetails && proposalInfo) {
+    if (provider && daoDetails && proposalInfo && account) {
       let queueApprovals = new QueueApprovals(
         account,
         daoDetails.queue.address,
@@ -372,8 +372,10 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   const challengeProposal = async () => {
     // if the reason's length is less than 10 words, it's highly unlikely
     // to specify the actual valid reason in less than 10 words
-    if(challengeReason.length < 10) {
-      enqueueSnackbar("Challenge reason must be at least 10 letters", { variant: 'error' });
+    if (challengeReason.length < 10) {
+      enqueueSnackbar('Challenge reason must be at least 10 letters', {
+        variant: 'error',
+      });
       return;
     }
 
@@ -446,8 +448,14 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
               </BackButton>
               <ProposalStatus>
                 <Label
-                  labelColor={getStateColor(proposalInfo.state, proposalInfo.payload.executionTime)}
-                  labelText={getState(proposalInfo.state, proposalInfo.payload.executionTime)}
+                  labelColor={getStateColor(
+                    proposalInfo.state,
+                    proposalInfo.payload.executionTime,
+                  )}
+                  labelText={getState(
+                    proposalInfo.state,
+                    proposalInfo.payload.executionTime,
+                  )}
                 />
               </ProposalStatus>
               <ProposalId>{proposalInfo.id}</ProposalId>
