@@ -11,7 +11,8 @@
   ],
   "license": "GPL-3.0",
   "devDependencies": {
-    "lerna": "^3.22.1"
+    "lerna": "^3.22.1",
+    "husky": "^6.0.0"
   },
   "scripts": {
     "clean": "lerna run --scope=@aragon/govern* --stream clean",

@@ -1,5 +1,5 @@
 {
-  "name": "app",
+  "name": "@aragon/govern-console",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -58,7 +58,8 @@
     "build-storybook": "build-storybook -s public",
     "lint": "eslint --ignore-path .gitignore",
     "lint:js": "npm run lint:eslint -- . ",
-    "lint:fix": "eslint --ignore-path .gitignore"
+    "lint:fix": "eslint --ignore-path .gitignore",
+    "precommit": "lint-staged"
   },
   "eslintConfig": {
     "extends": [
@@ -70,11 +71,6 @@
     "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
       "prettier --write"
     ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
   },
   "browserslist": {
     "production": [
