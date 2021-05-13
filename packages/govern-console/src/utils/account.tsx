@@ -1,4 +1,3 @@
-/* eslint-disable */
 export function getTruncatedAccountAddress(account: string | null) {
   if (account === null) return '';
   return (

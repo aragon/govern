@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { styled } from '@material-ui/core/styles';
 import AragonIcon from 'images/aragon-graphic-only-icon.svg';
 import aragonText from 'images/svgs/Aragon.svg';
@@ -8,6 +7,7 @@ import twitterIcon from 'images/svgs/twitter.svg';
 import youtubeIcon from 'images/svgs/youtube.svg';
 import { useHistory } from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
+import React from 'react';
 
 const FooterWrapperDiv = styled('div')({
   width: 'auto',

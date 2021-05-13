@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { memo, useEffect, useMemo, useState } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { PROPOSAL_STATES } from 'utils/states';

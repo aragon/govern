@@ -1,4 +1,3 @@
-/* eslint-disable */
 import Modal, { ModalProps } from '@material-ui/core/Modal';
 import { useTheme, styled } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';

@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { toUtf8Bytes } from '@ethersproject/strings';
 import { ethers } from 'ethers';
 import { DaoConfig, ProposalParams, PayloadType } from '@aragon/govern';

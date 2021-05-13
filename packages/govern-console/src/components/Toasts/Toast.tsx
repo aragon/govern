@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { useState, memo } from 'react';
 import { styled, Theme } from '@material-ui/core/styles';
 import MUICard, { CardProps } from '@material-ui/core/Card';

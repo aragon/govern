@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 import { Token, getToken, DaoConfig } from '@aragon/govern';
 import { ethers, BigNumber, BigNumberish } from 'ethers';
 

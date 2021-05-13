@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 import { useHistory } from 'react-router-dom';

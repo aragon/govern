@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { memo, useEffect, useMemo } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { styled } from '@material-ui/core/styles';
@@ -132,7 +131,7 @@ const CreateDaoForm: React.FC<FormProps> = ({
   const submitCreateDao = async (params: FormInputs) => {
     let token: Partial<Token>;
 
-    let progress: CreateDaoProgressProps = {
+    const progress: CreateDaoProgressProps = {
       isTokenRegister: true,
       progressStatus: {
         create: CiruclarProgressStatus.InProgress,
@@ -160,7 +159,8 @@ const CreateDaoForm: React.FC<FormProps> = ({
       // update progress
       setProgress({ ...progress });
 
-      registerTokenCallback = async (registerToken: Function) => {
+      // TODO: Typescript doesn't allow `Function` type instead of any...
+      registerTokenCallback = async (registerToken: any) => {
         // update progress
         progress.progressStatus = {
           create: CiruclarProgressStatus.Done,

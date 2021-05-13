@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { gql } from '@apollo/client';
 
 export const GET_PROPOSAL_DETAILS_QUERY = gql`

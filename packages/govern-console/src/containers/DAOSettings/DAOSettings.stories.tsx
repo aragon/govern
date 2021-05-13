@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React from 'react';
 import DAOSetting from './DAOSettings';
 import { Story, Meta } from '@storybook/react';

@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { styled, useTheme } from '@material-ui/core/styles';

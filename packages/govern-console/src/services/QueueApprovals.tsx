@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { CourtABI } from 'utils/abis/court';
 import { ethers } from 'ethers';
 import { TokenDeposit } from '@aragon/govern';

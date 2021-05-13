@@ -1,9 +1,9 @@
-/* eslint-disable */
 import { makeStyles } from '@material-ui/core/styles';
 import CircularProgress, { CircularProgressProps } from '@material-ui/core/CircularProgress';
 import blueTickImage from '../../images/svgs/Blue_tick.svg';
 import crossImage from '../../images/svgs/cross.svg';
 import { CiruclarProgressStatus } from 'utils/types';
+import React from 'react';
 
 export interface ANCircularProgressProps extends CircularProgressProps {
   /**

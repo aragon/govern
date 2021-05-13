@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 export default {
   APPROVE: 'APPROVE',
   SCHEDULE: 'SCHEDULE',

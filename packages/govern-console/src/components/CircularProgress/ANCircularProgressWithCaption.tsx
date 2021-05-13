@@ -1,6 +1,6 @@
-/* eslint-disable */
 import { ANCircularProgress } from './ANCircularProgress';
 import { CiruclarProgressStatus } from 'utils/types';
+import React from 'react';
 
 export interface ANProgressCationPropos {
   /**

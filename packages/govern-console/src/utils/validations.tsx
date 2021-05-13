@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { getToken } from '@aragon/govern';
 import { ValidateResult } from 'react-hook-form';
 import Abi from './AbiHandler';

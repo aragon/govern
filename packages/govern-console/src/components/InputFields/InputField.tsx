@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { useState } from 'react';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import TextField, { StandardTextFieldProps } from '@material-ui/core/TextField';

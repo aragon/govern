@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { ANWrappedPaper } from './ANWrapperPaper';
 import { PaperProps } from '@material-ui/core/Paper';
 

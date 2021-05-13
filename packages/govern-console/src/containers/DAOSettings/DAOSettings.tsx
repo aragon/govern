@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { useState, memo, useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { ANWrappedPaper } from '../../components/WrapperPaper/ANWrapperPaper';
@@ -133,7 +132,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
 
   const proposalInstance = React.useMemo(() => {
     if (provider && account && daoDetails) {
-      let queueApprovals = new QueueApprovals(
+      const queueApprovals = new QueueApprovals(
         account,
         daoDetails.queue.address,
         daoDetails.queue.config.resolver,
@@ -235,8 +234,12 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
         onTransactionFailure: (error) => {
           enqueueSnackbar(error, { variant: 'error' });
         },
-        onTransactionSuccess: () => {},
-        onCompleteAllTransactions: () => {},
+        onTransactionSuccess: () => {
+          //
+        },
+        onCompleteAllTransactions: () => {
+          //
+        },
       },
     });
   };
@@ -489,7 +492,9 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
             >
               <InputField
                 label=""
-                onInputChange={() => {}}
+                onInputChange={() => {
+                  //
+                }}
                 value={''}
                 height="46px"
                 width="540px"
@@ -500,7 +505,9 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
                 buttonType={'secondary'}
                 backgroundColor={'#FFFFFF'}
                 buttonColor={'#20232C'}
-                onClick={() => {}}
+                onClick={() => {
+                  //
+                }}
                 style={{ marginLeft: '10px' }}
                 disabled={true}
               />
@@ -572,7 +579,9 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
             >
               <InputField
                 label=""
-                onInputChange={() => {}}
+                onInputChange={() => {
+                  //
+                }}
                 value={''}
                 height="46px"
                 width="540px"
@@ -583,7 +592,9 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
                 buttonType={'secondary'}
                 backgroundColor={'#FFFFFF'}
                 buttonColor={'#20232C'}
-                onClick={() => {}}
+                onClick={() => {
+                  //
+                }}
                 style={{ marginLeft: '10px' }}
                 disabled={true}
               />

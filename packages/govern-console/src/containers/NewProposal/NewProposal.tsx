@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { useState, useEffect, memo } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { styled } from '@material-ui/core/styles';
@@ -25,7 +24,7 @@ import FacadeProposal from 'services/Proposal';
 import { useForm, Controller } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
 
-import { Proposal, ProposalOptions, PayloadType, ActionType } from '@aragon/govern';
+import { Proposal, ProposalOptions, ActionType } from '@aragon/govern';
 
 export interface NewProposalProps {
   /**
@@ -111,38 +110,7 @@ const SettingsLink = styled(Typography)({
     color: '#00C2FF',
   },
 });
-const proofTextArea = styled(TextArea)({
-  background: '#FFFFFF',
-  border: '2px solid #EFF1F7',
-  boxSizing: 'border-box',
-  boxShadow: 'inset 0px 2px 3px 0px rgba(180, 193, 228, 0.35)',
-  borderRadius: '8px',
-  width: '100%',
-  height: 104,
-  padding: '11px 21px',
-  fontSize: 18,
-  fontStyle: 'normal',
-  fontWeight: 400,
-  lineHeight: '25px',
-  letterSpacing: '0em',
-  // border: '0 !important',
-  '& .MuiInputBase-root': {
-    border: 0,
-    width: '100%',
-    input: {
-      width: '100%',
-    },
-  },
-  '& .MuiInput-underline:after': {
-    border: 0,
-  },
-  '& .MuiInput-underline:before': {
-    border: 0,
-  },
-  '& .MuiInput-underline:hover:not(.Mui-disabled):before': {
-    border: 0,
-  },
-});
+
 export interface NewProposalProps {
   /**
    * callback for click on schedule
@@ -270,7 +238,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
 
   const proposalInstance = React.useMemo(() => {
     if (provider && account && daoDetails) {
-      let queueApprovals = new QueueApprovals(
+      const queueApprovals = new QueueApprovals(
         account,
         daoDetails.queue.address,
         daoDetails.queue.config.resolver,
@@ -425,8 +393,12 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
         onTransactionFailure: (error) => {
           enqueueSnackbar(error, { variant: 'error' });
         },
-        onTransactionSuccess: () => {},
-        onCompleteAllTransactions: () => {},
+        onTransactionSuccess: () => {
+          //
+        },
+        onCompleteAllTransactions: () => {
+          //
+        },
       },
     });
   };

@@ -1,6 +1,6 @@
-/* eslint-disable */
 import { makeStyles } from '@material-ui/core/styles';
 import Paper, { PaperProps } from '@material-ui/core/Paper';
+import React from 'react';
 
 const useStyle = makeStyles({
   root: {

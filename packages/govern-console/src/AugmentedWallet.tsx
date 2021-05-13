@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { useContext, useMemo } from 'react';
 import { ethers, providers as EthersProviders } from 'ethers';
 import { UseWalletProvider, useWallet } from 'use-wallet';

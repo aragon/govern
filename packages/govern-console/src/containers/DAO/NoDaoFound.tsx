@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { useRef, useState, useEffect, memo } from 'react';
 import { styled, useTheme } from '@material-ui/core/styles';
 import { DaoHeader } from 'components/DaoHeader/DaoHeader';
@@ -58,7 +57,7 @@ const RowFlexDiv = styled('div')(({ theme }) => ({
 }));
 //* Styled Components List End
 
-const NoDaoFound: React.FC<{}> = ({ ...props }) => {
+const NoDaoFound: React.FC<unknown> = ({ ...props }) => {
   const history = useHistory();
 
   const { daoName } = useParams<any>();

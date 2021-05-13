@@ -1,4 +1,3 @@
-/* eslint-disable*/
 import React from 'react';
 import { CustomTransaction, CustomTransactionStatus } from 'utils/types';
 import { ANCircularProgressWithCaption } from 'components/CircularProgress/ANCircularProgressWithCaption';

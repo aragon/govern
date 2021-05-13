@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { useRef, useState, useEffect, memo } from 'react';
 import { styled, useTheme } from '@material-ui/core/styles';
 import { DaoHeader } from 'components/DaoHeader/DaoHeader';
