@@ -28,7 +28,6 @@ import { validateToken } from '../../utils/validations';
 import { CreateDaoStatus } from './CreateDao';
 import { CreateDaoProgressProps } from './CreateDaoProgress';
 import { ContractReceipt } from 'ethers';
-import { useSnackbar } from 'notistack';
 
 interface FormInputs {
   /**
@@ -123,7 +122,6 @@ const CreateDaoForm: React.FC<FormProps> = ({
   setCreatedDaoRoute,
   cancelForm,
 }) => {
-  const { enqueueSnackbar } = useSnackbar();
   const context: any = useWallet();
   const { chainId, provider, isConnected } = context;
 
@@ -144,12 +142,6 @@ const CreateDaoForm: React.FC<FormProps> = ({
   }, [connectedChainId]);
 
   const submitCreateDao = async (params: FormInputs) => {
-    if (!isConnected) {
-      enqueueSnackbar('Wallet not connected.', {
-        variant: 'error',
-      });
-      return;
-    }
     let token: Partial<Token>;
 
     let progress: CreateDaoProgressProps = {
@@ -453,6 +445,7 @@ const CreateDaoForm: React.FC<FormProps> = ({
           }}
         >
           <ANButton
+            disabled={!isConnected}
             label="Create new DAO"
             buttonType="primary"
             style={{ marginTop: 40 }}

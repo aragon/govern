@@ -205,13 +205,6 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
   }, [daoDetails, provider]);
 
   const callSaveSetting = async (formData: FormInputs) => {
-    if (!isConnected) {
-      enqueueSnackbar('Wallet not connected.', {
-        variant: 'error',
-      });
-      return;
-    }
-
     const newConfig: DaoConfig = formData.daoConfig;
 
     // modify config before sending to schedule.
@@ -640,6 +633,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
             }}
           >
             <ANButton
+              disabled={!isConnected}
               label={'Save settings'}
               buttonType={'primary'}
               onClick={handleSubmit(callSaveSetting)}
