@@ -14,7 +14,7 @@ enum TransactionKeeperState {
 }
 
 const getErrorFromException = (ex: any): string => {
-  let errorMessage = ex.error?.message || ex.message;
+  let errorMessage = ex.error?.message || ex.reason || ex.message;
   if (!errorMessage) {
     try {
       errorMessage = JSON.stringify(ex);
