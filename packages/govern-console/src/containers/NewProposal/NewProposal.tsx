@@ -25,7 +25,7 @@ import {
 } from 'utils/types';
 import { useSnackbar } from 'notistack';
 
-import { ActionTypes, closeTransactionsModalAction, ModalsContext } from 'containers/HomePage/ModalsContext';
+import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import  FacadeProposal from 'services/Proposal';
 import { useForm, Controller } from 'react-hook-form';
 

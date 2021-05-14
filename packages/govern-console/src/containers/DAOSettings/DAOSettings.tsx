@@ -19,7 +19,6 @@ import { CustomTransaction } from 'utils/types';
 import {
   ActionTypes,
   ModalsContext,
-  closeTransactionsModalAction,
 } from 'containers/HomePage/ModalsContext';
 import { correctDecimal } from 'utils/token';
 import FacadeProposal from 'services/Proposal';
