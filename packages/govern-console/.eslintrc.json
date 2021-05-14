@@ -15,6 +15,10 @@
     }
   },
   "extends": [
+    // if more rules is needed .../recommended could be changed to .../all 
+    // and/or more plugins could be used
+    // "react-app",
+    // "eslint:recommended",
     "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:react-hooks/recommended",
@@ -25,6 +29,9 @@
     "@typescript-eslint/explicit-function-return-type": "off",
     "prettier/prettier": "error",
     "@typescript-eslint/no-explicit-any": "off",
-    "react/prop-types": "off"
+    "react/prop-types": "off",
+    // next two rules can not be turned on for yarn start, so we set them off
+    "react/react-in-jsx-scope": "off",
+    "react/no-unescaped-entities": "off"
   }
 }

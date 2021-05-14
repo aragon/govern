@@ -57,9 +57,10 @@
     "eject": "react-scripts eject",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public",
-    "lint": "eslint --ignore-path .gitignore",
+    "lint": "eslint src --ext .tsx .gitignore",
     "lint:js": "npm run lint:eslint -- . ",
-    "lint:fix": "eslint --ignore-path .gitignore",
+    "lint:error-only": "eslint --quiet \"src/**/*.{ts,tsx}\"",
+    "lint:fix": "npm run lint -- --fix",
     "precommit": "lint-staged"
   },
   "eslintConfig": {
@@ -96,6 +97,7 @@
     "babel-loader": "8.1.0",
     "eslint-config-prettier": "4.1.0",
     "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-react-hooks": "^4.2.0",
     "husky": "^5.2.0",
     "prettier": "^2.2.1"
   }
