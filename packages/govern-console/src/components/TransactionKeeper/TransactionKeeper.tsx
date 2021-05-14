@@ -107,6 +107,7 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
     transactions,
     onTransactionFailure,
     onTransactionSuccess,
+    onCompleteAllTransactions,
     updateTransaction,
   ]);
 
