@@ -261,12 +261,12 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
             ReceiptType.Scheduled,
           );
         },
-        onCompleteAllTransactions: () => {
-          dispatch(closeTransactionsModalAction);
+        onCompleteAllTransactions: () => {},
+        redirect: () => {
           if (containerHash) {
             history.push(proposalDetailsUrl(daoName, containerHash));
           }
-        },
+        }
       },
     });
   };

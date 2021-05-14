@@ -32,6 +32,7 @@ const TransactionsModal: React.FC = () => {
           transactionList,
           onTransactionFailure,
           onCompleteAllTransactions,
+          redirect,
         },
       },
     },
@@ -54,6 +55,8 @@ const TransactionsModal: React.FC = () => {
           onTransactionFailure={onTransactionFailure}
           onTransactionSuccess={onTransactionSuccess}
           onCompleteAllTransactions={onCompleteAllTransactions}
+          closeModal={handleClose}
+          redirect={redirect}
         />
       </TransactionsDialog>
     </>

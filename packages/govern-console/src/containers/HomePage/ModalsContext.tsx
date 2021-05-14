@@ -19,6 +19,7 @@ type TransactionsModalAction = {
       transactionReceipt: any,
     ) => void;
     onCompleteAllTransactions: (transactions: CustomTransaction[]) => void;
+    redirect?: () => void;
   };
 };
 
@@ -45,6 +46,7 @@ interface ModalContextState {
         transactionReceipt: any,
       ) => void;
       onCompleteAllTransactions: (transactions: CustomTransaction[]) => void;
+      redirect?: () => void;
     };
   };
 }
