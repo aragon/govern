@@ -532,7 +532,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
                 label={'Examine'}
                 buttonType={'secondary'}
                 backgroundColor={'#FFFFFF'}
-                buttonColor={'#20232C'}
+                labelColor={'#20232C'}
                 onClick={() => {}}
                 style={{ marginLeft: '10px' }}
                 disabled={true}
@@ -618,7 +618,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
                 label={'Examine'}
                 buttonType={'secondary'}
                 backgroundColor={'#FFFFFF'}
-                buttonColor={'#20232C'}
+                labelColor={'#20232C'}
                 onClick={() => {}}
                 style={{ marginLeft: '10px' }}
                 disabled={true}

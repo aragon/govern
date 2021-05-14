@@ -10,12 +10,13 @@ import Typography from '@material-ui/core/Typography';
 import { useEffect } from 'react';
 import { getTruncatedAccountAddress } from 'utils/account';
 import { useSnackbar } from 'notistack';
+import detectEthereumProvider from '@metamask/detect-provider';
 
 const WalletWrapper = styled(Card)({
   background: '#FFFFFF',
   height: '48px',
   width: '178px',
-  // border: '2px solid #EFF1F7',
+  // border: '2px solid #252b3e',
   boxSizing: 'border-box',
   // boxShadow: '0px 3px 3px rgba(180, 193, 228, 0.35)',
   boxShadow: 'none',
@@ -104,7 +105,7 @@ const Wallet = ({}) => {
         enqueueSnackbar('Please select the correct chain in your wallet.', {
           variant: 'error',
         });
-      } else if(error.message.includes('window.ethereum')) {
+      } else if (error.message.includes('window.ethereum')) {
         enqueueSnackbar('Please install a wallet.', {
           variant: 'error',
         });
@@ -115,6 +116,11 @@ const Wallet = ({}) => {
       }
     }
   }, [error]);
+  useEffect(() => {
+    if (window && window.ethereum) {
+      connectWalletAndSetStatus('injected');
+    }
+  }, [window]);
 
   useEffect(() => {
     if (account) {
@@ -153,7 +159,7 @@ const Wallet = ({}) => {
     return (
       <WalletWrapper>
         <ANButton
-          buttonType="primary"
+          buttonType="secondary"
           onClick={() => {
             connectWalletAndSetStatus('injected');
             // connect('injected');
@@ -170,7 +176,7 @@ const Wallet = ({}) => {
     return (
       <WalletWrapper>
         <ANButton
-          buttonType="primary"
+          buttonType="secondary"
           onClick={() => {
             connectWalletAndSetStatus('injected');
             // connect('injected');
@@ -187,7 +193,7 @@ const Wallet = ({}) => {
     return (
       // <WalletWrapper>
       <ANButton
-        buttonType="primary"
+        buttonType="secondary"
         onClick={() => {
           connectWalletAndSetStatus('injected');
           // connect('injected');

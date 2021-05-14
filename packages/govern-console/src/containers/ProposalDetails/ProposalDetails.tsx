@@ -27,8 +27,6 @@ import { useSnackbar } from 'notistack';
 import ChallengeWidget from './components/ChallengeWidget';
 import ExecuteWidget from './components/ExecuteWidget';
 import ResolveWidget from './components/ResolveWidget';
-
-// import { InputField } from 'component/InputField/InputField';
 interface ProposalDetailsProps {
   onClickBack?: any;
 }
@@ -66,9 +64,11 @@ const ProposalId = styled('div')(({ theme }) => ({
   marginTop: '11px',
   textOverflow: 'ellipsis',
   boxSizing: 'border-box',
+  fontFamily: 'Manrope',
 }));
 const DateDisplay = styled('div')({
   height: '25px',
+  fontFamily: 'Manrope',
   width: '100%',
   color: '#7483B3',
   marginTop: '10px',
@@ -80,6 +80,7 @@ const DetailsWrapper = styled('div')({
   display: 'flex',
   justifyContent: 'space-between',
   marginTop: '47px',
+  fontFamily: 'Manrope',
 });
 const ProposalDetailsWrapper = styled('div')({
   width: 'calc(100% - 443px)',
@@ -88,6 +89,7 @@ const ProposalDetailsWrapper = styled('div')({
   minHeight: '900px',
   border: ' 2px solid #E2ECF5',
   padding: '32px 30px',
+  fontFamily: 'Manrope',
 });
 const WidgetWrapper = styled('div')({
   width: '427px',
@@ -99,6 +101,7 @@ const TitleText = styled(Typography)({
   height: '38px',
   width: '100%',
   boxSizing: 'border-box',
+  fontFamily: 'Manrope',
 });
 export const InfoWrapper = styled('div')({
   // display: 'flex',
@@ -108,6 +111,7 @@ export const InfoWrapper = styled('div')({
   width: '100%',
   boxSizing: 'border-box',
   height: 'fit-content',
+  fontFamily: 'Manrope',
 });
 export const InfoKeyDiv = styled('div')({
   fontFamily: 'Manrope',
@@ -131,13 +135,16 @@ export const InfoValueDivInline = styled('div')({
   maxWidth: '100%',
   textOverflow: 'ellipsis',
   overflow: 'hidden',
-  verticalAlign: 'bottom',
   minHeight: '25px',
   lineHeight: '25px',
+  fontSize: '18px',
   '& a': {
     width: '100%',
     color: '#0094FF',
     boxSizing: 'border-box',
+    height: '25px',
+    display: 'block',
+    lineHeight: '25px',
   },
 });
 const InfoValuePre = styled('pre')({
@@ -217,9 +224,13 @@ const ActionDiv = styled('div')({
   overflow: 'hidden',
   cursor: 'pointer',
   '& > div': {
+    display: 'flex',
+    minHeight: '62px !important',
+    alignItems: 'center',
     width: '100%',
     paddingTop: 0,
     paddingBottom: 0,
+
     // lineHeight: '62px',
   },
   '& div': {
