@@ -2,38 +2,33 @@
 import React, { memo } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { PROPOSAL_STATES } from 'utils/states';
-import {
-  InfoKeyDiv,
-  InfoValueDivInline,
-  InfoValueDivBlock,
-} from '../ProposalDetails';
+import { InfoKeyDiv, InfoValueDivInline } from '../ProposalDetails';
 import { Widget, WidgetRow, InfoWrapper, TitleText } from './SharedStyles';
-import {
-  getTruncatedAccountAddress,
-  getFormattedDate,
-} from 'utils/HelperFunctions';
+import { formatDate } from 'utils/date';
 
 const ResolveWidget: React.FC<any> = ({
+  disabled,
   containerEventResolve,
   currentState,
+  disputeId,
   onResolveProposal,
 }) => {
   if (containerEventResolve) {
     return (
       <Widget>
         <WidgetRow>
-          <TitleText>Challenge Details</TitleText>
+          <TitleText>Resolve Details</TitleText>
         </WidgetRow>
         <InfoWrapper>
           <InfoKeyDiv>Resolved At</InfoKeyDiv>
           <InfoValueDivInline id="challenged-date__value">
-            {getFormattedDate(containerEventResolve.createdAt)}
+            {formatDate(containerEventResolve.createdAt)}
           </InfoValueDivInline>
         </InfoWrapper>
         <InfoWrapper>
           <InfoKeyDiv>Approved</InfoKeyDiv>
           <InfoValueDivInline id="challenger__value">
-            {getTruncatedAccountAddress(containerEventResolve.approved)}
+            containerEventResolve.approved
           </InfoValueDivInline>
         </InfoWrapper>
       </Widget>
@@ -56,17 +51,16 @@ const ResolveWidget: React.FC<any> = ({
       >
         <ANButton
           label="Resolve"
+          disabled={disabled}
           height="45px"
           width="372px"
           style={{ margin: 'auto' }}
-          onClick={onResolveProposal}
+          onClick={() => onResolveProposal(disputeId)}
           buttonType="primary"
         />
       </div>
     </Widget>
   );
-
-  return <p></p>;
 };
 
 export default memo(ResolveWidget);

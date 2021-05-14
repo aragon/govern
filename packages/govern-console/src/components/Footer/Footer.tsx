@@ -1,54 +1,33 @@
-import React from 'react';
-import { styled, useTheme } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import governIcon from 'images/aragon-icon.svg';
+/* eslint-disable */
+import { styled } from '@material-ui/core/styles';
+import AragonIcon from 'images/aragon-graphic-only-icon.svg';
 import aragonText from 'images/svgs/Aragon.svg';
 import discordIcon from 'images/svgs/discord.svg';
 import messageIcon from 'images/svgs/message.svg';
 import twitterIcon from 'images/svgs/twitter.svg';
-import youtubeIcon from 'images/svgs/youtube.svg';
-import Wallet from 'components/Wallet/Wallet';
+import telegramIcon from 'images/svgs/telegrama.svg';
 import { useHistory } from 'react-router-dom';
+import Grid from '@material-ui/core/Grid';
 
 const FooterWrapperDiv = styled('div')({
-  height: '106px',
-  width: '100%',
-  display: 'block',
-  // position: 'absolute',
-  bottom: 0,
-  left: 0,
+  width: 'auto',
+  height: '60px',
+  marginTop: '30px',
+  // background: '#FFFFFF'
 });
-const TitleText = styled(Typography)({
-  fontFamily: 'Manrope',
-  fontStyle: 'normal',
-  fontWeight: 'normal',
-  fontSize: '18px',
-  lineHeight: '25px',
-  color: '#7483B2',
-  width: '200px',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-});
-const FooterDiv = styled('div')({
-  display: 'flex',
-  width: '100%',
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  height: '100%',
-});
+
 const Logo = styled('div')({
   display: 'flex',
+  flexDirection: 'row',
   width: 'fit-content',
   cursor: 'pointer',
   marginLeft: '50px',
 });
-const Account = styled('div')({
+const Social = styled('div')({
   display: 'flex',
-  width: '200px',
+  width: 'auto',
   flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
+  justifyContent: 'flex-end',
   marginRight: '50px',
 });
 
@@ -60,22 +39,53 @@ const Footer = ({}) => {
   };
 
   return (
-    <FooterWrapperDiv id="footer_wrapper">
-      <FooterDiv id="footer">
-        <Logo id="footer_logo" onClick={redirectToHomePage}>
-          <img
-            src={governIcon}
-            style={{ height: '31px', width: '35px', paddingTop: '35px' }}
-          />
-          <img src={aragonText} />
-        </Logo>
-        <Account id="account">
-          <img src={youtubeIcon} />
-          <img src={twitterIcon} />
-          <img src={discordIcon} />
-          <img src={messageIcon} />
-        </Account>
-      </FooterDiv>
+    <FooterWrapperDiv>
+      <Grid container spacing={5}>
+        <Grid item xs={12} sm={6}>
+          <Logo onClick={redirectToHomePage}>
+            <img src={AragonIcon} style={{ height: '31px', width: '35px' }} />
+            <img src={aragonText} />
+          </Logo>
+        </Grid>
+        <Grid item xs={12} sm={6} key="social">
+          <Social>
+            <a
+              href={'https://twitter.com/AragonProject'}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <img src={twitterIcon} />
+            </a>
+            <a
+              style={{ marginLeft: '28px' }}
+              href={'https://discord.com/invite/eqQJkdp'}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <img src={discordIcon} />
+            </a>
+            <a
+              style={{ marginLeft: '28px' }}
+              href={'https://t.me/AragonProject'}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <img
+                style={{ width: '25px', height: '25px' }}
+                src={telegramIcon}
+              />
+            </a>
+            <a
+              style={{ marginLeft: '28px' }}
+              href={'https://forum.aragon.org/'}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <img src={messageIcon} />
+            </a>
+          </Social>
+        </Grid>
+      </Grid>
     </FooterWrapperDiv>
   );
 };

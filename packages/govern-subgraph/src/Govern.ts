@@ -21,10 +21,12 @@ export function handleExecuted(event: ExecutedEvent): void {
 }
 
 export function handleETHDeposited(event: ETHDepositedEvent): void {
-  let govern = loadOrCreateGovern(event.address)
-  govern.balance = event.params.value
+  // This would be useful if we store in the subgraph who deposited
+  // and how much
+  // let govern = loadOrCreateGovern(event.address)
+  // govern.balance = event.params.value
 
-  govern.save()
+  // govern.save()
 }
 
 // MiniACL Events
@@ -73,7 +75,6 @@ export function loadOrCreateGovern(entity: Address): Govern {
     govern = new Govern(governId)
     govern.address = entity
     govern.roles = []
-    govern.balance = BigInt.fromI32(0)
   }
   return govern!
 }

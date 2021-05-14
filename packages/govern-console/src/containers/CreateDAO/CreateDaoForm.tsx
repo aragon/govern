@@ -27,7 +27,7 @@ import { ChainId, CiruclarProgressStatus } from '../../utils/types';
 import { validateToken } from '../../utils/validations';
 import { CreateDaoStatus } from './CreateDao';
 import { CreateDaoProgressProps } from './CreateDaoProgress';
-import { ContractReceipt } from 'ethers'
+import { ContractReceipt } from 'ethers';
 
 interface FormInputs {
   /**
@@ -86,7 +86,6 @@ const SwitchRow = styled('div')({
   flexDirection: 'row',
   justifyContent: 'space-between',
   verticalAlign: 'middle',
-  lineHeight: '40px',
   margin: '25px 25px 5px 25px',
 });
 
@@ -95,6 +94,7 @@ const OptionText = styled('div')({
   fontStyle: 'normal',
   fontWeight: 400,
   fontSize: 18,
+  lineHeight: '22.08px',
 });
 
 const BackButton = styled('div')({
@@ -123,16 +123,15 @@ const CreateDaoForm: React.FC<FormProps> = ({
   cancelForm,
 }) => {
   const context: any = useWallet();
-  const { chainId, status, provider } = context;
+  const { chainId, provider, isConnected } = context;
 
   const { control, handleSubmit, watch, setValue } = useForm<FormInputs>();
 
   const connectedChainId = useMemo(() => {
-    if (chainId === ChainId.RINKEBY && status === 'connected')
-      return ChainId.RINKEBY;
+    if (chainId === ChainId.RINKEBY && isConnected) return ChainId.RINKEBY;
 
     return ChainId.MAINNET;
-  }, [chainId, status]);
+  }, [chainId, isConnected]);
 
   // use appropriate default config
   useEffect(() => {
@@ -179,17 +178,21 @@ const CreateDaoForm: React.FC<FormProps> = ({
         };
         setProgress({ ...progress });
 
-        const result: ContractReceipt | undefined  = await registerToken();
+        const result: ContractReceipt | undefined = await registerToken();
         if (typeof result === 'undefined' || result.status === 1) {
           // handle token already registed
           progress.progressStatus.register = CiruclarProgressStatus.Done;
           setProgress({ ...progress });
-          setTimeout( () => { setCreateDaoStatus(CreateDaoStatus.Successful) }, 2000 ); // delay 2 seconds, so user can obeserve each progress result.
+          setTimeout(() => {
+            setCreateDaoStatus(CreateDaoStatus.Successful);
+          }, 2000); // delay 2 seconds, so user can obeserve each progress result.
         } else {
           // update progress
           progress.progressStatus.register = CiruclarProgressStatus.Failed;
           setProgress({ ...progress });
-          setTimeout( () => { setCreateDaoStatus(CreateDaoStatus.Failed) }, 2000 );
+          setTimeout(() => {
+            setCreateDaoStatus(CreateDaoStatus.Failed);
+          }, 2000);
         }
       };
     } else {
@@ -216,15 +219,18 @@ const CreateDaoForm: React.FC<FormProps> = ({
       );
 
       await result.wait();
-      
+
       setCreatedDaoRoute(params.daoName);
-      
+
       // update progress
       progress.progressStatus.create = CiruclarProgressStatus.Done;
       setProgress({ ...progress });
-      
+
       // set creation successful if Vocdoni not used
-      if (!params.useVocdoni) setTimeout( () => { setCreateDaoStatus(CreateDaoStatus.Successful) }, 2000 );
+      if (!params.useVocdoni)
+        setTimeout(() => {
+          setCreateDaoStatus(CreateDaoStatus.Successful);
+        }, 2000);
     } catch (error) {
       console.log(error);
       setCreateDaoStatus(CreateDaoStatus.Failed);
@@ -259,14 +265,16 @@ const CreateDaoForm: React.FC<FormProps> = ({
         />
         <SwitchRow>
           <OptionText>{'Create new token'}</OptionText>
-          <Controller
-            name="isExistingToken"
-            control={control}
-            defaultValue={false}
-            render={({ field: { onChange, value } }) => (
-              <BlueSwitch onChange={onChange} value={value} />
-            )}
-          />
+          <div style={{ marginTop: '-12px' }}>
+            <Controller
+              name="isExistingToken"
+              control={control}
+              defaultValue={false}
+              render={({ field: { onChange, value } }) => (
+                <BlueSwitch onChange={onChange} value={value} />
+              )}
+            />
+          </div>
           <OptionText>{'Use existing token'}</OptionText>
         </SwitchRow>
         {!watch('isExistingToken') ? (
@@ -435,7 +443,7 @@ const CreateDaoForm: React.FC<FormProps> = ({
           }}
         >
           <ANButton
-            disabled={status !== 'connected'}
+            disabled={!isConnected}
             label="Create new DAO"
             buttonType="primary"
             style={{ marginTop: 40 }}

@@ -14,13 +14,13 @@ type Dao @entity {
   executor: Govern!
   token: String!
   registrant: String!
+  createdAt: BigInt!
 }
 
 type Govern @entity {
   id: ID!
   address: Bytes!
   metadata: Bytes
-  balance: BigInt!
   roles: [Role!]!
 }
 
@@ -96,7 +96,7 @@ enum ContainerState {
   Approved
   Challenged
   Rejected
-  Cancelled
+  Vetoed
   Executed
 }
 

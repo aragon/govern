@@ -13,6 +13,7 @@ import { formatEther } from 'ethers/lib/utils';
 import { useHistory, useParams } from 'react-router-dom';
 import MUITypography from '@material-ui/core/Typography';
 import daoNoutFound from 'images/dao-not-found.svg';
+import { useSnackbar } from 'notistack';
 
 //* Styled Components List
 
@@ -62,9 +63,23 @@ const NoDaoFound: React.FC<{}> = ({ ...props }) => {
 
   const { daoName } = useParams<any>();
   //TODO daoname empty handling
+  const { enqueueSnackbar } = useSnackbar();
 
   const onGotoDao = () => {
-    history.push(`${daoSearchText}`);
+    if (daoSearchText.length > 0) {
+      history.push(`${daoSearchText}`);
+    } else {
+      enqueueSnackbar(
+        'Invalid Dao Name. Atleast one letter should be entered.',
+        { variant: 'error' },
+      );
+    }
+  };
+
+  const handleKeyPress = (e: any) => {
+    if (e.key === 'Enter') {
+      onGotoDao();
+    }
   };
 
   const { data: daoList, loading: loadingDao } = useQuery(GET_DAO_BY_NAME, {
@@ -72,6 +87,7 @@ const NoDaoFound: React.FC<{}> = ({ ...props }) => {
   });
 
   const [daoSearchText, updateDaoSearchText] = useState('');
+  const [openToast, setOpenToast] = React.useState<boolean>(false);
   const onInputChange = (updatedText: string) => {
     updateDaoSearchText(updatedText);
   };
@@ -90,6 +106,7 @@ const NoDaoFound: React.FC<{}> = ({ ...props }) => {
                 placeholder="DAO Name"
                 onInputChange={onInputChange}
                 value={daoSearchText}
+                onKeyPress={handleKeyPress}
                 label=""
                 height="46px"
                 width="448px"
@@ -99,6 +116,7 @@ const NoDaoFound: React.FC<{}> = ({ ...props }) => {
             <div>
               <ANButton
                 buttonType="primary"
+                type="submit"
                 label="Go to DAO"
                 height={'46px'}
                 width={'116px'}

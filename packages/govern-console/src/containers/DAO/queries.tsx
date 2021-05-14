@@ -14,6 +14,9 @@ export const GET_PROPOSAL_LIST = gql`
         id
         state
         createdAt
+        payload {
+          executionTime
+        }
       }
       nonce
     }
@@ -47,7 +50,6 @@ export const GET_DAO_BY_NAME = gql`
       executor {
         id
         address
-        # balance
       }
       token
       registrant

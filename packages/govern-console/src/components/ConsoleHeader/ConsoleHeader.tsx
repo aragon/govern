@@ -6,6 +6,8 @@ import { InputField } from '../InputFields/InputField';
 import { ANButton } from '../Button/ANButton';
 import { useHistory } from 'react-router-dom';
 import consoleHeaderGraphic from 'images/console-header.svg';
+import { useSnackbar } from 'notistack';
+
 export interface ConsoleHeaderProps {
   /**
    * Function to be called on search
@@ -65,6 +67,7 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
   onSearch,
   ...props
 }) => {
+  const { enqueueSnackbar } = useSnackbar();
   const history = useHistory();
   const theme = useTheme();
   const [searchString, updateSearchString] = React.useState<string>('');
@@ -72,8 +75,22 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
   const onInputChange = (val: string) => {
     updateSearchString(val);
   };
+
+  const handleKeyPress = (e: any) => {
+    if (e.key === 'Enter') {
+      onGotoDao();
+    }
+  };
+
   const onGotoDao = () => {
-    history.push(`daos/${searchString}`);
+    if (searchString.length > 0) {
+      history.push(`daos/${searchString}`);
+    } else {
+      enqueueSnackbar(
+        'Invalid Dao Name. Atleast one letter should be entered.',
+        { variant: 'error' },
+      );
+    }
   };
 
   return (

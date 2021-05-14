@@ -5,7 +5,6 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import backButtonIcon from 'images/back-btn.svg';
 import { Label } from 'components/Labels/Label';
-import { InputField } from 'components/InputFields/InputField';
 import { useParams } from 'react-router-dom';
 import { GET_PROPOSAL_DETAILS_QUERY } from './queries';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
@@ -18,14 +17,16 @@ import { Proposal, ProposalOptions } from '@aragon/govern';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import QueueApprovals from 'services/QueueApprovals';
 import FacadeProposal from 'services/Proposal';
+import AbiHandler from 'utils/AbiHandler';
 import { toUtf8String } from '@ethersproject/strings';
+import { formatDate } from 'utils/date';
+import { getState, getStateColor } from 'utils/states';
+import { useSnackbar } from 'notistack';
 
 // widget components
 import ChallengeWidget from './components/ChallengeWidget';
 import ExecuteWidget from './components/ExecuteWidget';
 import ResolveWidget from './components/ResolveWidget';
-
-// import { InputField } from 'component/InputField/InputField';
 interface ProposalDetailsProps {
   onClickBack?: any;
 }
@@ -75,11 +76,6 @@ const DateDisplay = styled('div')({
   fontWeight: 'normal',
   boxSizing: 'border-box',
 });
-const getLabelColor = (proposalState: string) => {
-  if (proposalState === 'Scheduled') return 'yellow';
-  if (proposalState === 'Executed') return 'green';
-  if (proposalState === 'Challenged') return 'red';
-};
 const DetailsWrapper = styled('div')({
   display: 'flex',
   justifyContent: 'space-between',
@@ -151,6 +147,15 @@ export const InfoValueDivInline = styled('div')({
     lineHeight: '25px',
   },
 });
+const InfoValuePre = styled('pre')({
+  fontFamily: 'Manrope',
+  fontStyle: 'normal',
+  fontWeight: 'normal',
+  color: '#20232C',
+  overflow: 'auto',
+  margin: '0',
+});
+
 export const InfoValueDivBlock = styled('div')(
   ({ maxlines }: { maxlines?: number }) => ({
     display: 'flex',
@@ -237,7 +242,6 @@ const ActionDiv = styled('div')({
 });
 
 const CollapsedDiv = styled('div')({
-  height: '62px',
   display: 'block',
   width: '100%',
   paddingLeft: '23px',
@@ -254,7 +258,7 @@ const ExpandedDiv = styled('div')({
   boxSizing: 'border-box',
   margin: 0,
   '& #value-div': {
-    height: '27px',
+    height: '30px',
     lineHeight: '27px',
     minHeight: '27px !important',
   },
@@ -279,18 +283,28 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   });
   const context: any = useWallet();
 
-  const { account, provider } = context;
+  const { account, provider, networkName, isConnected } = context;
 
   const { dispatch } = React.useContext(ModalsContext);
+  const { enqueueSnackbar } = useSnackbar();
 
   const [proposalInfo, updateProposalInfo] = React.useState<any>(null);
+  const [abiCache, updateAbiCache] = React.useState<any>({});
+  const [decodedData, updateDecodedData] = React.useState<any>({});
+  const [decoding, setDecoding] = React.useState(false);
   const [isExpanded, updateIsExpanded] = React.useState<any>({});
   const [daoDetails, updateDaoDetails] = React.useState<any>();
   const [challengeReason, setChallengeReason] = React.useState('');
   const transactionsQueue = React.useRef<CustomTransaction[]>([]);
 
+  const abiHandler = React.useMemo(() => {
+    if (networkName) {
+      return new AbiHandler(networkName);
+    }
+  }, [networkName]);
+
   const proposalInstance = React.useMemo(() => {
-    if (provider && account && daoDetails && proposalInfo) {
+    if (provider && daoDetails && proposalInfo && account) {
       let queueApprovals = new QueueApprovals(
         account,
         daoDetails.queue.address,
@@ -326,7 +340,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     }
   }, [proposalDetailsData]);
 
-  const toggleDiv = (index: number) => {
+  const toggleDiv = async (index: number) => {
     const cloneObject = { ...isExpanded };
     if (cloneObject[index]) {
       cloneObject[index] = false;
@@ -334,6 +348,25 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       cloneObject[index] = true;
     }
     updateIsExpanded(cloneObject);
+
+    // try to decode action data if the div was expanded for the first time
+    if (cloneObject[index] && !decodedData[index] && abiHandler) {
+      setDecoding(true);
+      const action = proposalInfo.payload.actions[index];
+      let abi = abiCache[index];
+      if (abi === undefined) {
+        abi = await abiHandler.get(action.to);
+        updateAbiCache({ ...abiCache, [action.to]: abi });
+      }
+
+      if (abi) {
+        const data = AbiHandler.decode(abi, action.data);
+        if (data) {
+          updateDecodedData({ ...decodedData, [index]: data });
+        }
+      }
+      setDecoding(false);
+    }
   };
 
   useEffect(() => {
@@ -348,6 +381,15 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   }, [daoList]);
 
   const challengeProposal = async () => {
+    // if the reason's length is less than 10 words, it's highly unlikely
+    // to specify the actual valid reason in less than 10 words
+    if (challengeReason.length < 10) {
+      enqueueSnackbar('Challenge reason must be at least 10 letters', {
+        variant: 'error',
+      });
+      return;
+    }
+
     const proposalParams = getProposalParams(proposalInfo);
 
     if (proposalInstance) {
@@ -357,7 +399,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
           challengeReason,
         );
       } catch (error) {
-        // TODO: Bhanu show error
+        enqueueSnackbar(error.message, { variant: 'error' });
       }
     }
 
@@ -365,8 +407,10 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     dispatch({
       type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
       payload: {
-        transactionList: transactionsQueue.current, // TODO: Bhanu check if the length is more than 0 in the dispatch..
-        onTransactionFailure: () => {},
+        transactionList: transactionsQueue.current,
+        onTransactionFailure: (error) => {
+          enqueueSnackbar(error, { variant: 'error' });
+        },
         onTransactionSuccess: () => {},
         onCompleteAllTransactions: () => {},
       },
@@ -375,79 +419,32 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
 
   const executeProposal = async () => {
     const proposalParams = getProposalParams(proposalInfo);
-    console.log(proposalParams);
     if (proposalInstance) {
-      const executeTransaction = await proposalInstance.execute(proposalParams);
+      try {
+        await proposalInstance.execute(proposalParams);
+      } catch (error) {
+        enqueueSnackbar(error.error.message, { variant: 'error' });
+      }
     }
   };
 
-  const resolveProposal = async (disputeId: number) => {};
+  const resolveProposal = async (disputeId: number) => {
+    const proposalParams = getProposalParams(proposalInfo);
+    if (proposalInstance) {
+      try {
+        await proposalInstance.resolve(proposalParams, disputeId);
+      } catch (error) {
+        enqueueSnackbar(error.error.message, { variant: 'error' });
+      }
+    }
+  };
 
   const proposalStates: any = {};
-  // check if the user has the veto power.
   if (proposalInfo) {
     proposalInfo.history.forEach((item: any) => {
       proposalStates[item.__typename] = item;
     });
-    console.log(proposalInfo, ' states');
-
-    // =============================================
-    // if(proposalStates['ContainerEventChallenge']){ MEANS it was challenged.
-    //     show the followings
-    //
-    //     proposalStates['ContainerEventChallenge'].reason
-    //     proposalStates['ContainerEventChallenge'].createdAt
-    //     proposalStates['ContainerEventChallenge].challenger
-    //
-
-    // } else if(proposalInfo.state == 'Scheduled') {{
-    //     show what you were showing before. (challenge reason label + input + button)
-    //  }
-    // =============================================
-
-    // if(proposalStates['ContainerEventExecute']){
-    //   show the following
-    //   proposalStates['ContainerEventExecute'].createdAt
-    //   proposalStates['ContainerEventExecute'].execResults bytes array here.. each member can have arbitrary size.
-    // }else if(proposalInfo.state == 'Scheduled'){
-    //   if({proposalInfo.payload.executionTime - currentTimestamp} > 0) - show the message: You will not be able to execute this action until {proposalInfo.payload.executionTime - proposalInfo.payload.currentTimestamp} in human readable date format
-    //   else show what you were showing before. (execute button)
-    // }
-    // =============================================
-    // if(proposalStates['ContainerEventVeto']){
-    //     show the following
-    //     proposalStates['ContainerEventVeto'].createdAt
-    //     proposalStates['ContainerEventVeto'].reason // This is the array of bytes, where each member can be any size.
-    //  }
-    //  else if(proposalInfo.state == 'Scheduled' || proposalInfo.state == 'Challenged')){
-    //    const vetoRoles = proposalInfo.queue.roles.filter(
-    //       (role: any) => role.selector === proposalInstance.getSigHash('veto') &&
-    //       role.who == "0x94C34FB5025e054B24398220CBDaBE901bd8eE5e" && // TODO: Bhanu instead of address, put signer's address
-    //       role.granted
-    //    )
-    //    if(vetoRoles.length === 0){
-    //        TODO:Bhanu If This comes here, it means user doens't have the veto permission, which means we should be showing
-    //        the message on the veto card: You don't have the permission to veto the proposal. Otherwise
-    //    }else{
-    //        // show veto reason label + input + veto button as showing previously.
-    //    }
-
-    //  }
-
-    // =============================================
-    // if(proposalStates['ContainerEventResolve']){
-    //   show the following
-    //   proposalStates['ContainerEventResolve'].createdAt
-    //   proposalStates['ContainerEventResolve'].approved  true or false. (yes | no)
-    // } else if(proposalInfo.state == 'Challenged'){
-    //     show the new card where only button is resolve.
-    //
-    // }
   }
-
-  // const getParsedDataFromBytes = (data) => {
-
-  // };
 
   return (
     <>
@@ -462,23 +459,18 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
               </BackButton>
               <ProposalStatus>
                 <Label
-                  labelColor={getLabelColor(proposalInfo.status)}
-                  labelText={proposalInfo.state}
+                  labelColor={getStateColor(
+                    proposalInfo.state,
+                    proposalInfo.payload.executionTime,
+                  )}
+                  labelText={getState(
+                    proposalInfo.state,
+                    proposalInfo.payload.executionTime,
+                  )}
                 />
               </ProposalStatus>
               <ProposalId>{proposalInfo.id}</ProposalId>
-              <DateDisplay>
-                {
-                  // TODO:Bhanu you can make this work with the dates library you use
-                  new Date(proposalInfo.createdAt * 1000).toLocaleDateString(
-                    'en-US',
-                  ) +
-                    ' ' +
-                    new Date(proposalInfo.createdAt * 1000).toLocaleTimeString(
-                      'en-US',
-                    )
-                }
-              </DateDisplay>
+              <DateDisplay>{formatDate(proposalInfo.createdAt)}</DateDisplay>
               <DetailsWrapper>
                 <ProposalDetailsWrapper id="proposal_wrapper">
                   <TitleText>Config</TitleText>
@@ -547,10 +539,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                         'No executor ID'}
                     </InfoValueDivInline>
                   </InfoWrapper>
-                  {/* <InfoWrapper>
-                    <InfoKeyDiv>On Chain Actions:</InfoKeyDiv>
-                    <InfoValueDivInline>Proof Text</InfoValueDivInline>
-                  </InfoWrapper> */}
                   <InfoWrapper>
                     <InfoKeyDiv>AllowFailuresMap:</InfoKeyDiv>
                     <InfoValueDivInline>
@@ -561,10 +549,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                     <InfoKeyDiv>Proof:</InfoKeyDiv>
                     <InfoValueDivBlock>
                       {toUtf8String(proposalInfo.payload.proof)}
-                      {/* Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                  laboris nisi ut aliquip ex ea commodo consequat. */}
                     </InfoValueDivBlock>
                   </InfoWrapper>
                   <InfoWrapper>
@@ -579,9 +563,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                               onClick={() => toggleDiv(index)}
                               id={'action' + index}
                               style={{
-                                height: isExpanded[index]
-                                  ? 'fit-content !important'
-                                  : '66px',
+                                height: 'auto',
                               }}
                             >
                               <CollapsedDiv id="collapsed-div">
@@ -593,23 +575,52 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                                 </InfoWrapper>
                                 {/* <Carat /> */}
                               </CollapsedDiv>
-                              <ExpandedDiv id="expanded-div">
-                                <InfoWrapper id="value-div">
-                                  <InfoKeyDiv>value</InfoKeyDiv>
-                                  <InfoValueDivInline>
-                                    <a>{action.value}</a>
-                                  </InfoValueDivInline>
-                                </InfoWrapper>
-                                <InfoWrapper id="data-div">
-                                  <InfoKeyDiv>data</InfoKeyDiv>
-                                  <InfoValueDivBlock
-                                    className="full-width"
-                                    id="data-div-block"
-                                  >
-                                    {action.data}
-                                  </InfoValueDivBlock>
-                                </InfoWrapper>
-                              </ExpandedDiv>
+                              {isExpanded[index] && (
+                                <ExpandedDiv id="expanded-div">
+                                  <InfoWrapper id="value-div">
+                                    <InfoKeyDiv>value</InfoKeyDiv>
+                                    <InfoValueDivInline>
+                                      <a>{action.value}</a>
+                                    </InfoValueDivInline>
+                                  </InfoWrapper>
+                                  {decoding && <div>Decoding data....</div>}
+                                  {!decoding && !decodedData[index] && (
+                                    <InfoWrapper id="data-div">
+                                      <InfoKeyDiv>data</InfoKeyDiv>
+                                      <InfoValueDivBlock
+                                        className="full-width"
+                                        id="data-div-block"
+                                      >
+                                        {action.data}
+                                      </InfoValueDivBlock>
+                                    </InfoWrapper>
+                                  )}
+                                  {!decoding && decodedData[index] && (
+                                    <React.Fragment>
+                                      <InfoWrapper id="function-div">
+                                        <InfoKeyDiv>function</InfoKeyDiv>
+                                        <InfoValueDivInline>
+                                          <a>
+                                            {decodedData[index].functionName}
+                                          </a>
+                                        </InfoValueDivInline>
+                                      </InfoWrapper>
+                                      <InfoWrapper id="data-div">
+                                        <InfoKeyDiv>arguments</InfoKeyDiv>
+                                        {decodedData[index] && (
+                                          <InfoValuePre>
+                                            {JSON.stringify(
+                                              decodedData[index].inputData,
+                                              null,
+                                              2,
+                                            )}
+                                          </InfoValuePre>
+                                        )}
+                                      </InfoWrapper>
+                                    </React.Fragment>
+                                  )}
+                                </ExpandedDiv>
+                              )}
                             </ActionDiv>
                           );
                         },
@@ -620,6 +631,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                 <WidgetWrapper id="widget_wrapper">
                   {
                     <ChallengeWidget
+                      disabled={!isConnected}
                       containerEventChallenge={
                         proposalStates['ContainerEventChallenge']
                       }
@@ -631,6 +643,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
 
                   {
                     <ExecuteWidget
+                      disabled={!isConnected}
                       containerEventExecute={
                         proposalStates['ContainerEventExecute']
                       }
@@ -641,57 +654,20 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                   }
                   {
                     <ResolveWidget
+                      disabled={!isConnected}
                       containerEventExecute={
-                        proposalStates['ContainerEventExecute']
+                        proposalStates['ContainerEventResolve']
+                      }
+                      disputeId={
+                        proposalStates['ContainerEventChallenge']
+                          ? proposalStates['ContainerEventChallenge'].disputeId
+                          : null
                       }
                       currentState={proposalInfo.state}
                       executionTime={proposalInfo.payload.executionTime}
-                      onExecuteProposal={executeProposal}
+                      onResolveProposal={resolveProposal}
                     />
                   }
-
-                  {/* ResolveWidget */}
-
-                  {/* <Widget>
-                    <div
-                      style={{
-                        fontFamily: 'Manrope',
-                        fontStyle: 'normal',
-                        fontWeight: 'normal',
-                        fontSize: '18px',
-                        color: '#7483B3',
-                      }}
-                    >
-                      Veto Reason
-                    </div>
-                    <InputField
-                      onInputChange={(value) => {
-                        vetoReason.current = value;
-                      }}
-                      label={''}
-                      placeholder={''}
-                      height={'46px'}
-                      width={'372px'}
-                      // value={vetoReason.current}
-                    />
-                    <ANButton
-                      label="Veto"
-                      height="45px"
-                      width="372px"
-                      style={{ margin: 'auto' }}
-                      //  onClick={}
-                    />
-                  </Widget> */}
-                  {/* <Widget>
-                    <ANButton
-                      buttonType="primary"
-                      label="Resolve"
-                      height="45px"
-                      width="372px"
-                      style={{ margin: 'auto' }}
-                      // onClick={resolveProposal(0)}
-                    />
-                  </Widget> */}
                 </WidgetWrapper>
               </DetailsWrapper>
             </StyledPaper>

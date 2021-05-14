@@ -1,8 +1,11 @@
 /* eslint-disable */
-import React, { memo, useEffect, useMemo, useState } from 'react';
+import React, { memo } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { InputField } from 'components/InputFields/InputField';
 import { PROPOSAL_STATES } from 'utils/states';
+import { Link } from 'react-router-dom';
+import { toUtf8String } from '@ethersproject/strings';
+
 import {
   InfoKeyDiv,
   InfoValueDivInline,
@@ -10,12 +13,12 @@ import {
 } from '../ProposalDetails';
 import { Widget, WidgetRow, InfoWrapper, TitleText } from './SharedStyles';
 
-import {
-  getTruncatedAccountAddress,
-  getFormattedDate,
-} from 'utils/HelperFunctions';
+import { formatDate } from 'utils/date';
+import { getTruncatedAccountAddress } from 'utils/account';
+import { getIpfsCid, getIpfsURI } from 'utils/ipfs';
 
 const ChallengeWidget: React.FC<any> = ({
+  disabled,
   containerEventChallenge,
   currentState,
   setChallengeReason,
@@ -24,6 +27,7 @@ const ChallengeWidget: React.FC<any> = ({
   const [isExpanded, updateIsExpanded] = React.useState<boolean>(false);
 
   if (containerEventChallenge) {
+    const challengeReasonCid = getIpfsCid(containerEventChallenge.reason);
     return (
       <Widget>
         <WidgetRow>
@@ -32,7 +36,7 @@ const ChallengeWidget: React.FC<any> = ({
         <InfoWrapper>
           <InfoKeyDiv>Challenged At</InfoKeyDiv>
           <InfoValueDivInline id="challenged-date__value">
-            {getFormattedDate(containerEventChallenge.createdAt)}
+            {formatDate(containerEventChallenge.createdAt)}
           </InfoValueDivInline>
         </InfoWrapper>
         <InfoWrapper>
@@ -51,7 +55,17 @@ const ChallengeWidget: React.FC<any> = ({
             marginTop: 0,
           }}
         >
-          {containerEventChallenge.reason + ' '}
+          {challengeReasonCid ? (
+            <Link
+              to={getIpfsURI(challengeReasonCid)}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              View file
+            </Link>
+          ) : (
+            toUtf8String(containerEventChallenge.reason)
+          )}
         </InfoValueDivBlock>
       </Widget>
     );
@@ -81,13 +95,13 @@ const ChallengeWidget: React.FC<any> = ({
           placeholder={''}
           height={'46px'}
           width={'372px'}
-          // value={challengeReason.current}
         />
       </WidgetRow>
       <WidgetRow marginBottom="9px">
         <ANButton
           buttonType="primary"
           label="Challenge"
+          disabled={disabled}
           height="45px"
           width="372px"
           style={{ margin: 'auto' }}

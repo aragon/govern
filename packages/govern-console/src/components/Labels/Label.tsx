@@ -18,12 +18,12 @@ export interface LabelProps extends ChipProps {
 }
 
 const getBackground = (labelColor: string, theme: Theme) => {
-  if (labelColor === 'green') return `${theme.custom.informative.green}`;
-  if (labelColor === 'orange') return `${theme.custom.informative.orange}`;
-  if (labelColor === 'yellow') return `${theme.custom.informative.yellow}`;
-  if (labelColor === 'red') return `${theme.custom.informative.red}`;
-  if (labelColor === 'white') return `${theme.custom.white}`;
-  if (labelColor === 'grey') return `${theme.custom.greyscale.soft}`;
+  if (labelColor === 'green') return `${theme.custom.labels.green}`;
+  if (labelColor === 'orange') return `${theme.custom.labels.orange}`;
+  if (labelColor === 'purple') return `${theme.custom.labels.purple}`;
+  if (labelColor === 'red') return `${theme.custom.labels.red}`;
+  if (labelColor === 'lightBlue') return `${theme.custom.labels.lightBlue}`;
+  if (labelColor === 'grey') return `${theme.custom.labels.grey}`;
 };
 
 const getColor = (labelColor: string, theme: Theme) => {
@@ -32,7 +32,9 @@ const getColor = (labelColor: string, theme: Theme) => {
   if (labelColor === 'yellow') return `${theme.custom.white}`;
   if (labelColor === 'red') return `${theme.custom.white}`;
   if (labelColor === 'white') return `${theme.custom.black}`;
-  if (labelColor === 'grey') return `${theme.custom.greyscale.solid}`;
+  if (labelColor === 'grey') return `${theme.custom.white}`;
+
+  return `${theme.custom.white}`;
 };
 const getBorder = (labelColor: string, theme: Theme): string => {
   if (labelColor === 'white') {
@@ -44,7 +46,7 @@ const getBorder = (labelColor: string, theme: Theme): string => {
 const StyledLabel = styled(MUIChip)(
   ({ labelColor, theme }: { labelColor: string; theme: Theme }) => ({
     color: getColor(labelColor, theme),
-    backgroundColor: getBackground(labelColor, theme),
+    background: getBackground(labelColor, theme),
     width: 'fit-content',
     height: '19px',
     display: 'flex',

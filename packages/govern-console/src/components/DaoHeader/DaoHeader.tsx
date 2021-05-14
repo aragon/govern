@@ -92,7 +92,6 @@ export const DaoHeader: React.FC<DaoHeaderProps> = ({
           <HeaderLabel>DAO Name</HeaderLabel>
           <HeaderValue>{daoName}</HeaderValue>
         </div>
-
         <div
           style={{
             marginRight: '60px',
