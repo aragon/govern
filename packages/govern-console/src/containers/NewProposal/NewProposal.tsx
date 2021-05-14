@@ -498,7 +498,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
           // width={155}
           // height={45}
           buttonType="secondary"
-          buttonColor="#00C2FF"
+          labelColor="#00C2FF"
           style={{ marginTop: 40 }}
           onClick={handleInputModalOpen}
         />

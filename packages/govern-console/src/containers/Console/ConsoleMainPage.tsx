@@ -144,7 +144,7 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({
             buttonType="secondary"
             height="46px"
             width="163px"
-            buttonColor="#00C2FF"
+            labelColor="#00C2FF"
             onClick={fetchMoreData}
           ></ANButton>
         ) : null}

@@ -71,6 +71,7 @@ export interface TransactionKeeperProps {
     transactionReceipt: any,
   ) => void;
   onCompleteAllTransactions: (transactions: CustomTransaction[]) => void;
+  closeModal: () => void;
 }
 
 const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
@@ -78,11 +79,16 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
   onTransactionFailure,
   onTransactionSuccess,
   onCompleteAllTransactions,
+  closeModal,
   ...props
 }) => {
   const [
     isProcessingTransactions,
     updateIsProcessingTransactions,
+  ] = React.useState<boolean>(false);
+  const [
+    isFinishedExecutingTransactions,
+    updateIsFinishedExecutingTransactions,
   ] = React.useState<boolean>(false);
   const [transactions, updateTransactions] = React.useState<
     CustomTransaction[]
@@ -100,7 +106,6 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
   };
 
   const executeTransactions = React.useCallback(async () => {
-    console.log('Executing transactions');
     updateIsProcessingTransactions(true);
     let index = 0;
     let isQueueAborted = false;
@@ -122,7 +127,7 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
         const updatedTransaction = produce(transaction, (draft) => {
           draft.status = CustomTransactionStatus.Failed;
         });
-        // TODO add a condition to check if we need to stop executing transacctions based on a transaction level propoerty. This propeorty if needed is to be added to CustomTransactions type. CustomTransaction.abortQueueOnFailure = true/false
+        // TODO add a condition to check if we need to stop executing transactions based on a transaction level propoerty. This propeorty if needed is to be added to CustomTransactions type. CustomTransaction.abortQueueOnFailure = true/false
         isQueueAborted = true;
         updateTransaction(updatedTransaction, index);
         onTransactionFailure(ex.toString(), updatedTransaction);
@@ -130,29 +135,41 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
       index++;
     }
     if (!isQueueAborted) {
+      updateIsFinishedExecutingTransactions(true);
+      onCompleteAllTransactions(transactions);
+      updateIsProcessingTransactions(false);
+    } else {
+      updateIsFinishedExecutingTransactions(true);
       updateIsProcessingTransactions(false);
     }
   }, [transactionList]);
   return (
     <Wrapper>
-      {isProcessingTransactions ? (
+      {isProcessingTransactions || isFinishedExecutingTransactions ? (
         <>
-          <Title>Confirm Transactions</Title>
+          <Title>Processing Transactions</Title>
           <TransactionStatusWrapper>
             <TransactionList transactions={transactions}></TransactionList>
           </TransactionStatusWrapper>
           <ANButton
             buttonType="primary"
-            disabled
-            label="Please do not close this window until it finishes"
+            disabled={!isFinishedExecutingTransactions}
+            label={
+              isFinishedExecutingTransactions
+                ? 'Continue'
+                : 'Please do not close this window until it finishes'
+            }
             width="100%"
             height="55px"
-            onClick={executeTransactions}
+            labelColor="white"
+            onClick={
+              isFinishedExecutingTransactions ? closeModal : executeTransactions
+            }
           />
         </>
       ) : (
         <>
-          <Title>Processing transactions</Title>
+          <Title>Confirm transactions</Title>
           <TransactionMessagesCard>
             <BoldText>Transactions to be triggered</BoldText>
             <TransactionListWrapper>

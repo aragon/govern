@@ -113,7 +113,7 @@ export const DaoHeader: React.FC<DaoHeaderProps> = ({
             }
             buttonType={'secondary'}
             backgroundColor={'#FFFFFF'}
-            buttonColor={'#20232C'}
+            labelColor={'#20232C'}
             onClick={goToSettingPage}
           />
         </div>

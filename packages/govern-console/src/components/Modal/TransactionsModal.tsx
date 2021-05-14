@@ -56,6 +56,7 @@ const TransactionsModal = ({}) => {
           onTransactionFailure={onTransactionFailure}
           onTransactionSuccess={onTransactionSuccess}
           onCompleteAllTransactions={onCompleteAllTransactions}
+          closeModal={handleClose}
         />
       </TransactionsDialog>
     </>

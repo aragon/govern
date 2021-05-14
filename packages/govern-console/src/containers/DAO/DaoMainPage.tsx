@@ -318,7 +318,7 @@ const DaoMainPage: React.FC<{
                         buttonType="secondary"
                         height="46px"
                         width="196px"
-                        buttonColor="#00C2FF"
+                        labelColor="#00C2FF"
                         onClick={fetchMoreData}
                       ></ANButton>
                     ) : null}
