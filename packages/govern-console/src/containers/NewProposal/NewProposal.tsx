@@ -279,7 +279,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const { account, provider, isConnected } = context;
 
   const proposalInstance = React.useMemo(() => {
-    if (provider && account && daoDetails) {
+    if (provider && daoDetails && account) {
       let queueApprovals = new QueueApprovals(
         account,
         daoDetails.queue.address,
@@ -479,8 +479,8 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
         <SettingsLink>
           This execution will use the current{' '}
           <a
-            style={{cursor:'pointer'}}
-            onClick={()=> history.push(`/daos/${daoName}/dao-settings`)}
+            style={{ cursor: 'pointer' }}
+            onClick={() => history.push(`/daos/${daoName}/dao-settings`)}
           >
             DAO Settings
           </a>
@@ -502,21 +502,22 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
           </div>
         </div>
         <Controller
-            name="proof"
-            control={control}
-            defaultValue={''}
-            rules={{ required: 'This is required.'}}
-            render={({ field: { onChange, value }, fieldState: { error } }) => (
-              <InputField
-                onInputChange={onChange}
-                placeholder={'Enter proof'}
-                label=""
-                value={value}
-                height={'108px'}
-                width={'700px'}
-                error={!!error}
-                helperText={error ? error.message : null}
-              />)}
+          name="proof"
+          control={control}
+          defaultValue={''}
+          rules={{ required: 'This is required.' }}
+          render={({ field: { onChange, value }, fieldState: { error } }) => (
+            <InputField
+              onInputChange={onChange}
+              placeholder={'Enter proof'}
+              label=""
+              value={value}
+              height={'108px'}
+              width={'700px'}
+              error={!!error}
+              helperText={error ? error.message : null}
+            />
+          )}
         />
         <Title>Actions</Title>
         {selectedActions.length === 0 ? (
@@ -536,7 +537,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
           // width={155}
           // height={45}
           buttonType="secondary"
-          buttonColor="#00C2FF"
+          labelColor="#00C2FF"
           style={{ marginTop: 40 }}
           onClick={handleInputModalOpen}
         />

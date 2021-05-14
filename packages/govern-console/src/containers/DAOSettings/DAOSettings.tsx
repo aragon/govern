@@ -33,7 +33,6 @@ import {
 } from '@aragon/govern';
 import { useSnackbar } from 'notistack';
 
-
 import { toUtf8Bytes, toUtf8String } from '@ethersproject/strings';
 import { proposalDetailsUrl } from 'utils/urls';
 
@@ -120,7 +119,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
   const history = useHistory();
   
   const context: any = useWallet();
-  const { account, status, isConnected, provider } = context;
+  const { account, isConnected, provider } = context;
 
   const { dispatch } = React.useContext(ModalsContext);
   const { enqueueSnackbar } = useSnackbar();
@@ -149,7 +148,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
   }, [daoList]);
 
   const proposalInstance = React.useMemo(() => {
-    if (provider && account && daoDetails) {
+    if (provider && daoDetails && account) {
       let queueApprovals = new QueueApprovals(
         account,
         daoDetails.queue.address,
@@ -211,7 +210,6 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
   }, [daoDetails, provider]);
 
   const callSaveSetting = async (formData: FormInputs) => {
-    console.log('formData', formData);
     const newConfig: DaoConfig = formData.daoConfig;
     let containerHash: string | undefined;
 
@@ -550,7 +548,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
                 label={'Examine'}
                 buttonType={'secondary'}
                 backgroundColor={'#FFFFFF'}
-                buttonColor={'#20232C'}
+                labelColor={'#20232C'}
                 onClick={() => {}}
                 style={{ marginLeft: '10px' }}
                 disabled={true}
@@ -636,7 +634,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
                 label={'Examine'}
                 buttonType={'secondary'}
                 backgroundColor={'#FFFFFF'}
-                buttonColor={'#20232C'}
+                labelColor={'#20232C'}
                 onClick={() => {}}
                 style={{ marginLeft: '10px' }}
                 disabled={true}
@@ -651,8 +649,8 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
             }}
           >
             <ANButton
-              label={'Save settings'}
               disabled={!isConnected}
+              label={'Save settings'}
               buttonType={'primary'}
               onClick={handleSubmit(callSaveSetting)}
               style={{ marginTop: '34px' }}

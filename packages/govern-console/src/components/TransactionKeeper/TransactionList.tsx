@@ -10,9 +10,11 @@ export interface TransactionListProps {
 }
 
 const TransactionListWrapper = styled('ul')({
-  listStyleType: 'none',
+  paddingInlineStart: '30px',
+  listStyle: 'none',
+});
+const TransactionListItem = styled('li')({
   padding: 0,
-  margin: 0,
 });
 
 const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
@@ -52,7 +54,11 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
     <>
       <TransactionListWrapper>
         {transactions.map((transaction) => {
-          return <li key={transaction.message}>{getListItem(transaction)}</li>;
+          return (
+            <TransactionListItem key={transaction.message}>
+              {getListItem(transaction)}
+            </TransactionListItem>
+          );
         })}
       </TransactionListWrapper>
     </>

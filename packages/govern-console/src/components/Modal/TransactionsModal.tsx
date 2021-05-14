@@ -5,7 +5,6 @@ import TransactionKeeper from 'components/TransactionKeeper/TransactionKeeper';
 import Paper from '@material-ui/core/Paper';
 import {
   ModalsContext,
-  ActionTypes,
   closeTransactionsModalAction,
 } from 'containers/HomePage/ModalsContext';
 const TransactionsDialog = styled(Dialog)({
@@ -23,7 +22,7 @@ const StyledModalPaper = styled(Paper)({
   background: '#ffffff',
 });
 
-const TransactionsModal = ({}) => {
+const TransactionsModal: React.FC = () => {
   const {
     state: {
       transactionsModal: {
@@ -47,7 +46,7 @@ const TransactionsModal = ({}) => {
         onClose={handleClose}
         aria-labelledby="transactions-dialog-title"
         open={open}
-        maxWidth="lg"
+        maxWidth="sm"
         PaperComponent={StyledModalPaper}
       >
         <TransactionKeeper
