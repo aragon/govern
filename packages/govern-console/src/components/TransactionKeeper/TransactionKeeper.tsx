@@ -130,7 +130,12 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
         // TODO add a condition to check if we need to stop executing transactions based on a transaction level propoerty. This propeorty if needed is to be added to CustomTransactions type. CustomTransaction.abortQueueOnFailure = true/false
         isQueueAborted = true;
         updateTransaction(updatedTransaction, index);
-        onTransactionFailure(ex.error.message, updatedTransaction);
+        // TODO proper error handling will be done in https://linear.app/aragon/issue/DAO-278
+        // for now just make this line not crash the site because ex.error sometimes is undefined
+        onTransactionFailure(
+          ex.error?.message || ex.message,
+          updatedTransaction,
+        );
       }
       index++;
     }
