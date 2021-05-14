@@ -460,7 +460,6 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
           );
         },
         onCompleteAllTransactions: () => {
-          dispatch(closeTransactionsModalAction);
           if (containerHash) {
             history.push(proposalDetailsUrl(daoName, containerHash));
           }

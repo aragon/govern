@@ -37,7 +37,6 @@ export interface TransactionKeeperProps {
   ) => void;
   onCompleteAllTransactions: (transactions: CustomTransaction[]) => void;
   closeModal: () => void;
-  redirect?: () => void;
 }
 
 const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
@@ -46,7 +45,6 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
   onTransactionSuccess,
   onCompleteAllTransactions,
   closeModal,
-  redirect,
 }) => {
   const [state, setState] = React.useState(TransactionKeeperState.Initial);
   const [transactions, updateTransactions] = React.useState<
@@ -101,13 +99,11 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
     }
     if (!isQueueAborted) {
       setState(TransactionKeeperState.Success);
-      onCompleteAllTransactions(transactions);
     }
   }, [
     transactions,
     onTransactionFailure,
     onTransactionSuccess,
-    onCompleteAllTransactions,
     updateTransaction,
   ]);
 
@@ -132,9 +128,7 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
         <TransactionKeeperSuccess
           onClick={() => {
             closeModal();
-            if (redirect) {
-              redirect();
-            }
+            onCompleteAllTransactions(transactions);
           }}
         ></TransactionKeeperSuccess>
       );
