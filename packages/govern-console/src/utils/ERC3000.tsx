@@ -28,7 +28,7 @@ export const buildContainer = (
       payload.executionTime ||
       Math.round(Date.now() / 1000) +
         parseInt(config.executionDelay.toString()) +
-        300, // add 5 minutes for network latency.
+        30, // add 30 seconds for network latency.
     submitter: payload.submitter,
     executor: payload.executor,
     actions: payload.actions || [],
