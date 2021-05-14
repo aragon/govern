@@ -32,6 +32,7 @@ export async function erc20ApprovalTransaction(
   let allowance: BigNumber = ethers.BigNumber.from(0);
   let userBalance: BigNumber = ethers.BigNumber.from(0);
   let amountForHuman: string;
+  let symbol: string = 'tokens'
   try {
     allowance = await contract.allowance(account.address, spender);
     userBalance = await contract.balanceOf(account.address);
@@ -44,10 +45,15 @@ export async function erc20ApprovalTransaction(
     throw new Error(`Contract ${token} doesn't seem to be ERC20 compliant.`);
   }
 
+  try {
+    // symbol is optional ERC token
+    symbol = await contract.symbol();
+  } catch {}
+
   // user balance is less than the amount that needs approval.
   // this means user won't be able to approve full amount.
   if (userBalance.lt(amountInBigNumber)) {
-    throw new Error(`You need ${amount} to schedule this proposal.`);
+    throw new Error(`You need ${amountForHuman} ${symbol} for this transaction.`);
   }
 
   // user has enough balance, but also already got amountInBigNumber approved for spender
@@ -60,7 +66,7 @@ export async function erc20ApprovalTransaction(
     tx: () => {
       return contract.approve(spender, amountInBigNumber);
     },
-    message: `Approves ${amountForHuman} Tokens for ${spender} on ${token}`,
+    message: `Approves ${amountForHuman} ${symbol} for ${spender} on ${token}`,
     status: CustomTransactionStatus.Pending,
   };
 
