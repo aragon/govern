@@ -9,13 +9,13 @@ export interface TransactionListProps {
   transactions: CustomTransaction[];
 }
 
-const TransactionListWrapper = styled('ul')(({ theme }) => ({
+const TransactionListWrapper = styled('ul')({
   paddingInlineStart: '30px',
   listStyle: 'none',
-}));
-const TransactionListItem = styled('li')(({ theme }) => ({
+});
+const TransactionListItem = styled('li')({
   padding: 0,
-}));
+});
 
 const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
   const getListItem = (transaction: CustomTransaction) => {
@@ -44,7 +44,7 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
       case CustomTransactionStatus.Failed:
         return (
           <ANCircularProgressWithCaption
-            caption={transaction.message} // TODO: successfull
+            caption={transaction.message} // TODO: failed
             state={CiruclarProgressStatus.Failed}
           />
         );

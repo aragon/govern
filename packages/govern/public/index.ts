@@ -13,6 +13,7 @@ export {
   ProposalOptions,
   ActionType,
   PayloadType,
+  ReceiptType,
 } from './proposal'
 
 // Types

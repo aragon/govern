@@ -1,6 +1,6 @@
 /* eslint-disable */
 import React, { useState, memo, useRef, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { ANWrappedPaper } from '../../components/WrapperPaper/ANWrapperPaper';
 import backButtonIcon from '../../images/back-btn.svg';
 import { styled } from '@material-ui/core/styles';
@@ -12,26 +12,28 @@ import { useQuery } from '@apollo/client';
 import { buildContainer } from '../../utils/ERC3000';
 import { useWallet } from 'AugmentedWallet';
 import { HelpButton } from 'components/HelpButton/HelpButton';
-import { BlueSwitch } from 'components/Switchs/BlueSwitch';
 import Grid from '@material-ui/core/Grid';
 import { DaoConfig } from '@aragon/govern';
 import QueueApprovals from 'services/QueueApprovals';
 import { CustomTransaction } from 'utils/types';
-import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
+import {
+  ActionTypes,
+  ModalsContext,
+} from 'containers/HomePage/ModalsContext';
 import { correctDecimal } from 'utils/token';
 import FacadeProposal from 'services/Proposal';
 import { useForm, Controller } from 'react-hook-form';
-import { BytesLike } from 'ethers';
+import { BytesLike, Contract, ContractReceipt } from 'ethers';
 import { validateToken, validateContract } from '../../utils/validations';
 import {
   Proposal,
   ProposalOptions,
-  PayloadType,
-  ActionType,
+  ReceiptType,
 } from '@aragon/govern';
 import { useSnackbar } from 'notistack';
 
 import { toUtf8Bytes, toUtf8String } from '@ethersproject/strings';
+import { proposalDetailsUrl } from 'utils/urls';
 
 export interface DaoSettingFormProps {
   /**
@@ -113,6 +115,8 @@ const OptionTextStyle = styled('div')({
 });
 
 const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
+  const history = useHistory();
+  
   const context: any = useWallet();
   const { account, isConnected, provider } = context;
 
@@ -206,6 +210,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
 
   const callSaveSetting = async (formData: FormInputs) => {
     const newConfig: DaoConfig = formData.daoConfig;
+    let containerHash: string | undefined;
 
     // modify config before sending to schedule.
     newConfig.rules = toUtf8Bytes(newConfig.rules.toString());
@@ -249,8 +254,17 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
         onTransactionFailure: (error) => {
           enqueueSnackbar(error, { variant: 'error' });
         },
-        onTransactionSuccess: () => {},
-        onCompleteAllTransactions: () => {},
+        onTransactionSuccess: (_, receipt: ContractReceipt) => {
+          containerHash = Proposal.getContainerHashFromReceipt(
+            receipt,
+            ReceiptType.Scheduled,
+          );
+        },
+        onCompleteAllTransactions: () => {
+          if (containerHash) {
+            history.push(proposalDetailsUrl(daoName, containerHash));
+          }
+        }
       },
     });
   };
