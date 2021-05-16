@@ -8,6 +8,7 @@ import Paper from '@material-ui/core/Paper';
 import { useQuery } from '@apollo/client';
 import { GET_DAO_LIST, GET_GOVERN_REGISTRY_DATA } from './queries';
 import { useHistory } from 'react-router-dom';
+
 export interface ConsoleMainPageProps {
   /**
    * Callback on selection of Dao
@@ -34,7 +35,7 @@ const WrapperGrid = styled(Grid)({
   width: '100% !important',
 });
 
-const ConsoleMainPage: React.FC<ConsoleMainPageProps> = () => {
+const ConsoleMainPage: React.FC = () => {
   const history = useHistory();
   const [visibleDaoList, updateDaoList] = useState<any>([]);
   const [totalDaoCount, updateTotalDaoCount] = useState<number>();

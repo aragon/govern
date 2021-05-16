@@ -18,6 +18,7 @@ const ConsoleHeaderCard = styled(MUICard)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'space-between',
 }));
+
 const LeftWrapper = styled('div')({
   maxWidth: '900px',
   width: 'fit-content',

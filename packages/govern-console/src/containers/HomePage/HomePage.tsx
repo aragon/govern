@@ -54,8 +54,8 @@ const HomePage = () => {
           <Switch>
             <Route exact path="/">
               <ConsoleMainPage
-                updateSelectedDao={updateSelectedDaoAndPushToHistory}
-                onSearchByDaoName={onSearchByDaoName}
+              // updateSelectedDao={updateSelectedDaoAndPushToHistory}
+              // onSearchByDaoName={onSearchByDaoName}
               />
             </Route>
             <Route exact path="/daos/:daoName">
