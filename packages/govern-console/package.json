@@ -58,7 +58,7 @@
     "eject": "react-scripts eject",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public",
-    "lint": "eslint src --ext .tsx .gitignore",
+    "lint": "eslint src --ext .tsx",
     "lint:js": "npm run lint:eslint -- . ",
     "lint:error-only": "eslint --quiet \"src/**/*.{ts,tsx}\"",
     "lint:fix": "npm run lint -- --fix",

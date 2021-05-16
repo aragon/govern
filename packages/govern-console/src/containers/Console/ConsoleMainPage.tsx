@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { styled } from '@material-ui/core/styles';
 import { ConsoleHeader } from 'components/ConsoleHeader/ConsoleHeader';
 import { DaoCard } from 'components/DaoCards/DaoCard';
 import { ANButton } from 'components/Button/ANButton';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
-import { useQuery, useLazyQuery } from '@apollo/client';
-import { GET_DAO_LIST, GET_GOVERN_REGISTRY_DATA, GET_DAO_BY_NAME } from './queries';
-import { Link, useHistory } from 'react-router-dom';
-import { formatEther } from 'ethers/lib/utils';
+import { useQuery } from '@apollo/client';
+import { GET_DAO_LIST, GET_GOVERN_REGISTRY_DATA } from './queries';
+import { useHistory } from 'react-router-dom';
 export interface ConsoleMainPageProps {
   /**
    * Callback on selection of Dao
@@ -28,22 +27,22 @@ const ConsoleMainDiv = styled(Paper)(({ theme }) => ({
   boxShadow: 'none',
 }));
 
-const WrapperGrid = styled(Grid)(({ theme }) => ({
+const WrapperGrid = styled(Grid)({
   marginTop: '24px',
   boxSizing: 'border-box',
   margin: '0 !important',
   width: '100% !important',
-}));
+});
 
-const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({ updateSelectedDao, ...props }) => {
+const ConsoleMainPage: React.FC<ConsoleMainPageProps> = () => {
   const history = useHistory();
   const [visibleDaoList, updateDaoList] = useState<any>([]);
   const [totalDaoCount, updateTotalDaoCount] = useState<number>();
 
   const {
     data: daoListData,
-    loading: isLoadingDaoList,
-    error: errorLoadingDaoList,
+    // loading: isLoadingDaoList,
+    // error: errorLoadingDaoList,
     fetchMore: fetchMoreDaos,
   } = useQuery(GET_DAO_LIST, {
     variables: {
@@ -54,8 +53,8 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({ updateSelectedDao, ..
 
   const {
     data: daoRegistryData,
-    loading: isLoadingRegistryData,
-    error: errorLoadingRegistryData,
+    // loading: isLoadingRegistryData,
+    // error: errorLoadingRegistryData,
   } = useQuery(GET_GOVERN_REGISTRY_DATA);
 
   useEffect(() => {
@@ -71,10 +70,7 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({ updateSelectedDao, ..
   }, [daoRegistryData]);
 
   const fetchMoreData = async () => {
-    const {
-      data: moreData,
-      loading: loadingMore,
-    }: { data: any; loading: boolean } = await fetchMoreDaos({
+    const { data: moreData }: { data: any; loading: boolean } = await fetchMoreDaos({
       variables: {
         offset: visibleDaoList.length,
       },
@@ -105,12 +101,7 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({ updateSelectedDao, ..
               sm={6}
               xs={12}
             >
-              <DaoCard
-                label={dao.name}
-                // aumValue={formatEther(dao.executor.balance)}
-                numberOfProposals={dao.queue.nonce}
-                daoId={dao.id}
-              ></DaoCard>
+              <DaoCard label={dao.name} numberOfProposals={dao.queue.nonce}></DaoCard>
             </Grid>
           ))}
       </WrapperGrid>
@@ -140,4 +131,4 @@ const ConsoleMainPage: React.FC<ConsoleMainPageProps> = ({ updateSelectedDao, ..
   );
 };
 
-export default React.memo(ConsoleMainPage);
+export default memo(ConsoleMainPage);

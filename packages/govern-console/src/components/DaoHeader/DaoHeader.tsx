@@ -1,7 +1,7 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-import { styled, useTheme } from '@material-ui/core/styles';
-import MUICard, { CardProps } from '@material-ui/core/Card';
+import { styled } from '@material-ui/core/styles';
+import MUICard from '@material-ui/core/Card';
 import MUITypography from '@material-ui/core/Typography';
 import { ANButton } from '../Button/ANButton';
 import SettingIconImage from '../../images/svgs/Setting_Icon.svg';
@@ -12,18 +12,6 @@ export interface DaoHeaderProps {
    * Label of the card - name of the DAO
    */
   daoName: string;
-  /**
-   * Value in Ether
-   */
-  // ethBalance: string | number;
-  /**
-   * Value in USD
-   */
-  usdBalance: number | string;
-  /**
-   * logo of the DAO
-   */
-  logoUrl?: string;
 }
 
 const DaoHeaderCard = styled(MUICard)(({ theme }) => ({
@@ -55,24 +43,8 @@ const HeaderValue = styled(MUITypography)(({ theme }) => ({
   fontStyle: 'normal',
 }));
 
-const HeaderUsdBalance = styled(MUITypography)(({ theme }) => ({
-  color: theme.custom.daoHeader.valueColor,
-  lineHeight: theme.custom.daoHeader.valueLineHeight,
-  fontSize: theme.custom.daoHeader.labelFontSize,
-  fontWeight: theme.custom.daoHeader.labelFontWeight,
-  fontFamily: theme.typography.fontFamily,
-  fontStyle: 'normal',
-}));
-
-export const DaoHeader: React.FC<DaoHeaderProps> = ({
-  daoName,
-  // ethBalance,
-  usdBalance,
-  ...props
-}) => {
+export const DaoHeader: React.FC<DaoHeaderProps> = ({ daoName }) => {
   const history = useHistory();
-  const theme = useTheme();
-
   const goToSettingPage = () => {
     history.push(settingsUrl(daoName));
   };

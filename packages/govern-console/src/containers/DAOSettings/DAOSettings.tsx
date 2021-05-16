@@ -1,4 +1,4 @@
-import React, { useState, memo, useRef, useEffect } from 'react';
+import React, { useState, memo, useEffect } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { ANWrappedPaper } from '../../components/WrapperPaper/ANWrapperPaper';
 import backButtonIcon from '../../images/back-btn.svg';
@@ -19,20 +19,12 @@ import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import { correctDecimal } from 'utils/token';
 import FacadeProposal from 'services/Proposal';
 import { useForm, Controller } from 'react-hook-form';
-import { BytesLike, Contract, ContractReceipt } from 'ethers';
+import { BytesLike, ContractReceipt } from 'ethers';
 import { validateToken, validateContract } from '../../utils/validations';
 import { Proposal, ProposalOptions, ReceiptType } from '@aragon/govern';
 import { useSnackbar } from 'notistack';
-
 import { toUtf8Bytes, toUtf8String } from '@ethersproject/strings';
 import { proposalDetailsUrl } from 'utils/urls';
-
-export interface DaoSettingFormProps {
-  /**
-   * on click back
-   */
-  onClickBack: () => void;
-}
 
 interface ParamTypes {
   /**
@@ -99,14 +91,7 @@ const InputSubTitle = styled(Typography)({
   marginBottom: '17px',
 });
 
-const OptionTextStyle = styled('div')({
-  fontFamily: 'Manrope',
-  fontStyle: 'normal',
-  fontWeight: 400,
-  fontSize: 18,
-});
-
-const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
+const DaoSettings: React.FC = () => {
   const history = useHistory();
 
   const context: any = useWallet();
@@ -155,7 +140,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
     const _load = async () => {
       // config is also used as a check in order to set and populate
       // the UI with current Dao's config only once
-      if (daoDetails && provider && !config) {
+      if (daoDetails && provider && !config && setValue) {
         const _config = daoDetails.queue.config;
         setConfig(_config);
 
@@ -188,7 +173,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
       }
     };
     _load();
-  }, [daoDetails, provider]);
+  }, [daoDetails, provider, config, setValue]);
 
   const callSaveSetting = async (formData: FormInputs) => {
     const newConfig: DaoConfig = formData.daoConfig;
@@ -252,7 +237,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
     <>
       <SettingsContainer>
         <ANWrappedPaper style={{ width: window.innerWidth }}>
-          <BackButton onClick={onClickBack}>
+          <BackButton onClick={() => history.goBack()}>
             <img src={backButtonIcon} />
           </BackButton>
           <Title style={{ fontSize: '38px' }}>DAO Settings</Title>

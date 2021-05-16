@@ -1,27 +1,18 @@
-import React, { useRef, useState, useEffect, memo } from 'react';
-import { styled, useTheme } from '@material-ui/core/styles';
-import { DaoHeader } from 'components/DaoHeader/DaoHeader';
-import { ProposalCard } from 'components/ProposalCards/ProposalCard';
+import React, { useState, memo } from 'react';
+import { styled } from '@material-ui/core/styles';
 import { ANButton } from 'components/Button/ANButton';
 import { InputField } from 'components/InputFields/InputField';
-import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
-import { GET_PROPOSAL_LIST, GET_DAO_BY_NAME } from './queries';
-import { useQuery, useLazyQuery } from '@apollo/client';
-import { formatEther } from 'ethers/lib/utils';
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import MUITypography from '@material-ui/core/Typography';
 import daoNoutFound from 'images/dao-not-found.svg';
 import { useSnackbar } from 'notistack';
 
-//* Styled Components List
-
-const VerticalAlignWrapper = styled('div')(({ theme }) => ({
+const VerticalAlignWrapper = styled('div')({
   height: 'fit-content',
   width: 'fit-content',
   padding: '120px',
   margin: 'auto',
-}));
+});
 
 const Subtitle = styled(MUITypography)(({ theme }) => ({
   color: theme.custom.daoHeader.labelColor,
@@ -41,7 +32,7 @@ const Title = styled(MUITypography)(({ theme }: any) => ({
   fontStyle: 'normal',
 }));
 
-const DaoNotFoundWrapper = styled('div')(({ theme }) => ({
+const DaoNotFoundWrapper = styled('div')({
   width: '100%',
   height: '100%',
   textAlign: 'center',
@@ -49,19 +40,21 @@ const DaoNotFoundWrapper = styled('div')(({ theme }) => ({
   borderRadius: '16px',
   boxSizing: 'border-box',
   position: 'relative',
-}));
-const RowFlexDiv = styled('div')(({ theme }) => ({
+});
+
+const RowFlexDiv = styled('div')({
   display: 'flex',
   flexDirection: 'row',
   marginTop: '22px',
-}));
-//* Styled Components List End
+});
 
-const NoDaoFound: React.FC<unknown> = ({ ...props }) => {
+const NotFoundImage = styled('img')({
+  width: '236px',
+  height: '225px',
+});
+
+const NoDaoFound: React.FC = () => {
   const history = useHistory();
-
-  const { daoName } = useParams<any>();
-  //TODO daoname empty handling
   const { enqueueSnackbar } = useSnackbar();
 
   const onGotoDao = () => {
@@ -80,22 +73,16 @@ const NoDaoFound: React.FC<unknown> = ({ ...props }) => {
     }
   };
 
-  const { data: daoList, loading: loadingDao } = useQuery(GET_DAO_BY_NAME, {
-    variables: { name: daoName },
-  });
-
   const [daoSearchText, updateDaoSearchText] = useState('');
-  const [openToast, setOpenToast] = React.useState<boolean>(false);
   const onInputChange = (updatedText: string) => {
     updateDaoSearchText(updatedText);
   };
 
   return (
-    //TODO extract to another component and remove inline styles
     <>
       <DaoNotFoundWrapper>
         <VerticalAlignWrapper>
-          <img width="236px" height="225px" src={daoNoutFound} />
+          <NotFoundImage src={daoNoutFound} />
           <Title>DAO not found</Title>
           <Subtitle>You can try with other DAO name</Subtitle>
           <RowFlexDiv>

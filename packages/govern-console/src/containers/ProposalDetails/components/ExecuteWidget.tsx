@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useMemo, useState } from 'react';
+import React, { memo } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { PROPOSAL_STATES } from 'utils/states';
 import { formatDate } from 'utils/date';

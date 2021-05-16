@@ -49,13 +49,13 @@ const INITIAL_STATE: ModalContextState = {
     open: false,
     params: {
       transactionList: [],
-      onTransactionFailure: (errorMessage: string, transaction: CustomTransaction) => {
+      onTransactionFailure: () => {
         // do nothing
       },
-      onTransactionSuccess: (updatedTransaction: CustomTransaction, transactionReceipt: any) => {
+      onTransactionSuccess: () => {
         // do nothing
       },
-      onCompleteAllTransactions: (transactions: CustomTransaction[]) => {
+      onCompleteAllTransactions: () => {
         // do nothing
       },
     },

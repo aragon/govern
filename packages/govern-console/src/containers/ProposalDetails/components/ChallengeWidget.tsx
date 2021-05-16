@@ -4,10 +4,8 @@ import { InputField } from 'components/InputFields/InputField';
 import { PROPOSAL_STATES } from 'utils/states';
 import { Link } from 'react-router-dom';
 import { toUtf8String } from '@ethersproject/strings';
-
 import { InfoKeyDiv, InfoValueDivInline, InfoValueDivBlock } from '../ProposalDetails';
 import { Widget, WidgetRow, InfoWrapper, TitleText } from './SharedStyles';
-
 import { formatDate } from 'utils/date';
 import { getTruncatedAccountAddress } from 'utils/account';
 import { getIpfsCid, getIpfsURI } from 'utils/ipfs';
@@ -19,8 +17,6 @@ const ChallengeWidget: React.FC<any> = ({
   setChallengeReason,
   onChallengeProposal,
 }) => {
-  const [isExpanded, updateIsExpanded] = React.useState<boolean>(false);
-
   if (containerEventChallenge) {
     const challengeReasonCid = getIpfsCid(containerEventChallenge.reason);
     return (
@@ -42,7 +38,7 @@ const ChallengeWidget: React.FC<any> = ({
         </InfoWrapper>
         <InfoKeyDiv>Challenge Reason</InfoKeyDiv>
         <InfoValueDivBlock
-          maxlines={isExpanded ? undefined : 4}
+          maxlines={4}
           style={{
             padding: 0,
             WebkitBoxOrient: 'vertical',

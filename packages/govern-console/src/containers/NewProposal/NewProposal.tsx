@@ -4,7 +4,6 @@ import { styled } from '@material-ui/core/styles';
 import backButtonIcon from 'images/back-btn.svg';
 import Typography from '@material-ui/core/Typography';
 import { HelpButton } from 'components/HelpButton/HelpButton';
-import TextArea from 'components/TextArea/TextArea';
 import Paper from '@material-ui/core/Paper';
 import { NewActionModal } from 'components/Modal/NewActionModal';
 import { AddActionsModal } from 'components/Modal/AddActionsModal';
@@ -18,11 +17,9 @@ import { useWallet } from 'AugmentedWallet';
 import QueueApprovals from 'services/QueueApprovals';
 import { CustomTransaction, abiItem, actionType, ActionToSchedule } from 'utils/types';
 import { useSnackbar } from 'notistack';
-
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import FacadeProposal from 'services/Proposal';
 import { useForm, Controller } from 'react-hook-form';
-
 import { Proposal, ProposalOptions, ReceiptType, ActionType } from '@aragon/govern';
 import { proposalDetailsUrl } from 'utils/urls';
 
@@ -131,12 +128,7 @@ export interface AddedActionsProps {
   onAddInputToAction: any;
 }
 
-const AddedActions: React.FC<AddedActionsProps> = ({
-  selectedActions,
-  onAddInputToAction,
-  actionsToSchedule,
-  ...props
-}) => {
+const AddedActions: React.FC<AddedActionsProps> = ({ selectedActions, onAddInputToAction }) => {
   const actionDivStyle = {
     width: '862px',
     border: '2px solid #E2ECF5',
@@ -209,7 +201,7 @@ const AddedActions: React.FC<AddedActionsProps> = ({
   });
 };
 
-const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
+const NewProposal: React.FC<NewProposalProps> = ({ onClickBack }) => {
   const history = useHistory();
   const { control, getValues, handleSubmit } = useForm<{ proof: string }>();
   const { daoName } = useParams<any>();
@@ -293,7 +285,6 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     abi: any[],
     functionIndex: number,
     inputIndex: number,
-    functionName: string,
   ) => {
     const actions: any[] = actionsToSchedule;
     const { params } = actions[functionIndex];
@@ -330,10 +321,6 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     handleActionModalOpen();
   };
 
-  const onChangeProof = (val: string) => {
-    // setProof(val);
-  };
-
   const validate = () => {
     if (actionsToSchedule.length === 0) {
       enqueueSnackbar('Atleast one action is needed to schedule a proposal.', {
@@ -347,7 +334,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const onSchedule = () => {
     if (!validate()) return;
     const actions: any[] = actionsToSchedule.map((item: any) => {
-      const { abi, contractAddress, name, params, numberOfInputs } = item;
+      const { abi, contractAddress, name, params } = item;
       const abiInterface = new utils.Interface(abi);
       const functionParameters = [];
       for (const key in params) {

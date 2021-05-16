@@ -1,19 +1,12 @@
-import React, { useRef } from 'react';
-import { styled, useTheme, Theme } from '@material-ui/core/styles';
-import MUICard, { CardProps } from '@material-ui/core/Card';
+import React, { useState } from 'react';
+import { styled } from '@material-ui/core/styles';
+import MUICard from '@material-ui/core/Card';
 import MUITypography from '@material-ui/core/Typography';
 import { InputField } from '../InputFields/InputField';
 import { ANButton } from '../Button/ANButton';
 import { useHistory } from 'react-router-dom';
 import consoleHeaderGraphic from 'images/console-header.svg';
 import { useSnackbar } from 'notistack';
-
-export interface ConsoleHeaderProps {
-  /**
-   * Function to be called on search
-   */
-  onSearch?: (val: string) => void;
-}
 
 const ConsoleHeaderCard = styled(MUICard)(({ theme }) => ({
   background: theme.custom.daoHeader.background,
@@ -63,20 +56,13 @@ const ConsoleImage = styled('img')({
   width: '400px',
 });
 
-export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({ onSearch, ...props }) => {
+export const ConsoleHeader: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const history = useHistory();
-  const theme = useTheme();
-  const [searchString, updateSearchString] = React.useState<string>('');
+  const [searchString, updateSearchString] = useState<string>('');
 
   const onInputChange = (val: string) => {
     updateSearchString(val);
-  };
-
-  const handleKeyPress = (e: any) => {
-    if (e.key === 'Enter') {
-      onGotoDao();
-    }
   };
 
   const onGotoDao = () => {

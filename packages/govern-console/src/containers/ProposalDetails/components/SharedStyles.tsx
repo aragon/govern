@@ -25,7 +25,7 @@ export const Widget = styled('div')({
   },
 });
 export const WidgetRow = styled('div')(
-  ({ theme, marginBottom }: { marginBottom?: string; theme: Theme }) => ({
+  ({ marginBottom }: { marginBottom?: string; theme: Theme }) => ({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -34,10 +34,10 @@ export const WidgetRow = styled('div')(
     marginBottom: marginBottom || 0,
   }),
 );
-export const TitleText = styled(Typography)(({ theme }) => ({
+export const TitleText = styled(Typography)({
   fontStyle: 'normal',
   fontWeight: 500,
   fontSize: '18px',
   color: '#20232C',
   marginBottom: '20px',
-}));
+});

@@ -1,5 +1,4 @@
 import { createMuiTheme } from '@material-ui/core/styles';
-import lightBlue from '@material-ui/core/colors/lightBlue';
 
 interface CustomTheme {
   mainBackground: string;
@@ -318,15 +317,15 @@ const custom = {
   black: '#20232C',
   white: '#FFFFFF',
 };
-const breakpoints = {
-  values: {
-    xs: 320,
-    sm: 768,
-    md: 964,
-    lg: 964,
-    xl: 964,
-  },
-};
+// const breakpoints = {
+//   values: {
+//     xs: 320,
+//     sm: 768,
+//     md: 964,
+//     lg: 964,
+//     xl: 964,
+//   },
+// };
 export const lightTheme = createMuiTheme({
   custom,
   palette: {

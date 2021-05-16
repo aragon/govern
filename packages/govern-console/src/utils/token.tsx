@@ -1,5 +1,5 @@
-import { Token, getToken, DaoConfig } from '@aragon/govern';
-import { ethers, BigNumber, BigNumberish } from 'ethers';
+import { Token, getToken } from '@aragon/govern';
+import { ethers, BigNumberish } from 'ethers';
 
 /**
  * @param address address of the token

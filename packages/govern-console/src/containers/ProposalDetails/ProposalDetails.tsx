@@ -8,7 +8,6 @@ import { useParams } from 'react-router-dom';
 import { GET_PROPOSAL_DETAILS_QUERY } from './queries';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { useQuery, useLazyQuery } from '@apollo/client';
-import { ANButton } from 'components/Button/ANButton';
 import { useWallet } from '../../AugmentedWallet';
 import { CustomTransaction } from 'utils/types';
 import { getProposalParams } from 'utils/ERC3000';
@@ -314,11 +313,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
 
   const [
     getProposalData,
-    {
-      loading: isLoadingProposalDetails,
-      data: proposalDetailsData,
-      error: errorFetchingProposalDetails,
-    },
+    { loading: isLoadingProposalDetails, data: proposalDetailsData },
   ] = useLazyQuery(GET_PROPOSAL_DETAILS_QUERY);
 
   useEffect(() => {
@@ -363,7 +358,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   };
 
   useEffect(() => {
-    if (daoList) {
+    if (daoList && proposalId && getProposalData) {
       updateDaoDetails(daoList.daos[0]);
       getProposalData({
         variables: {
@@ -371,7 +366,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
         },
       });
     }
-  }, [daoList]);
+  }, [daoList, proposalId, getProposalData]);
 
   const challengeProposal = async () => {
     // if the reason's length is less than 10 words, it's highly unlikely

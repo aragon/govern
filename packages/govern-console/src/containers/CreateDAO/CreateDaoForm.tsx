@@ -122,11 +122,10 @@ const CreateDaoForm: React.FC<FormProps> = ({
     return ChainId.MAINNET;
   }, [chainId, isConnected]);
 
-  // use appropriate default config
   useEffect(() => {
     const _config: DaoConfig = DEFAULT_DAO_CONFIG[connectedChainId];
-    setValue('daoConfig', _config);
-  }, [connectedChainId]);
+    if (setValue) setValue('daoConfig', _config);
+  }, [connectedChainId, setValue]);
 
   const submitCreateDao = async (params: FormInputs) => {
     let token: Partial<Token>;

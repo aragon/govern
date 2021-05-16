@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import CreateDaoInProgressImage from '../../images/svgs/CreateDaoInProgress.svg';
 import { ANCircularProgressWithCaption } from 'components/CircularProgress/ANCircularProgressWithCaption';
 import { ANWrappedPaper } from 'components/WrapperPaper/ANWrapperPaper';

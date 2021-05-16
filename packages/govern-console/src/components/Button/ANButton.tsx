@@ -1,5 +1,5 @@
 import React from 'react';
-import { styled, Theme, useTheme } from '@material-ui/core/styles';
+import { styled, Theme } from '@material-ui/core/styles';
 import MUIButton from '@material-ui/core/Button';
 
 export interface ANButtonProps {
@@ -19,10 +19,6 @@ export interface ANButtonProps {
    * Button contents
    */
   label: string | React.ReactNode;
-  // /**
-  //  * Any additional overwriting style.
-  //  */
-  // style: object;
   /**
    * Optional click handler
    */
@@ -47,6 +43,9 @@ export interface ANButtonProps {
    * style
    */
   style?: any;
+  /**
+   * Type of button
+   */
   type?: 'button' | 'submit';
 }
 
@@ -109,7 +108,6 @@ const StyledButton = styled(MUIButton)(
     width,
     height,
     labelColor,
-    style,
   }: {
     theme: Theme;
     buttonType: string;
@@ -150,16 +148,13 @@ const StyledButton = styled(MUIButton)(
     '& .MuiTouchRipple-root': {
       display: 'none',
     },
-    // ...style,
   }),
 );
 
 export const ANButton: React.FC<ANButtonProps> = ({
   buttonType: buttonType = 'primary',
-  // size = 'medium',
   backgroundColor,
   label,
-  // style,
   disabled,
   width,
   height,

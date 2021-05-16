@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import TextField, { StandardTextFieldProps } from '@material-ui/core/TextField';
 
@@ -27,11 +27,6 @@ export interface InputFieldProps extends StandardTextFieldProps {
   maxWidth?: any;
   isUpperCase?: boolean;
   value?: string;
-}
-
-interface InputProps {
-  inputRef: any;
-  // any other props that come into the component
 }
 
 export const InputField: React.FC<InputFieldProps> = ({
@@ -129,7 +124,6 @@ export const InputField: React.FC<InputFieldProps> = ({
       InputProps={{
         classes: inputBaseClasses,
         disableUnderline: true,
-        // inputComponent: CustomInputComponent,
       }}
       FormHelperTextProps={{ classes: helperTextClasses }}
       onChange={(e) => onChangeInput(e.target.value)}

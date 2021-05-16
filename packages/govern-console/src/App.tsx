@@ -1,7 +1,4 @@
-import React from 'react';
-// import { Web3ReactProvider } from '@web3-react/core';
 import Home from 'containers/HomePage/HomePage';
-import { Web3Provider } from '@ethersproject/providers';
 import { HashRouter as Router } from 'react-router-dom';
 import { WalletProvider } from './AugmentedWallet';
 import { SnackbarProvider } from 'notistack';
@@ -29,12 +26,6 @@ const useStyles = makeStyles(() => ({
     color: '#0176FF !important',
   },
 }));
-
-function getLibrary(provider: any): Web3Provider {
-  const library = new Web3Provider(provider);
-  library.pollingInterval = 12000;
-  return library;
-}
 
 const App = () => {
   const toastClasses = useStyles();
