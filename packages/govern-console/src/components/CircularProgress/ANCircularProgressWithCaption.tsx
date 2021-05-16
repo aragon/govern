@@ -19,13 +19,10 @@ export const ANCircularProgressWithCaption = (props: ANProgressCationPropos) => 
     switch (state) {
       case CiruclarProgressStatus.Disabled:
         return '#B4C1E4';
-        break;
       case CiruclarProgressStatus.Failed:
         return '#FF6A60';
-        break;
       default:
         return '#00C2FF';
-        break;
     }
   };
 

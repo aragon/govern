@@ -8,10 +8,7 @@ export interface DaoCardProps {
    * Label of the card - name of the DAO
    */
   label: string;
-  /**
-   * Aum Value of the DAO
-   */
-  aumValue: string | number;
+
   /**
    * Number of Proposals
    */
@@ -55,13 +52,7 @@ const CardLabel = styled(MUITypography)(({ theme }) => ({
   marginBottom: '35px',
 }));
 
-export const DaoCard: React.FC<DaoCardProps> = ({
-  label,
-  aumValue,
-  numberOfProposals,
-  daoId,
-  ...props
-}) => {
+export const DaoCard: React.FC<DaoCardProps> = ({ label, numberOfProposals, daoId, ...props }) => {
   return (
     <DaoCardWrapper>
       <CardLabel>{label}</CardLabel>
@@ -72,9 +63,12 @@ export const DaoCard: React.FC<DaoCardProps> = ({
           justifyContent: 'space-evenly',
         }}
       >
-        <div>
-          <DaoProperty propertyLabel="AUM(USD)" propertyText={'$' + aumValue + 'M'} />
-        </div>
+        {/* <div>
+          <DaoProperty
+            propertyLabel="AUM(USD)"
+            propertyText={'$' + aumValue + 'M'}
+          />
+        </div> */}
         <div>
           <DaoProperty propertyLabel="PROPOSALS" propertyText={numberOfProposals} />
         </div>

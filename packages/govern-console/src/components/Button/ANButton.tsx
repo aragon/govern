@@ -42,7 +42,7 @@ export interface ANButtonProps {
   /**
    * Color value
    */
-  buttonColor?: string;
+  labelColor?: string;
   /**
    * style
    */
@@ -58,9 +58,11 @@ const getBackground = (
 ) => {
   if (disabled) return `${theme.custom.greyscale.light} !important`;
   if (backgroundColor) return backgroundColor;
-  if (buttonType === 'primary') return 'linear-gradient(107.79deg, #00C2FF 1.46%, #01E8F7 100%)';
-  if (buttonType === 'challenge') return 'linear-gradient(107.79deg, #F7B201 1.46%, #FF7A00 100%)';
-  return '#ffffff';
+  if (buttonType === 'primary')
+    return 'linear-gradient(107.79deg, #00C2FF 1.46%, #01E8F7 100%) !important';
+  if (buttonType === 'challenge')
+    return 'linear-gradient(107.79deg, #F7B201 1.46%, #FF7A00 100%) !important';
+  return '#ffffff !important';
 };
 const getBackgroundForHoveredState = (
   buttonType: string,
@@ -70,9 +72,11 @@ const getBackgroundForHoveredState = (
 ) => {
   if (disabled) return '#D9E0F5 !important';
   if (backgroundColor) return backgroundColor;
-  if (buttonType === 'primary') return 'linear-gradient(107.79deg, #82E1FF 1.46%, #3CF3FF 100%)';
-  if (buttonType === 'challenge') return 'linear-gradient(107.79deg, #FFD056 1.46%, #FF9636 100%)';
-  return '#ffffff';
+  if (buttonType === 'primary')
+    return 'linear-gradient(107.79deg, #82E1FF 1.46%, #3CF3FF 100%) !important';
+  if (buttonType === 'challenge')
+    return 'linear-gradient(107.79deg, #FFD056 1.46%, #FF9636 100%) !important';
+  return '#ffffff !important';
 };
 const getBackgroundForPressedState = (
   buttonType: string,
@@ -82,16 +86,18 @@ const getBackgroundForPressedState = (
 ) => {
   if (disabled) return '#D9E0F5 !important';
   if (backgroundColor) return backgroundColor;
-  if (buttonType === 'primary') return 'linear-gradient(107.79deg, #01B9F2 1.46%, #01DBE9 100%)';
-  if (buttonType === 'challenge') return 'linear-gradient(107.79deg, #EBA900 1.46%, #ED7100 100%)';
-  return '#EFF1F7;';
+  if (buttonType === 'primary')
+    return 'linear-gradient(107.79deg, #01B9F2 1.46%, #01DBE9 100%) !important';
+  if (buttonType === 'challenge')
+    return 'linear-gradient(107.79deg, #EBA900 1.46%, #ED7100 100%) !important';
+  return '#EFF1F7 !important';
 };
 
 const getColor = (buttonType: string, color?: string, disabled?: boolean) => {
   if (disabled) return '#B0BDE5 !important';
   if (color && color !== '') return color;
-  if (buttonType === 'secondary') return '#20232C';
-  return '#ffffff';
+  if (buttonType === 'secondary') return '#20232C !important';
+  return '#ffffff !important';
 };
 
 const StyledButton = styled(MUIButton)(
@@ -102,7 +108,7 @@ const StyledButton = styled(MUIButton)(
     disabled,
     width,
     height,
-    buttonColor,
+    labelColor,
     style,
   }: {
     theme: Theme;
@@ -113,10 +119,10 @@ const StyledButton = styled(MUIButton)(
     disabled?: boolean;
     width?: string;
     height?: string;
-    buttonColor?: string;
+    labelColor?: string;
     style?: any;
   }) => ({
-    color: getColor(buttonType, buttonColor, disabled),
+    color: getColor(buttonType, labelColor, disabled),
     height: height || 46,
     width: width || 154,
     background: getBackground(buttonType, theme, disabled, backgroundColor),
@@ -130,8 +136,8 @@ const StyledButton = styled(MUIButton)(
     lineHeight: '22px',
     textTransform: 'none',
     animation: 'none',
-    transition: 'none',
     cursor: 'pointer',
+    transition: 'background 0.5s, color 0.5s',
     '&:hover': {
       background: getBackgroundForHoveredState(buttonType, theme, disabled, backgroundColor),
       boxShadow: '0px 4px 4px rgba(116, 131, 178, 0.25)',
@@ -144,7 +150,7 @@ const StyledButton = styled(MUIButton)(
     '& .MuiTouchRipple-root': {
       display: 'none',
     },
-    ...style,
+    // ...style,
   }),
 );
 
@@ -157,7 +163,7 @@ export const ANButton: React.FC<ANButtonProps> = ({
   disabled,
   width,
   height,
-  buttonColor,
+  labelColor,
   style,
   ...props
 }) => {
@@ -175,7 +181,7 @@ export const ANButton: React.FC<ANButtonProps> = ({
       width={width}
       buttonType={buttonType}
       height={height}
-      buttonColor={buttonColor}
+      labelColor={labelColor}
       style={style}
     >
       {label}

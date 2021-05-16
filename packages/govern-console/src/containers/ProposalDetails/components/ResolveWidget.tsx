@@ -33,7 +33,6 @@ const ResolveWidget: React.FC<any> = ({
       </Widget>
     );
   }
-
   if (currentState !== PROPOSAL_STATES.CHALLENGED) {
     return <></>;
   }

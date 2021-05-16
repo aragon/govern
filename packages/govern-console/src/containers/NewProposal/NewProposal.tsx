@@ -9,8 +9,8 @@ import Paper from '@material-ui/core/Paper';
 import { NewActionModal } from 'components/Modal/NewActionModal';
 import { AddActionsModal } from 'components/Modal/AddActionsModal';
 import { InputField } from 'components/InputFields/InputField';
-import { useParams } from 'react-router-dom';
-import { utils } from 'ethers';
+import { useParams, useHistory } from 'react-router-dom';
+import { ContractReceipt, utils } from 'ethers';
 import { useQuery } from '@apollo/client';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { buildContainer } from 'utils/ERC3000';
@@ -18,12 +18,13 @@ import { useWallet } from 'AugmentedWallet';
 import QueueApprovals from 'services/QueueApprovals';
 import { CustomTransaction, abiItem, actionType, ActionToSchedule } from 'utils/types';
 import { useSnackbar } from 'notistack';
+
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import FacadeProposal from 'services/Proposal';
 import { useForm, Controller } from 'react-hook-form';
-import { useHistory } from 'react-router-dom';
 
-import { Proposal, ProposalOptions, ActionType } from '@aragon/govern';
+import { Proposal, ProposalOptions, ReceiptType, ActionType } from '@aragon/govern';
+import { proposalDetailsUrl } from 'utils/urls';
 
 export interface NewProposalProps {
   /**
@@ -366,6 +367,8 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   };
 
   const scheduleProposal = async (actions: ActionType[]) => {
+    let containerHash: string | undefined;
+
     // build the container to schedule.
     const payload = {
       submitter: account.address,
@@ -392,11 +395,13 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
         onTransactionFailure: (error) => {
           enqueueSnackbar(error, { variant: 'error' });
         },
-        onTransactionSuccess: () => {
-          //
+        onTransactionSuccess: (_, receipt: ContractReceipt) => {
+          containerHash = Proposal.getContainerHashFromReceipt(receipt, ReceiptType.Scheduled);
         },
         onCompleteAllTransactions: () => {
-          //
+          if (containerHash) {
+            history.push(proposalDetailsUrl(daoName, containerHash));
+          }
         },
       },
     });
@@ -470,7 +475,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
           // width={155}
           // height={45}
           buttonType="secondary"
-          buttonColor="#00C2FF"
+          labelColor="#00C2FF"
           style={{ marginTop: 40 }}
           onClick={handleInputModalOpen}
         />

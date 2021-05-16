@@ -137,7 +137,7 @@ const DaoMainPage: React.FC<{
       error: proposalErrors,
       fetchMore: fetchMoreProposals,
     },
-  ] = useLazyQuery(GET_PROPOSAL_LIST);
+  ] = useLazyQuery(GET_PROPOSAL_LIST, { fetchPolicy: 'no-cache' });
 
   const fetchMoreData = async () => {
     if (fetchMoreProposals) {
@@ -198,7 +198,11 @@ const DaoMainPage: React.FC<{
           'loading'
         ) : (
           <>
-            <DaoHeader ethBalance={formatEther(0)} usdBalance={'2222'} daoName={daoDetails.name} />
+            <DaoHeader
+              // ethBalance={formatEther(daoDetails.executor.balance)}
+              usdBalance={'2222'}
+              daoName={daoDetails.name}
+            />
             <div
               style={{
                 paddingTop: '33px',
@@ -255,7 +259,7 @@ const DaoMainPage: React.FC<{
                       onClick={goToNewProposal}
                     ></ANButton>
                   </div>
-                  <WrapperGrid container spacing={3} xs={12} direction="row" justify="center">
+                  <WrapperGrid container spacing={3} xs={12} direction="row" justify="flex-start">
                     {visibleProposalList.map((proposal: any) => (
                       <Grid item key={proposal.id} xl={3} lg={4} xs={12} sm={12} md={6}>
                         <ProposalCard
@@ -288,7 +292,7 @@ const DaoMainPage: React.FC<{
                         buttonType="secondary"
                         height="46px"
                         width="196px"
-                        buttonColor="#00C2FF"
+                        labelColor="#00C2FF"
                         onClick={fetchMoreData}
                       ></ANButton>
                     ) : null}

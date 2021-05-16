@@ -91,3 +91,10 @@ export const ModalsProvider: React.FC = ({ children }) => {
     </ModalsContext.Provider>
   );
 };
+
+export const closeTransactionsModalAction: CloseAction = {
+  type: ActionTypes.CLOSE,
+  payload: {
+    modal: 'transactionsModal',
+  },
+};

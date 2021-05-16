@@ -16,6 +16,7 @@ import { ModalsProvider } from 'containers/HomePage/ModalsContext';
 
 const AppWrapper = styled('div')({
   width: 'calc(100vw - 96px)',
+  maxWidth: '1440px',
   margin: 'auto',
   boxSizing: 'border-box',
   position: 'relative',
@@ -66,8 +67,8 @@ const HomePage = ({ ...props }) => {
       <AppWrapper id="app-wrapper">
         <Header />
         {/* add breadcrumbs later */}
-        <Switch>
-          <MainBodyWrapper id="main-body-wrapper">
+        <MainBodyWrapper id="main-body-wrapper">
+          <Switch>
             <Route exact path="/">
               <ConsoleMainPage
                 updateSelectedDao={updateSelectedDaoAndPushToHistory}
@@ -99,8 +100,8 @@ const HomePage = ({ ...props }) => {
         <Dashboard />
       </Route>
     */}
-          </MainBodyWrapper>
-        </Switch>
+          </Switch>
+        </MainBodyWrapper>
         <Footer />
         {/* <Footer /> */}
       </AppWrapper>
