@@ -28,16 +28,9 @@ const TransactionKeeperFailure: React.FC<TransactionKeeperFailureProps> = ({
         <TransactionList transactions={transactions}></TransactionList>
       </TransactionStatusWrapper>
       <TransactionSubtitle>
-        An error has occurred during the signature process. Do not worry, you
-        can try again.
+        An error has occurred during the signature process. Do not worry, you can try again.
       </TransactionSubtitle>
-      <ANButton
-        buttonType="primary"
-        label="OK"
-        width="100%"
-        height="45px"
-        onClick={onClick}
-      />
+      <ANButton buttonType="primary" label="OK" width="100%" height="45px" onClick={onClick} />
     </TransactionKeeperWrapper>
   );
 };

@@ -1,7 +1,6 @@
 import React from 'react';
 // also exported from '@storybook/react' if you can deal with breaking changes in 6.1
 
-/* eslint-disable */
 import { Story, Meta } from '@storybook/react';
 import { ModalProps } from '@material-ui/core/Modal';
 import { SimpleModal, SimpleModalProps } from './SimpleModal';

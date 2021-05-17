@@ -11,10 +11,6 @@ export interface LabelProps extends ChipProps {
    * Label Text
    */
   labelText: string | React.ReactNode;
-  /**
-   * Optional Function Handler
-   */
-  onClick?: () => void;
 }
 
 const getBackground = (labelColor: string, theme: Theme) => {
@@ -67,11 +63,6 @@ const StyledLabel = styled(MUIChip)(
   }),
 );
 
-export const Label: React.FC<any> = ({
-  labelColor,
-  labelText,
-  onClick,
-  ...props
-}) => {
+export const Label: React.FC<any> = ({ labelColor, labelText }) => {
   return <StyledLabel label={labelText} labelColor={labelColor} />;
 };

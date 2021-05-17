@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { styled } from '@material-ui/core/styles';
 import AragonIcon from 'images/aragon-graphic-only-icon.svg';
 import aragonText from 'images/svgs/Aragon.svg';
@@ -8,6 +7,7 @@ import twitterIcon from 'images/svgs/twitter.svg';
 import telegramIcon from 'images/svgs/telegrama.svg';
 import { useHistory } from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
+import React from 'react';
 
 const FooterWrapperDiv = styled('div')({
   width: 'auto',
@@ -49,11 +49,7 @@ const Footer = ({}) => {
         </Grid>
         <Grid item xs={12} sm={6} key="social">
           <Social>
-            <a
-              href={'https://twitter.com/AragonProject'}
-              target="_blank"
-              rel="noreferrer noopener"
-            >
+            <a href={'https://twitter.com/AragonProject'} target="_blank" rel="noreferrer noopener">
               <img src={twitterIcon} />
             </a>
             <a
@@ -70,10 +66,7 @@ const Footer = ({}) => {
               target="_blank"
               rel="noreferrer noopener"
             >
-              <img
-                style={{ width: '25px', height: '25px' }}
-                src={telegramIcon}
-              />
+              <img style={{ width: '25px', height: '25px' }} src={telegramIcon} />
             </a>
             <a
               style={{ marginLeft: '28px' }}

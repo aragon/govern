@@ -9,9 +9,7 @@ import TransactionList, {
 } from 'components/TransactionKeeper/TransactionList';
 import { ANButton } from 'components/Button/ANButton';
 
-const TransactionKeeperProgress: React.FC<TransactionListProps> = ({
-  transactions,
-}) => {
+const TransactionKeeperProgress: React.FC<TransactionListProps> = ({ transactions }) => {
   return (
     <TransactionKeeperWrapper>
       <TransactionKeeperTitle>Confirm Transactions</TransactionKeeperTitle>

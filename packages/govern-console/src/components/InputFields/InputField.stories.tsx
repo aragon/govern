@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React from 'react';
 // also exported from '@storybook/react' if you can deal with breaking changes in 6.1
 
@@ -17,11 +16,7 @@ export default {
 const Template: Story<InputFieldProps> = (args) => {
   const [value, setValue] = React.useState<string>('');
   return (
-    <InputField
-      onInputChange={(updatedValue) => setValue(updatedValue)}
-      value={value}
-      {...args}
-    />
+    <InputField onInputChange={(updatedValue) => setValue(updatedValue)} value={value} {...args} />
   );
 };
 export const InputFieldExample = Template.bind({});

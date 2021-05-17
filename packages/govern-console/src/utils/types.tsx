@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 export enum CustomTransactionStatus {
   Successful,
   Failed,
@@ -14,7 +12,6 @@ export enum CiruclarProgressStatus {
   Failed,
 }
 
-// eslint-disable-next-line
 export type CustomTransaction = {
   tx: any;
   message: string;

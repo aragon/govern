@@ -1,9 +1,7 @@
 import React, { ReactChild, ReactFragment, ReactPortal } from 'react';
-import { styled, useTheme } from '@material-ui/core/styles';
+import { styled } from '@material-ui/core/styles';
 import Button, { ButtonProps } from '@material-ui/core/Button';
-// import { div } from '@material-ui/core';
 import MuiTooltip from '@material-ui/core/Tooltip';
-
 import helpIcon from '../../images/ds/help-icon.svg';
 
 export interface HelpButtonProps extends ButtonProps {
@@ -32,7 +30,6 @@ const HelpButtonDiv = styled(Button)({
   '& .MuiTouchRipple-root': {
     display: 'none',
   },
-  // ...style,
 });
 
 const HelpToolTip = styled(MuiTooltip)(({ theme }) => ({
@@ -47,15 +44,10 @@ const HelpToolTip = styled(MuiTooltip)(({ theme }) => ({
 }));
 
 export const HelpButton: React.FC<HelpButtonProps> = ({ helpText }) => {
-  const theme = useTheme();
-
   return (
     <HelpToolTip title={helpText} interactive>
       <HelpButtonDiv>
-        <img
-          src={helpIcon}
-          // onMouseEnter={() => {}} onMouseLeave={() => {}}
-        />
+        <img src={helpIcon} />
       </HelpButtonDiv>
     </HelpToolTip>
   );

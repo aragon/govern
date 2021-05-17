@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { DaoConfig } from '@aragon/govern';
 import { ChainId } from './types';
 import { toUtf8Bytes } from '@ethersproject/strings';

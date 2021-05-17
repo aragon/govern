@@ -1,5 +1,5 @@
 import React from 'react';
-import { styled, Theme, useTheme } from '@material-ui/core/styles';
+import { styled, Theme } from '@material-ui/core/styles';
 import MUIButton from '@material-ui/core/Button';
 
 export interface ANButtonProps {
@@ -19,10 +19,6 @@ export interface ANButtonProps {
    * Button contents
    */
   label: string | React.ReactNode;
-  // /**
-  //  * Any additional overwriting style.
-  //  */
-  // style: object;
   /**
    * Optional click handler
    */
@@ -47,6 +43,9 @@ export interface ANButtonProps {
    * style
    */
   style?: any;
+  /**
+   * Type of button
+   */
   type?: 'button' | 'submit';
 }
 
@@ -109,7 +108,6 @@ const StyledButton = styled(MUIButton)(
     width,
     height,
     labelColor,
-    style,
   }: {
     theme: Theme;
     buttonType: string;
@@ -127,9 +125,7 @@ const StyledButton = styled(MUIButton)(
     width: width || 154,
     background: getBackground(buttonType, theme, disabled, backgroundColor),
     boxSizing: 'border-box',
-    boxShadow: disabled
-      ? 'none !important'
-      : '0px 3px 3px rgba(116, 131, 178, 0.2)',
+    boxShadow: disabled ? 'none !important' : '0px 3px 3px rgba(116, 131, 178, 0.2)',
     borderRadius: '8px',
     fontFamily: 'Manrope',
     fontStyle: 'normal',
@@ -141,37 +137,24 @@ const StyledButton = styled(MUIButton)(
     cursor: 'pointer',
     transition: 'background 0.5s, color 0.5s',
     '&:hover': {
-      background: getBackgroundForHoveredState(
-        buttonType,
-        theme,
-        disabled,
-        backgroundColor,
-      ),
+      background: getBackgroundForHoveredState(buttonType, theme, disabled, backgroundColor),
       boxShadow: '0px 4px 4px rgba(116, 131, 178, 0.25)',
       color: buttonType === 'secondary' ? '#7483B2' : 'white',
     },
     '&:active': {
-      background: getBackgroundForPressedState(
-        buttonType,
-        theme,
-        disabled,
-        backgroundColor,
-      ),
+      background: getBackgroundForPressedState(buttonType, theme, disabled, backgroundColor),
       boxShadow: '0px 1px 1px rgba(116, 131, 178, 0.35)',
     },
     '& .MuiTouchRipple-root': {
       display: 'none',
     },
-    // ...style,
   }),
 );
 
 export const ANButton: React.FC<ANButtonProps> = ({
   buttonType: buttonType = 'primary',
-  // size = 'medium',
   backgroundColor,
   label,
-  // style,
   disabled,
   width,
   height,

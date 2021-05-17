@@ -12,9 +12,7 @@ export interface TransactionKeeperSuccessProps {
   onClick: () => void;
 }
 
-const TransactionKeeperSuccess: React.FC<TransactionKeeperSuccessProps> = ({
-  onClick,
-}) => {
+const TransactionKeeperSuccess: React.FC<TransactionKeeperSuccessProps> = ({ onClick }) => {
   return (
     <TransactionKeeperWrapper>
       <TransactionKeeperTitle>Success</TransactionKeeperTitle>

@@ -1,4 +1,3 @@
-/* eslint-disable*/
 import { CustomTransaction, CustomTransactionStatus } from 'utils/types';
 import { ethers, BigNumber } from 'ethers';
 import { erc20TokenABI } from './abis/erc20';

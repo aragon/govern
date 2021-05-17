@@ -1,6 +1,5 @@
-/* eslint-disable */
-import React, { useRef, useState, useEffect, memo } from 'react';
-import { styled, useTheme } from '@material-ui/core/styles';
+import React, { useState, useEffect, memo } from 'react';
+import { styled } from '@material-ui/core/styles';
 import { DaoHeader } from 'components/DaoHeader/DaoHeader';
 import { ProposalCard } from 'components/ProposalCards/ProposalCard';
 import { ANButton } from 'components/Button/ANButton';
@@ -9,13 +8,11 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import { GET_PROPOSAL_LIST, GET_DAO_BY_NAME } from './queries';
 import { useQuery, useLazyQuery } from '@apollo/client';
-import { formatEther } from 'ethers/lib/utils';
 import Grid from '@material-ui/core/Grid';
 import { useHistory, useParams } from 'react-router-dom';
-import MUITypography from '@material-ui/core/Typography';
 import NoDaoFound from './NoDaoFound';
-import { formatDate } from 'utils/date'
-import { getState, getStateColor } from 'utils/states'
+import { formatDate } from 'utils/date';
+import { getState, getStateColor } from 'utils/states';
 
 //* Styled Components List
 const DaoPageMainDiv = styled(Paper)(({ theme }) => ({
@@ -28,8 +25,7 @@ const DaoPageMainDiv = styled(Paper)(({ theme }) => ({
 }));
 
 const PageLabelSelected = styled(Typography)(({ theme }) => ({
-  background:
-    'linear-gradient(282.07deg, #01E8F7 -5.08%, #01DCFA 21.97%, #00C2FF 81.4%)',
+  background: 'linear-gradient(282.07deg, #01E8F7 -5.08%, #01DCFA 21.97%, #00C2FF 81.4%)',
   lineHeight: '25px',
   fontSize: '20px',
   fontWeight: 500,
@@ -50,48 +46,16 @@ const PageLabel = styled(Typography)(({ theme }) => ({
   cursor: 'pointer',
 }));
 
-const Subtitle = styled(MUITypography)(({ theme }) => ({
-  color: theme.custom.daoHeader.labelColor,
-  lineHeight: '27px',
-  fontSize: '18px',
-  fontWeight: theme.custom.daoHeader.labelFontWeight,
-  fontFamily: theme.typography.fontFamily,
-  fontStyle: 'normal',
-}));
-
-const Title = styled(MUITypography)(({ theme }: any) => ({
-  color: theme.custom.daoHeader.valueColor,
-  lineHeight: '60.1px',
-  fontSize: '44px',
-  fontWeight: theme.custom.daoHeader.valueFontWeight,
-  fontFamily: theme.typography.fontFamily,
-  fontStyle: 'normal',
-}));
-
-const DaoNotFoundWrapper = styled('div')(({ theme }) => ({
-  width: '100%',
-  height: '100%',
-  textAlign: 'center',
-  background: ' linear-gradient(107.79deg, #E4F8FF 1.46%, #F1F1FF 100%)',
-  borderRadius: '16px',
-  boxSizing: 'border-box',
-  position: 'relative',
-}));
-
-const WrapperGrid = styled(Grid)(({ theme }) => ({
+const WrapperGrid = styled(Grid)({
   marginTop: '16px',
   boxSizing: 'border-box',
   margin: '0 !important',
   width: '100% !important',
-}));
+});
 //* Styled Components List End
 
-const DaoMainPage: React.FC<{
-  onClickProposalCard: any;
-  onClickNewProposal: any;
-}> = ({ onClickProposalCard, onClickNewProposal, ...props }) => {
+const DaoMainPage: React.FC = () => {
   const history = useHistory();
-  const theme = useTheme();
   const { daoName } = useParams<any>();
   //TODO daoname empty handling
 
@@ -102,41 +66,32 @@ const DaoMainPage: React.FC<{
   const [isProposalPage, setProposalPage] = useState(true);
   const [visibleProposalList, updateVisibleProposalList] = useState<any>([]);
   const [queueNonce, updateQueueNonce] = useState<number>();
-  const [fetchMoreProposal, updateFetchMoreProposals] = useState<any>();
-  const [isProfilePage, setProfilePage] = useState(false);
+  // const [fetchMoreProposal, updateFetchMoreProposals] = useState<any>();
+  // const [isProfilePage, setProfilePage] = useState(false);
   const [daoDetails, updateDaoDetails] = useState<any>();
   const [isAnExistingDao, updateIsAnExistingDao] = useState<boolean>(true);
-  const [searchDaoName, setSearchDaoName] = useState('');
+  // const [searchDaoName, setSearchDaoName] = useState('');
 
-  // useEffect(() => {
-  //   if (isProfile) {
-  //     setProposalPage(false);
-  //     setProfilePage(true);
-  //   }
-  // }, [isProfile]);
+  // const onInputChange = (val: string) => {
+  //   setSearchDaoName(val);
+  // };
 
-  const onInputChange = (val: string) => {
-    setSearchDaoName(val);
-  };
-  const onSearch = () => {
-    console.log(searchDaoName);
-  };
   const onPageChange = (page: string) => {
     if (page === 'profile') {
       setProposalPage(false);
-      setProfilePage(true);
+      // setProfilePage(true);
     } else {
       setProposalPage(true);
-      setProfilePage(false);
+      // setProfilePage(false);
     }
   };
 
   const [
     getQueueData,
     {
-      loading: loadingProposals,
+      // loading: loadingProposals,
       data: queueData,
-      error: proposalErrors,
+      // error: proposalErrors,
       fetchMore: fetchMoreProposals,
     },
   ] = useLazyQuery(GET_PROPOSAL_LIST, { fetchPolicy: 'no-cache' });
@@ -144,25 +99,22 @@ const DaoMainPage: React.FC<{
   const fetchMoreData = async () => {
     if (fetchMoreProposals) {
       const {
+        // loading: loadingMore,
         data: moreData,
-        loading: loadingMore,
       }: { data: any; loading: boolean } = await fetchMoreProposals({
         variables: {
           offset: visibleProposalList.length,
         },
       });
       if (moreData && moreData.governQueue.containers.length > 0) {
-        updateVisibleProposalList([
-          ...visibleProposalList,
-          ...moreData.governQueue.containers,
-        ]);
+        updateVisibleProposalList([...visibleProposalList, ...moreData.governQueue.containers]);
       }
     }
   };
 
   useEffect(() => {
     if (loadingDao) return;
-    if (daoList.daos.length > 0) {
+    if (daoList.daos.length > 0 && getQueueData) {
       updateDaoDetails(daoList.daos[0]);
       if (daoList.daos[0] && daoList.daos[0].queue) {
         getQueueData({
@@ -176,7 +128,7 @@ const DaoMainPage: React.FC<{
     } else {
       updateIsAnExistingDao(false);
     }
-  }, [daoList]);
+  }, [loadingDao, daoList, getQueueData]);
 
   useEffect(() => {
     if (queueData) {
@@ -203,11 +155,7 @@ const DaoMainPage: React.FC<{
           'loading'
         ) : (
           <>
-            <DaoHeader
-              // ethBalance={formatEther(daoDetails.executor.balance)}
-              usdBalance={'2222'}
-              daoName={daoDetails.name}
-            />
+            <DaoHeader daoName={daoDetails.name} />
             <div
               style={{
                 paddingTop: '33px',
@@ -228,17 +176,15 @@ const DaoMainPage: React.FC<{
                 {isProposalPage ? (
                   <PageLabelSelected>Proposals</PageLabelSelected>
                 ) : (
-                  <PageLabel onClick={() => onPageChange('proposal')}>
-                    Proposal
-                  </PageLabel>
+                  <PageLabel onClick={() => onPageChange('proposal')}>Proposal</PageLabel>
                 )}
                 {/* {isProfilePage ? (
-            <PageLabelSelected>Profile</PageLabelSelected>
-          ) : (
-            <PageLabel onClick={() => onPageChange('profile')}>
-              Profile
-            </PageLabel>
-          )} */}
+                    <PageLabelSelected>Profile</PageLabelSelected>
+                  ) : (
+                    <PageLabel onClick={() => onPageChange('profile')}>
+                      Profile
+                    </PageLabel>
+                  )} */}
               </div>
               {isProposalPage ? (
                 <div>
@@ -256,7 +202,10 @@ const DaoMainPage: React.FC<{
                       placeholder="Search"
                       width="298px"
                       height="46px"
-                      onInputChange={onInputChange}
+                      // onInputChange={onInputChange}
+                      onInputChange={() => {
+                        console.log('search is not developed yet');
+                      }}
                     ></InputField>
                     <ANButton
                       label="New Proposal"
@@ -266,28 +215,17 @@ const DaoMainPage: React.FC<{
                       onClick={goToNewProposal}
                     ></ANButton>
                   </div>
-                  <WrapperGrid
-                    container
-                    spacing={3}
-                    xs={12}
-                    direction="row"
-                    justify="flex-start"
-                  >
+                  <WrapperGrid container spacing={3} xs={12} direction="row" justify="flex-start">
                     {visibleProposalList.map((proposal: any) => (
-                      <Grid
-                        item
-                        key={proposal.id}
-                        xl={3}
-                        lg={4}
-                        xs={12}
-                        sm={12}
-                        md={6}
-                      >
+                      <Grid item key={proposal.id} xl={3} lg={4} xs={12} sm={12} md={6}>
                         <ProposalCard
                           transactionHash={proposal.id}
                           proposalDate={formatDate(proposal.createdAt)}
                           proposalStatus={getState(proposal.state, proposal.payload.executionTime)}
-                          proposalStatusColor={getStateColor(proposal.state, proposal.payload.executionTime)}
+                          proposalStatusColor={getStateColor(
+                            proposal.state,
+                            proposal.payload.executionTime,
+                          )}
                           onClickProposalCard={() => onClickProposal(proposal)}
                         ></ProposalCard>
                       </Grid>

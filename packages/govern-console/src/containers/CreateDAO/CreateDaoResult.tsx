@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { styled } from '@material-ui/core/styles';

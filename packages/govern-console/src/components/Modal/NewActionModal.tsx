@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import MuiDialog from '@material-ui/core/Dialog';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
@@ -11,14 +11,7 @@ import { validateContract, validateAbi } from 'utils/validations';
 import { Controller, useForm } from 'react-hook-form';
 import { utils } from 'ethers';
 import AbiHandler from 'utils/AbiHandler';
-import {
-  styled,
-  useTheme,
-  Theme,
-  withStyles,
-  WithStyles,
-  createStyles,
-} from '@material-ui/core/styles';
+import { styled, Theme, withStyles, WithStyles, createStyles } from '@material-ui/core/styles';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
 
@@ -75,15 +68,15 @@ export interface DialogTitleProps extends WithStyles<typeof styles> {
   onClose: () => void;
 }
 
-const DialogContent = withStyles((theme: Theme) => ({
+const DialogContent = withStyles({
   root: {
     paddingTop: '33px',
     paddingLeft: '40px',
     paddingBottom: '0px',
   },
-}))(MuiDialogContent);
+})(MuiDialogContent);
 
-const DialogActions = withStyles((theme: Theme) => ({
+const DialogActions = withStyles({
   root: {
     margin: 0,
     paddingTop: '24px',
@@ -93,7 +86,7 @@ const DialogActions = withStyles((theme: Theme) => ({
     justifyContent: 'left',
     alignItems: 'left',
   },
-}))(MuiDialogActions);
+})(MuiDialogActions);
 
 export const DialogTitle = withStyles(styles)((props: DialogTitleProps) => {
   const { children, classes, onClose, ...other } = props;
@@ -101,11 +94,7 @@ export const DialogTitle = withStyles(styles)((props: DialogTitleProps) => {
     <MuiDialogTitle disableTypography className={classes.root} {...other}>
       <Typography variant="h6">{children}</Typography>
       {onClose ? (
-        <IconButton
-          aria-label="close"
-          className={classes.closeButton}
-          onClick={onClose}
-        >
+        <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
           <CloseIcon />
         </IconButton>
       ) : null}
@@ -123,7 +112,6 @@ export const NewActionModal: React.FC<NewActionModalProps> = ({
   onCloseModal,
   onGenerate,
 }) => {
-  const theme = useTheme();
   const [fetchAbi, setFetchAbi] = useState(true);
   const { provider, networkName }: any = useWallet();
 

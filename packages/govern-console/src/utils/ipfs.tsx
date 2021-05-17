@@ -1,4 +1,3 @@
-/* eslint-disable */
 import CID from 'cids';
 import { toUtf8String } from '@ethersproject/strings';
 import { IPFS_GATEWAY } from './constants';
@@ -24,7 +23,6 @@ export const getIpfsCid = (uriOrCid: string) => {
   // if cidString can be passed to CID class without throwing
   // it means it's the actual cid
   try {
-    // eslint-disable-next-line no-new
     new CID(cidString);
     return cidString;
   } catch (err) {}
@@ -33,7 +31,6 @@ export const getIpfsCid = (uriOrCid: string) => {
   // we add `f` as a multibase prefix and remove `0x`
   try {
     const cid = `f${cidString.substring(2)}`;
-    // eslint-disable-next-line no-new
     new CID(cid);
     return cid;
   } catch (err) {}
@@ -41,7 +38,6 @@ export const getIpfsCid = (uriOrCid: string) => {
   // if cidString is hex received from string-to-hex converter
   try {
     const cid = toUtf8String(cidString);
-    // eslint-disable-next-line no-new
     new CID(cid);
     return cid;
   } catch (err) {}

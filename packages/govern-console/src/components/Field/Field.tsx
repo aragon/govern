@@ -10,13 +10,11 @@ interface FieldProps {
 const InlineField = styled('div')({
   display: 'inline',
 });
-const BlockField = styled('div')(
-  ({ width, height }: { width?: string; height?: string }) => ({
-    display: 'block',
-    width: width ? width : 'fit-content',
-    height: height ? height : 'fit-content',
-  }),
-);
+const BlockField = styled('div')(({ width, height }: { width?: string; height?: string }) => ({
+  display: 'block',
+  width: width ? width : 'fit-content',
+  height: height ? height : 'fit-content',
+}));
 const StyledLink = styled('a')({
   display: 'inline',
   width: 'fit-content',
