@@ -4,4 +4,5 @@ export const erc20TokenABI = [
   'function approve(address spender, uint256 value) returns (bool)',
   'function balanceOf(address who) external view returns (uint256)',
   'function decimals() view returns (uint8)',
+  'function symbol() public view returns (string)',
 ];

@@ -386,6 +386,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
         );
       } catch (error) {
         enqueueSnackbar(error.message, { variant: 'error' });
+        return;
       }
     }
 
