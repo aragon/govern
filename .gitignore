@@ -1,5 +1,5 @@
 node_modules/
 yarn-error.log
 .env
-/packages/govern-server/dev-data/
+dev-data/
 .vscode

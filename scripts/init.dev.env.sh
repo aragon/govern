@@ -35,7 +35,7 @@ fi
 # Init docker containers
 # ----------------------------------
 
-cd ../govern-server/
+cd ../../
 
 if [[ -d "./dev-data" ]]; then
     rm -rf ./dev-data
@@ -45,10 +45,10 @@ mkdir -p ./dev-data/postgres
 mkdir -p ./dev-data/ipfs
 
 if [[ "$(docker ps -a | grep graph)" ]]; then
-    yarn stop:containers
+    yarn stop:dev
 fi
 
-yarn start:containers
+yarn start:dev
 
 if [ $? -ne 0 ]
 then
@@ -80,7 +80,7 @@ echo -e ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 # Create local subgraph
 # ---------------------
 
-cd ../govern-subgraph/
+cd ./packages/govern-subgraph/
 yarn create-local
 
 if [ $? -ne 0 ]
@@ -123,8 +123,8 @@ else
     echo "**                                                                              **"
     echo "**                    Govern: local dev env initialized                         **"
     echo "**                                                                              **"
-    echo "**      Execute from now on just 'yarn start:dev' in the root folder or         **"
-    echo "**           'yarn start:containers' in the 'govern-server' package.            **"
+    echo "**      Execute from now on just 'yarn start:dev' in the root folder.           **"
+    echo "**                                                                              **"
     echo "**                                                                              **"
     echo -e ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>${NC}"
 fi

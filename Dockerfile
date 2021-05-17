@@ -12,7 +12,6 @@ COPY ./packages/govern-contract-utils/package.json    /app/packages/govern-contr
 COPY ./packages/govern-core/package.json              /app/packages/govern-core/package.json
 COPY ./packages/govern-create/package.json            /app/packages/govern-create/package.json
 COPY ./packages/govern-discord/package.json           /app/packages/govern-discord/package.json
-COPY ./packages/govern-server/package.json            /app/packages/govern-server/package.json
 COPY ./packages/govern-subgraph/package.json          /app/packages/govern-subgraph/package.json
 COPY ./packages/govern-token/package.json             /app/packages/govern-token/package.json
 
