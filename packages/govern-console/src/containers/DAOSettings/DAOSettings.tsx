@@ -251,9 +251,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
       type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
       payload: {
         transactionList: transactionsQueue.current,
-        onTransactionFailure: (error) => {
-          enqueueSnackbar(error, { variant: 'error' });
-        },
+        onTransactionFailure: () => {},
         onTransactionSuccess: (_, receipt: ContractReceipt) => {
           containerHash = Proposal.getContainerHashFromReceipt(
             receipt,

@@ -38,7 +38,9 @@ export const ANCircularProgressWithCaption = (
         lineHeight: '25px',
       }}
     >
-      <ANCircularProgress status={props.state} />
+      <div>
+        <ANCircularProgress status={props.state} />
+      </div>
       <div
         style={{
           marginLeft: '10px',
@@ -48,6 +50,7 @@ export const ANCircularProgressWithCaption = (
           fontSize: 18,
           color: getTextColor(props.state),
           lineHeight: '20px',
+          wordBreak: 'break-word',
         }}
       >
         {props.caption}

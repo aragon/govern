@@ -1,10 +1,8 @@
 import React from 'react';
 import { CustomTransaction, CustomTransactionStatus } from 'utils/types';
 import produce from 'immer';
-import TransactionKeeperInitial from './TransactionKeeperInitial';
-import TransactionKeeperProgress from './TransactionKeeperProgress';
-import TransactionKeeperSuccess from './TransactionKeeperSuccess';
-import TransactionKeeperFailure from './TransactionKeeperFailure';
+import TransactionDialog from 'components/Dialog/TransactionDialog';
+import FailureDialog from 'components/Dialog/FailureDialog';
 
 enum TransactionKeeperState {
   Initial,
@@ -50,6 +48,7 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
   const [transactions, updateTransactions] = React.useState<
     CustomTransaction[]
   >([...transactionList]);
+  const [errorMessage, setErrorMessage] = React.useState('');
 
   const updateTransaction = React.useCallback(
     (
@@ -92,8 +91,9 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
         isQueueAborted = true;
         updateTransaction(updatedTransaction, index);
         setState(TransactionKeeperState.Failure);
-        const errorMessage = getErrorFromException(ex);
-        onTransactionFailure(errorMessage, updatedTransaction);
+        const message = getErrorFromException(ex);
+        onTransactionFailure(message, updatedTransaction);
+        setErrorMessage(ex.message);
       }
       index++;
     }
@@ -110,35 +110,44 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
   switch (state) {
     case TransactionKeeperState.Initial: {
       return (
-        <TransactionKeeperInitial
+        <TransactionDialog
+          title={'Confirm transactions'}
           transactions={transactions}
           onClick={executeTransactions}
-        ></TransactionKeeperInitial>
+          onClose={closeModal}
+          buttonLabel={'Get started'}
+        />
       );
     }
     case TransactionKeeperState.Processing: {
       return (
-        <TransactionKeeperProgress
+        <TransactionDialog
+          title={'Processing transactions'}
+          info={'Please do not close this window until it finishes.'}
           transactions={transactions}
-        ></TransactionKeeperProgress>
+        />
       );
     }
     case TransactionKeeperState.Success: {
       return (
-        <TransactionKeeperSuccess
+        <TransactionDialog
+          title={'Completed Transactions'}
+          transactions={transactions}
+          buttonLabel={'Continue'}
           onClick={() => {
             closeModal();
             onCompleteAllTransactions(transactions);
           }}
-        ></TransactionKeeperSuccess>
+        />
       );
     }
     case TransactionKeeperState.Failure: {
       return (
-        <TransactionKeeperFailure
-          transactions={transactions}
+        <FailureDialog
+          subTitle={'An error has occurred during the signature process.'}
           onClick={closeModal}
-        ></TransactionKeeperFailure>
+          moreDetails={errorMessage}
+        />
       );
     }
   }
