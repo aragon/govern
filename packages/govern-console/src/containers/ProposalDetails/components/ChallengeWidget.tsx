@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { memo, useState } from 'react';
+import React, { memo, useState, useCallback } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { InputField } from 'components/InputFields/InputField';
 import { PROPOSAL_STATES } from 'utils/states';
@@ -41,7 +41,6 @@ export const InputSubTitle = styled(Typography)({
   marginTop: '17px',
   marginBottom: '17px',
 });
-
 
 const ChallengeWidget: React.FC<any> = ({
   disabled,
@@ -114,36 +113,28 @@ const ChallengeWidget: React.FC<any> = ({
     formState: { errors },
   } = methods;
 
-  const [reasonFile, setReasonFile] = useState<any>(null);
+  const submit = useCallback(() => {
+    console.log(getValues('reasonFile'),  ' blax')
+    onChallengeProposal(getValues('reason'), getValues('reasonFile'));
+  }, []);
 
   return (
     <Widget>
-      {/* <WidgetRow
-        style={{
-          fontSize: '18px',
-          color: '#7483B3',
-        }}
-        marginBottom="9px"
-      >
-        Challenge Reason
-      </WidgetRow> */}
       <InputSubTitle>
         Challenge Reason{' '}
         <HelpButton
           helpText={
-            'The amount of time any action will be delayed before it can be executed. During this time anyone can challenge it, preventing its execution'
+            "Please provide the reasons why you are challenging this proposal. It's very important for guardians to decide if the proposal should be accepted or cancelled"
           }
         />
       </InputSubTitle>
 
       <FormProvider {...methods}>
         <IPFSInput
-          label="Enter the justification for changes"
+          label="Provide file"
           placeholder="Justification Reason..."
-          isFile="isReasonFile"
           textInputName="reason"
           fileInputName="reasonFile"
-          updateFile={setReasonFile}
         />
         <WidgetRow marginBottom="9px">
           <ANButton
@@ -153,10 +144,7 @@ const ChallengeWidget: React.FC<any> = ({
             height="45px"
             width="372px"
             style={{ margin: 'auto', marginTop: '10px' }}
-            onClick={() => onChallengeProposal(
-              getValues('reason'),
-              getValues('reasonFile')
-            )}
+            onClick={handleSubmit(submit)}
           />
         </WidgetRow>
       </FormProvider>

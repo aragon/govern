@@ -22,6 +22,7 @@ import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { validateToken, validateContract } from '../../utils/validations';
 import { getIpfsUrl, addToIpfs } from 'utils/ipfs';
 import { IPFSInput } from 'components/Field/IPFSInput';
+import { useFacadeProposal } from 'hooks/proposals'
 
 import {
   Proposal,
@@ -135,33 +136,16 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
   const [config, setConfig] = useState<any>(undefined);
   const [rulesIpfsUrl, setRulesIpfsUrl] = useState<string>('');
 
-  //ipfs cid bytes
-  const [rulesFile, setRulesFile] = useState<any>(null);
-  const [proofFile, setProofFile] = useState<any>(null);
-
   useEffect(() => {
     if (daoList) {
       updateDaoDetails(daoList.daos[0]);
     }
   }, [daoList]);
 
-  const proposalInstance = React.useMemo(() => {
-    if (provider && daoDetails && account) {
-      let queueApprovals = new QueueApprovals(
-        account,
-        daoDetails.queue.address,
-        daoDetails.queue.config.resolver,
-      );
-      const proposal = new Proposal(
-        daoDetails.queue.address,
-        {} as ProposalOptions,
-      );
-      return new FacadeProposal(queueApprovals, proposal) as FacadeProposal &
-        Proposal;
-    }
-  }, [provider, account, daoDetails]);
+  const proposalInstance = useFacadeProposal(daoDetails?.queue.address, daoDetails?.queue.config.resolver)
 
   const transactionsQueue = React.useRef<CustomTransaction[]>([]);
+  
   useEffect(() => {
     return function cleanUp() {
       transactionsQueue.current = [];
@@ -217,10 +201,12 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
     // TODO: add modal 
     // Upload proof to ipfs if it's a file, 
     // otherwise convert it to utf8bytes
-    newConfig.rules  = getValues('isRuleFile')
+    const rulesFile = getValues('rulesFile')
+    newConfig.rules  = rulesFile
       ? await addToIpfs(rulesFile[0])
       : toUTF8Bytes(newConfig.rules.toString())
-    
+
+  
     newConfig.scheduleDeposit.amount = await correctDecimal(
       newConfig.scheduleDeposit.token,
       newConfig.scheduleDeposit.amount,
@@ -237,7 +223,8 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
     // TODO: add modal 
     // Upload proof to ipfs if it's a file, 
     // otherwise convert it to utf8bytes
-    const proof = getValues('isProofFile')
+    const proofFile = getValues('proofFile')
+    const proof = proofFile
       ? await addToIpfs(proofFile[0])
       : toUTF8Bytes(getValues('proof'));
 
@@ -493,8 +480,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
               ipfsURI={rulesIpfsUrl}
               isFile="isRuleFile"
               textInputName="daoConfig.rules"
-              fileInputName="ruleFile"
-              updateFile={setRulesFile}
+              fileInputName="rulesFile"
             />
 
             <InputTitle>
@@ -511,7 +497,6 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
               isFile="isProofFile"
               textInputName="proof"
               fileInputName="proofFile"
-              updateFile={setProofFile}
             />
 
             <div

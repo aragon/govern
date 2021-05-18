@@ -10,7 +10,7 @@ import { HelpButton } from 'components/HelpButton/HelpButton';
 import { useFormContext, Controller } from 'react-hook-form';
 import { BlueSwitch } from 'components/Switchs/BlueSwitch';
 import { addToIpfs } from 'utils/ipfs';
-import { OptionTextStyle, InputSubTitle } from 'components/Titles/styles'
+import { OptionTextStyle, InputSubTitle } from 'components/Titles/styles';
 
 export interface IPFSInputProps {
   /**
@@ -30,18 +30,27 @@ export interface IPFSInputProps {
    */
   fileInputName: string;
   /**
-   * helper string which registers another control in the form
+   * Optional param to detect if the file is chosen(true) or text field(false)
+   * Works well with shouldUnregister prop.
+   *
+   * If shouldUnregister is false, isFile prop is needed so
+   * parent can track which type was chosen.
+   *
+   * If shouldUnregister is true(default), isFile prop is not needed
+   * and parent can directly check first the file on getValues.
+   * In case it's undefined, it means it was text that user chose.
    */
-  isFile: string;
+  isFile?: string;
+  /**
+   * Whether or not unregister field after changing checkbox value.
+   * If user put something in text field and then switched to file type,
+   * and then came back to text field, value will not be preserved
+   */
+  shouldUnregister?: boolean;
   /**
    * IPFS gateway url of the file.
    */
   ipfsURI?: string;
-  /**
-   * If the file type is chosen, we set the ipfs cid
-   * via setIpfsCid.
-   */
-  updateFile: (val: any) => any;
 }
 
 export const IPFSInput: React.FC<IPFSInputProps> = ({
@@ -49,9 +58,9 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
   placeholder,
   textInputName,
   fileInputName,
-  isFile,
+  isFile = null,
+  shouldUnregister = true,
   ipfsURI,
-  updateFile,
   ...props
 }) => {
   const {
@@ -60,27 +69,14 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
     watch,
     getValues,
     formState: { errors },
-    trigger
+    trigger,
   } = useFormContext();
-    
-  const [cidUploaded, setCidUploaded] = useState<boolean>(false);
 
-  const upload = async () => {
-    // const file = getValues(fileInputName);
-    // if (!file || file.length === 0) {
-    //     return;
-    // }
-    // const cid = await addToIpfs(file[0]);
-    // updateCid(cid);
-    // setCidUploaded(true);
-    // trigger(fileInputName)
-  }
+  const onChange = (e: any) => {
+    trigger(fileInputName);
+  };
 
-  const onChange = (e:any) => {
-    const files = e.target.files
-    updateFile(files);
-  }
-
+  const isFileChosen = isFile || `is_file_${fileInputName}`;
 
   return (
     <React.Fragment>
@@ -97,7 +93,7 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
         <OptionTextStyle>{'Text'}</OptionTextStyle>
         <div style={{ marginLeft: '20px' }}>
           <Controller
-            name={isFile}
+            name={isFileChosen}
             control={control}
             defaultValue={false}
             render={({ field: { onChange, value } }) => (
@@ -116,11 +112,12 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
         </InputSubTitle>
       )}
       <InputSubTitle>{label}</InputSubTitle>
-      {!watch(isFile) ? (
+      {!watch(isFileChosen) ? (
         <Controller
           name={textInputName}
           control={control}
           defaultValue={''}
+          shouldUnregister={shouldUnregister}
           rules={{ required: 'This is required.' }}
           render={({ field: { onChange, value }, fieldState: { error } }) => (
             <InputField
@@ -149,28 +146,19 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
             {
               <input
                 {...register(fileInputName, {
+                  shouldUnregister: shouldUnregister,
                   required: 'This is required.',
-                //   validate: (value) => {
-                //     if(!cidUploaded) {
-                //         return 'File is not uploaded'
-                //     }
-                //     return true
-                //   },
+                  validate: (value) => {
+                    return true;
+                  },
                 })}
                 type="file"
                 onChange={onChange}
               />
             }
           </div>
-          
-          <p>{errors[fileInputName] && errors[fileInputName].message }</p>
-          {/* <ANButton
-            label={'Upload to IPFS'}
-            buttonType={'primary'}
-            onClick={upload}
-            style={{ marginTop: '34px' }}
-            disabled={!watch(fileInputName) || watch(fileInputName).length == 0}
-          /> */}
+
+          <p>{errors[fileInputName] && errors[fileInputName].message}</p>
         </div>
       )}
     </React.Fragment>

@@ -25,6 +25,7 @@ import { useSnackbar } from 'notistack';
 import { Link } from 'react-router-dom';
 import { IPFSField } from 'components/Field/IPFSField';
 import { getIpfsUrl, addToIpfs } from 'utils/ipfs';
+import { useFacadeProposal } from 'hooks/proposals'
 
 // widget components
 import ChallengeWidget from './components/ChallengeWidget';
@@ -296,22 +297,8 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       return new AbiHandler(networkName);
     }
   }, [networkName]);
-
-  const proposalInstance = React.useMemo(() => {
-    if (provider && daoDetails && proposalInfo && account) {
-      let queueApprovals = new QueueApprovals(
-        account,
-        daoDetails.queue.address,
-        proposalInfo.config.resolver,
-      );
-      const proposal = new Proposal(
-        daoDetails.queue.address,
-        {} as ProposalOptions,
-      );
-      return new FacadeProposal(queueApprovals, proposal) as FacadeProposal &
-        Proposal;
-    }
-  }, [provider, account, daoDetails, proposalInfo]);
+  
+  const proposalInstance = useFacadeProposal(daoDetails?.queue.address, proposalInfo?.config.resolver)
 
   const [
     getProposalData,
@@ -377,12 +364,12 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   const challengeProposal = async (challengeReason:string, challengeReasonFile:any) => {
     // if the reason's length is less than 10 words, it's highly unlikely
     // to specify the actual valid reason in less than 10 words
-    if (challengeReason.length < 10) {
-      enqueueSnackbar('Challenge reason must be at least 10 letters', {
-        variant: 'error',
-      });
-      return;
-    }
+    // if (challengeReason.length < 10) {
+    //   enqueueSnackbar('Challenge reason must be at least 10 letters', {
+    //     variant: 'error',
+    //   });
+    //   return;
+    // }
 
     // TODO: add modal 
     // Upload proof to ipfs if it's a file, 

@@ -31,6 +31,7 @@ import { useHistory } from 'react-router-dom';
 import { IPFSInput } from 'components/Field/IPFSInput';
 import { toUTF8String, toUTF8Bytes } from 'utils/lib';
 import { addToIpfs } from 'utils/ipfs';
+import { useFacadeProposal } from 'hooks/proposals'
 
 import {
   Proposal,
@@ -285,9 +286,6 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const [abiFunctions, setAbiFunctions] = useState([]);
   const [actionsToSchedule, setActionsToSchedule] = useState([]);
   
-  // proof file 
-  const [proofFile, setProofFile] = useState<any>(null);
-
   useEffect(() => {
     if (daoList) {
       updateDaoDetails(daoList.daos[0]);
@@ -297,21 +295,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const context: any = useWallet();
   const { account, provider, isConnected } = context;
 
-  const proposalInstance = React.useMemo(() => {
-    if (provider && daoDetails && account) {
-      let queueApprovals = new QueueApprovals(
-        account,
-        daoDetails.queue.address,
-        daoDetails.queue.config.resolver,
-      );
-      const proposal = new Proposal(
-        daoDetails.queue.address,
-        {} as ProposalOptions,
-      );
-      return new FacadeProposal(queueApprovals, proposal) as FacadeProposal &
-        Proposal;
-    }
-  }, [provider, account, daoDetails]);
+  const proposalInstance = useFacadeProposal(daoDetails?.queue.address, daoDetails?.queue.config.resolver)
 
   const transactionsQueue = React.useRef<CustomTransaction[]>([]);
 
@@ -443,7 +427,8 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     // TODO: add modal 
     // Upload proof to ipfs if it's a file, 
     // otherwise convert it to utf8bytes
-    const proof = getValues('isProofFile')
+    const proofFile = getValues('proofFile')
+    const proof = proofFile
       ? await addToIpfs(proofFile[0])
       : toUTF8Bytes(getValues('proof'));
 
@@ -519,7 +504,6 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
             isFile="isProofFile"
             textInputName="proof"
             fileInputName="proofFile"
-            updateFile={setProofFile}
           />
 
           <Title>Actions</Title>
