@@ -71,14 +71,16 @@ const ContractAddressText = styled(Typography)({
   color: '0A0B0B',
 });
 const WrapperDiv = styled(Paper)(({ theme }) => ({
-  width: '100%',
+  display: 'flex',
+  flexDirection: 'column',
   background: theme.custom.white,
   height: 'auto',
-  padding: '50px 273px 76px 273px',
-  // display: 'block',
+  paddingLeft: '273px',
+  paddingRight: '273px',
+  paddingTop: '37px',
+  paddingBottom: '100px',
   boxSizing: 'border-box',
   boxShadow: 'none',
-  // flexDirection: 'column',
 }));
 const BackButton = styled('div')({
   height: 25,
@@ -438,7 +440,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack }) => {
               label=""
               value={value}
               height={'108px'}
-              width={'700px'}
+              fullWidth={true}
               error={!!error}
               helperText={error ? error.message : null}
             />

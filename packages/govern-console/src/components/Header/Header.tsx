@@ -3,6 +3,8 @@ import governIcon from 'images/aragon-icon.svg';
 import Wallet from 'components/Wallet/Wallet';
 import { useHistory } from 'react-router-dom';
 import { ANButton } from 'components/Button/ANButton';
+import { Label } from '../Labels/Label';
+import { useWallet } from '../../AugmentedWallet';
 
 const HeaderWrapperDiv = styled('div')({
   height: '106px',
@@ -23,16 +25,21 @@ const Title = styled('div')({
   cursor: 'pointer',
   '& img': {},
 });
-const Account = styled('div')({
+
+const RigtSideContainer = styled('div')({
   display: 'flex',
   width: '100%',
+  flexWrap: 'wrap',
   flexDirection: 'row',
   justifyContent: 'flex-end',
   alignItems: 'center',
+  gap: '10px',
 });
 
 const Header = () => {
   const history = useHistory();
+  const context: any = useWallet();
+  const { networkName } = context;
 
   const redirectToHomePage = () => {
     history.push('/');
@@ -48,21 +55,18 @@ const Header = () => {
         <Title id="navbar_title" onClick={redirectToHomePage}>
           <img src={governIcon} width="210px" />
         </Title>
-        <Account id="account">
-          <div style={{ marginRight: '20px' }}>
-            <Wallet />
-          </div>
-          <div>
-            <ANButton
-              buttonType="primary"
-              onClick={goToCreateDaoPage}
-              label={'Create DAO'}
-              height={'48px'}
-              width={'174px'}
-              disabled={status === 'connecting'}
-            ></ANButton>
-          </div>
-        </Account>
+        <RigtSideContainer id="account">
+          <Label labelText={`${networkName} network`} labelColor={'purple'} />
+          <Wallet />
+          <ANButton
+            buttonType="primary"
+            onClick={goToCreateDaoPage}
+            label={'Create DAO'}
+            height={'48px'}
+            width={'174px'}
+            disabled={status === 'connecting'}
+          />
+        </RigtSideContainer>
       </Navbar>
     </HeaderWrapperDiv>
   );
