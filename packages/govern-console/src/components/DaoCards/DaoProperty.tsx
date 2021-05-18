@@ -1,6 +1,11 @@
 import React from 'react';
 import MUITypography from '@material-ui/core/Typography';
-import { styled, Theme } from '@material-ui/core/styles';
+import { styled } from '@material-ui/core/styles';
+
+interface DaoPropertyProps {
+  propertyLabel: string;
+  propertyText: string;
+}
 
 const DaoPropertyLabel = styled(MUITypography)(({ theme }) => ({
   color: theme.custom.daoCard.propertyLabelColor,
@@ -19,7 +24,7 @@ const DaoPropertyText = styled(MUITypography)(({ theme }) => ({
   fontStyle: theme.custom.daoCard.fontStyle,
 }));
 
-const DaoProperty: React.FC<any> = ({ propertyLabel, propertyText }) => {
+const DaoProperty: React.FC<DaoPropertyProps> = ({ propertyLabel, propertyText }) => {
   return (
     <div
       style={{

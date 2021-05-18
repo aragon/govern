@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { memo, useEffect, useMemo } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { styled } from '@material-ui/core/styles';
@@ -10,18 +9,8 @@ import { BlueSwitch } from 'components/Switchs/BlueSwitch';
 import { BlueCheckbox } from 'components/Checkboxs/BlueCheckbox';
 import { ANWrappedPaper } from 'components/WrapperPaper/ANWrapperPaper';
 import { useWallet } from '../../AugmentedWallet';
-import {
-  createDao,
-  CreateDaoParams,
-  DaoConfig,
-  Token,
-  getToken,
-} from '@aragon/govern';
-import {
-  ARAGON_VOICE_URL,
-  PROXY_CONTRACT_URL,
-  DEFAULT_DAO_CONFIG,
-} from 'utils/constants';
+import { createDao, CreateDaoParams, DaoConfig, Token, getToken } from '@aragon/govern';
+import { ARAGON_VOICE_URL, PROXY_CONTRACT_URL, DEFAULT_DAO_CONFIG } from 'utils/constants';
 import { useForm, Controller } from 'react-hook-form';
 import { ChainId, CiruclarProgressStatus } from '../../utils/types';
 import { validateToken } from '../../utils/validations';
@@ -133,16 +122,15 @@ const CreateDaoForm: React.FC<FormProps> = ({
     return ChainId.MAINNET;
   }, [chainId, isConnected]);
 
-  // use appropriate default config
   useEffect(() => {
     const _config: DaoConfig = DEFAULT_DAO_CONFIG[connectedChainId];
-    setValue('daoConfig', _config);
-  }, [connectedChainId]);
+    if (setValue) setValue('daoConfig', _config);
+  }, [connectedChainId, setValue]);
 
   const submitCreateDao = async (params: FormInputs) => {
     let token: Partial<Token>;
 
-    let progress: CreateDaoProgressProps = {
+    const progress: CreateDaoProgressProps = {
       isTokenRegister: true,
       progressStatus: {
         create: CiruclarProgressStatus.InProgress,
@@ -170,7 +158,8 @@ const CreateDaoForm: React.FC<FormProps> = ({
       // update progress
       setProgress({ ...progress });
 
-      registerTokenCallback = async (registerToken: Function) => {
+      // TODO: Typescript doesn't allow `Function` type instead of any...
+      registerTokenCallback = async (registerToken: any) => {
         // update progress
         progress.progressStatus = {
           create: CiruclarProgressStatus.Done,
@@ -212,11 +201,7 @@ const CreateDaoForm: React.FC<FormProps> = ({
     try {
       setCreateDaoStatus(CreateDaoStatus.InProgress);
 
-      const result: any = await createDao(
-        createDaoParams,
-        {},
-        registerTokenCallback,
-      );
+      const result: any = await createDao(createDaoParams, {}, registerTokenCallback);
 
       await result.wait();
 
@@ -287,10 +272,7 @@ const CreateDaoForm: React.FC<FormProps> = ({
                 defaultValue=""
                 shouldUnregister={!watch('isExistingToken')}
                 rules={{ required: 'This is required.' }}
-                render={({
-                  field: { onChange, value },
-                  fieldState: { error },
-                }) => (
+                render={({ field: { onChange, value }, fieldState: { error } }) => (
                   <InputField
                     label={''}
                     onInputChange={onChange}
@@ -315,10 +297,7 @@ const CreateDaoForm: React.FC<FormProps> = ({
                     message: 'Only 6 character is allowed.',
                   },
                 }}
-                render={({
-                  field: { onChange, value },
-                  fieldState: { error },
-                }) => (
+                render={({ field: { onChange, value }, fieldState: { error } }) => (
                   <InputField
                     label={''}
                     onInputChange={onChange}
@@ -345,18 +324,13 @@ const CreateDaoForm: React.FC<FormProps> = ({
                 required: 'This is required.',
                 validate: async (value) => await validateToken(value, provider),
               }}
-              render={({
-                field: { onChange, value },
-                fieldState: { error },
-              }) => (
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
                 <InputField
                   label={''}
                   onInputChange={onChange}
                   height="46px"
                   width="451px"
-                  placeholder={
-                    'Please insert existing token ether address (0x000...)'
-                  }
+                  placeholder={'Please insert existing token ether address (0x000...)'}
                   value={value}
                   error={!!error}
                   helperText={error ? error.message : null}
@@ -389,16 +363,11 @@ const CreateDaoForm: React.FC<FormProps> = ({
           </div>
           <OptionText>
             Use{' '}
-            <a
-              href={PROXY_CONTRACT_URL}
-              target="_blank"
-              rel="noreferrer noopener"
-            >
+            <a href={PROXY_CONTRACT_URL} target="_blank" rel="noreferrer noopener">
               Proxies
             </a>{' '}
-            for the deployment - This will enable your DAO to use the already
-            deployed code of the Govern Executer and Queue, and heavily decrease
-            gas costs for your DAO deployment.
+            for the deployment - This will enable your DAO to use the already deployed code of the
+            Govern Executer and Queue, and heavily decrease gas costs for your DAO deployment.
           </OptionText>
         </div>
 
@@ -426,11 +395,7 @@ const CreateDaoForm: React.FC<FormProps> = ({
           </div>
           <OptionText>
             Use{' '}
-            <a
-              href={ARAGON_VOICE_URL[connectedChainId]}
-              target="_blank"
-              rel="noreferrer noopener"
-            >
+            <a href={ARAGON_VOICE_URL[connectedChainId]} target="_blank" rel="noreferrer noopener">
               Aragon Voice
             </a>{' '}
             - This will enable your DAO to have free voting for you proposals

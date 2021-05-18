@@ -1,9 +1,8 @@
 import React from 'react';
 // also exported from '@storybook/react' if you can deal with breaking changes in 6.1
-
 import { Story, Meta } from '@storybook/react';
-
-import { ConsoleMainPage } from './ConsoleMainPage';
+import SnackBarProvider from '../../customProviders/snackbarProvider';
+import ConsoleMainPage from './ConsoleMainPage';
 
 export default {
   title: 'Console Main Page',
@@ -11,89 +10,12 @@ export default {
   argTypes: {},
 } as Meta;
 
-const Template: Story = (args) => <ConsoleMainPage {...args} />;
-// const daoList = [
-//   {
-//     name: 'Aragon',
-//     aumValue: '540.3',
-//     numberOfProposals: 43,
-//     daoId: 1,
-//   },
-//   {
-//     name: 'Aragon',
-//     aumValue: '540.3',
-//     numberOfProposals: 43,
-//     daoId: 1,
-//   },
-//   {
-//     name: 'Aragon',
-//     aumValue: '540.3',
-//     numberOfProposals: 43,
-//     daoId: 1,
-//   },
-//   {
-//     name: 'Aragon',
-//     aumValue: '540.3',
-//     numberOfProposals: 43,
-//     daoId: 1,
-//   },
-//   {
-//     name: 'Aragon',
-//     aumValue: '540.3',
-//     numberOfProposals: 43,
-//     daoId: 1,
-//   },
-//   {
-//     name: 'Aragon',
-//     aumValue: '540.3',
-//     numberOfProposals: 43,
-//     daoId: 1,
-//   },
-//   {
-//     name: 'Aragon',
-//     aumValue: '540.3',
-//     numberOfProposals: 43,
-//     daoId: 1,
-//   },
-//   {
-//     name: 'Aragon',
-//     aumValue: '540.3',
-//     numberOfProposals: 43,
-//     daoId: 1,
-//   },
-//   {
-//     name: 'Aragon',
-//     aumValue: '540.3',
-//     numberOfProposals: 43,
-//     daoId: 1,
-//   },
-//   {
-//     name: 'Aragon',
-//     aumValue: '540.3',
-//     numberOfProposals: 43,
-//     daoId: 1,
-//   },
-//   {
-//     name: 'Aragon',
-//     aumValue: '540.3',
-//     numberOfProposals: 43,
-//     daoId: 1,
-//   },
-//   {
-//     name: 'Aragon',
-//     aumValue: '540.3',
-//     numberOfProposals: 43,
-//     daoId: 1,
-//   },
-//   {
-//     name: 'Aragon',
-//     aumValue: '540.3',
-//     numberOfProposals: 43,
-//     daoId: 1,
-//   },
-// ];
+const Template: Story = () => {
+  return (
+    <SnackBarProvider>
+      <ConsoleMainPage />
+    </SnackBarProvider>
+  );
+};
 
 export const ANDaoCard = Template.bind({});
-// ANDaoCard.args = {
-//   daoList,
-// };

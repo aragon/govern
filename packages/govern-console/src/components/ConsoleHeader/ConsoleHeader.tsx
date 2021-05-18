@@ -1,19 +1,12 @@
-import React, { useRef } from 'react';
-import { styled, useTheme, Theme } from '@material-ui/core/styles';
-import MUICard, { CardProps } from '@material-ui/core/Card';
+import React, { useState } from 'react';
+import { styled } from '@material-ui/core/styles';
+import MUICard from '@material-ui/core/Card';
 import MUITypography from '@material-ui/core/Typography';
 import { InputField } from '../InputFields/InputField';
 import { ANButton } from '../Button/ANButton';
 import { useHistory } from 'react-router-dom';
 import consoleHeaderGraphic from 'images/console-header.svg';
 import { useSnackbar } from 'notistack';
-
-export interface ConsoleHeaderProps {
-  /**
-   * Function to be called on search
-   */
-  onSearch?: (val: string) => void;
-}
 
 const ConsoleHeaderCard = styled(MUICard)(({ theme }) => ({
   background: theme.custom.daoHeader.background,
@@ -25,6 +18,7 @@ const ConsoleHeaderCard = styled(MUICard)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'space-between',
 }));
+
 const LeftWrapper = styled('div')({
   maxWidth: '900px',
   width: 'fit-content',
@@ -63,33 +57,22 @@ const ConsoleImage = styled('img')({
   width: '400px',
 });
 
-export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
-  onSearch,
-  ...props
-}) => {
+export const ConsoleHeader: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const history = useHistory();
-  const theme = useTheme();
-  const [searchString, updateSearchString] = React.useState<string>('');
+  const [searchString, updateSearchString] = useState<string>('');
 
   const onInputChange = (val: string) => {
     updateSearchString(val);
-  };
-
-  const handleKeyPress = (e: any) => {
-    if (e.key === 'Enter') {
-      onGotoDao();
-    }
   };
 
   const onGotoDao = () => {
     if (searchString.length > 0) {
       history.push(`daos/${searchString}`);
     } else {
-      enqueueSnackbar(
-        'Invalid Dao Name. Atleast one letter should be entered.',
-        { variant: 'error' },
-      );
+      enqueueSnackbar('Invalid Dao Name. Atleast one letter should be entered.', {
+        variant: 'error',
+      });
     }
   };
 
@@ -99,13 +82,11 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
         <Title> Welcome to Aragon Console</Title>
         <div style={{ maxWidth: '480px', marginTop: '7px' }}>
           <Subtitle>
-            Lorem ipsum dolor amet ipsu amet dolores ipsum amet dolor ipsum amet
-            ipsum amet dolors ipsum{' '}
+            Lorem ipsum dolor amet ipsu amet dolores ipsum amet dolor ipsum amet ipsum amet dolors
+            ipsum{' '}
           </Subtitle>
         </div>
-        <div
-          style={{ display: 'flex', flexDirection: 'row', marginTop: '22px' }}
-        >
+        <div style={{ display: 'flex', flexDirection: 'row', marginTop: '22px' }}>
           <div style={{ marginRight: '10px' }}>
             <InputField
               placeholder="DAO Name"

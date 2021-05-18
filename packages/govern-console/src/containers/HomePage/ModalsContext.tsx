@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { createContext, Dispatch, useReducer } from 'react';
 import TransctionsModal from 'components/Modal/TransactionsModal';
 import { CustomTransaction } from 'utils/types';
@@ -10,14 +9,8 @@ type TransactionsModalAction = {
   type: ActionTypes.OPEN_TRANSACTIONS_MODAL;
   payload: {
     transactionList: CustomTransaction[];
-    onTransactionFailure: (
-      errorMessage: string,
-      transaction: CustomTransaction,
-    ) => void;
-    onTransactionSuccess: (
-      updatedTransaction: CustomTransaction,
-      transactionReceipt: any,
-    ) => void;
+    onTransactionFailure: (errorMessage: string, transaction: CustomTransaction) => void;
+    onTransactionSuccess: (updatedTransaction: CustomTransaction, transactionReceipt: any) => void;
     onCompleteAllTransactions: (transactions: CustomTransaction[]) => void;
   };
 };
@@ -36,10 +29,7 @@ interface ModalContextState {
     open: boolean;
     params: {
       transactionList: CustomTransaction[];
-      onTransactionFailure: (
-        errorMessage: string,
-        transaction: CustomTransaction,
-      ) => void;
+      onTransactionFailure: (errorMessage: string, transaction: CustomTransaction) => void;
       onTransactionSuccess: (
         updatedTransaction: CustomTransaction,
         transactionReceipt: any,
@@ -59,19 +49,13 @@ const INITIAL_STATE: ModalContextState = {
     open: false,
     params: {
       transactionList: [],
-      onTransactionFailure: (
-        errorMessage: string,
-        transaction: CustomTransaction,
-      ) => {
+      onTransactionFailure: () => {
         // do nothing
       },
-      onTransactionSuccess: (
-        updatedTransaction: CustomTransaction,
-        transactionReceipt: any,
-      ) => {
+      onTransactionSuccess: () => {
         // do nothing
       },
-      onCompleteAllTransactions: (transactions: CustomTransaction[]) => {
+      onCompleteAllTransactions: () => {
         // do nothing
       },
     },
@@ -83,10 +67,7 @@ export const ModalsContext = createContext<Context>({
   dispatch: () => null,
 });
 
-const reducer = (
-  state: ModalContextState,
-  action: ModalsContextAction,
-): ModalContextState => {
+const reducer = (state: ModalContextState, action: ModalsContextAction): ModalContextState => {
   switch (action.type) {
     case ActionTypes.OPEN_TRANSACTIONS_MODAL:
       return {
@@ -116,4 +97,4 @@ export const closeTransactionsModalAction: CloseAction = {
   payload: {
     modal: 'transactionsModal',
   },
-}
+};

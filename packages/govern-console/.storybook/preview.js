@@ -6,8 +6,7 @@ import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
 import '../src/App.css';
 
-const subgraphUri =
-  'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby';
+const subgraphUri = 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby';
 
 const client = new ApolloClient({
   uri: subgraphUri,

@@ -4,22 +4,13 @@ import { ProposalParams, Proposal } from '@aragon/govern';
 import { CustomTransaction, CustomTransactionStatus } from 'utils/types';
 
 export default class FacadeProposal {
-  constructor(
-    private queueApproval: QueueApproval,
-    private proposal: Proposal,
-  ) {
+  constructor(private queueApproval: QueueApproval, private proposal: Proposal) {
     // Copy proposal's functions into this class.
-    for (let func of Object.getOwnPropertyNames(
-      this.proposal.constructor.prototype,
-    )) {
+    for (const func of Object.getOwnPropertyNames(this.proposal.constructor.prototype)) {
       // make sure we don't override methods from proposal.
-      if (
-        !Object.getOwnPropertyNames(this.constructor.prototype).includes(func)
-      ) {
+      if (!Object.getOwnPropertyNames(this.constructor.prototype).includes(func)) {
         // @ts-ignore
-        this[func] = this.proposal.constructor.prototype[func].bind(
-          this.proposal,
-        );
+        this[func] = this.proposal.constructor.prototype[func].bind(this.proposal);
       }
     }
   }
@@ -27,9 +18,7 @@ export default class FacadeProposal {
   public async challenge(container: ProposalParams, reason: string) {
     let txs: CustomTransaction[] = [];
     try {
-      txs = await this.queueApproval.challengeApprovals(
-        container.config.challengeDeposit,
-      );
+      txs = await this.queueApproval.challengeApprovals(container.config.challengeDeposit);
     } catch (err) {
       throw err;
     }
@@ -50,9 +39,7 @@ export default class FacadeProposal {
   public async schedule(container: ProposalParams) {
     let txs: CustomTransaction[] = [];
     try {
-      txs = await this.queueApproval.scheduleApprovals(
-        container.config.scheduleDeposit,
-      );
+      txs = await this.queueApproval.scheduleApprovals(container.config.scheduleDeposit);
     } catch (error) {
       throw error;
     }

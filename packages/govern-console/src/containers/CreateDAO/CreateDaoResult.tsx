@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React from 'react';
 import { styled } from '@material-ui/core/styles';
 import { useHistory } from 'react-router-dom';
@@ -46,9 +45,7 @@ const CreateDaoResult: React.FC<ResultProps> = ({
         <SuccessDialog
           paperStyle
           title={'Your DAO is ready'}
-          subTitle={
-            'Congratulations. Your DAO is created and you can start interacting with it'
-          }
+          subTitle={'Congratulations. Your DAO is created and you can start interacting with it'}
           buttonLabel={'Get started'}
           onClick={onClickSuccess}
         />

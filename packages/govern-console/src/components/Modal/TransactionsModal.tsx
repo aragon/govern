@@ -1,10 +1,7 @@
 import React, { useContext, useCallback } from 'react';
 import Dialog from '@material-ui/core/Dialog';
 import TransactionKeeper from 'components/TransactionKeeper/TransactionKeeper';
-import {
-  ModalsContext,
-  closeTransactionsModalAction,
-} from 'containers/HomePage/ModalsContext';
+import { ModalsContext, closeTransactionsModalAction } from 'containers/HomePage/ModalsContext';
 
 const TransactionsModal: React.FC = () => {
   const {

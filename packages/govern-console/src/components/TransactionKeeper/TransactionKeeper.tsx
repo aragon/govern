@@ -25,14 +25,8 @@ const getErrorFromException = (ex: any): string => {
 
 export interface TransactionKeeperProps {
   transactionList: CustomTransaction[];
-  onTransactionFailure: (
-    errorMessage: string,
-    transaction: CustomTransaction,
-  ) => void;
-  onTransactionSuccess: (
-    updatedTransaction: CustomTransaction,
-    transactionReceipt: any,
-  ) => void;
+  onTransactionFailure: (errorMessage: string, transaction: CustomTransaction) => void;
+  onTransactionSuccess: (updatedTransaction: CustomTransaction, transactionReceipt: any) => void;
   onCompleteAllTransactions: (transactions: CustomTransaction[]) => void;
   closeModal: () => void;
 }
@@ -45,16 +39,13 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
   closeModal,
 }) => {
   const [state, setState] = React.useState(TransactionKeeperState.Initial);
-  const [transactions, updateTransactions] = React.useState<
-    CustomTransaction[]
-  >([...transactionList]);
+  const [transactions, updateTransactions] = React.useState<CustomTransaction[]>([
+    ...transactionList,
+  ]);
   const [errorMessage, setErrorMessage] = React.useState('');
 
   const updateTransaction = React.useCallback(
-    (
-      updatedTransaction: CustomTransaction,
-      updatedTransactionIndex: number,
-    ) => {
+    (updatedTransaction: CustomTransaction, updatedTransactionIndex: number) => {
       console.log('updating transaction' + updatedTransactionIndex);
       const updatedTransactions = transactions.map((transaction, index) =>
         index === updatedTransactionIndex ? updatedTransaction : transaction,
@@ -100,12 +91,7 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
     if (!isQueueAborted) {
       setState(TransactionKeeperState.Success);
     }
-  }, [
-    transactions,
-    onTransactionFailure,
-    onTransactionSuccess,
-    updateTransaction,
-  ]);
+  }, [transactions, onTransactionFailure, onTransactionSuccess, updateTransaction]);
 
   switch (state) {
     case TransactionKeeperState.Initial: {

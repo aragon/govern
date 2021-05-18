@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { useEffect } from 'react';
+import React from 'react';
 import CreateDaoInProgressImage from '../../images/svgs/CreateDaoInProgress.svg';
 import { ANCircularProgressWithCaption } from 'components/CircularProgress/ANCircularProgressWithCaption';
 import { ANWrappedPaper } from 'components/WrapperPaper/ANWrapperPaper';
@@ -103,10 +102,7 @@ const CreateDaoProgress: React.FC<CreateDaoProgressProps> = ({
           <SubTitle>Hold tight your transaction is under process</SubTitle>
         </div>
         <ProgressContainer>
-          <ANCircularProgressWithCaption
-            caption={'Creating DAO'}
-            state={progressStatus.create}
-          />
+          <ANCircularProgressWithCaption caption={'Creating DAO'} state={progressStatus.create} />
           {isTokenRegister ? (
             <ANCircularProgressWithCaption
               caption={'Registering token'}

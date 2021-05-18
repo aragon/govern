@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { useState, memo, useRef, useEffect } from 'react';
+import React, { useState, memo, useEffect } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { ANWrappedPaper } from '../../components/WrapperPaper/ANWrapperPaper';
 import backButtonIcon from '../../images/back-btn.svg';
@@ -16,31 +15,16 @@ import Grid from '@material-ui/core/Grid';
 import { DaoConfig } from '@aragon/govern';
 import QueueApprovals from 'services/QueueApprovals';
 import { CustomTransaction } from 'utils/types';
-import {
-  ActionTypes,
-  ModalsContext,
-} from 'containers/HomePage/ModalsContext';
+import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import { correctDecimal } from 'utils/token';
 import FacadeProposal from 'services/Proposal';
 import { useForm, Controller } from 'react-hook-form';
-import { BytesLike, Contract, ContractReceipt } from 'ethers';
+import { BytesLike, ContractReceipt } from 'ethers';
 import { validateToken, validateContract } from '../../utils/validations';
-import {
-  Proposal,
-  ProposalOptions,
-  ReceiptType,
-} from '@aragon/govern';
+import { Proposal, ProposalOptions, ReceiptType } from '@aragon/govern';
 import { useSnackbar } from 'notistack';
-
 import { toUtf8Bytes, toUtf8String } from '@ethersproject/strings';
 import { proposalDetailsUrl } from 'utils/urls';
-
-export interface DaoSettingFormProps {
-  /**
-   * on click back
-   */
-  onClickBack: () => void;
-}
 
 interface ParamTypes {
   /**
@@ -107,29 +91,16 @@ const InputSubTitle = styled(Typography)({
   marginBottom: '17px',
 });
 
-const OptionTextStyle = styled('div')({
-  fontFamily: 'Manrope',
-  fontStyle: 'normal',
-  fontWeight: 400,
-  fontSize: 18,
-});
-
-const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
+const DaoSettings: React.FC = () => {
   const history = useHistory();
-  
+
   const context: any = useWallet();
   const { account, isConnected, provider } = context;
 
   const { dispatch } = React.useContext(ModalsContext);
   const { enqueueSnackbar } = useSnackbar();
 
-  const {
-    control,
-    watch,
-    setValue,
-    getValues,
-    handleSubmit,
-  } = useForm<FormInputs>();
+  const { control, watch, setValue, getValues, handleSubmit } = useForm<FormInputs>();
 
   const { daoName } = useParams<ParamTypes>();
   //TODO daoname empty handling
@@ -147,18 +118,14 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
   }, [daoList]);
 
   const proposalInstance = React.useMemo(() => {
-    if (provider && daoDetails && account) {
-      let queueApprovals = new QueueApprovals(
+    if (provider && account && daoDetails) {
+      const queueApprovals = new QueueApprovals(
         account,
         daoDetails.queue.address,
         daoDetails.queue.config.resolver,
       );
-      const proposal = new Proposal(
-        daoDetails.queue.address,
-        {} as ProposalOptions,
-      );
-      return new FacadeProposal(queueApprovals, proposal) as FacadeProposal &
-        Proposal;
+      const proposal = new Proposal(daoDetails.queue.address, {} as ProposalOptions);
+      return new FacadeProposal(queueApprovals, proposal) as FacadeProposal & Proposal;
     }
   }, [provider, account, daoDetails]);
 
@@ -173,7 +140,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
     const _load = async () => {
       // config is also used as a check in order to set and populate
       // the UI with current Dao's config only once
-      if (daoDetails && provider && !config) {
+      if (daoDetails && provider && !config && setValue) {
         const _config = daoDetails.queue.config;
         setConfig(_config);
 
@@ -206,7 +173,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
       }
     };
     _load();
-  }, [daoDetails, provider]);
+  }, [daoDetails, provider, config, setValue]);
 
   const callSaveSetting = async (formData: FormInputs) => {
     const newConfig: DaoConfig = formData.daoConfig;
@@ -251,18 +218,17 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
       type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
       payload: {
         transactionList: transactionsQueue.current,
-        onTransactionFailure: () => {},
+        onTransactionFailure: () => {
+          /* do nothing */
+        },
         onTransactionSuccess: (_, receipt: ContractReceipt) => {
-          containerHash = Proposal.getContainerHashFromReceipt(
-            receipt,
-            ReceiptType.Scheduled,
-          );
+          containerHash = Proposal.getContainerHashFromReceipt(receipt, ReceiptType.Scheduled);
         },
         onCompleteAllTransactions: () => {
           if (containerHash) {
             history.push(proposalDetailsUrl(daoName, containerHash));
           }
-        }
+        },
       },
     });
   };
@@ -271,7 +237,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
     <>
       <SettingsContainer>
         <ANWrappedPaper style={{ width: window.innerWidth }}>
-          <BackButton onClick={onClickBack}>
+          <BackButton onClick={() => history.goBack()}>
             <img src={backButtonIcon} />
           </BackButton>
           <Title style={{ fontSize: '38px' }}>DAO Settings</Title>
@@ -321,13 +287,9 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
                 defaultValue=""
                 rules={{
                   required: 'This is required.',
-                  validate: async (value) =>
-                    await validateToken(value, provider),
+                  validate: async (value) => await validateToken(value, provider),
                 }}
-                render={({
-                  field: { onChange, value },
-                  fieldState: { error },
-                }) => (
+                render={({ field: { onChange, value }, fieldState: { error } }) => (
                   <InputField
                     label=""
                     onInputChange={onChange}
@@ -348,10 +310,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
                 control={control}
                 defaultValue={''}
                 rules={{ required: 'This is required.' }}
-                render={({
-                  field: { onChange, value },
-                  fieldState: { error },
-                }) => (
+                render={({ field: { onChange, value }, fieldState: { error } }) => (
                   <InputField
                     type="number"
                     label=""
@@ -385,13 +344,9 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
                 defaultValue=""
                 rules={{
                   required: 'This is required.',
-                  validate: async (value) =>
-                    await validateToken(value, provider),
+                  validate: async (value) => await validateToken(value, provider),
                 }}
-                render={({
-                  field: { onChange, value },
-                  fieldState: { error },
-                }) => (
+                render={({ field: { onChange, value }, fieldState: { error } }) => (
                   <InputField
                     label=""
                     onInputChange={onChange}
@@ -412,10 +367,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
                 control={control}
                 defaultValue={''}
                 rules={{ required: 'This is required.' }}
-                render={({
-                  field: { onChange, value },
-                  fieldState: { error },
-                }) => (
+                render={({ field: { onChange, value }, fieldState: { error } }) => (
                   <InputField
                     type="number"
                     label=""
@@ -496,19 +448,14 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
             </div>
             <OptionTextStyle>{'File'}</OptionTextStyle> */}
           </div>
-          <InputSubTitle>
-            Provide the base rules under what your DAO should be ran
-          </InputSubTitle>
+          <InputSubTitle>Provide the base rules under what your DAO should be ran</InputSubTitle>
           {!watch('isRuleFile') ? (
             <Controller
               name="daoConfig.rules"
               control={control}
               defaultValue={''}
               rules={{ required: 'This is required.' }}
-              render={({
-                field: { onChange, value },
-                fieldState: { error },
-              }) => (
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
                 <InputField
                   label=""
                   onInputChange={onChange}
@@ -534,7 +481,9 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
             >
               <InputField
                 label=""
-                onInputChange={() => {}}
+                onInputChange={() => {
+                  //
+                }}
                 value={''}
                 height="46px"
                 width="540px"
@@ -545,7 +494,10 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
                 buttonType={'secondary'}
                 backgroundColor={'#FFFFFF'}
                 labelColor={'#20232C'}
-                onClick={() => {}}
+                onClick={() => {
+                  // TODO: this should not be empty
+                  console.log('this should not be empty');
+                }}
                 style={{ marginLeft: '10px' }}
                 disabled={true}
               />
@@ -591,10 +543,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
               control={control}
               defaultValue={''}
               rules={{ required: 'This is required.' }}
-              render={({
-                field: { onChange, value },
-                fieldState: { error },
-              }) => (
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
                 <InputField
                   label=""
                   onInputChange={onChange}
@@ -620,7 +569,9 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
             >
               <InputField
                 label=""
-                onInputChange={() => {}}
+                onInputChange={() => {
+                  //
+                }}
                 value={''}
                 height="46px"
                 width="540px"
@@ -631,7 +582,10 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
                 buttonType={'secondary'}
                 backgroundColor={'#FFFFFF'}
                 labelColor={'#20232C'}
-                onClick={() => {}}
+                onClick={() => {
+                  // TODO: this should not be empty
+                  console.log('this should not be empty');
+                }}
                 style={{ marginLeft: '10px' }}
                 disabled={true}
               />

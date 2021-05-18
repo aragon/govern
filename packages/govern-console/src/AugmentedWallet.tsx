@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { useContext, useMemo } from 'react';
+import React, { useEffect, useContext, useMemo } from 'react';
 import { ethers, providers as EthersProviders } from 'ethers';
 import { UseWalletProvider, useWallet } from 'use-wallet';
 import { Account } from 'utils/types';
@@ -24,12 +23,8 @@ const WalletAugmented: React.FC<unknown> = ({ children }) => {
     [ethereum],
   );
 
-  React.useEffect(() => {
-    if (injectedProvider) {
-      updateProvider(injectedProvider);
-    } else {
-      updateProvider(fallbackProvider);
-    }
+  useEffect(() => {
+    if (injectedProvider) updateProvider(injectedProvider);
   }, [injectedProvider]);
 
   const contextValue = useMemo(() => {
@@ -47,7 +42,8 @@ const WalletAugmented: React.FC<unknown> = ({ children }) => {
       provider,
       account,
     };
-  }, [wallet, provider]);
+  }, [wallet, provider, injectedProvider]);
+
   return (
     <WalletAugmentedContext.Provider value={contextValue}>
       {children}

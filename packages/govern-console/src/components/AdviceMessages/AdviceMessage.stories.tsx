@@ -13,9 +13,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<AdviceMessageProps> = (args) => (
-  <AdviceMessage {...args} />
-);
+const Template: Story<AdviceMessageProps> = (args) => <AdviceMessage {...args} />;
 
 export const Green = Template.bind({});
 Green.args = {

@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { CourtABI } from 'utils/abis/court';
 import { ethers } from 'ethers';
 import { TokenDeposit } from '@aragon/govern';
@@ -8,11 +7,7 @@ import { CustomTransaction } from 'utils/types';
 import { Account } from 'utils/types';
 
 export default class QueueApprovals {
-  constructor(
-    private account: Account,
-    private queue: string,
-    private resolver: string,
-  ) {}
+  constructor(private account: Account, private queue: string, private resolver: string) {}
 
   /**
    * @param scheduleDepositToken token to approve
@@ -46,11 +41,7 @@ export default class QueueApprovals {
   public async challengeApprovals(tokenDeposit: TokenDeposit) {
     let transactionsQueue: CustomTransaction[] = [];
 
-    const contract = new ethers.Contract(
-      this.resolver,
-      CourtABI,
-      this.account.signer,
-    );
+    const contract = new ethers.Contract(this.resolver, CourtABI, this.account.signer);
 
     // add approval transaction for the challenge deposit token
     try {

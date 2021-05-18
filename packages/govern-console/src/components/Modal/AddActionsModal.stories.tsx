@@ -13,9 +13,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<AddActionsModalProps> = (args) => (
-  <AddActionsModal {...args} />
-);
+const Template: Story<AddActionsModalProps> = (args) => <AddActionsModal {...args} />;
 
 export const AddActionsModalExample = Template.bind({});
 AddActionsModalExample.args = {

@@ -1,14 +1,14 @@
 {
-    "site": {
-        "id": "15a86cf1-2b97-4c1d-bd70-349a5a60daad",
-        "team": "aragonone-team",
-        "platform": "ipfs",
-        "source": "ipfs",
-        "name": "dark-butterfly-6166"
-    },
-    "build": {
-        "baseDir": "",
-        "publicDir": "build",
-        "rootDir": ""
-    }
+  "site": {
+    "id": "15a86cf1-2b97-4c1d-bd70-349a5a60daad",
+    "team": "aragonone-team",
+    "platform": "ipfs",
+    "source": "ipfs",
+    "name": "dark-butterfly-6166"
+  },
+  "build": {
+    "baseDir": "",
+    "publicDir": "build",
+    "rootDir": ""
+  }
 }
