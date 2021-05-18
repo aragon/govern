@@ -1,10 +1,12 @@
 /* eslint-disable */
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { InputField } from 'components/InputFields/InputField';
 import { PROPOSAL_STATES } from 'utils/states';
 import { Link } from 'react-router-dom';
-import { toUtf8String } from '@ethersproject/strings';
+import { toUTF8String } from 'utils/lib';
+import { useForm, Controller, FormProvider } from 'react-hook-form';
+import { HelpButton } from 'components/HelpButton/HelpButton';
 
 import {
   InfoKeyDiv,
@@ -12,22 +14,47 @@ import {
   InfoValueDivBlock,
 } from '../ProposalDetails';
 import { Widget, WidgetRow, InfoWrapper, TitleText } from './SharedStyles';
+import { IPFSInput } from 'components/Field/IPFSInput';
 
 import { formatDate } from 'utils/date';
 import { getTruncatedAccountAddress } from 'utils/account';
-import { getIpfsCid, getIpfsURI } from 'utils/ipfs';
+import { getIpfsUrl } from 'utils/ipfs';
+
+import { styled } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+
+interface FormInputs {
+  reason: string;
+  isReasonFile: boolean;
+  reasonFile: any;
+}
+
+// TODO: GIORGI repeating styles
+export const InputSubTitle = styled(Typography)({
+  width: 'fit-content',
+  fontFamily: 'Manrope',
+  fontStyle: 'normal',
+  fontWeight: 'normal',
+  fontSize: 18,
+  lineHeight: '25px',
+  color: '#7483AB',
+  marginTop: '17px',
+  marginBottom: '17px',
+});
+
 
 const ChallengeWidget: React.FC<any> = ({
   disabled,
   containerEventChallenge,
   currentState,
   setChallengeReason,
+  setChallengeFile,
   onChallengeProposal,
 }) => {
   const [isExpanded, updateIsExpanded] = React.useState<boolean>(false);
 
   if (containerEventChallenge) {
-    const challengeReasonCid = getIpfsCid(containerEventChallenge.reason);
+    const challengeReasonIpfsUrl = getIpfsUrl(containerEventChallenge.reason);
     return (
       <Widget>
         <WidgetRow>
@@ -55,16 +82,17 @@ const ChallengeWidget: React.FC<any> = ({
             marginTop: 0,
           }}
         >
-          {challengeReasonCid ? (
+          {challengeReasonIpfsUrl ? (
             <Link
-              to={getIpfsURI(challengeReasonCid)}
+              to={challengeReasonIpfsUrl}
               target="_blank"
               rel="noreferrer noopener"
             >
               View file
             </Link>
           ) : (
-            toUtf8String(containerEventChallenge.reason)
+            toUTF8String(containerEventChallenge.reason) ||
+            `Reason can't be decoded: ${containerEventChallenge.reason}`
           )}
         </InfoValueDivBlock>
       </Widget>
@@ -75,9 +103,22 @@ const ChallengeWidget: React.FC<any> = ({
     return <></>;
   }
 
+  const methods = useForm<FormInputs>();
+  const {
+    register,
+    control,
+    watch,
+    setValue,
+    getValues,
+    handleSubmit,
+    formState: { errors },
+  } = methods;
+
+  const [reasonFile, setReasonFile] = useState<any>(null);
+
   return (
     <Widget>
-      <WidgetRow
+      {/* <WidgetRow
         style={{
           fontSize: '18px',
           color: '#7483B3',
@@ -85,29 +126,40 @@ const ChallengeWidget: React.FC<any> = ({
         marginBottom="9px"
       >
         Challenge Reason
-      </WidgetRow>
-      <WidgetRow marginBottom="9px">
-        <InputField
-          onInputChange={(value) => {
-            setChallengeReason(value);
-          }}
-          label={''}
-          placeholder={''}
-          height={'46px'}
-          width={'372px'}
+      </WidgetRow> */}
+      <InputSubTitle>
+        Challenge Reason{' '}
+        <HelpButton
+          helpText={
+            'The amount of time any action will be delayed before it can be executed. During this time anyone can challenge it, preventing its execution'
+          }
         />
-      </WidgetRow>
-      <WidgetRow marginBottom="9px">
-        <ANButton
-          buttonType="primary"
-          label="Challenge"
-          disabled={disabled}
-          height="45px"
-          width="372px"
-          style={{ margin: 'auto' }}
-          onClick={() => onChallengeProposal()}
+      </InputSubTitle>
+
+      <FormProvider {...methods}>
+        <IPFSInput
+          label="Enter the justification for changes"
+          placeholder="Justification Reason..."
+          isFile="isReasonFile"
+          textInputName="reason"
+          fileInputName="reasonFile"
+          updateFile={setReasonFile}
         />
-      </WidgetRow>
+        <WidgetRow marginBottom="9px">
+          <ANButton
+            buttonType="primary"
+            label="Challenge"
+            disabled={disabled}
+            height="45px"
+            width="372px"
+            style={{ margin: 'auto', marginTop: '10px' }}
+            onClick={() => onChallengeProposal(
+              getValues('reason'),
+              getValues('reasonFile')
+            )}
+          />
+        </WidgetRow>
+      </FormProvider>
     </Widget>
   );
 };

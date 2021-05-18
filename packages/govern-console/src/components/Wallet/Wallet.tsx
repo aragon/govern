@@ -104,7 +104,7 @@ const Wallet = ({}) => {
         enqueueSnackbar('Please select the correct chain in your wallet.', {
           variant: 'error',
         });
-      } else if(error.message.includes('window.ethereum')) {
+      } else if (error.message.includes('window.ethereum')) {
         enqueueSnackbar('Please install a wallet.', {
           variant: 'error',
         });

@@ -37,7 +37,7 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
         tokenAddress: `0x${(deployToken ? '00' : '11').repeat(20)}`,
         tokenName: 'Eaglet Token',
         tokenSymbol: 'EAG',
-        tokenDecimals: 18
+        tokenDecimals: 18,
       },
       ERC3000DefaultConfig,
       useProxies
@@ -50,12 +50,10 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
     const { gasUsed } = await waffle.provider.getTransactionReceipt(hash)
 
     expect(gasUsed).to.be.lte(gasTarget)
-
   }
 
   const GAS_TARGET = network.name !== 'hardhat' ? 5.5e6 : 20e6
   const GAS_TARGET_PROXY = network.name !== 'hardhat' ? 6e5 : 2e6
-
 
   it(`deploys DAO with custom token and doesn't use proxies under ${GAS_TARGET} gas`, async () => {
     await deployDAO(false, GAS_TARGET, false)
@@ -72,5 +70,4 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
   it(`deploys DAO with custom token and uses proxies under ${GAS_TARGET_PROXY} gas`, async () => {
     await deployDAO(true, GAS_TARGET_PROXY, false)
   })
-
 })

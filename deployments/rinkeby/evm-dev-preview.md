@@ -1,8 +1,10 @@
 # Developer Preview (EVM, Rinkeby)
 
 ---
+
 - Deployer: [@izqui](https://github.com/izqui) ([`0x1111a5f9decc25927037de55d2013d7ad30f1af0`](https://rinkeby.etherscan.io/address/0x1111a5f9decc25927037de55d2013d7ad30f1af0)
 - Commit hash: [`a26d0f07`](https://github.com/aragon/govern/commit/a26d0f073b70839f5182abbace2aef1dd1918b51)
+
 ---
 
 ## Registry
@@ -48,5 +50,3 @@ A wild new Govern named *autonomous-olive* appeared 🦅
 - Queue: https://rinkeby.etherscan.io/address/0x111b5feb00f7ce0fC1fD84E399cE4DCF695A0a08
 ✨  Done in 141.99s.
 ```
-
-

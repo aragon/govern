@@ -2,11 +2,11 @@ name: Subgraph CI/CD
 on:
   push:
     paths:
-    - 'packages/govern-subgraph/**'
+      - 'packages/govern-subgraph/**'
     branches:
-    - master
-    - develop
-    
+      - master
+      - develop
+
 env:
   GRAPHKEY: ${{secrets.GRAPHKEY}}
 
@@ -14,42 +14,42 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Install node
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12
+      - name: Install node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
 
-    - name: Cache yarn modules
-      uses: actions/cache@v2
-      with:
-        path: '**/node_modules'
-        key: yarn-${{ hashFiles('yarn.lock') }}
-    
-    - name: Cache contracts
-      uses: actions/cache@v2
-      with:
-        path: |
-          packages/*/cache
-          packages/*/artifacts
-          ~/.cache/buidler-nodejs/
-          ~/.cache/hardhat-nodejs/
-        key: contracts-${{ hashFiles('packages/*/contracts/**/*.sol') }}
+      - name: Cache yarn modules
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: yarn-${{ hashFiles('yarn.lock') }}
 
-    - name: Install dependencies
-      run: yarn install --frozen-lockfile
+      - name: Cache contracts
+        uses: actions/cache@v2
+        with:
+          path: |
+            packages/*/cache
+            packages/*/artifacts
+            ~/.cache/buidler-nodejs/
+            ~/.cache/hardhat-nodejs/
+          key: contracts-${{ hashFiles('packages/*/contracts/**/*.sol') }}
 
-    - name: Build contracts
-      run: yarn compile:cached
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
 
-    - name: Configure k8s
-      run: .github/scripts/kubectl-config.sh ${{secrets.KUBE_CA}} ${{secrets.KUBE_SERVER}} ${{secrets.KUBE_TOKEN}}
+      - name: Build contracts
+        run: yarn compile:cached
 
-    - name: Deploy rinkeby
-      if: github.ref == 'refs/heads/develop'
-      run: yarn deploy:subgraph:rinkeby
+      - name: Configure k8s
+        run: .github/scripts/kubectl-config.sh ${{secrets.KUBE_CA}} ${{secrets.KUBE_SERVER}} ${{secrets.KUBE_TOKEN}}
 
-    - name: Deploy mainnet
-      if: github.ref == 'refs/heads/master'
-      run: yarn deploy:subgraph:mainnet
+      - name: Deploy rinkeby
+        if: github.ref == 'refs/heads/develop'
+        run: yarn deploy:subgraph:rinkeby
+
+      - name: Deploy mainnet
+        if: github.ref == 'refs/heads/master'
+        run: yarn deploy:subgraph:mainnet

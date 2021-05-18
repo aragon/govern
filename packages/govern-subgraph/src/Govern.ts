@@ -4,7 +4,7 @@ import {
   Frozen as FrozenEvent,
   Granted as GrantedEvent,
   Revoked as RevokedEvent,
-  ETHDeposited as ETHDepositedEvent
+  ETHDeposited as ETHDepositedEvent,
 } from '../generated/templates/Govern/Govern'
 import { Govern } from '../generated/schema'
 import { frozenRoles, roleGranted, roleRevoked } from './lib/MiniACL'
@@ -25,7 +25,6 @@ export function handleETHDeposited(event: ETHDepositedEvent): void {
   // and how much
   // let govern = loadOrCreateGovern(event.address)
   // govern.balance = event.params.value
-
   // govern.save()
 }
 

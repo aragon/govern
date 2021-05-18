@@ -14,8 +14,8 @@ import Grid from '@material-ui/core/Grid';
 import { useHistory, useParams } from 'react-router-dom';
 import MUITypography from '@material-ui/core/Typography';
 import NoDaoFound from './NoDaoFound';
-import { formatDate } from 'utils/date'
-import { getState, getStateColor } from 'utils/states'
+import { formatDate } from 'utils/date';
+import { getState, getStateColor } from 'utils/states';
 
 //* Styled Components List
 const DaoPageMainDiv = styled(Paper)(({ theme }) => ({
@@ -286,8 +286,14 @@ const DaoMainPage: React.FC<{
                         <ProposalCard
                           transactionHash={proposal.id}
                           proposalDate={formatDate(proposal.createdAt)}
-                          proposalStatus={getState(proposal.state, proposal.payload.executionTime)}
-                          proposalStatusColor={getStateColor(proposal.state, proposal.payload.executionTime)}
+                          proposalStatus={getState(
+                            proposal.state,
+                            proposal.payload.executionTime,
+                          )}
+                          proposalStatusColor={getStateColor(
+                            proposal.state,
+                            proposal.payload.executionTime,
+                          )}
                           onClickProposalCard={() => onClickProposal(proposal)}
                         ></ProposalCard>
                       </Grid>

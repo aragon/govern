@@ -67,7 +67,7 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
       history.push(`daos/${searchString}`);
     } else {
       enqueueSnackbar(
-        'Invalid Dao Name. Atleast one letter should be entered.',
+        'Invalid Dao Name. At least one letter should be entered.',
         { variant: 'error' },
       );
     }

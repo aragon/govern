@@ -28,10 +28,10 @@ export function getPayloadHash(container: any): string {
           defaultAbiCoder.encode(
             [
               'tuple(' +
-              'address to, ' +
-              'uint256 value, ' +
-              'bytes data' +
-              ')[]',
+                'address to, ' +
+                'uint256 value, ' +
+                'bytes data' +
+                ')[]',
             ],
             [container.payload.actions]
           )
@@ -55,13 +55,13 @@ export function getConfigHash(container: any): string {
     defaultAbiCoder.encode(
       [
         'tuple(' +
-        'uint256 executionDelay, ' +
-        'tuple(address token, uint256 amount) scheduleDeposit, ' +
-        'tuple(address token, uint256 amount) challengeDeposit, ' +
-        'address resolver, ' +
-        'bytes rules, ' +
-        'uint256 maxCalldataSize' +
-        ')',
+          'uint256 executionDelay, ' +
+          'tuple(address token, uint256 amount) scheduleDeposit, ' +
+          'tuple(address token, uint256 amount) challengeDeposit, ' +
+          'address resolver, ' +
+          'bytes rules, ' +
+          'uint256 maxCalldataSize' +
+          ')',
       ],
       [container.config]
     )
@@ -77,11 +77,21 @@ export function getConfigHash(container: any): string {
  *
  * @returns {string}
  */
-export function getContainerHash(container: any, address: string, chainId: number): string {
+export function getContainerHash(
+  container: any,
+  address: string,
+  chainId: number
+): string {
   return keccak256(
     solidityPack(
       ['string', 'address', 'uint', 'bytes32', 'bytes32'],
-      ['erc3k-v1', address, chainId, getPayloadHash(container), getConfigHash(container)]
+      [
+        'erc3k-v1',
+        address,
+        chainId,
+        getPayloadHash(container),
+        getConfigHash(container),
+      ]
     )
   )
 }
@@ -98,36 +108,34 @@ export function getEncodedContainer(container: any): string {
     [
       'tuple(' +
         'tuple(' +
-          'uint256 nonce, ' +
-          'uint256 executionTime, ' +
-          'address submitter, ' +
-          'address executor, ' +
-          'tuple(' +
-            'address to, ' +
-            'uint256 value, ' +
-            'bytes data' +
-          ')[] actions, ' +
-          'bytes32 allowFailuresMap, ' +
-          'bytes proof' +
+        'uint256 nonce, ' +
+        'uint256 executionTime, ' +
+        'address submitter, ' +
+        'address executor, ' +
+        'tuple(' +
+        'address to, ' +
+        'uint256 value, ' +
+        'bytes data' +
+        ')[] actions, ' +
+        'bytes32 allowFailuresMap, ' +
+        'bytes proof' +
         ') payload, ' +
         'tuple(' +
-          'uint256 executionDelay, ' +
-          'tuple(' +
-            'address token, ' +
-            'uint256 amount' +
-          ') scheduleDeposit, ' +
-          'tuple(' +
-            'address token, ' +
-            'uint256 amount' +
-          ') challengeDeposit, ' +
-          'address resolver, ' +
-          'bytes rules, ' +
-          'uint256 maxCalldataSize' +
+        'uint256 executionDelay, ' +
+        'tuple(' +
+        'address token, ' +
+        'uint256 amount' +
+        ') scheduleDeposit, ' +
+        'tuple(' +
+        'address token, ' +
+        'uint256 amount' +
+        ') challengeDeposit, ' +
+        'address resolver, ' +
+        'bytes rules, ' +
+        'uint256 maxCalldataSize' +
         ') config' +
-      ')'
+        ')',
     ],
-    [
-      container
-    ]
-  );
+    [container]
+  )
 }

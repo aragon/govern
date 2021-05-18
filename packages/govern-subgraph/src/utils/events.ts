@@ -6,7 +6,7 @@ import {
   ContainerEventResolve,
   ContainerEventRule,
   ContainerEventSchedule,
-  ContainerEventVeto
+  ContainerEventVeto,
 } from '../../generated/schema'
 import { Executed as ExecutedEvent } from '../../generated/templates/Govern/Govern'
 import {
@@ -14,10 +14,10 @@ import {
   Resolved as ResolvedEvent,
   Ruled as RuledEvent,
   Scheduled as ScheduledEvent,
-  Vetoed as VetoedEvent
+  Vetoed as VetoedEvent,
 } from '../../generated/templates/GovernQueue/GovernQueue'
 import { buildId, buildEventHandlerId } from './ids'
-import { Bytes } from "@graphprotocol/graph-ts" 
+import { Bytes } from '@graphprotocol/graph-ts'
 
 function finalizeContainerEvent<T, U>(
   container: ContainerEntity,
@@ -38,7 +38,11 @@ export function handleContainerEventChallenge(
   ethereumEvent: ChallengedEvent,
   resolver: Bytes
 ): ContainerEventChallenge {
-  let eventId = buildEventHandlerId(container.id, 'challenge', ethereumEvent.transactionLogIndex.toHexString())
+  let eventId = buildEventHandlerId(
+    container.id,
+    'challenge',
+    ethereumEvent.transactionLogIndex.toHexString()
+  )
 
   let containerEvent = new ContainerEventChallenge(eventId)
 
@@ -46,7 +50,7 @@ export function handleContainerEventChallenge(
   containerEvent.reason = ethereumEvent.params.reason
   containerEvent.disputeId = ethereumEvent.params.resolverId
   containerEvent.resolver = resolver
-  
+
   let collateral = new CollateralEntity(buildId(ethereumEvent))
   collateral.token = ethereumEvent.params.collateral.token
   collateral.amount = ethereumEvent.params.collateral.amount
@@ -65,7 +69,11 @@ export function handleContainerEventExecute(
   container: ContainerEntity,
   ethereumEvent: ExecutedEvent
 ): ContainerEventExecute {
-  let eventId = buildEventHandlerId(container.id, 'execute', ethereumEvent.transactionLogIndex.toHexString())
+  let eventId = buildEventHandlerId(
+    container.id,
+    'execute',
+    ethereumEvent.transactionLogIndex.toHexString()
+  )
 
   let containerEvent = new ContainerEventExecute(eventId)
   containerEvent.execResults = ethereumEvent.params.execResults
@@ -81,7 +89,11 @@ export function handleContainerEventResolve(
   container: ContainerEntity,
   ethereumEvent: ResolvedEvent
 ): ContainerEventResolve {
-  let eventId = buildEventHandlerId(container.id, 'resolve', ethereumEvent.transactionLogIndex.toHexString())
+  let eventId = buildEventHandlerId(
+    container.id,
+    'resolve',
+    ethereumEvent.transactionLogIndex.toHexString()
+  )
 
   let containerEvent = new ContainerEventResolve(eventId)
   containerEvent.approved = ethereumEvent.params.approved
@@ -97,7 +109,11 @@ export function handleContainerEventRule(
   container: ContainerEntity,
   ethereumEvent: RuledEvent
 ): ContainerEventRule {
-  let eventId = buildEventHandlerId(container.id, 'rule', ethereumEvent.transactionLogIndex.toHexString())
+  let eventId = buildEventHandlerId(
+    container.id,
+    'rule',
+    ethereumEvent.transactionLogIndex.toHexString()
+  )
 
   let containerEvent = new ContainerEventRule(eventId)
   containerEvent.ruling = ethereumEvent.params.ruling
@@ -114,7 +130,11 @@ export function handleContainerEventSchedule(
   ethereumEvent: ScheduledEvent,
   scheduleDeposit: CollateralEntity
 ): ContainerEventSchedule {
-  let eventId = buildEventHandlerId(container.id, 'schedule', ethereumEvent.transactionLogIndex.toHexString())
+  let eventId = buildEventHandlerId(
+    container.id,
+    'schedule',
+    ethereumEvent.transactionLogIndex.toHexString()
+  )
 
   let containerEvent = new ContainerEventSchedule(eventId)
 
@@ -132,13 +152,15 @@ export function handleContainerEventSchedule(
   )
 }
 
-
-
 export function handleContainerEventVeto(
   container: ContainerEntity,
   ethereumEvent: VetoedEvent
 ): ContainerEventVeto {
-  let eventId = buildEventHandlerId(container.id, 'veto', ethereumEvent.transactionLogIndex.toHexString())
+  let eventId = buildEventHandlerId(
+    container.id,
+    'veto',
+    ethereumEvent.transactionLogIndex.toHexString()
+  )
 
   let containerEvent = new ContainerEventVeto(eventId)
   containerEvent.reason = ethereumEvent.params.reason

@@ -1,17 +1,19 @@
-import { ethers, waffle} from 'hardhat'
+import { ethers, waffle } from 'hardhat'
 import chai, { expect } from 'chai'
 import chaiUtils from '../chai-utils'
-chai.use(chaiUtils);
+chai.use(chaiUtils)
 
 import { GovernQueue } from '../../typechain/GovernQueue'
 import { TestToken } from '../../typechain/TestToken'
 import { ArbitratorMock } from '../../typechain/ArbitratorMock'
 import { ERC3000ExecutorMock } from '../../typechain/ERC3000ExecutorMock'
 
-const { deployMockContract, provider } = waffle;
+const { deployMockContract, provider } = waffle
 
-const  abi = require('../../artifacts/contracts/test/TestToken.sol/TestToken.json');
-const unlockedEventAbi = ["event Unlocked(address indexed token, address indexed to, uint256 amount)"];
+const abi = require('../../artifacts/contracts/test/TestToken.sol/TestToken.json')
+const unlockedEventAbi = [
+  'event Unlocked(address indexed token, address indexed to, uint256 amount)',
+]
 
 import {
   GovernQueue__factory,
@@ -22,12 +24,17 @@ import {
 } from '../../typechain'
 
 import { container as containerJson } from './container'
-import { getConfigHash, getContainerHash, getEncodedContainer, getPayloadHash } from './helpers'
+import {
+  getConfigHash,
+  getContainerHash,
+  getEncodedContainer,
+  getPayloadHash,
+} from './helpers'
 import { formatBytes32String, keccak256, toUtf8Bytes } from 'ethers/lib/utils'
 import { BigNumber, Contract } from 'ethers'
 
 // TODO: Create mock contract to check the return values of public methods
-describe('Govern Queue', function() {
+describe('Govern Queue', function () {
   let ownerAddr: string,
     testToken: TestToken,
     chainId: number,
@@ -44,12 +51,12 @@ describe('Govern Queue', function() {
     VETOED: 'Vetoed',
     CONFIGURED: 'Configured',
     RESOLVED: 'Resolved',
-    RULED: 'Ruled'
+    RULED: 'Ruled',
   }
 
   const RULES = {
     APPROVED: 4,
-    DENIED: 3
+    DENIED: 3,
   }
 
   const ERRORS = {
@@ -66,7 +73,7 @@ describe('Govern Queue', function() {
     BAD_DISPUTE_ID: 'queue: bad dispute id',
     BAD_SUBJECT: 'queue: not subject',
     UNRESOLVED: 'queue: unresolved',
-    EVIDENCE: 'queue: evidence'
+    EVIDENCE: 'queue: evidence',
   }
 
   const STATE = {
@@ -76,7 +83,7 @@ describe('Govern Queue', function() {
     APPROVED: 3,
     REJECTED: 4,
     CANCELLED: 5,
-    EXECUTED: 6
+    EXECUTED: 6,
   }
 
   container = JSON.parse(JSON.stringify(containerJson))
@@ -84,25 +91,27 @@ describe('Govern Queue', function() {
   const ownerTokenAmount = 1000000
   const disputeFee = 1000
   const disputeId = 1000
-  const zeroByteHash = "0x0000000000000000000000000000000000000000"
+  const zeroByteHash = '0x0000000000000000000000000000000000000000'
 
   // grab the original, honest values that queue contract gets deployed with.
-  const executionDelay  = container.config.executionDelay
+  const executionDelay = container.config.executionDelay
   const maxCalldataSize = container.config.maxCalldataSize
 
   let executor: ERC3000ExecutorMock
-  
-  const createArbitratorMock = async () => {
-    const ArbitratorMock = (await ethers.getContractFactory('ArbitratorMock')) as ArbitratorMock__factory
-    const arbitratorMock = (await ArbitratorMock.deploy(testToken.address)) as ArbitratorMock
-    return arbitratorMock;
-  }
 
+  const createArbitratorMock = async () => {
+    const ArbitratorMock = (await ethers.getContractFactory(
+      'ArbitratorMock'
+    )) as ArbitratorMock__factory
+    const arbitratorMock = (await ArbitratorMock.deploy(
+      testToken.address
+    )) as ArbitratorMock
+    return arbitratorMock
+  }
 
   beforeEach(async () => {
     container.payload.nonce = (await gq.nonce()).toNumber() + 1
   })
-
 
   before(async () => {
     chainId = (await ethers.provider.getNetwork()).chainId
@@ -110,7 +119,9 @@ describe('Govern Queue', function() {
     container.payload.submitter = ownerAddr
 
     // add tokens for schedule, challenge and fee amounts from arbitrator
-    const TestToken = (await ethers.getContractFactory('TestToken')) as TestToken__factory
+    const TestToken = (await ethers.getContractFactory(
+      'TestToken'
+    )) as TestToken__factory
     testToken = (await TestToken.deploy(ownerAddr)) as TestToken
     await testToken.mint(ownerAddr, 1000000)
 
@@ -118,21 +129,24 @@ describe('Govern Queue', function() {
       ...container.config,
       scheduleDeposit: {
         token: testToken.address,
-        amount: 100
+        amount: 100,
       },
       challengeDeposit: {
         token: testToken.address,
-        amount: 100
-      }
+        amount: 100,
+      },
     }
-    
+
     // add ERC3000 executor
-    const ERC3000ExecutorMock = (await ethers.getContractFactory('ERC3000ExecutorMock')) as ERC3000ExecutorMock__factory
+    const ERC3000ExecutorMock = (await ethers.getContractFactory(
+      'ERC3000ExecutorMock'
+    )) as ERC3000ExecutorMock__factory
     executor = await ERC3000ExecutorMock.deploy()
     container.payload.executor = executor.address
 
-
-    const GQ = (await ethers.getContractFactory('GovernQueue')) as GovernQueue__factory
+    const GQ = (await ethers.getContractFactory(
+      'GovernQueue'
+    )) as GovernQueue__factory
 
     gq = (await GQ.deploy(ownerAddr, container.config)) as GovernQueue
 
@@ -140,80 +154,83 @@ describe('Govern Queue', function() {
       {
         op: 0,
         role: gq.interface.getSighash(gq.interface.getFunction('schedule')),
-        who: ownerAddr
+        who: ownerAddr,
       },
       {
         op: 0,
         role: gq.interface.getSighash(gq.interface.getFunction('execute')),
-        who: ownerAddr
+        who: ownerAddr,
       },
       {
         op: 0,
         role: gq.interface.getSighash(gq.interface.getFunction('challenge')),
-        who: ownerAddr
+        who: ownerAddr,
       },
       {
         op: 0,
         role: gq.interface.getSighash(gq.interface.getFunction('configure')),
-        who: ownerAddr
+        who: ownerAddr,
       },
       {
         op: 0,
         role: gq.interface.getSighash(gq.interface.getFunction('veto')),
-        who: ownerAddr
-      }
+        who: ownerAddr,
+      },
     ])
   })
 
   context('GovernQueue.schedule', () => {
-
     before(async () => {
-      container.payload.executionTime = (await ethers.provider.getBlock('latest')).timestamp + executionDelay + 100
+      container.payload.executionTime =
+        (await ethers.provider.getBlock('latest')).timestamp +
+        executionDelay +
+        100
     })
-    
+
     it('emits the expected events and adds the container to the queue', async () => {
-      await testToken.approve(gq.address, container.config.scheduleDeposit.amount)
+      await testToken.approve(
+        gq.address,
+        container.config.scheduleDeposit.amount
+      )
 
       const containerHash = getContainerHash(container, gq.address, chainId)
       await expect(gq.schedule(container))
         .to.emit(gq, EVENTS.SCHEDULED)
-        .withArgs(
-          containerHash,
+        .withArgs(containerHash, [
+          container.payload.nonce,
+          container.payload.executionTime,
+          container.payload.submitter,
+          container.payload.executor,
           [
-            container.payload.nonce,
-            container.payload.executionTime,
-            container.payload.submitter,
-            container.payload.executor,
             [
-              [
-                container.payload.actions[0].to,
-                BigNumber.from(container.payload.actions[0].value),
-                container.payload.actions[0].data
-              ]
+              container.payload.actions[0].to,
+              BigNumber.from(container.payload.actions[0].value),
+              container.payload.actions[0].data,
             ],
-            container.payload.allowFailuresMap,
-            container.payload.proof
-          ]
-        )
+          ],
+          container.payload.allowFailuresMap,
+          container.payload.proof,
+        ])
 
       expect(await gq.queue(containerHash)).to.equal(STATE.SCHEDULED)
 
-      expect(await testToken.balanceOf(ownerAddr)).to.equal(ownerTokenAmount - container.config.scheduleDeposit.amount)
+      expect(await testToken.balanceOf(ownerAddr)).to.equal(
+        ownerTokenAmount - container.config.scheduleDeposit.amount
+      )
     })
-
 
     it('reverts with "calldatasize: limit exceeded"', async () => {
       container.config.maxCalldataSize = 100
-      
-      await gq.configure(container.config);
-     
-      await expect(gq.schedule(container)).to.be.revertedWith(ERRORS.CALLDATASIZE_LIMIT)
-      
+
+      await gq.configure(container.config)
+
+      await expect(gq.schedule(container)).to.be.revertedWith(
+        ERRORS.CALLDATASIZE_LIMIT
+      )
+
       container.config.maxCalldataSize = maxCalldataSize
-      await gq.configure(container.config);
-      
+      await gq.configure(container.config)
     })
-    
 
     it('reverts with "queue: bad config"', async () => {
       container.config.executionDelay = 100
@@ -228,13 +245,18 @@ describe('Govern Queue', function() {
 
       await expect(gq.schedule(container)).to.be.revertedWith(ERRORS.BAD_DELAY)
 
-      container.payload.executionTime = (await ethers.provider.getBlock('latest')).timestamp + executionDelay + 100
+      container.payload.executionTime =
+        (await ethers.provider.getBlock('latest')).timestamp +
+        executionDelay +
+        100
     })
 
     it('reverts with "queue: bad submitter"', async () => {
       container.payload.submitter = zeroByteHash
 
-      await expect(gq.schedule(container)).to.be.revertedWith(ERRORS.BAD_SUBMITTER)
+      await expect(gq.schedule(container)).to.be.revertedWith(
+        ERRORS.BAD_SUBMITTER
+      )
 
       container.payload.submitter = ownerAddr
     })
@@ -247,13 +269,18 @@ describe('Govern Queue', function() {
   })
 
   context('GovernQueue.execute', async () => {
-
     before(async () => {
-      container.payload.executionTime = (await ethers.provider.getBlock('latest')).timestamp + executionDelay + 100
+      container.payload.executionTime =
+        (await ethers.provider.getBlock('latest')).timestamp +
+        executionDelay +
+        100
     })
 
     it('emits the expected events and updates the container state', async () => {
-      await testToken.approve(gq.address, container.config.scheduleDeposit.amount)
+      await testToken.approve(
+        gq.address,
+        container.config.scheduleDeposit.amount
+      )
       await gq.schedule(container)
 
       await ethers.provider.send('evm_increaseTime', [executionDelay + 100])
@@ -267,299 +294,401 @@ describe('Govern Queue', function() {
 
       expect(await gq.queue(containerHash)).to.equal(STATE.EXECUTED)
 
-      expect(await testToken.balanceOf(ownerAddr)).to.equal(ownerBalance + container.config.scheduleDeposit.amount)
+      expect(await testToken.balanceOf(ownerAddr)).to.equal(
+        ownerBalance + container.config.scheduleDeposit.amount
+      )
 
       expect(await executor.passedActionsLength()).to.equal(1)
 
-      expect(await executor.passedAllowFailuresMap()).to.equal(container.payload.allowFailuresMap)
+      expect(await executor.passedAllowFailuresMap()).to.equal(
+        container.payload.allowFailuresMap
+      )
 
       expect(await executor.passedContainerHash()).to.equal(containerHash)
     })
 
     it('reverts with "queue: wait more"', async () => {
-      await testToken.approve(gq.address, container.config.scheduleDeposit.amount)
-      
-      container.payload.executionTime = (await ethers.provider.getBlock('latest')).timestamp + executionDelay + 100
+      await testToken.approve(
+        gq.address,
+        container.config.scheduleDeposit.amount
+      )
+
+      container.payload.executionTime =
+        (await ethers.provider.getBlock('latest')).timestamp +
+        executionDelay +
+        100
 
       await gq.schedule(container)
 
       await expect(gq.execute(container)).to.be.revertedWith(ERRORS.WAIT_MORE)
     })
-
   })
 
   context('GovernQueue.challenge', () => {
-
     before(async () => {
-      container.payload.executionTime = (await ethers.provider.getBlock('latest')).timestamp + executionDelay + 100
+      container.payload.executionTime =
+        (await ethers.provider.getBlock('latest')).timestamp +
+        executionDelay +
+        100
     })
 
     it('executes as expected', async () => {
       const ownerBalance = (await testToken.balanceOf(ownerAddr)).toNumber()
 
-      const arbitratorMock = await createArbitratorMock();
-      container.config.resolver = arbitratorMock.address;
+      const arbitratorMock = await createArbitratorMock()
+      container.config.resolver = arbitratorMock.address
 
       await gq.configure(container.config)
 
-      await testToken.approve(gq.address, container.config.scheduleDeposit.amount + container.config.challengeDeposit.amount + disputeFee)
+      await testToken.approve(
+        gq.address,
+        container.config.scheduleDeposit.amount +
+          container.config.challengeDeposit.amount +
+          disputeFee
+      )
 
       await gq.schedule(container)
 
       const containerHash = getContainerHash(container, gq.address, chainId)
 
-      await expect(gq.challenge(container, formatBytes32String('NOPE!'))).to.emit(gq, EVENTS.CHALLENGED)
+      await expect(
+        gq.challenge(container, formatBytes32String('NOPE!'))
+      ).to.emit(gq, EVENTS.CHALLENGED)
 
       expect(await gq.queue(containerHash)).to.equal(STATE.CHALLENGED)
 
       expect(await gq.challengerCache(containerHash)).to.equal(ownerAddr)
 
-      expect(await gq.disputeItemCache(containerHash, container.config.resolver)).to.equal(disputeId + 1)
-    
+      expect(
+        await gq.disputeItemCache(containerHash, container.config.resolver)
+      ).to.equal(disputeId + 1)
+
       expect(await testToken.balanceOf(ownerAddr)).to.equal(
-        ownerBalance -(container.config.challengeDeposit.amount + container.config.challengeDeposit.amount + disputeFee)
+        ownerBalance -
+          (container.config.challengeDeposit.amount +
+            container.config.challengeDeposit.amount +
+            disputeFee)
       )
 
       expect(await arbitratorMock.possibleRulings()).to.equal(2)
 
-      expect(await arbitratorMock.metadata()).to.equal(getEncodedContainer(container))
+      expect(await arbitratorMock.metadata()).to.equal(
+        getEncodedContainer(container)
+      )
 
       expect(await arbitratorMock.evidencePeriodClosed()).to.equal(disputeId)
     })
 
     it('reverts with "queue: bad fee pull"', async () => {
       container.payload.proof = '0x01'
-      
-      await testToken.approve(gq.address, container.config.challengeDeposit.amount + container.config.scheduleDeposit.amount)
 
-      const arbitratorMock = await createArbitratorMock();
-      container.config.resolver = arbitratorMock.address;
+      await testToken.approve(
+        gq.address,
+        container.config.challengeDeposit.amount +
+          container.config.scheduleDeposit.amount
+      )
+
+      const arbitratorMock = await createArbitratorMock()
+      container.config.resolver = arbitratorMock.address
 
       await gq.configure(container.config)
       await gq.schedule(container)
-  
-      await expect(gq.challenge(container, formatBytes32String('NOPE!'))).to.be.revertedWith(ERRORS.BAD_FEE_PULL)
-    })
-    
-    // TODO: Implement after mock contract solution has been found.
-    it.skip('reverts with "queue: bad approve"', async () => {
-      
+
+      await expect(
+        gq.challenge(container, formatBytes32String('NOPE!'))
+      ).to.be.revertedWith(ERRORS.BAD_FEE_PULL)
     })
 
     // TODO: Implement after mock contract solution has been found.
-    it.skip('reverts with "queue: bad reset"', async () => {
-      
-    })
+    it.skip('reverts with "queue: bad approve"', async () => {})
 
+    // TODO: Implement after mock contract solution has been found.
+    it.skip('reverts with "queue: bad reset"', async () => {})
   })
 
-
   context('GovernQueue.resolve', () => {
-
     before(async () => {
-      container.payload.executionTime = (await ethers.provider.getBlock('latest')).timestamp + executionDelay + 100
+      container.payload.executionTime =
+        (await ethers.provider.getBlock('latest')).timestamp +
+        executionDelay +
+        100
     })
 
     it('reverts with bad dispute id wrong dispute id is passed', async () => {
-      const arbitratorMock = await createArbitratorMock();
-      container.config.resolver = arbitratorMock.address;
+      const arbitratorMock = await createArbitratorMock()
+      container.config.resolver = arbitratorMock.address
 
-      await gq.configure(container.config);
+      await gq.configure(container.config)
 
-      await testToken.approve(gq.address, container.config.scheduleDeposit.amount + container.config.challengeDeposit.amount + disputeFee);
+      await testToken.approve(
+        gq.address,
+        container.config.scheduleDeposit.amount +
+          container.config.challengeDeposit.amount +
+          disputeFee
+      )
       await gq.schedule(container)
-      await gq.challenge(container,  "0x02");
+      await gq.challenge(container, '0x02')
 
-      await expect(gq.resolve(container, 0)).to.be.revertedWith(ERRORS.BAD_DISPUTE_ID)
+      await expect(gq.resolve(container, 0)).to.be.revertedWith(
+        ERRORS.BAD_DISPUTE_ID
+      )
     })
 
-
     it('reverts when arbitrator subject does not match the queue address', async () => {
-      const ArbitratorMock = (await ethers.getContractFactory('ArbitratorWrongSubjectMock')) as ArbitratorWrongSubjectMock__factory
+      const ArbitratorMock = (await ethers.getContractFactory(
+        'ArbitratorWrongSubjectMock'
+      )) as ArbitratorWrongSubjectMock__factory
       const arbitratorMock = await ArbitratorMock.deploy(testToken.address)
-      container.config.resolver = arbitratorMock.address;
+      container.config.resolver = arbitratorMock.address
 
-      await gq.configure(container.config);
+      await gq.configure(container.config)
 
-      await testToken.approve(gq.address, container.config.scheduleDeposit.amount + container.config.challengeDeposit.amount + disputeFee);
+      await testToken.approve(
+        gq.address,
+        container.config.scheduleDeposit.amount +
+          container.config.challengeDeposit.amount +
+          disputeFee
+      )
       await gq.schedule(container)
-      await gq.challenge(container,  "0x02");
+      await gq.challenge(container, '0x02')
 
-      await expect(gq.resolve(container, disputeId)).to.be.revertedWith(ERRORS.BAD_SUBJECT)
+      await expect(gq.resolve(container, disputeId)).to.be.revertedWith(
+        ERRORS.BAD_SUBJECT
+      )
     })
 
     it('successfully rejects and cancels container when the ruling is not approved', async () => {
-      const arbitratorMock = await createArbitratorMock();
-      await arbitratorMock.executeRuling(disputeId, RULES.DENIED);
-      
-      container.config.resolver = arbitratorMock.address;
+      const arbitratorMock = await createArbitratorMock()
+      await arbitratorMock.executeRuling(disputeId, RULES.DENIED)
 
-      await gq.configure(container.config);
+      container.config.resolver = arbitratorMock.address
 
-      await testToken.approve(gq.address, container.config.scheduleDeposit.amount + container.config.challengeDeposit.amount + disputeFee);
+      await gq.configure(container.config)
 
-      let ownerBalance:any = (await testToken.balanceOf(ownerAddr))
+      await testToken.approve(
+        gq.address,
+        container.config.scheduleDeposit.amount +
+          container.config.challengeDeposit.amount +
+          disputeFee
+      )
+
+      let ownerBalance: any = await testToken.balanceOf(ownerAddr)
 
       const containerHash = getContainerHash(container, gq.address, chainId)
 
-      await gq.schedule(container);
-      await gq.challenge(container,  "0x02");
-      
-      await expect(gq.resolve(container, disputeId))
-            .to.emit(gq, EVENTS.RESOLVED)
-            .withArgs(containerHash, ownerAddr, false)
+      await gq.schedule(container)
+      await gq.challenge(container, '0x02')
 
-      expect(await testToken.balanceOf(ownerAddr)).to.equal(ownerBalance - disputeFee)
+      await expect(gq.resolve(container, disputeId))
+        .to.emit(gq, EVENTS.RESOLVED)
+        .withArgs(containerHash, ownerAddr, false)
+
+      expect(await testToken.balanceOf(ownerAddr)).to.equal(
+        ownerBalance - disputeFee
+      )
 
       expect(await gq.challengerCache(containerHash)).to.equal(zeroByteHash)
 
       expect(await gq.queue(containerHash)).to.equal(STATE.CANCELLED)
     })
 
-
-
     it('successfully resolves and  approves container when the ruling is approved', async () => {
-      const arbitratorMock = await createArbitratorMock();
-      await arbitratorMock.executeRuling(disputeId, RULES.APPROVED);
-      container.config.resolver = arbitratorMock.address;
+      const arbitratorMock = await createArbitratorMock()
+      await arbitratorMock.executeRuling(disputeId, RULES.APPROVED)
+      container.config.resolver = arbitratorMock.address
 
-      await gq.configure(container.config);
+      await gq.configure(container.config)
 
-      await testToken.approve(gq.address, container.config.scheduleDeposit.amount + container.config.challengeDeposit.amount + disputeFee);
+      await testToken.approve(
+        gq.address,
+        container.config.scheduleDeposit.amount +
+          container.config.challengeDeposit.amount +
+          disputeFee
+      )
 
-      const ownerBalance:any = (await testToken.balanceOf(ownerAddr))
+      const ownerBalance: any = await testToken.balanceOf(ownerAddr)
 
       const containerHash = getContainerHash(container, gq.address, chainId)
 
-      await gq.schedule(container);
-      await gq.challenge(container,  "0x02");
-      
+      await gq.schedule(container)
+      await gq.challenge(container, '0x02')
+
       // workaround for events defined in a library which doesn't get included in the ABI
       // generated when contract was compiled.  The event was emitted, the `to.emit` just
       // need a contract interface with event interface to detect the event
-      const eventContract = new Contract(gq.address, unlockedEventAbi, gq.provider);
+      const eventContract = new Contract(
+        gq.address,
+        unlockedEventAbi,
+        gq.provider
+      )
 
       await expect(gq.resolve(container, disputeId))
-            .to.emit(eventContract, EVENTS.UNLOCK)
-            .withArgs(container.config.scheduleDeposit.token, ownerAddr, container.config.scheduleDeposit.amount)
-            .to.emit(gq, EVENTS.RESOLVED)
-            .withArgs(containerHash, ownerAddr, true)
-            .to.emit(gq, EVENTS.EXECUTED)
-            .withArgs(containerHash, ownerAddr);
+        .to.emit(eventContract, EVENTS.UNLOCK)
+        .withArgs(
+          container.config.scheduleDeposit.token,
+          ownerAddr,
+          container.config.scheduleDeposit.amount
+        )
+        .to.emit(gq, EVENTS.RESOLVED)
+        .withArgs(containerHash, ownerAddr, true)
+        .to.emit(gq, EVENTS.EXECUTED)
+        .withArgs(containerHash, ownerAddr)
 
       expect(await gq.challengerCache(containerHash)).to.equal(zeroByteHash)
 
-      expect(await testToken.balanceOf(ownerAddr)).to.equal(ownerBalance - disputeFee)
+      expect(await testToken.balanceOf(ownerAddr)).to.equal(
+        ownerBalance - disputeFee
+      )
 
       expect(await gq.queue(containerHash)).to.equal(STATE.EXECUTED)
     })
-    
   })
-    
-    context('GovernQueue.veto', () => {
 
-      before(async () => {
-        container.payload.executionTime = (await ethers.provider.getBlock('latest')).timestamp + executionDelay + 100
-      })
-      
-      it('reverts when the container is not scheduled or challenged', async () => {
-        await expect(gq.veto(container, "0x02")).to.be.revertedWith(ERRORS.BAD_STATE)
-      })
-
-      it('successfully cancels when the container is in scheduled state', async () => {
-        const ownerBalance:any = (await testToken.balanceOf(ownerAddr))
-        await testToken.approve(gq.address, container.config.scheduleDeposit.amount);
-
-        await gq.schedule(container);
-
-        expect(await testToken.balanceOf(ownerAddr)).to.equal(ownerBalance - container.config.scheduleDeposit.amount)
-
-        const containerHash = getContainerHash(container, gq.address, chainId);
-        
-        // workaround for events defined in a library which doesn't get included in the ABI
-        // generated when contract was compiled.  The event was emitted, the `to.emit` just
-        // need a contract interface with event interface to detect the event
-        const eventContract = new Contract(gq.address, unlockedEventAbi, gq.provider);
-
-        await expect(gq.veto(container, "0x02"))
-               .to.emit(eventContract, EVENTS.UNLOCK)
-               .withArgs(container.config.scheduleDeposit.token, ownerAddr, container.config.scheduleDeposit.amount)
-               .to.emit(gq, EVENTS.VETOED)
-               .withArgs(containerHash, ownerAddr, '0x02')
-
-        expect(await gq.queue(containerHash)).to.be.equal(STATE.CANCELLED)
-
-        expect(await testToken.balanceOf(ownerAddr)).to.equal(ownerBalance) 
-      })
-
-      it('successfully cancels when the container is in challenged state', async () => {
-        const ownerBalance:any = (await testToken.balanceOf(ownerAddr))
-        await testToken.approve(gq.address, container.config.scheduleDeposit.amount + container.config.challengeDeposit.amount + disputeFee);
-        
-        const ArbitratorMock = (await ethers.getContractFactory('ArbitratorMock')) as ArbitratorMock__factory
-        const arbitratorMock = await ArbitratorMock.deploy(testToken.address)
-        container.config.resolver = arbitratorMock.address;
-        
-        await gq.configure(container.config);
-
-        await gq.schedule(container);
-        await gq.challenge(container, '0x02');
-
-        const containerHash = getContainerHash(container, gq.address, chainId);
-
-        // workaround for events defined in a library which doesn't get included in the ABI
-        // generated when contract was compiled.  The event was emitted, the `to.emit` just
-        // need a contract interface with event interface to detect the event
-        const eventContract = new Contract(gq.address, unlockedEventAbi, gq.provider);
-        await expect(gq.veto(container, "0x02"))
-               .to.emit(eventContract, EVENTS.UNLOCK)
-               .withArgs(container.config.scheduleDeposit.token, ownerAddr, container.config.scheduleDeposit.amount)
-               .to.emit(gq, EVENTS.VETOED)
-               .withArgs(containerHash, ownerAddr, '0x02')
-
-        expect(await gq.queue(containerHash)).to.be.equal(STATE.CANCELLED)
-
-        expect(await testToken.balanceOf(ownerAddr)).to.equal(ownerBalance-disputeFee)
-
-        expect(await gq.challengerCache(containerHash)).to.equal(zeroByteHash)
-        expect(await gq.disputeItemCache(containerHash, container.config.resolver)).to.equal(zeroByteHash)
-      })
+  context('GovernQueue.veto', () => {
+    before(async () => {
+      container.payload.executionTime =
+        (await ethers.provider.getBlock('latest')).timestamp +
+        executionDelay +
+        100
     })
-    
-    context('GovernQueue.configure', () => {
-      it('updated the configuration as expected', async () => {
 
-        const configHash = getConfigHash(container)
-    
-        await expect(gq.configure(container.config))
-          .to.emit(gq, EVENTS.CONFIGURED)
-          .withArgs(
-            configHash,
-            ownerAddr,
-            [
-              container.config.executionDelay,
-              [ container.config.scheduleDeposit.token, BigNumber.from(container.config.scheduleDeposit.amount) ],
-              [ container.config.challengeDeposit.token, BigNumber.from(container.config.challengeDeposit.amount) ],
-              container.config.resolver,
-              container.config.rules,
-            ]
-          )
-    
-        expect(await gq.configHash()).to.equal(configHash)
-      })
+    it('reverts when the container is not scheduled or challenged', async () => {
+      await expect(gq.veto(container, '0x02')).to.be.revertedWith(
+        ERRORS.BAD_STATE
+      )
+    })
 
-      it("reverts if schedule collateral doesn't have balanceOf", async () => {
-        container.config.scheduleDeposit.amount = 1
-        container.config.scheduleDeposit.token = gq.address
+    it('successfully cancels when the container is in scheduled state', async () => {
+      const ownerBalance: any = await testToken.balanceOf(ownerAddr)
+      await testToken.approve(
+        gq.address,
+        container.config.scheduleDeposit.amount
+      )
 
-        await expect(gq.configure(container.config)).to.be.revertedWith(ERRORS.BAD_CONFIG)
-      })
+      await gq.schedule(container)
 
-      it("reverts if challenge collateral doesn't have balanceOf", async () => {
-        container.config.scheduleDeposit.amount = 1
-        container.config.scheduleDeposit.token = gq.address
+      expect(await testToken.balanceOf(ownerAddr)).to.equal(
+        ownerBalance - container.config.scheduleDeposit.amount
+      )
 
-        await expect(gq.configure(container.config)).to.be.revertedWith(ERRORS.BAD_CONFIG)
-      })
+      const containerHash = getContainerHash(container, gq.address, chainId)
+
+      // workaround for events defined in a library which doesn't get included in the ABI
+      // generated when contract was compiled.  The event was emitted, the `to.emit` just
+      // need a contract interface with event interface to detect the event
+      const eventContract = new Contract(
+        gq.address,
+        unlockedEventAbi,
+        gq.provider
+      )
+
+      await expect(gq.veto(container, '0x02'))
+        .to.emit(eventContract, EVENTS.UNLOCK)
+        .withArgs(
+          container.config.scheduleDeposit.token,
+          ownerAddr,
+          container.config.scheduleDeposit.amount
+        )
+        .to.emit(gq, EVENTS.VETOED)
+        .withArgs(containerHash, ownerAddr, '0x02')
+
+      expect(await gq.queue(containerHash)).to.be.equal(STATE.CANCELLED)
+
+      expect(await testToken.balanceOf(ownerAddr)).to.equal(ownerBalance)
+    })
+
+    it('successfully cancels when the container is in challenged state', async () => {
+      const ownerBalance: any = await testToken.balanceOf(ownerAddr)
+      await testToken.approve(
+        gq.address,
+        container.config.scheduleDeposit.amount +
+          container.config.challengeDeposit.amount +
+          disputeFee
+      )
+
+      const ArbitratorMock = (await ethers.getContractFactory(
+        'ArbitratorMock'
+      )) as ArbitratorMock__factory
+      const arbitratorMock = await ArbitratorMock.deploy(testToken.address)
+      container.config.resolver = arbitratorMock.address
+
+      await gq.configure(container.config)
+
+      await gq.schedule(container)
+      await gq.challenge(container, '0x02')
+
+      const containerHash = getContainerHash(container, gq.address, chainId)
+
+      // workaround for events defined in a library which doesn't get included in the ABI
+      // generated when contract was compiled.  The event was emitted, the `to.emit` just
+      // need a contract interface with event interface to detect the event
+      const eventContract = new Contract(
+        gq.address,
+        unlockedEventAbi,
+        gq.provider
+      )
+      await expect(gq.veto(container, '0x02'))
+        .to.emit(eventContract, EVENTS.UNLOCK)
+        .withArgs(
+          container.config.scheduleDeposit.token,
+          ownerAddr,
+          container.config.scheduleDeposit.amount
+        )
+        .to.emit(gq, EVENTS.VETOED)
+        .withArgs(containerHash, ownerAddr, '0x02')
+
+      expect(await gq.queue(containerHash)).to.be.equal(STATE.CANCELLED)
+
+      expect(await testToken.balanceOf(ownerAddr)).to.equal(
+        ownerBalance - disputeFee
+      )
+
+      expect(await gq.challengerCache(containerHash)).to.equal(zeroByteHash)
+      expect(
+        await gq.disputeItemCache(containerHash, container.config.resolver)
+      ).to.equal(zeroByteHash)
     })
   })
+
+  context('GovernQueue.configure', () => {
+    it('updated the configuration as expected', async () => {
+      const configHash = getConfigHash(container)
+
+      await expect(gq.configure(container.config))
+        .to.emit(gq, EVENTS.CONFIGURED)
+        .withArgs(configHash, ownerAddr, [
+          container.config.executionDelay,
+          [
+            container.config.scheduleDeposit.token,
+            BigNumber.from(container.config.scheduleDeposit.amount),
+          ],
+          [
+            container.config.challengeDeposit.token,
+            BigNumber.from(container.config.challengeDeposit.amount),
+          ],
+          container.config.resolver,
+          container.config.rules,
+        ])
+
+      expect(await gq.configHash()).to.equal(configHash)
+    })
+
+    it("reverts if schedule collateral doesn't have balanceOf", async () => {
+      container.config.scheduleDeposit.amount = 1
+      container.config.scheduleDeposit.token = gq.address
+
+      await expect(gq.configure(container.config)).to.be.revertedWith(
+        ERRORS.BAD_CONFIG
+      )
+    })
+
+    it("reverts if challenge collateral doesn't have balanceOf", async () => {
+      container.config.scheduleDeposit.amount = 1
+      container.config.scheduleDeposit.token = gq.address
+
+      await expect(gq.configure(container.config)).to.be.revertedWith(
+        ERRORS.BAD_CONFIG
+      )
+    })
+  })
+})

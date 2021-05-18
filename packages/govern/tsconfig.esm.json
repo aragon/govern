@@ -7,18 +7,11 @@
     "strictPropertyInitialization": false,
     "strict": false,
     "outDir": "./dist/esm",
-    "strict":false,
+    "strict": false,
     "sourceRoot": "./",
     "inlineSources": true,
-    "types": [
-      "jest"
-    ],
-    "lib": [
-      "dom"
-    ]
+    "types": ["jest"],
+    "lib": ["dom"]
   },
-  "include": [
-    "./internal/**/*",
-    "./public/**/*"
-  ]
+  "include": ["./internal/**/*", "./public/**/*"]
 }

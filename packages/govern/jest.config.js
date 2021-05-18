@@ -8,8 +8,8 @@ module.exports = {
     global: {
       functions: 80,
       lines: 80,
-      statements: 80
-    }
+      statements: 80,
+    },
   },
   notify: true,
   clearMocks: true,
@@ -24,6 +24,6 @@ module.exports = {
     'proposal.ts',
     'Gateway.ts',
     'token.ts',
-    'RegisterToken.ts'
-  ]
+    'RegisterToken.ts',
+  ],
 }

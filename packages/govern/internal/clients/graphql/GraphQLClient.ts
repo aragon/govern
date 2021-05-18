@@ -38,7 +38,7 @@ export default class GraphQLClient implements ClientInterface {
     this.client = new Client({
       maskTypename: true,
       url: this.subgraphUrl,
-      fetch
+      fetch,
     })
   }
 
@@ -57,10 +57,9 @@ export default class GraphQLClient implements ClientInterface {
   public async request(query: string, args: any = {}): Promise<any> {
     const result = await this.client.query(gql(query), args).toPromise()
 
-    if (result.error) { // TODO: Use errors from core
-      throw new Error(
-        this.mapResponse(result) + this.mapError(result.error)
-      )
+    if (result.error) {
+      // TODO: Use errors from core
+      throw new Error(this.mapResponse(result) + this.mapError(result.error))
     }
 
     return result.data

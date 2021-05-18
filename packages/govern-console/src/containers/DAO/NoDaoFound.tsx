@@ -70,7 +70,7 @@ const NoDaoFound: React.FC<{}> = ({ ...props }) => {
       history.push(`${daoSearchText}`);
     } else {
       enqueueSnackbar(
-        'Invalid Dao Name. Atleast one letter should be entered.',
+        'Invalid Dao Name. At least one letter should be entered.',
         { variant: 'error' },
       );
     }

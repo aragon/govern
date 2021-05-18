@@ -34,7 +34,7 @@ export const buildContainer = (
     actions: payload.actions || [],
     allowFailuresMap:
       payload.allowFailuresMap || ethers.utils.hexZeroPad('0x0', 32),
-    proof: payload.proof ? toUtf8Bytes(payload.proof) : toUtf8Bytes('0x'),
+    proof: payload.proof || toUtf8Bytes('0x'),
   };
 
   const container: ProposalParams = {

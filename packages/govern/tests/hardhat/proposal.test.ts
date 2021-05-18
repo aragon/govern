@@ -3,18 +3,15 @@ import { expect } from 'chai'
 import { createDao, CreateDaoParams, DaoConfig } from '../../public/createDao'
 import { registryAbi } from './createDaoTest.hd'
 import {
-    Proposal,
-    ProposalParams,
-    PayloadType,
-    ProposalOptions,
-    ActionType
+  Proposal,
+  ProposalParams,
+  PayloadType,
+  ProposalOptions,
+  ActionType,
 } from '../../public'
 
 import { Container } from '../../public/proposal'
-import {
-  TestToken,
-  ArbitratorMock
-} from '@aragon/govern-core/typechain'
+import { TestToken, ArbitratorMock } from '@aragon/govern-core/typechain'
 
 import * as TestTokenArtifact from '@aragon/govern-core/artifacts/contracts/test/TestToken.sol/TestToken.json'
 import * as ArbitratorMockArtifact from '@aragon/govern-core/artifacts/contracts/test/ArbitratorMock.sol/ArbitratorMock.json'
@@ -22,14 +19,13 @@ import { TransactionReceipt } from '@ethersproject/abstract-provider'
 
 const RULES = {
   APPROVED: 4,
-  DENIED: 3
+  DENIED: 3,
 }
 
 const vetoAbi = [
   'function bulk((uint8 op, bytes4 role, address who)[] items)',
-  `function veto(${Container} _container, bytes _reason)`
+  `function veto(${Container} _container, bytes _reason)`,
 ]
-
 
 // use rinkeby addresses as the tests run on a hardhat network forked from rinkeby
 const tokenAddress = '0x9fB402A33761b88D5DcbA55439e6668Ec8D4F2E8'
@@ -44,8 +40,8 @@ const noCollateral = {
 
 type payloadArgs = {
   submitter: string
-  executor: string,
-  executionTime: number,
+  executor: string
+  executionTime: number
   actions?: ActionType[]
 }
 
@@ -58,17 +54,21 @@ async function advanceTime(provider: any) {
 function encodeDataForVetoRole(who: string): string {
   const iface = new ethers.utils.Interface(vetoAbi)
   const role = iface.getSighash('veto')
-  const paramData = iface.encodeFunctionData('bulk', [[{op: 0, role, who}]])
+  const paramData = iface.encodeFunctionData('bulk', [[{ op: 0, role, who }]])
   return paramData
 }
 
-
-const buildPayload = ({submitter, executor, actions, executionTime}: payloadArgs) => {
+const buildPayload = ({
+  submitter,
+  executor,
+  actions,
+  executionTime,
+}: payloadArgs) => {
   const payload: PayloadType = {
     executionTime,
     submitter,
     executor,
-    actions: actions?? [{ to: tokenAddress, value: 0, data: emptyBytes }],
+    actions: actions ?? [{ to: tokenAddress, value: 0, data: emptyBytes }],
     allowFailuresMap: ethers.utils.hexZeroPad('0x0', 32),
     proof: emptyBytes,
   }
@@ -77,23 +77,25 @@ const buildPayload = ({submitter, executor, actions, executionTime}: payloadArgs
 }
 
 type ProposalResult = {
-  proposal: Proposal,
-  proposalData: ProposalParams,
+  proposal: Proposal
+  proposalData: ProposalParams
   txResult: any
 }
 
 type makeProposalParams = {
-  options: ProposalOptions,
-  queueAddress: string,
-  executor: string,
+  options: ProposalOptions
+  queueAddress: string
+  executor: string
   actions?: ActionType[]
 }
 
-describe("Proposal", function() {
+describe('Proposal', function () {
   let queueAddress: string
   let executor: string
   let testToken: TestToken
-  let signer = (new ethers.providers.Web3Provider(<any>network.provider)).getSigner()
+  let signer = new ethers.providers.Web3Provider(
+    <any>network.provider
+  ).getSigner()
   let arbitrator: ArbitratorMock
   const daoConfig: DaoConfig = {
     executionDelay: 1, // how many seconds to wait before being able to call `execute`.
@@ -107,8 +109,10 @@ describe("Proposal", function() {
   const createArbitratorMock = async (testTokenAddress: string) => {
     const { abi, bytecode } = ArbitratorMockArtifact
     const ArbitratorMock = new ethers.ContractFactory(abi, bytecode, signer)
-    const arbitratorMock = (await ArbitratorMock.deploy(testTokenAddress)) as ArbitratorMock
-    return arbitratorMock;
+    const arbitratorMock = (await ArbitratorMock.deploy(
+      testTokenAddress
+    )) as ArbitratorMock
+    return arbitratorMock
   }
 
   const createTestToken = async () => {
@@ -120,43 +124,60 @@ describe("Proposal", function() {
     return testToken
   }
 
-  async function makeProposal(args: makeProposalParams): Promise<ProposalResult>
-  {
+  async function makeProposal(
+    args: makeProposalParams
+  ): Promise<ProposalResult> {
     const { options, queueAddress, executor, actions } = args
     const proposal = new Proposal(queueAddress, options)
     const web3Provider = new ethers.providers.Web3Provider(options.provider)
-    const submitter = await (web3Provider.getSigner()).getAddress()
+    const submitter = await web3Provider.getSigner().getAddress()
 
     const currentTimestamp = (await web3Provider.getBlock('latest')).timestamp
-    const executionTime = Number(currentTimestamp) + Number(daoConfig.executionDelay) + 100
-    const payload = buildPayload({ submitter, executor, actions, executionTime})
+    const executionTime =
+      Number(currentTimestamp) + Number(daoConfig.executionDelay) + 100
+    const payload = buildPayload({
+      submitter,
+      executor,
+      actions,
+      executionTime,
+    })
     const proposalData = { payload, config: daoConfig }
     const txResult = await proposal.schedule(proposalData)
 
     return { proposal, proposalData, txResult }
   }
 
-  async function grantVetoPower(provider: any, queueAddress: string, executor: string) {
-    const signer = (new ethers.providers.Web3Provider(provider)).getSigner()
+  async function grantVetoPower(
+    provider: any,
+    queueAddress: string,
+    executor: string
+  ) {
+    const signer = new ethers.providers.Web3Provider(provider).getSigner()
     const testUser = await signer.getAddress()
-  
+
     const changeVetoRole = encodeDataForVetoRole(testUser)
-    const actions: ActionType[] = [{ to: queueAddress, value: 0, data: changeVetoRole }]
-  
-    const { proposal: vetoProposal, txResult: vetoProposalTx, proposalData: vetoData } = await makeProposal({
+    const actions: ActionType[] = [
+      { to: queueAddress, value: 0, data: changeVetoRole },
+    ]
+
+    const {
+      proposal: vetoProposal,
+      txResult: vetoProposalTx,
+      proposalData: vetoData,
+    } = await makeProposal({
       options: { provider: network.provider },
       queueAddress,
       executor,
-      actions
+      actions,
     })
     await vetoProposalTx.wait()
-  
+
     // advance the time so we can execute the proposal immediately
     await advanceTime(ethers.provider)
-  
+
     const vetoResult = await vetoProposal.execute(vetoData)
     const execResult = await vetoResult.wait()
-  
+
     expect(execResult.status).to.equal(1)
     expect(vetoResult.hash).to.equal(execResult.transactionHash)
   }
@@ -199,28 +220,28 @@ describe("Proposal", function() {
     queueAddress = args?.args[1] as string
   })
 
-  it("schedule should work", async function() {
+  it('schedule should work', async function () {
     const { txResult } = await makeProposal({
       options: { provider: network.provider },
       queueAddress,
-      executor
+      executor,
     })
 
     const receipt = await txResult.wait()
     expect(receipt.status).to.equal(1)
     expect(txResult.hash).to.equal(receipt.transactionHash)
-  });
+  })
 
-  it("veto should work", async function() {
+  it('veto should work', async function () {
     // remember the snapshot to move back after this test is finished.
-    const snapshotId = await ethers.provider.send("evm_snapshot", []);
+    const snapshotId = await ethers.provider.send('evm_snapshot', [])
     // submit a proposal to give the test user veto power
     await grantVetoPower(network.provider, queueAddress, executor)
 
     const { proposal, txResult, proposalData } = await makeProposal({
       options: { provider: network.provider },
       queueAddress,
-      executor
+      executor,
     })
     await txResult.wait()
 
@@ -229,24 +250,22 @@ describe("Proposal", function() {
     const receipt = await result.wait()
     expect(receipt.status).to.equal(1)
     expect(result.hash).to.equal(receipt.transactionHash)
-    
+
     // gets back to the snapshot before time was advanced.
     // necessary so that other tests can still work with court
     // without getting CLK_TOO_MANY_TRANSITIONS error.
-    await ethers.provider.send("evm_revert", [snapshotId]);
+    await ethers.provider.send('evm_revert', [snapshotId])
   })
 
-  it("challenge should work", async function() {
-
+  it('challenge should work', async function () {
     const { feeAmount } = await arbitrator.getDisputeFees()
     let tx = await testToken.approve(queueAddress, feeAmount)
     await tx.wait()
 
-
     const { proposal, txResult, proposalData } = await makeProposal({
       options: { provider: network.provider },
       queueAddress,
-      executor
+      executor,
     })
     await txResult.wait()
 
@@ -257,7 +276,7 @@ describe("Proposal", function() {
     expect(result.hash).to.equal(receipt.transactionHash)
   })
 
-  it("resolve should work", async function() {
+  it('resolve should work', async function () {
     const { feeAmount } = await arbitrator.getDisputeFees()
     let tx = await testToken.approve(queueAddress, feeAmount)
     await tx.wait()
@@ -265,7 +284,7 @@ describe("Proposal", function() {
     const { proposal, txResult, proposalData } = await makeProposal({
       options: { provider: network.provider },
       queueAddress,
-      executor
+      executor,
     })
     await txResult.wait()
 
@@ -274,10 +293,12 @@ describe("Proposal", function() {
     const challengeReceipt = await tx.wait()
 
     // can only dispute after a challenge
-    const disputeId = proposal.getDisputeId(<TransactionReceipt>challengeReceipt)
+    const disputeId = proposal.getDisputeId(
+      <TransactionReceipt>challengeReceipt
+    )
     expect(disputeId).to.not.be.null
 
-    await arbitrator.executeRuling(disputeId!, RULES.APPROVED);
+    await arbitrator.executeRuling(disputeId!, RULES.APPROVED)
     const result = await proposal.resolve(proposalData, disputeId!)
 
     const receipt = await result.wait()
@@ -285,11 +306,11 @@ describe("Proposal", function() {
     expect(result.hash).to.equal(receipt.transactionHash)
   })
 
-  it("execute should work", async function() {
+  it('execute should work', async function () {
     const { proposal, proposalData, txResult } = await makeProposal({
-      options: { provider: network.provider},
+      options: { provider: network.provider },
       queueAddress,
-      executor
+      executor,
     })
     await txResult.wait()
 
@@ -299,13 +320,12 @@ describe("Proposal", function() {
     const receipt = await result.wait()
     expect(receipt.status).to.equal(1)
     expect(result.hash).to.equal(receipt.transactionHash)
-  });
+  })
 
-
-  it("use invalid queue abi should throw", async function() {
+  it('use invalid queue abi should throw', async function () {
     const abi = [
       `function schedule(bool) public`,
-      `function nonce() public view returns (uint256)`
+      `function nonce() public view returns (uint256)`,
     ]
 
     try {
@@ -313,7 +333,7 @@ describe("Proposal", function() {
       const tx = await makeProposal({
         options: { provider, abi },
         queueAddress,
-        executor
+        executor,
       })
       expect(tx).to.be.undefined
     } catch (err) {

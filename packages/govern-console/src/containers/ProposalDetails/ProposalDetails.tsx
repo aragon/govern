@@ -18,10 +18,13 @@ import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import QueueApprovals from 'services/QueueApprovals';
 import FacadeProposal from 'services/Proposal';
 import AbiHandler from 'utils/AbiHandler';
-import { toUtf8String } from '@ethersproject/strings';
+import { toUTF8String,toUTF8Bytes } from 'utils/lib';
 import { formatDate } from 'utils/date';
 import { getState, getStateColor } from 'utils/states';
 import { useSnackbar } from 'notistack';
+import { Link } from 'react-router-dom';
+import { IPFSField } from 'components/Field/IPFSField';
+import { getIpfsUrl, addToIpfs } from 'utils/ipfs';
 
 // widget components
 import ChallengeWidget from './components/ChallengeWidget';
@@ -285,7 +288,9 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   const [daoDetails, updateDaoDetails] = React.useState<any>();
   const [challengeReason, setChallengeReason] = React.useState('');
   const transactionsQueue = React.useRef<CustomTransaction[]>([]);
-
+  
+  const [challengeReasonFile, setChallengeReasonFile] = React.useState<any>(null);
+  
   const abiHandler = React.useMemo(() => {
     if (networkName) {
       return new AbiHandler(networkName);
@@ -369,7 +374,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     }
   }, [daoList]);
 
-  const challengeProposal = async () => {
+  const challengeProposal = async (challengeReason:string, challengeReasonFile:any) => {
     // if the reason's length is less than 10 words, it's highly unlikely
     // to specify the actual valid reason in less than 10 words
     if (challengeReason.length < 10) {
@@ -379,13 +384,20 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       return;
     }
 
+    // TODO: add modal 
+    // Upload proof to ipfs if it's a file, 
+    // otherwise convert it to utf8bytes
+    const reason = challengeReasonFile  
+      ? await addToIpfs(challengeReasonFile[0])
+      : toUTF8Bytes(challengeReason);
+
     const proposalParams = getProposalParams(proposalInfo);
 
     if (proposalInstance) {
       try {
         transactionsQueue.current = await proposalInstance.challenge(
           proposalParams,
-          challengeReason,
+          reason,
         );
       } catch (error) {
         enqueueSnackbar(error.message, { variant: 'error' });
@@ -495,9 +507,8 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                   </InfoWrapper>
                   <InfoWrapper>
                     <InfoKeyDiv>Rules:</InfoKeyDiv>
-                    {/* <InfoValueDivInline>{getParsedDataFromBytes(proposalInfo.config.rules)}</InfoValueDivInline> */}
                     <InfoValueDivInline>
-                      {toUtf8String(proposalInfo.config.rules)}
+                      <IPFSField value={proposalInfo.config.rules} />
                     </InfoValueDivInline>
                   </InfoWrapper>
                   <div style={{ height: '32px', width: '100%' }} />
@@ -535,11 +546,12 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                     </InfoValueDivInline>
                   </InfoWrapper>
                   <InfoWrapper>
-                    <InfoKeyDiv>Proof:</InfoKeyDiv>
-                    <InfoValueDivBlock>
-                      {toUtf8String(proposalInfo.payload.proof)}
-                    </InfoValueDivBlock>
+                    <InfoKeyDiv>Justification:</InfoKeyDiv>
+                    <InfoValueDivInline>
+                      <IPFSField value={proposalInfo.payload.proof} />
+                    </InfoValueDivInline>
                   </InfoWrapper>
+
                   <InfoWrapper>
                     <InfoKeyDiv>Actions:</InfoKeyDiv>
                     <ActionsWrapper id="action-wrapper">
@@ -626,6 +638,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                       }
                       currentState={proposalInfo.state}
                       setChallengeReason={setChallengeReason}
+                      setChallengeFile={setChallengeReasonFile}
                       onChallengeProposal={challengeProposal}
                     />
                   }

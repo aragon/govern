@@ -1,7 +1,6 @@
 import { hexlify, arrayify, keccak256 } from 'ethers/lib/utils'
 
 export default class MerkleTree {
-  
   private readonly elements: Buffer[]
   private readonly bufferElementPositionIndex: { [hexElement: string]: number }
   private readonly layers: Buffer[][]
@@ -13,7 +12,9 @@ export default class MerkleTree {
     // Deduplicate elements
     this.elements = MerkleTree.bufDedup(this.elements)
 
-    this.bufferElementPositionIndex = this.elements.reduce<{ [hexElement: string]: number }>((memo, el, index) => {
+    this.bufferElementPositionIndex = this.elements.reduce<{
+      [hexElement: string]: number
+    }>((memo, el, index) => {
       memo[hexlify(el)] = index
       return memo
     }, {})
@@ -57,7 +58,9 @@ export default class MerkleTree {
       return first
     }
 
-    return Buffer.from(arrayify(keccak256(MerkleTree.sortAndConcat(first, second))))
+    return Buffer.from(
+      arrayify(keccak256(MerkleTree.sortAndConcat(first, second)))
+    )
   }
 
   getRoot(): Buffer {
@@ -122,4 +125,3 @@ export default class MerkleTree {
     return Buffer.concat([...args].sort(Buffer.compare))
   }
 }
-

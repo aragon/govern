@@ -17,8 +17,7 @@
 </div>
 
 [![](https://img.shields.io/discord/672466989217873929?label=discord)](https://discord.gg/aKAKcf) [![](https://img.shields.io/npm/v/@aragon/govern-core)](https://www.npmjs.com/package/@aragon/govern-core) [![](https://img.shields.io/badge/solidity-%3E%3D%200.6.8-lightgrey)](https://img.shields.io/badge/solidity-%3E%3D%200.6.8-lightgrey) [![Actions Status](https://github.com/aragon/govern/workflows/CI/badge.svg)](https://github.com/aragon/govern/actions?query=workflow%3ACI) [![Actions Status](https://github.com/aragon/govern/workflows/CD/badge.svg)](https://github.com/aragon/govern/actions?query=workflow%3ACD)
-  [![codecov](https://codecov.io/gh/aragon/govern/branch/master/graph/badge.svg)](https://codecov.io/gh/aragon/govern)
-
+[![codecov](https://codecov.io/gh/aragon/govern/branch/master/graph/badge.svg)](https://codecov.io/gh/aragon/govern)
 
 ## Aragon Govern
 
@@ -36,10 +35,11 @@ Read the documentation if you have any doubts about the high-level overview of G
 
 Before explaining how you can contribute, It's worth mentioning that we use `develop` branch as the default one. This makes it easier for us to
 have all the latest, development changes without affecting the current production version. Though, We don't use `release` branches to make the process a little bit easier !
- * Pushing to `develop` branch via PR deploys changes to testing environments(currently only rinkeby). 
- * Pushing to `master` branch via PR from `develop` deploys changes to production servers(mainnet).
- * Pushing to `master|develop` directly will be restricted to make sure the PR's are reviewed.
- * Creating PRs end up in relation to `develop` by default.
+
+- Pushing to `develop` branch via PR deploys changes to testing environments(currently only rinkeby).
+- Pushing to `master` branch via PR from `develop` deploys changes to production servers(mainnet).
+- Pushing to `master|develop` directly will be restricted to make sure the PR's are reviewed.
+- Creating PRs end up in relation to `develop` by default.
 
 Don't be shy to contribute even the smallest tweak. Everyone will be especially nice and helpful to beginners to help you get started!
 
@@ -72,7 +72,6 @@ To use Govern, feel free to deploy your own registries and factories, but using 
 - 🏭 GovernBaseFactory: [`0xc03710063b0e4435f997A0B1bbdf2680A2f07E13`](https://rinkeby.etherscan.io/address/0xc03710063b0e4435f997A0B1bbdf2680A2f07E13)
 
 ## Help shape Aragon Govern
+
 - Discuss in [Aragon Forum](https://forum.aragon.org/tags/aragon-govern)
 - Join the [Aragon Govern channel](https://discord.gg/DrKMbeY) on Discord.
-
-

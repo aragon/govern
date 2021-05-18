@@ -26,8 +26,11 @@ import {
 import { useSnackbar } from 'notistack';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import FacadeProposal from 'services/Proposal';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
+import { IPFSInput } from 'components/Field/IPFSInput';
+import { toUTF8String, toUTF8Bytes } from 'utils/lib';
+import { addToIpfs } from 'utils/ipfs';
 
 import {
   Proposal,
@@ -91,7 +94,8 @@ const WrapperDiv = styled(Paper)(({ theme }) => ({
   // display: 'block',
   boxSizing: 'border-box',
   boxShadow: 'none',
-  // flexDirection: 'column',
+  flexDirection: 'column',
+  display: 'flex',
 }));
 const BackButton = styled('div')({
   height: 25,
@@ -100,6 +104,8 @@ const BackButton = styled('div')({
   position: 'relative',
   left: -6,
 });
+
+// TODO: GIORGI repeating styles
 const Title = styled(Typography)({
   fontFamily: 'Manrope',
   fontStyle: 'normal',
@@ -111,6 +117,7 @@ const Title = styled(Typography)({
   height: 50,
   display: 'block',
 });
+
 const SettingsLink = styled(Typography)({
   fontFamily: 'Manrope',
   fontStyle: 'normal',
@@ -170,6 +177,12 @@ export interface AddedActionsProps {
    */
   selectedActions?: any;
   onAddInputToAction: any;
+}
+
+interface FormInputs {
+  proof: string;
+  isProofFile: boolean;
+  proofFile: any;
 }
 
 const AddedActions: React.FC<AddedActionsProps> = ({
@@ -252,7 +265,7 @@ const AddedActions: React.FC<AddedActionsProps> = ({
 
 const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const history = useHistory();
-  const { control, getValues, handleSubmit } = useForm<{ proof: string }>();
+
   const { daoName } = useParams<any>();
   //TODO daoname empty handling
   const { data: daoList } = useQuery(GET_DAO_BY_NAME, {
@@ -261,12 +274,19 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const { enqueueSnackbar } = useSnackbar();
   const { dispatch } = React.useContext(ModalsContext);
 
+  // form
+  const methods = useForm<FormInputs>();
+  const { getValues, handleSubmit } = methods;
+
   const [selectedActions, updateSelectedOptions] = useState([]);
   const [isInputModalOpen, setInputModalOpen] = useState(false);
   const [isActionModalOpen, setActionModalOpen] = useState(false);
   const [daoDetails, updateDaoDetails] = useState<any>();
   const [abiFunctions, setAbiFunctions] = useState([]);
   const [actionsToSchedule, setActionsToSchedule] = useState([]);
+  
+  // proof file 
+  const [proofFile, setProofFile] = useState<any>(null);
 
   useEffect(() => {
     if (daoList) {
@@ -384,17 +404,13 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     handleActionModalOpen();
   };
 
-  const onChangeProof = (val: string) => {
-    // setProof(val);
-  };
-
   const validate = () => {
-    if (actionsToSchedule.length === 0) {
-      enqueueSnackbar('Atleast one action is needed to schedule a proposal.', {
-        variant: 'error',
-      });
-      return false;
-    }
+    // if (actionsToSchedule.length === 0) {
+    //   enqueueSnackbar('At least one action is needed to schedule a proposal.', {
+    //     variant: 'error',
+    //   });
+    //   return false;
+    // }
     return true;
   };
 
@@ -424,12 +440,19 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   };
 
   const scheduleProposal = async (actions: ActionType[]) => {
+    // TODO: add modal 
+    // Upload proof to ipfs if it's a file, 
+    // otherwise convert it to utf8bytes
+    const proof = getValues('isProofFile')
+      ? await addToIpfs(proofFile[0])
+      : toUTF8Bytes(getValues('proof'));
+
     // build the container to schedule.
     const payload = {
       submitter: account.address,
       executor: daoDetails.executor.address,
       actions: actions,
-      proof: getValues('proof'),
+      proof: proof,
     };
 
     // the final container to be sent to schedule.
@@ -472,89 +495,83 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
             DAO Settings
           </a>
         </SettingsLink>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            marginBottom: '10px',
-          }}
-        >
-          <div>
-            <SubTitle>Proof</SubTitle>{' '}
+        <FormProvider {...methods}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              marginBottom: '10px',
+            }}
+          >
+            <div>
+              <SubTitle>Proof</SubTitle>{' '}
+            </div>
+            <div style={{ marginLeft: '10px' }}>
+              {
+                <HelpButton helpText="Please provide the reasons why this proposal deserves to be executed" />
+              }
+            </div>
           </div>
-          <div style={{ marginLeft: '10px' }}>
-            {
-              <HelpButton helpText="Please provide the reasons why this proposal deserves to be executed" />
-            }
-          </div>
-        </div>
-        <Controller
-          name="proof"
-          control={control}
-          defaultValue={''}
-          rules={{ required: 'This is required.' }}
-          render={({ field: { onChange, value }, fieldState: { error } }) => (
-            <InputField
-              onInputChange={onChange}
-              placeholder={'Enter proof'}
-              label=""
-              value={value}
-              height={'108px'}
-              width={'700px'}
-              error={!!error}
-              helperText={error ? error.message : null}
-            />
+
+          <IPFSInput
+            label="Enter the justification for changes"
+            placeholder="Justification Reason..."
+            isFile="isProofFile"
+            textInputName="proof"
+            fileInputName="proofFile"
+            updateFile={setProofFile}
+          />
+
+          <Title>Actions</Title>
+          {selectedActions.length === 0 ? (
+            <SubTitle>No actions defined Yet</SubTitle>
+          ) : (
+            <div>
+              <AddedActions
+                selectedActions={selectedActions}
+                onAddInputToAction={onAddInputToAction}
+                actionsToSchedule={actionsToSchedule}
+              />
+            </div>
           )}
-        />
-        <Title>Actions</Title>
-        {selectedActions.length === 0 ? (
-          <SubTitle>No actions defined Yet</SubTitle>
-        ) : (
-          <div>
-            <AddedActions
-              selectedActions={selectedActions}
-              onAddInputToAction={onAddInputToAction}
-              actionsToSchedule={actionsToSchedule}
-            />
-          </div>
-        )}
-        <br />
-        <ANButton
-          label="Add new action"
-          // width={155}
-          // height={45}
-          buttonType="secondary"
-          buttonColor="#00C2FF"
-          style={{ marginTop: 40 }}
-          onClick={handleInputModalOpen}
-        />
-        <br />
-        <ANButton
-          label="Schedule/Submit"
-          disabled={!isConnected}
-          // width={178}
-          // height={45}
-          buttonType="primary"
-          // color="#00C2FF"
-          style={{ marginTop: 16 }}
-          // disabled={!isProposalValid()}
-          onClick={handleSubmit(() => onSchedule())}
-        />
-        {isInputModalOpen && (
-          <NewActionModal
-            onCloseModal={handleInputModalClose}
-            onGenerate={onGenerateActionsFromAbi}
-            open={isInputModalOpen}
-          ></NewActionModal>
-        )}
-        {isActionModalOpen && (
-          <AddActionsModal
-            onCloseModal={handleActionModalClose}
-            open={isActionModalOpen}
-            onAddActions={onAddNewActions}
-            actions={abiFunctions as any}
-          ></AddActionsModal>
-        )}
+          <br />
+          <ANButton
+            label="Add new action"
+            // width={155}
+            // height={45}
+            buttonType="secondary"
+            buttonColor="#00C2FF"
+            style={{ marginTop: 40 }}
+            onClick={handleInputModalOpen}
+          />
+          <br />
+          <ANButton
+            label="Schedule/Submit"
+            disabled={!isConnected}
+            // width={178}
+            // height={45}
+            buttonType="primary"
+            // color="#00C2FF"
+            style={{ marginTop: 16 }}
+            // disabled={!isProposalValid()}
+            onClick={handleSubmit(() => onSchedule())}
+          />
+          {isInputModalOpen && (
+            <NewActionModal
+              onCloseModal={handleInputModalClose}
+              onGenerate={onGenerateActionsFromAbi}
+              open={isInputModalOpen}
+            ></NewActionModal>
+          )}
+          {isActionModalOpen && (
+            <AddActionsModal
+              onCloseModal={handleActionModalClose}
+              open={isActionModalOpen}
+              onAddActions={onAddNewActions}
+              actions={abiFunctions as any}
+            ></AddActionsModal>
+          )}
+        </FormProvider>
       </WrapperDiv>
     </>
   );

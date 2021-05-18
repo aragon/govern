@@ -4,7 +4,7 @@ import { styled, useTheme } from '@material-ui/core/styles';
 import MUICard, { CardProps } from '@material-ui/core/Card';
 import MUITypography from '@material-ui/core/Typography';
 import { Label } from '../Labels/Label';
-import { getState, getStateColor } from 'utils/states'
+import { getState, getStateColor } from 'utils/states';
 
 export interface ProposalCardProps {
   /**
@@ -100,10 +100,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
   return (
     <ProposalCardWrapper onClick={onClickProposalCard}>
       <LabelWrapper>
-        <Label
-          labelColor={proposalStatusColor}
-          labelText={proposalStatus}
-        />
+        <Label labelColor={proposalStatusColor} labelText={proposalStatus} />
       </LabelWrapper>
       <ProposalHash>{getSlicedTransactionHash()}</ProposalHash>
       <ProposalDateText>{proposalDate}</ProposalDateText>
