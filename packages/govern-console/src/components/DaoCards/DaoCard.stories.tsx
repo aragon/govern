@@ -15,7 +15,6 @@ const Template: Story<DaoCardProps> = (args) => <DaoCard {...args} />;
 
 export const ANDaoCard = Template.bind({});
 ANDaoCard.args = {
-  label: 'Aaragon Dao',
-  aumValue: 100.4,
-  numberOfProposals: 453,
+  label: 'Aragon Dao',
+  numberOfProposals: 15,
 };

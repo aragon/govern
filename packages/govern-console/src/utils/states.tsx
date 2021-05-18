@@ -1,4 +1,3 @@
-/* eslint-disable */
 export const PROPOSAL_STATES = {
   SCHEDULED: 'Scheduled',
   CHALLENGED: 'Challenged',
@@ -24,10 +23,7 @@ export const isEligibleForExecution = (time: number) => {
 };
 
 export const getStateColor = (state: string, executionTime: number) => {
-  if (
-    state == PROPOSAL_STATES.SCHEDULED &&
-    isEligibleForExecution(executionTime)
-  ) {
+  if (state == PROPOSAL_STATES.SCHEDULED && isEligibleForExecution(executionTime)) {
     return PROPOSAL_STATES_COLORS[PROPOSAL_STATES.EXECUTABLE];
   }
 
@@ -35,10 +31,7 @@ export const getStateColor = (state: string, executionTime: number) => {
 };
 
 export const getState = (state: string, executionTime: number) => {
-  if (
-    state == PROPOSAL_STATES.SCHEDULED &&
-    isEligibleForExecution(executionTime)
-  ) {
+  if (state == PROPOSAL_STATES.SCHEDULED && isEligibleForExecution(executionTime)) {
     return 'Executable';
   }
   if (state == PROPOSAL_STATES.APPROVED) {

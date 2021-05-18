@@ -8,11 +8,7 @@ import { toUTF8String } from 'utils/lib';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { HelpButton } from 'components/HelpButton/HelpButton';
 
-import {
-  InfoKeyDiv,
-  InfoValueDivInline,
-  InfoValueDivBlock,
-} from '../ProposalDetails';
+import { InfoKeyDiv, InfoValueDivInline, InfoValueDivBlock } from '../ProposalDetails';
 import { Widget, WidgetRow, InfoWrapper, TitleText } from './SharedStyles';
 import { IPFSInput } from 'components/Field/IPFSInput';
 
@@ -50,9 +46,8 @@ const ChallengeWidget: React.FC<any> = ({
   setChallengeFile,
   onChallengeProposal,
 }) => {
-  const [isExpanded, updateIsExpanded] = React.useState<boolean>(false);
-
   if (containerEventChallenge) {
+    console.log('modis aq 111', containerEventChallenge.reason);
     const challengeReasonIpfsUrl = getIpfsUrl(containerEventChallenge.reason);
     return (
       <Widget>
@@ -73,7 +68,7 @@ const ChallengeWidget: React.FC<any> = ({
         </InfoWrapper>
         <InfoKeyDiv>Challenge Reason</InfoKeyDiv>
         <InfoValueDivBlock
-          maxlines={isExpanded ? undefined : 4}
+          maxlines={4}
           style={{
             padding: 0,
             WebkitBoxOrient: 'vertical',
@@ -82,13 +77,9 @@ const ChallengeWidget: React.FC<any> = ({
           }}
         >
           {challengeReasonIpfsUrl ? (
-            <Link
-              to={challengeReasonIpfsUrl}
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              View file
-            </Link>
+            <a href={challengeReasonIpfsUrl} target="_blank" rel="noreferrer noopener">
+              Read more
+            </a>
           ) : (
             toUTF8String(containerEventChallenge.reason) ||
             `Reason can't be decoded: ${containerEventChallenge.reason}`
@@ -114,7 +105,6 @@ const ChallengeWidget: React.FC<any> = ({
   } = methods;
 
   const submit = useCallback(() => {
-    console.log(getValues('reasonFile'),  ' blax')
     onChallengeProposal(getValues('reason'), getValues('reasonFile'));
   }, []);
 

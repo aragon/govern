@@ -3,12 +3,7 @@ import React, { useState, memo, useRef, useEffect } from 'react';
 import QueueApprovals from 'services/QueueApprovals';
 import FacadeProposal from 'services/Proposal';
 
-import {
-  Proposal,
-  ProposalOptions,
-  PayloadType,
-  ActionType,
-} from '@aragon/govern';
+import { Proposal, ProposalOptions, PayloadType, ActionType } from '@aragon/govern';
 
 export function useFacadeProposal(queue: string, resolver: string) {
   const context: any = useWallet();
@@ -22,8 +17,7 @@ export function useFacadeProposal(queue: string, resolver: string) {
     if (provider && account && queue && resolver) {
       const queueApprovals = new QueueApprovals(account, queue, resolver);
       const proposal = new Proposal(queue, {} as ProposalOptions);
-      return new FacadeProposal(queueApprovals, proposal) as FacadeProposal &
-        Proposal;
+      return new FacadeProposal(queueApprovals, proposal) as FacadeProposal & Proposal;
     }
   }, [provider, account, queue, resolver]);
 

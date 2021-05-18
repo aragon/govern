@@ -1,4 +1,4 @@
-import React, { useState, memo, useRef } from 'react';
+import React, { useState } from 'react';
 import MuiDialog from '@material-ui/core/Dialog';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
@@ -8,14 +8,7 @@ import { ANButton } from '../../components/Button/ANButton';
 import { InputField } from '../../components/InputFields/InputField';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
-import {
-  styled,
-  useTheme,
-  Theme,
-  withStyles,
-  WithStyles,
-  createStyles,
-} from '@material-ui/core/styles';
+import { styled, Theme, withStyles, WithStyles, createStyles } from '@material-ui/core/styles';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
 
@@ -66,7 +59,7 @@ export interface DialogTitleProps extends WithStyles<typeof styles> {
   onClose: () => void;
 }
 
-const DialogContent = withStyles((theme: Theme) => ({
+const DialogContent = withStyles({
   root: {
     paddingTop: '33px',
     paddingLeft: '40px',
@@ -74,9 +67,9 @@ const DialogContent = withStyles((theme: Theme) => ({
     paddingBottom: '0px',
     maxHeight: '424px',
   },
-}))(MuiDialogContent);
+})(MuiDialogContent);
 
-const DialogContentSearch = withStyles((theme: Theme) => ({
+const DialogContentSearch = withStyles({
   root: {
     paddingTop: '20px',
     paddingLeft: '40px',
@@ -84,9 +77,9 @@ const DialogContentSearch = withStyles((theme: Theme) => ({
     paddingBottom: '20px',
     maxHeight: '424px',
   },
-}))(MuiDialogContent);
+})(MuiDialogContent);
 
-const DialogActions = withStyles((theme: Theme) => ({
+const DialogActions = withStyles({
   root: {
     margin: 0,
     paddingTop: '24px',
@@ -97,7 +90,7 @@ const DialogActions = withStyles((theme: Theme) => ({
     justifyContent: 'left',
     alignItems: 'left',
   },
-}))(MuiDialogActions);
+})(MuiDialogActions);
 
 export const DialogTitle = withStyles(styles)((props: DialogTitleProps) => {
   const { children, classes, onClose, ...other } = props;
@@ -105,11 +98,7 @@ export const DialogTitle = withStyles(styles)((props: DialogTitleProps) => {
     <MuiDialogTitle disableTypography className={classes.root} {...other}>
       <Typography variant="h6">{children}</Typography>
       {onClose ? (
-        <IconButton
-          aria-label="close"
-          className={classes.closeButton}
-          onClick={onClose}
-        >
+        <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
           <CloseIcon />
         </IconButton>
       ) : null}
@@ -121,7 +110,6 @@ const IncrementorDecrementorButtons: React.FC<any> = ({
   onIncrementAction,
   onDecrementAction,
   action,
-  ...props
 }) => {
   const [counter, setCounter] = useState<number>(0);
   return (
@@ -149,7 +137,7 @@ const IncrementorDecrementorButtons: React.FC<any> = ({
   );
 };
 
-const ActionText = styled(Typography)(({ theme }: any) => ({
+const ActionText = styled(Typography)(({ theme }) => ({
   color: theme.custom.black,
   lineHeight: theme.custom.modal.labelLineHeight,
   fontSize: theme.custom.modal.labelFontSize,
@@ -164,7 +152,6 @@ export const AddActionsModal: React.FC<AddActionsModalProps> = ({
   onAddActions,
   actions,
 }) => {
-  const theme = useTheme();
   const [shownActions, setShownActions] = useState<any>(actions);
   const [selectedActions, setSelectedActions] = useState<any>([]);
   const actionStyle = {
@@ -242,12 +229,6 @@ export const AddActionsModal: React.FC<AddActionsModalProps> = ({
                   onIncrementAction={onIncrementAction}
                   onDecrementAction={onDecrementAction}
                 ></IncrementorDecrementorButtons>
-                {/* <ANButton
-                  label="Add"
-                  onClick={() => onAddAction(action)}
-                  height={'30px'}
-                  width="80px"
-                ></ANButton> */}
               </div>
             ))}
           </div>

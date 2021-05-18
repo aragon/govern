@@ -1,5 +1,5 @@
 import React from 'react';
-import { styled, Theme, useTheme } from '@material-ui/core/styles';
+import { styled, Theme } from '@material-ui/core/styles';
 import MUIButton from '@material-ui/core/Button';
 
 export interface ANButtonProps {
@@ -19,10 +19,6 @@ export interface ANButtonProps {
    * Button contents
    */
   label: string | React.ReactNode;
-  // /**
-  //  * Any additional overwriting style.
-  //  */
-  // style: object;
   /**
    * Optional click handler
    */
@@ -42,11 +38,14 @@ export interface ANButtonProps {
   /**
    * Color value
    */
-  buttonColor?: string;
+  labelColor?: string;
   /**
    * style
    */
   style?: any;
+  /**
+   * Type of button
+   */
   type?: 'button' | 'submit';
 }
 
@@ -59,10 +58,10 @@ const getBackground = (
   if (disabled) return `${theme.custom.greyscale.light} !important`;
   if (backgroundColor) return backgroundColor;
   if (buttonType === 'primary')
-    return 'linear-gradient(107.79deg, #00C2FF 1.46%, #01E8F7 100%)';
+    return 'linear-gradient(107.79deg, #00C2FF 1.46%, #01E8F7 100%) !important';
   if (buttonType === 'challenge')
-    return 'linear-gradient(107.79deg, #F7B201 1.46%, #FF7A00 100%)';
-  return '#ffffff';
+    return 'linear-gradient(107.79deg, #F7B201 1.46%, #FF7A00 100%) !important';
+  return '#ffffff !important';
 };
 const getBackgroundForHoveredState = (
   buttonType: string,
@@ -73,10 +72,10 @@ const getBackgroundForHoveredState = (
   if (disabled) return '#D9E0F5 !important';
   if (backgroundColor) return backgroundColor;
   if (buttonType === 'primary')
-    return 'linear-gradient(107.79deg, #82E1FF 1.46%, #3CF3FF 100%)';
+    return 'linear-gradient(107.79deg, #82E1FF 1.46%, #3CF3FF 100%) !important';
   if (buttonType === 'challenge')
-    return 'linear-gradient(107.79deg, #FFD056 1.46%, #FF9636 100%)';
-  return '#ffffff';
+    return 'linear-gradient(107.79deg, #FFD056 1.46%, #FF9636 100%) !important';
+  return '#ffffff !important';
 };
 const getBackgroundForPressedState = (
   buttonType: string,
@@ -87,17 +86,17 @@ const getBackgroundForPressedState = (
   if (disabled) return '#D9E0F5 !important';
   if (backgroundColor) return backgroundColor;
   if (buttonType === 'primary')
-    return 'linear-gradient(107.79deg, #01B9F2 1.46%, #01DBE9 100%)';
+    return 'linear-gradient(107.79deg, #01B9F2 1.46%, #01DBE9 100%) !important';
   if (buttonType === 'challenge')
-    return 'linear-gradient(107.79deg, #EBA900 1.46%, #ED7100 100%)';
-  return '#EFF1F7;';
+    return 'linear-gradient(107.79deg, #EBA900 1.46%, #ED7100 100%) !important';
+  return '#EFF1F7 !important';
 };
 
 const getColor = (buttonType: string, color?: string, disabled?: boolean) => {
   if (disabled) return '#B0BDE5 !important';
   if (color && color !== '') return color;
-  if (buttonType === 'secondary') return '#20232C';
-  return '#ffffff';
+  if (buttonType === 'secondary') return '#20232C !important';
+  return '#ffffff !important';
 };
 
 const StyledButton = styled(MUIButton)(
@@ -108,8 +107,7 @@ const StyledButton = styled(MUIButton)(
     disabled,
     width,
     height,
-    buttonColor,
-    style,
+    labelColor,
   }: {
     theme: Theme;
     buttonType: string;
@@ -119,17 +117,15 @@ const StyledButton = styled(MUIButton)(
     disabled?: boolean;
     width?: string;
     height?: string;
-    buttonColor?: string;
+    labelColor?: string;
     style?: any;
   }) => ({
-    color: getColor(buttonType, buttonColor, disabled),
+    color: getColor(buttonType, labelColor, disabled),
     height: height || 46,
     width: width || 154,
     background: getBackground(buttonType, theme, disabled, backgroundColor),
     boxSizing: 'border-box',
-    boxShadow: disabled
-      ? 'none !important'
-      : '0px 3px 3px rgba(116, 131, 178, 0.2)',
+    boxShadow: disabled ? 'none !important' : '0px 3px 3px rgba(116, 131, 178, 0.2)',
     borderRadius: '8px',
     fontFamily: 'Manrope',
     fontStyle: 'normal',
@@ -138,44 +134,31 @@ const StyledButton = styled(MUIButton)(
     lineHeight: '22px',
     textTransform: 'none',
     animation: 'none',
-    transition: 'none',
     cursor: 'pointer',
+    transition: 'background 0.5s, color 0.5s',
     '&:hover': {
-      background: getBackgroundForHoveredState(
-        buttonType,
-        theme,
-        disabled,
-        backgroundColor,
-      ),
+      background: getBackgroundForHoveredState(buttonType, theme, disabled, backgroundColor),
       boxShadow: '0px 4px 4px rgba(116, 131, 178, 0.25)',
       color: buttonType === 'secondary' ? '#7483B2' : 'white',
     },
     '&:active': {
-      background: getBackgroundForPressedState(
-        buttonType,
-        theme,
-        disabled,
-        backgroundColor,
-      ),
+      background: getBackgroundForPressedState(buttonType, theme, disabled, backgroundColor),
       boxShadow: '0px 1px 1px rgba(116, 131, 178, 0.35)',
     },
     '& .MuiTouchRipple-root': {
       display: 'none',
     },
-    ...style,
   }),
 );
 
 export const ANButton: React.FC<ANButtonProps> = ({
   buttonType: buttonType = 'primary',
-  // size = 'medium',
   backgroundColor,
   label,
-  // style,
   disabled,
   width,
   height,
-  buttonColor,
+  labelColor,
   style,
   ...props
 }) => {
@@ -193,7 +176,7 @@ export const ANButton: React.FC<ANButtonProps> = ({
       width={width}
       buttonType={buttonType}
       height={height}
-      buttonColor={buttonColor}
+      labelColor={labelColor}
       style={style}
     >
       {label}

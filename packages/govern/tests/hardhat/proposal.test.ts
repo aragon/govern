@@ -10,8 +10,11 @@ import {
   ActionType,
 } from '../../public'
 
-import { Container } from '../../public/proposal'
-import { TestToken, ArbitratorMock } from '@aragon/govern-core/typechain'
+import { Container, ReceiptType } from '../../public/proposal'
+import {
+  TestToken,
+  ArbitratorMock
+} from '@aragon/govern-core/typechain'
 
 import * as TestTokenArtifact from '@aragon/govern-core/artifacts/contracts/test/TestToken.sol/TestToken.json'
 import * as ArbitratorMockArtifact from '@aragon/govern-core/artifacts/contracts/test/ArbitratorMock.sol/ArbitratorMock.json'
@@ -230,7 +233,9 @@ describe('Proposal', function () {
     const receipt = await txResult.wait()
     expect(receipt.status).to.equal(1)
     expect(txResult.hash).to.equal(receipt.transactionHash)
-  })
+    const containerHash = Proposal.getContainerHashFromReceipt(receipt, ReceiptType.Scheduled)
+    expect(containerHash).to.be.a('string').with.length.greaterThan(0)
+  });
 
   it('veto should work', async function () {
     // remember the snapshot to move back after this test is finished.
@@ -250,7 +255,9 @@ describe('Proposal', function () {
     const receipt = await result.wait()
     expect(receipt.status).to.equal(1)
     expect(result.hash).to.equal(receipt.transactionHash)
-
+    const containerHash = Proposal.getContainerHashFromReceipt(receipt, ReceiptType.Vetoed)
+    expect(containerHash).to.be.a('string').with.length.greaterThan(0)
+    
     // gets back to the snapshot before time was advanced.
     // necessary so that other tests can still work with court
     // without getting CLK_TOO_MANY_TRANSITIONS error.
@@ -274,6 +281,8 @@ describe('Proposal', function () {
     const receipt = await result.wait()
     expect(receipt.status).to.equal(1)
     expect(result.hash).to.equal(receipt.transactionHash)
+    const containerHash = Proposal.getContainerHashFromReceipt(receipt, ReceiptType.Challenged)
+    expect(containerHash).to.be.a('string').with.length.greaterThan(0)
   })
 
   it('resolve should work', async function () {
@@ -304,6 +313,8 @@ describe('Proposal', function () {
     const receipt = await result.wait()
     expect(receipt.status).to.equal(1)
     expect(result.hash).to.equal(receipt.transactionHash)
+    const containerHash = Proposal.getContainerHashFromReceipt(receipt, ReceiptType.Resolved)
+    expect(containerHash).to.be.a('string').with.length.greaterThan(0)
   })
 
   it('execute should work', async function () {
@@ -320,7 +331,10 @@ describe('Proposal', function () {
     const receipt = await result.wait()
     expect(receipt.status).to.equal(1)
     expect(result.hash).to.equal(receipt.transactionHash)
-  })
+    const containerHash = Proposal.getContainerHashFromReceipt(receipt, ReceiptType.Executed)
+    expect(containerHash).to.be.a('string').with.length.greaterThan(0)
+  });
+
 
   it('use invalid queue abi should throw', async function () {
     const abi = [

@@ -1,5 +1,4 @@
 import { createMuiTheme } from '@material-ui/core/styles';
-import lightBlue from '@material-ui/core/colors/lightBlue';
 
 interface CustomTheme {
   mainBackground: string;
@@ -224,8 +223,7 @@ const custom = {
   daoCard: {
     background: '#FFFFFF',
     border: '#ECF1F7',
-    labelColor:
-      '-webkit-linear-gradient(107.79deg, #87E0FF 1.46%, #7A7AF7 100%)',
+    labelColor: '-webkit-linear-gradient(107.79deg, #87E0FF 1.46%, #7A7AF7 100%)',
     fontFamily: 'Manrope',
     fontStyle: 'normal',
     labeFontSize: '24px',
@@ -319,15 +317,15 @@ const custom = {
   black: '#20232C',
   white: '#FFFFFF',
 };
-const breakpoints = {
-  values: {
-    xs: 320,
-    sm: 768,
-    md: 964,
-    lg: 964,
-    xl: 964,
-  },
-};
+// const breakpoints = {
+//   values: {
+//     xs: 320,
+//     sm: 768,
+//     md: 964,
+//     lg: 964,
+//     xl: 964,
+//   },
+// };
 export const lightTheme = createMuiTheme({
   custom,
   palette: {

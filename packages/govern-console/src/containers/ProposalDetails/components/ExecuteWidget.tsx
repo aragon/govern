@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { memo, useEffect, useMemo, useState } from 'react';
+import React, { memo } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { PROPOSAL_STATES } from 'utils/states';
 import { formatDate } from 'utils/date';
@@ -55,9 +54,7 @@ const ExecuteWidget: React.FC<any> = ({
           <WidgetRow>
             <InfoWrapper>
               <InfoKeyDiv>Execute available at</InfoKeyDiv>
-              <InfoValueDivInline>
-                {formatDate(executionTime)}
-              </InfoValueDivInline>
+              <InfoValueDivInline>{formatDate(executionTime)}</InfoValueDivInline>
             </InfoWrapper>
           </WidgetRow>
         )}

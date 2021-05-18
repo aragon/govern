@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { useEffect } from 'react';
 import { styled } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
@@ -9,30 +8,25 @@ import { useParams } from 'react-router-dom';
 import { GET_PROPOSAL_DETAILS_QUERY } from './queries';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { useQuery, useLazyQuery } from '@apollo/client';
-import { ANButton } from 'components/Button/ANButton';
 import { useWallet } from '../../AugmentedWallet';
 import { CustomTransaction } from 'utils/types';
 import { getProposalParams } from 'utils/ERC3000';
 import { Proposal, ProposalOptions } from '@aragon/govern';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
-import QueueApprovals from 'services/QueueApprovals';
-import FacadeProposal from 'services/Proposal';
 import AbiHandler from 'utils/AbiHandler';
-import { toUTF8String,toUTF8Bytes } from 'utils/lib';
+import { toUTF8String, toUTF8Bytes } from 'utils/lib';
 import { formatDate } from 'utils/date';
 import { getState, getStateColor } from 'utils/states';
 import { useSnackbar } from 'notistack';
 import { Link } from 'react-router-dom';
 import { IPFSField } from 'components/Field/IPFSField';
-import { getIpfsUrl, addToIpfs } from 'utils/ipfs';
-import { useFacadeProposal } from 'hooks/proposals'
+import { addToIpfs } from 'utils/ipfs';
+import { useFacadeProposal } from 'hooks/proposals';
 
 // widget components
 import ChallengeWidget from './components/ChallengeWidget';
 import ExecuteWidget from './components/ExecuteWidget';
 import ResolveWidget from './components/ResolveWidget';
-
-// import { InputField } from 'component/InputField/InputField';
 interface ProposalDetailsProps {
   onClickBack?: any;
 }
@@ -70,9 +64,11 @@ const ProposalId = styled('div')(({ theme }) => ({
   marginTop: '11px',
   textOverflow: 'ellipsis',
   boxSizing: 'border-box',
+  fontFamily: 'Manrope',
 }));
 const DateDisplay = styled('div')({
   height: '25px',
+  fontFamily: 'Manrope',
   width: '100%',
   color: '#7483B3',
   marginTop: '10px',
@@ -84,6 +80,7 @@ const DetailsWrapper = styled('div')({
   display: 'flex',
   justifyContent: 'space-between',
   marginTop: '47px',
+  fontFamily: 'Manrope',
 });
 const ProposalDetailsWrapper = styled('div')({
   width: 'calc(100% - 443px)',
@@ -92,6 +89,7 @@ const ProposalDetailsWrapper = styled('div')({
   minHeight: '900px',
   border: ' 2px solid #E2ECF5',
   padding: '32px 30px',
+  fontFamily: 'Manrope',
 });
 const WidgetWrapper = styled('div')({
   width: '427px',
@@ -103,6 +101,7 @@ const TitleText = styled(Typography)({
   height: '38px',
   width: '100%',
   boxSizing: 'border-box',
+  fontFamily: 'Manrope',
 });
 export const InfoWrapper = styled('div')({
   // display: 'flex',
@@ -112,6 +111,8 @@ export const InfoWrapper = styled('div')({
   width: '100%',
   boxSizing: 'border-box',
   height: 'fit-content',
+  fontFamily: 'Manrope',
+  overflow: 'hidden',
 });
 export const InfoKeyDiv = styled('div')({
   fontFamily: 'Manrope',
@@ -134,14 +135,17 @@ export const InfoValueDivInline = styled('div')({
   marginLeft: '9px',
   maxWidth: '100%',
   textOverflow: 'ellipsis',
-  overflow: 'hidden',
-  verticalAlign: 'bottom',
+  // overflow: 'hidden',
   minHeight: '25px',
   lineHeight: '25px',
+  fontSize: '18px',
   '& a': {
     width: '100%',
     color: '#0094FF',
     boxSizing: 'border-box',
+    height: '25px',
+    display: 'block',
+    lineHeight: '25px',
   },
 });
 const InfoValuePre = styled('pre')({
@@ -153,50 +157,48 @@ const InfoValuePre = styled('pre')({
   margin: '0',
 });
 
-export const InfoValueDivBlock = styled('div')(
-  ({ maxlines }: { maxlines?: number }) => ({
-    display: 'flex',
-    flexDirection: 'column',
-    minWidth: '75%',
-    height: 'auto',
-    fontFamily: 'Manrope',
-    fontStyle: 'normal',
-    fontWeight: 'normal',
-    color: '#20232C',
-    fontSize: '18px',
-    marginTop: '9px',
-    paddingLeft: '25px',
+export const InfoValueDivBlock = styled('div')(({ maxlines }: { maxlines?: number }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  minWidth: '75%',
+  height: 'auto',
+  fontFamily: 'Manrope',
+  fontStyle: 'normal',
+  fontWeight: 'normal',
+  color: '#20232C',
+  fontSize: '18px',
+  marginTop: '9px',
+  paddingLeft: '25px',
+  boxSizing: 'border-box',
+  maxWidth: '100%',
+  textOverflow: 'ellipsis',
+  overflow: 'hidden',
+  WebkitLineClamp: maxlines || 'none',
+  boxOrientation: 'vertical',
+  // wordBreak:'break-all',
+  '& a': {
+    display: 'block',
+    width: 'fit-content',
+    color: '#0094FF',
     boxSizing: 'border-box',
-    maxWidth: '100%',
-    textOverflow: 'ellipsis',
-    overflow: 'hidden',
-    WebkitLineClamp: maxlines || 'none',
-    boxOrientation: 'vertical',
-    // wordBreak:'break-all',
-    '& a': {
-      display: 'block',
-      width: 'fit-content',
-      color: '#0094FF',
-      boxSizing: 'border-box',
-    },
-    '& div': {
-      display: 'block',
-      height: 'auto',
-      width: '100%',
-      color: '#20232C',
-      boxSizing: 'border-box',
-    },
-    '& > *': {
-      marginBottom: '9px',
-    },
-    '& :last-child': {
-      marginBottom: '0 !important',
-    },
-    '& .full-width': {
-      width: '100% !important',
-    },
-  }),
-);
+  },
+  '& div': {
+    display: 'block',
+    height: 'auto',
+    width: '100%',
+    color: '#20232C',
+    boxSizing: 'border-box',
+  },
+  '& > *': {
+    marginBottom: '9px',
+  },
+  '& :last-child': {
+    marginBottom: '0 !important',
+  },
+  '& .full-width': {
+    width: '100% !important',
+  },
+}));
 const ActionsWrapper = styled('div')({
   display: 'flex',
   flexDirection: 'column',
@@ -221,9 +223,13 @@ const ActionDiv = styled('div')({
   overflow: 'hidden',
   cursor: 'pointer',
   '& > div': {
+    display: 'flex',
+    minHeight: '62px !important',
+    alignItems: 'center',
     width: '100%',
     paddingTop: 0,
     paddingBottom: 0,
+
     // lineHeight: '62px',
   },
   '& div': {
@@ -289,24 +295,23 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   const [daoDetails, updateDaoDetails] = React.useState<any>();
   const [challengeReason, setChallengeReason] = React.useState('');
   const transactionsQueue = React.useRef<CustomTransaction[]>([]);
-  
+
   const [challengeReasonFile, setChallengeReasonFile] = React.useState<any>(null);
-  
+
   const abiHandler = React.useMemo(() => {
     if (networkName) {
       return new AbiHandler(networkName);
     }
   }, [networkName]);
-  
-  const proposalInstance = useFacadeProposal(daoDetails?.queue.address, proposalInfo?.config.resolver)
+
+  const proposalInstance = useFacadeProposal(
+    daoDetails?.queue.address,
+    proposalInfo?.config.resolver,
+  );
 
   const [
     getProposalData,
-    {
-      loading: isLoadingProposalDetails,
-      data: proposalDetailsData,
-      error: errorFetchingProposalDetails,
-    },
+    { loading: isLoadingProposalDetails, data: proposalDetailsData },
   ] = useLazyQuery(GET_PROPOSAL_DETAILS_QUERY);
 
   useEffect(() => {
@@ -351,7 +356,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   };
 
   useEffect(() => {
-    if (daoList) {
+    if (daoList && proposalId && getProposalData) {
       updateDaoDetails(daoList.daos[0]);
       getProposalData({
         variables: {
@@ -359,22 +364,13 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
         },
       });
     }
-  }, [daoList]);
+  }, [daoList, proposalId, getProposalData]);
 
-  const challengeProposal = async (challengeReason:string, challengeReasonFile:any) => {
-    // if the reason's length is less than 10 words, it's highly unlikely
-    // to specify the actual valid reason in less than 10 words
-    // if (challengeReason.length < 10) {
-    //   enqueueSnackbar('Challenge reason must be at least 10 letters', {
-    //     variant: 'error',
-    //   });
-    //   return;
-    // }
-
-    // TODO: add modal 
-    // Upload proof to ipfs if it's a file, 
+  const challengeProposal = async (challengeReason: string, challengeReasonFile: any) => {
+    // TODO: add modal
+    // Upload proof to ipfs if it's a file,
     // otherwise convert it to utf8bytes
-    const reason = challengeReasonFile  
+    const reason = challengeReasonFile
       ? await addToIpfs(challengeReasonFile[0])
       : toUTF8Bytes(challengeReason);
 
@@ -382,12 +378,10 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
 
     if (proposalInstance) {
       try {
-        transactionsQueue.current = await proposalInstance.challenge(
-          proposalParams,
-          reason,
-        );
+        transactionsQueue.current = await proposalInstance.challenge(proposalParams, reason);
       } catch (error) {
         enqueueSnackbar(error.message, { variant: 'error' });
+        return;
       }
     }
 
@@ -399,8 +393,12 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
         onTransactionFailure: (error) => {
           enqueueSnackbar(error, { variant: 'error' });
         },
-        onTransactionSuccess: () => {},
-        onCompleteAllTransactions: () => {},
+        onTransactionSuccess: () => {
+          //
+        },
+        onCompleteAllTransactions: () => {
+          //
+        },
       },
     });
   };
@@ -447,14 +445,8 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
               </BackButton>
               <ProposalStatus>
                 <Label
-                  labelColor={getStateColor(
-                    proposalInfo.state,
-                    proposalInfo.payload.executionTime,
-                  )}
-                  labelText={getState(
-                    proposalInfo.state,
-                    proposalInfo.payload.executionTime,
-                  )}
+                  labelColor={getStateColor(proposalInfo.state, proposalInfo.payload.executionTime)}
+                  labelText={getState(proposalInfo.state, proposalInfo.payload.executionTime)}
                 />
               </ProposalStatus>
               <ProposalId>{proposalInfo.id}</ProposalId>
@@ -464,26 +456,20 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                   <TitleText>Config</TitleText>
                   <InfoWrapper>
                     <InfoKeyDiv>Execution Delay:</InfoKeyDiv>
-                    <InfoValueDivInline>
-                      {proposalInfo.config.executionDelay}
-                    </InfoValueDivInline>
+                    <InfoValueDivInline>{proposalInfo.config.executionDelay}</InfoValueDivInline>
                   </InfoWrapper>
                   <InfoWrapper>
                     <InfoKeyDiv>Schedule Deposit:</InfoKeyDiv>
                     <InfoValueDivBlock>
                       <a>{proposalInfo.config.scheduleDeposit.token}</a>
-                      <div>
-                        {proposalInfo.config.scheduleDeposit.amount} ANT
-                      </div>
+                      <div>{proposalInfo.config.scheduleDeposit.amount} ANT</div>
                     </InfoValueDivBlock>
                   </InfoWrapper>
                   <InfoWrapper>
                     <InfoKeyDiv>Challenge Deposit:</InfoKeyDiv>
                     <InfoValueDivBlock>
                       <a>{proposalInfo.config.challengeDeposit.token}</a>
-                      <div>
-                        {proposalInfo.config.challengeDeposit.amount} ANT
-                      </div>
+                      <div>{proposalInfo.config.challengeDeposit.amount} ANT</div>
                     </InfoValueDivBlock>
                   </InfoWrapper>
                   <InfoWrapper>
@@ -503,34 +489,25 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                   <TitleText>Payload</TitleText>
                   <InfoWrapper>
                     <InfoKeyDiv>Nonce:</InfoKeyDiv>
-                    <InfoValueDivInline>
-                      {proposalInfo.payload.nonce}
-                    </InfoValueDivInline>
+                    <InfoValueDivInline>{proposalInfo.payload.nonce}</InfoValueDivInline>
                   </InfoWrapper>
                   <InfoWrapper>
                     <InfoKeyDiv>Execution Time:</InfoKeyDiv>
-                    <InfoValueDivInline>
-                      {proposalInfo.payload.executionTime}
-                    </InfoValueDivInline>
+                    <InfoValueDivInline>{proposalInfo.payload.executionTime}</InfoValueDivInline>
                   </InfoWrapper>
                   <InfoWrapper>
                     <InfoKeyDiv>Submitter:</InfoKeyDiv>
-                    <InfoValueDivInline>
-                      {proposalInfo.payload.submitter}
-                    </InfoValueDivInline>
+                    <InfoValueDivInline>{proposalInfo.payload.submitter}</InfoValueDivInline>
                   </InfoWrapper>
                   <InfoWrapper>
                     <InfoKeyDiv>Executor:</InfoKeyDiv>
                     <InfoValueDivInline>
-                      {proposalInfo.payload.executor.address ||
-                        'No executor ID'}
+                      {proposalInfo.payload.executor.address || 'No executor ID'}
                     </InfoValueDivInline>
                   </InfoWrapper>
                   <InfoWrapper>
                     <InfoKeyDiv>AllowFailuresMap:</InfoKeyDiv>
-                    <InfoValueDivInline>
-                      {proposalInfo.payload.allowFailuresMap}
-                    </InfoValueDivInline>
+                    <InfoValueDivInline>{proposalInfo.payload.allowFailuresMap}</InfoValueDivInline>
                   </InfoWrapper>
                   <InfoWrapper>
                     <InfoKeyDiv>Justification:</InfoKeyDiv>
@@ -543,76 +520,65 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                     <InfoKeyDiv>Actions:</InfoKeyDiv>
                     <ActionsWrapper id="action-wrapper">
                       {/* Show action accordians */}
-                      {proposalInfo.payload.actions.map(
-                        (action: any, index: number) => {
-                          return (
-                            <ActionDiv
-                              key={index}
-                              onClick={() => toggleDiv(index)}
-                              id={'action' + index}
-                              style={{
-                                height: 'auto',
-                              }}
-                            >
-                              <CollapsedDiv id="collapsed-div">
-                                <InfoWrapper id="to-div">
-                                  <InfoKeyDiv>to</InfoKeyDiv>
+                      {proposalInfo.payload.actions.map((action: any, index: number) => {
+                        return (
+                          <ActionDiv
+                            key={index}
+                            onClick={() => toggleDiv(index)}
+                            id={'action' + index}
+                            style={{
+                              height: 'auto',
+                            }}
+                          >
+                            <CollapsedDiv id="collapsed-div">
+                              <InfoWrapper id="to-div">
+                                <InfoKeyDiv>to</InfoKeyDiv>
+                                <InfoValueDivInline>
+                                  <a>{action.to}</a>
+                                </InfoValueDivInline>
+                              </InfoWrapper>
+                              {/* <Carat /> */}
+                            </CollapsedDiv>
+                            {isExpanded[index] && (
+                              <ExpandedDiv id="expanded-div">
+                                <InfoWrapper id="value-div">
+                                  <InfoKeyDiv>value</InfoKeyDiv>
                                   <InfoValueDivInline>
-                                    <a>{action.to}</a>
+                                    <a>{action.value}</a>
                                   </InfoValueDivInline>
                                 </InfoWrapper>
-                                {/* <Carat /> */}
-                              </CollapsedDiv>
-                              {isExpanded[index] && (
-                                <ExpandedDiv id="expanded-div">
-                                  <InfoWrapper id="value-div">
-                                    <InfoKeyDiv>value</InfoKeyDiv>
-                                    <InfoValueDivInline>
-                                      <a>{action.value}</a>
-                                    </InfoValueDivInline>
+                                {decoding && <div>Decoding data....</div>}
+                                {!decoding && !decodedData[index] && (
+                                  <InfoWrapper id="data-div">
+                                    <InfoKeyDiv>data</InfoKeyDiv>
+                                    <InfoValueDivBlock className="full-width" id="data-div-block">
+                                      {action.data}
+                                    </InfoValueDivBlock>
                                   </InfoWrapper>
-                                  {decoding && <div>Decoding data....</div>}
-                                  {!decoding && !decodedData[index] && (
-                                    <InfoWrapper id="data-div">
-                                      <InfoKeyDiv>data</InfoKeyDiv>
-                                      <InfoValueDivBlock
-                                        className="full-width"
-                                        id="data-div-block"
-                                      >
-                                        {action.data}
-                                      </InfoValueDivBlock>
+                                )}
+                                {!decoding && decodedData[index] && (
+                                  <React.Fragment>
+                                    <InfoWrapper id="function-div">
+                                      <InfoKeyDiv>function</InfoKeyDiv>
+                                      <InfoValueDivInline>
+                                        <a>{decodedData[index].functionName}</a>
+                                      </InfoValueDivInline>
                                     </InfoWrapper>
-                                  )}
-                                  {!decoding && decodedData[index] && (
-                                    <React.Fragment>
-                                      <InfoWrapper id="function-div">
-                                        <InfoKeyDiv>function</InfoKeyDiv>
-                                        <InfoValueDivInline>
-                                          <a>
-                                            {decodedData[index].functionName}
-                                          </a>
-                                        </InfoValueDivInline>
-                                      </InfoWrapper>
-                                      <InfoWrapper id="data-div">
-                                        <InfoKeyDiv>arguments</InfoKeyDiv>
-                                        {decodedData[index] && (
-                                          <InfoValuePre>
-                                            {JSON.stringify(
-                                              decodedData[index].inputData,
-                                              null,
-                                              2,
-                                            )}
-                                          </InfoValuePre>
-                                        )}
-                                      </InfoWrapper>
-                                    </React.Fragment>
-                                  )}
-                                </ExpandedDiv>
-                              )}
-                            </ActionDiv>
-                          );
-                        },
-                      )}
+                                    <InfoWrapper id="data-div">
+                                      <InfoKeyDiv>arguments</InfoKeyDiv>
+                                      {decodedData[index] && (
+                                        <InfoValuePre>
+                                          {JSON.stringify(decodedData[index].inputData, null, 2)}
+                                        </InfoValuePre>
+                                      )}
+                                    </InfoWrapper>
+                                  </React.Fragment>
+                                )}
+                              </ExpandedDiv>
+                            )}
+                          </ActionDiv>
+                        );
+                      })}
                     </ActionsWrapper>
                   </InfoWrapper>
                 </ProposalDetailsWrapper>
@@ -620,9 +586,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                   {
                     <ChallengeWidget
                       disabled={!isConnected}
-                      containerEventChallenge={
-                        proposalStates['ContainerEventChallenge']
-                      }
+                      containerEventChallenge={proposalStates['ContainerEventChallenge']}
                       currentState={proposalInfo.state}
                       setChallengeReason={setChallengeReason}
                       setChallengeFile={setChallengeReasonFile}
@@ -633,9 +597,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                   {
                     <ExecuteWidget
                       disabled={!isConnected}
-                      containerEventExecute={
-                        proposalStates['ContainerEventExecute']
-                      }
+                      containerEventExecute={proposalStates['ContainerEventExecute']}
                       currentState={proposalInfo.state}
                       executionTime={proposalInfo.payload.executionTime}
                       onExecuteProposal={executeProposal}
@@ -644,9 +606,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                   {
                     <ResolveWidget
                       disabled={!isConnected}
-                      containerEventExecute={
-                        proposalStates['ContainerEventResolve']
-                      }
+                      containerEventExecute={proposalStates['ContainerEventResolve']}
                       disputeId={
                         proposalStates['ContainerEventChallenge']
                           ? proposalStates['ContainerEventChallenge'].disputeId

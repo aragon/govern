@@ -1,10 +1,8 @@
-/* eslint-disable */
 import React from 'react';
-import { styled, useTheme } from '@material-ui/core/styles';
-import MUICard, { CardProps } from '@material-ui/core/Card';
+import { styled } from '@material-ui/core/styles';
+import MUICard from '@material-ui/core/Card';
 import MUITypography from '@material-ui/core/Typography';
 import { Label } from '../Labels/Label';
-import { getState, getStateColor } from 'utils/states';
 
 export interface ProposalCardProps {
   /**
@@ -66,12 +64,6 @@ const ProposalDateText = styled(MUITypography)(({ theme }) => ({
   textAlign: 'center',
 }));
 
-const getLabelColor = (proposalStatus: string) => {
-  if (proposalStatus === 'Scheduled') return 'yellow';
-  if (proposalStatus === 'Executed') return 'green';
-  if (proposalStatus === 'Challenged') return 'red';
-};
-
 const LabelWrapper = styled('div')({
   marginLeft: '32px',
 });
@@ -82,18 +74,12 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
   proposalStatus,
   proposalStatusColor,
   onClickProposalCard,
-  ...props
 }) => {
-  const theme = useTheme();
-
   const getSlicedTransactionHash = () => {
     const hash =
       transactionHash.slice(0, 6) +
       '...' +
-      transactionHash.slice(
-        transactionHash.length - 5,
-        transactionHash.length - 1,
-      );
+      transactionHash.slice(transactionHash.length - 5, transactionHash.length - 1);
     return hash;
   };
 

@@ -13,9 +13,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<AddressIdentifierProps> = (args) => (
-  <AddressIdentifier {...args} />
-);
+const Template: Story<AddressIdentifierProps> = (args) => <AddressIdentifier {...args} />;
 
 export const AddressSmall = Template.bind({});
 AddressSmall.args = {

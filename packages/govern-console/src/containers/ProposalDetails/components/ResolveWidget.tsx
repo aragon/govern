@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { memo } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { PROPOSAL_STATES } from 'utils/states';
@@ -34,7 +33,6 @@ const ResolveWidget: React.FC<any> = ({
       </Widget>
     );
   }
-
   if (currentState !== PROPOSAL_STATES.CHALLENGED) {
     return <></>;
   }

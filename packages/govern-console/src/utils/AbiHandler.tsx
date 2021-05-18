@@ -53,12 +53,7 @@ function decodeInput(name: string, input: any, value: any, accum: any) {
 
   if (input.type === 'tuple') {
     input.components.forEach((component: any, index: number) => {
-      decodeInput(
-        `${component.name}(${component.baseType})`,
-        component,
-        value[index],
-        accum[name],
-      );
+      decodeInput(`${component.name}(${component.baseType})`, component, value[index], accum[name]);
     });
     return;
   }
@@ -131,12 +126,7 @@ export default class AbiHandler {
       const onlyNamedResult = decodedData.reduce((accum, value, index) => {
         const input = functionABI.inputs[index];
 
-        decodeInput(
-          `Argument #${index + 1} (${input.baseType})`,
-          input,
-          value,
-          accum,
-        );
+        decodeInput(`Argument #${index + 1} (${input.baseType})`, input, value, accum);
 
         return accum;
       }, {});

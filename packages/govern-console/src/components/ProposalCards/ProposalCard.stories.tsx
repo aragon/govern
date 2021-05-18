@@ -15,16 +15,14 @@ const Template: Story<ProposalCardProps> = (args) => <ProposalCard {...args} />;
 
 export const Scheduled = Template.bind({});
 Scheduled.args = {
-  transactionHash:
-    '0x833bc6779e615b491e82c68ebc43d1a2af519b95d21ef1a3a81c8d8cfd35ca42',
+  transactionHash: '0x833bc6779e615b491e82c68ebc43d1a2af519b95d21ef1a3a81c8d8cfd35ca42',
   proposalStatus: 'scheduled',
   proposalDate: '23/01/2021',
 };
 
 export const Executed = Template.bind({});
 Executed.args = {
-  transactionHash:
-    '0x833bc6779e615b491e82c68ebc43d1a2af519b95d21ef1a3a81c8d8cfd35ca42',
+  transactionHash: '0x833bc6779e615b491e82c68ebc43d1a2af519b95d21ef1a3a81c8d8cfd35ca42',
   proposalStatus: 'executed',
   proposalDate: '23/01/2021',
 };

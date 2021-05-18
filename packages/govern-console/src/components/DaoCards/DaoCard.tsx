@@ -1,6 +1,6 @@
 import React from 'react';
-import { styled, Theme } from '@material-ui/core/styles';
-import MUICard, { CardProps } from '@material-ui/core/Card';
+import { styled } from '@material-ui/core/styles';
+import MUICard from '@material-ui/core/Card';
 import MUITypography from '@material-ui/core/Typography';
 import DaoProperty from './DaoProperty';
 export interface DaoCardProps {
@@ -8,18 +8,11 @@ export interface DaoCardProps {
    * Label of the card - name of the DAO
    */
   label: string;
-  /**
-   * Aum Value of the DAO
-   */
-  aumValue: string | number;
+
   /**
    * Number of Proposals
    */
   numberOfProposals: number;
-  /**
-   * ID of the DAO
-   */
-  daoId: number | string;
   /**
    * function to be called on click.
    */
@@ -55,13 +48,7 @@ const CardLabel = styled(MUITypography)(({ theme }) => ({
   marginBottom: '35px',
 }));
 
-export const DaoCard: React.FC<DaoCardProps> = ({
-  label,
-  aumValue,
-  numberOfProposals,
-  daoId,
-  ...props
-}) => {
+export const DaoCard: React.FC<DaoCardProps> = ({ label, numberOfProposals }) => {
   return (
     <DaoCardWrapper>
       <CardLabel>{label}</CardLabel>
@@ -73,16 +60,7 @@ export const DaoCard: React.FC<DaoCardProps> = ({
         }}
       >
         <div>
-          <DaoProperty
-            propertyLabel="AUM(USD)"
-            propertyText={'$' + aumValue + 'M'}
-          />
-        </div>
-        <div>
-          <DaoProperty
-            propertyLabel="PROPOSALS"
-            propertyText={numberOfProposals}
-          />
+          <DaoProperty propertyLabel="PROPOSALS" propertyText={numberOfProposals.toString()} />
         </div>
       </div>
     </DaoCardWrapper>

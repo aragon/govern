@@ -1,5 +1,5 @@
 import React from 'react';
-import { styled, useTheme } from '@material-ui/core/styles';
+import { styled } from '@material-ui/core/styles';
 import MUIChip, { ChipProps } from '@material-ui/core/Chip';
 import Avatar from '@material-ui/core/Avatar';
 // import { ReactComponent as AddressIcon } from '../../../src/images/svgs/DefaultImageAddress.svg';
@@ -17,10 +17,6 @@ export interface AddressIdentifierProps extends ChipProps {
    * User Name or Address
    */
   displayText: string;
-  /**
-   * Image to be shown or not
-   */
-  isImageVisible: boolean;
   /**
    * Size of the component
    */
@@ -45,18 +41,8 @@ export const AddressIdentifier: React.FC<any> = ({
   imageUrl,
   isAddress,
   displayText,
-  isImageVisible,
   componentSize,
-  ...props
 }) => {
-  const theme = useTheme();
-  const getImageUrl = () => {
-    if (imageUrl) {
-      return imageUrl;
-    } else {
-      return 'src/images/svgs/DefaultImageAddress.svg';
-    }
-  };
   const getDisplayText = () => {
     if (isAddress) {
       const formattedAddress =

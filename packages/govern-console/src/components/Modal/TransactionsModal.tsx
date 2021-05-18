@@ -3,7 +3,7 @@ import Dialog from '@material-ui/core/Dialog';
 import { styled } from '@material-ui/core/styles';
 import TransactionKeeper from 'components/TransactionKeeper/TransactionKeeper';
 import Paper from '@material-ui/core/Paper';
-import { ModalsContext, ActionTypes } from 'containers/HomePage/ModalsContext';
+import { ModalsContext, closeTransactionsModalAction } from 'containers/HomePage/ModalsContext';
 const TransactionsDialog = styled(Dialog)({
   // width: '446px',
   // height: '294px',
@@ -19,7 +19,7 @@ const StyledModalPaper = styled(Paper)({
   background: '#ffffff',
 });
 
-const TransactionsModal = ({}) => {
+const TransactionsModal: React.FC = () => {
   const {
     state: {
       transactionsModal: {
@@ -35,12 +35,7 @@ const TransactionsModal = ({}) => {
     dispatch,
   } = useContext(ModalsContext);
   const handleClose = useCallback(() => {
-    dispatch({
-      type: ActionTypes.CLOSE,
-      payload: {
-        modal: 'transactionsModal',
-      },
-    });
+    dispatch(closeTransactionsModalAction);
   }, [dispatch]);
   return (
     <>
@@ -48,7 +43,7 @@ const TransactionsModal = ({}) => {
         onClose={handleClose}
         aria-labelledby="transactions-dialog-title"
         open={open}
-        maxWidth="lg"
+        maxWidth="sm"
         PaperComponent={StyledModalPaper}
       >
         <TransactionKeeper
@@ -56,6 +51,7 @@ const TransactionsModal = ({}) => {
           onTransactionFailure={onTransactionFailure}
           onTransactionSuccess={onTransactionSuccess}
           onCompleteAllTransactions={onCompleteAllTransactions}
+          closeModal={handleClose}
         />
       </TransactionsDialog>
     </>

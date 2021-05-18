@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { useState, memo, useEffect, useMemo } from 'react';
+import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { CiruclarProgressStatus } from '../../utils/types';
 import CreateDaoProgress, { CreateDaoProgressProps } from './CreateDaoProgress';

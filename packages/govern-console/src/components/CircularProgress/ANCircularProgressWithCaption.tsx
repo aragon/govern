@@ -1,6 +1,6 @@
-/* eslint-disable */
 import { ANCircularProgress } from './ANCircularProgress';
 import { CiruclarProgressStatus } from 'utils/types';
+import React from 'react';
 
 export interface ANProgressCationPropos {
   /**
@@ -14,20 +14,15 @@ export interface ANProgressCationPropos {
   state: CiruclarProgressStatus;
 }
 
-export const ANCircularProgressWithCaption = (
-  props: ANProgressCationPropos,
-) => {
+export const ANCircularProgressWithCaption = (props: ANProgressCationPropos) => {
   const getTextColor = (state: CiruclarProgressStatus) => {
     switch (state) {
       case CiruclarProgressStatus.Disabled:
         return '#B4C1E4';
-        break;
       case CiruclarProgressStatus.Failed:
         return '#FF6A60';
-        break;
       default:
         return '#00C2FF';
-        break;
     }
   };
 

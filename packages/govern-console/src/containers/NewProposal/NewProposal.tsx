@@ -1,44 +1,30 @@
-/* eslint-disable */
 import React, { useState, useEffect, memo } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { styled } from '@material-ui/core/styles';
 import backButtonIcon from 'images/back-btn.svg';
 import Typography from '@material-ui/core/Typography';
 import { HelpButton } from 'components/HelpButton/HelpButton';
-import TextArea from 'components/TextArea/TextArea';
 import Paper from '@material-ui/core/Paper';
 import { NewActionModal } from 'components/Modal/NewActionModal';
 import { AddActionsModal } from 'components/Modal/AddActionsModal';
 import { InputField } from 'components/InputFields/InputField';
-import { useParams } from 'react-router-dom';
-import { utils } from 'ethers';
+import { useParams, useHistory } from 'react-router-dom';
+import { ContractReceipt, utils } from 'ethers';
 import { useQuery } from '@apollo/client';
 import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { buildContainer } from 'utils/ERC3000';
 import { useWallet } from 'AugmentedWallet';
-import QueueApprovals from 'services/QueueApprovals';
-import {
-  CustomTransaction,
-  abiItem,
-  actionType,
-  ActionToSchedule,
-} from 'utils/types';
+import { CustomTransaction, abiItem, actionType, ActionToSchedule } from 'utils/types';
 import { useSnackbar } from 'notistack';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
-import FacadeProposal from 'services/Proposal';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
-import { useHistory } from 'react-router-dom';
-import { IPFSInput } from 'components/Field/IPFSInput';
-import { toUTF8String, toUTF8Bytes } from 'utils/lib';
+import { Proposal, ProposalOptions, ReceiptType, ActionType } from '@aragon/govern';
+import { proposalDetailsUrl } from 'utils/urls';
 import { addToIpfs } from 'utils/ipfs';
-import { useFacadeProposal } from 'hooks/proposals'
-
-import {
-  Proposal,
-  ProposalOptions,
-  PayloadType,
-  ActionType,
-} from '@aragon/govern';
+import { useFacadeProposal } from 'hooks/proposals';
+import { toUTF8Bytes } from 'utils/lib';
+import { IPFSInput } from 'components/Field/IPFSInput';
+import { settingsUrl } from 'utils/urls';
 
 export interface NewProposalProps {
   /**
@@ -128,38 +114,7 @@ const SettingsLink = styled(Typography)({
     color: '#00C2FF',
   },
 });
-const proofTextArea = styled(TextArea)({
-  background: '#FFFFFF',
-  border: '2px solid #EFF1F7',
-  boxSizing: 'border-box',
-  boxShadow: 'inset 0px 2px 3px 0px rgba(180, 193, 228, 0.35)',
-  borderRadius: '8px',
-  width: '100%',
-  height: 104,
-  padding: '11px 21px',
-  fontSize: 18,
-  fontStyle: 'normal',
-  fontWeight: 400,
-  lineHeight: '25px',
-  letterSpacing: '0em',
-  // border: '0 !important',
-  '& .MuiInputBase-root': {
-    border: 0,
-    width: '100%',
-    input: {
-      width: '100%',
-    },
-  },
-  '& .MuiInput-underline:after': {
-    border: 0,
-  },
-  '& .MuiInput-underline:before': {
-    border: 0,
-  },
-  '& .MuiInput-underline:hover:not(.Mui-disabled):before': {
-    border: 0,
-  },
-});
+
 export interface NewProposalProps {
   /**
    * callback for click on schedule
@@ -182,16 +137,10 @@ export interface AddedActionsProps {
 
 interface FormInputs {
   proof: string;
-  isProofFile: boolean;
   proofFile: any;
 }
 
-const AddedActions: React.FC<AddedActionsProps> = ({
-  selectedActions,
-  onAddInputToAction,
-  actionsToSchedule,
-  ...props
-}) => {
+const AddedActions: React.FC<AddedActionsProps> = ({ selectedActions, onAddInputToAction }) => {
   const actionDivStyle = {
     width: '862px',
     border: '2px solid #E2ECF5',
@@ -264,7 +213,7 @@ const AddedActions: React.FC<AddedActionsProps> = ({
   });
 };
 
-const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
+const NewProposal: React.FC<NewProposalProps> = ({ onClickBack }) => {
   const history = useHistory();
 
   const { daoName } = useParams<any>();
@@ -285,7 +234,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const [daoDetails, updateDaoDetails] = useState<any>();
   const [abiFunctions, setAbiFunctions] = useState([]);
   const [actionsToSchedule, setActionsToSchedule] = useState([]);
-  
+
   useEffect(() => {
     if (daoList) {
       updateDaoDetails(daoList.daos[0]);
@@ -295,7 +244,10 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const context: any = useWallet();
   const { account, provider, isConnected } = context;
 
-  const proposalInstance = useFacadeProposal(daoDetails?.queue.address, daoDetails?.queue.config.resolver)
+  const proposalInstance = useFacadeProposal(
+    daoDetails?.queue.address,
+    daoDetails?.queue.config.resolver,
+  );
 
   const transactionsQueue = React.useRef<CustomTransaction[]>([]);
 
@@ -319,22 +271,20 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     handleActionModalClose();
     const newActions = [...selectedActions, ...actions] as any;
     updateSelectedOptions(newActions);
-    const initialActions: ActionToSchedule[] = newActions.map(
-      (actionItem: actionType) => {
-        const { contractAddress, name, item, abi } = actionItem;
-        const { inputs } = item;
-        const numberOfInputs = inputs.length;
-        const params = {};
-        const data = {
-          contractAddress,
-          name,
-          params,
-          abi,
-          numberOfInputs,
-        };
-        return data as ActionToSchedule;
-      },
-    );
+    const initialActions: ActionToSchedule[] = newActions.map((actionItem: actionType) => {
+      const { contractAddress, name, item, abi } = actionItem;
+      const { inputs } = item;
+      const numberOfInputs = inputs.length;
+      const params = {};
+      const data = {
+        contractAddress,
+        name,
+        params,
+        abi,
+        numberOfInputs,
+      };
+      return data as ActionToSchedule;
+    });
     setActionsToSchedule(initialActions as []);
   };
 
@@ -344,7 +294,6 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
     abi: any[],
     functionIndex: number,
     inputIndex: number,
-    functionName: string,
   ) => {
     const actions: any[] = actionsToSchedule;
     const { params } = actions[functionIndex];
@@ -359,18 +308,11 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   };
   // const onScheduleProposal = () => {};
 
-  const onGenerateActionsFromAbi = async (
-    contractAddress: string,
-    abi: any[],
-  ) => {
+  const onGenerateActionsFromAbi = async (contractAddress: string, abi: any[]) => {
     const functions = [] as any;
     await abi.forEach((item: abiItem) => {
       const { name, type, stateMutability } = item;
-      if (
-        type === 'function' &&
-        stateMutability !== 'view' &&
-        stateMutability !== 'pure'
-      ) {
+      if (type === 'function' && stateMutability !== 'view' && stateMutability !== 'pure') {
         const data = {
           abi,
           name,
@@ -401,17 +343,14 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   const onSchedule = () => {
     if (!validate()) return;
     const actions: any[] = actionsToSchedule.map((item: any) => {
-      const { abi, contractAddress, name, params, numberOfInputs } = item;
+      const { abi, contractAddress, name, params } = item;
       const abiInterface = new utils.Interface(abi);
       const functionParameters = [];
       for (const key in params) {
         functionParameters.push(params[key]);
       }
       console.log('functionParams', functionParameters);
-      const calldata = abiInterface.encodeFunctionData(
-        name,
-        functionParameters,
-      );
+      const calldata = abiInterface.encodeFunctionData(name, functionParameters);
       const data = {
         to: contractAddress,
         value: 0,
@@ -424,13 +363,13 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
   };
 
   const scheduleProposal = async (actions: ActionType[]) => {
-    // TODO: add modal 
-    // Upload proof to ipfs if it's a file, 
+    // TODO: add modal
+    // Upload proof to ipfs if it's a file,
     // otherwise convert it to utf8bytes
-    const proofFile = getValues('proofFile')
-    const proof = proofFile
-      ? await addToIpfs(proofFile[0])
-      : toUTF8Bytes(getValues('proof'));
+    const proofFile = getValues('proofFile');
+    const proof = proofFile ? await addToIpfs(proofFile[0]) : toUTF8Bytes(getValues('proof'));
+
+    let containerHash: string | undefined;
 
     // build the container to schedule.
     const payload = {
@@ -458,8 +397,14 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
         onTransactionFailure: (error) => {
           enqueueSnackbar(error, { variant: 'error' });
         },
-        onTransactionSuccess: () => {},
-        onCompleteAllTransactions: () => {},
+        onTransactionSuccess: (_, receipt: ContractReceipt) => {
+          containerHash = Proposal.getContainerHashFromReceipt(receipt, ReceiptType.Scheduled);
+        },
+        onCompleteAllTransactions: () => {
+          if (containerHash) {
+            history.push(proposalDetailsUrl(daoName, containerHash));
+          }
+        },
       },
     });
   };
@@ -473,10 +418,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
         <Title>New Proposal</Title>
         <SettingsLink>
           This execution will use the current{' '}
-          <a
-            style={{ cursor: 'pointer' }}
-            onClick={() => history.push(`/daos/${daoName}/dao-settings`)}
-          >
+          <a style={{ cursor: 'pointer' }} onClick={() => history.push(settingsUrl(daoName))}>
             DAO Settings
           </a>
         </SettingsLink>
@@ -501,7 +443,6 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
           <IPFSInput
             label="Enter the justification for changes"
             placeholder="Justification Reason..."
-            isFile="isProofFile"
             textInputName="proof"
             fileInputName="proofFile"
           />
@@ -524,7 +465,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack, ...props }) => {
             // width={155}
             // height={45}
             buttonType="secondary"
-            buttonColor="#00C2FF"
+            labelColor="#00C2FF"
             style={{ marginTop: 40 }}
             onClick={handleInputModalOpen}
           />

@@ -1,11 +1,9 @@
-/* eslint-disable */
 import { makeStyles } from '@material-ui/core/styles';
-import CircularProgress, {
-  CircularProgressProps,
-} from '@material-ui/core/CircularProgress';
+import CircularProgress, { CircularProgressProps } from '@material-ui/core/CircularProgress';
 import blueTickImage from '../../images/svgs/Blue_tick.svg';
 import crossImage from '../../images/svgs/cross.svg';
 import { CiruclarProgressStatus } from 'utils/types';
+import React from 'react';
 
 export interface ANCircularProgressProps extends CircularProgressProps {
   /**
@@ -43,7 +41,7 @@ export const ANCircularProgress = (props: ANCircularProgressProps) => {
         <CircularProgress
           variant={'indeterminate'}
           value={80}
-          size={20}
+          size={40}
           thickness={8}
           classes={{
             root: classes.root,
@@ -72,11 +70,8 @@ export const ANCircularProgress = (props: ANCircularProgressProps) => {
           />
         </>
       );
-      break;
-
     case CiruclarProgressStatus.InProgress:
       return getCircularProgress();
-      break;
 
     case CiruclarProgressStatus.Done:
       return (

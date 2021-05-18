@@ -1,4 +1,3 @@
-/* eslint-disable */
 import CID from 'cids';
 import { toUTF8String } from 'utils/lib';
 import { IPFS_GATEWAY } from './constants';
@@ -29,30 +28,28 @@ export function getIpfsCid(uriOrCid: string) {
   // if cidString can be passed to CID class without throwing
   // it means it's the actual cid
   try {
-    // eslint-disable-next-line no-new
     new CID(cidString);
     return cidString;
   } catch (err) {}
 
-  // if cidString is ipfs v1 version hex from the cid's raw bytes and 
+  // if cidString is ipfs v1 version hex from the cid's raw bytes and
   // we add `f` as a multibase prefix and remove `0x`
   try {
     const cid = `f${cidString.substring(2)}`;
-    // eslint-disable-next-line no-new
     new CID(cid);
     return cid;
-  }catch(err) {}
+  } catch (err) {}
 
-  // if cidString is ipfs v0 version hex from the cid's raw bytes, 
+  // if cidString is ipfs v0 version hex from the cid's raw bytes,
   // we add:
   // 1. 112 (0x70 in hex) which is dag-pb format.
   // 2. 01 because we want to use v1 version
   // 3. f since cidString is already hex, we only add `f` without converting anything.
   try {
     const cid = `f0170${cidString.substring(2)}`;
-    new CID(cid)
+    new CID(cid);
     return cid;
-  }catch(err) {}
+  } catch (err) {}
 
   // if cidString is hex received from string-to-hex converter
   try {

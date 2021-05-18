@@ -1,5 +1,4 @@
-import React from 'react';
-import { styled, useTheme } from '@material-ui/core/styles';
+import { styled } from '@material-ui/core/styles';
 import governIcon from 'images/aragon-icon.svg';
 import Wallet from 'components/Wallet/Wallet';
 import { useHistory } from 'react-router-dom';
@@ -32,7 +31,7 @@ const Account = styled('div')({
   alignItems: 'center',
 });
 
-const Header = ({}) => {
+const Header = () => {
   const history = useHistory();
 
   const redirectToHomePage = () => {
@@ -50,7 +49,6 @@ const Header = ({}) => {
           <img src={governIcon} width="210px" />
         </Title>
         <Account id="account">
-          {/* <ChainSelector /> */}
           <div style={{ marginRight: '20px' }}>
             <Wallet />
           </div>

@@ -1,4 +1,3 @@
-/* eslint-disable */
 import Modal, { ModalProps } from '@material-ui/core/Modal';
 import { useTheme, styled } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
@@ -42,21 +41,15 @@ const ModalCloseButton = styled('div')({
   marginBottom: '-10px',
 });
 
-export const SimpleModal: React.FC<SimpleModalProps> = (
-  props: SimpleModalProps,
-) => {
+export const SimpleModal: React.FC<SimpleModalProps> = (props: SimpleModalProps) => {
   return (
     <NakedModal {...props}>
-      <ANWrappedPaper
-        style={{ boxShadow: '0px 13px 9px 0px rgb(102, 102, 102, 0.35)' }}
-      >
+      <ANWrappedPaper style={{ boxShadow: '0px 13px 9px 0px rgb(102, 102, 102, 0.35)' }}>
         <ModalCloseButton>
           <IconButton
             aria-label="close"
             onClick={() => {
-              typeof props.onClose !== 'undefined'
-                ? props.onClose({}, 'backdropClick')
-                : null;
+              typeof props.onClose !== 'undefined' ? props.onClose({}, 'backdropClick') : null;
             }}
           >
             <CloseIcon />
