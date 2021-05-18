@@ -51,7 +51,15 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
     }
   };
   return (
-    <div style={{ background: '#F6F9FC', padding: 2, borderRadius: 10 }}>
+    <div
+      style={{
+        background: '#F6F9FC',
+        padding: 2,
+        borderRadius: 10,
+        margin: 'auto',
+        width: 'fit-content',
+      }}
+    >
       <TransactionListWrapper>
         {transactions.map((transaction) => {
           return (
