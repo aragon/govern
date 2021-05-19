@@ -16,12 +16,17 @@ interface payload extends optionalPayload {
 }
 
 export const buildContainer = (payload: payload, config: DaoConfig): ProposalParams => {
-  // executionTime:
-  // payload.executionTime ||
-  // Math.round(Date.now() / 1000) + parseInt(config.executionDelay.toString()) + 30
-
+  // TODO: Giorgi when the buildContainer is called, we already set `executionTime` as stated below.
+  // The important part is how many seconds we add as the last step. currently it's 150.
+  // This is important because in the contract we have `require(executionTime > executionDelay + block.timestamp)
+  // After the buildContainer is called, we don't immediatelly call transactions because we show modal which
+  // contains all the necessary transactions. The idea is that if we have 0 instead of 150, before we
+  // start executing this transaction(maybe user didn't click get started or first transaction took time)
+  // when this tx gets to the contract, executionTime > executionDelay + block.timestamp will be invalid.
   const containerPayload: PayloadType = {
-    executionTime: Math.round(Date.now() / 1000) + 120, // add 30 seconds for network latency.
+    executionTime:
+      payload.executionTime ||
+      Math.round(Date.now() / 1000) + parseInt(config.executionDelay.toString()) + 150, // add 150 seconds for network latency.
     submitter: payload.submitter,
     executor: payload.executor,
     actions: payload.actions || [],
@@ -43,6 +48,10 @@ export const getProposalParams = (proposalInfo: any) => {
   const payload: PayloadType = {
     ...proposalInfo.payload,
     executor: proposalInfo.payload.executor.address,
+    // subgraph returns timestamps for dates in secs, which
+    // we transform into Ms. Before sending dates back, we
+    // need to convert them into seconds again.
+    executionTime: proposalInfo.payload.executionTime / 1000,
   };
 
   const params: ProposalParams = {

@@ -2,7 +2,6 @@ import React from 'react';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import { DAO_BY_NAME, DAO_LIST, GOVERN_REGISTRY } from 'queries/dao';
 import { PROPOSAL_DETAILS, PROPOSAL_LIST } from 'queries/proposals';
-import { toMs } from 'utils/date';
 import { transformProposalDetails, transformProposals } from 'utils/proposal';
 
 export function useDaoSubscription(daoName: string) {
@@ -25,12 +24,7 @@ export function useDaosSubscription() {
     },
   });
 
-  return {
-    data,
-    loading,
-    error,
-    fetchMore,
-  };
+  return { data, loading, error, fetchMore };
 }
 
 export function useGovernRegistrySubscription() {
@@ -53,11 +47,7 @@ export function useLazyProposalDetails() {
     return transformProposalDetails(data);
   }, [data]);
 
-  return {
-    getProposalData,
-    loading,
-    data: proposalData,
-  };
+  return { getProposalData, loading, data: proposalData };
 }
 
 export function useLazyProposalList() {

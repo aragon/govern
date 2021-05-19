@@ -12,7 +12,6 @@ import NoDaoFound from './NoDaoFound';
 import { formatDate } from 'utils/date';
 import { getState, getStateColor } from 'utils/states';
 import { useDaoSubscription, useLazyProposalList } from 'hooks/subscription-hooks';
-import { transformProposalDetails, transformProposals } from 'utils/proposal';
 
 //* Styled Components List
 const DaoPageMainDiv = styled(Paper)(({ theme }) => ({
@@ -90,7 +89,7 @@ const DaoMainPage: React.FC = () => {
 
   const fetchMoreData = async () => {
     if (fetchMoreProposals) {
-      const { data: moreData, loading } = await fetchMoreProposals(visibleProposalList.length);
+      const { data: moreData } = await fetchMoreProposals(visibleProposalList.length);
 
       if (moreData && moreData.governQueue.containers.length > 0) {
         updateVisibleProposalList([...visibleProposalList, ...moreData.governQueue.containers]);

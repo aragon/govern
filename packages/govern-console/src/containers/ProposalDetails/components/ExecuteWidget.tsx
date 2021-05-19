@@ -4,7 +4,7 @@ import { PROPOSAL_STATES } from 'utils/states';
 import { formatDate } from 'utils/date';
 import { InfoKeyDiv, InfoValueDivInline } from '../ProposalDetails';
 import { Widget, WidgetRow, InfoWrapper, TitleText } from './SharedStyles';
-import { isEligibleForExecution, eligibleExecutionTime } from 'utils/states';
+import { eligibleExecution } from 'utils/states';
 
 const ExecuteWidget: React.FC<any> = ({
   disabled,
@@ -32,11 +32,12 @@ const ExecuteWidget: React.FC<any> = ({
   if (currentState !== PROPOSAL_STATES.SCHEDULED) {
     return <></>;
   }
+  const { isEligible, eligibleDate } = eligibleExecution(executionTime);
 
   return (
     <>
       <Widget>
-        {isEligibleForExecution(executionTime) ? (
+        {isEligible ? (
           <>
             <WidgetRow marginBottom="9px">
               <ANButton
@@ -54,7 +55,7 @@ const ExecuteWidget: React.FC<any> = ({
           <WidgetRow>
             <InfoWrapper>
               <InfoKeyDiv>Execute available at</InfoKeyDiv>
-              <InfoValueDivInline>{eligibleExecutionTime(executionTime)}</InfoValueDivInline>
+              <InfoValueDivInline>{eligibleDate}</InfoValueDivInline>
             </InfoWrapper>
           </WidgetRow>
         )}

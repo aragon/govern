@@ -405,6 +405,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       try {
         await proposalInstance.execute(proposalParams);
       } catch (error) {
+        // TODO: Giorgi reject the transaction and it will fail
         enqueueSnackbar(error.error.message, { variant: 'error' });
       }
     }
@@ -416,6 +417,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       try {
         await proposalInstance.resolve(proposalParams, disputeId);
       } catch (error) {
+        // TODO: Giorgi reject the transaction and it will fail
         enqueueSnackbar(error.error.message, { variant: 'error' });
       }
     }
@@ -489,7 +491,9 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                   </InfoWrapper>
                   <InfoWrapper>
                     <InfoKeyDiv>Execution Time:</InfoKeyDiv>
-                    <InfoValueDivInline>{proposalInfo.payload.executionTime}</InfoValueDivInline>
+                    <InfoValueDivInline>
+                      {formatDate(proposalInfo.payload.executionTime)}
+                    </InfoValueDivInline>
                   </InfoWrapper>
                   <InfoWrapper>
                     <InfoKeyDiv>Submitter:</InfoKeyDiv>
