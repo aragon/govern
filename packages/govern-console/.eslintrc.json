@@ -29,8 +29,6 @@
     "react/prop-types": "off",
     // next two rules can not be turned on for react-script, so we set them off for lint
     "react/react-in-jsx-scope": "off",
-    "react/no-unescaped-entities": "off",
-    // next rule is allways on for react-script, we turn it off for lint
-    "@typescript-eslint/no-unused-vars": "off"
+    "react/no-unescaped-entities": "off"
   }
 }

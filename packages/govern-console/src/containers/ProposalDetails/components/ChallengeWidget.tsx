@@ -42,8 +42,6 @@ const ChallengeWidget: React.FC<any> = ({
   disabled,
   containerEventChallenge,
   currentState,
-  setChallengeReason,
-  setChallengeFile,
   onChallengeProposal,
 }) => {
   if (containerEventChallenge) {

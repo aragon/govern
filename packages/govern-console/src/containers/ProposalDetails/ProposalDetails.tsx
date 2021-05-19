@@ -8,14 +8,12 @@ import { useParams } from 'react-router-dom';
 import { useWallet } from '../../AugmentedWallet';
 import { CustomTransaction } from 'utils/types';
 import { getProposalParams } from 'utils/ERC3000';
-import { Proposal, ProposalOptions } from '@aragon/govern';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import AbiHandler from 'utils/AbiHandler';
-import { toUTF8String, toUTF8Bytes } from 'utils/lib';
+import { toUTF8Bytes } from 'utils/lib';
 import { formatDate } from 'utils/date';
 import { getState, getStateColor } from 'utils/states';
 import { useSnackbar } from 'notistack';
-import { Link } from 'react-router-dom';
 import { IPFSField } from 'components/Field/IPFSField';
 import { addToIpfs } from 'utils/ipfs';
 import { useFacadeProposal } from 'hooks/proposals';
@@ -282,7 +280,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
 
   const context: any = useWallet();
 
-  const { account, provider, networkName, isConnected } = context;
+  const { networkName, isConnected } = context;
 
   const { dispatch } = React.useContext(ModalsContext);
   const { enqueueSnackbar } = useSnackbar();
@@ -293,10 +291,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   const [decoding, setDecoding] = React.useState(false);
   const [isExpanded, updateIsExpanded] = React.useState<any>({});
   const [daoDetails, updateDaoDetails] = React.useState<any>();
-  const [challengeReason, setChallengeReason] = React.useState('');
   const transactionsQueue = React.useRef<CustomTransaction[]>([]);
-
-  const [challengeReasonFile, setChallengeReasonFile] = React.useState<any>(null);
 
   const abiHandler = React.useMemo(() => {
     if (networkName) {
@@ -589,8 +584,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                       disabled={!isConnected}
                       containerEventChallenge={proposalStates['ContainerEventChallenge']}
                       currentState={proposalInfo.state}
-                      setChallengeReason={setChallengeReason}
-                      setChallengeFile={setChallengeReasonFile}
                       onChallengeProposal={challengeProposal}
                     />
                   }

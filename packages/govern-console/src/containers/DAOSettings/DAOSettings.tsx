@@ -17,7 +17,7 @@ import { correctDecimal } from 'utils/token';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { ContractReceipt } from 'ethers';
 import { validateToken, validateContract } from 'utils/validations';
-import { Proposal, ProposalOptions, ReceiptType } from '@aragon/govern';
+import { Proposal, ReceiptType } from '@aragon/govern';
 import { useSnackbar } from 'notistack';
 import { toUTF8Bytes, toUTF8String } from 'utils/lib';
 import { proposalDetailsUrl } from 'utils/urls';
@@ -97,7 +97,7 @@ export const InputSubTitle = styled(Typography)({
   marginBottom: '17px',
 });
 
-const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
+const DaoSettings: React.FC<DaoSettingFormProps> = () => {
   const history = useHistory();
   const context: any = useWallet();
   const { account, isConnected, provider } = context;
@@ -106,15 +106,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
   const { enqueueSnackbar } = useSnackbar();
 
   const methods = useForm<FormInputs>();
-  const {
-    register,
-    control,
-    watch,
-    setValue,
-    getValues,
-    handleSubmit,
-    formState: { errors },
-  } = methods;
+  const { control, setValue, getValues, handleSubmit } = methods;
 
   const { daoName } = useParams<ParamTypes>();
   //TODO daoname empty handling

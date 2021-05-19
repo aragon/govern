@@ -1,4 +1,3 @@
-import React, { useCallback } from 'react';
 import { Switch, Route } from 'react-router-dom';
 import { useHistory } from 'react-router-dom';
 import { styled } from '@material-ui/core/styles';
@@ -33,18 +32,6 @@ const MainBodyWrapper = styled('div')({
 const HomePage = () => {
   const history = useHistory();
 
-  const updateSelectedDaoAndPushToHistory = useCallback(
-    (daoDetails: any) => {
-      sessionStorage.setItem('selectedDao', JSON.stringify(daoDetails));
-      history.push(`/daos/${daoDetails.name}`);
-    },
-    [history],
-  );
-
-  const onSearchByDaoName = (daoName: string) => {
-    history.push(`/daos/${daoName}`);
-  };
-
   return (
     <ModalsProvider>
       <AppWrapper id="app-wrapper">
@@ -53,16 +40,10 @@ const HomePage = () => {
         <MainBodyWrapper id="main-body-wrapper">
           <Switch>
             <Route exact path="/">
-              <ConsoleMainPage
-              // updateSelectedDao={updateSelectedDaoAndPushToHistory}
-              // onSearchByDaoName={onSearchByDaoName}
-              />
+              <ConsoleMainPage />
             </Route>
             <Route exact path="/daos/:daoName">
-              <DaoMainPage
-              // onClickProposalCard={onClickProposalCard}
-              // onClickNewProposal={onClickNewProposal}
-              />
+              <DaoMainPage />
             </Route>
             <Route exact path="/proposals/:daoName/:id">
               <ProposalDetails onClickBack={() => history.goBack()} />
