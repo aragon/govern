@@ -39,28 +39,30 @@ const getBorder = (labelColor: string, theme: Theme): string => {
     return 'none';
   }
 };
-const StyledLabel = styled(MUIChip)(({ lcolor, theme }: { lcolor: string; theme: Theme }) => ({
-  color: getColor(lcolor, theme),
-  background: getBackground(lcolor, theme),
-  width: 'fit-content',
-  height: '19px',
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  padding: '1px 3px',
-  borderRadius: '40px',
-  border: getBorder(lcolor, theme),
-  '& .MuiChip-label': {
-    lineHeight: '10px',
-    fontSize: '12px',
-    fontWeight: 500,
-    fontFamily: 'Manrope',
-    fontStyle: 'normal',
-    overflow: 'visible',
-  },
-}));
+const StyledLabel = styled(MUIChip)(
+  ({ labelColor, theme }: { labelColor: string; theme: Theme }) => ({
+    color: getColor(labelColor, theme),
+    background: getBackground(labelColor, theme),
+    width: 'fit-content',
+    height: '19px',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: '1px 3px',
+    borderRadius: '40px',
+    border: getBorder(labelColor, theme),
+    '& .MuiChip-label': {
+      lineHeight: '10px',
+      fontSize: '12px',
+      fontWeight: 500,
+      fontFamily: 'Manrope',
+      fontStyle: 'normal',
+      overflow: 'visible',
+    },
+  }),
+);
 
 export const Label: React.FC<any> = ({ labelColor, labelText }) => {
-  return <StyledLabel label={labelText} lcolor={labelColor} />;
+  return <StyledLabel label={labelText} labelColor={labelColor} />;
 };
