@@ -1,4 +1,3 @@
-import React, { useCallback } from 'react';
 import { Switch, Route } from 'react-router-dom';
 import { useHistory } from 'react-router-dom';
 import { styled } from '@material-ui/core/styles';
@@ -32,18 +31,6 @@ const MainBodyWrapper = styled('div')({
 
 const HomePage = () => {
   const history = useHistory();
-
-  const updateSelectedDaoAndPushToHistory = useCallback(
-    (daoDetails: any) => {
-      sessionStorage.setItem('selectedDao', JSON.stringify(daoDetails));
-      history.push(`/daos/${daoDetails.name}`);
-    },
-    [history],
-  );
-
-  const onSearchByDaoName = (daoName: string) => {
-    history.push(`/daos/${daoName}`);
-  };
 
   return (
     <ModalsProvider>
