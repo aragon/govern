@@ -6,13 +6,13 @@ import { ANButton } from 'components/Button/ANButton';
 import { InputField } from 'components/InputFields/InputField';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
-import { GET_PROPOSAL_LIST, GET_DAO_BY_NAME } from './queries';
-import { useQuery, useLazyQuery } from '@apollo/client';
 import Grid from '@material-ui/core/Grid';
 import { useHistory, useParams } from 'react-router-dom';
 import NoDaoFound from './NoDaoFound';
 import { formatDate } from 'utils/date';
 import { getState, getStateColor } from 'utils/states';
+import { useDaoSubscription, useLazyProposalList } from 'hooks/subscription-hooks';
+import { transformProposalDetails, transformProposals } from 'utils/proposal';
 
 //* Styled Components List
 const DaoPageMainDiv = styled(Paper)(({ theme }) => ({
@@ -59,9 +59,9 @@ const DaoMainPage: React.FC = () => {
   const { daoName } = useParams<any>();
   //TODO daoname empty handling
 
-  const { data: daoList, loading: loadingDao } = useQuery(GET_DAO_BY_NAME, {
-    variables: { name: daoName },
-  });
+  // TODO: Giorgi useDaoSubscription should be returning the single object
+  // we shouldn't be doing daoList.daos[0]
+  const { data: daoList, loading: loadingDao } = useDaoSubscription(daoName);
 
   const [isProposalPage, setProposalPage] = useState(true);
   const [visibleProposalList, updateVisibleProposalList] = useState<any>([]);
@@ -86,26 +86,12 @@ const DaoMainPage: React.FC = () => {
     }
   };
 
-  const [
-    getQueueData,
-    {
-      // loading: loadingProposals,
-      data: queueData,
-      // error: proposalErrors,
-      fetchMore: fetchMoreProposals,
-    },
-  ] = useLazyQuery(GET_PROPOSAL_LIST, { fetchPolicy: 'no-cache' });
+  const { getQueueData, data: queueData, fetchMore: fetchMoreProposals } = useLazyProposalList();
 
   const fetchMoreData = async () => {
     if (fetchMoreProposals) {
-      const {
-        // loading: loadingMore,
-        data: moreData,
-      }: { data: any; loading: boolean } = await fetchMoreProposals({
-        variables: {
-          offset: visibleProposalList.length,
-        },
-      });
+      const { data: moreData, loading } = await fetchMoreProposals(visibleProposalList.length);
+
       if (moreData && moreData.governQueue.containers.length > 0) {
         updateVisibleProposalList([...visibleProposalList, ...moreData.governQueue.containers]);
       }

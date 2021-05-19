@@ -6,8 +6,6 @@ import { styled } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { InputField } from 'components/InputFields/InputField';
 import { ANButton } from 'components/Button/ANButton';
-import { GET_DAO_BY_NAME } from '../DAO/queries';
-import { useQuery } from '@apollo/client';
 import { buildContainer } from 'utils/ERC3000';
 import { useWallet } from 'AugmentedWallet';
 import { HelpButton } from 'components/HelpButton/HelpButton';
@@ -26,6 +24,7 @@ import { proposalDetailsUrl } from 'utils/urls';
 import { getIpfsUrl, addToIpfs } from 'utils/ipfs';
 import { IPFSInput } from 'components/Field/IPFSInput';
 import { useFacadeProposal } from 'hooks/proposals';
+import { useDaoSubscription } from 'hooks/subscription-hooks';
 
 export interface DaoSettingFormProps {
   /**
@@ -119,9 +118,10 @@ const DaoSettings: React.FC<DaoSettingFormProps> = ({ onClickBack }) => {
 
   const { daoName } = useParams<ParamTypes>();
   //TODO daoname empty handling
-  const { data: daoList } = useQuery(GET_DAO_BY_NAME, {
-    variables: { name: daoName },
-  });
+
+  // TODO: Giorgi useDaoSubscription should be returning the single object
+  // we shouldn't be doing daoList.daos[0]
+  const { data: daoList } = useDaoSubscription(daoName);
 
   const [daoDetails, updateDaoDetails] = useState<any>();
   const [config, setConfig] = useState<any>(undefined);

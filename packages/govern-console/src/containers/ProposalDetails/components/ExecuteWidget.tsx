@@ -4,7 +4,7 @@ import { PROPOSAL_STATES } from 'utils/states';
 import { formatDate } from 'utils/date';
 import { InfoKeyDiv, InfoValueDivInline } from '../ProposalDetails';
 import { Widget, WidgetRow, InfoWrapper, TitleText } from './SharedStyles';
-import { isEligibleForExecution } from 'utils/states';
+import { isEligibleForExecution, eligibleExecutionTime } from 'utils/states';
 
 const ExecuteWidget: React.FC<any> = ({
   disabled,
@@ -54,7 +54,7 @@ const ExecuteWidget: React.FC<any> = ({
           <WidgetRow>
             <InfoWrapper>
               <InfoKeyDiv>Execute available at</InfoKeyDiv>
-              <InfoValueDivInline>{formatDate(executionTime)}</InfoValueDivInline>
+              <InfoValueDivInline>{eligibleExecutionTime(executionTime)}</InfoValueDivInline>
             </InfoWrapper>
           </WidgetRow>
         )}

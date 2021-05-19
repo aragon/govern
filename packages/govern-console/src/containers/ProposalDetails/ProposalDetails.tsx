@@ -5,9 +5,6 @@ import Typography from '@material-ui/core/Typography';
 import backButtonIcon from 'images/back-btn.svg';
 import { Label } from 'components/Labels/Label';
 import { useParams } from 'react-router-dom';
-import { GET_PROPOSAL_DETAILS_QUERY } from './queries';
-import { GET_DAO_BY_NAME } from '../DAO/queries';
-import { useQuery, useLazyQuery } from '@apollo/client';
 import { useWallet } from '../../AugmentedWallet';
 import { CustomTransaction } from 'utils/types';
 import { getProposalParams } from 'utils/ERC3000';
@@ -22,6 +19,7 @@ import { Link } from 'react-router-dom';
 import { IPFSField } from 'components/Field/IPFSField';
 import { addToIpfs } from 'utils/ipfs';
 import { useFacadeProposal } from 'hooks/proposals';
+import { useLazyProposalDetails, useDaoSubscription } from 'hooks/subscription-hooks';
 
 // widget components
 import ChallengeWidget from './components/ChallengeWidget';
@@ -277,9 +275,11 @@ const ExpandedDiv = styled('div')({
 
 const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   const { daoName, id: proposalId } = useParams<any>();
-  const { data: daoList } = useQuery(GET_DAO_BY_NAME, {
-    variables: { name: daoName },
-  });
+
+  // TODO: Giorgi useDaoSubscription should be returning the single object
+  // we shouldn't be doing daoList.daos[0]
+  const { data: daoList } = useDaoSubscription(daoName);
+
   const context: any = useWallet();
 
   const { account, provider, networkName, isConnected } = context;
@@ -309,10 +309,11 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     proposalInfo?.config.resolver,
   );
 
-  const [
+  const {
     getProposalData,
-    { loading: isLoadingProposalDetails, data: proposalDetailsData },
-  ] = useLazyQuery(GET_PROPOSAL_DETAILS_QUERY);
+    data: proposalDetailsData,
+    loading: isLoadingProposalDetails,
+  } = useLazyProposalDetails();
 
   useEffect(() => {
     return function cleanUp() {

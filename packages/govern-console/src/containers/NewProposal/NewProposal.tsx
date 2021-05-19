@@ -10,8 +10,6 @@ import { AddActionsModal } from 'components/Modal/AddActionsModal';
 import { InputField } from 'components/InputFields/InputField';
 import { useParams, useHistory } from 'react-router-dom';
 import { ContractReceipt, utils } from 'ethers';
-import { useQuery } from '@apollo/client';
-import { GET_DAO_BY_NAME } from '../DAO/queries';
 import { buildContainer } from 'utils/ERC3000';
 import { useWallet } from 'AugmentedWallet';
 import { CustomTransaction, abiItem, actionType, ActionToSchedule } from 'utils/types';
@@ -25,6 +23,7 @@ import { useFacadeProposal } from 'hooks/proposals';
 import { toUTF8Bytes } from 'utils/lib';
 import { IPFSInput } from 'components/Field/IPFSInput';
 import { settingsUrl } from 'utils/urls';
+import { useDaoSubscription } from 'hooks/subscription-hooks';
 
 export interface NewProposalProps {
   /**
@@ -218,9 +217,11 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack }) => {
 
   const { daoName } = useParams<any>();
   //TODO daoname empty handling
-  const { data: daoList } = useQuery(GET_DAO_BY_NAME, {
-    variables: { name: daoName },
-  });
+
+  // TODO: Giorgi useDaoSubscription should be returning the single object
+  // we shouldn't be doing daoList.daos[0]
+  const { data: daoList } = useDaoSubscription(daoName);
+
   const { enqueueSnackbar } = useSnackbar();
   const { dispatch } = React.useContext(ModalsContext);
 

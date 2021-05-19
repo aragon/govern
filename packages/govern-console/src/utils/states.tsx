@@ -1,3 +1,5 @@
+import { formatDate } from './date';
+
 export const PROPOSAL_STATES = {
   SCHEDULED: 'Scheduled',
   CHALLENGED: 'Challenged',
@@ -19,7 +21,15 @@ export const PROPOSAL_STATES_COLORS = {
 };
 
 export const isEligibleForExecution = (time: number) => {
-  return Date.now() >= time * 1000;
+  // add 15 seconds latency due to ethereum's block.timestamp variance by 15 seconds.
+  // needed so that user doesn't click the button immediatelly once it's eligible which
+  // will cause the tx error due to  `wait more` from the contract.
+  return Date.now() >= time + 15000;
+};
+
+export const eligibleExecutionTime = (time: number) => {
+  // add 15 seconds latency due to ethereum's block.timestamp variance by 15 seconds.
+  return formatDate(time + 15000);
 };
 
 export const getStateColor = (state: string, executionTime: number) => {
