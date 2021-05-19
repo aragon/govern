@@ -40,16 +40,10 @@ const HomePage = () => {
         <MainBodyWrapper id="main-body-wrapper">
           <Switch>
             <Route exact path="/">
-              <ConsoleMainPage
-              // updateSelectedDao={updateSelectedDaoAndPushToHistory}
-              // onSearchByDaoName={onSearchByDaoName}
-              />
+              <ConsoleMainPage />
             </Route>
             <Route exact path="/daos/:daoName">
-              <DaoMainPage
-              // onClickProposalCard={onClickProposalCard}
-              // onClickNewProposal={onClickNewProposal}
-              />
+              <DaoMainPage />
             </Route>
             <Route exact path="/proposals/:daoName/:id">
               <ProposalDetails onClickBack={() => history.goBack()} />
@@ -58,7 +52,7 @@ const HomePage = () => {
               <NewProposal onClickBack={() => history.goBack()} />
             </Route>
             <Route exact path="/daos/:daoName/dao-settings">
-              <DaoSettings />
+              <DaoSettings onClickBack={() => history.goBack()} />
             </Route>
             <Route exact path="/create-dao">
               <CreateDao />

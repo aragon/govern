@@ -1,30 +1,37 @@
 import React, { useState, memo, useEffect } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
-import { ANWrappedPaper } from '../../components/WrapperPaper/ANWrapperPaper';
+import { ANWrappedPaper } from 'components/WrapperPaper/ANWrapperPaper';
 import backButtonIcon from '../../images/back-btn.svg';
 import { styled } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { InputField } from 'components/InputFields/InputField';
 import { ANButton } from 'components/Button/ANButton';
-import { GET_DAO_BY_NAME } from '../DAO/queries';
-import { useQuery } from '@apollo/client';
-import { buildContainer } from '../../utils/ERC3000';
+import { buildContainer } from 'utils/ERC3000';
 import { useWallet } from 'AugmentedWallet';
 import { HelpButton } from 'components/HelpButton/HelpButton';
 import Grid from '@material-ui/core/Grid';
 import { DaoConfig } from '@aragon/govern';
-import QueueApprovals from 'services/QueueApprovals';
 import { CustomTransaction } from 'utils/types';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import { correctDecimal } from 'utils/token';
-import FacadeProposal from 'services/Proposal';
-import { useForm, Controller } from 'react-hook-form';
-import { BytesLike, ContractReceipt } from 'ethers';
-import { validateToken, validateContract } from '../../utils/validations';
-import { Proposal, ProposalOptions, ReceiptType } from '@aragon/govern';
+import { useForm, Controller, FormProvider } from 'react-hook-form';
+import { ContractReceipt } from 'ethers';
+import { validateToken, validateContract } from 'utils/validations';
+import { Proposal, ReceiptType } from '@aragon/govern';
 import { useSnackbar } from 'notistack';
-import { toUtf8Bytes, toUtf8String } from '@ethersproject/strings';
+import { toUTF8Bytes, toUTF8String } from 'utils/lib';
 import { proposalDetailsUrl } from 'utils/urls';
+import { getIpfsUrl, addToIpfs } from 'utils/ipfs';
+import { IPFSInput } from 'components/Field/IPFSInput';
+import { useFacadeProposal } from 'hooks/proposals';
+import { useDaoSubscription } from 'hooks/subscription-hooks';
+
+export interface DaoSettingFormProps {
+  /**
+   * on click back
+   */
+  onClickBack: () => void;
+}
 
 interface ParamTypes {
   /**
@@ -36,8 +43,8 @@ interface ParamTypes {
 interface FormInputs {
   daoConfig: DaoConfig;
   proof: string;
-  isRuleFile: BytesLike;
-  isProofFile: string;
+  rulesFile: any;
+  proofFile: any;
 }
 
 const SettingsContainer = styled('div')({
@@ -54,18 +61,17 @@ const BackButton = styled('div')({
   left: -6,
 });
 
+// TODO: GIORGI repeating styles
 const Title = styled(Typography)({
   fontFamily: 'Manrope',
   fontStyle: 'normal',
-  fontWeight: 500,
+  fontWeight: 600,
   fontSize: 28,
   lineHeight: '38px',
   color: '#20232C',
   marginTop: 17,
-  width: 'fit-content',
   height: 50,
-  display: 'flex',
-  justifyContent: 'start',
+  display: 'block',
 });
 
 const InputTitle = styled(Typography)({
@@ -79,7 +85,7 @@ const InputTitle = styled(Typography)({
   marginTop: '17px',
 });
 
-const InputSubTitle = styled(Typography)({
+export const InputSubTitle = styled(Typography)({
   width: 'fit-content',
   fontFamily: 'Manrope',
   fontStyle: 'normal',
@@ -91,25 +97,27 @@ const InputSubTitle = styled(Typography)({
   marginBottom: '17px',
 });
 
-const DaoSettings: React.FC = () => {
+const DaoSettings: React.FC<DaoSettingFormProps> = () => {
   const history = useHistory();
-
   const context: any = useWallet();
   const { account, isConnected, provider } = context;
 
   const { dispatch } = React.useContext(ModalsContext);
   const { enqueueSnackbar } = useSnackbar();
 
-  const { control, watch, setValue, getValues, handleSubmit } = useForm<FormInputs>();
+  const methods = useForm<FormInputs>();
+  const { control, setValue, getValues, handleSubmit } = methods;
 
   const { daoName } = useParams<ParamTypes>();
   //TODO daoname empty handling
-  const { data: daoList } = useQuery(GET_DAO_BY_NAME, {
-    variables: { name: daoName },
-  });
+
+  // TODO: Giorgi useDaoSubscription should be returning the single object
+  // we shouldn't be doing daoList.daos[0]
+  const { data: daoList } = useDaoSubscription(daoName);
 
   const [daoDetails, updateDaoDetails] = useState<any>();
   const [config, setConfig] = useState<any>(undefined);
+  const [rulesIpfsUrl, setRulesIpfsUrl] = useState<string>('');
 
   useEffect(() => {
     if (daoList) {
@@ -117,19 +125,13 @@ const DaoSettings: React.FC = () => {
     }
   }, [daoList]);
 
-  const proposalInstance = React.useMemo(() => {
-    if (provider && account && daoDetails) {
-      const queueApprovals = new QueueApprovals(
-        account,
-        daoDetails.queue.address,
-        daoDetails.queue.config.resolver,
-      );
-      const proposal = new Proposal(daoDetails.queue.address, {} as ProposalOptions);
-      return new FacadeProposal(queueApprovals, proposal) as FacadeProposal & Proposal;
-    }
-  }, [provider, account, daoDetails]);
+  const proposalInstance = useFacadeProposal(
+    daoDetails?.queue.address,
+    daoDetails?.queue.config.resolver,
+  );
 
   const transactionsQueue = React.useRef<CustomTransaction[]>([]);
+
   useEffect(() => {
     return function cleanUp() {
       transactionsQueue.current = [];
@@ -151,10 +153,14 @@ const DaoSettings: React.FC = () => {
           challengeDeposit: { ..._config.challengeDeposit },
         };
 
-        // TODO: We only allow ordinary strings/text types for the rules settings
-        // in the future, toUtf8String won't be correct and need to handle different types
-        // mostly (toUTF8string again + ipfs)
-        formConfig.rules = toUtf8String(_config.rules);
+        // config.rules IPFS handling with utf8string fallback.
+        const rulesIpfsUrl = getIpfsUrl(_config.rules);
+        if (rulesIpfsUrl) {
+          setRulesIpfsUrl(rulesIpfsUrl);
+          formConfig.rules = '';
+        } else {
+          formConfig.rules = toUTF8String(_config.rules) || _config.rules;
+        }
 
         formConfig.scheduleDeposit.amount = await correctDecimal(
           _config.scheduleDeposit.token,
@@ -179,8 +185,14 @@ const DaoSettings: React.FC = () => {
     const newConfig: DaoConfig = formData.daoConfig;
     let containerHash: string | undefined;
 
-    // modify config before sending to schedule.
-    newConfig.rules = toUtf8Bytes(newConfig.rules.toString());
+    // TODO: add modal
+    // Upload proof to ipfs if it's a file,
+    // otherwise convert it to utf8bytes
+    const rulesFile = getValues('rulesFile');
+    newConfig.rules = rulesFile
+      ? await addToIpfs(rulesFile[0])
+      : toUTF8Bytes(newConfig.rules.toString());
+
     newConfig.scheduleDeposit.amount = await correctDecimal(
       newConfig.scheduleDeposit.token,
       newConfig.scheduleDeposit.amount,
@@ -194,12 +206,18 @@ const DaoSettings: React.FC = () => {
       provider,
     );
 
-    // build the container to schedule.
+    // TODO: add modal
+    // Upload proof to ipfs if it's a file,
+    // otherwise convert it to utf8bytes
+    const proofFile = getValues('proofFile');
+    const proof = proofFile ? await addToIpfs(proofFile[0]) : toUTF8Bytes(getValues('proof'));
+
+    // payload for the final container
     const payload = {
       submitter: account.address,
       executor: daoDetails.executor.address,
       actions: [proposalInstance?.buildAction('configure', [newConfig], 0)],
-      proof: getValues('proof'),
+      proof: proof,
     };
 
     // the final container to be sent to schedule.
@@ -218,8 +236,8 @@ const DaoSettings: React.FC = () => {
       type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
       payload: {
         transactionList: transactionsQueue.current,
-        onTransactionFailure: (error) => {
-          enqueueSnackbar(error, { variant: 'error' });
+        onTransactionFailure: () => {
+          /* do nothing */
         },
         onTransactionSuccess: (_, receipt: ContractReceipt) => {
           containerHash = Proposal.getContainerHashFromReceipt(receipt, ReceiptType.Scheduled);
@@ -241,372 +259,228 @@ const DaoSettings: React.FC = () => {
             <img src={backButtonIcon} />
           </BackButton>
           <Title style={{ fontSize: '38px' }}>DAO Settings</Title>
-          <InputTitle>
-            Execution Delay{' '}
-            <HelpButton
-              helpText={
-                'The amount of time any action will be delayed before it can be executed. During this time anyone can challenge it, preventing its execution'
-              }
-            />
-          </InputTitle>
-          <InputSubTitle>In seconds</InputSubTitle>
-          <Controller
-            name="daoConfig.executionDelay"
-            control={control}
-            defaultValue={''}
-            rules={{ required: 'This is required.' }}
-            render={({ field: { onChange, value }, fieldState: { error } }) => (
-              <InputField
-                type="number"
-                label=""
-                onInputChange={onChange}
-                value={value.toString()}
-                height="46px"
-                width={window.innerWidth > 700 ? '50%' : '100%'}
-                placeholder={'350s'}
-                error={!!error}
-                helperText={error ? error.message : null}
+          <FormProvider {...methods}>
+            <InputTitle>
+              Execution Delay{' '}
+              <HelpButton
+                helpText={
+                  'The amount of time any action will be delayed before it can be executed. During this time anyone can challenge it, preventing its execution'
+                }
               />
-            )}
-          />
-          <InputTitle>
-            Action collateral
-            <HelpButton
-              helpText={
-                'The requested collateral to be staked when anyone is scheduling an action. This is required so if action is challenged, collateral is used in resolver contract. If action passes, collateral returns to owner.'
-              }
-            />
-          </InputTitle>
-
-          <Grid container spacing={3}>
-            <Grid item>
-              <InputSubTitle>Token contract address</InputSubTitle>
-              <Controller
-                name="daoConfig.scheduleDeposit.token"
-                control={control}
-                defaultValue=""
-                rules={{
-                  required: 'This is required.',
-                  validate: async (value) => await validateToken(value, provider),
-                }}
-                render={({ field: { onChange, value }, fieldState: { error } }) => (
-                  <InputField
-                    label=""
-                    onInputChange={onChange}
-                    value={value}
-                    height="46px"
-                    width={window.innerWidth > 700 ? '540px' : '100%'}
-                    placeholder={'350s'}
-                    error={!!error}
-                    helperText={error ? error.message : null}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item>
-              <InputSubTitle>Amount</InputSubTitle>
-              <Controller
-                name="daoConfig.scheduleDeposit.amount"
-                control={control}
-                defaultValue={''}
-                rules={{ required: 'This is required.' }}
-                render={({ field: { onChange, value }, fieldState: { error } }) => (
-                  <InputField
-                    type="number"
-                    label=""
-                    onInputChange={onChange}
-                    value={value.toString()}
-                    height="46px"
-                    width={window.innerWidth > 700 ? '540px' : '100%'}
-                    placeholder={'350s'}
-                    error={!!error}
-                    helperText={error ? error.message : null}
-                  />
-                )}
-              />
-            </Grid>
-          </Grid>
-
-          <InputTitle>
-            Challenge collateral{' '}
-            <HelpButton
-              helpText={
-                'The requested collateral to be staked when anyone challenges a scheduled action. This is required to be used in the dispute on a resolver contract. If challenge wins the dispute, collateral returns to owner.'
-              }
-            />
-          </InputTitle>
-          <Grid container spacing={3}>
-            <Grid item>
-              <InputSubTitle>Token contract address</InputSubTitle>
-              <Controller
-                name="daoConfig.challengeDeposit.token"
-                control={control}
-                defaultValue=""
-                rules={{
-                  required: 'This is required.',
-                  validate: async (value) => await validateToken(value, provider),
-                }}
-                render={({ field: { onChange, value }, fieldState: { error } }) => (
-                  <InputField
-                    label=""
-                    onInputChange={onChange}
-                    value={value}
-                    height="46px"
-                    width={window.innerWidth > 700 ? '540px' : '100%'}
-                    placeholder={'350s'}
-                    error={!!error}
-                    helperText={error ? error.message : null}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <InputSubTitle>Amount</InputSubTitle>
-              <Controller
-                name="daoConfig.challengeDeposit.amount"
-                control={control}
-                defaultValue={''}
-                rules={{ required: 'This is required.' }}
-                render={({ field: { onChange, value }, fieldState: { error } }) => (
-                  <InputField
-                    type="number"
-                    label=""
-                    onInputChange={onChange}
-                    value={value.toString()}
-                    height="46px"
-                    width={window.innerWidth > 700 ? '540px' : '100%'}
-                    placeholder={'350s'}
-                    error={!!error}
-                    helperText={error ? error.message : null}
-                  />
-                )}
-              />
-            </Grid>
-          </Grid>
-
-          <InputTitle>
-            Resolver contract
-            <HelpButton
-              helpText={
-                'A resolver contract is used to handle any disputes of the DAO. This contract needs to implement the AragonCourt interface - https://github.com/aragon/protocol/blob/development/packages/evm/contracts/AragonCourt.sol'
-              }
-            />
-          </InputTitle>
-          <InputSubTitle>Contract address</InputSubTitle>
-          <Controller
-            name="daoConfig.resolver"
-            control={control}
-            defaultValue={''}
-            rules={{
-              required: 'This is required.',
-              validate: (value) => {
-                return validateContract(value, provider);
-              },
-            }}
-            render={({ field: { onChange, value }, fieldState: { error } }) => (
-              <InputField
-                label=""
-                onInputChange={onChange}
-                value={value}
-                height="46px"
-                width={window.innerWidth > 700 ? '540px' : '100%'}
-                placeholder={'350s'}
-                error={!!error}
-                helperText={error ? error.message : null}
-              />
-            )}
-          />
-          <InputTitle>
-            DAO rules / agreement{' '}
-            <HelpButton
-              helpText={
-                'Please provide the base rules under what your DAO should be ran. This is a human readable document that can guide anyone on what are the accepted behaviours when being part and interacting with this DAO.'
-              }
-            />
-          </InputTitle>
-          <div
-            style={{
-              width: 'fit-content',
-              display: 'flex',
-              flexDirection: 'row',
-              marginTop: '23px',
-              verticalAlign: 'middle',
-              lineHeight: '40px',
-            }}
-          >
-            {/* <OptionTextStyle>{'Text'}</OptionTextStyle>
-            TODO: add this when the IPFS support kicks in
-            <div style={{ marginLeft: '20px' }}>
-              <Controller
-                name="isRuleFile"
-                control={control}
-                defaultValue={false}
-                render={({ field: { onChange, value } }) => (
-                  <BlueSwitch onChange={onChange} value={value} />
-                )}
-              />
-            </div>
-            <OptionTextStyle>{'File'}</OptionTextStyle> */}
-          </div>
-          <InputSubTitle>Provide the base rules under what your DAO should be ran</InputSubTitle>
-          {!watch('isRuleFile') ? (
+            </InputTitle>
+            <InputSubTitle>In seconds</InputSubTitle>
             <Controller
-              name="daoConfig.rules"
+              name="daoConfig.executionDelay"
               control={control}
               defaultValue={''}
               rules={{ required: 'This is required.' }}
               render={({ field: { onChange, value }, fieldState: { error } }) => (
                 <InputField
+                  type="number"
                   label=""
                   onInputChange={onChange}
                   value={value.toString()}
-                  height={'100px'}
-                  width={'100%'}
-                  placeholder={'DAO rules and agreement ...'}
+                  height="46px"
+                  width={window.innerWidth > 700 ? '50%' : '100%'}
+                  placeholder={'350s'}
                   error={!!error}
                   helperText={error ? error.message : null}
                 />
               )}
             />
-          ) : (
-            <div
-              style={{
-                width: 'inherited',
-                display: 'flex',
-                flexDirection: 'row',
-                verticalAlign: 'middle',
-                lineHeight: '40px',
-                marginTop: '17px',
-              }}
-            >
-              <InputField
-                label=""
-                onInputChange={() => {
-                  //
-                }}
-                value={''}
-                height="46px"
-                width="540px"
-                placeholder={'Select A file...'}
+            <InputTitle>
+              Action collateral{' '}
+              <HelpButton
+                helpText={
+                  'The requested collateral to be staked when anyone is scheduling an action. This is required so if action is challenged, collateral is used in resolver contract. If action passes, collateral returns to owner.'
+                }
               />
-              <ANButton
-                label={'Examine'}
-                buttonType={'secondary'}
-                backgroundColor={'#FFFFFF'}
-                labelColor={'#20232C'}
-                onClick={() => {
-                  // TODO: this should not be empty
-                  console.log('this should not be empty');
-                }}
-                style={{ marginLeft: '10px' }}
-                disabled={true}
+            </InputTitle>
+            <Grid container spacing={3}>
+              <Grid item>
+                <InputSubTitle>Token contract address</InputSubTitle>
+                <Controller
+                  name="daoConfig.scheduleDeposit.token"
+                  control={control}
+                  defaultValue=""
+                  rules={{
+                    required: 'This is required.',
+                    validate: async (value) => await validateToken(value, provider),
+                  }}
+                  render={({ field: { onChange, value }, fieldState: { error } }) => (
+                    <InputField
+                      label=""
+                      onInputChange={onChange}
+                      value={value}
+                      height="46px"
+                      width={window.innerWidth > 700 ? '540px' : '100%'}
+                      placeholder={'350s'}
+                      error={!!error}
+                      helperText={error ? error.message : null}
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item>
+                <InputSubTitle>Amount</InputSubTitle>
+                <Controller
+                  name="daoConfig.scheduleDeposit.amount"
+                  control={control}
+                  defaultValue={''}
+                  rules={{ required: 'This is required.' }}
+                  render={({ field: { onChange, value }, fieldState: { error } }) => (
+                    <InputField
+                      type="number"
+                      label=""
+                      onInputChange={onChange}
+                      value={value.toString()}
+                      height="46px"
+                      width={window.innerWidth > 700 ? '540px' : '100%'}
+                      placeholder={'350s'}
+                      error={!!error}
+                      helperText={error ? error.message : null}
+                    />
+                  )}
+                />
+              </Grid>
+            </Grid>
+            <InputTitle>
+              Challenge collateral{' '}
+              <HelpButton
+                helpText={
+                  'The requested collateral to be staked when anyone challenges a scheduled action. This is required to be used in the dispute on a resolver contract. If challenge wins the dispute, collateral returns to owner.'
+                }
               />
-            </div>
-          )}
+            </InputTitle>
+            <Grid container spacing={3}>
+              <Grid item>
+                <InputSubTitle>Token contract address</InputSubTitle>
+                <Controller
+                  name="daoConfig.challengeDeposit.token"
+                  control={control}
+                  defaultValue=""
+                  rules={{
+                    required: 'This is required.',
+                    validate: async (value) => await validateToken(value, provider),
+                  }}
+                  render={({ field: { onChange, value }, fieldState: { error } }) => (
+                    <InputField
+                      label=""
+                      onInputChange={onChange}
+                      value={value}
+                      height="46px"
+                      width={window.innerWidth > 700 ? '540px' : '100%'}
+                      placeholder={'350s'}
+                      error={!!error}
+                      helperText={error ? error.message : null}
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <InputSubTitle>Amount</InputSubTitle>
+                <Controller
+                  name="daoConfig.challengeDeposit.amount"
+                  control={control}
+                  defaultValue={''}
+                  rules={{ required: 'This is required.' }}
+                  render={({ field: { onChange, value }, fieldState: { error } }) => (
+                    <InputField
+                      type="number"
+                      label=""
+                      onInputChange={onChange}
+                      value={value.toString()}
+                      height="46px"
+                      width={window.innerWidth > 700 ? '540px' : '100%'}
+                      placeholder={'350s'}
+                      error={!!error}
+                      helperText={error ? error.message : null}
+                    />
+                  )}
+                />
+              </Grid>
+            </Grid>
 
-          <InputTitle>
-            Proof{' '}
-            <HelpButton
-              helpText={
-                'Please provide the reasons for this DAO settings change as this will trigger an action on the executor queue'
-              }
-            />
-          </InputTitle>
-          <div
-            style={{
-              width: 'fit-content',
-              display: 'flex',
-              flexDirection: 'row',
-              marginTop: '23px',
-              verticalAlign: 'middle',
-              lineHeight: '40px',
-            }}
-          >
-            {/* <OptionTextStyle>{'Text'}</OptionTextStyle>
-            TODO: add this when the IPFS support kicks in
-            <div style={{ marginLeft: '20px' }}>
-              <Controller
-                name="isProofFile"
-                control={control}
-                defaultValue={false}
-                render={({ field: { onChange, value } }) => (
-                  <BlueSwitch onChange={onChange} value={value} />
-                )}
+            <InputTitle>
+              Resolver contract{' '}
+              <HelpButton
+                helpText={
+                  'A resolver contract is used to handle any disputes of the DAO. This contract needs to implement the AragonCourt interface - https://github.com/aragon/protocol/blob/development/packages/evm/contracts/AragonCourt.sol'
+                }
               />
-            </div>
-            <OptionTextStyle>{'File'}</OptionTextStyle> */}
-          </div>
-          <InputSubTitle>Enter the proof for changes</InputSubTitle>
-          {!watch('isProofFile') ? (
+            </InputTitle>
+            <InputSubTitle>Contract address</InputSubTitle>
             <Controller
-              name="proof"
+              name="daoConfig.resolver"
               control={control}
               defaultValue={''}
-              rules={{ required: 'This is required.' }}
+              rules={{
+                required: 'This is required.',
+                validate: (value) => {
+                  return validateContract(value, provider);
+                },
+              }}
               render={({ field: { onChange, value }, fieldState: { error } }) => (
                 <InputField
                   label=""
                   onInputChange={onChange}
                   value={value}
-                  height={'100px'}
-                  width={'100%'}
-                  placeholder={'DAO rules and agreement ...'}
+                  height="46px"
+                  width={window.innerWidth > 700 ? '540px' : '100%'}
+                  placeholder={'350s'}
                   error={!!error}
                   helperText={error ? error.message : null}
                 />
               )}
             />
-          ) : (
+            <InputTitle>
+              DAO rules / agreement{' '}
+              <HelpButton
+                helpText={
+                  'Please provide the base rules under what your DAO should be ran. This is a human readable document that can guide anyone on what are the accepted behaviours when being part and interacting with this DAO.'
+                }
+              />
+            </InputTitle>
+
+            <IPFSInput
+              label="Provide the base rules under what your DAO should be ran"
+              placeholder="DAO rules and agreement.."
+              ipfsURI={rulesIpfsUrl}
+              textInputName="daoConfig.rules"
+              fileInputName="rulesFile"
+            />
+
+            <InputTitle>
+              Justification{' '}
+              <HelpButton
+                helpText={
+                  'Please provide the reasons for this DAO settings change as this will trigger an action on the executor queue'
+                }
+              />
+            </InputTitle>
+            <IPFSInput
+              label="Enter the justification for changes"
+              placeholder="Justification Reason..."
+              textInputName="proof"
+              fileInputName="proofFile"
+            />
+
             <div
               style={{
-                width: 'inherited',
+                justifyContent: 'center',
                 display: 'flex',
-                flexDirection: 'row',
-                verticalAlign: 'middle',
-                lineHeight: '40px',
-                marginTop: '17px',
               }}
             >
-              <InputField
-                label=""
-                onInputChange={() => {
-                  //
-                }}
-                value={''}
-                height="46px"
-                width="540px"
-                placeholder={'Select A file...'}
-              />
               <ANButton
-                label={'Examine'}
-                buttonType={'secondary'}
-                backgroundColor={'#FFFFFF'}
-                labelColor={'#20232C'}
-                onClick={() => {
-                  // TODO: this should not be empty
-                  console.log('this should not be empty');
-                }}
-                style={{ marginLeft: '10px' }}
-                disabled={true}
+                disabled={!isConnected}
+                label={'Save settings'}
+                buttonType={'primary'}
+                onClick={handleSubmit(callSaveSetting)}
+                style={{ marginTop: '34px' }}
+                width={'100%'}
               />
             </div>
-          )}
-
-          <div
-            style={{
-              justifyContent: 'center',
-              display: 'flex',
-            }}
-          >
-            <ANButton
-              disabled={!isConnected}
-              label={'Save settings'}
-              buttonType={'primary'}
-              onClick={handleSubmit(callSaveSetting)}
-              style={{ marginTop: '34px' }}
-              width={'100%'}
-            />
-          </div>
+          </FormProvider>
         </ANWrappedPaper>
       </SettingsContainer>
     </>

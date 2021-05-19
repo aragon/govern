@@ -87,7 +87,6 @@ type Role @entity {
   frozen: Boolean!
 }
 
-
 # Enums
 
 enum ContainerState {

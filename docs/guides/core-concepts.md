@@ -12,8 +12,8 @@ To date, acceptable actions and behavioral boundaries within DAOs are rigidly de
 
 A Govern DAO, in its most normal and basic form has two key pieces:
 
-* An Action Queue
-* An Executor
+- An Action Queue
+- An Executor
 
 Govern's Action Queue is what most users will interact with directly—it holds the DAOs configuration parameters, and its where actors can schedule, execute, veto and challenge actions. It's also flexible, meaning that actions can be introduced to tweak its own parameters on the fly.
 
@@ -22,4 +22,3 @@ Through the Executor, Govern DAOs can also hold funds and interact with any arbi
 Learn more about the [smart contract system here](../developers/smart-contracts.md).
 
 Govern will also have first class support with Snapshot, in which a space will be able to be configured so that every proposal can attach an on-chain action to the corresponding options to vote for. With these tools, we have everything we need to allow a project, to fully and progressively decentralize and take decisions over its future in a community-oriented manner.
-

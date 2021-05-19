@@ -13,7 +13,6 @@ describe('DaoActionTest', () => {
     clientMockClass = GraphQLClient as jest.MockedClass<typeof GraphQLClient>,
     clientMock: GraphQLClient
 
-
   beforeEach(() => {
     action = new DaosAction()
     clientMock = clientMockClass.mock.instances[0]
@@ -21,14 +20,14 @@ describe('DaoActionTest', () => {
 
   it('calls execute and does map the response accordingly', async () => {
     clientMock.request = jest.fn((query: string, args: any = {}) => {
-      expect(query).toEqual(daos);
+      expect(query).toEqual(daos)
 
       expect(args).toEqual({})
 
-      return Promise.resolve({daos: true})
-    });
+      return Promise.resolve({ daos: true })
+    })
 
-    const response = await action.execute();
+    const response = await action.execute()
 
     expect(response).toEqual(true)
   })

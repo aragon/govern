@@ -4,13 +4,14 @@ import { DAO_FACTORY_ADDRESS, GOVERN_REGISTRY_ADDRESS } from './ConfigDefaults'
 
 export interface ConfigurationObject {
   subgraphURL?: string
-  daoFactoryAddress?: string,
+  daoFactoryAddress?: string
   tokenStorageProof?: string
   governRegistry?: string
 }
 
 let defaultConfig: Configuration
-const subgraphURL = 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-mainnet'
+const subgraphURL =
+  'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-mainnet'
 
 /**
  * @class Configuration
@@ -24,9 +25,9 @@ export default class Configuration {
    * @private
    */
   private config: {
-    subgraphURL: string;
+    subgraphURL: string
     client: ClientInterface
-    daoFactoryAddress: string,
+    daoFactoryAddress: string
     governRegistry: string
   }
 
@@ -102,7 +103,7 @@ export default class Configuration {
    *
    * @public
    */
-   get daoFactoryAddress(): string {
+  get daoFactoryAddress(): string {
     return this.config.daoFactoryAddress
   }
 
@@ -118,7 +119,6 @@ export default class Configuration {
   get governRegistry(): string {
     return this.config.governRegistry
   }
-
 
   /**
    * Static setter/factory method of the Configuration class

@@ -27,6 +27,6 @@ export default class DaosAction extends AbstractAction {
   public async execute(): Promise<Daos> {
     const response = await super.execute()
 
-    return response.daos;
+    return response.daos
   }
 }

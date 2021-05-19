@@ -53,73 +53,73 @@ export type ContainerEvent =
   | ContainerEventVeto
 
 export interface Action {
-  id: string,
-  to: string,
-  value: string,
+  id: string
+  to: string
+  value: string
   data: string
 }
 
 type Role = {
-  id: string,
-  entity: string,
-  selector: string,
-  who: string,
-  granted: boolean,
+  id: string
+  entity: string
+  selector: string
+  who: string
+  granted: boolean
   frozen: boolean
 }
 
 type Config = {
-  id: string,
+  id: string
   executionDelay: string
-  scheduleDeposit: Collateral,
-  challengeDeposit: Collateral,
-  resolver: string,
+  scheduleDeposit: Collateral
+  challengeDeposit: Collateral
+  resolver: string
   rules: string
 }
 
 type Executor = {
-  id: string,
-  address: string,
-  metadata: string,
-  balance: string,
+  id: string
+  address: string
+  metadata: string
+  balance: string
   roles: Role[]
 }
 
 type Container = {
-  id: string,
-  state: string,
-  config: Config,
+  id: string
+  state: string
+  config: Config
   payload: {
-    id: string,
-    nonce: string,
-    executionTime: string,
-    submitter: string,
-    executor: Executor,
+    id: string
+    nonce: string
+    executionTime: string
+    submitter: string
+    executor: Executor
     actions: Action[]
-    allowFailuresMap: string,
+    allowFailuresMap: string
     proof: string
-  },
+  }
   history: ContainerEvent[]
 }
 
 export interface Dao {
-  id: string,
-  name: string,
+  id: string
+  name: string
   queue: {
-    id: string,
-    address: string,
-    nonce: string,
-    config: Config,
+    id: string
+    address: string
+    nonce: string
+    config: Config
     containers: Container[]
-  },
-  executor: Executor,
-  token: string,
+  }
+  executor: Executor
+  token: string
   registrant: string
 }
 
 export type Daos = Dao[]
 
-const daoFragment= `
+const daoFragment = `
   fragment daoFragment on Dao {
     id
     name
@@ -263,4 +263,4 @@ const daoFragment= `
   }
 `
 
-export default daoFragment;
+export default daoFragment

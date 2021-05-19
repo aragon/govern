@@ -13,7 +13,7 @@ describe('[e2e] dao Test', () => {
   it('calls dao and returns as expected', async () => {
     const daoList = await daos()
 
-    const daoWithContainer = daoList.find(d => d.queue.containers.length > 0)
+    const daoWithContainer = daoList.find((d) => d.queue.containers.length > 0)
 
     // fail the test if there is no dao with a container so we can manually
     // add a dao for the testing.  This should rarely happen because registry
@@ -83,12 +83,10 @@ describe('[e2e] dao Test', () => {
   })
 
   it('non-existent dao should return null', async () => {
-    const name = "non-existent"
+    const name = 'non-existent'
 
     const response = await dao(name)
 
     expect(response).toBeNull()
   })
-
 })
-

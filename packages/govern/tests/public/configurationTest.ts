@@ -10,7 +10,10 @@ jest.mock('../../internal/clients/graphql/GraphQLClient')
  */
 describe('configure Test', () => {
   it('calls configure and defines the expected default config', () => {
-    configure({ subgraphURL: 'localhost', daoFactoryAddress: '0x123' } as ConfigurationObject)
+    configure({
+      subgraphURL: 'localhost',
+      daoFactoryAddress: '0x123',
+    } as ConfigurationObject)
 
     const config = Configuration.get()
 

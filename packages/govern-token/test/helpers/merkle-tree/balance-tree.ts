@@ -27,9 +27,18 @@ export default class BalanceTree {
   }
 
   // keccak256(abi.encode(index, account, amount))
-  public static toNode(index: number | BigNumber, account: string, amount: BigNumber): Buffer {
+  public static toNode(
+    index: number | BigNumber,
+    account: string,
+    amount: BigNumber
+  ): Buffer {
     return Buffer.from(
-      utils.solidityKeccak256(['uint256', 'address', 'uint256'], [index, account, amount]).substr(2),
+      utils
+        .solidityKeccak256(
+          ['uint256', 'address', 'uint256'],
+          [index, account, amount]
+        )
+        .substr(2),
       'hex'
     )
   }
@@ -39,8 +48,11 @@ export default class BalanceTree {
   }
 
   // returns the hex bytes32 values of the proof
-  public getProof(index: number | BigNumber, account: string, amount: BigNumber): string[] {
+  public getProof(
+    index: number | BigNumber,
+    account: string,
+    amount: BigNumber
+  ): string[] {
     return this.tree.getHexProof(BalanceTree.toNode(index, account, amount))
   }
 }
-

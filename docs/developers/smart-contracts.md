@@ -18,15 +18,14 @@ ERC3000 specific contracts haven't been included here. To browse them, go to the
 
 The `ERC3000Registry` contract serves as the **central registry for all Govern DAOs**. Every DAO spawned through a properly-implemented `GovernFactory` will register the new DAO in the "official" registry. The registry takes care of doing these things:
 
-* Keep track\* of every `Govern` ⟷ `GovernQueue` pair assigning it a name on the blockchain. This means that instead of assigning an ENS name, this is left to the user, as the name itself will be saved in the contract's storage.
-* Setting metadata, which means you can include an IPFS CID to talk about your DAO, and include relevant links.
+- Keep track\* of every `Govern` ⟷ `GovernQueue` pair assigning it a name on the blockchain. This means that instead of assigning an ENS name, this is left to the user, as the name itself will be saved in the contract's storage.
+- Setting metadata, which means you can include an IPFS CID to talk about your DAO, and include relevant links.
 
 **Think of it as...**
 
 A book which keeps track of every DAO and its core relevant info, which will be accessible through a subgraph.
 
-{% hint style="info" %}
-\* Due to the stateless nature of these contracts, it actually only emits an event, and registers the DAO name to the contract's storage so it cannot be overwritten. We rely on the subgraph to get this information.
+{% hint style="info" %} \* Due to the stateless nature of these contracts, it actually only emits an event, and registers the DAO name to the contract's storage so it cannot be overwritten. We rely on the subgraph to get this information.
 {% endhint %}
 
 ### GovernFactory.sol & GovernQueueFactory.sol
@@ -85,8 +84,7 @@ Actions can be **vetoed**, which might be useful for projects which are venturin
 
 The ACL from govern is a much leaner implementation of the original ACL from aragonOS, but still very powerful, having the ability to grant, revoke, and freeze roles. There are a couple of differences:
 
-* Is devised to be as an **inheritable** contract. Instead of being a single contract that binds the whole organization together, **both `GovernQueue` and `Govern` have their own ACLs**.
-* It has a handy **bulk** function to set multiple permissions at once.
-* The address for freezing a role is `0x0000000000000000000000000000000000000001`.
-* The address for giving the permission to everyone is`0xffffffffffffffffffffffffffffffffffffffff`
-
+- Is devised to be as an **inheritable** contract. Instead of being a single contract that binds the whole organization together, **both `GovernQueue` and `Govern` have their own ACLs**.
+- It has a handy **bulk** function to set multiple permissions at once.
+- The address for freezing a role is `0x0000000000000000000000000000000000000001`.
+- The address for giving the permission to everyone is`0xffffffffffffffffffffffffffffffffffffffff`

@@ -6,7 +6,8 @@ import { DAO_FACTORY_ADDRESS } from '../../../internal/configuration/ConfigDefau
 jest.mock('../../../internal/clients/graphql/GraphQLClient')
 
 const expected = {
-  "defaultUrl": "https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-mainnet"
+  defaultUrl:
+    'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-mainnet',
 }
 
 /**
@@ -16,7 +17,10 @@ describe('ConfigurationTest', () => {
   let config: Configuration
 
   beforeEach(() => {
-    config = new Configuration({ subgraphURL: 'localhost', daoFactoryAddress: '0x123' })
+    config = new Configuration({
+      subgraphURL: 'localhost',
+      daoFactoryAddress: '0x123',
+    })
   })
 
   it('initialization test', () => {

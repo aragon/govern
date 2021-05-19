@@ -19,7 +19,7 @@ import {
   Config,
   Container,
   Payload,
-  GovernQueue
+  GovernQueue,
 } from '../generated/schema'
 import { frozenRoles, roleGranted, roleRevoked } from './lib/MiniACL'
 import { buildId, buildIndexedId } from './utils/ids'
@@ -31,13 +31,13 @@ import {
   EXECUTED_STATUS,
   NONE_STATUS,
   REJECTED_STATUS,
-  SCHEDULED_STATUS
+  SCHEDULED_STATUS,
 } from './utils/constants'
 import {
   handleContainerEventChallenge,
   handleContainerEventResolve,
   handleContainerEventSchedule,
-  handleContainerEventVeto
+  handleContainerEventVeto,
 } from './utils/events'
 
 import { loadOrCreateGovern } from './Govern'
@@ -125,11 +125,15 @@ export function handleConfigured(event: ConfiguredEvent): void {
   let configId = buildId(event)
   let config = new Config(configId)
 
-  let scheduleDeposit = new Collateral(buildIndexedId(event.transaction.hash.toHex(), 1))
+  let scheduleDeposit = new Collateral(
+    buildIndexedId(event.transaction.hash.toHex(), 1)
+  )
   scheduleDeposit.token = event.params.config.scheduleDeposit.token
   scheduleDeposit.amount = event.params.config.scheduleDeposit.amount
 
-  let challengeDeposit = new Collateral(buildIndexedId(event.transaction.hash.toHex(), 2))
+  let challengeDeposit = new Collateral(
+    buildIndexedId(event.transaction.hash.toHex(), 2)
+  )
   challengeDeposit.token = event.params.config.challengeDeposit.token
   challengeDeposit.amount = event.params.config.challengeDeposit.amount
 
@@ -223,7 +227,6 @@ export function loadOrCreateQueue(queueAddress: Address): GovernQueue {
     queue.roles = []
   }
 
-
   queue.nonce = GovernQueueContract.bind(queueAddress).nonce()
 
   return queue!
@@ -280,4 +283,3 @@ function buildActions(event: ScheduledEvent): void {
     action.save()
   }
 }
-

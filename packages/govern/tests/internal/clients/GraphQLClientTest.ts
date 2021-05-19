@@ -26,7 +26,7 @@ describe('GraphQLClientTest', () => {
     expect(Client).toHaveBeenNthCalledWith(1, {
       maskTypename: true,
       url: 'localhost',
-      fetch
+      fetch,
     })
   })
 
@@ -34,7 +34,7 @@ describe('GraphQLClientTest', () => {
     const nestedToPromise = {
       toPromise: jest.fn(async () => {
         return { error: false, data: true }
-      })
+      }),
     }
 
     urqlClientMock.query = jest.fn((query, args) => {
@@ -60,24 +60,24 @@ describe('GraphQLClientTest', () => {
         return {
           error: {
             name: 'ERROR',
-            message: 'MESSAGE'
+            message: 'MESSAGE',
           },
           data: 'data',
           operation: {
             context: {
-              url: 'localhost'
+              url: 'localhost',
             },
             variables: 'variables',
             query: {
               loc: {
                 source: {
-                  body: 'body'
-                }
-              }
-            }
-          }
+                  body: 'body',
+                },
+              },
+            },
+          },
         }
-      })
+      }),
     }
 
     urqlClientMock.query = jest.fn((query, args) => {
@@ -88,17 +88,19 @@ describe('GraphQLClientTest', () => {
       return nestedToPromise
     })
 
-    await expect(client.request(testQuery, { test: 'test' })).rejects.toEqual(new Error(
-      'Subgraph: localhost\n' +
-      '\n' +
-      'Arguments: "variables"\n' +
-      '\n' +
-      'Query: body\n' +
-      '\n' +
-      'Returned data: "data"\n' +
-      '\n' +
-      'ERROR: MESSAGE\n\n'
-    ))
+    await expect(client.request(testQuery, { test: 'test' })).rejects.toEqual(
+      new Error(
+        'Subgraph: localhost\n' +
+          '\n' +
+          'Arguments: "variables"\n' +
+          '\n' +
+          'Query: body\n' +
+          '\n' +
+          'Returned data: "data"\n' +
+          '\n' +
+          'ERROR: MESSAGE\n\n'
+      )
+    )
 
     expect(urqlClientMock.query).toHaveBeenCalledTimes(1)
 

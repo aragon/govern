@@ -13,7 +13,9 @@ import './tasks/token'
 
 dotenvConfig({ path: resolve(__dirname, './.env') })
 
-const PRIV_KEYS = process.env.PRIVATE_KEY ? [`0x${process.env.PRIVATE_KEY}`] : [];
+const PRIV_KEYS = process.env.PRIVATE_KEY
+  ? [`0x${process.env.PRIVATE_KEY}`]
+  : []
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -40,8 +42,8 @@ const config: HardhatUserConfig = {
       allowUnlimitedContractSize: true,
       blockGasLimit: 0x1fffffffffffff,
       accounts: {
-          mnemonic: 'test test test test test test test test test test test junk'
-      }
+        mnemonic: 'test test test test test test test test test test test junk',
+      },
     },
     coverage: {
       url: 'http://localhost:8555',
@@ -49,11 +51,11 @@ const config: HardhatUserConfig = {
     },
     mainnet: {
       url: 'https://mainnet.eth.aragon.network',
-      accounts: PRIV_KEYS
+      accounts: PRIV_KEYS,
     },
     rinkeby: {
       url: 'https://rinkeby.eth.aragon.network',
-      accounts: PRIV_KEYS
+      accounts: PRIV_KEYS,
     },
   },
 }
