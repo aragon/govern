@@ -65,7 +65,7 @@ export async function erc20ApprovalTransaction(
     tx: () => {
       return contract.approve(spender, amountInBigNumber);
     },
-    message: `Approves ${amountForHuman} ${symbol} for ${spender} on ${token}`,
+    message: `Approves ${amountForHuman} ${symbol} to be used by ${spender}`,
     status: CustomTransactionStatus.Pending,
   };
 

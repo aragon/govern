@@ -119,6 +119,7 @@ export const InfoKeyDiv = styled('div')({
   height: 'fit-content',
   width: 'fit-content',
   display: 'inline-block',
+  verticalAlign: 'top',
   color: '#7483B3',
 });
 export const InfoValueDivInline = styled('div')({
@@ -131,7 +132,8 @@ export const InfoValueDivInline = styled('div')({
   marginLeft: '9px',
   maxWidth: '100%',
   textOverflow: 'ellipsis',
-  // overflow: 'hidden',
+  overflow: 'hidden',
+  verticalAlign: 'top',
   minHeight: '25px',
   lineHeight: '25px',
   fontSize: '18px',
@@ -219,14 +221,15 @@ const ActionDiv = styled('div')({
   overflow: 'hidden',
   cursor: 'pointer',
   '& > div': {
-    display: 'flex',
-    minHeight: '62px !important',
     alignItems: 'center',
     width: '100%',
     paddingTop: 0,
     paddingBottom: 0,
 
     // lineHeight: '62px',
+  },
+  '& > div:only-child': {
+    height: '62px !important',
   },
   '& div': {
     marginTop: 0,
@@ -266,6 +269,7 @@ const ExpandedDiv = styled('div')({
   '& #data-div-block': {
     // overflowWrap: 'normal',
     overflowWrap: 'break-word',
+    maxWidth: 'calc(100% - 48px)',
   },
 });
 
@@ -386,14 +390,14 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
       payload: {
         transactionList: transactionsQueue.current,
-        onTransactionFailure: (error) => {
-          enqueueSnackbar(error, { variant: 'error' });
+        onTransactionFailure: () => {
+          /* do nothing */
         },
         onTransactionSuccess: () => {
-          //
+          /* do nothing */
         },
         onCompleteAllTransactions: () => {
-          //
+          /* do nothing */
         },
       },
     });
@@ -551,9 +555,9 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                                 {!decoding && !decodedData[index] && (
                                   <InfoWrapper id="data-div">
                                     <InfoKeyDiv>data</InfoKeyDiv>
-                                    <InfoValueDivBlock className="full-width" id="data-div-block">
+                                    <InfoValueDivInline id="data-div-block">
                                       {action.data}
-                                    </InfoValueDivBlock>
+                                    </InfoValueDivInline>
                                   </InfoWrapper>
                                 )}
                                 {!decoding && decodedData[index] && (
@@ -561,16 +565,14 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                                     <InfoWrapper id="function-div">
                                       <InfoKeyDiv>function</InfoKeyDiv>
                                       <InfoValueDivInline>
-                                        <a>{decodedData[index].functionName}</a>
+                                        {decodedData[index].functionName}
                                       </InfoValueDivInline>
                                     </InfoWrapper>
                                     <InfoWrapper id="data-div">
                                       <InfoKeyDiv>arguments</InfoKeyDiv>
-                                      {decodedData[index] && (
-                                        <InfoValuePre>
-                                          {JSON.stringify(decodedData[index].inputData, null, 2)}
-                                        </InfoValuePre>
-                                      )}
+                                      <InfoValuePre>
+                                        {JSON.stringify(decodedData[index].inputData, null, 2)}
+                                      </InfoValuePre>
                                     </InfoWrapper>
                                   </React.Fragment>
                                 )}

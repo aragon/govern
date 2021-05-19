@@ -395,8 +395,8 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack }) => {
       type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
       payload: {
         transactionList: transactionsQueue.current,
-        onTransactionFailure: (error) => {
-          enqueueSnackbar(error, { variant: 'error' });
+        onTransactionFailure: () => {
+          /* do nothing */
         },
         onTransactionSuccess: (_, receipt: ContractReceipt) => {
           containerHash = Proposal.getContainerHashFromReceipt(receipt, ReceiptType.Scheduled);
