@@ -200,7 +200,7 @@ const DaoMainPage: React.FC = () => {
                       onClick={goToNewProposal}
                     ></ANButton>
                   </div>
-                  <WrapperGrid container spacing={3} xs={12} direction="row" justify="flex-start">
+                  <WrapperGrid container spacing={3} direction="row" justify="flex-start">
                     {visibleProposalList.map((proposal: any) => (
                       <Grid item key={proposal.id} xl={3} lg={4} xs={12} sm={12} md={6}>
                         <ProposalCard
