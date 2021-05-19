@@ -437,196 +437,188 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     });
   }
 
+  if (isLoadingProposalDetails || !proposalInfo) {
+    return <div> Loading...</div>;
+  }
+
   return (
     <>
-      {isLoadingProposalDetails ? (
-        <> Loading...</>
-      ) : (
-        <>
-          {proposalInfo ? (
-            <StyledPaper elevation={0}>
-              <BackButton onClick={onClickBack}>
-                <img src={backButtonIcon} />
-              </BackButton>
-              <ProposalStatus>
-                <Label
-                  labelColor={getStateColor(proposalInfo.state, proposalInfo.payload.executionTime)}
-                  labelText={getState(proposalInfo.state, proposalInfo.payload.executionTime)}
-                />
-              </ProposalStatus>
-              <ProposalId>{proposalInfo.id}</ProposalId>
-              <DateDisplay>{formatDate(proposalInfo.createdAt)}</DateDisplay>
-              <DetailsWrapper>
-                <ProposalDetailsWrapper id="proposal_wrapper">
-                  <TitleText>Config</TitleText>
-                  <InfoWrapper>
-                    <InfoKeyDiv>Execution Delay:</InfoKeyDiv>
-                    <InfoValueDivInline>{proposalInfo.config.executionDelay}</InfoValueDivInline>
-                  </InfoWrapper>
-                  <InfoWrapper>
-                    <InfoKeyDiv>Schedule Deposit:</InfoKeyDiv>
-                    <InfoValueDivBlock>
-                      <a>{proposalInfo.config.scheduleDeposit.token}</a>
-                      <div>{proposalInfo.config.scheduleDeposit.amount} ANT</div>
-                    </InfoValueDivBlock>
-                  </InfoWrapper>
-                  <InfoWrapper>
-                    <InfoKeyDiv>Challenge Deposit:</InfoKeyDiv>
-                    <InfoValueDivBlock>
-                      <a>{proposalInfo.config.challengeDeposit.token}</a>
-                      <div>{proposalInfo.config.challengeDeposit.amount} ANT</div>
-                    </InfoValueDivBlock>
-                  </InfoWrapper>
-                  <InfoWrapper>
-                    <InfoKeyDiv>Resolver:</InfoKeyDiv>
-                    <InfoValueDivInline>
-                      <a>{proposalInfo.config.resolver}</a>
-                    </InfoValueDivInline>
-                  </InfoWrapper>
-                  <InfoWrapper>
-                    <InfoKeyDiv>Rules:</InfoKeyDiv>
-                    {/* <InfoValueDivInline>{getParsedDataFromBytes(proposalInfo.config.rules)}</InfoValueDivInline> */}
-                    <InfoValueDivInline>
-                      {toUtf8String(proposalInfo.config.rules)}
-                    </InfoValueDivInline>
-                  </InfoWrapper>
-                  <div style={{ height: '32px', width: '100%' }} />
+      <StyledPaper elevation={0}>
+        <BackButton onClick={onClickBack}>
+          <img src={backButtonIcon} />
+        </BackButton>
+        <ProposalStatus>
+          <Label
+            labelColor={getStateColor(proposalInfo.state, proposalInfo.payload.executionTime)}
+            labelText={getState(proposalInfo.state, proposalInfo.payload.executionTime)}
+          />
+        </ProposalStatus>
+        <ProposalId>{proposalInfo.id}</ProposalId>
+        <DateDisplay>{formatDate(proposalInfo.createdAt)}</DateDisplay>
+        <DetailsWrapper>
+          <ProposalDetailsWrapper id="proposal_wrapper">
+            <TitleText>Config</TitleText>
+            <InfoWrapper>
+              <InfoKeyDiv>Execution Delay:</InfoKeyDiv>
+              <InfoValueDivInline>{proposalInfo.config.executionDelay}</InfoValueDivInline>
+            </InfoWrapper>
+            <InfoWrapper>
+              <InfoKeyDiv>Schedule Deposit:</InfoKeyDiv>
+              <InfoValueDivBlock>
+                <a>{proposalInfo.config.scheduleDeposit.token}</a>
+                <div>{proposalInfo.config.scheduleDeposit.amount} ANT</div>
+              </InfoValueDivBlock>
+            </InfoWrapper>
+            <InfoWrapper>
+              <InfoKeyDiv>Challenge Deposit:</InfoKeyDiv>
+              <InfoValueDivBlock>
+                <a>{proposalInfo.config.challengeDeposit.token}</a>
+                <div>{proposalInfo.config.challengeDeposit.amount} ANT</div>
+              </InfoValueDivBlock>
+            </InfoWrapper>
+            <InfoWrapper>
+              <InfoKeyDiv>Resolver:</InfoKeyDiv>
+              <InfoValueDivInline>
+                <a>{proposalInfo.config.resolver}</a>
+              </InfoValueDivInline>
+            </InfoWrapper>
+            <InfoWrapper>
+              <InfoKeyDiv>Rules:</InfoKeyDiv>
+              {/* <InfoValueDivInline>{getParsedDataFromBytes(proposalInfo.config.rules)}</InfoValueDivInline> */}
+              <InfoValueDivInline>{toUtf8String(proposalInfo.config.rules)}</InfoValueDivInline>
+            </InfoWrapper>
+            <div style={{ height: '32px', width: '100%' }} />
 
-                  <TitleText>Payload</TitleText>
-                  <InfoWrapper>
-                    <InfoKeyDiv>Nonce:</InfoKeyDiv>
-                    <InfoValueDivInline>{proposalInfo.payload.nonce}</InfoValueDivInline>
-                  </InfoWrapper>
-                  <InfoWrapper>
-                    <InfoKeyDiv>Execution Time:</InfoKeyDiv>
-                    <InfoValueDivInline>{proposalInfo.payload.executionTime}</InfoValueDivInline>
-                  </InfoWrapper>
-                  <InfoWrapper>
-                    <InfoKeyDiv>Submitter:</InfoKeyDiv>
-                    <InfoValueDivInline>{proposalInfo.payload.submitter}</InfoValueDivInline>
-                  </InfoWrapper>
-                  <InfoWrapper>
-                    <InfoKeyDiv>Executor:</InfoKeyDiv>
-                    <InfoValueDivInline>
-                      {proposalInfo.payload.executor.address || 'No executor ID'}
-                    </InfoValueDivInline>
-                  </InfoWrapper>
-                  <InfoWrapper>
-                    <InfoKeyDiv>AllowFailuresMap:</InfoKeyDiv>
-                    <InfoValueDivInline>{proposalInfo.payload.allowFailuresMap}</InfoValueDivInline>
-                  </InfoWrapper>
-                  <InfoWrapper>
-                    <InfoKeyDiv>Proof:</InfoKeyDiv>
-                    <InfoValueDivBlock>
-                      {toUtf8String(proposalInfo.payload.proof)}
-                    </InfoValueDivBlock>
-                  </InfoWrapper>
-                  <InfoWrapper>
-                    <InfoKeyDiv>Actions:</InfoKeyDiv>
-                    <ActionsWrapper id="action-wrapper">
-                      {/* Show action accordians */}
-                      {proposalInfo.payload.actions.map((action: any, index: number) => {
-                        return (
-                          <ActionDiv
-                            key={index}
-                            onClick={() => toggleDiv(index)}
-                            id={'action' + index}
-                            style={{
-                              height: 'auto',
-                            }}
-                          >
-                            <CollapsedDiv id="collapsed-div">
-                              <InfoWrapper id="to-div">
-                                <InfoKeyDiv>to</InfoKeyDiv>
+            <TitleText>Payload</TitleText>
+            <InfoWrapper>
+              <InfoKeyDiv>Nonce:</InfoKeyDiv>
+              <InfoValueDivInline>{proposalInfo.payload.nonce}</InfoValueDivInline>
+            </InfoWrapper>
+            <InfoWrapper>
+              <InfoKeyDiv>Execution Time:</InfoKeyDiv>
+              <InfoValueDivInline>{proposalInfo.payload.executionTime}</InfoValueDivInline>
+            </InfoWrapper>
+            <InfoWrapper>
+              <InfoKeyDiv>Submitter:</InfoKeyDiv>
+              <InfoValueDivInline>{proposalInfo.payload.submitter}</InfoValueDivInline>
+            </InfoWrapper>
+            <InfoWrapper>
+              <InfoKeyDiv>Executor:</InfoKeyDiv>
+              <InfoValueDivInline>
+                {proposalInfo.payload.executor.address || 'No executor ID'}
+              </InfoValueDivInline>
+            </InfoWrapper>
+            <InfoWrapper>
+              <InfoKeyDiv>AllowFailuresMap:</InfoKeyDiv>
+              <InfoValueDivInline>{proposalInfo.payload.allowFailuresMap}</InfoValueDivInline>
+            </InfoWrapper>
+            <InfoWrapper>
+              <InfoKeyDiv>Proof:</InfoKeyDiv>
+              <InfoValueDivBlock>{toUtf8String(proposalInfo.payload.proof)}</InfoValueDivBlock>
+            </InfoWrapper>
+            <InfoWrapper>
+              <InfoKeyDiv>Actions:</InfoKeyDiv>
+              <ActionsWrapper id="action-wrapper">
+                {/* Show action accordians */}
+                {proposalInfo.payload.actions.map((action: any, index: number) => {
+                  return (
+                    <ActionDiv
+                      key={index}
+                      onClick={() => toggleDiv(index)}
+                      id={'action' + index}
+                      style={{
+                        height: 'auto',
+                      }}
+                    >
+                      <CollapsedDiv id="collapsed-div">
+                        <InfoWrapper id="to-div">
+                          <InfoKeyDiv>to</InfoKeyDiv>
+                          <InfoValueDivInline>
+                            <a>{action.to}</a>
+                          </InfoValueDivInline>
+                        </InfoWrapper>
+                        {/* <Carat /> */}
+                      </CollapsedDiv>
+                      {isExpanded[index] && (
+                        <ExpandedDiv id="expanded-div">
+                          <InfoWrapper id="value-div">
+                            <InfoKeyDiv>value</InfoKeyDiv>
+                            <InfoValueDivInline>
+                              <a>{action.value}</a>
+                            </InfoValueDivInline>
+                          </InfoWrapper>
+                          {decoding && <div>Decoding data....</div>}
+                          {!decoding && !decodedData[index] && (
+                            <InfoWrapper id="data-div">
+                              <InfoKeyDiv>data</InfoKeyDiv>
+                              <InfoValueDivBlock className="full-width" id="data-div-block">
+                                {action.data}
+                              </InfoValueDivBlock>
+                            </InfoWrapper>
+                          )}
+                          {!decoding && decodedData[index] && (
+                            <React.Fragment>
+                              <InfoWrapper id="function-div">
+                                <InfoKeyDiv>function</InfoKeyDiv>
                                 <InfoValueDivInline>
-                                  <a>{action.to}</a>
+                                  <a>{decodedData[index].functionName}</a>
                                 </InfoValueDivInline>
                               </InfoWrapper>
-                              {/* <Carat /> */}
-                            </CollapsedDiv>
-                            {isExpanded[index] && (
-                              <ExpandedDiv id="expanded-div">
-                                <InfoWrapper id="value-div">
-                                  <InfoKeyDiv>value</InfoKeyDiv>
-                                  <InfoValueDivInline>
-                                    <a>{action.value}</a>
-                                  </InfoValueDivInline>
-                                </InfoWrapper>
-                                {decoding && <div>Decoding data....</div>}
-                                {!decoding && !decodedData[index] && (
-                                  <InfoWrapper id="data-div">
-                                    <InfoKeyDiv>data</InfoKeyDiv>
-                                    <InfoValueDivBlock className="full-width" id="data-div-block">
-                                      {action.data}
-                                    </InfoValueDivBlock>
-                                  </InfoWrapper>
+                              <InfoWrapper id="data-div">
+                                <InfoKeyDiv>arguments</InfoKeyDiv>
+                                {decodedData[index] && (
+                                  <InfoValuePre>
+                                    {JSON.stringify(decodedData[index].inputData, null, 2)}
+                                  </InfoValuePre>
                                 )}
-                                {!decoding && decodedData[index] && (
-                                  <React.Fragment>
-                                    <InfoWrapper id="function-div">
-                                      <InfoKeyDiv>function</InfoKeyDiv>
-                                      <InfoValueDivInline>
-                                        <a>{decodedData[index].functionName}</a>
-                                      </InfoValueDivInline>
-                                    </InfoWrapper>
-                                    <InfoWrapper id="data-div">
-                                      <InfoKeyDiv>arguments</InfoKeyDiv>
-                                      {decodedData[index] && (
-                                        <InfoValuePre>
-                                          {JSON.stringify(decodedData[index].inputData, null, 2)}
-                                        </InfoValuePre>
-                                      )}
-                                    </InfoWrapper>
-                                  </React.Fragment>
-                                )}
-                              </ExpandedDiv>
-                            )}
-                          </ActionDiv>
-                        );
-                      })}
-                    </ActionsWrapper>
-                  </InfoWrapper>
-                </ProposalDetailsWrapper>
-                <WidgetWrapper id="widget_wrapper">
-                  {
-                    <ChallengeWidget
-                      disabled={!isConnected}
-                      containerEventChallenge={proposalStates['ContainerEventChallenge']}
-                      currentState={proposalInfo.state}
-                      setChallengeReason={setChallengeReason}
-                      onChallengeProposal={challengeProposal}
-                    />
-                  }
+                              </InfoWrapper>
+                            </React.Fragment>
+                          )}
+                        </ExpandedDiv>
+                      )}
+                    </ActionDiv>
+                  );
+                })}
+              </ActionsWrapper>
+            </InfoWrapper>
+          </ProposalDetailsWrapper>
+          <WidgetWrapper id="widget_wrapper">
+            {
+              <ChallengeWidget
+                disabled={!isConnected}
+                containerEventChallenge={proposalStates['ContainerEventChallenge']}
+                currentState={proposalInfo.state}
+                setChallengeReason={setChallengeReason}
+                onChallengeProposal={challengeProposal}
+              />
+            }
 
-                  {
-                    <ExecuteWidget
-                      disabled={!isConnected}
-                      containerEventExecute={proposalStates['ContainerEventExecute']}
-                      currentState={proposalInfo.state}
-                      executionTime={proposalInfo.payload.executionTime}
-                      onExecuteProposal={executeProposal}
-                    />
-                  }
-                  {
-                    <ResolveWidget
-                      disabled={!isConnected}
-                      containerEventExecute={proposalStates['ContainerEventResolve']}
-                      disputeId={
-                        proposalStates['ContainerEventChallenge']
-                          ? proposalStates['ContainerEventChallenge'].disputeId
-                          : null
-                      }
-                      currentState={proposalInfo.state}
-                      executionTime={proposalInfo.payload.executionTime}
-                      onResolveProposal={resolveProposal}
-                    />
-                  }
-                </WidgetWrapper>
-              </DetailsWrapper>
-            </StyledPaper>
-          ) : null}
-        </>
-      )}
+            {
+              <ExecuteWidget
+                disabled={!isConnected}
+                containerEventExecute={proposalStates['ContainerEventExecute']}
+                currentState={proposalInfo.state}
+                executionTime={proposalInfo.payload.executionTime}
+                onExecuteProposal={executeProposal}
+              />
+            }
+            {
+              <ResolveWidget
+                disabled={!isConnected}
+                containerEventExecute={proposalStates['ContainerEventResolve']}
+                disputeId={
+                  proposalStates['ContainerEventChallenge']
+                    ? proposalStates['ContainerEventChallenge'].disputeId
+                    : null
+                }
+                currentState={proposalInfo.state}
+                executionTime={proposalInfo.payload.executionTime}
+                onResolveProposal={resolveProposal}
+              />
+            }
+          </WidgetWrapper>
+        </DetailsWrapper>
+      </StyledPaper>
     </>
   );
 };

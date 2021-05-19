@@ -84,7 +84,7 @@ const ConsoleMainPage: React.FC = () => {
         updateDaoList([...visibleDaoList, ...moreData.daos]);
       }
     } catch (error) {
-      enqueueSnackbar(error.message, { variant: 'error' });
+      enqueueSnackbar('Somthing is worng, please try again later.', { variant: 'error' });
     }
   };
 
