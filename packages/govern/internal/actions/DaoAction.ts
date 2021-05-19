@@ -33,9 +33,9 @@ export default class DaoAction extends AbstractAction {
    *
    * @public
    */
-  public async execute(): Promise<Dao|null> {
+  public async execute(): Promise<Dao | null> {
     const response = await super.execute()
 
-    return response.dao;
+    return response.dao
   }
 }

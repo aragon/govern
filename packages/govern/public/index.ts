@@ -5,7 +5,14 @@ export { configure, ConfigurationObject } from './configure'
 export { dao } from './dao'
 export { daos } from './daos'
 export { query } from './query'
-export { createDao, CreateDaoOptions, CreateDaoParams, DaoConfig, Token, TokenDeposit } from './createDao'
+export {
+  createDao,
+  CreateDaoOptions,
+  CreateDaoParams,
+  DaoConfig,
+  Token,
+  TokenDeposit,
+} from './createDao'
 export { getToken } from './token'
 export {
   Proposal,
@@ -29,5 +36,5 @@ export {
   ContainerEventVeto,
   Dao,
   Daos,
-  Action
+  Action,
 } from '../internal/clients/graphql/fragments/dao-entry'

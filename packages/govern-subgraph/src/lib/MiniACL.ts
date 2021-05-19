@@ -3,9 +3,9 @@ import { Role as RoleEntity } from '../../generated/schema'
 
 export function frozenRoles(roles: string[], selector: Bytes): void {
   roles
-    .map<RoleEntity>(role => RoleEntity.load(role)!)
-    .filter(role => role.selector === selector)
-    .forEach(role => {
+    .map<RoleEntity>((role) => RoleEntity.load(role)!)
+    .filter((role) => role.selector === selector)
+    .forEach((role) => {
       role.frozen = true
       role.save()
     })

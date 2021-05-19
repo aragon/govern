@@ -2,10 +2,10 @@ name: Govern-Console CI/CD
 on:
   push:
     paths:
-    - 'packages/govern-console/**'
+      - 'packages/govern-console/**'
     branches:
-    - 'develop'
-    - 'master'
+      - 'develop'
+      - 'master'
 
 env:
   working-directory: packages/govern-console
@@ -20,7 +20,7 @@ jobs:
         working-directory: ${{env.working-directory}}
     steps:
       - uses: actions/checkout@v2
-      
+
       - name: Install node
         uses: actions/setup-node@v1
         with:
@@ -34,7 +34,7 @@ jobs:
 
       - name: Build the app
         run: CI='' yarn build
-          
+
       - name: activate rinkeby's fleek
         run: mv fleek/console.rinkeby.json .fleek.json
         if: github.ref == 'refs/heads/develop'
@@ -71,10 +71,10 @@ jobs:
 
       - name: Build the storybook
         run: CI='' yarn build-storybook
-         
+
       - name: activate rinkeby's fleek
         run: mv fleek/storybook.json .fleek.json
-  
+
       - name: deploy storybook
         id: deploy
         uses: fleekhq/action-deploy@v0.1.4-beta2

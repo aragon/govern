@@ -4,100 +4,104 @@
 
 > The default config uses the Govern servers deployed by Aragon
 
-``` javascript
+```javascript
 import { dao } from '@aragon/govern'
 
-const response = await dao('0x0...');
+const response = await dao('0x0...')
 
 console.log(response)
 ```
 
 **Usage with custom config**
-``` javascript
+
+```javascript
 import { dao, configure } from '@aragon/govern'
 
-configure({governURL: 'https://myOwnGovernServer.io'});
+configure({ governURL: 'https://myOwnGovernServer.io' })
 
-const response = await dao('0x0...');
+const response = await dao('0x0...')
 
 console.log(response)
 ```
 
-### dao(name) ⇒ ``Promise<Dao>``
+### dao(name) ⇒ `Promise<Dao>`
 
 Returns details about a DAO by his address.
 
-| Param  | Type                  | Description                               |
-| ------ | --------------------- | ----------------------------------------- |
-| name   | <code>string</code>   | The name of the DAO                       |
+| Param | Type                | Description         |
+| ----- | ------------------- | ------------------- |
+| name  | <code>string</code> | The name of the DAO |
 
 Example:
-``` typescript 
+
+```typescript
 import { dao } from '@aragon/govern'
 
-const response = await dao('0x0...');
+const response = await dao('0x0...')
 ```
 
-### daos() ⇒ ``Promise<Dao[]>``
+### daos() ⇒ `Promise<Dao[]>`
 
 Returns all DAOs.
 
-
 Example:
-``` typescript 
+
+```typescript
 import { daos } from '@aragon/govern'
 
-const response = await daos();
+const response = await daos()
 ```
 
-### query(query, args) ⇒ ``Promise<object>``
+### query(query, args) ⇒ `Promise<object>`
 
 Returns the desired data.
 
-| Param  | Type                      | Description                               |
-| ------ | ------------------------- | ----------------------------------------- |
-| query  | <code>string</code>       | GraphQL query                             |
-| args   | <code>object</code>       | Object with parameters                    |
+| Param | Type                | Description            |
+| ----- | ------------------- | ---------------------- |
+| query | <code>string</code> | GraphQL query          |
+| args  | <code>object</code> | Object with parameters |
 
 Example:
-``` typescript 
+
+```typescript
 import { query } from '@aragon/govern'
 
 const query = await query(myQuery, {...});
 ```
 
-### createDao(args, options) ⇒ ``Promise<TransactionResponse>``
+### createDao(args, options) ⇒ `Promise<TransactionResponse>`
 
 Create
 
-| Param    | Type                            | Description                             |
-| -------- | ------------------------------- | --------------------------------------- |
-| args     | <code>CreateDaoParams</code>    | Dao name, Dao token, useProxies option  |
-| options  | <code>CreateDaoOptions</code>   | EIP 1193 provider, Dao factory address  |
+| Param   | Type                          | Description                            |
+| ------- | ----------------------------- | -------------------------------------- |
+| args    | <code>CreateDaoParams</code>  | Dao name, Dao token, useProxies option |
+| options | <code>CreateDaoOptions</code> | EIP 1193 provider, Dao factory address |
 
 Examples:
 
 For Node.js:
-``` typescript
+
+```typescript
 import { createDao } from '@aragon/govern'
 
-const result = await createDao(args, options);
+const result = await createDao(args, options)
 ```
 
-
-### configure(config) ⇒ ``void``
+### configure(config) ⇒ `void`
 
 Overwrites the default configuration of govern.
 
-| Param  | Type                                                    | Description                                          |
-| ------ | ------------------------------------------------------- | ---------------------------------------------------- |
-| config | <code>[ConfigurationObject][ConfigurationObject]</code> | Object with all [config options][ConfigurationObject]|
+| Param  | Type                                                    | Description                                           |
+| ------ | ------------------------------------------------------- | ----------------------------------------------------- |
+| config | <code>[ConfigurationObject][configurationobject]</code> | Object with all [config options][configurationobject] |
 
 Example:
-``` typescript 
+
+```typescript
 import { configure } from '@aragon/govern'
 
-configure({governURL: 'https://myOwnGovernServer.io'});
+configure({ governURL: 'https://myOwnGovernServer.io' })
 ```
 
-[ConfigurationObject]: https://github.com/aragon/govern/tree/master/packages/govern/internal/configuration/Configuration.ts#L4
+[configurationobject]: https://github.com/aragon/govern/tree/master/packages/govern/internal/configuration/Configuration.ts#L4

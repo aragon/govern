@@ -1,24 +1,52 @@
-import React, { memo } from 'react';
+/* eslint-disable */
+import React, { memo, useState, useCallback } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { InputField } from 'components/InputFields/InputField';
 import { PROPOSAL_STATES } from 'utils/states';
 import { Link } from 'react-router-dom';
-import { toUtf8String } from '@ethersproject/strings';
+import { toUTF8String } from 'utils/lib';
+import { useForm, Controller, FormProvider } from 'react-hook-form';
+import { HelpButton } from 'components/HelpButton/HelpButton';
+
 import { InfoKeyDiv, InfoValueDivInline, InfoValueDivBlock } from '../ProposalDetails';
 import { Widget, WidgetRow, InfoWrapper, TitleText } from './SharedStyles';
+import { IPFSInput } from 'components/Field/IPFSInput';
+
 import { formatDate } from 'utils/date';
 import { getTruncatedAccountAddress } from 'utils/account';
-import { getIpfsCid, getIpfsURI } from 'utils/ipfs';
+import { getIpfsUrl } from 'utils/ipfs';
+
+import { styled } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+
+interface FormInputs {
+  reason: string;
+  isReasonFile: boolean;
+  reasonFile: any;
+}
+
+// TODO: GIORGI repeating styles
+export const InputSubTitle = styled(Typography)({
+  width: 'fit-content',
+  fontFamily: 'Manrope',
+  fontStyle: 'normal',
+  fontWeight: 'normal',
+  fontSize: 18,
+  lineHeight: '25px',
+  color: '#7483AB',
+  marginTop: '17px',
+  marginBottom: '17px',
+});
 
 const ChallengeWidget: React.FC<any> = ({
   disabled,
   containerEventChallenge,
   currentState,
-  setChallengeReason,
   onChallengeProposal,
 }) => {
   if (containerEventChallenge) {
-    const challengeReasonCid = getIpfsCid(containerEventChallenge.reason);
+    console.log('modis aq 111', containerEventChallenge.reason);
+    const challengeReasonIpfsUrl = getIpfsUrl(containerEventChallenge.reason);
     return (
       <Widget>
         <WidgetRow>
@@ -46,12 +74,13 @@ const ChallengeWidget: React.FC<any> = ({
             marginTop: 0,
           }}
         >
-          {challengeReasonCid ? (
-            <Link to={getIpfsURI(challengeReasonCid)} target="_blank" rel="noreferrer noopener">
-              View file
-            </Link>
+          {challengeReasonIpfsUrl ? (
+            <a href={challengeReasonIpfsUrl} target="_blank" rel="noreferrer noopener">
+              Read more
+            </a>
           ) : (
-            toUtf8String(containerEventChallenge.reason)
+            toUTF8String(containerEventChallenge.reason) ||
+            `Reason can't be decoded: ${containerEventChallenge.reason}`
           )}
         </InfoValueDivBlock>
       </Widget>
@@ -62,39 +91,51 @@ const ChallengeWidget: React.FC<any> = ({
     return <></>;
   }
 
+  const methods = useForm<FormInputs>();
+  const {
+    register,
+    control,
+    watch,
+    setValue,
+    getValues,
+    handleSubmit,
+    formState: { errors },
+  } = methods;
+
+  const submit = useCallback(() => {
+    onChallengeProposal(getValues('reason'), getValues('reasonFile'));
+  }, []);
+
   return (
     <Widget>
-      <WidgetRow
-        style={{
-          fontSize: '18px',
-          color: '#7483B3',
-        }}
-        marginBottom="9px"
-      >
-        Challenge Reason
-      </WidgetRow>
-      <WidgetRow marginBottom="9px">
-        <InputField
-          onInputChange={(value) => {
-            setChallengeReason(value);
-          }}
-          label={''}
-          placeholder={''}
-          height={'46px'}
-          width={'372px'}
+      <InputSubTitle>
+        Challenge Reason{' '}
+        <HelpButton
+          helpText={
+            "Please provide the reasons why you are challenging this proposal. It's very important for guardians to decide if the proposal should be accepted or cancelled"
+          }
         />
-      </WidgetRow>
-      <WidgetRow marginBottom="9px">
-        <ANButton
-          buttonType="primary"
-          label="Challenge"
-          disabled={disabled}
-          height="45px"
-          width="372px"
-          style={{ margin: 'auto' }}
-          onClick={() => onChallengeProposal()}
+      </InputSubTitle>
+
+      <FormProvider {...methods}>
+        <IPFSInput
+          label="Provide file"
+          placeholder="Justification Reason..."
+          textInputName="reason"
+          fileInputName="reasonFile"
         />
-      </WidgetRow>
+        <WidgetRow marginBottom="9px">
+          <ANButton
+            buttonType="primary"
+            label="Challenge"
+            disabled={disabled}
+            height="45px"
+            width="372px"
+            style={{ margin: 'auto', marginTop: '10px' }}
+            onClick={handleSubmit(submit)}
+          />
+        </WidgetRow>
+      </FormProvider>
     </Widget>
   );
 };

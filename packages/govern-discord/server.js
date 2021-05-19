@@ -17,11 +17,13 @@ client.on('message', async (message) => {
     const script = `new-dao --name ${name}`
     console.log('executing', script)
 
-    await message.reply(`got it! Will let you know when your new *${name}* DAO is ready`)
+    await message.reply(
+      `got it! Will let you know when your new *${name}* DAO is ready`
+    )
 
     try {
       const { stdout, stderr } = await execa('yarn', script.split(' '))
-      await message.reply('alright, I\'m done!')
+      await message.reply("alright, I'm done!")
       await message.reply(stdout.split('----\n')[1])
     } catch (e) {
       await message.reply('something went wrong :(')

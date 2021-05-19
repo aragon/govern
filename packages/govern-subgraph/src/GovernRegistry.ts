@@ -1,11 +1,11 @@
 import { Address } from '@graphprotocol/graph-ts'
 import {
   Registered as RegisteredEvent,
-  SetMetadata as SetMetadataEvent
+  SetMetadata as SetMetadataEvent,
 } from '../generated/GovernRegistry/GovernRegistry'
 import {
   Govern as GovernTemplate,
-  GovernQueue as GovernQueueTemplate
+  GovernQueue as GovernQueueTemplate,
 } from '../generated/templates'
 import { GovernRegistry, Dao } from '../generated/schema'
 import { loadOrCreateGovern } from './Govern'
@@ -14,9 +14,9 @@ import { loadOrCreateQueue } from './GovernQueue'
 export function handleRegistered(event: RegisteredEvent): void {
   let registry = loadOrCreateRegistry(event.address)
 
-  let queue  = loadOrCreateQueue(event.params.queue)
+  let queue = loadOrCreateQueue(event.params.queue)
   let govern = loadOrCreateGovern(event.params.executor)
-  
+
   queue.save()
   govern.save()
   let dao = new Dao(event.params.name)

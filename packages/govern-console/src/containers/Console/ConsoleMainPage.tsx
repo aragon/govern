@@ -5,9 +5,8 @@ import { DaoCard } from 'components/DaoCards/DaoCard';
 import { ANButton } from 'components/Button/ANButton';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
-import { useQuery } from '@apollo/client';
-import { GET_DAO_LIST, GET_GOVERN_REGISTRY_DATA } from './queries';
 import { useHistory } from 'react-router-dom';
+import { useDaosSubscription, useGovernRegistrySubscription } from 'hooks/subscription-hooks';
 
 export interface ConsoleMainPageProps {
   /**
@@ -40,23 +39,8 @@ const ConsoleMainPage: React.FC = () => {
   const [visibleDaoList, updateDaoList] = useState<any>([]);
   const [totalDaoCount, updateTotalDaoCount] = useState<number>();
 
-  const {
-    data: daoListData,
-    // loading: isLoadingDaoList,
-    // error: errorLoadingDaoList,
-    fetchMore: fetchMoreDaos,
-  } = useQuery(GET_DAO_LIST, {
-    variables: {
-      offset: 0,
-      limit: 12,
-    },
-  });
-
-  const {
-    data: daoRegistryData,
-    // loading: isLoadingRegistryData,
-    // error: errorLoadingRegistryData,
-  } = useQuery(GET_GOVERN_REGISTRY_DATA);
+  const { data: daoListData, fetchMore: fetchMoreDaos } = useDaosSubscription();
+  const { data: daoRegistryData } = useGovernRegistrySubscription();
 
   useEffect(() => {
     if (daoListData && daoListData.daos) {
@@ -88,7 +72,7 @@ const ConsoleMainPage: React.FC = () => {
   return (
     <ConsoleMainDiv>
       <ConsoleHeader />
-      <WrapperGrid container spacing={3} xs={12} direction="row" justify="flex-start">
+      <WrapperGrid container spacing={3} direction="row" justify="flex-start">
         {visibleDaoList &&
           visibleDaoList.length > 0 &&
           visibleDaoList.map((dao: any) => (

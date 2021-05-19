@@ -1,21 +1,18 @@
 import { expect } from 'chai'
 import { ethers } from 'hardhat'
 import { Signer } from 'ethers'
-import {
-  ACL,
-  ACL__factory
-} from '../typechain'
+import { ACL, ACL__factory } from '../typechain'
 
 const ERRORS = {
   AUTH: 'acl: auth',
   FROZEN: 'acl: frozen',
-  BAD_FREEZE: 'acl: bad freeze'
+  BAD_FREEZE: 'acl: bad freeze',
 }
 
 const EVENTS = {
   GRANTED: 'Granted',
   REVOKED: 'Revoked',
-  FROZEN: 'Frozen'
+  FROZEN: 'Frozen',
 }
 
 const ROLE = '0xabcdabcd'
@@ -43,11 +40,18 @@ describe('ACL', function () {
   })
 
   const grant = (inst: ACL, role = ROLE, who = notRoot) => inst.grant(role, who)
-  const revoke = (inst: ACL, role = ROLE, who = notRoot) => inst.revoke(role, who)
+  const revoke = (inst: ACL, role = ROLE, who = notRoot) =>
+    inst.revoke(role, who)
   const freeze = (inst: ACL, role = ROLE) => inst.freeze(role)
 
-  const assertRole = async (shouldHaveRole = true, role = ROLE, who = notRoot) =>
-    expect(await acl.roles(role, who)).to.equal(shouldHaveRole ? ALLOW_ROLE : NO_ROLE)
+  const assertRole = async (
+    shouldHaveRole = true,
+    role = ROLE,
+    who = notRoot
+  ) =>
+    expect(await acl.roles(role, who)).to.equal(
+      shouldHaveRole ? ALLOW_ROLE : NO_ROLE
+    )
 
   context('granting', async () => {
     beforeEach('root grants', async () => {
@@ -140,73 +144,81 @@ describe('ACL', function () {
   })
 
   it('root cannot freeze by granting', async () => {
-    await expect(grant(acl, ROLE, FREEZE_ADDR)).to.be.revertedWith(ERRORS.BAD_FREEZE)
+    await expect(grant(acl, ROLE, FREEZE_ADDR)).to.be.revertedWith(
+      ERRORS.BAD_FREEZE
+    )
   })
 
   context('ACL.bulk', () => {
     it('Grant', async () => {
-      await expect(acl.bulk([
-        {
-          op: 0,
-          role: ROLE,
-          who: notRoot
-        }
-      ])).to.emit(acl, EVENTS.GRANTED)
+      await expect(
+        acl.bulk([
+          {
+            op: 0,
+            role: ROLE,
+            who: notRoot,
+          },
+        ])
+      ).to.emit(acl, EVENTS.GRANTED)
 
       await assertRole(true, ROLE, notRoot)
     })
 
     it('Revoke', async () => {
-      await expect(acl.bulk([
-        {
-          op: 1,
-          role: ROLE,
-          who: notRoot
-        }
-      ])).to.emit(acl, EVENTS.REVOKED)
+      await expect(
+        acl.bulk([
+          {
+            op: 1,
+            role: ROLE,
+            who: notRoot,
+          },
+        ])
+      ).to.emit(acl, EVENTS.REVOKED)
 
       await assertRole(false, ROLE, notRoot)
     })
 
     it('Freeze', async () => {
-      await expect(acl.bulk([
-        {
-          op: 2,
-          role: ROLE,
-          who: '0x0000000000000000000000000000000000000000'
-        }
-      ])).to.emit(acl, EVENTS.FROZEN)
+      await expect(
+        acl.bulk([
+          {
+            op: 2,
+            role: ROLE,
+            who: '0x0000000000000000000000000000000000000000',
+          },
+        ])
+      ).to.emit(acl, EVENTS.FROZEN)
 
-      expect(await acl.roles(ROLE, FREEZE_ADDR))
-        .to.equal(FREEZE_ADDR)
+      expect(await acl.roles(ROLE, FREEZE_ADDR)).to.equal(FREEZE_ADDR)
     })
 
-    it("Grant, revoke, and freeze", async () => {
-      await expect(acl.bulk([
-        {
-          op: 0,
-          role: ROLE,
-          who: notRoot
-        },
-        {
-          op: 1,
-          role: ROLE,
-          who: notRoot
-        },
-        {
-          op: 2,
-          role: ROLE,
-          who: '0x0000000000000000000000000000000000000000'
-        }
-      ]))
+    it('Grant, revoke, and freeze', async () => {
+      await expect(
+        acl.bulk([
+          {
+            op: 0,
+            role: ROLE,
+            who: notRoot,
+          },
+          {
+            op: 1,
+            role: ROLE,
+            who: notRoot,
+          },
+          {
+            op: 2,
+            role: ROLE,
+            who: '0x0000000000000000000000000000000000000000',
+          },
+        ])
+      )
         .to.emit(acl, EVENTS.GRANTED)
         .to.emit(acl, EVENTS.REVOKED)
         .to.emit(acl, EVENTS.FROZEN)
 
       await assertRole(false, ROLE, notRoot)
 
-      expect(await acl.roles(ROLE, FREEZE_ADDR))
-        .to.equal(FREEZE_ADDR)
+      expect(await acl.roles(ROLE, FREEZE_ADDR)).to.equal(FREEZE_ADDR)
     })
   })
 })

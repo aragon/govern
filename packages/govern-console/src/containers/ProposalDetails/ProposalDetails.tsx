@@ -5,21 +5,19 @@ import Typography from '@material-ui/core/Typography';
 import backButtonIcon from 'images/back-btn.svg';
 import { Label } from 'components/Labels/Label';
 import { useParams } from 'react-router-dom';
-import { GET_PROPOSAL_DETAILS_QUERY } from './queries';
-import { GET_DAO_BY_NAME } from '../DAO/queries';
-import { useQuery, useLazyQuery } from '@apollo/client';
 import { useWallet } from '../../AugmentedWallet';
 import { CustomTransaction } from 'utils/types';
 import { getProposalParams } from 'utils/ERC3000';
-import { Proposal, ProposalOptions } from '@aragon/govern';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
-import QueueApprovals from 'services/QueueApprovals';
-import FacadeProposal from 'services/Proposal';
 import AbiHandler from 'utils/AbiHandler';
-import { toUtf8String } from '@ethersproject/strings';
+import { toUTF8Bytes } from 'utils/lib';
 import { formatDate } from 'utils/date';
 import { getState, getStateColor } from 'utils/states';
 import { useSnackbar } from 'notistack';
+import { IPFSField } from 'components/Field/IPFSField';
+import { addToIpfs } from 'utils/ipfs';
+import { useFacadeProposal } from 'hooks/proposals';
+import { useLazyProposalDetails, useDaoSubscription } from 'hooks/subscription-hooks';
 
 // widget components
 import ChallengeWidget from './components/ChallengeWidget';
@@ -110,6 +108,7 @@ export const InfoWrapper = styled('div')({
   boxSizing: 'border-box',
   height: 'fit-content',
   fontFamily: 'Manrope',
+  overflow: 'hidden',
 });
 export const InfoKeyDiv = styled('div')({
   fontFamily: 'Manrope',
@@ -278,12 +277,14 @@ const ExpandedDiv = styled('div')({
 
 const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   const { daoName, id: proposalId } = useParams<any>();
-  const { data: daoList } = useQuery(GET_DAO_BY_NAME, {
-    variables: { name: daoName },
-  });
+
+  // TODO: Giorgi useDaoSubscription should be returning the single object
+  // we shouldn't be doing daoList.daos[0]
+  const { data: daoList } = useDaoSubscription(daoName);
+
   const context: any = useWallet();
 
-  const { account, provider, networkName, isConnected } = context;
+  const { networkName, isConnected } = context;
 
   const { dispatch } = React.useContext(ModalsContext);
   const { enqueueSnackbar } = useSnackbar();
@@ -294,7 +295,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   const [decoding, setDecoding] = React.useState(false);
   const [isExpanded, updateIsExpanded] = React.useState<any>({});
   const [daoDetails, updateDaoDetails] = React.useState<any>();
-  const [challengeReason, setChallengeReason] = React.useState('');
   const transactionsQueue = React.useRef<CustomTransaction[]>([]);
 
   const abiHandler = React.useMemo(() => {
@@ -303,22 +303,16 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     }
   }, [networkName]);
 
-  const proposalInstance = React.useMemo(() => {
-    if (provider && account && daoDetails && proposalInfo) {
-      const queueApprovals = new QueueApprovals(
-        account,
-        daoDetails.queue.address,
-        proposalInfo.config.resolver,
-      );
-      const proposal = new Proposal(daoDetails.queue.address, {} as ProposalOptions);
-      return new FacadeProposal(queueApprovals, proposal) as FacadeProposal & Proposal;
-    }
-  }, [provider, account, daoDetails, proposalInfo]);
+  const proposalInstance = useFacadeProposal(
+    daoDetails?.queue.address,
+    proposalInfo?.config.resolver,
+  );
 
-  const [
+  const {
     getProposalData,
-    { loading: isLoadingProposalDetails, data: proposalDetailsData },
-  ] = useLazyQuery(GET_PROPOSAL_DETAILS_QUERY);
+    data: proposalDetailsData,
+    loading: isLoadingProposalDetails,
+  } = useLazyProposalDetails();
 
   useEffect(() => {
     return function cleanUp() {
@@ -372,22 +366,19 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     }
   }, [daoList, proposalId, getProposalData]);
 
-  const challengeProposal = async () => {
-    // if the reason's length is less than 10 words, it's highly unlikely
-    // to specify the actual valid reason in less than 10 words
-    if (challengeReason.length < 10) {
-      enqueueSnackbar('Challenge reason must be at least 10 letters', { variant: 'error' });
-      return;
-    }
+  const challengeProposal = async (challengeReason: string, challengeReasonFile: any) => {
+    // TODO: add modal
+    // Upload proof to ipfs if it's a file,
+    // otherwise convert it to utf8bytes
+    const reason = challengeReasonFile
+      ? await addToIpfs(challengeReasonFile[0])
+      : toUTF8Bytes(challengeReason);
 
     const proposalParams = getProposalParams(proposalInfo);
 
     if (proposalInstance) {
       try {
-        transactionsQueue.current = await proposalInstance.challenge(
-          proposalParams,
-          challengeReason,
-        );
+        transactionsQueue.current = await proposalInstance.challenge(proposalParams, reason);
       } catch (error) {
         enqueueSnackbar(error.message, { variant: 'error' });
         return;
@@ -418,6 +409,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       try {
         await proposalInstance.execute(proposalParams);
       } catch (error) {
+        // TODO: Giorgi reject the transaction and it will fail
         enqueueSnackbar(error.error.message, { variant: 'error' });
       }
     }
@@ -429,6 +421,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       try {
         await proposalInstance.resolve(proposalParams, disputeId);
       } catch (error) {
+        // TODO: Giorgi reject the transaction and it will fail
         enqueueSnackbar(error.error.message, { variant: 'error' });
       }
     }
@@ -489,9 +482,8 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                   </InfoWrapper>
                   <InfoWrapper>
                     <InfoKeyDiv>Rules:</InfoKeyDiv>
-                    {/* <InfoValueDivInline>{getParsedDataFromBytes(proposalInfo.config.rules)}</InfoValueDivInline> */}
                     <InfoValueDivInline>
-                      {toUtf8String(proposalInfo.config.rules)}
+                      <IPFSField value={proposalInfo.config.rules} />
                     </InfoValueDivInline>
                   </InfoWrapper>
                   <div style={{ height: '32px', width: '100%' }} />
@@ -503,7 +495,9 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                   </InfoWrapper>
                   <InfoWrapper>
                     <InfoKeyDiv>Execution Time:</InfoKeyDiv>
-                    <InfoValueDivInline>{proposalInfo.payload.executionTime}</InfoValueDivInline>
+                    <InfoValueDivInline>
+                      {formatDate(proposalInfo.payload.executionTime)}
+                    </InfoValueDivInline>
                   </InfoWrapper>
                   <InfoWrapper>
                     <InfoKeyDiv>Submitter:</InfoKeyDiv>
@@ -520,11 +514,12 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                     <InfoValueDivInline>{proposalInfo.payload.allowFailuresMap}</InfoValueDivInline>
                   </InfoWrapper>
                   <InfoWrapper>
-                    <InfoKeyDiv>Proof:</InfoKeyDiv>
-                    <InfoValueDivBlock>
-                      {toUtf8String(proposalInfo.payload.proof)}
-                    </InfoValueDivBlock>
+                    <InfoKeyDiv>Justification:</InfoKeyDiv>
+                    <InfoValueDivInline>
+                      <IPFSField value={proposalInfo.payload.proof} />
+                    </InfoValueDivInline>
                   </InfoWrapper>
+
                   <InfoWrapper>
                     <InfoKeyDiv>Actions:</InfoKeyDiv>
                     <ActionsWrapper id="action-wrapper">
@@ -595,7 +590,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                       disabled={!isConnected}
                       containerEventChallenge={proposalStates['ContainerEventChallenge']}
                       currentState={proposalInfo.state}
-                      setChallengeReason={setChallengeReason}
                       onChallengeProposal={challengeProposal}
                     />
                   }

@@ -36,9 +36,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       tokenFactory.address,
     ],
     log: true,
-    deterministicDeployment:true
+    deterministicDeployment: true,
   })
-
 }
 export default func
 func.tags = [

@@ -1,5 +1,5 @@
 import DaoAction from '../../internal/actions/DaoAction'
-import { dao} from '../../public/dao'
+import { dao } from '../../public/dao'
 
 // Mocks
 jest.mock('../../internal/actions/DaoAction')

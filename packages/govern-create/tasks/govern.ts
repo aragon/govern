@@ -48,11 +48,11 @@ task('deploy-govern', 'Deploys a Govern instance')
       const { ethers, deployments, network } = HRE
 
       const registryContract = registry
-      ? await ethers.getContractAt('GovernRegistry', registry)
-      : await ethers.getContractAt(
-          'GovernRegistry',
-          (await deployments.get('GovernRegistry')).address
-        )
+        ? await ethers.getContractAt('GovernRegistry', registry)
+        : await ethers.getContractAt(
+            'GovernRegistry',
+            (await deployments.get('GovernRegistry')).address
+          )
 
       const baseFactoryContract = factory
         ? await ethers.getContractAt('GovernBaseFactory', factory)
@@ -65,9 +65,9 @@ task('deploy-govern', 'Deploys a Govern instance')
         name,
         {
           tokenAddress: token,
-          tokenName:  tokenName || name,
+          tokenName: tokenName || name,
           tokenSymbol: tokenSymbol,
-          tokenDecimals: 18
+          tokenDecimals: 18,
         },
         ERC3000DefaultConfig,
         useProxies,

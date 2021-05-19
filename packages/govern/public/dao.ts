@@ -10,6 +10,6 @@ export { Dao }
  *
  * @returns {Promise<Dao|null>}
  */
-export function dao(name: string): Promise<Dao|null> {
+export function dao(name: string): Promise<Dao | null> {
   return new DaoAction({ name: name }).execute()
 }

@@ -1,6 +1,25 @@
 import { gql } from '@apollo/client';
 
-export const GET_PROPOSAL_DETAILS_QUERY = gql`
+export const PROPOSAL_LIST = gql`
+  query proposals($id: ID, $offset: Int, $limit: Int) {
+    governQueue(id: $id) {
+      id
+      address
+      nonce
+      containers(skip: $offset, first: $limit, orderBy: createdAt, orderDirection: desc) {
+        id
+        state
+        createdAt
+        payload {
+          executionTime
+        }
+      }
+      nonce
+    }
+  }
+`;
+
+export const PROPOSAL_DETAILS = gql`
   query proposalDetails($id: ID) {
     container(id: $id) {
       id

@@ -9,7 +9,6 @@ import {
   ContractReceipt,
 } from 'ethers'
 
-
 const Payload = `
   tuple(
     uint256 nonce,
@@ -93,15 +92,15 @@ export enum ReceiptType {
 
 export class Proposal {
   private readonly contract: Contract
-  private readonly interface: any;
+  private readonly interface: any
 
   constructor(queueAddress: string, options: ProposalOptions) {
-    const abi:any = options?.abi || queueAbis // TODO instead of any, put Fragment|JSONFragment from ethers
-     
+    const abi: any = options?.abi || queueAbis // TODO instead of any, put Fragment|JSONFragment from ethers
+
     const provider = options.provider || window.ethereum
     const signer = new providers.Web3Provider(provider).getSigner()
     this.contract = new Contract(queueAddress, abi, signer)
-    this.interface  = new utils.Interface(abi);
+    this.interface = new utils.Interface(abi)
   }
 
   /**
@@ -170,37 +169,34 @@ export class Proposal {
    *
    * @returns {Promise<ContractTransaction>} constract response object
    */
-  async challenge(proposal: ProposalParams, reason: string): Promise<ContractTransaction> {
-    const reasonBytes = utils.toUtf8Bytes(reason)
-    const result = this.contract.challenge(proposal, reasonBytes)
+  async challenge(proposal: ProposalParams, reason: utils.BytesLike): Promise<ContractTransaction> {
+    // const reasonBytes = utils.toUtf8Bytes(reason)
+    const result = this.contract.challenge(proposal, reason)
     return result
   }
 
   /**
    * Build an Action
    *
-   * @param {string} name 
+   * @param {string} name
    *
    * @param {any} parameters
-   * 
+   *
    * @param {number|string} value
    *
-   * @returns {any} 
+   * @returns {any}
    */
-  buildAction(name: string, parameters: any, value: number|string): any {
+  buildAction(name: string, parameters: any, value: number | string): any {
     return {
-      data: this.interface.encodeFunctionData(
-        name,
-        parameters,
-      ),
+      data: this.interface.encodeFunctionData(name, parameters),
       to: this.contract.address,
-      value: value
+      value: value,
     }
   }
 
   /**
    * @param name function name of the govern queue abi
-   * 
+   *
    * @returns {string} the signature of the function
    */
   getSigHash(name: string): string {
@@ -214,14 +210,16 @@ export class Proposal {
    *
    * @returns {number|null>} transaction response object
    */
-  getDisputeId(receipt: providers.TransactionReceipt): number|null {
+  getDisputeId(receipt: providers.TransactionReceipt): number | null {
     const args = receipt.logs
-    .filter(({ address }: { address : string }) => address === this.contract.address)
-    .map((log: any) => this.contract.interface.parseLog(log))
-    .find(({ name }: { name: string }) => name === 'Challenged')
+      .filter(
+        ({ address }: { address: string }) => address === this.contract.address
+      )
+      .map((log: any) => this.contract.interface.parseLog(log))
+      .find(({ name }: { name: string }) => name === 'Challenged')
 
     const rawDisputeId = args?.args[3]
-    const disputeId = rawDisputeId? rawDisputeId.toNumber() : null
+    const disputeId = rawDisputeId ? rawDisputeId.toNumber() : null
 
     return disputeId
   }

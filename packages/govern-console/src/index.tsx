@@ -4,6 +4,7 @@ import MomentUtils from '@date-io/moment';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
+// import { offsetLimitPagination } from '@apollo/client/utilities';
 
 import App from './App';
 import reportWebVitals from './reportWebVitals';
@@ -16,6 +17,7 @@ const subgraphUri = 'https://api.thegraph.com/subgraphs/name/aragon/aragon-gover
 const client = new ApolloClient({
   uri: subgraphUri,
   cache: new InMemoryCache(),
+  connectToDevTools: true,
 });
 
 ReactDOM.render(

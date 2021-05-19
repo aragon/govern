@@ -11,4 +11,6 @@ export const SCHEDULED_STATUS = 'Scheduled'
 
 export let ALLOW_RULING = BigInt.fromI32(4)
 
-export let ZERO_ADDRESS = Bytes.fromHexString("0x0000000000000000000000000000000000000000") as Bytes
+export let ZERO_ADDRESS = Bytes.fromHexString(
+  '0x0000000000000000000000000000000000000000'
+) as Bytes

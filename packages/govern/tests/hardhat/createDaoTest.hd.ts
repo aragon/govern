@@ -9,7 +9,7 @@ import {
 export const registryAbi = [
   `event Registered(address indexed executor, address queue, address indexed token, address indexed registrant, string name)`,
   `event SetMetadata(address indexed executor, bytes metadata)`,
-  `function nameUsed(string) view returns (bool)`
+  `function nameUsed(string) view returns (bool)`,
 ]
 
 // use rinkeby addresses as the tests run on a hardhat network forked from rinkeby

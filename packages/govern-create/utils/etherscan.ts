@@ -70,7 +70,7 @@ export const runTaskWithRetry = async (
   } catch (error) {
     counter--
     // This is not the ideal check, but it's all that's possible for now https://github.com/nomiclabs/hardhat/issues/1301
-    if(!/already verified/i.test(error.message)){
+    if (!/already verified/i.test(error.message)) {
       console.log(`Retrying attemps: ${counter}.`)
       console.error(error.message)
       await runTaskWithRetry(task, params, counter, msDelay, cleanup)
