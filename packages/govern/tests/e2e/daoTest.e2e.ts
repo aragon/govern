@@ -74,8 +74,6 @@ describe('[e2e] dao Test', () => {
 
     expect(response.executor.metadata).toBeDefined()
 
-    expect(response.executor.balance).toBeDefined()
-
     expect(response.executor.roles[0]).toBeDefined()
 
     expect(utils.isAddress(response.token)).toEqual(true)
