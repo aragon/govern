@@ -8,6 +8,7 @@ import Paper from '@material-ui/core/Paper';
 import { useQuery } from '@apollo/client';
 import { GET_DAO_LIST, GET_GOVERN_REGISTRY_DATA } from './queries';
 import { useHistory } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
 
 export interface ConsoleMainPageProps {
   /**
@@ -37,6 +38,8 @@ const WrapperGrid = styled(Grid)({
 
 const ConsoleMainPage: React.FC = () => {
   const history = useHistory();
+  const { enqueueSnackbar } = useSnackbar();
+
   const [visibleDaoList, updateDaoList] = useState<any>([]);
   const [totalDaoCount, updateTotalDaoCount] = useState<number>();
 
@@ -71,13 +74,17 @@ const ConsoleMainPage: React.FC = () => {
   }, [daoRegistryData]);
 
   const fetchMoreData = async () => {
-    const { data: moreData }: { data: any; loading: boolean } = await fetchMoreDaos({
-      variables: {
-        offset: visibleDaoList.length,
-      },
-    });
-    if (moreData && moreData.daos.length > 0) {
-      updateDaoList([...visibleDaoList, ...moreData.daos]);
+    try {
+      const { data: moreData }: { data: any; loading: boolean } = await fetchMoreDaos({
+        variables: {
+          offset: visibleDaoList.length,
+        },
+      });
+      if (moreData && moreData.daos.length > 0) {
+        updateDaoList([...visibleDaoList, ...moreData.daos]);
+      }
+    } catch (error) {
+      enqueueSnackbar(error.message, { variant: 'error' });
     }
   };
 
