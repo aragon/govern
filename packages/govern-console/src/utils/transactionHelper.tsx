@@ -31,7 +31,7 @@ export async function erc20ApprovalTransaction(
   let allowance: BigNumber = ethers.BigNumber.from(0);
   let userBalance: BigNumber = ethers.BigNumber.from(0);
   let amountForHuman: string;
-  let symbol: string = 'tokens'
+  let symbol = 'tokens';
   try {
     allowance = await contract.allowance(account.address, spender);
     userBalance = await contract.balanceOf(account.address);
