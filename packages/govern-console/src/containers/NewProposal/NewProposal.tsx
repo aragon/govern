@@ -17,8 +17,8 @@ import { useWallet } from 'AugmentedWallet';
 import { CustomTransaction, abiItem, actionType, ActionToSchedule } from 'utils/types';
 import { useSnackbar } from 'notistack';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
-import { useForm, Controller, FormProvider } from 'react-hook-form';
-import { Proposal, ProposalOptions, ReceiptType, ActionType } from '@aragon/govern';
+import { useForm, FormProvider } from 'react-hook-form';
+import { Proposal, ReceiptType, ActionType } from '@aragon/govern';
 import { proposalDetailsUrl } from 'utils/urls';
 import { addToIpfs } from 'utils/ipfs';
 import { useFacadeProposal } from 'hooks/proposals';
@@ -242,7 +242,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack }) => {
   }, [daoList]);
 
   const context: any = useWallet();
-  const { account, provider, isConnected } = context;
+  const { account, isConnected } = context;
 
   const proposalInstance = useFacadeProposal(
     daoDetails?.queue.address,
