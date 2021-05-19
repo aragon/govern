@@ -34,7 +34,7 @@ export const DEFAULT_DAO_CONFIG: { [chainId in ChainId]: DaoConfig } = {
   },
 
   [ChainId.RINKEBY]: {
-    executionDelay: 86400,
+    executionDelay: 180,
     scheduleDeposit: {
       token: '0xc7AD46e0b8a400Bb3C915120d284AafbA8fc4735',
       amount: '10000000000000000000',
