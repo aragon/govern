@@ -399,14 +399,14 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
       payload: {
         transactionList: transactionsQueue.current,
-        onTransactionFailure: (error) => {
-          enqueueSnackbar(error, { variant: 'error' });
+        onTransactionFailure: () => {
+          /* do nothing */
         },
         onTransactionSuccess: () => {
-          //
+          /* do nothing */
         },
         onCompleteAllTransactions: () => {
-          //
+          /* do nothing */
         },
       },
     });

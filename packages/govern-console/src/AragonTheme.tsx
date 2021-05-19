@@ -328,6 +328,9 @@ const custom = {
 // };
 export const lightTheme = createMuiTheme({
   custom,
+  shape: {
+    borderRadius: 16,
+  },
   palette: {
     background: {
       default: '#fff',
