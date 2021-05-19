@@ -25,5 +25,6 @@ module.exports = {
     'Gateway.ts',
     'token.ts',
     'RegisterToken.ts',
+    'public/index.ts',
   ],
 }

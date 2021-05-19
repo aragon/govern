@@ -81,7 +81,6 @@ type Executor = {
   id: string
   address: string
   metadata: string
-  balance: string
   roles: Role[]
 }
 
@@ -171,7 +170,6 @@ const daoFragment = `
                   id
                   address
                   metadata
-                  balance
                   roles {
                     id
                     entity
@@ -248,7 +246,6 @@ const daoFragment = `
       id
       address
       metadata
-      balance
       roles {
         id
         entity
