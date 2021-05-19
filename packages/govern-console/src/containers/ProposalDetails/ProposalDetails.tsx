@@ -434,6 +434,10 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     });
   }
 
+  if (isLoadingProposalDetails || !proposalInfo) {
+    return <div> Loading...</div>;
+  }
+
   return (
     <>
       {isLoadingProposalDetails ? (

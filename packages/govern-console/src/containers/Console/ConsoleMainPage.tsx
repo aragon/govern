@@ -6,6 +6,7 @@ import { ANButton } from 'components/Button/ANButton';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import { useHistory } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
 import { useDaosSubscription, useGovernRegistrySubscription } from 'hooks/subscription-hooks';
 
 export interface ConsoleMainPageProps {
@@ -36,6 +37,8 @@ const WrapperGrid = styled(Grid)({
 
 const ConsoleMainPage: React.FC = () => {
   const history = useHistory();
+  const { enqueueSnackbar } = useSnackbar();
+
   const [visibleDaoList, updateDaoList] = useState<any>([]);
   const [totalDaoCount, updateTotalDaoCount] = useState<number>();
 
@@ -55,13 +58,17 @@ const ConsoleMainPage: React.FC = () => {
   }, [daoRegistryData]);
 
   const fetchMoreData = async () => {
-    const { data: moreData }: { data: any; loading: boolean } = await fetchMoreDaos({
-      variables: {
-        offset: visibleDaoList.length,
-      },
-    });
-    if (moreData && moreData.daos.length > 0) {
-      updateDaoList([...visibleDaoList, ...moreData.daos]);
+    try {
+      const { data: moreData }: { data: any; loading: boolean } = await fetchMoreDaos({
+        variables: {
+          offset: visibleDaoList.length,
+        },
+      });
+      if (moreData && moreData.daos.length > 0) {
+        updateDaoList([...visibleDaoList, ...moreData.daos]);
+      }
+    } catch (error) {
+      enqueueSnackbar('Somthing is worng, please try again later.', { variant: 'error' });
     }
   };
 

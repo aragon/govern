@@ -4,7 +4,7 @@ import { styled } from '@material-ui/core/styles';
 import backButtonIcon from '../../images/back-btn.svg';
 import Typography from '@material-ui/core/Typography';
 import { InputField } from 'components/InputFields/InputField';
-import CreateDaoImage from '../../images/svgs/CreateDao.svg';
+import CreateDaoImage from '../../images/pngs/create_dao@2x.png';
 import { BlueSwitch } from 'components/Switchs/BlueSwitch';
 import { BlueCheckbox } from 'components/Checkboxs/BlueCheckbox';
 import { ANWrappedPaper } from 'components/WrapperPaper/ANWrapperPaper';
@@ -54,6 +54,20 @@ interface FormProps {
     */
   cancelForm(): void;
 }
+
+const ImageContainer = styled('div')({
+  display: 'flex',
+  width: '100%',
+  flexDirection: 'column',
+  alignItems: 'center',
+});
+
+const Image = styled('img')({
+  minWidth: '100px',
+  maxWidth: '354.75px',
+  // height: '329.25px',
+  height: 'auto',
+});
 
 const FormContainer = styled('div')({
   // height: window.innerHeight * 0.7,
@@ -228,7 +242,9 @@ const CreateDaoForm: React.FC<FormProps> = ({
         <BackButton onClick={cancelForm}>
           <img src={backButtonIcon} />
         </BackButton>
-        <img src={CreateDaoImage} />
+        <ImageContainer>
+          <Image src={CreateDaoImage} />
+        </ImageContainer>
         <InputTitle>DAO Name</InputTitle>
         <Controller
           name="daoName"

@@ -2,7 +2,7 @@ import {
   ANCircularProgressWithCaption,
   ANProgressCationPropos,
 } from './ANCircularProgressWithCaption';
-import { CircularProgressProps } from '@material-ui/core/CircularProgress';
+import { Story, Meta } from '@storybook/react';
 
 export default {
   title: 'AN-CircularProgressWithCaption',

@@ -65,15 +65,8 @@ const DaoMainPage: React.FC = () => {
   const [isProposalPage, setProposalPage] = useState(true);
   const [visibleProposalList, updateVisibleProposalList] = useState<any>([]);
   const [queueNonce, updateQueueNonce] = useState<number>();
-  // const [fetchMoreProposal, updateFetchMoreProposals] = useState<any>();
-  // const [isProfilePage, setProfilePage] = useState(false);
   const [daoDetails, updateDaoDetails] = useState<any>();
   const [isAnExistingDao, updateIsAnExistingDao] = useState<boolean>(true);
-  // const [searchDaoName, setSearchDaoName] = useState('');
-
-  // const onInputChange = (val: string) => {
-  //   setSearchDaoName(val);
-  // };
 
   const onPageChange = (page: string) => {
     if (page === 'profile') {
@@ -98,7 +91,7 @@ const DaoMainPage: React.FC = () => {
   };
 
   useEffect(() => {
-    if (loadingDao) return;
+    if (loadingDao || !daoList) return;
     if (daoList.daos.length > 0 && getQueueData) {
       updateDaoDetails(daoList.daos[0]);
       if (daoList.daos[0] && daoList.daos[0].queue) {
@@ -129,6 +122,7 @@ const DaoMainPage: React.FC = () => {
   const goToNewProposal = () => {
     history.push(`/daos/${daoName}/new-proposal`);
   };
+
   if (loadingDao) {
     return <div>Loading...</div>;
   }
