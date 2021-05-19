@@ -88,7 +88,7 @@ const ConsoleMainPage: React.FC = () => {
   return (
     <ConsoleMainDiv>
       <ConsoleHeader />
-      <WrapperGrid container spacing={3} xs={12} direction="row" justify="flex-start">
+      <WrapperGrid container spacing={3} direction="row" justify="flex-start">
         {visibleDaoList &&
           visibleDaoList.length > 0 &&
           visibleDaoList.map((dao: any) => (

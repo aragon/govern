@@ -1,6 +1,6 @@
 import React from 'react';
 import { styled, Theme } from '@material-ui/core/styles';
-import MUIButton from '@material-ui/core/Button';
+import Button from '@material-ui/core/Button';
 
 export interface ANButtonProps {
   /**
@@ -99,31 +99,31 @@ const getColor = (buttonType: string, color?: string, disabled?: boolean) => {
   return '#ffffff !important';
 };
 
-const StyledButton = styled(MUIButton)(
+const StyledButton = styled(Button)(
   ({
     theme,
-    buttonType,
-    backgroundColor,
+    buttontype,
+    backgroundcolor,
     disabled,
     width,
     height,
-    labelColor,
+    labelcolor,
   }: {
     theme: Theme;
-    buttonType: string;
-    backgroundColor?: string;
+    buttontype: string;
+    backgroundcolor?: string;
     size?: 'small' | 'medium' | 'large';
     onClick?: () => void;
     disabled?: boolean;
     width?: string;
     height?: string;
-    labelColor?: string;
+    labelcolor?: string;
     style?: any;
   }) => ({
-    color: getColor(buttonType, labelColor, disabled),
+    color: getColor(buttontype, labelcolor, disabled),
     height: height || 46,
     width: width || 154,
-    background: getBackground(buttonType, theme, disabled, backgroundColor),
+    background: getBackground(buttontype, theme, disabled, backgroundcolor),
     boxSizing: 'border-box',
     boxShadow: disabled ? 'none !important' : '0px 3px 3px rgba(116, 131, 178, 0.2)',
     borderRadius: '8px',
@@ -137,12 +137,12 @@ const StyledButton = styled(MUIButton)(
     cursor: 'pointer',
     transition: 'background 0.5s, color 0.5s',
     '&:hover': {
-      background: getBackgroundForHoveredState(buttonType, theme, disabled, backgroundColor),
+      background: getBackgroundForHoveredState(buttontype, theme, disabled, backgroundcolor),
       boxShadow: '0px 4px 4px rgba(116, 131, 178, 0.25)',
-      color: buttonType === 'secondary' ? '#7483B2' : 'white',
+      color: buttontype === 'secondary' ? '#7483B2' : 'white',
     },
     '&:active': {
-      background: getBackgroundForPressedState(buttonType, theme, disabled, backgroundColor),
+      background: getBackgroundForPressedState(buttontype, theme, disabled, backgroundcolor),
       boxShadow: '0px 1px 1px rgba(116, 131, 178, 0.35)',
     },
     '& .MuiTouchRipple-root': {
@@ -160,7 +160,7 @@ export const ANButton: React.FC<ANButtonProps> = ({
   height,
   labelColor,
   style,
-  ...props
+  onClick,
 }) => {
   return (
     <StyledButton
@@ -169,14 +169,14 @@ export const ANButton: React.FC<ANButtonProps> = ({
           ? () => {
               return;
             }
-          : props.onClick
+          : onClick
       }
-      backgroundColor={backgroundColor}
+      backgroundcolor={backgroundColor}
       disabled={disabled}
       width={width}
-      buttonType={buttonType}
+      buttontype={buttonType}
       height={height}
-      labelColor={labelColor}
+      labelcolor={labelColor}
       style={style}
     >
       {label}
