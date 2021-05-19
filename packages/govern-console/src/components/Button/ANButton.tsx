@@ -102,28 +102,28 @@ const getColor = (buttonType: string, color?: string, disabled?: boolean) => {
 const StyledButton = styled(Button)(
   ({
     theme,
-    buttontype,
-    backgroundcolor,
+    kind,
+    background,
     disabled,
     width,
     height,
-    labelcolor,
+    label,
   }: {
     theme: Theme;
-    buttontype: string;
-    backgroundcolor?: string;
+    kind: string;
+    background?: string;
     size?: 'small' | 'medium' | 'large';
     onClick?: () => void;
     disabled?: boolean;
     width?: string;
     height?: string;
-    labelcolor?: string;
+    label?: string;
     style?: any;
   }) => ({
-    color: getColor(buttontype, labelcolor, disabled),
+    color: getColor(kind, label, disabled),
     height: height || 46,
     width: width || 154,
-    background: getBackground(buttontype, theme, disabled, backgroundcolor),
+    background: getBackground(kind, theme, disabled, background),
     boxSizing: 'border-box',
     boxShadow: disabled ? 'none !important' : '0px 3px 3px rgba(116, 131, 178, 0.2)',
     borderRadius: '8px',
@@ -137,12 +137,12 @@ const StyledButton = styled(Button)(
     cursor: 'pointer',
     transition: 'background 0.5s, color 0.5s',
     '&:hover': {
-      background: getBackgroundForHoveredState(buttontype, theme, disabled, backgroundcolor),
+      background: getBackgroundForHoveredState(kind, theme, disabled, background),
       boxShadow: '0px 4px 4px rgba(116, 131, 178, 0.25)',
-      color: buttontype === 'secondary' ? '#7483B2' : 'white',
+      color: kind === 'secondary' ? '#7483B2' : 'white',
     },
     '&:active': {
-      background: getBackgroundForPressedState(buttontype, theme, disabled, backgroundcolor),
+      background: getBackgroundForPressedState(kind, theme, disabled, background),
       boxShadow: '0px 1px 1px rgba(116, 131, 178, 0.35)',
     },
     '& .MuiTouchRipple-root': {
@@ -171,12 +171,12 @@ export const ANButton: React.FC<ANButtonProps> = ({
             }
           : onClick
       }
-      backgroundcolor={backgroundColor}
+      background={backgroundColor}
       disabled={disabled}
       width={width}
-      buttontype={buttonType}
+      kind={buttonType}
       height={height}
-      labelcolor={labelColor}
+      label={labelColor}
       style={style}
     >
       {label}
