@@ -462,7 +462,9 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                   <TitleText>Config</TitleText>
                   <InfoWrapper>
                     <InfoKeyDiv>Execution Delay:</InfoKeyDiv>
-                    <InfoValueDivInline>{proposalInfo.config.executionDelay}</InfoValueDivInline>
+                    <InfoValueDivInline>
+                      {proposalInfo.config.executionDelay} seconds
+                    </InfoValueDivInline>
                   </InfoWrapper>
                   <InfoWrapper>
                     <InfoKeyDiv>Schedule Deposit:</InfoKeyDiv>

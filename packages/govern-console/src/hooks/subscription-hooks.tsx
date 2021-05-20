@@ -51,7 +51,10 @@ export function useLazyProposalDetails() {
 }
 
 export function useLazyProposalList() {
-  const [getQueueData, { loading, data, error, fetchMore }] = useLazyQuery(PROPOSAL_LIST);
+  const [getQueueData, { loading, data, error, fetchMore }] = useLazyQuery(PROPOSAL_LIST, {
+    notifyOnNetworkStatusChange: true,
+    fetchPolicy: 'network-only',
+  });
 
   // TODO: Giorgi This needs to be replaced
   // by this idea https://github.com/apollographql/apollo-client/discussions/8264
@@ -63,7 +66,7 @@ export function useLazyProposalList() {
         };
       }
 
-      const { data, loading, error } = await fetchMore({
+      const { data } = await fetchMore({
         variables: {
           offset: offset,
         },
@@ -71,8 +74,6 @@ export function useLazyProposalList() {
 
       return {
         data: transformProposals(data),
-        loading,
-        error,
       };
     },
     [fetchMore],

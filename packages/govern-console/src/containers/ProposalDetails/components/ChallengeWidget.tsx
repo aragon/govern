@@ -119,7 +119,7 @@ const ChallengeWidget: React.FC<any> = ({
 
       <FormProvider {...methods}>
         <IPFSInput
-          label="Provide file"
+          label="Provide Reason"
           placeholder="Justification Reason..."
           textInputName="reason"
           fileInputName="reasonFile"
