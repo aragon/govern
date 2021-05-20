@@ -78,7 +78,6 @@ const DaoMainPage: React.FC = () => {
     }
   };
 
-  console.log(visibleProposalList, ' updated here');
   const {
     getQueueData,
     loading: fuckme,
@@ -91,13 +90,10 @@ const DaoMainPage: React.FC = () => {
       const { data: moreData } = await fetchMoreProposals(visibleProposalList.length);
 
       if (moreData && moreData.governQueue.containers.length > 0) {
-        console.log(moreData.governQueue.containers, visibleProposalList, 'moreData');
-        console.log([...visibleProposalList, ...moreData.governQueue.containers], ' scream');
         updateVisibleProposalList([...visibleProposalList, ...moreData.governQueue.containers]);
       }
     }
   };
-  console.log(fuckme, ' fuck me');
 
   useEffect(() => {
     if (loadingDao || !daoList) return;

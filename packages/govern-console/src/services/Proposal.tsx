@@ -55,4 +55,28 @@ export default class FacadeProposal {
     txs = [...txs, scheduleTransaction];
     return txs;
   }
+
+  public async execute(container: ProposalParams) {
+    const executeTransaction: CustomTransaction = {
+      tx: () => {
+        return this.proposal.execute(container);
+      },
+      message: 'Executes a proposal',
+      status: CustomTransactionStatus.Pending,
+    };
+
+    return [executeTransaction];
+  }
+
+  public async resolve(container: ProposalParams, disputeId: number) {
+    const resolveTransaction: CustomTransaction = {
+      tx: () => {
+        return this.proposal.resolve(container, disputeId);
+      },
+      message: 'Resolves a proposal',
+      status: CustomTransactionStatus.Pending,
+    };
+
+    return [resolveTransaction];
+  }
 }

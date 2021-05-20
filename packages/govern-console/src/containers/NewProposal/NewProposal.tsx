@@ -333,12 +333,12 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack }) => {
   };
 
   const validate = () => {
-    if (actionsToSchedule.length === 0) {
-      enqueueSnackbar('At least one action is needed to schedule a proposal.', {
-        variant: 'error',
-      });
-      return false;
-    }
+    //   if (actionsToSchedule.length === 0) {
+    //     enqueueSnackbar('At least one action is needed to schedule a proposal.', {
+    //       variant: 'error',
+    //     });
+    //     return false;
+    //   }
     return true;
   };
 

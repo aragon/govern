@@ -51,10 +51,7 @@ export function useLazyProposalDetails() {
 }
 
 export function useLazyProposalList() {
-  const [getQueueData, { loading, data, error, fetchMore }] = useLazyQuery(PROPOSAL_LIST, {
-    notifyOnNetworkStatusChange: true,
-    fetchPolicy: 'network-only',
-  });
+  const [getQueueData, { loading, data, error, fetchMore }] = useLazyQuery(PROPOSAL_LIST);
 
   // TODO: Giorgi This needs to be replaced
   // by this idea https://github.com/apollographql/apollo-client/discussions/8264
