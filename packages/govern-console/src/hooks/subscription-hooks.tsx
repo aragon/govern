@@ -53,31 +53,6 @@ export function useLazyProposalDetails() {
 export function useLazyProposalList() {
   const [getQueueData, { loading, data, error, fetchMore }] = useLazyQuery(PROPOSAL_LIST);
 
-  // TODO: Giorgi This needs to be replaced
-  // by this idea https://github.com/apollographql/apollo-client/discussions/8264
-  const loadMore = React.useCallback(
-    async (offset: number) => {
-      if (!fetchMore) {
-        return {
-          data: null,
-        };
-      }
-
-      const { data, loading, error } = await fetchMore({
-        variables: {
-          offset: offset,
-        },
-      });
-
-      return {
-        data: transformProposals(data),
-        loading,
-        error,
-      };
-    },
-    [fetchMore],
-  );
-
   const proposalList = React.useMemo(() => {
     if (!data) {
       return null;
@@ -87,7 +62,7 @@ export function useLazyProposalList() {
 
   return {
     getQueueData,
-    fetchMore: loadMore,
+    fetchMore: fetchMore,
     loading,
     data: proposalList,
     error,

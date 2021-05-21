@@ -29,6 +29,10 @@ export function transformProposals(data: any) {
         return {
           ...item,
           createdAt: toMs(item.createdAt),
+          payload: {
+            ...item.payload,
+            executionTime: toMs(item.payload.executionTime),
+          },
         };
       }),
     },

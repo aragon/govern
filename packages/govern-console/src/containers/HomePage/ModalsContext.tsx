@@ -9,9 +9,9 @@ type TransactionsModalAction = {
   type: ActionTypes.OPEN_TRANSACTIONS_MODAL;
   payload: {
     transactionList: CustomTransaction[];
-    onTransactionFailure: (errorMessage: string, transaction: CustomTransaction) => void;
-    onTransactionSuccess: (updatedTransaction: CustomTransaction, transactionReceipt: any) => void;
-    onCompleteAllTransactions: (transactions: CustomTransaction[]) => void;
+    onTransactionFailure?: (errorMessage: string, transaction: CustomTransaction) => void;
+    onTransactionSuccess?: (updatedTransaction: CustomTransaction, transactionReceipt: any) => void;
+    onCompleteAllTransactions?: (transactions: CustomTransaction[]) => void;
   };
 };
 
@@ -29,12 +29,12 @@ interface ModalContextState {
     open: boolean;
     params: {
       transactionList: CustomTransaction[];
-      onTransactionFailure: (errorMessage: string, transaction: CustomTransaction) => void;
-      onTransactionSuccess: (
+      onTransactionFailure?: (errorMessage: string, transaction: CustomTransaction) => void;
+      onTransactionSuccess?: (
         updatedTransaction: CustomTransaction,
         transactionReceipt: any,
       ) => void;
-      onCompleteAllTransactions: (transactions: CustomTransaction[]) => void;
+      onCompleteAllTransactions?: (transactions: CustomTransaction[]) => void;
     };
   };
 }

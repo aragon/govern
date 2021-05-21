@@ -390,41 +390,38 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
       payload: {
         transactionList: transactionsQueue.current,
-        onTransactionFailure: () => {
-          /* do nothing */
-        },
-        onTransactionSuccess: () => {
-          /* do nothing */
-        },
-        onCompleteAllTransactions: () => {
-          /* do nothing */
-        },
       },
     });
   };
 
   const executeProposal = async () => {
     const proposalParams = getProposalParams(proposalInfo);
+
     if (proposalInstance) {
-      try {
-        await proposalInstance.execute(proposalParams);
-      } catch (error) {
-        // TODO: Giorgi reject the transaction and it will fail
-        enqueueSnackbar(error.error.message, { variant: 'error' });
-      }
+      transactionsQueue.current = [...(await proposalInstance.execute(proposalParams))];
     }
+
+    dispatch({
+      type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
+      payload: {
+        transactionList: transactionsQueue.current,
+      },
+    });
   };
 
   const resolveProposal = async (disputeId: number) => {
     const proposalParams = getProposalParams(proposalInfo);
+
     if (proposalInstance) {
-      try {
-        await proposalInstance.resolve(proposalParams, disputeId);
-      } catch (error) {
-        // TODO: Giorgi reject the transaction and it will fail
-        enqueueSnackbar(error.error.message, { variant: 'error' });
-      }
+      transactionsQueue.current = [...(await proposalInstance.resolve(proposalParams, disputeId))];
     }
+
+    dispatch({
+      type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
+      payload: {
+        transactionList: transactionsQueue.current,
+      },
+    });
   };
 
   const proposalStates: any = {};
@@ -462,7 +459,9 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                   <TitleText>Config</TitleText>
                   <InfoWrapper>
                     <InfoKeyDiv>Execution Delay:</InfoKeyDiv>
-                    <InfoValueDivInline>{proposalInfo.config.executionDelay}</InfoValueDivInline>
+                    <InfoValueDivInline>
+                      {proposalInfo.config.executionDelay} seconds
+                    </InfoValueDivInline>
                   </InfoWrapper>
                   <InfoWrapper>
                     <InfoKeyDiv>Schedule Deposit:</InfoKeyDiv>

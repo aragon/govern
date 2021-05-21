@@ -25,9 +25,9 @@ const getErrorFromException = (ex: any): string => {
 
 export interface TransactionKeeperProps {
   transactionList: CustomTransaction[];
-  onTransactionFailure: (errorMessage: string, transaction: CustomTransaction) => void;
-  onTransactionSuccess: (updatedTransaction: CustomTransaction, transactionReceipt: any) => void;
-  onCompleteAllTransactions: (transactions: CustomTransaction[]) => void;
+  onTransactionFailure?: (errorMessage: string, transaction: CustomTransaction) => void;
+  onTransactionSuccess?: (updatedTransaction: CustomTransaction, transactionReceipt: any) => void;
+  onCompleteAllTransactions?: (transactions: CustomTransaction[]) => void;
   closeModal: () => void;
 }
 
@@ -73,7 +73,9 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
           draft.status = CustomTransactionStatus.Successful;
         });
         updateTransaction(updatedTransaction, index);
-        onTransactionSuccess(updatedTransaction, transactionReceipt);
+        if (typeof onTransactionSuccess === 'function') {
+          onTransactionSuccess(updatedTransaction, transactionReceipt);
+        }
       } catch (ex) {
         const updatedTransaction = produce(transaction, (draft) => {
           draft.status = CustomTransactionStatus.Failed;
@@ -83,7 +85,9 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
         updateTransaction(updatedTransaction, index);
         setState(TransactionKeeperState.Failure);
         const message = getErrorFromException(ex);
-        onTransactionFailure(message, updatedTransaction);
+        if (typeof onTransactionFailure === 'function') {
+          onTransactionFailure(message, updatedTransaction);
+        }
         setErrorMessage(ex.message);
       }
       index++;
@@ -97,7 +101,7 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
     case TransactionKeeperState.Initial: {
       return (
         <TransactionDialog
-          title={'Confirm transactions'}
+          title={transactionList.length > 1 ? 'Confirm transactions' : 'Confirm Transaction'}
           transactions={transactions}
           onClick={executeTransactions}
           onClose={closeModal}
@@ -108,7 +112,7 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
     case TransactionKeeperState.Processing: {
       return (
         <TransactionDialog
-          title={'Processing transactions'}
+          title={transactionList.length > 1 ? 'Processing transactions' : 'Processing transaction'}
           info={'Please do not close this window until it finishes.'}
           transactions={transactions}
         />
@@ -117,12 +121,14 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
     case TransactionKeeperState.Success: {
       return (
         <TransactionDialog
-          title={'Completed Transactions'}
+          title={transactionList.length > 1 ? 'Completed Transactions' : 'Completed Transaction'}
           transactions={transactions}
           buttonLabel={'Continue'}
           onClick={() => {
             closeModal();
-            onCompleteAllTransactions(transactions);
+            if (typeof onCompleteAllTransactions === 'function') {
+              onCompleteAllTransactions(transactions);
+            }
           }}
         />
       );

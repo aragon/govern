@@ -14,9 +14,34 @@ import './index.css';
 // move to env files.
 const subgraphUri = 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby';
 
+function mergeFunction(existing: [], incoming: []) {
+  if (!incoming) return existing;
+  if (!existing) return incoming;
+  return [...existing, ...incoming];
+}
+
 const client = new ApolloClient({
   uri: subgraphUri,
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      GovernQueue: {
+        fields: {
+          containers: {
+            keyArgs: false,
+            merge: mergeFunction,
+          },
+        },
+      },
+      Query: {
+        fields: {
+          daos: {
+            keyArgs: ['where', ['name']],
+            merge: mergeFunction,
+          },
+        },
+      },
+    },
+  }),
   connectToDevTools: true,
 });
 
