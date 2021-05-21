@@ -60,6 +60,7 @@ const DaoMainPage: React.FC = () => {
 
   // TODO: Giorgi useDaoSubscription should be returning the single object
   // we shouldn't be doing daoList.daos[0]
+  console.log(daoName, ' daoName haha');
   const { data: daoList, loading: loadingDao } = useDaoSubscription(daoName);
 
   const [isProposalPage, setProposalPage] = useState(true);
@@ -78,22 +79,24 @@ const DaoMainPage: React.FC = () => {
     }
   };
 
-  const {
-    getQueueData,
-    loading: fuckme,
-    data: queueData,
-    fetchMore: fetchMoreProposals,
-  } = useLazyProposalList();
+  const { getQueueData, data, fetchMore } = useLazyProposalList();
 
   const fetchMoreData = async () => {
-    if (fetchMoreProposals) {
-      const { data: moreData } = await fetchMoreProposals(visibleProposalList.length);
-
-      if (moreData && moreData.governQueue.containers.length > 0) {
-        updateVisibleProposalList([...visibleProposalList, ...moreData.governQueue.containers]);
-      }
+    if (fetchMore) {
+      fetchMore({
+        variables: {
+          offset: visibleProposalList.length,
+        },
+      });
     }
   };
+
+  useEffect(() => {
+    if (data) {
+      updateVisibleProposalList(data.governQueue.containers);
+      updateQueueNonce(parseInt(data.governQueue.nonce));
+    }
+  }, [data]);
 
   useEffect(() => {
     if (loadingDao || !daoList) return;
@@ -112,13 +115,6 @@ const DaoMainPage: React.FC = () => {
       updateIsAnExistingDao(false);
     }
   }, [loadingDao, daoList, getQueueData]);
-
-  useEffect(() => {
-    if (queueData) {
-      updateVisibleProposalList(queueData.governQueue.containers);
-      updateQueueNonce(parseInt(queueData.governQueue.nonce));
-    }
-  }, [queueData]);
 
   const onClickProposal = (proposal: any) => {
     history.push(`/proposals/${daoName}/${proposal.id}`);
