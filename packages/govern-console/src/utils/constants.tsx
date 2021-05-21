@@ -36,12 +36,12 @@ export const DEFAULT_DAO_CONFIG: { [chainId in ChainId]: DaoConfig } = {
   [ChainId.RINKEBY]: {
     executionDelay: 180,
     scheduleDeposit: {
-      token: '0xc7AD46e0b8a400Bb3C915120d284AafbA8fc4735',
-      amount: '10000000000000000000',
+      token: '0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa',
+      amount: '1000',
     },
     challengeDeposit: {
-      token: '0xc7AD46e0b8a400Bb3C915120d284AafbA8fc4735',
-      amount: '10000000000000000000',
+      token: '0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa',
+      amount: '1000',
     },
     resolver: '0xC464EB732A1D2f5BbD705727576065C91B2E9f18',
     rules: toUtf8Bytes('No main agreement has been defined'),
