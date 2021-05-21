@@ -6,7 +6,6 @@ import { ANButton } from 'components/Button/ANButton';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import { useHistory } from 'react-router-dom';
-import { useSnackbar } from 'notistack';
 import { useDaosSubscription, useGovernRegistrySubscription } from 'hooks/subscription-hooks';
 
 export interface ConsoleMainPageProps {

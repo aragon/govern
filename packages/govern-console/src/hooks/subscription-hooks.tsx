@@ -5,12 +5,9 @@ import { PROPOSAL_DETAILS, PROPOSAL_LIST } from 'queries/proposals';
 import { transformProposalDetails, transformProposals } from 'utils/proposal';
 
 export function useDaoSubscription(daoName: string) {
-  console.log(daoName, ' name here');
   const { data, loading, error } = useQuery(DAO_BY_NAME, {
     variables: { name: daoName },
   });
-
-  console.log(data, ' data here');
 
   return {
     data,
