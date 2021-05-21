@@ -11,6 +11,7 @@ export const PROPOSAL_LIST = gql`
         state
         createdAt
         payload {
+          id
           executionTime
         }
       }
@@ -26,7 +27,9 @@ export const PROPOSAL_DETAILS = gql`
       state
       createdAt
       queue {
+        id
         roles {
+          id
           selector
           who
           granted
@@ -34,12 +37,15 @@ export const PROPOSAL_DETAILS = gql`
         }
       }
       config {
+        id
         executionDelay
         scheduleDeposit {
+          id
           token
           amount
         }
         challengeDeposit {
+          id
           token
           amount
         }
@@ -48,13 +54,16 @@ export const PROPOSAL_DETAILS = gql`
         maxCalldataSize
       }
       payload {
+        id
         nonce
         executionTime
         submitter
         executor {
+          id
           address
         }
         actions {
+          id
           to
           value
           data
@@ -66,9 +75,11 @@ export const PROPOSAL_DETAILS = gql`
         id
         createdAt
         ... on ContainerEventChallenge {
+          id
           disputeId
           challenger
           collateral {
+            id
             token
             amount
           }
@@ -77,18 +88,23 @@ export const PROPOSAL_DETAILS = gql`
           resolver
         }
         ... on ContainerEventSchedule {
+          id
           collateral {
+            id
             token
             amount
           }
         }
         ... on ContainerEventExecute {
+          id
           execResults
         }
         ... on ContainerEventResolve {
+          id
           approved
         }
         ... on ContainerEventVeto {
+          id
           reason
         }
       }
