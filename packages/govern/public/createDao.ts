@@ -91,22 +91,24 @@ export async function createDao(
   options: CreateDaoOptions = {},
   registerTokenCallback?: Function
 ): Promise<providers.TransactionResponse> {
+  let token: Partial<Token>
   if (!args.token.tokenAddress) {
-    args.token.tokenAddress = constants.AddressZero
+    const tokenIsMissingInfo = !args.token.tokenName || !args.token.tokenSymbol || !args.token.tokenDecimals
+
+    if (tokenIsMissingInfo) {
+      throw new Error('Missing token name, decimals and/or symbol')
+    }
+    token = {
+      tokenAddress: constants.AddressZero,
+      ...args.token
+    }
   } else {
-    args.token = {
+    token = {
+      tokenAddress: args.token.tokenAddress,
       tokenDecimals: 18,
       tokenName: '',
       tokenSymbol: '',
-      ...args.token,
     }
-  }
-
-  const addressIsZero = args.token.tokenAddress === constants.AddressZero
-  const tokenIsMissingInfo = !args.token.tokenName || !args.token.tokenSymbol
-
-  if (addressIsZero && tokenIsMissingInfo) {
-    throw new Error('Missing token name and/or symbol')
   }
 
   const config = Configuration.get()
@@ -137,7 +139,7 @@ export async function createDao(
 
   const result = contract.newGovern(
     args.name,
-    args.token,
+    token,
     args.config,
     args.useProxies
   )
