@@ -23,8 +23,8 @@ import { toUTF8Bytes, toUTF8String } from 'utils/lib';
 import { proposalDetailsUrl } from 'utils/urls';
 import { getIpfsUrl, addToIpfs } from 'utils/ipfs';
 import { IPFSInput } from 'components/Field/IPFSInput';
-import { useFacadeProposal } from 'hooks/proposals';
-import { useDaoSubscription } from 'hooks/subscription-hooks';
+import { useFacadeProposal } from 'hooks/proposal-hooks';
+import { useDaoQuery } from 'hooks/query-hooks';
 
 export interface DaoSettingFormProps {
   /**
@@ -111,19 +111,17 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
   const { daoName } = useParams<ParamTypes>();
   //TODO daoname empty handling
 
-  // TODO: Giorgi useDaoSubscription should be returning the single object
-  // we shouldn't be doing daoList.daos[0]
-  const { data: daoList } = useDaoSubscription(daoName);
+  const { data: dao } = useDaoQuery(daoName);
 
   const [daoDetails, updateDaoDetails] = useState<any>();
   const [config, setConfig] = useState<any>(undefined);
   const [rulesIpfsUrl, setRulesIpfsUrl] = useState<string>('');
 
   useEffect(() => {
-    if (daoList) {
-      updateDaoDetails(daoList.daos[0]);
+    if (dao) {
+      updateDaoDetails(dao);
     }
-  }, [daoList]);
+  }, [dao]);
 
   const proposalInstance = useFacadeProposal(
     daoDetails?.queue.address,
@@ -161,19 +159,6 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
         } else {
           formConfig.rules = toUTF8String(_config.rules) || _config.rules;
         }
-
-        formConfig.scheduleDeposit.amount = await correctDecimal(
-          _config.scheduleDeposit.token,
-          _config.scheduleDeposit.amount,
-          false,
-          provider,
-        );
-        formConfig.challengeDeposit.amount = await correctDecimal(
-          _config.challengeDeposit.token,
-          _config.challengeDeposit.amount,
-          false,
-          provider,
-        );
 
         setValue('daoConfig', formConfig);
       }

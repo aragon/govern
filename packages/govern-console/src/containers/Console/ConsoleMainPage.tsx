@@ -6,7 +6,7 @@ import { ANButton } from 'components/Button/ANButton';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import { useHistory } from 'react-router-dom';
-import { useDaosSubscription, useGovernRegistrySubscription } from 'hooks/subscription-hooks';
+import { useDaosQuery, useGovernRegistryQuery } from 'hooks/query-hooks';
 
 export interface ConsoleMainPageProps {
   /**
@@ -40,8 +40,8 @@ const ConsoleMainPage: React.FC = () => {
   const [visibleDaoList, updateDaoList] = useState<any>([]);
   const [totalDaoCount, updateTotalDaoCount] = useState<number>();
 
-  const { data: daoListData, fetchMore } = useDaosSubscription();
-  const { data: daoRegistryData } = useGovernRegistrySubscription();
+  const { data: daoListData, fetchMore } = useDaosQuery();
+  const { data: daoRegistryData } = useGovernRegistryQuery();
 
   useEffect(() => {
     if (daoListData && daoListData.daos) {

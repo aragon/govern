@@ -1,6 +1,6 @@
-import { getToken } from '@aragon/govern';
 import { ValidateResult } from 'react-hook-form';
 import Abi from './AbiHandler';
+import { isTokenERC20 } from 'utils/token';
 
 /**
  * Validate if address is an ERC20 token
@@ -10,11 +10,8 @@ import Abi from './AbiHandler';
  * @returns <ValidateResult> true if valid, or error message if invalid
  */
 export const validateToken = async (address: string, provider: any): Promise<ValidateResult> => {
-  try {
-    await getToken(address, provider);
-    return true;
-  } catch (error) {}
-  return 'Token adress is not valid.';
+  const isERC20 = await isTokenERC20(address, provider);
+  return isERC20 || 'Token adress is not ERC20 compliant';
 };
 
 /**

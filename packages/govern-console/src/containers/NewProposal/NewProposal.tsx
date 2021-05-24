@@ -19,11 +19,11 @@ import { useForm, FormProvider } from 'react-hook-form';
 import { Proposal, ReceiptType, ActionType } from '@aragon/govern';
 import { proposalDetailsUrl } from 'utils/urls';
 import { addToIpfs } from 'utils/ipfs';
-import { useFacadeProposal } from 'hooks/proposals';
+import { useFacadeProposal } from 'hooks/proposal-hooks';
 import { toUTF8Bytes } from 'utils/lib';
 import { IPFSInput } from 'components/Field/IPFSInput';
 import { settingsUrl } from 'utils/urls';
-import { useDaoSubscription } from 'hooks/subscription-hooks';
+import { useDaoQuery } from 'hooks/query-hooks';
 
 export interface NewProposalProps {
   /**
@@ -219,9 +219,7 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack }) => {
   const { daoName } = useParams<any>();
   //TODO daoname empty handling
 
-  // TODO: Giorgi useDaoSubscription should be returning the single object
-  // we shouldn't be doing daoList.daos[0]
-  const { data: daoList } = useDaoSubscription(daoName);
+  const { data: dao } = useDaoQuery(daoName);
 
   const { enqueueSnackbar } = useSnackbar();
   const { dispatch } = React.useContext(ModalsContext);
@@ -238,10 +236,10 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack }) => {
   const [actionsToSchedule, setActionsToSchedule] = useState([]);
 
   useEffect(() => {
-    if (daoList) {
-      updateDaoDetails(daoList.daos[0]);
+    if (dao) {
+      updateDaoDetails(dao);
     }
-  }, [daoList]);
+  }, [dao]);
 
   const context: any = useWallet();
   const { account, isConnected } = context;
@@ -333,12 +331,12 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack }) => {
   };
 
   const validate = () => {
-    //   if (actionsToSchedule.length === 0) {
-    //     enqueueSnackbar('At least one action is needed to schedule a proposal.', {
-    //       variant: 'error',
-    //     });
-    //     return false;
-    //   }
+    if (actionsToSchedule.length === 0) {
+      enqueueSnackbar('At least one action is needed to schedule a proposal.', {
+        variant: 'error',
+      });
+      return false;
+    }
     return true;
   };
 

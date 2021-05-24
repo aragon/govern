@@ -1,10 +1,45 @@
-import { Token, getToken } from '@aragon/govern';
 import { ethers, BigNumberish } from 'ethers';
+import { erc20TokenABI } from 'abis/erc20';
+
+export async function isTokenERC20(address: string, provider: any) {
+  const contract = new ethers.Contract(address, erc20TokenABI, provider);
+  try {
+    await Promise.all([contract.balanceOf(address), contract.totalSupply()]);
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+export async function getTokenInfo(address: string, provider: any) {
+  const contract = new ethers.Contract(address, erc20TokenABI, provider);
+  let decimals,
+    name,
+    symbol = null;
+
+  try {
+    decimals = await contract.decimals();
+  } catch (err) {}
+
+  try {
+    name = await contract.name();
+  } catch (err) {}
+
+  try {
+    symbol = await contract.symbol();
+  } catch (err) {}
+
+  return {
+    decimals,
+    name,
+    symbol,
+  };
+}
 
 /**
  * @param address address of the token
  * @param amount  amount
- * @param isFormat if true - appends, else cuts off tokenDecimals 0's
+ * @param isFormat if true - appends, else cuts off decimal number 0's
  * @param provider provider
  *
  * @returns {BigNumberish} amount
@@ -16,10 +51,12 @@ export const correctDecimal = async (
   provider: any,
 ) => {
   try {
-    const token: Token = await getToken(address, provider);
+    const { decimals } = await getTokenInfo(address, provider);
+    if (!decimals) return amount;
+
     return isFormat
-      ? ethers.utils.parseUnits(amount.toString(), token.tokenDecimals)
-      : ethers.utils.formatUnits(amount, token.tokenDecimals);
+      ? ethers.utils.parseUnits(amount.toString(), decimals)
+      : ethers.utils.formatUnits(amount, decimals);
   } catch (err) {
     return amount;
   }

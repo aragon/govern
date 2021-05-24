@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useEffect } from 'react';
 import { styled } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
@@ -16,8 +17,8 @@ import { getState, getStateColor } from 'utils/states';
 import { useSnackbar } from 'notistack';
 import { IPFSField } from 'components/Field/IPFSField';
 import { addToIpfs } from 'utils/ipfs';
-import { useFacadeProposal } from 'hooks/proposals';
-import { useLazyProposalDetails, useDaoSubscription } from 'hooks/subscription-hooks';
+import { useFacadeProposal } from 'hooks/proposal-hooks';
+import { useLazyProposalQuery, useDaoQuery } from 'hooks/query-hooks';
 
 // widget components
 import ChallengeWidget from './components/ChallengeWidget';
@@ -278,10 +279,7 @@ const ExpandedDiv = styled('div')({
 const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   const { daoName, id: proposalId } = useParams<any>();
 
-  // TODO: Giorgi useDaoSubscription should be returning the single object
-  // we shouldn't be doing daoList.daos[0]
-  const { data: daoList } = useDaoSubscription(daoName);
-
+  const { data: dao } = useDaoQuery(daoName);
   const context: any = useWallet();
 
   const { networkName, isConnected } = context;
@@ -312,7 +310,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     getProposalData,
     data: proposalDetailsData,
     loading: isLoadingProposalDetails,
-  } = useLazyProposalDetails();
+  } = useLazyProposalQuery();
 
   useEffect(() => {
     return function cleanUp() {
@@ -356,15 +354,15 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   };
 
   useEffect(() => {
-    if (daoList && proposalId && getProposalData) {
-      updateDaoDetails(daoList.daos[0]);
+    if (dao && proposalId && getProposalData) {
+      updateDaoDetails(dao);
       getProposalData({
         variables: {
           id: proposalId,
         },
       });
     }
-  }, [daoList, proposalId, getProposalData]);
+  }, [dao, proposalId, getProposalData]);
 
   const challengeProposal = async (challengeReason: string, challengeReasonFile: any) => {
     // TODO: add modal

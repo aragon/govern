@@ -1,4 +1,4 @@
-import { CourtABI } from 'utils/abis/court';
+import { CourtABI } from 'abis/court';
 import { ethers } from 'ethers';
 import { TokenDeposit } from '@aragon/govern';
 
