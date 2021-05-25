@@ -109,6 +109,30 @@
     use-inside "^0.2.0"
     use-token "^0.2.0"
 
+"@aragon/ui@https://github.com/aragon/ui.git#v2":
+  version "1.7.0"
+  resolved "https://github.com/aragon/ui.git#68a4bfb125d6a624b21b54ba747ca802c7906b30"
+  dependencies:
+    "@babel/runtime" "^7.3.1"
+    airbnb-prop-types "^2.9.0"
+    arg "^2.0.0"
+    command-exists "^1.2.6"
+    dayjs "^1.8.14"
+    js-sha3 "^0.8.0"
+    jsbi "^3.1.2"
+    lodash "^4.17.19"
+    markdown-to-jsx "^6.11.0"
+    popper.js "^1.14.4"
+    prop-types "^15.6.0"
+    react-blockies "^1.4.0"
+    react-display-name "^0.2.3"
+    react-onclickout "^2.0.8"
+    react-spring "^7.2.11"
+    recursive-copy "^2.0.9"
+    token-amount "^0.1.0"
+    use-inside "^0.2.0"
+    use-token "^0.2.0"
+
 "@assemblyscript/loader@^0.9.4":
   version "0.9.4"
   resolved "https://registry.yarnpkg.com/@assemblyscript/loader/-/loader-0.9.4.tgz#a483c54c1253656bb33babd464e3154a173e1577"
