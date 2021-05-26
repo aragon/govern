@@ -44,6 +44,7 @@ contract GovernBaseFactory {
         string calldata _name,
         Token calldata _token,
         ERC3000Data.Config calldata _config,
+        address[] calldata scheduleAccessList,
         bool _useProxies
     ) external returns (Govern govern, GovernQueue queue) {
         bytes32 salt = _useProxies ? keccak256(abi.encodePacked(_name)) : bytes32(0);
@@ -65,16 +66,19 @@ contract GovernBaseFactory {
         }
 
         registry.register(govern, queue, token, _name, "");
-
-        ACLData.BulkItem[] memory items = new ACLData.BulkItem[](7);
-        items[0] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.schedule.selector, ANY_ADDR);
-        items[1] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.execute.selector, ANY_ADDR);
-        items[2] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.challenge.selector, ANY_ADDR);
-        items[3] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.configure.selector, address(govern));
-        items[4] = ACLData.BulkItem(ACLData.BulkOp.Revoke, queue.ROOT_ROLE(), address(this));
-        items[5] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.ROOT_ROLE(), address(govern));
-        items[6] = ACLData.BulkItem(ACLData.BulkOp.Freeze, queue.ROOT_ROLE(), address(0));
         
+        ACLData.BulkItem[] memory items = new ACLData.BulkItem[](6 + scheduleAccessList.length);
+        items[0] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.execute.selector, ANY_ADDR);
+        items[1] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.challenge.selector, ANY_ADDR);
+        items[2] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.configure.selector, address(govern));
+        items[3] = ACLData.BulkItem(ACLData.BulkOp.Revoke, queue.ROOT_ROLE(), address(this));
+        items[4] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.ROOT_ROLE(), address(govern));
+        items[5] = ACLData.BulkItem(ACLData.BulkOp.Freeze, queue.ROOT_ROLE(), address(0));
+
+        for (uint256 i = 0; i < scheduleAccessList.length; i++) {
+            items[6 + i] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.schedule.selector, scheduleAccessList[i]);
+        }
+
         queue.bulk(items);
     }
     

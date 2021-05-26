@@ -40,7 +40,8 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
         tokenDecimals: 18,
       },
       ERC3000DefaultConfig,
-      useProxies
+      [],
+      useProxies,
     )
 
     await expect(tx).to.emit(registryContract, EVENTS.REGISTERED)

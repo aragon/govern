@@ -80,6 +80,7 @@ describe('Govern Base Factory with mocked contracts', function () {
         tokenDecimals: 18,
       },
       ERC3000DefaultConfig,
+      [],
       useProxies
     )
 
