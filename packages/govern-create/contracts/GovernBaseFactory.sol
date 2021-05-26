@@ -9,13 +9,15 @@ import "@aragon/govern-core/contracts/GovernRegistry.sol";
 
 import "@aragon/govern-token/contracts/GovernTokenFactory.sol";
 import "@aragon/govern-token/contracts/interfaces/IERC20.sol";
-import "@aragon/govern-token/contracts/libraries/TokenConfig.sol";
+import "@aragon/govern-token/contracts/libraries/TokenLib.sol";
 
 import "./core-factories/GovernFactory.sol";
 import "./core-factories/GovernQueueFactory.sol";
 
 contract GovernBaseFactory {
     address internal constant ANY_ADDR = address(-1);
+
+    string private constant ERROR_SCHEDULE_LIST_EXCEEDED = "GBF_SCHEDULE_LIST_EXCEEDED";
 
     GovernFactory public governFactory;
     GovernQueueFactory public queueFactory;
@@ -36,11 +38,13 @@ contract GovernBaseFactory {
 
     function newGovern(
         string calldata _name,
-        TokenConfig.Token calldata _token,
+        TokenLib.TokenConfig calldata _token,
         ERC3000Data.Config calldata _config,
-        address[] calldata scheduleAccessList,
+        address[] calldata _scheduleAccessList,
         bool _useProxies
     ) external returns (Govern govern, GovernQueue queue) {
+        require(_scheduleAccessList.length <= 10, ERROR_SCHEDULE_LIST_EXCEEDED);
+
         bytes32 salt = _useProxies ? keccak256(abi.encodePacked(_name)) : bytes32(0);
 
         queue = queueFactory.newQueue(address(this), _config, salt);
@@ -57,7 +61,7 @@ contract GovernBaseFactory {
 
         registry.register(govern, queue, token, _name, "");
         
-        ACLData.BulkItem[] memory items = new ACLData.BulkItem[](6 + scheduleAccessList.length);
+        ACLData.BulkItem[] memory items = new ACLData.BulkItem[](6 + _scheduleAccessList.length);
         
         items[0] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.execute.selector, ANY_ADDR);
         items[1] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.challenge.selector, ANY_ADDR);
@@ -67,12 +71,12 @@ contract GovernBaseFactory {
         items[5] = ACLData.BulkItem(ACLData.BulkOp.Freeze, queue.ROOT_ROLE(), address(0));
 
         // If the length is 0, it means anyone can start scheduling, otherwise
-        // we only allow schedule be called by specified scheduleAccessList addresses
-        if(scheduleAccessList.length == 0) {
+        // we only allow schedule be called by specified _scheduleAccessList addresses
+        if (_scheduleAccessList.length == 0) {
             items[6] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.schedule.selector, ANY_ADDR);
-        }else{
-            for (uint256 i = 0; i < scheduleAccessList.length; i++) {
-                items[6 + i] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.schedule.selector, scheduleAccessList[i]);
+        } else {
+            for (uint256 i = 0; i < _scheduleAccessList.length; i++) {
+                items[6 + i] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.schedule.selector, _scheduleAccessList[i]);
             }
         }
 

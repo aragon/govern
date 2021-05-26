@@ -6,7 +6,7 @@ pragma solidity 0.6.8;
 pragma experimental ABIEncoderV2;
 
 import "@aragon/govern-contract-utils/contracts/minimal-proxies/ERC1167ProxyFactory.sol";
-import "@aragon/govern-token/contracts/libraries/TokenConfig.sol";
+import "@aragon/govern-token/contracts/libraries/TokenLib.sol";
 
 import "erc3k/contracts/IERC3000Executor.sol";
 
@@ -29,7 +29,7 @@ contract GovernTokenFactory {
 
     function newToken(
         IERC3000Executor _governExecutor,
-        TokenConfig.Token calldata _token,
+        TokenLib.TokenConfig calldata _token,
         bool _useProxies
     ) external returns (
         GovernToken token,
@@ -54,8 +54,15 @@ contract GovernTokenFactory {
         }
 
         token.changeMinter(address(minter));
-        if (_token.mintAmount > 0) minter.mint(_token.mintAddress, _token.mintAmount, "initial mint");
-    
+        
+        if (_token.mintAmount > 0) {
+            minter.mint(_token.mintAddress, _token.mintAmount, "initial mint");
+        }
+
+        if (_token.merkleRoot != bytes32(0)) {
+            minter.merkleMint(_token.merkleRoot, _token.merkleMintAmount, "", "");
+        }
+
         bytes4 mintRole = minter.mint.selector ^ minter.merkleMint.selector;
         bytes4 rootRole = minter.ROOT_ROLE();
 
