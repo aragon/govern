@@ -9,6 +9,7 @@ import "@aragon/govern-core/contracts/GovernRegistry.sol";
 
 import "@aragon/govern-token/contracts/GovernTokenFactory.sol";
 import "@aragon/govern-token/contracts/interfaces/IERC20.sol";
+import "@aragon/govern-token/contracts/libraries/TokenConfig.sol";
 
 import "./core-factories/GovernFactory.sol";
 import "./core-factories/GovernQueueFactory.sol";
@@ -20,14 +21,7 @@ contract GovernBaseFactory {
     GovernQueueFactory public queueFactory;
     GovernTokenFactory public tokenFactory;
     GovernRegistry public registry;
-
-    struct Token {
-        IERC20 tokenAddress;
-        uint8  tokenDecimals;
-        string tokenName;
-        string tokenSymbol;
-    }
-
+    
     constructor(
         GovernRegistry _registry,
         GovernFactory _governFactory,
@@ -42,7 +36,7 @@ contract GovernBaseFactory {
 
     function newGovern(
         string calldata _name,
-        Token calldata _token,
+        TokenConfig.Token calldata _token,
         ERC3000Data.Config calldata _config,
         address[] calldata scheduleAccessList,
         bool _useProxies
@@ -56,11 +50,7 @@ contract GovernBaseFactory {
         if (address(token) == address(0)) {
             (token,) = tokenFactory.newToken(
                 govern,
-                _token.tokenName,
-                _token.tokenSymbol,
-                _token.tokenDecimals,
-                msg.sender,
-                1 * 10 ** 18,
+                _token,
                 _useProxies
             );
         }
@@ -68,6 +58,7 @@ contract GovernBaseFactory {
         registry.register(govern, queue, token, _name, "");
         
         ACLData.BulkItem[] memory items = new ACLData.BulkItem[](6 + scheduleAccessList.length);
+        
         items[0] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.execute.selector, ANY_ADDR);
         items[1] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.challenge.selector, ANY_ADDR);
         items[2] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.configure.selector, address(govern));
@@ -75,9 +66,16 @@ contract GovernBaseFactory {
         items[4] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.ROOT_ROLE(), address(govern));
         items[5] = ACLData.BulkItem(ACLData.BulkOp.Freeze, queue.ROOT_ROLE(), address(0));
 
-        for (uint256 i = 0; i < scheduleAccessList.length; i++) {
-            items[6 + i] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.schedule.selector, scheduleAccessList[i]);
+        // If the length is 0, it means anyone can start scheduling, otherwise
+        // we only allow schedule be called by specified scheduleAccessList addresses
+        if(scheduleAccessList.length == 0) {
+            items[6] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.schedule.selector, ANY_ADDR);
+        }else{
+            for (uint256 i = 0; i < scheduleAccessList.length; i++) {
+                items[6 + i] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.schedule.selector, scheduleAccessList[i]);
+            }
         }
+
 
         queue.bulk(items);
     }
