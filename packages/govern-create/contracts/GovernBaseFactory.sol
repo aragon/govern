@@ -16,8 +16,9 @@ import "./core-factories/GovernQueueFactory.sol";
 
 contract GovernBaseFactory {
     address internal constant ANY_ADDR = address(-1);
+    uint256 internal constant MAX_SCHEDULE_ACCESS_LIST_ALLOWED = 10;
 
-    string private constant ERROR_SCHEDULE_LIST_EXCEEDED = "GBF_SCHEDULE_LIST_EXCEEDED";
+    string private constant ERROR_SCHEDULE_LIST_EXCEEDED = "basefactory: schedule list exceeded";
 
     GovernFactory public governFactory;
     GovernQueueFactory public queueFactory;
@@ -43,7 +44,7 @@ contract GovernBaseFactory {
         address[] calldata _scheduleAccessList,
         bool _useProxies
     ) external returns (Govern govern, GovernQueue queue) {
-        require(_scheduleAccessList.length <= 10, ERROR_SCHEDULE_LIST_EXCEEDED);
+        require(_scheduleAccessList.length <= MAX_SCHEDULE_ACCESS_LIST_ALLOWED, ERROR_SCHEDULE_LIST_EXCEEDED);
 
         bytes32 salt = _useProxies ? keccak256(abi.encodePacked(_name)) : bytes32(0);
 
@@ -57,11 +58,33 @@ contract GovernBaseFactory {
                 _token,
                 _useProxies
             );
+            // give base factory the permission so that it can change 
+            // the config with new token in the same transaction
+            queue.grant(queue.configure.selector, address(this));
+            
+            ERC3000Data.Config memory newConfig = ERC3000Data.Config({
+                executionDelay: _config.executionDelay,
+                scheduleDeposit: ERC3000Data.Collateral({
+                    token: address(token),
+                    amount: _config.scheduleDeposit.amount
+                }),
+                challengeDeposit: ERC3000Data.Collateral({
+                    token: address(token),
+                    amount: _config.challengeDeposit.amount
+                }),
+                resolver: _config.resolver,
+                rules: _config.rules,
+                maxCalldataSize: _config.maxCalldataSize
+            });
+
+            queue.configure(newConfig);
+            queue.revoke(queue.configure.selector, address(this));
         }
 
         registry.register(govern, queue, token, _name, "");
         
-        ACLData.BulkItem[] memory items = new ACLData.BulkItem[](6 + _scheduleAccessList.length);
+        uint256 bulkSize = _scheduleAccessList.length == 0 ? 7 : 6 + _scheduleAccessList.length;
+        ACLData.BulkItem[] memory items = new ACLData.BulkItem[](bulkSize);
         
         items[0] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.execute.selector, ANY_ADDR);
         items[1] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.challenge.selector, ANY_ADDR);
@@ -70,16 +93,19 @@ contract GovernBaseFactory {
         items[4] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.ROOT_ROLE(), address(govern));
         items[5] = ACLData.BulkItem(ACLData.BulkOp.Freeze, queue.ROOT_ROLE(), address(0));
 
-        // If the length is 0, it means anyone can start scheduling, otherwise
-        // we only allow schedule be called by specified _scheduleAccessList addresses
-        if (_scheduleAccessList.length == 0) {
+        // If the schedule access list is empty, anyone can schedule
+        // otherwise, only the addresses specified are allowed.
+        if (_scheduleAccessList.length == 0) { 
             items[6] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.schedule.selector, ANY_ADDR);
-        } else {
+        } else { 
             for (uint256 i = 0; i < _scheduleAccessList.length; i++) {
-                items[6 + i] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.schedule.selector, _scheduleAccessList[i]);
+                items[6 + i] = ACLData.BulkItem(
+                    ACLData.BulkOp.Grant, 
+                    queue.schedule.selector, 
+                    _scheduleAccessList[i]
+                );
             }
         }
-
 
         queue.bulk(items);
     }

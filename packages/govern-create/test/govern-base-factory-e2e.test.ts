@@ -10,7 +10,10 @@ const EVENTS = {
 }
 
 describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
+  let signers, owner:any
   beforeEach(async () => {
+    signers = await ethers.getSigners()
+    owner = await signers[0].getAddress()
     await deployments.fixture()
   })
 
@@ -35,9 +38,13 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
       'eagle',
       {
         tokenAddress: `0x${(deployToken ? '00' : '11').repeat(20)}`,
+        tokenDecimals: 18,
         tokenName: 'Eaglet Token',
         tokenSymbol: 'EAG',
-        tokenDecimals: 18,
+        mintAddress: owner,
+        mintAmount: 100,
+        merkleRoot: '0x'+'00'.repeat(32),
+        merkleMintAmount:0
       },
       ERC3000DefaultConfig,
       [],

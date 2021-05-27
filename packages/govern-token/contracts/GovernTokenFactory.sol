@@ -6,7 +6,7 @@ pragma solidity 0.6.8;
 pragma experimental ABIEncoderV2;
 
 import "@aragon/govern-contract-utils/contracts/minimal-proxies/ERC1167ProxyFactory.sol";
-import "@aragon/govern-token/contracts/libraries/TokenLib.sol";
+import "./libraries/TokenLib.sol";
 
 import "erc3k/contracts/IERC3000Executor.sol";
 
