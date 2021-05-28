@@ -29,7 +29,7 @@ import {
   getContainerHash,
   getEncodedContainer,
   getPayloadHash,
-} from './helpers'
+} from 'erc3k/utils/ERC3000'
 import { formatBytes32String, keccak256, toUtf8Bytes } from 'ethers/lib/utils'
 import { BigNumber, Contract } from 'ethers'
 
@@ -652,7 +652,7 @@ describe('Govern Queue', function () {
 
   context('GovernQueue.configure', () => {
     it('updated the configuration as expected', async () => {
-      const configHash = getConfigHash(container)
+      const configHash = getConfigHash(container.config)
 
       await expect(gq.configure(container.config))
         .to.emit(gq, EVENTS.CONFIGURED)
