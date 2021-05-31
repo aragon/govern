@@ -3,7 +3,6 @@ import { styled } from '@material-ui/core/styles';
 import { DaoHeader } from 'components/DaoHeader/DaoHeader';
 import { ProposalCard } from 'components/ProposalCards/ProposalCard';
 import { ANButton } from 'components/Button/ANButton';
-import { InputField } from 'components/InputFields/InputField';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
@@ -173,26 +172,17 @@ const DaoMainPage: React.FC = () => {
                       display: 'flex',
                       flexDirection: 'row',
                       width: '100%',
-                      justifyContent: 'space-between',
+                      justifyContent: 'flex-end',
                       marginTop: '28px',
                     }}
                   >
-                    <InputField
-                      label=""
-                      placeholder="Search"
-                      width="298px"
-                      height="46px"
-                      // onInputChange={onInputChange}
-                      onInputChange={() => {
-                        console.log('search is not developed yet');
-                      }}
-                    ></InputField>
                     <ANButton
                       label="New Proposal"
                       buttonType="primary"
                       height="46px"
                       width="142px"
                       onClick={goToNewProposal}
+                      style={{ marginRight: '12px' }}
                     ></ANButton>
                   </div>
                   <WrapperGrid container spacing={3} direction="row" justify="flex-start">
