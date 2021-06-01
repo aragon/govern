@@ -62,6 +62,7 @@ type Payload @entity {
   actions: [Action!]! @derivedFrom(field: "payload")
   allowFailuresMap: Bytes!
   proof: Bytes!
+  title: String
 }
 
 type Collateral @entity {

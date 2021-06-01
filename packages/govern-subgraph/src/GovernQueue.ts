@@ -1,4 +1,4 @@
-import { Address, Bytes, BigInt } from '@graphprotocol/graph-ts'
+import { Address, Bytes, BigInt, ipfs, json } from '@graphprotocol/graph-ts'
 import {
   Challenged as ChallengedEvent,
   Configured as ConfiguredEvent,
@@ -8,8 +8,7 @@ import {
   Resolved as ResolvedEvent,
   Revoked as RevokedEvent,
   Scheduled as ScheduledEvent,
-  Vetoed as VetoedEvent,
-  Ruled,
+  Vetoed as VetoedEvent
 } from '../generated/templates/GovernQueue/GovernQueue'
 
 import { GovernQueue as GovernQueueContract } from '../generated/templates/GovernQueue/GovernQueue'
@@ -19,7 +18,7 @@ import {
   Config,
   Container,
   Payload,
-  GovernQueue,
+  GovernQueue
 } from '../generated/schema'
 import { frozenRoles, roleGranted, roleRevoked } from './lib/MiniACL'
 import { buildId, buildIndexedId } from './utils/ids'
@@ -31,13 +30,13 @@ import {
   EXECUTED_STATUS,
   NONE_STATUS,
   REJECTED_STATUS,
-  SCHEDULED_STATUS,
+  SCHEDULED_STATUS
 } from './utils/constants'
 import {
   handleContainerEventChallenge,
   handleContainerEventResolve,
   handleContainerEventSchedule,
-  handleContainerEventVeto,
+  handleContainerEventVeto
 } from './utils/events'
 
 import { loadOrCreateGovern } from './Govern'
@@ -58,6 +57,13 @@ export function handleScheduled(event: ScheduledEvent): void {
   payload.executor = executor.id
   payload.allowFailuresMap = event.params.payload.allowFailuresMap
   payload.proof = event.params.payload.proof
+
+  // TODO: replace these placeholder sample code later
+  let result = ipfs.cat("QmYRuxEUtoJmxYSjtDQzaDNEDcMxdWquwPwz4YsnYMeDZk/metadata.json")
+  if (result) {
+    let data = json.fromBytes(result as Bytes)
+    payload.title = data.toObject().get('name').toString()
+  }
 
   container.payload = payload.id
   container.state = SCHEDULED_STATUS
