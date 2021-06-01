@@ -96,8 +96,10 @@ const DaoMainPage: React.FC = () => {
   }, [data]);
 
   useEffect(() => {
-    if (loadingDao || !dao) return;
+    if (loadingDao) return;
+
     if (dao && getQueueData) {
+      updateIsAnExistingDao(true);
       updateDaoDetails(dao);
       if (dao && dao.queue) {
         getQueueData({
