@@ -299,7 +299,8 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
 
   const [proof, setProof] = React.useState<ipfsMetadata & string>();
   const [rules, setRules] = React.useState<ipfsMetadata & string>();
-  const [isIpfsLoading, setIpfsLoading] = React.useState<boolean>(true);
+  const [rulesLoading, setRulesLoading] = React.useState<boolean>(true);
+  const [proofLoading, setProofsLoading] = React.useState<boolean>(true);
 
   const abiHandler = useMemo(() => {
     if (networkName) {
@@ -330,14 +331,15 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       if (proposalDetailsData && proposalDetailsData.container) {
         updateProposalInfo(proposalDetailsData.container);
 
-        const data = await Promise.all([
-          fetchIPFS(proposalDetailsData.container.config.rules),
-          fetchIPFS(proposalDetailsData.container.payload.proof),
-        ]);
+        fetchIPFS(proposalDetailsData.container.config.rules).then((data) => {
+          setRules(data || proposalDetailsData.container.config.rules);
+          setRulesLoading(false);
+        });
 
-        setRules(data[0] || proposalDetailsData.container.config.rules);
-        setProof(data[1] || proposalDetailsData.container.payload.proof);
-        setIpfsLoading(false);
+        fetchIPFS(proposalDetailsData.container.payload.proof).then((data) => {
+          setProof(data || proposalDetailsData.container.payload.proof);
+          setProofsLoading(false);
+        });
       }
     }
     load();
@@ -510,7 +512,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                   <InfoWrapper>
                     <InfoKeyDiv>Rules:</InfoKeyDiv>
                     <InfoValueDivInline>
-                      <IPFSField value={rules} loading={isIpfsLoading} />
+                      <IPFSField value={rules} loading={rulesLoading} />
                     </InfoValueDivInline>
                   </InfoWrapper>
                   <div style={{ height: '32px', width: '100%' }} />
@@ -553,7 +555,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                   <InfoWrapper>
                     <InfoKeyDiv>Justification:</InfoKeyDiv>
                     <InfoValueDivInline>
-                      <IPFSField value={proof} loading={isIpfsLoading} />
+                      <IPFSField value={proof} loading={proofLoading} />
                     </InfoValueDivInline>
                   </InfoWrapper>
 
