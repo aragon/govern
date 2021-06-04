@@ -15,6 +15,11 @@ interface payload extends optionalPayload {
   proof: string;
 }
 
+// Helper/Builder functions.. Better than directly doing
+// destructuring config = {...configData} since configData and
+// other parameters for these functions are subgraphs data
+// which might contain more fields.
+
 export const buildConfig = (configData: any): DaoConfig => {
   const config: DaoConfig = {
     executionDelay: configData.executionDelay,

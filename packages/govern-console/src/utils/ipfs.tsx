@@ -166,6 +166,7 @@ export async function fetchIPFS(uriOrCid: string) {
           const response = await fetch(IPFS_GATEWAY + file.path);
           if (!response.ok) {
             data.error = !response.ok;
+            return data;
           }
 
           const blob = await response.clone().blob();

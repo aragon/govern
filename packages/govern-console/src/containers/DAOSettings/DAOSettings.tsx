@@ -200,52 +200,6 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
     const proof = getValues('proofFile') ? getValues('proofFile')[0] : getValues('proof');
     const proofCid = await addToIpfs(proof, {
       title: 'DAO Configuration change',
-      _id: '60b90900287db7f1a38ea1b6',
-      index: 0,
-      guid: 'c56b6065-4713-440c-869b-bba9eb20d78f',
-      isActive: true,
-      balance: '$2,057.37',
-      picture: 'http://placehold.it/32x32',
-      age: 25,
-      eyeColor: 'blue',
-      name: 'Shelton Gates',
-      gender: 'male',
-      company: 'HOMETOWN',
-      email: 'sheltongates@hometown.com',
-      phone: '+1 (883) 524-2709',
-      address: '787 Willow Place, Eastvale, South Dakota, 4537',
-      about:
-        'Voluptate ex eu cupidatat commodo magna ea consequat qui quis Lorem et irure velit reprehenderit. Culpa aliqua occaecat voluptate dolor. Ad irure irure ipsum adipisicing et aliquip ea.\r\n',
-      registered: '2018-08-20T07:11:35 -04:00',
-      latitude: -80.736684,
-      longitude: 12.144972,
-      tags: ['velit', 'cillum', 'fugiat', 'irure', 'ut', 'commodo', 'Lorem'],
-      _id1: '60b90900287db7f1a38ea1b6',
-      index1: 0,
-      guid1: 'c56b6065-4713-440c-869b-bba9eb20d78f',
-      isActive1: true,
-      balance1: '$2,057.37',
-      picture1: 'http://placehold.it/32x32',
-      age1: 25,
-      giorga:
-        'Voluptate ex eu cupidatat commodo magna ea consequat qui quis Lorem et irure velit reprehenderit. Culpa aliqua occaecat voluptate dolor. Ad irure irure ipsum adipisicing et aliquip ea.\r\n',
-      fff:
-        'Voluptate ex eu cupidatat commodo magna ea consequat qui quis Lorem et irure velit reprehenderit. Culpa aliqua occaecat voluptate dolor. Ad irure irure ipsum adipisicing et aliquip ea.\r\n',
-      ffsd:
-        'Voluptate ex eu cupidatat commodo magna ea consequat qui quis Lorem et irure velit reprehenderit. Culpa aliqua occaecat voluptate dolor. Ad irure irure ipsum adipisicing et aliquip ea.\r\n',
-      eyeColor1: 'blue',
-      name1: 'Shelton Gates',
-      gender1: 'male',
-      company1: 'HOMETOWN',
-      email1: 'sheltongates@hometown.com',
-      phone1: '+1 (883) 524-2709',
-      address1: '787 Willow Place, Eastvale, South Dakota, 4537',
-      about1:
-        'Voluptate ex eu cupidatat commodo magna ea consequat qui quis Lorem et irure velit reprehenderit. Culpa aliqua occaecat voluptate dolor. Ad irure irure ipsum adipisicing et aliquip ea.\r\n',
-      registered1: '2018-08-20T07:11:35 -04:00',
-      latitude1: -80.736684,
-      longitude1: 12.144972,
-      tags1: ['velit', 'cillum', 'fugiat', 'irure', 'ut', 'commodo', 'Lorem'],
     });
 
     // payload for the final container
