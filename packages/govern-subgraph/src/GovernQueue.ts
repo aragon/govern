@@ -1,4 +1,4 @@
-import { Address, Bytes, BigInt, ipfs, json } from '@graphprotocol/graph-ts'
+import { Address, Bytes, BigInt, ipfs, json, log } from '@graphprotocol/graph-ts'
 import {
   Challenged as ChallengedEvent,
   Configured as ConfiguredEvent,
@@ -12,6 +12,9 @@ import {
 } from '../generated/templates/GovernQueue/GovernQueue'
 
 import { GovernQueue as GovernQueueContract } from '../generated/templates/GovernQueue/GovernQueue'
+import { ERC20 } from '../generated/templates/GovernQueue/ERC20'
+import { getERC20Info } from './utils/tokens';
+
 import {
   Action,
   Collateral,
@@ -58,11 +61,23 @@ export function handleScheduled(event: ScheduledEvent): void {
   payload.allowFailuresMap = event.params.payload.allowFailuresMap
   payload.proof = event.params.payload.proof
 
-  // TODO: replace these placeholder sample code later
-  let result = ipfs.cat("QmYRuxEUtoJmxYSjtDQzaDNEDcMxdWquwPwz4YsnYMeDZk/metadata.json")
+  let proofIpfsHex = event.params.payload.proof.toHexString().substring(2)
+  // if cidString is ipfs v1 version hex from the cid's raw bytes and
+  // we add `f` as a multibase prefix and remove `0x`
+  let result = ipfs.cat('f' + proofIpfsHex + "/metadata.json")
   if (result) {
     let data = json.fromBytes(result as Bytes)
-    payload.title = data.toObject().get('name').toString()
+    payload.title = data.toObject().get('title').toString()
+  }
+  // if cidString is ipfs v0 version hex from the cid's raw bytes,
+  // we add:
+  // 1. 112 (0x70 in hex) which is dag-pb format.
+  // 2. 01 because we want to use v1 version
+  // 3. f since cidString is already hex, we only add `f` without converting anything.
+  result = ipfs.cat('f0170' + proofIpfsHex + '/metadata.json')
+  if(result) {
+    let data = json.fromBytes(result as Bytes)
+    payload.title = data.toObject().get('title').toString()
   }
 
   container.payload = payload.id
@@ -142,6 +157,18 @@ export function handleConfigured(event: ConfiguredEvent): void {
   )
   challengeDeposit.token = event.params.config.challengeDeposit.token
   challengeDeposit.amount = event.params.config.challengeDeposit.amount
+
+  // Grab Schedule Token info
+  let data = getERC20Info(event.params.config.scheduleDeposit.token)
+  scheduleDeposit.decimals = data.decimals;
+  scheduleDeposit.name = data.name;
+  scheduleDeposit.symbol = data.symbol;
+
+  // Grab challenge Token info
+  data = getERC20Info(event.params.config.challengeDeposit.token)
+  challengeDeposit.decimals = data.decimals;
+  challengeDeposit.name = data.name;
+  challengeDeposit.symbol = data.symbol;
 
   config.executionDelay = event.params.config.executionDelay
   config.scheduleDeposit = scheduleDeposit.id
