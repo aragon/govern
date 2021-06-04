@@ -38,7 +38,7 @@ const ConsoleMainPage: React.FC = () => {
   const history = useHistory();
 
   const [visibleDaoList, updateDaoList] = useState<any>([]);
-  const [totalDaoCount, updateTotalDaoCount] = useState<number>();
+  const [totalDaoCount, updateTotalDaoCount] = useState<number>(0);
 
   const { data: daoListData, fetchMore } = useDaosQuery();
   const { data: daoRegistryData } = useGovernRegistryQuery();
@@ -50,7 +50,7 @@ const ConsoleMainPage: React.FC = () => {
   }, [daoListData]);
 
   useEffect(() => {
-    if (daoRegistryData) {
+    if (daoRegistryData && daoRegistryData.governRegistries.length > 0) {
       updateTotalDaoCount(daoRegistryData.governRegistries[0].count);
     }
   }, [daoRegistryData]);

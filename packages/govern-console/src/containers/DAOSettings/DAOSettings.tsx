@@ -6,7 +6,7 @@ import { styled } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { InputField } from 'components/InputFields/InputField';
 import { ANButton } from 'components/Button/ANButton';
-import { buildContainer } from 'utils/ERC3000';
+import { buildContainer, buildConfig } from 'utils/ERC3000';
 import { useWallet } from 'AugmentedWallet';
 import { HelpButton } from 'components/HelpButton/HelpButton';
 import Grid from '@material-ui/core/Grid';
@@ -19,12 +19,14 @@ import { ContractReceipt } from 'ethers';
 import { validateToken, validateContract } from 'utils/validations';
 import { Proposal, ReceiptType } from '@aragon/govern';
 import { useSnackbar } from 'notistack';
-import { toUTF8Bytes, toUTF8String } from 'utils/lib';
+import { toUTF8String } from 'utils/lib';
 import { proposalDetailsUrl } from 'utils/urls';
-import { getIpfsUrl, addToIpfs } from 'utils/ipfs';
+import { addToIpfs, fetchIPFS } from 'utils/ipfs';
 import { IPFSInput } from 'components/Field/IPFSInput';
 import { useFacadeProposal } from 'hooks/proposal-hooks';
 import { useDaoQuery } from 'hooks/query-hooks';
+import { ipfsMetadata } from 'utils/types';
+import { formatUnits } from 'utils/lib';
 
 export interface DaoSettingFormProps {
   /**
@@ -115,7 +117,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
 
   const [daoDetails, updateDaoDetails] = useState<any>();
   const [config, setConfig] = useState<any>(undefined);
-  const [rulesIpfsUrl, setRulesIpfsUrl] = useState<string>('');
+  const [rulesIpfsUrl, setRulesIpfsUrl] = useState<ipfsMetadata & string>();
 
   useEffect(() => {
     if (dao) {
@@ -145,17 +147,22 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
         setConfig(_config);
 
         // copy the nested objects so we can change the amount values
-        const formConfig: DaoConfig = {
-          ..._config,
-          scheduleDeposit: { ..._config.scheduleDeposit },
-          challengeDeposit: { ..._config.challengeDeposit },
-        };
+        const formConfig = buildConfig(_config);
 
+        // can/should be extracted in the transformProposals in useQuery hooks.
+        formConfig.scheduleDeposit.amount = formatUnits(
+          _config.scheduleDeposit.amount,
+          _config.scheduleDeposit.decimals,
+        );
+        formConfig.challengeDeposit.amount = formatUnits(
+          _config.challengeDeposit.amount,
+          _config.challengeDeposit.decimals,
+        );
         // config.rules IPFS handling with utf8string fallback.
-        const rulesIpfsUrl = getIpfsUrl(_config.rules);
-        if (rulesIpfsUrl) {
-          setRulesIpfsUrl(rulesIpfsUrl);
-          formConfig.rules = '';
+        const ipfsRules = await fetchIPFS(_config.rules);
+        if (ipfsRules) {
+          setRulesIpfsUrl(ipfsRules);
+          formConfig.rules = ipfsRules.text || '';
         } else {
           formConfig.rules = toUTF8String(_config.rules) || _config.rules;
         }
@@ -171,12 +178,8 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
     let containerHash: string | undefined;
 
     // TODO: add modal
-    // Upload proof to ipfs if it's a file,
-    // otherwise convert it to utf8bytes
-    const rulesFile = getValues('rulesFile');
-    newConfig.rules = rulesFile
-      ? await addToIpfs(rulesFile[0])
-      : toUTF8Bytes(newConfig.rules.toString());
+    const rules = getValues('rulesFile') ? getValues('rulesFile')[0] : newConfig.rules.toString();
+    newConfig.rules = await addToIpfs(rules);
 
     newConfig.scheduleDeposit.amount = await correctDecimal(
       newConfig.scheduleDeposit.token,
@@ -194,15 +197,63 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
     // TODO: add modal
     // Upload proof to ipfs if it's a file,
     // otherwise convert it to utf8bytes
-    const proofFile = getValues('proofFile');
-    const proof = proofFile ? await addToIpfs(proofFile[0]) : toUTF8Bytes(getValues('proof'));
+    const proof = getValues('proofFile') ? getValues('proofFile')[0] : getValues('proof');
+    const proofCid = await addToIpfs(proof, {
+      title: 'DAO Configuration change',
+      _id: '60b90900287db7f1a38ea1b6',
+      index: 0,
+      guid: 'c56b6065-4713-440c-869b-bba9eb20d78f',
+      isActive: true,
+      balance: '$2,057.37',
+      picture: 'http://placehold.it/32x32',
+      age: 25,
+      eyeColor: 'blue',
+      name: 'Shelton Gates',
+      gender: 'male',
+      company: 'HOMETOWN',
+      email: 'sheltongates@hometown.com',
+      phone: '+1 (883) 524-2709',
+      address: '787 Willow Place, Eastvale, South Dakota, 4537',
+      about:
+        'Voluptate ex eu cupidatat commodo magna ea consequat qui quis Lorem et irure velit reprehenderit. Culpa aliqua occaecat voluptate dolor. Ad irure irure ipsum adipisicing et aliquip ea.\r\n',
+      registered: '2018-08-20T07:11:35 -04:00',
+      latitude: -80.736684,
+      longitude: 12.144972,
+      tags: ['velit', 'cillum', 'fugiat', 'irure', 'ut', 'commodo', 'Lorem'],
+      _id1: '60b90900287db7f1a38ea1b6',
+      index1: 0,
+      guid1: 'c56b6065-4713-440c-869b-bba9eb20d78f',
+      isActive1: true,
+      balance1: '$2,057.37',
+      picture1: 'http://placehold.it/32x32',
+      age1: 25,
+      giorga:
+        'Voluptate ex eu cupidatat commodo magna ea consequat qui quis Lorem et irure velit reprehenderit. Culpa aliqua occaecat voluptate dolor. Ad irure irure ipsum adipisicing et aliquip ea.\r\n',
+      fff:
+        'Voluptate ex eu cupidatat commodo magna ea consequat qui quis Lorem et irure velit reprehenderit. Culpa aliqua occaecat voluptate dolor. Ad irure irure ipsum adipisicing et aliquip ea.\r\n',
+      ffsd:
+        'Voluptate ex eu cupidatat commodo magna ea consequat qui quis Lorem et irure velit reprehenderit. Culpa aliqua occaecat voluptate dolor. Ad irure irure ipsum adipisicing et aliquip ea.\r\n',
+      eyeColor1: 'blue',
+      name1: 'Shelton Gates',
+      gender1: 'male',
+      company1: 'HOMETOWN',
+      email1: 'sheltongates@hometown.com',
+      phone1: '+1 (883) 524-2709',
+      address1: '787 Willow Place, Eastvale, South Dakota, 4537',
+      about1:
+        'Voluptate ex eu cupidatat commodo magna ea consequat qui quis Lorem et irure velit reprehenderit. Culpa aliqua occaecat voluptate dolor. Ad irure irure ipsum adipisicing et aliquip ea.\r\n',
+      registered1: '2018-08-20T07:11:35 -04:00',
+      latitude1: -80.736684,
+      longitude1: 12.144972,
+      tags1: ['velit', 'cillum', 'fugiat', 'irure', 'ut', 'commodo', 'Lorem'],
+    });
 
     // payload for the final container
     const payload = {
       submitter: account.address,
       executor: daoDetails.executor.address,
       actions: [proposalInstance?.buildAction('configure', [newConfig], 0)],
-      proof: proof,
+      proof: proofCid,
     };
 
     // the final container to be sent to schedule.
@@ -430,7 +481,8 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
             <IPFSInput
               label="Provide the base rules under what your DAO should be ran"
               placeholder="DAO rules and agreement.."
-              ipfsURI={rulesIpfsUrl}
+              ipfsURI={rulesIpfsUrl?.endpoint}
+              shouldUnregister={false}
               textInputName="daoConfig.rules"
               fileInputName="rulesFile"
             />

@@ -15,6 +15,24 @@ interface payload extends optionalPayload {
   proof: string;
 }
 
+export const buildConfig = (configData: any): DaoConfig => {
+  const config: DaoConfig = {
+    executionDelay: configData.executionDelay,
+    scheduleDeposit: {
+      token: configData.scheduleDeposit.token,
+      amount: configData.scheduleDeposit.amount,
+    },
+    challengeDeposit: {
+      token: configData.challengeDeposit.token,
+      amount: configData.challengeDeposit.amount,
+    },
+    maxCalldataSize: configData.maxCalldataSize,
+    resolver: configData.resolver,
+    rules: configData.rules,
+  };
+  return config;
+};
+
 export const buildContainer = (payload: payload, config: DaoConfig): ProposalParams => {
   // TODO: Giorgi when the buildContainer is called, we already set `executionTime` as stated below.
   // The important part is how many seconds we add as the last step. currently it's 150.
@@ -43,15 +61,16 @@ export const buildContainer = (payload: payload, config: DaoConfig): ProposalPar
 };
 
 export const getProposalParams = (proposalInfo: any) => {
-  const config: DaoConfig = { ...proposalInfo.config };
+  const config = buildConfig(proposalInfo.config);
 
   const payload: PayloadType = {
-    ...proposalInfo.payload,
+    actions: proposalInfo.payload.actions,
     executor: proposalInfo.payload.executor.address,
-    // subgraph returns timestamps for dates in secs, which
-    // we transform into Ms. Before sending dates back, we
-    // need to convert them into seconds again.
-    executionTime: proposalInfo.payload.executionTime / 1000,
+    proof: proposalInfo.payload.proof,
+    submitter: proposalInfo.payload.submitter,
+    allowFailuresMap: proposalInfo.payload.allowFailuresMap,
+    executionTime: proposalInfo.payload.executionTime,
+    nonce: proposalInfo.payload.nonce,
   };
 
   const params: ProposalParams = {

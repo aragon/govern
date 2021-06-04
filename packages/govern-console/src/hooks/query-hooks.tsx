@@ -8,28 +8,20 @@ import {
   transformDaoDetails,
 } from 'utils/transforms';
 
-import { useWallet } from 'AugmentedWallet';
-
 export function useDaoQuery(daoName: string) {
-  const context: any = useWallet();
-  const { provider } = context;
-
   const [daoData, setDaoData] = useState<any>(null);
-  const [isLoading, setLoading] = useState<boolean>(true);
 
-  const { data, loading, error } = useQuery(DAO_BY_NAME, {
+  const { loading, error } = useQuery(DAO_BY_NAME, {
     variables: { name: daoName },
-    onCompleted: async () => {
-      const daoData = await transformDaoDetails(data, provider);
+    onCompleted: (newData) => {
+      const daoData = transformDaoDetails(newData);
       setDaoData(daoData);
-      setLoading(false);
     },
-    onError: () => setLoading(false),
   });
 
   return {
     data: daoData,
-    loading: isLoading,
+    loading: loading,
     error,
   };
 }
@@ -56,15 +48,12 @@ export function useGovernRegistryQuery() {
 }
 
 export function useLazyProposalQuery() {
-  const context: any = useWallet();
-  const { provider } = context;
-
   const [proposalData, setProposalData] = useState<any>(null);
 
-  const [getProposalData, { loading, data }] = useLazyQuery(PROPOSAL_DETAILS, {
-    onCompleted: async () => {
-      const finalD = await transformProposalDetails(data, provider);
-      setProposalData(finalD);
+  const [getProposalData, { loading }] = useLazyQuery(PROPOSAL_DETAILS, {
+    onCompleted: (newData) => {
+      const transformedData = transformProposalDetails(newData);
+      setProposalData(transformedData);
     },
   });
 
@@ -74,6 +63,7 @@ export function useLazyProposalQuery() {
 export function useLazyProposalListQuery() {
   // const [proposalList, setProposalList] = useState<any>(null);
   const [getQueueData, { loading, data, error, fetchMore }] = useLazyQuery(PROPOSAL_LIST);
+
   // onCompleted doesn't work with lazyQuery when clicked on `fetchMore`.
   // https://github.com/apollographql/apollo-client/issues/6636
   const proposalList = useMemo(() => {

@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { styled } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
@@ -16,9 +16,11 @@ import { formatDate } from 'utils/date';
 import { getState, getStateColor } from 'utils/states';
 import { useSnackbar } from 'notistack';
 import { IPFSField } from 'components/Field/IPFSField';
-import { addToIpfs } from 'utils/ipfs';
+import { addToIpfs, fetchIPFS } from 'utils/ipfs';
 import { useFacadeProposal } from 'hooks/proposal-hooks';
 import { useLazyProposalQuery, useDaoQuery } from 'hooks/query-hooks';
+import { ipfsMetadata } from 'utils/types';
+import { formatUnits } from 'utils/lib';
 
 // widget components
 import ChallengeWidget from './components/ChallengeWidget';
@@ -295,7 +297,11 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   const [daoDetails, updateDaoDetails] = React.useState<any>();
   const transactionsQueue = React.useRef<CustomTransaction[]>([]);
 
-  const abiHandler = React.useMemo(() => {
+  const [proof, setProof] = React.useState<ipfsMetadata & string>();
+  const [rules, setRules] = React.useState<ipfsMetadata & string>();
+  const [isIpfsLoading, setIpfsLoading] = React.useState<boolean>(true);
+
+  const abiHandler = useMemo(() => {
     if (networkName) {
       return new AbiHandler(networkName);
     }
@@ -312,6 +318,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     loading: isLoadingProposalDetails,
   } = useLazyProposalQuery();
 
+  // USE EFFECTS
   useEffect(() => {
     return function cleanUp() {
       transactionsQueue.current = [];
@@ -319,10 +326,33 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   }, []);
 
   useEffect(() => {
-    if (proposalDetailsData) {
-      updateProposalInfo(proposalDetailsData.container);
+    async function load() {
+      if (proposalDetailsData && proposalDetailsData.container) {
+        updateProposalInfo(proposalDetailsData.container);
+
+        const data = await Promise.all([
+          fetchIPFS(proposalDetailsData.container.config.rules),
+          fetchIPFS(proposalDetailsData.container.payload.proof),
+        ]);
+
+        setRules(data[0] || proposalDetailsData.container.config.rules);
+        setProof(data[1] || proposalDetailsData.container.payload.proof);
+        setIpfsLoading(false);
+      }
     }
+    load();
   }, [proposalDetailsData]);
+
+  useEffect(() => {
+    if (dao && proposalId && getProposalData) {
+      updateDaoDetails(dao);
+      getProposalData({
+        variables: {
+          id: proposalId,
+        },
+      });
+    }
+  }, [dao, proposalId, getProposalData]);
 
   const toggleDiv = async (index: number) => {
     const cloneObject = { ...isExpanded };
@@ -353,37 +383,22 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     }
   };
 
-  useEffect(() => {
-    if (dao && proposalId && getProposalData) {
-      updateDaoDetails(dao);
-      getProposalData({
-        variables: {
-          id: proposalId,
-        },
-      });
-    }
-  }, [dao, proposalId, getProposalData]);
-
   const challengeProposal = async (challengeReason: string, challengeReasonFile: any) => {
     // TODO: add modal
-    // Upload proof to ipfs if it's a file,
-    // otherwise convert it to utf8bytes
-    const reason = challengeReasonFile
-      ? await addToIpfs(challengeReasonFile[0])
-      : toUTF8Bytes(challengeReason);
+    const reason = challengeReasonFile ? challengeReasonFile[0] : challengeReason;
+    const reasonCid = await addToIpfs(reason);
 
     const proposalParams = getProposalParams(proposalInfo);
 
     if (proposalInstance) {
       try {
-        transactionsQueue.current = await proposalInstance.challenge(proposalParams, reason);
+        transactionsQueue.current = await proposalInstance.challenge(proposalParams, reasonCid);
       } catch (error) {
         enqueueSnackbar(error.message, { variant: 'error' });
         return;
       }
     }
 
-    // setIsTransactionModalOpen(true);
     dispatch({
       type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
       payload: {
@@ -394,7 +409,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
 
   const executeProposal = async () => {
     const proposalParams = getProposalParams(proposalInfo);
-
     if (proposalInstance) {
       transactionsQueue.current = [...(await proposalInstance.execute(proposalParams))];
     }
@@ -465,14 +479,26 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                     <InfoKeyDiv>Schedule Deposit:</InfoKeyDiv>
                     <InfoValueDivBlock>
                       <a>{proposalInfo.config.scheduleDeposit.token}</a>
-                      <div>{proposalInfo.config.scheduleDeposit.amount} ANT</div>
+                      <div>
+                        {formatUnits(
+                          proposalInfo.config.scheduleDeposit.amount,
+                          proposalInfo.config.scheduleDeposit.decimals,
+                        )}{' '}
+                        {proposalInfo.config.scheduleDeposit.symbol || 'TKN'}
+                      </div>
                     </InfoValueDivBlock>
                   </InfoWrapper>
                   <InfoWrapper>
                     <InfoKeyDiv>Challenge Deposit:</InfoKeyDiv>
                     <InfoValueDivBlock>
                       <a>{proposalInfo.config.challengeDeposit.token}</a>
-                      <div>{proposalInfo.config.challengeDeposit.amount} ANT</div>
+                      <div>
+                        {formatUnits(
+                          proposalInfo.config.challengeDeposit.amount,
+                          proposalInfo.config.challengeDeposit.decimals,
+                        )}{' '}
+                        {proposalInfo.config.challengeDeposit.symbol || 'TKN'}
+                      </div>
                     </InfoValueDivBlock>
                   </InfoWrapper>
                   <InfoWrapper>
@@ -484,7 +510,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                   <InfoWrapper>
                     <InfoKeyDiv>Rules:</InfoKeyDiv>
                     <InfoValueDivInline>
-                      <IPFSField value={proposalInfo.config.rules} />
+                      <IPFSField value={rules} loading={isIpfsLoading} />
                     </InfoValueDivInline>
                   </InfoWrapper>
                   <div style={{ height: '32px', width: '100%' }} />
@@ -494,6 +520,16 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                     <InfoKeyDiv>Nonce:</InfoKeyDiv>
                     <InfoValueDivInline>{proposalInfo.payload.nonce}</InfoValueDivInline>
                   </InfoWrapper>
+                  {(() => {
+                    if (proof?.metadata) {
+                      return (
+                        <InfoWrapper>
+                          <InfoKeyDiv>Description:</InfoKeyDiv>
+                          <InfoValueDivInline>{proof.metadata.title}</InfoValueDivInline>
+                        </InfoWrapper>
+                      );
+                    }
+                  })()}
                   <InfoWrapper>
                     <InfoKeyDiv>Execution Time:</InfoKeyDiv>
                     <InfoValueDivInline>
@@ -517,7 +553,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                   <InfoWrapper>
                     <InfoKeyDiv>Justification:</InfoKeyDiv>
                     <InfoValueDivInline>
-                      <IPFSField value={proposalInfo.payload.proof} />
+                      <IPFSField value={proof} loading={isIpfsLoading} />
                     </InfoValueDivInline>
                   </InfoWrapper>
 

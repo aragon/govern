@@ -189,6 +189,7 @@ const DaoMainPage: React.FC = () => {
                       <Grid item key={proposal.id} xl={3} lg={4} xs={12} sm={12} md={6}>
                         <ProposalCard
                           transactionHash={proposal.id}
+                          proposalTitle={proposal.payload.title}
                           proposalDate={formatDate(proposal.createdAt)}
                           proposalStatus={getState(proposal.state, proposal.payload.executionTime)}
                           proposalStatusColor={getStateColor(

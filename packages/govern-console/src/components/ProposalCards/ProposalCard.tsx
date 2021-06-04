@@ -10,6 +10,10 @@ export interface ProposalCardProps {
    */
   transactionHash: string;
   /**
+   * Title of the proposal
+   */
+  proposalTitle: string;
+  /**
    * Date of proposal
    */
   proposalDate: string | React.ReactNode;
@@ -70,6 +74,7 @@ const LabelWrapper = styled('div')({
 
 export const ProposalCard: React.FC<ProposalCardProps> = ({
   transactionHash,
+  proposalTitle,
   proposalDate,
   proposalStatus,
   proposalStatusColor,
@@ -88,7 +93,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
       <LabelWrapper>
         <Label labelColor={proposalStatusColor} labelText={proposalStatus} />
       </LabelWrapper>
-      <ProposalHash>{getSlicedTransactionHash()}</ProposalHash>
+      <ProposalHash>{proposalTitle || getSlicedTransactionHash()}</ProposalHash>
       <ProposalDateText>{proposalDate}</ProposalDateText>
     </ProposalCardWrapper>
   );

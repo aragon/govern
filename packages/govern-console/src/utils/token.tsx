@@ -1,5 +1,6 @@
 import { ethers, BigNumberish } from 'ethers';
 import { erc20TokenABI } from 'abis/erc20';
+import { formatUnits, parseUnits } from 'utils/lib';
 
 export async function isTokenERC20(address: string, provider: any) {
   const contract = new ethers.Contract(address, erc20TokenABI, provider);
@@ -54,9 +55,7 @@ export const correctDecimal = async (
     const { decimals } = await getTokenInfo(address, provider);
     if (!decimals) return amount;
 
-    return isFormat
-      ? ethers.utils.parseUnits(amount.toString(), decimals)
-      : ethers.utils.formatUnits(amount, decimals);
+    return isFormat ? parseUnits(amount.toString(), decimals) : formatUnits(amount, decimals);
   } catch (err) {
     return amount;
   }

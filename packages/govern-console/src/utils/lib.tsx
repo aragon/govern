@@ -1,5 +1,5 @@
 // Library utils (Ethers currently)
-import { utils } from 'ethers';
+import { utils, BigNumberish, ethers } from 'ethers';
 
 const { toUtf8String, toUtf8Bytes } = utils;
 
@@ -17,4 +17,14 @@ export function toUTF8Bytes(data: string): utils.BytesLike | null {
   } catch (err) {
     return null; // can't be decoded
   }
+}
+
+export function formatUnits(amount: BigNumberish, decimals: number) {
+  if (decimals == 0) return amount;
+  return ethers.utils.formatUnits(amount, decimals);
+}
+
+export function parseUnits(amount: BigNumberish, decimals: number) {
+  if (decimals == 0) return amount;
+  return ethers.utils.parseUnits(amount.toString(), 18);
 }
