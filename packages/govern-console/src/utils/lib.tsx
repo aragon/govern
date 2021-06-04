@@ -20,11 +20,9 @@ export function toUTF8Bytes(data: string): utils.BytesLike | null {
 }
 
 export function formatUnits(amount: BigNumberish, decimals: number) {
-  if (decimals == 0) return amount;
   return ethers.utils.formatUnits(amount, decimals);
 }
 
 export function parseUnits(amount: BigNumberish, decimals: number) {
-  if (decimals == 0) return amount;
-  return ethers.utils.parseUnits(amount.toString(), 18);
+  return ethers.utils.parseUnits(amount.toString(), decimals);
 }

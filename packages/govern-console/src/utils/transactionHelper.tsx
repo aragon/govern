@@ -5,6 +5,7 @@ import { AddressZero } from '@ethersproject/constants';
 import { BigNumberish } from '@ethersproject/bignumber';
 import { Account } from 'utils/types';
 import { getTokenInfo } from 'utils/token';
+import { formatUnits } from 'utils/lib';
 
 /**
  * @param token address of the token
@@ -38,7 +39,7 @@ export async function erc20ApprovalTransaction(
   const decimals = tokenInfo.decimals;
 
   if (decimals) {
-    amountForHuman = ethers.utils.formatUnits(amount, decimals);
+    amountForHuman = formatUnits(amount, decimals);
   }
 
   try {
