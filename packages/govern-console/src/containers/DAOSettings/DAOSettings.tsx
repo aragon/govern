@@ -6,7 +6,6 @@ import { styled } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { InputField } from 'components/InputFields/InputField';
 import { ANButton } from 'components/Button/ANButton';
-import { buildContainer } from 'utils/ERC3000';
 import { useWallet } from 'AugmentedWallet';
 import { HelpButton } from 'components/HelpButton/HelpButton';
 import Grid from '@material-ui/core/Grid';
@@ -220,12 +219,9 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
       proof: proof,
     };
 
-    // the final container to be sent to schedule.
-    const container = buildContainer(payload, config);
-
     if (proposalInstance) {
       try {
-        transactionsQueue.current = await proposalInstance.schedule(container);
+        transactionsQueue.current = await proposalInstance.schedule(payload, config);
       } catch (error) {
         enqueueSnackbar(error.message, { variant: 'error' });
         return;

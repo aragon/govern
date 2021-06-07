@@ -11,18 +11,13 @@ type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 type WithOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
 type optionalPayload = WithOptional<PayloadType, 'executionTime' | 'allowFailuresMap' | 'proof'>;
-interface payload extends optionalPayload {
+export interface Payload extends optionalPayload {
   proof: string;
 }
 
-export const buildContainer = (payload: payload, config: DaoConfig): ProposalParams => {
-  // TODO: Giorgi when the buildContainer is called, we already set `executionTime` as stated below.
-  // The important part is how many seconds we add as the last step. currently it's 150.
-  // This is important because in the contract we have `require(executionTime > executionDelay + block.timestamp)
-  // After the buildContainer is called, we don't immediatelly call transactions because we show modal which
-  // contains all the necessary transactions. The idea is that if we have 0 instead of 150, before we
-  // start executing this transaction(maybe user didn't click get started or first transaction took time)
-  // when this tx gets to the contract, executionTime > executionDelay + block.timestamp will be invalid.
+export const buildContainer = (payload: Payload, config: DaoConfig): ProposalParams => {
+  // buildContainer should be called right before proposal.schedule() to minimize hitting contract asssertion
+  // `require(executionTime > executionDelay + block.timestamp)` where executionTime becomes stale and invalid
   const containerPayload: PayloadType = {
     executionTime:
       payload.executionTime ||

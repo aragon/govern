@@ -1,7 +1,8 @@
 /* eslint-disable */
 import QueueApproval from './QueueApprovals';
-import { ProposalParams, Proposal } from '@aragon/govern';
+import { ProposalParams, Proposal, DaoConfig } from '@aragon/govern';
 import { CustomTransaction, CustomTransactionStatus } from 'utils/types';
+import { buildContainer, Payload } from 'utils/ERC3000';
 
 export default class FacadeProposal {
   constructor(private queueApproval: QueueApproval, private proposal: Proposal) {
@@ -36,16 +37,17 @@ export default class FacadeProposal {
     return txs;
   }
 
-  public async schedule(container: ProposalParams) {
+  public async schedule(payload: Payload, config: DaoConfig) {
     let txs: CustomTransaction[] = [];
     try {
-      txs = await this.queueApproval.scheduleApprovals(container.config.scheduleDeposit);
+      txs = await this.queueApproval.scheduleApprovals(config.scheduleDeposit);
     } catch (error) {
       throw error;
     }
 
     const scheduleTransaction: CustomTransaction = {
       tx: () => {
+        const container = buildContainer(payload, config);
         return this.proposal.schedule(container);
       },
       message: 'Schedules a proposal',
