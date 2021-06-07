@@ -9,15 +9,16 @@ import {
 } from 'utils/transforms';
 
 export function useDaoQuery(daoName: string) {
-  const [daoData, setDaoData] = useState<any>(null);
-
-  const { loading, error } = useQuery(DAO_BY_NAME, {
+  const { data, loading, error } = useQuery(DAO_BY_NAME, {
     variables: { name: daoName },
-    onCompleted: (newData) => {
-      const daoData = transformDaoDetails(newData);
-      setDaoData(daoData);
-    },
   });
+
+  const daoData = useMemo(() => {
+    if (data) {
+      return transformDaoDetails(data);
+    }
+    return null;
+  }, [data]);
 
   return {
     data: daoData,
