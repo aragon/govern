@@ -15,6 +15,31 @@ export const validateToken = async (address: string, provider: any): Promise<Val
 };
 
 /**
+ * Validates amount dependin on decimal.
+ * @dev if the decimals is 0, and amount contains fractions or
+ * if the decimals is more than 0 and it doesn't contain fractions, it returns an error
+ *
+ * @param amount amount
+ * @param decimals decimals
+ */
+export const validateAmountForDecimals = (amount: string, decimals: number) => {
+  if (!decimals) {
+    if (amount.includes('.')) {
+      return "The token doesn't contain decimals. Please enter the exact amount";
+    }
+    return true;
+  }
+  if (!amount.includes('.')) {
+    return 'Please, follow the format - 10.0';
+  }
+
+  if (amount.split('.')[1].length > decimals) {
+    return `The fractional component exceeds the decimals - ${decimals}`;
+  }
+
+  return true;
+};
+/**
  * Check if contract is a contract
  *
  * @param address <string> address to be validated

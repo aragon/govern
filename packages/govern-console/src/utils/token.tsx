@@ -14,8 +14,8 @@ export async function isTokenERC20(address: string, provider: any) {
 
 export async function getTokenInfo(address: string, provider: any) {
   const contract = new ethers.Contract(address, erc20TokenABI, provider);
-  let decimals,
-    name,
+  let decimals = null,
+    name = null,
     symbol = null;
 
   try {

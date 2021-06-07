@@ -20,6 +20,7 @@ export function toUTF8Bytes(data: string): utils.BytesLike | null {
 }
 
 export function formatUnits(amount: BigNumberish, decimals: number) {
+  if (!decimals) return amount.toString();
   return ethers.utils.formatUnits(amount, decimals);
 }
 
