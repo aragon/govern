@@ -147,7 +147,7 @@ export async function fetchIPFS(uriOrCid: string) {
 
       if (file.path.includes('metadata')) {
         try {
-          data.metadata = JSON.parse(new TextDecoder().decode(content[0]));
+          data.metadata = JSON.parse(new TextDecoder().decode(Buffer.concat(content)));
         } catch (err) {}
       } else {
         data.endpoint = IPFS_GATEWAY + file.path;
@@ -157,7 +157,7 @@ export async function fetchIPFS(uriOrCid: string) {
         // to get the text representation by saving bandwith.
         if (Object.values(FILE_EXTS).includes(extension)) {
           try {
-            data.text = new TextDecoder().decode(content[0]);
+            data.text = new TextDecoder().decode(Buffer.concat(content));
           } catch (err) {}
         } // if the path name doesn't have .txt extension
         // or doesn't include path at all, fetch is needed
