@@ -10,7 +10,6 @@ import { AddActionsModal } from 'components/Modal/AddActionsModal';
 import { InputField } from 'components/InputFields/InputField';
 import { useParams, useHistory } from 'react-router-dom';
 import { ContractReceipt, utils } from 'ethers';
-import { buildContainer } from 'utils/ERC3000';
 import { useWallet } from 'AugmentedWallet';
 import { CustomTransaction, abiItem, actionType, ActionToSchedule } from 'utils/types';
 import { useSnackbar } from 'notistack';
@@ -381,12 +380,12 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack }) => {
       proof: proof,
     };
 
-    // the final container to be sent to schedule.
-    const container = buildContainer(payload, daoDetails.queue.config);
-
     if (proposalInstance) {
       try {
-        transactionsQueue.current = await proposalInstance.schedule(container);
+        transactionsQueue.current = await proposalInstance.schedule(
+          payload,
+          daoDetails.queue.config,
+        );
       } catch (error) {
         enqueueSnackbar(error.message, { variant: 'error' });
       }
