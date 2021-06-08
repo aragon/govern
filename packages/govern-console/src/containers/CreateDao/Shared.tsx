@@ -46,9 +46,9 @@ const formatParamNames: { [key: string]: string } = {
   ruleText: 'Rule Text',
   resolver: 'Resolver',
 
-  scheduellAddress: 'Scheduell Address',
-  scheduellAmount: 'Scheduell Amount',
-  isScheduellNewDaoToken: 'Use Scheduell New Dao Token',
+  scheduleAddress: 'Schedule Address',
+  scheduleAmount: 'Schedule Amount',
+  isScheduleNewDaoToken: 'Use Schedule New Dao Token',
   challengeAddress: 'Challenge Address',
   challengeAmount: 'Challenge Amount',
   isChallengeNewDaoToken: 'Use Challenge New Dao Token',
@@ -73,9 +73,9 @@ export type ConfigIndexType =
   | 'resolver';
 
 export type CollateralsIndexType =
-  | 'scheduellAddress'
-  | 'scheduellAmount'
-  | 'isScheduellNewDaoToken'
+  | 'scheduleAddress'
+  | 'scheduleAmount'
+  | 'isScheduleNewDaoToken'
   | 'challengeAddress'
   | 'challengeAmount'
   | 'isChallengeNewDaoToken'

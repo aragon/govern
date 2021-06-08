@@ -27,9 +27,9 @@ const CreateDaoCollateral: React.FC<{
   const spacing = SPACING[layoutName];
   const { collaterals, setCollaterals } = useCreateDao();
   const {
-    scheduellAddress,
-    scheduellAmount,
-    isScheduellNewDaoToken,
+    scheduleAddress,
+    scheduleAmount,
+    isScheduleNewDaoToken,
     challengeAddress,
     challengeAmount,
     isChallengeNewDaoToken,
@@ -89,22 +89,22 @@ const CreateDaoCollateral: React.FC<{
           <div style={{ marginTop: 8 }}>
             Custom Token{' '}
             <Switch
-              checked={isScheduellNewDaoToken}
+              checked={isScheduleNewDaoToken}
               onChange={() => {
-                updateCollaterals('isScheduellNewDaoToken', !isScheduellNewDaoToken);
+                updateCollaterals('isScheduleNewDaoToken', !isScheduleNewDaoToken);
               }}
             />{' '}
             New DAO Token
           </div>
-          {!isScheduellNewDaoToken ? (
+          {!isScheduleNewDaoToken ? (
             <div>
               <StyledText name={'body3'}>Token contract address</StyledText>
               <TextInput
                 wide
                 placeholder={'Contract address...'}
-                value={scheduellAddress}
+                value={scheduleAddress}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  updateCollaterals('scheduellAddress', e.target.value);
+                  updateCollaterals('scheduleAddress', e.target.value);
                 }}
               />
             </div>
@@ -115,9 +115,9 @@ const CreateDaoCollateral: React.FC<{
                 wide
                 disabled={true}
                 placeholder={'The contract address will be avaible after the creation process'}
-                value={scheduellAddress}
+                value={scheduleAddress}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  updateCollaterals('scheduellAddress', e.target.value);
+                  updateCollaterals('scheduleAddress', e.target.value);
                 }}
               />
             </div>
@@ -126,9 +126,9 @@ const CreateDaoCollateral: React.FC<{
           <TextInput
             wide
             placeholder={'Token amount...'}
-            value={scheduellAmount}
+            value={scheduleAmount}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              updateCollaterals('scheduellAmount', e.target.value);
+              updateCollaterals('scheduleAmount', e.target.value);
             }}
           />
           <StyledText name={'title4'} style={{ marginTop: spacing }}>
@@ -164,9 +164,9 @@ const CreateDaoCollateral: React.FC<{
               wide
               disabled={true}
               placeholder={'The contract address will be avaible after the creation process'}
-              value={scheduellAddress}
+              value={scheduleAddress}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                updateCollaterals('scheduellAddress', e.target.value);
+                updateCollaterals('scheduleAddress', e.target.value);
               }}
             />
           )}

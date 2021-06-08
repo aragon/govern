@@ -23,9 +23,9 @@ export interface ICreateDaoConfig {
 }
 
 export interface ICreateDaoCollaterals {
-  scheduellAddress: string;
-  scheduellAmount: BigNumber | null;
-  isScheduellNewDaoToken: boolean;
+  scheduleAddress: string;
+  scheduleAmount: BigNumber | null;
+  isScheduleNewDaoToken: boolean;
   challengeAddress: string;
   challengeAmount: BigNumber | null;
   isChallengeNewDaoToken: boolean;
@@ -71,9 +71,9 @@ const CreateDaoProvider: React.FC = ({ children }) => {
   });
 
   const [collaterals, setCollaterals] = useState<ICreateDaoCollaterals>({
-    scheduellAddress: defaultConfig.scheduleDeposit.token,
-    scheduellAmount: BigNumber.from(defaultConfig.scheduleDeposit.amount),
-    isScheduellNewDaoToken: false,
+    scheduleAddress: defaultConfig.scheduleDeposit.token,
+    scheduleAmount: BigNumber.from(defaultConfig.scheduleDeposit.amount),
+    isScheduleNewDaoToken: false,
     challengeAddress: defaultConfig.challengeDeposit.token,
     challengeAmount: BigNumber.from(defaultConfig.challengeDeposit.amount),
     isChallengeNewDaoToken: true,
