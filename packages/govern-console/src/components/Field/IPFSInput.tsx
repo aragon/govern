@@ -105,9 +105,9 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
       </div>
       {ipfsURI && (
         <InputSubTitle>
-          Current Rules:
+          Current file:
           <a href={ipfsURI} target="_blank" rel="noreferrer noopener">
-            Read more
+            View
           </a>
         </InputSubTitle>
       )}

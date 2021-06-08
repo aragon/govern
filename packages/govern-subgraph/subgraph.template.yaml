@@ -27,6 +27,8 @@ templates:
       abis:
         - name: GovernQueue
           file: $GOVERN_CORE_MODULE/abi/contracts/pipelines/GovernQueue.sol/GovernQueue.json
+        - name: ERC20
+          file: $GOVERN_CONTRACT_UTILS_MODULE/abi/contracts/erc20/ERC20.sol/ERC20.json
       eventHandlers:
         - event: Configured(indexed bytes32,indexed address,(uint256,(address,uint256),(address,uint256),address,bytes,uint256))
           handler: handleConfigured

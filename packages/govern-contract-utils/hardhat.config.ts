@@ -4,6 +4,7 @@ import '@nomiclabs/hardhat-ethers'
 import '@nomiclabs/hardhat-waffle'
 import 'hardhat-typechain'
 import 'solidity-coverage'
+import 'hardhat-abi-exporter'
 
 const config: HardhatUserConfig = {
   solidity: {
