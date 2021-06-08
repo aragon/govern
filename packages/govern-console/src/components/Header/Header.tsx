@@ -2,9 +2,10 @@ import { styled } from '@material-ui/core/styles';
 import governIcon from 'images/aragon-icon.svg';
 import Wallet from 'components/Wallet/Wallet';
 import { useHistory } from 'react-router-dom';
-import { ANButton } from 'components/Button/ANButton';
-import { Label } from '../Labels/Label';
+// import { ANButton } from 'components/Button/ANButton';
+// import { Label } from '../Labels/Label';
 import { useWallet } from '../../AugmentedWallet';
+import { Button, IconStar, IconStarFilled, Tag, useTheme } from '@aragon/ui';
 
 const HeaderWrapperDiv = styled('div')({
   height: '106px',
@@ -36,7 +37,8 @@ const RigtSideContainer = styled('div')({
   gap: '10px',
 });
 
-const Header = () => {
+const Header = ({ ...props }) => {
+  const theme = useTheme();
   const history = useHistory();
   const context: any = useWallet();
   const { networkName } = context;
@@ -56,10 +58,18 @@ const Header = () => {
           <img src={governIcon} width="210px" />
         </Title>
         <RigtSideContainer id="account">
-          <Label labelText={`${networkName} network`} labelColor={'purple'} />
+          <Button
+            onClick={props.toggleTheme}
+            icon={props.themeMode === 'light' ? <IconStar /> : <IconStarFilled />}
+          />
+          <Tag
+            label={`${networkName} network`}
+            color={theme.primaryContent}
+            background={theme.primary}
+          />
           <Wallet />
-          <ANButton
-            buttonType="primary"
+          <Button
+            size={'large'}
             onClick={goToCreateDaoPage}
             label={'Create DAO'}
             height={'48px'}
