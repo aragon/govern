@@ -10,6 +10,10 @@ export interface ProposalCardProps {
    */
   transactionHash: string;
   /**
+   * Title of the proposal
+   */
+  proposalTitle: string;
+  /**
    * Date of proposal
    */
   proposalDate: string | React.ReactNode;
@@ -38,6 +42,9 @@ const ProposalCardWrapper = styled(MUICard)(({ theme }) => ({
   boxSizing: 'border-box',
   boxShadow: '0px 6px 6px rgba(180, 193, 228, 0.35)',
   cursor: 'pointer',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
 }));
 
 const ProposalHash = styled(MUITypography)(({ theme }) => ({
@@ -70,6 +77,7 @@ const LabelWrapper = styled('div')({
 
 export const ProposalCard: React.FC<ProposalCardProps> = ({
   transactionHash,
+  proposalTitle,
   proposalDate,
   proposalStatus,
   proposalStatusColor,
@@ -88,7 +96,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
       <LabelWrapper>
         <Label labelColor={proposalStatusColor} labelText={proposalStatus} />
       </LabelWrapper>
-      <ProposalHash>{getSlicedTransactionHash()}</ProposalHash>
+      <ProposalHash>{proposalTitle || getSlicedTransactionHash()}</ProposalHash>
       <ProposalDateText>{proposalDate}</ProposalDateText>
     </ProposalCardWrapper>
   );

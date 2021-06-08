@@ -1,9 +1,11 @@
 import { CustomTransaction, CustomTransactionStatus } from 'utils/types';
 import { ethers, BigNumber } from 'ethers';
-import { erc20TokenABI } from './abis/erc20';
+import { erc20TokenABI } from 'abis/erc20';
 import { AddressZero } from '@ethersproject/constants';
 import { BigNumberish } from '@ethersproject/bignumber';
 import { Account } from 'utils/types';
+import { getTokenInfo } from 'utils/token';
+import { formatUnits } from 'utils/lib';
 
 /**
  * @param token address of the token
@@ -30,24 +32,24 @@ export async function erc20ApprovalTransaction(
 
   let allowance: BigNumber = ethers.BigNumber.from(0);
   let userBalance: BigNumber = ethers.BigNumber.from(0);
-  let amountForHuman: string;
-  let symbol = 'tokens';
+  let amountForHuman: string = amount.toString();
+
+  const tokenInfo = await getTokenInfo(token, account.signer);
+  const symbol = tokenInfo.symbol || 'tokens';
+  const decimals = tokenInfo.decimals;
+
+  if (decimals) {
+    amountForHuman = formatUnits(amount, decimals);
+  }
+
   try {
     allowance = await contract.allowance(account.address, spender);
     userBalance = await contract.balanceOf(account.address);
-    // transfer from big number(including decimals * 0) to human readable
-    const decimals = await contract.decimals();
-    amountForHuman = ethers.utils.formatUnits(amount, decimals);
   } catch (err) {
     // contract address might not have `allowance` or balanceOf on it.
     // TODO: track it with sentry
     throw new Error(`Contract ${token} doesn't seem to be ERC20 compliant.`);
   }
-
-  try {
-    // symbol is optional ERC token
-    symbol = await contract.symbol();
-  } catch {}
 
   // user balance is less than the amount that needs approval.
   // this means user won't be able to approve full amount.

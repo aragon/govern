@@ -15,6 +15,50 @@ export interface Payload extends optionalPayload {
   proof: string;
 }
 
+// NOTE: configData comes directly from a subgraph, which may contain
+// more fields than Govern's DaoConfig can handle.
+// so we build it manually.
+export const buildConfig = (configData: any): DaoConfig => {
+  const config: DaoConfig = {
+    executionDelay: configData.executionDelay,
+    scheduleDeposit: {
+      token: configData.scheduleDeposit.token,
+      amount: configData.scheduleDeposit.amount,
+    },
+    challengeDeposit: {
+      token: configData.challengeDeposit.token,
+      amount: configData.challengeDeposit.amount,
+    },
+    maxCalldataSize: configData.maxCalldataSize,
+    resolver: configData.resolver,
+    rules: configData.rules,
+  };
+  return config;
+};
+
+// NOTE: ProposalInfo comes directly from a subgraph, which may contain
+// more fields than Govern's PayloadType and DaoConfig can handle.
+// so we build both of them manually.
+export const getProposalParams = (proposalInfo: any) => {
+  const config = buildConfig(proposalInfo.config);
+
+  const payload: PayloadType = {
+    actions: proposalInfo.payload.actions,
+    executor: proposalInfo.payload.executor.address,
+    proof: proposalInfo.payload.proof,
+    submitter: proposalInfo.payload.submitter,
+    allowFailuresMap: proposalInfo.payload.allowFailuresMap,
+    executionTime: proposalInfo.payload.executionTime,
+    nonce: proposalInfo.payload.nonce,
+  };
+
+  const params: ProposalParams = {
+    payload,
+    config,
+  };
+  return params;
+};
+
 export const buildContainer = (payload: Payload, config: DaoConfig): ProposalParams => {
   // buildContainer should be called right before proposal.schedule() to minimize hitting contract asssertion
   // `require(executionTime > executionDelay + block.timestamp)` where executionTime becomes stale and invalid
@@ -35,23 +79,4 @@ export const buildContainer = (payload: Payload, config: DaoConfig): ProposalPar
   };
 
   return container;
-};
-
-export const getProposalParams = (proposalInfo: any) => {
-  const config: DaoConfig = { ...proposalInfo.config };
-
-  const payload: PayloadType = {
-    ...proposalInfo.payload,
-    executor: proposalInfo.payload.executor.address,
-    // subgraph returns timestamps for dates in secs, which
-    // we transform into Ms. Before sending dates back, we
-    // need to convert them into seconds again.
-    executionTime: proposalInfo.payload.executionTime / 1000,
-  };
-
-  const params: ProposalParams = {
-    payload,
-    config,
-  };
-  return params;
 };

@@ -52,6 +52,13 @@ export type Account = {
   address: string | null;
 };
 
+export type ipfsMetadata = {
+  metadata: any;
+  text: string;
+  endpoint: string;
+  error: any;
+};
+
 export enum ChainId {
   MAINNET = 1,
   RINKEBY = 4,

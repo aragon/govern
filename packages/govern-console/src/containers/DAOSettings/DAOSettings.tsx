@@ -6,25 +6,27 @@ import { styled } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { InputField } from 'components/InputFields/InputField';
 import { ANButton } from 'components/Button/ANButton';
+import { buildConfig } from 'utils/ERC3000';
 import { useWallet } from 'AugmentedWallet';
 import { HelpButton } from 'components/HelpButton/HelpButton';
 import Grid from '@material-ui/core/Grid';
 import { DaoConfig } from '@aragon/govern';
 import { CustomTransaction } from 'utils/types';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
-import { correctDecimal } from 'utils/token';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { ContractReceipt } from 'ethers';
-import { validateToken, validateContract } from 'utils/validations';
+import { validateToken, validateContract, validateAmountForDecimals } from 'utils/validations';
 import { Proposal, ReceiptType } from '@aragon/govern';
 import { useSnackbar } from 'notistack';
-import { toUTF8Bytes, toUTF8String } from 'utils/lib';
+import { toUTF8String } from 'utils/lib';
 import { proposalDetailsUrl } from 'utils/urls';
-import { getIpfsUrl, addToIpfs } from 'utils/ipfs';
+import { addToIpfs, fetchIPFS } from 'utils/ipfs';
 import { IPFSInput } from 'components/Field/IPFSInput';
-import { useFacadeProposal } from 'hooks/proposals';
-import { useDaoSubscription } from 'hooks/subscription-hooks';
-
+import { useFacadeProposal } from 'hooks/proposal-hooks';
+import { useDaoQuery } from 'hooks/query-hooks';
+import { ipfsMetadata } from 'utils/types';
+import { formatUnits, parseUnits } from 'utils/lib';
+import { getTokenInfo } from 'utils/token';
 export interface DaoSettingFormProps {
   /**
    * on click back
@@ -105,24 +107,25 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
   const { enqueueSnackbar } = useSnackbar();
 
   const methods = useForm<FormInputs>();
-  const { control, setValue, getValues, handleSubmit } = methods;
+  const { control, setValue, getValues, handleSubmit, trigger } = methods;
 
   const { daoName } = useParams<ParamTypes>();
   //TODO daoname empty handling
 
-  // TODO: Giorgi useDaoSubscription should be returning the single object
-  // we shouldn't be doing daoList.daos[0]
-  const { data: daoList } = useDaoSubscription(daoName);
+  const { data: dao } = useDaoQuery(daoName);
 
   const [daoDetails, updateDaoDetails] = useState<any>();
   const [config, setConfig] = useState<any>(undefined);
-  const [rulesIpfsUrl, setRulesIpfsUrl] = useState<string>('');
+  const [rulesIpfsUrl, setRulesIpfsUrl] = useState<ipfsMetadata & string>();
+
+  const [scheduleDecimals, setScheduleDecimals] = useState<number>(0);
+  const [challengeDecimals, setChallengeDecimals] = useState<number>(0);
 
   useEffect(() => {
-    if (daoList) {
-      updateDaoDetails(daoList.daos[0]);
+    if (dao) {
+      updateDaoDetails(dao);
     }
-  }, [daoList]);
+  }, [dao]);
 
   const proposalInstance = useFacadeProposal(
     daoDetails?.queue.address,
@@ -146,33 +149,28 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
         setConfig(_config);
 
         // copy the nested objects so we can change the amount values
-        const formConfig: DaoConfig = {
-          ..._config,
-          scheduleDeposit: { ..._config.scheduleDeposit },
-          challengeDeposit: { ..._config.challengeDeposit },
-        };
+        const formConfig = buildConfig(_config);
 
+        setScheduleDecimals(_config.scheduleDeposit.decimals);
+        setChallengeDecimals(_config.challengeDeposit.decimals);
+
+        // can/should be extracted in the transformProposals in useQuery hooks.
+        formConfig.scheduleDeposit.amount = formatUnits(
+          _config.scheduleDeposit.amount,
+          _config.scheduleDeposit.decimals,
+        );
+        formConfig.challengeDeposit.amount = formatUnits(
+          _config.challengeDeposit.amount,
+          _config.challengeDeposit.decimals,
+        );
         // config.rules IPFS handling with utf8string fallback.
-        const rulesIpfsUrl = getIpfsUrl(_config.rules);
-        if (rulesIpfsUrl) {
-          setRulesIpfsUrl(rulesIpfsUrl);
-          formConfig.rules = '';
+        const ipfsRules = await fetchIPFS(_config.rules);
+        if (ipfsRules) {
+          setRulesIpfsUrl(ipfsRules);
+          formConfig.rules = ipfsRules.text || '';
         } else {
           formConfig.rules = toUTF8String(_config.rules) || _config.rules;
         }
-
-        formConfig.scheduleDeposit.amount = await correctDecimal(
-          _config.scheduleDeposit.token,
-          _config.scheduleDeposit.amount,
-          false,
-          provider,
-        );
-        formConfig.challengeDeposit.amount = await correctDecimal(
-          _config.challengeDeposit.token,
-          _config.challengeDeposit.amount,
-          false,
-          provider,
-        );
 
         setValue('daoConfig', formConfig);
       }
@@ -184,44 +182,42 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
     const newConfig: DaoConfig = formData.daoConfig;
     let containerHash: string | undefined;
 
-    // TODO: add modal
-    // Upload proof to ipfs if it's a file,
-    // otherwise convert it to utf8bytes
-    const rulesFile = getValues('rulesFile');
-    newConfig.rules = rulesFile
-      ? await addToIpfs(rulesFile[0])
-      : toUTF8Bytes(newConfig.rules.toString());
+    // Upload rules to ipfs
+    const rules = getValues('rulesFile') ? getValues('rulesFile')[0] : newConfig.rules.toString();
+    newConfig.rules = await addToIpfs(rules);
 
-    newConfig.scheduleDeposit.amount = await correctDecimal(
-      newConfig.scheduleDeposit.token,
-      newConfig.scheduleDeposit.amount,
-      true,
-      provider,
-    );
-    newConfig.challengeDeposit.amount = await correctDecimal(
-      newConfig.challengeDeposit.token,
-      newConfig.challengeDeposit.amount,
-      true,
-      provider,
-    );
+    // Upload proof to ipfs
+    const proof = getValues('proofFile') ? getValues('proofFile')[0] : getValues('proof');
+    const proofCid = await addToIpfs(proof, {
+      title: 'DAO Configuration change',
+    });
 
-    // TODO: add modal
-    // Upload proof to ipfs if it's a file,
-    // otherwise convert it to utf8bytes
-    const proofFile = getValues('proofFile');
-    const proof = proofFile ? await addToIpfs(proofFile[0]) : toUTF8Bytes(getValues('proof'));
+    // if the amount contains `.`, means it's a fractional component
+    // and we need to parse it to bignumber again for smart contract
+    if (newConfig.scheduleDeposit.amount.toString().includes('.')) {
+      newConfig.scheduleDeposit.amount = parseUnits(
+        newConfig.scheduleDeposit.amount,
+        scheduleDecimals,
+      );
+    }
+    if (newConfig.challengeDeposit.amount.toString().includes('.')) {
+      newConfig.challengeDeposit.amount = parseUnits(
+        newConfig.challengeDeposit.amount,
+        challengeDecimals,
+      );
+    }
 
     // payload for the final container
     const payload = {
       submitter: account.address,
       executor: daoDetails.executor.address,
       actions: [proposalInstance?.buildAction('configure', [newConfig], 0)],
-      proof: proof,
+      proof: proofCid,
     };
 
     if (proposalInstance) {
       try {
-        transactionsQueue.current = await proposalInstance.schedule(payload, config);
+        transactionsQueue.current = await proposalInstance.schedule(payload, buildConfig(config));
       } catch (error) {
         enqueueSnackbar(error.message, { variant: 'error' });
         return;
@@ -301,7 +297,18 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
                   defaultValue=""
                   rules={{
                     required: 'This is required.',
-                    validate: async (value) => await validateToken(value, provider),
+                    validate: async (value) => {
+                      const v = await validateToken(value, provider);
+                      if (v !== true) {
+                        return v;
+                      }
+
+                      let { decimals } = await getTokenInfo(value, provider);
+                      decimals = decimals || 0;
+
+                      setScheduleDecimals(decimals);
+                      await trigger('daoConfig.scheduleDeposit.amount');
+                    },
                   }}
                   render={({ field: { onChange, value }, fieldState: { error } }) => (
                     <InputField
@@ -323,7 +330,10 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
                   name="daoConfig.scheduleDeposit.amount"
                   control={control}
                   defaultValue={''}
-                  rules={{ required: 'This is required.' }}
+                  rules={{
+                    required: 'This is required.',
+                    validate: (value) => validateAmountForDecimals(value, scheduleDecimals),
+                  }}
                   render={({ field: { onChange, value }, fieldState: { error } }) => (
                     <InputField
                       type="number"
@@ -357,7 +367,19 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
                   defaultValue=""
                   rules={{
                     required: 'This is required.',
-                    validate: async (value) => await validateToken(value, provider),
+                    validate: async (value) => {
+                      const v = await validateToken(value, provider);
+                      if (v !== true) {
+                        return v;
+                      }
+
+                      let { decimals } = await getTokenInfo(value, provider);
+                      decimals = decimals || 0;
+
+                      setChallengeDecimals(decimals);
+
+                      await trigger('daoConfig.challengeDeposit.amount');
+                    },
                   }}
                   render={({ field: { onChange, value }, fieldState: { error } }) => (
                     <InputField
@@ -379,7 +401,10 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
                   name="daoConfig.challengeDeposit.amount"
                   control={control}
                   defaultValue={''}
-                  rules={{ required: 'This is required.' }}
+                  rules={{
+                    required: 'This is required.',
+                    validate: (value) => validateAmountForDecimals(value, challengeDecimals),
+                  }}
                   render={({ field: { onChange, value }, fieldState: { error } }) => (
                     <InputField
                       type="number"
@@ -441,7 +466,8 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
             <IPFSInput
               label="Provide the base rules under what your DAO should be ran"
               placeholder="DAO rules and agreement.."
-              ipfsURI={rulesIpfsUrl}
+              ipfsURI={rulesIpfsUrl?.endpoint}
+              shouldUnregister={false}
               textInputName="daoConfig.rules"
               fileInputName="rulesFile"
             />

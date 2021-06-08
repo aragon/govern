@@ -9,7 +9,7 @@ import { BlueSwitch } from 'components/Switchs/BlueSwitch';
 import { BlueCheckbox } from 'components/Checkboxs/BlueCheckbox';
 import { ANWrappedPaper } from 'components/WrapperPaper/ANWrapperPaper';
 import { useWallet } from '../../AugmentedWallet';
-import { createDao, CreateDaoParams, DaoConfig, Token, getToken } from '@aragon/govern';
+import { createDao, CreateDaoParams, DaoConfig, Token } from '@aragon/govern';
 import { ARAGON_VOICE_URL, PROXY_CONTRACT_URL, DEFAULT_DAO_CONFIG } from 'utils/constants';
 import { useForm, Controller } from 'react-hook-form';
 import { ChainId, CiruclarProgressStatus } from '../../utils/types';
@@ -153,11 +153,9 @@ const CreateDaoForm: React.FC<FormProps> = ({
     };
 
     if (params.isExistingToken) {
-      try {
-        token = await getToken(params.tokenAddress, provider);
-      } catch (error) {
-        return false;
-      }
+      token = {
+        tokenAddress: params.tokenAddress,
+      };
     } else {
       token = {
         tokenDecimals: 18,
@@ -346,7 +344,7 @@ const CreateDaoForm: React.FC<FormProps> = ({
                   onInputChange={onChange}
                   height="46px"
                   width="451px"
-                  placeholder={'Please insert existing token ether address (0x000...)'}
+                  placeholder={'Please insert ERC20 token address address'}
                   value={value}
                   error={!!error}
                   helperText={error ? error.message : null}

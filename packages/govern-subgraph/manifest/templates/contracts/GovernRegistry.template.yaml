@@ -1,11 +1,11 @@
 # GovernRegistry
 - kind: ethereum/contract
-  name: { { name } }
-  network: { { network } }
+  name: {{name}}
+  network: {{network}}
   source:
     abi: GovernRegistry
     address: '{{address}}'
-    startBlock: { { startBlock } }
+    startBlock: {{startBlock}}
   mapping:
     kind: ethereum/events
     apiVersion: 0.0.1
