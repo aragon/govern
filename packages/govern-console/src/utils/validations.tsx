@@ -23,6 +23,10 @@ export const validateToken = async (address: string, provider: any): Promise<Val
  * @param decimals decimals
  */
 export const validateAmountForDecimals = (amount: string, decimals: number) => {
+  if (parseInt(amount) < 0) {
+    return 'The amount must be positive';
+  }
+
   if (!decimals) {
     if (amount.includes('.')) {
       return "The token doesn't contain decimals. Please enter the exact amount";
