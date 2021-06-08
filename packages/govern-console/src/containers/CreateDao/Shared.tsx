@@ -31,7 +31,7 @@ const accordionItems = [
 
 const stepsNames = ['Basic info', 'Config', 'Collateral', 'Review'];
 
-const formatParamNames = {
+const formatParamNames: { [key: string]: string } = {
   daoIdentifier: 'Dao Identifier',
   isExistingToken: 'Use Existing Token',
   tokenName: 'Token Name',
@@ -55,5 +55,31 @@ const formatParamNames = {
   isAnyAddress: 'Use Any Address',
   executionAddressList: 'Excutors Addresses',
 };
+
+export type BasicInfoIndexType =
+  | 'daoIdentifier'
+  | 'isExistingToken'
+  | 'tokenName'
+  | 'tokenSymbol'
+  | 'tokenAddress'
+  | 'tokenMintAmount'
+  | 'isProxy';
+
+export type ConfigIndexType =
+  | 'executionDelay'
+  | 'isRuleFile'
+  | 'ruleFile'
+  | 'ruleText'
+  | 'resolver';
+
+export type CollateralsIndexType =
+  | 'scheduellAddress'
+  | 'scheduellAmount'
+  | 'isScheduellNewDaoToken'
+  | 'challengeAddress'
+  | 'challengeAmount'
+  | 'isChallengeNewDaoToken'
+  | 'isAnyAddress'
+  | 'executionAddressList';
 
 export { accordionItems, stepsNames, formatParamNames, CreateDaoSteps };

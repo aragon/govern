@@ -1,5 +1,5 @@
 import React from 'react';
-import { CreateDaoSteps, accordionItems, stepsNames } from './Shared';
+import { CreateDaoSteps, accordionItems, stepsNames, CollateralsIndexType } from './Shared';
 import { useCreateDao, ICreateDaoCollaterals } from './CreateDaoContextProvider';
 import {
   useLayout,
@@ -37,18 +37,7 @@ const CreateDaoCollateral: React.FC<{
     executionAddressList,
   } = collaterals;
 
-  const updateCollaterals = (
-    indexType:
-      | 'scheduellAddress'
-      | 'scheduellAmount'
-      | 'isScheduellNewDaoToken'
-      | 'challengeAddress'
-      | 'challengeAmount'
-      | 'isChallengeNewDaoToken'
-      | 'isAnyAddress'
-      | 'executionAddressList',
-    value: any,
-  ) => {
+  const updateCollaterals = (indexType: CollateralsIndexType, value: any) => {
     console.log('updateCollaterals', indexType, value);
     const newCollaterals: ICreateDaoCollaterals = { ...collaterals };
     (newCollaterals[indexType] as any) = value;

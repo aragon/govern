@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CreateDaoSteps, accordionItems, stepsNames } from './Shared';
+import { CreateDaoSteps, accordionItems, stepsNames, ConfigIndexType } from './Shared';
 import { useCreateDao, ICreateDaoConfig } from './CreateDaoContextProvider';
 import {
   useLayout,
@@ -32,10 +32,7 @@ const CreateDaoConfig: React.FC<{
   const { config, setConfig } = useCreateDao();
   const { executionDelay, isRuleFile, ruleText, resolver } = config;
 
-  const updateConfig = (
-    indexType: 'executionDelay' | 'isRuleFile' | 'ruleFile' | 'ruleText' | 'resolver',
-    value: any,
-  ) => {
+  const updateConfig = (indexType: ConfigIndexType, value: any) => {
     const newConfig: ICreateDaoConfig = { ...config };
     (newConfig[indexType] as any) = value;
     setConfig(newConfig);

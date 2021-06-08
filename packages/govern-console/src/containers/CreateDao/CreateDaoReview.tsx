@@ -26,7 +26,7 @@ const CreateDaoReview: React.FC<{
   const basicInfoArray = useMemo(() => {
     return Object.entries(basicInfo).map((entry) => {
       const obj: { name: string; value: string } = {
-        name: (formatParamNames as any)[entry[0]?.toString()],
+        name: formatParamNames[entry[0]?.toString()],
         value: entry[1]?.toString(),
       };
       return obj;
@@ -49,7 +49,7 @@ const CreateDaoReview: React.FC<{
 
     return Object.entries(config).map((entry) => {
       const obj: { name: string; value: string } = {
-        name: (formatParamNames as any)[entry[0]?.toString()],
+        name: formatParamNames[entry[0]?.toString()],
         value: formatValue(entry[0], entry[1]),
       };
       return obj;
@@ -59,7 +59,7 @@ const CreateDaoReview: React.FC<{
   const CollateralArray = useMemo(() => {
     return Object.entries(collaterals).map((entry) => {
       const obj: { name: string; value: string } = {
-        name: (formatParamNames as any)[entry[0]?.toString()],
+        name: formatParamNames[entry[0]?.toString()],
         value: entry[1]?.toString(),
       };
       return obj;

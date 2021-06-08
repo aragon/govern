@@ -1,6 +1,6 @@
 import React from 'react';
 import { BigNumber } from 'ethers';
-import { CreateDaoSteps, accordionItems, stepsNames } from './Shared';
+import { CreateDaoSteps, accordionItems, stepsNames, BasicInfoIndexType } from './Shared';
 import { useCreateDao, ICreateDaoBasicInfo } from './CreateDaoContextProvider';
 import {
   useLayout,
@@ -34,17 +34,7 @@ const CreateDaoBasicInfo: React.FC<{
     isProxy,
   } = basicInfo;
 
-  const updateBasicInfo = (
-    indexType:
-      | 'daoIdentifier'
-      | 'isExistingToken'
-      | 'tokenName'
-      | 'tokenSymbol'
-      | 'tokenAddress'
-      | 'tokenMintAmount'
-      | 'isProxy',
-    value: any,
-  ) => {
+  const updateBasicInfo = (indexType: BasicInfoIndexType, value: any) => {
     const NewBasicInfo: ICreateDaoBasicInfo = { ...basicInfo };
     (NewBasicInfo[indexType] as any) = value;
     setBasicInfo(NewBasicInfo);
