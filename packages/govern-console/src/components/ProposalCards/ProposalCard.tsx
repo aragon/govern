@@ -42,6 +42,9 @@ const ProposalCardWrapper = styled(MUICard)(({ theme }) => ({
   boxSizing: 'border-box',
   boxShadow: '0px 6px 6px rgba(180, 193, 228, 0.35)',
   cursor: 'pointer',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
 }));
 
 const ProposalHash = styled(MUITypography)(({ theme }) => ({
