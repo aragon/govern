@@ -17,7 +17,8 @@ const CreateDaoProgress: React.FC<{
   ]);
   const [action, setAction] = useState<ReactNode | null>(null);
 
-  // test code start
+  ///////////////////////// test code start
+  // create dao calls and register token could be implemented here
   const registerSuccessAction = (
     <Button
       size={'large'}
@@ -89,7 +90,7 @@ const CreateDaoProgress: React.FC<{
     callCreateDao();
   }, []);
   /*eslint-disable */
-  // test code end
+  ///////////////////////// test code end
 
   return (
     <ProgressComponent
