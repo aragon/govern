@@ -6,7 +6,7 @@ import { styled } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { InputField } from 'components/InputFields/InputField';
 import { ANButton } from 'components/Button/ANButton';
-import { buildContainer, buildConfig } from 'utils/ERC3000';
+import { buildConfig } from 'utils/ERC3000';
 import { useWallet } from 'AugmentedWallet';
 import { HelpButton } from 'components/HelpButton/HelpButton';
 import Grid from '@material-ui/core/Grid';
@@ -182,33 +182,30 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
     const newConfig: DaoConfig = formData.daoConfig;
     let containerHash: string | undefined;
 
-    // TODO: add modal
+    // Upload rules to ipfs
     const rules = getValues('rulesFile') ? getValues('rulesFile')[0] : newConfig.rules.toString();
     newConfig.rules = await addToIpfs(rules);
 
+    // Upload proof to ipfs
+    const proof = getValues('proofFile') ? getValues('proofFile')[0] : getValues('proof');
+    const proofCid = await addToIpfs(proof, {
+      title: 'DAO Configuration change',
+    });
+
+    // if the amount contains `.`, means it's a fractional component
+    // and we need to parse it to bignumber again for smart contract
     if (newConfig.scheduleDeposit.amount.toString().includes('.')) {
       newConfig.scheduleDeposit.amount = parseUnits(
         newConfig.scheduleDeposit.amount,
         scheduleDecimals,
       );
     }
-
     if (newConfig.challengeDeposit.amount.toString().includes('.')) {
       newConfig.challengeDeposit.amount = parseUnits(
         newConfig.challengeDeposit.amount,
         challengeDecimals,
       );
     }
-
-    console.log(newConfig, ' newConfig');
-
-    // TODO: add modal
-    // Upload proof to ipfs if it's a file,
-    // otherwise convert it to utf8bytes
-    const proof = getValues('proofFile') ? getValues('proofFile')[0] : getValues('proof');
-    const proofCid = await addToIpfs(proof, {
-      title: 'DAO Configuration change',
-    });
 
     // payload for the final container
     const payload = {
@@ -218,12 +215,9 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
       proof: proofCid,
     };
 
-    // the final container to be sent to schedule.
-    const container = buildContainer(payload, config);
-
     if (proposalInstance) {
       try {
-        transactionsQueue.current = await proposalInstance.schedule(container);
+        transactionsQueue.current = await proposalInstance.schedule(payload, buildConfig(config));
       } catch (error) {
         enqueueSnackbar(error.message, { variant: 'error' });
         return;
