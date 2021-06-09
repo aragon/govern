@@ -48,6 +48,21 @@ const ChallengeWidget: React.FC<any> = ({
   const [reason, setReason] = useState<ipfsMetadata & string>();
   const [loading, setLoading] = useState<boolean>(true);
 
+  const methods = useForm<FormInputs>();
+  const {
+    register,
+    control,
+    watch,
+    setValue,
+    getValues,
+    handleSubmit,
+    formState: { errors },
+  } = methods;
+
+  const submit = useCallback(() => {
+    onChallengeProposal(getValues('reason'), getValues('reasonFile'));
+  }, []);
+
   useEffect(() => {
     async function getReason() {
       const data = await fetchIPFS(containerEventChallenge.reason);
@@ -97,21 +112,6 @@ const ChallengeWidget: React.FC<any> = ({
   if (currentState !== PROPOSAL_STATES.SCHEDULED) {
     return <></>;
   }
-
-  const methods = useForm<FormInputs>();
-  const {
-    register,
-    control,
-    watch,
-    setValue,
-    getValues,
-    handleSubmit,
-    formState: { errors },
-  } = methods;
-
-  const submit = useCallback(() => {
-    onChallengeProposal(getValues('reason'), getValues('reasonFile'));
-  }, []);
 
   return (
     <Widget>
