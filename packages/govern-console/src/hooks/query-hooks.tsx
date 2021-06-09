@@ -8,6 +8,8 @@ import {
   transformDaoDetails,
 } from 'utils/transforms';
 
+const POLL_INTERVAL = 5000;
+
 export function useDaoQuery(daoName: string) {
   const { data, loading, error } = useQuery(DAO_BY_NAME, {
     variables: { name: daoName },
@@ -52,6 +54,9 @@ export function useLazyProposalQuery() {
   const [proposalData, setProposalData] = useState<any>(null);
 
   const [getProposalData, { loading }] = useLazyQuery(PROPOSAL_DETAILS, {
+    fetchPolicy: 'cache-and-network',
+    notifyOnNetworkStatusChange: true,
+    pollInterval: POLL_INTERVAL,
     onCompleted: (newData) => {
       const transformedData = transformProposalDetails(newData);
       setProposalData(transformedData);
