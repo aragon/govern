@@ -636,7 +636,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
           {
             <ResolveWidget
               disabled={!isConnected}
-              containerEventExecute={proposalStates['ContainerEventResolve']}
+              containerEventResolve={proposalStates['ContainerEventResolve']}
               disputeId={
                 proposalStates['ContainerEventChallenge']
                   ? proposalStates['ContainerEventChallenge'].disputeId
