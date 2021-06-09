@@ -4,8 +4,9 @@ import Wallet from 'components/Wallet/Wallet';
 import { useHistory } from 'react-router-dom';
 // import { ANButton } from 'components/Button/ANButton';
 // import { Label } from '../Labels/Label';
-import { useWallet } from '../../AugmentedWallet';
 import { Button, IconStar, IconStarFilled, Tag, useTheme } from '@aragon/ui';
+
+import { networkEnvironment } from 'environment';
 
 const HeaderWrapperDiv = styled('div')({
   height: '106px',
@@ -40,8 +41,7 @@ const RigtSideContainer = styled('div')({
 const Header = ({ ...props }) => {
   const theme = useTheme();
   const history = useHistory();
-  const context: any = useWallet();
-  const { networkName } = context;
+  const { networkName } = networkEnvironment;
 
   const redirectToHomePage = () => {
     history.push('/');

@@ -11,8 +11,9 @@ import reportWebVitals from './reportWebVitals';
 import { lightTheme } from './AragonTheme';
 import './index.css';
 
-// move to env files.
-const subgraphUri = 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby';
+import { networkEnvironment } from './environment';
+
+const { subgraph: subgraphUri } = networkEnvironment.endpoints;
 
 function mergeFunction(existing: [], incoming: []) {
   if (!incoming) return existing;

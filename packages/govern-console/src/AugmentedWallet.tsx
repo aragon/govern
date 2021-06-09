@@ -3,6 +3,7 @@ import { ethers, providers as EthersProviders } from 'ethers';
 import { UseWalletProvider, useWallet } from 'use-wallet';
 import { Account } from 'utils/types';
 import { INFURA_PROJECT_ID } from 'utils/constants';
+import { networkEnvironment } from 'environment';
 
 const WalletAugmentedContext = React.createContext({});
 
@@ -53,7 +54,7 @@ const WalletAugmented: React.FC<unknown> = ({ children }) => {
 
 const WalletProvider: React.FC<unknown> = ({ children }) => {
   return (
-    <UseWalletProvider chainId={4}>
+    <UseWalletProvider chainId={networkEnvironment.chainId}>
       <WalletAugmented>{children}</WalletAugmented>
     </UseWalletProvider>
   );
