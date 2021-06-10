@@ -13,7 +13,7 @@ import './index.css';
 
 import { networkEnvironment } from './environment';
 
-const { subgraph: subgraphUri } = networkEnvironment.endpoints;
+const { subgraphUrl } = networkEnvironment;
 
 function mergeFunction(existing: [], incoming: []) {
   if (!incoming) return existing;
@@ -22,7 +22,7 @@ function mergeFunction(existing: [], incoming: []) {
 }
 
 const client = new ApolloClient({
-  uri: subgraphUri,
+  uri: subgraphUrl,
   cache: new InMemoryCache({
     typePolicies: {
       GovernQueue: {

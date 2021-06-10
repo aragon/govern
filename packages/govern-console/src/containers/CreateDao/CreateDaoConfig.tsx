@@ -53,7 +53,7 @@ const CreateDaoConfig: React.FC<{
 
           <StyledText name={'title4'}>Execution delay</StyledText>
           <StyledText name={'body3'}>
-            Amount of time any action in your DAO will be available to be challenged before bein
+            Amount of time any action in your DAO will be available to be challenged before being
             executed
           </StyledText>
           <TextInput
