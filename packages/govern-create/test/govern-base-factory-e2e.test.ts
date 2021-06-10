@@ -76,15 +76,15 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
   }
 
   // This changes the ERC3000DefaultConfig 
-  function updateConfig({ token }: {token: string}) {
+  function updateConfig({ scheduleToken, challengeToken }: {scheduleToken: string, challengeToken: string}) {
     return {
       ...ERC3000DefaultConfig,
       scheduleDeposit: {
-        token: token,
+        token: scheduleToken,
         amount: ERC3000DefaultConfig.scheduleDeposit.amount
       },
       challengeDeposit: {
-        token: token,
+        token: challengeToken,
         amount: ERC3000DefaultConfig.challengeDeposit.amount,
       }
     }
@@ -116,6 +116,7 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
       ],
       config.resolver,
       config.rules,
+      config.maxCalldataSize
     ]
   }
 
@@ -185,21 +186,27 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
       await expect(tx).to.be.revertedWith(ERRORS.SCHEDULE_EXCEEDED)
     })
 
-    it(`should deploy dao with new token and change the config with new token`, async () => {
+    it(`should deploy dao with new token, set schedule collateral to user's token, challenge collatral to new token`, async () => {
       const tx =  await governBaseFactory.newGovern(
         'eagle1',
         {
           ...tokenConfig,
           mintAddress: owner,
         },
-        ERC3000DefaultConfig,
+        {
+          ...ERC3000DefaultConfig,
+          challengeDeposit: {
+            ...ERC3000DefaultConfig.challengeDeposit,
+            token: CUSTOM_ADDRESS
+          }
+        },
         [],
         true,
       )
 
       const { token, queue } = await getDeployments(tx);
       
-      const config = updateConfig({token: token.address})
+      const config = updateConfig({scheduleToken: token.address, challengeToken: CUSTOM_ADDRESS})
 
       await expect(tx).to.emit(queue, EVENTS.CONFIGURED)
       .withArgs(getConfigHash(config), governBaseFactory.address, updateConfigForArgs(config))
@@ -213,7 +220,7 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
     })
 
     it(`should deploy dao with custom token and change config with this token`, async () => {
-      const config = updateConfig({token: CUSTOM_ADDRESS})
+      const config = updateConfig({scheduleToken: CUSTOM_ADDRESS, challengeToken: CUSTOM_ADDRESS})
 
       const tx =  await governBaseFactory.newGovern(
         'eagle2',
@@ -247,7 +254,7 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
 
       const { token, queue } = await getDeployments(tx);
       
-      const config = updateConfig({ token: token.address })
+      const config = updateConfig({scheduleToken: token.address, challengeToken: token.address})
       let container = await updateContainer({ submitter: owner, config: config})
       
       // calling schedule from different address than address 

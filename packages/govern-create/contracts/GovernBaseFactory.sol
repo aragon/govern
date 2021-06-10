@@ -58,18 +58,23 @@ contract GovernBaseFactory {
                 _token,
                 _useProxies
             );
+        }
+
+        // if one of the collateral token is zero address, it means user wants 
+        // to set a new token as the collateral, which requires config change 
+        if (_config.scheduleDeposit.token == address(0) || _config.challengeDeposit.token == address(0)) {
             // give base factory the permission so that it can change 
             // the config with new token in the same transaction
             queue.grant(queue.configure.selector, address(this));
-            
+
             ERC3000Data.Config memory newConfig = ERC3000Data.Config({
                 executionDelay: _config.executionDelay,
                 scheduleDeposit: ERC3000Data.Collateral({
-                    token: address(token),
+                    token: _config.scheduleDeposit.token != address(0) ? _config.scheduleDeposit.token : address(token),
                     amount: _config.scheduleDeposit.amount
                 }),
                 challengeDeposit: ERC3000Data.Collateral({
-                    token: address(token),
+                    token: _config.challengeDeposit.token != address(0) ? _config.challengeDeposit.token : address(token),
                     amount: _config.challengeDeposit.amount
                 }),
                 resolver: _config.resolver,
