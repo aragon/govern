@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useMemo } from 'react';
+import React, { memo, useEffect } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { styled } from '@material-ui/core/styles';
 import backButtonIcon from '../../images/back-btn.svg';
@@ -10,9 +10,10 @@ import { BlueCheckbox } from 'components/Checkboxs/BlueCheckbox';
 import { ANWrappedPaper } from 'components/WrapperPaper/ANWrapperPaper';
 import { useWallet } from '../../AugmentedWallet';
 import { createDao, CreateDaoParams, DaoConfig, Token } from '@aragon/govern';
-import { ARAGON_VOICE_URL, PROXY_CONTRACT_URL, DEFAULT_DAO_CONFIG } from 'utils/constants';
+import { PROXY_CONTRACT_URL } from 'utils/constants';
+import { networkEnvironment } from 'environment';
 import { useForm, Controller } from 'react-hook-form';
-import { ChainId, CiruclarProgressStatus } from '../../utils/types';
+import { CiruclarProgressStatus } from '../../utils/types';
 import { validateToken } from '../../utils/validations';
 import { CreateDaoStatus } from './CreateDao';
 import { CreateDaoProgressProps } from './CreateDaoProgress';
@@ -126,20 +127,14 @@ const CreateDaoForm: React.FC<FormProps> = ({
   cancelForm,
 }) => {
   const context: any = useWallet();
-  const { chainId, provider, isConnected } = context;
+  const { provider, isConnected } = context;
 
   const { control, handleSubmit, watch, setValue } = useForm<FormInputs>();
 
-  const connectedChainId = useMemo(() => {
-    if (chainId === ChainId.RINKEBY && isConnected) return ChainId.RINKEBY;
-
-    return ChainId.MAINNET;
-  }, [chainId, isConnected]);
-
   useEffect(() => {
-    const _config: DaoConfig = DEFAULT_DAO_CONFIG[connectedChainId];
-    if (setValue) setValue('daoConfig', _config);
-  }, [connectedChainId, setValue]);
+    const { defaultDaoConfig } = networkEnvironment;
+    if (setValue) setValue('daoConfig', defaultDaoConfig);
+  }, [setValue]);
 
   const submitCreateDao = async (params: FormInputs) => {
     let token: Partial<Token>;
@@ -409,7 +404,7 @@ const CreateDaoForm: React.FC<FormProps> = ({
           </div>
           <OptionText>
             Use{' '}
-            <a href={ARAGON_VOICE_URL[connectedChainId]} target="_blank" rel="noreferrer noopener">
+            <a href={networkEnvironment.voiceUrl} target="_blank" rel="noreferrer noopener">
               Aragon Voice
             </a>{' '}
             - This will enable your DAO to have free voting for you proposals

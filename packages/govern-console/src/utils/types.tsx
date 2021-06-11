@@ -58,8 +58,3 @@ export type ipfsMetadata = {
   endpoint: string;
   error: any;
 };
-
-export enum ChainId {
-  MAINNET = 1,
-  RINKEBY = 4,
-}
