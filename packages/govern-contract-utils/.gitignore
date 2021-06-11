@@ -5,6 +5,7 @@ yarn-error.log
 cache
 artifacts
 typechain
+abi
 
 
 coverage/
