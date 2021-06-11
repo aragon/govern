@@ -1,6 +1,6 @@
-import { getToken } from '@aragon/govern';
 import { ValidateResult } from 'react-hook-form';
 import Abi from './AbiHandler';
+import { isTokenERC20 } from 'utils/token';
 
 /**
  * Validate if address is an ERC20 token
@@ -10,13 +10,39 @@ import Abi from './AbiHandler';
  * @returns <ValidateResult> true if valid, or error message if invalid
  */
 export const validateToken = async (address: string, provider: any): Promise<ValidateResult> => {
-  try {
-    await getToken(address, provider);
-    return true;
-  } catch (error) {}
-  return 'Token adress is not valid.';
+  const isERC20 = await isTokenERC20(address, provider);
+  return isERC20 || 'Token adress is not ERC20 compliant';
 };
 
+/**
+ * Validates amount dependin on decimal.
+ * @dev if the decimals is 0, and amount contains fractions or
+ * if the decimals is more than 0 and it doesn't contain fractions, it returns an error
+ *
+ * @param amount amount
+ * @param decimals decimals
+ */
+export const validateAmountForDecimals = (amount: string, decimals: number) => {
+  if (parseInt(amount) < 0) {
+    return 'The amount must be positive';
+  }
+
+  if (!decimals) {
+    if (amount.includes('.')) {
+      return "The token doesn't contain decimals. Please enter the exact amount";
+    }
+    return true;
+  }
+  if (!amount.includes('.')) {
+    return 'Please, follow the format - 10.0';
+  }
+
+  if (amount.split('.')[1].length > decimals) {
+    return `The fractional component exceeds the decimals - ${decimals}`;
+  }
+
+  return true;
+};
 /**
  * Check if contract is a contract
  *

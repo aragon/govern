@@ -7,6 +7,5 @@ artifacts
 typechain
 abi
 
-
 coverage/
 coverage.json

@@ -10,20 +10,19 @@ import { AddActionsModal } from 'components/Modal/AddActionsModal';
 import { InputField } from 'components/InputFields/InputField';
 import { useParams, useHistory } from 'react-router-dom';
 import { ContractReceipt, utils } from 'ethers';
-import { buildContainer } from 'utils/ERC3000';
 import { useWallet } from 'AugmentedWallet';
+import { buildConfig } from 'utils/ERC3000';
 import { CustomTransaction, abiItem, actionType, ActionToSchedule } from 'utils/types';
 import { useSnackbar } from 'notistack';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
-import { useForm, FormProvider } from 'react-hook-form';
+import { useForm, FormProvider, Controller } from 'react-hook-form';
 import { Proposal, ReceiptType, ActionType } from '@aragon/govern';
 import { proposalDetailsUrl } from 'utils/urls';
 import { addToIpfs } from 'utils/ipfs';
-import { useFacadeProposal } from 'hooks/proposals';
-import { toUTF8Bytes } from 'utils/lib';
+import { useFacadeProposal } from 'hooks/proposal-hooks';
 import { IPFSInput } from 'components/Field/IPFSInput';
 import { settingsUrl } from 'utils/urls';
-import { useDaoSubscription } from 'hooks/subscription-hooks';
+import { useDaoQuery } from 'hooks/query-hooks';
 
 export interface NewProposalProps {
   /**
@@ -138,6 +137,7 @@ export interface AddedActionsProps {
 interface FormInputs {
   proof: string;
   proofFile: any;
+  title: string;
 }
 
 const AddedActions: React.FC<AddedActionsProps> = ({ selectedActions, onAddInputToAction }) => {
@@ -219,16 +219,14 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack }) => {
   const { daoName } = useParams<any>();
   //TODO daoname empty handling
 
-  // TODO: Giorgi useDaoSubscription should be returning the single object
-  // we shouldn't be doing daoList.daos[0]
-  const { data: daoList } = useDaoSubscription(daoName);
+  const { data: dao } = useDaoQuery(daoName);
 
   const { enqueueSnackbar } = useSnackbar();
   const { dispatch } = React.useContext(ModalsContext);
 
   // form
   const methods = useForm<FormInputs>();
-  const { getValues, handleSubmit } = methods;
+  const { getValues, handleSubmit, control } = methods;
 
   const [selectedActions, updateSelectedOptions] = useState([]);
   const [isInputModalOpen, setInputModalOpen] = useState(false);
@@ -238,10 +236,10 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack }) => {
   const [actionsToSchedule, setActionsToSchedule] = useState([]);
 
   useEffect(() => {
-    if (daoList) {
-      updateDaoDetails(daoList.daos[0]);
+    if (dao) {
+      updateDaoDetails(dao);
     }
-  }, [daoList]);
+  }, [dao]);
 
   const context: any = useWallet();
   const { account, isConnected } = context;
@@ -333,12 +331,12 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack }) => {
   };
 
   const validate = () => {
-    //   if (actionsToSchedule.length === 0) {
-    //     enqueueSnackbar('At least one action is needed to schedule a proposal.', {
-    //       variant: 'error',
-    //     });
-    //     return false;
-    //   }
+    if (actionsToSchedule.length === 0) {
+      enqueueSnackbar('At least one action is needed to schedule a proposal.', {
+        variant: 'error',
+      });
+      return false;
+    }
     return true;
   };
 
@@ -366,10 +364,11 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack }) => {
 
   const scheduleProposal = async (actions: ActionType[]) => {
     // TODO: add modal
-    // Upload proof to ipfs if it's a file,
-    // otherwise convert it to utf8bytes
-    const proofFile = getValues('proofFile');
-    const proof = proofFile ? await addToIpfs(proofFile[0]) : toUTF8Bytes(getValues('proof'));
+
+    const proof = getValues('proofFile') ? getValues('proofFile')[0] : getValues('proof');
+    const proofCid = await addToIpfs(proof, {
+      title: getValues('title'),
+    });
 
     let containerHash: string | undefined;
 
@@ -378,15 +377,15 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack }) => {
       submitter: account.address,
       executor: daoDetails.executor.address,
       actions: actions,
-      proof: proof,
+      proof: proofCid,
     };
-
-    // the final container to be sent to schedule.
-    const container = buildContainer(payload, daoDetails.queue.config);
 
     if (proposalInstance) {
       try {
-        transactionsQueue.current = await proposalInstance.schedule(container);
+        transactionsQueue.current = await proposalInstance.schedule(
+          payload,
+          buildConfig(daoDetails.queue.config),
+        );
       } catch (error) {
         enqueueSnackbar(error.message, { variant: 'error' });
       }
@@ -447,6 +446,26 @@ const NewProposal: React.FC<NewProposalProps> = ({ onClickBack }) => {
             placeholder="Justification Reason..."
             textInputName="proof"
             fileInputName="proofFile"
+          />
+          <br></br>
+
+          <SubTitle>Description</SubTitle>
+          <Controller
+            name="title"
+            control={control}
+            defaultValue={''}
+            rules={{ required: 'This is required.' }}
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <InputField
+                label=""
+                onInputChange={onChange}
+                value={value}
+                height={'100px'}
+                placeholder="Enter the proposal description"
+                error={!!error}
+                helperText={error ? error.message : null}
+              />
+            )}
           />
 
           <Title>Actions</Title>

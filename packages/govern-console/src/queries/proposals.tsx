@@ -13,6 +13,7 @@ export const PROPOSAL_LIST = gql`
         payload {
           id
           executionTime
+          title
         }
       }
       nonce
@@ -43,11 +44,17 @@ export const PROPOSAL_DETAILS = gql`
           id
           token
           amount
+          decimals
+          symbol
+          name
         }
         challengeDeposit {
           id
           token
           amount
+          decimals
+          symbol
+          name
         }
         resolver
         rules
@@ -58,6 +65,7 @@ export const PROPOSAL_DETAILS = gql`
         nonce
         executionTime
         submitter
+        title
         executor {
           id
           address

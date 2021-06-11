@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { memo, useState, useCallback } from 'react';
+import React, { memo, useState, useEffect, useCallback } from 'react';
 import { ANButton } from 'components/Button/ANButton';
 import { InputField } from 'components/InputFields/InputField';
 import { PROPOSAL_STATES } from 'utils/states';
@@ -11,10 +11,11 @@ import { HelpButton } from 'components/HelpButton/HelpButton';
 import { InfoKeyDiv, InfoValueDivInline, InfoValueDivBlock } from '../ProposalDetails';
 import { Widget, WidgetRow, InfoWrapper, TitleText } from './SharedStyles';
 import { IPFSInput } from 'components/Field/IPFSInput';
-
+import { IPFSField } from 'components/Field/IPFSField';
 import { formatDate } from 'utils/date';
 import { getTruncatedAccountAddress } from 'utils/account';
-import { getIpfsUrl } from 'utils/ipfs';
+import { getIpfsUrl, fetchIPFS } from 'utils/ipfs';
+import { ipfsMetadata } from 'utils/types';
 
 import { styled } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
@@ -44,9 +45,37 @@ const ChallengeWidget: React.FC<any> = ({
   currentState,
   onChallengeProposal,
 }) => {
+  const [reason, setReason] = useState<ipfsMetadata & string>();
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const methods = useForm<FormInputs>();
+  const {
+    register,
+    control,
+    watch,
+    setValue,
+    getValues,
+    handleSubmit,
+    formState: { errors },
+  } = methods;
+
+  const submit = useCallback(() => {
+    onChallengeProposal(getValues('reason'), getValues('reasonFile'));
+  }, []);
+
+  useEffect(() => {
+    async function getReason() {
+      const data = await fetchIPFS(containerEventChallenge.reason);
+      const reason = data || containerEventChallenge.reason;
+      setLoading(false);
+      setReason(reason);
+    }
+    if (containerEventChallenge) {
+      getReason();
+    }
+  }, [containerEventChallenge]);
+
   if (containerEventChallenge) {
-    console.log('modis aq 111', containerEventChallenge.reason);
-    const challengeReasonIpfsUrl = getIpfsUrl(containerEventChallenge.reason);
     return (
       <Widget>
         <WidgetRow>
@@ -74,14 +103,7 @@ const ChallengeWidget: React.FC<any> = ({
             marginTop: 0,
           }}
         >
-          {challengeReasonIpfsUrl ? (
-            <a href={challengeReasonIpfsUrl} target="_blank" rel="noreferrer noopener">
-              Read more
-            </a>
-          ) : (
-            toUTF8String(containerEventChallenge.reason) ||
-            `Reason can't be decoded: ${containerEventChallenge.reason}`
-          )}
+          <IPFSField value={reason} loading={loading} />
         </InfoValueDivBlock>
       </Widget>
     );
@@ -90,21 +112,6 @@ const ChallengeWidget: React.FC<any> = ({
   if (currentState !== PROPOSAL_STATES.SCHEDULED) {
     return <></>;
   }
-
-  const methods = useForm<FormInputs>();
-  const {
-    register,
-    control,
-    watch,
-    setValue,
-    getValues,
-    handleSubmit,
-    formState: { errors },
-  } = methods;
-
-  const submit = useCallback(() => {
-    onChallengeProposal(getValues('reason'), getValues('reasonFile'));
-  }, []);
 
   return (
     <Widget>

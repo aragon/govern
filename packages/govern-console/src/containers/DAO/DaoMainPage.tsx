@@ -3,7 +3,6 @@ import { styled } from '@material-ui/core/styles';
 import { DaoHeader } from 'components/DaoHeader/DaoHeader';
 import { ProposalCard } from 'components/ProposalCards/ProposalCard';
 import { ANButton } from 'components/Button/ANButton';
-import { InputField } from 'components/InputFields/InputField';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
@@ -11,7 +10,7 @@ import { useHistory, useParams } from 'react-router-dom';
 import NoDaoFound from './NoDaoFound';
 import { formatDate } from 'utils/date';
 import { getState, getStateColor } from 'utils/states';
-import { useDaoSubscription, useLazyProposalList } from 'hooks/subscription-hooks';
+import { useDaoQuery, useLazyProposalListQuery } from 'hooks/query-hooks';
 
 //* Styled Components List
 const DaoPageMainDiv = styled(Paper)(({ theme }) => ({
@@ -58,10 +57,7 @@ const DaoMainPage: React.FC = () => {
   const { daoName } = useParams<any>();
   //TODO daoname empty handling
 
-  // TODO: Giorgi useDaoSubscription should be returning the single object
-  // we shouldn't be doing daoList.daos[0]
-  console.log(daoName, ' daoName haha');
-  const { data: daoList, loading: loadingDao } = useDaoSubscription(daoName);
+  const { data: dao, loading: loadingDao } = useDaoQuery(daoName);
 
   const [isProposalPage, setProposalPage] = useState(true);
   const [visibleProposalList, updateVisibleProposalList] = useState<any>([]);
@@ -79,7 +75,7 @@ const DaoMainPage: React.FC = () => {
     }
   };
 
-  const { getQueueData, data, fetchMore } = useLazyProposalList();
+  const { getQueueData, data, fetchMore } = useLazyProposalListQuery();
 
   const fetchMoreData = async () => {
     if (fetchMore) {
@@ -99,22 +95,24 @@ const DaoMainPage: React.FC = () => {
   }, [data]);
 
   useEffect(() => {
-    if (loadingDao || !daoList) return;
-    if (daoList.daos.length > 0 && getQueueData) {
-      updateDaoDetails(daoList.daos[0]);
-      if (daoList.daos[0] && daoList.daos[0].queue) {
+    if (loadingDao) return;
+
+    if (dao && getQueueData) {
+      updateIsAnExistingDao(true);
+      updateDaoDetails(dao);
+      if (dao && dao.queue) {
         getQueueData({
           variables: {
             offset: 0,
             limit: 16,
-            id: daoList.daos[0].queue.id,
+            id: dao.queue.id,
           },
         });
       }
     } else {
       updateIsAnExistingDao(false);
     }
-  }, [loadingDao, daoList, getQueueData]);
+  }, [loadingDao, dao, getQueueData]);
 
   const onClickProposal = (proposal: any) => {
     history.push(`/proposals/${daoName}/${proposal.id}`);
@@ -173,26 +171,17 @@ const DaoMainPage: React.FC = () => {
                       display: 'flex',
                       flexDirection: 'row',
                       width: '100%',
-                      justifyContent: 'space-between',
+                      justifyContent: 'flex-end',
                       marginTop: '28px',
                     }}
                   >
-                    <InputField
-                      label=""
-                      placeholder="Search"
-                      width="298px"
-                      height="46px"
-                      // onInputChange={onInputChange}
-                      onInputChange={() => {
-                        console.log('search is not developed yet');
-                      }}
-                    ></InputField>
                     <ANButton
                       label="New Proposal"
                       buttonType="primary"
                       height="46px"
                       width="142px"
                       onClick={goToNewProposal}
+                      style={{ marginRight: '12px' }}
                     ></ANButton>
                   </div>
                   <WrapperGrid container spacing={3} direction="row" justify="flex-start">
@@ -200,6 +189,7 @@ const DaoMainPage: React.FC = () => {
                       <Grid item key={proposal.id} xl={3} lg={4} xs={12} sm={12} md={6}>
                         <ProposalCard
                           transactionHash={proposal.id}
+                          proposalTitle={proposal.payload.title}
                           proposalDate={formatDate(proposal.createdAt)}
                           proposalStatus={getState(proposal.state, proposal.payload.executionTime)}
                           proposalStatusColor={getStateColor(

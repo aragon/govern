@@ -14,10 +14,16 @@ export const DAO_BY_NAME = gql`
           scheduleDeposit {
             token
             amount
+            decimals
+            symbol
+            name
           }
           challengeDeposit {
             token
             amount
+            decimals
+            symbol
+            name
           }
           resolver
           rules
@@ -49,10 +55,16 @@ export const DAO_LIST = gql`
           scheduleDeposit {
             token
             amount
+            decimals
+            symbol
+            name
           }
           challengeDeposit {
             token
             amount
+            decimals
+            symbol
+            name
           }
           resolver
           rules
