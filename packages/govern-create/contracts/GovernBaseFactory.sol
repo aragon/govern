@@ -17,7 +17,7 @@ import "./core-factories/GovernQueueFactory.sol";
 contract GovernBaseFactory {
     address internal constant ANY_ADDR = address(-1);
     uint256 internal constant MAX_SCHEDULE_ACCESS_LIST_ALLOWED = 10;
-
+    
     string private constant ERROR_SCHEDULE_LIST_EXCEEDED = "basefactory: schedule list exceeded";
 
     GovernFactory public governFactory;
@@ -58,32 +58,32 @@ contract GovernBaseFactory {
                 _token,
                 _useProxies
             );
-        }
 
-        // if one of the collateral token is zero address, it means user wants 
-        // to set a new token as the collateral, which requires config change 
-        if (_config.scheduleDeposit.token == address(0) || _config.challengeDeposit.token == address(0)) {
-            // give base factory the permission so that it can change 
-            // the config with new token in the same transaction
-            queue.grant(queue.configure.selector, address(this));
+            // if both(scheduleDeposit and challengeDeposit) are non-zero, 
+            // they have already been set and no need for a config change.
+            if (_config.scheduleDeposit.token == address(0) || _config.challengeDeposit.token == address(0)) {
+                // give base factory the permission so that it can change 
+                // the config with new token in the same transaction
+                queue.grant(queue.configure.selector, address(this));
+                
+                ERC3000Data.Config memory newConfig = ERC3000Data.Config({
+                    executionDelay: _config.executionDelay,
+                    scheduleDeposit: ERC3000Data.Collateral({
+                        token: _config.scheduleDeposit.token != address(0) ? _config.scheduleDeposit.token : address(token),
+                        amount: _config.scheduleDeposit.amount
+                    }),
+                    challengeDeposit: ERC3000Data.Collateral({
+                        token:  _config.challengeDeposit.token != address(0) ? _config.challengeDeposit.token : address(token),
+                        amount: _config.challengeDeposit.amount
+                    }),
+                    resolver: _config.resolver,
+                    rules: _config.rules,
+                    maxCalldataSize: _config.maxCalldataSize
+                });
 
-            ERC3000Data.Config memory newConfig = ERC3000Data.Config({
-                executionDelay: _config.executionDelay,
-                scheduleDeposit: ERC3000Data.Collateral({
-                    token: _config.scheduleDeposit.token != address(0) ? _config.scheduleDeposit.token : address(token),
-                    amount: _config.scheduleDeposit.amount
-                }),
-                challengeDeposit: ERC3000Data.Collateral({
-                    token: _config.challengeDeposit.token != address(0) ? _config.challengeDeposit.token : address(token),
-                    amount: _config.challengeDeposit.amount
-                }),
-                resolver: _config.resolver,
-                rules: _config.rules,
-                maxCalldataSize: _config.maxCalldataSize
-            });
-
-            queue.configure(newConfig);
-            queue.revoke(queue.configure.selector, address(this));
+                queue.configure(newConfig);
+                queue.revoke(queue.configure.selector, address(this));
+            }
         }
 
         registry.register(govern, queue, token, _name, "");
@@ -116,3 +116,36 @@ contract GovernBaseFactory {
     }
     
 }
+
+
+
+// tokenAddress: 0x….000000
+// ScheduleDeposit : {
+//     Token: newToken
+// }
+
+// ChallengeDeposit : {
+//     Token: customToken
+// }
+
+// =====================
+
+// tokenAddress: 0x….000000
+// ScheduleDeposit : {
+//     Token: newToken
+// }
+
+// ChallengeDeposit : {
+//     Token: newToken
+// }
+
+// =====================
+
+// tokenAddress: 0x….000000
+// ScheduleDeposit : {
+//     Token: Custom Token
+// }
+
+// ChallengeDeposit : {
+//     Token:  Custom Token
+// }
