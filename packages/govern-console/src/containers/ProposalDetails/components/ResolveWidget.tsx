@@ -27,7 +27,7 @@ const ResolveWidget: React.FC<any> = ({
         <InfoWrapper>
           <InfoKeyDiv>Approved</InfoKeyDiv>
           <InfoValueDivInline id="challenger__value">
-            containerEventResolve.approved
+            {String(containerEventResolve.approved)}
           </InfoValueDivInline>
         </InfoWrapper>
       </Widget>
