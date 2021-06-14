@@ -1,6 +1,5 @@
 import { Contract, utils, providers, BigNumberish, constants } from 'ethers'
 import Configuration from '../internal/configuration/Configuration'
-import { registerToken } from '../internal/actions/RegisterToken'
 
 export const ContainerConfig = `
   tuple(
@@ -23,14 +22,19 @@ const token = `
     address tokenAddress, 
     uint8 tokenDecimals, 
     string tokenName, 
-    string tokenSymbol
+    string tokenSymbol,
+    address mintAddress,
+    uint256 mintAmount,
+    byte32 merkleRoot,
+    uint256 merkleMintAmount,
   )`
 
 const factoryAbi = [
   `function newGovern(
     string _name, 
     ${token} _token, 
-    ${ContainerConfig} _config, 
+    ${ContainerConfig} _config,
+    address[] _scheduleAccessList,
     bool _useProxies
   )`,
 ]
@@ -48,6 +52,10 @@ export type Token = {
   tokenDecimals: number
   tokenName: string
   tokenSymbol: string
+  mintAddress: string
+  mintAmount: BigNumberish | string
+  merkleRoot: utils.BytesLike
+  merkleMintAmount: BigNumberish | string
 }
 
 export type TokenDeposit = {
@@ -68,8 +76,8 @@ export type CreateDaoParams = {
   name: string
   token: Partial<Token>
   config: DaoConfig
+  scheduleAccessList: string[]
   useProxies?: boolean
-  useVocdoni?: boolean // not used yet
 }
 
 export type CreateDaoOptions = {
@@ -84,23 +92,32 @@ export type CreateDaoOptions = {
  *
  * @param {options} options to overwrite with eip1193 provider and DAO factory address
  *
+ * @param {(tokenAddress: string) => void} registeredDaoTokenCallback
+ *
  * @returns {Promise<TransactionResponse>} transaction response object
  */
 export async function createDao(
   args: CreateDaoParams,
   options: CreateDaoOptions = {},
-  registerTokenCallback?: Function
+  registeredDaoTokenCallback?: (tokenAddress: string) => void
 ): Promise<providers.TransactionResponse> {
   let token: Partial<Token>
   if (!args.token.tokenAddress) {
-    const tokenIsMissingInfo = !args.token.tokenName || !args.token.tokenSymbol || !args.token.tokenDecimals
+    const tokenIsMissingInfo =
+      !args.token.tokenName ||
+      !args.token.tokenSymbol ||
+      !args.token.tokenDecimals ||
+      !args.token.mintAddress ||
+      !args.token.mintAmount
 
     if (tokenIsMissingInfo) {
-      throw new Error('Missing token name, decimals and/or symbol')
+      throw new Error(
+        'Missing token name, decimals, symbol, mintAmount and/or mintAddress'
+      )
     }
     token = {
       tokenAddress: constants.AddressZero,
-      ...args.token
+      ...args.token,
     }
   } else {
     token = {
@@ -124,15 +141,15 @@ export async function createDao(
     signer
   )
 
-  if (typeof registerTokenCallback === 'function') {
+  if (typeof registeredDaoTokenCallback === 'function') {
     GovernRegistry.on(
       'Registered',
       async (govern, queue, token, registrant, name) => {
         // not our DAO, wait for next one
         if (name !== args.name) return
 
-        const ERC20 = new Contract(token, tokenAbi, signer)
-        registerTokenCallback(() => registerToken(signer, ERC20))
+        // send back token address
+        registeredDaoTokenCallback(token)
       }
     )
   }
@@ -141,6 +158,7 @@ export async function createDao(
     args.name,
     token,
     args.config,
+    args.scheduleAccessList,
     args.useProxies
   )
 

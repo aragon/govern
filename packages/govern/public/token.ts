@@ -10,7 +10,7 @@ const tokenAbi = [
 export async function getToken(
   tokenAddress: string,
   provider: providers.Web3Provider
-): Promise<Token> {
+): Promise<Partial<Token>> {
   const contract = new Contract(tokenAddress, tokenAbi, provider)
   const [tokenDecimals, tokenName, tokenSymbol]: [
     number,

@@ -17,7 +17,7 @@ const tokenAddress = '0x9fB402A33761b88D5DcbA55439e6668Ec8D4F2E8'
 const daoFactoryAddress = '0xb75290e69f83b52bfbf9c99b4ae211935e75a851'
 const registryAddress = '0x7714e0a2A2DA090C2bbba9199A54B903bB83A73d'
 
-describe('Create Dao', function () {
+describe('Create Dao', async function () {
   const goodConfig = {
     executionDelay: 3600, // how many seconds to wait before being able to call `execute`.
     scheduleDeposit: {
@@ -33,6 +33,9 @@ describe('Create Dao', function () {
     maxCalldataSize: 100000, // initial maxCalldatasize
   }
 
+  const [owner, addr1, addr2] = await ethers.getSigners()
+  const accessList = [owner.address, addr1.address, addr2.address]
+
   it('Should create a dao successfully', async function () {
     const token = {
       tokenName: 'magical',
@@ -44,6 +47,7 @@ describe('Create Dao', function () {
       name: 'magic',
       token,
       config: goodConfig,
+      scheduleAccessList: accessList,
       useProxies: false,
     }
 
@@ -94,6 +98,7 @@ describe('Create Dao', function () {
         tokenDecimals: 6,
       },
       config: goodConfig,
+      scheduleAccessList: accessList,
       useProxies: false,
     }
 
@@ -114,6 +119,7 @@ describe('Create Dao', function () {
       name: 'moon',
       token: { tokenName: 'moon' },
       config: goodConfig,
+      scheduleAccessList: accessList,
       useProxies: false,
     }
 
@@ -136,6 +142,7 @@ describe('Create Dao', function () {
       name: 'moon2',
       token: { tokenSymbol: 'moon' },
       config: goodConfig,
+      scheduleAccessList: accessList,
       useProxies: false,
     }
 
@@ -158,6 +165,7 @@ describe('Create Dao', function () {
       name: 'awesome',
       token: { tokenAddress, tokenDecimals: 6 },
       config: goodConfig,
+      scheduleAccessList: accessList,
       useProxies: false,
     }
 
@@ -178,6 +186,7 @@ describe('Create Dao', function () {
       name: 'spring',
       token: { tokenName: 'spring' },
       config: goodConfig,
+      scheduleAccessList: accessList,
       useProxies: false,
     }
 
@@ -198,6 +207,7 @@ describe('Create Dao', function () {
       name: 'summer',
       config: goodConfig,
       token: { tokenAddress: ethers.constants.AddressZero },
+      scheduleAccessList: accessList,
     }
 
     const options: CreateDaoOptions = {
@@ -218,6 +228,7 @@ describe('Create Dao', function () {
       name: 'rainbow',
       token: { tokenAddress },
       config: goodConfig,
+      scheduleAccessList: accessList,
       useProxies: true,
     }
 
@@ -235,6 +246,7 @@ describe('Create Dao', function () {
       name: 'bridge',
       token: { tokenAddress },
       config: goodConfig,
+      scheduleAccessList: accessList,
     }
 
     const options: CreateDaoOptions = {
