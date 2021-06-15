@@ -4,11 +4,14 @@ import { IPFSField } from 'components/Field/IPFSField';
 import { JSONField } from 'components/Field/JSONField';
 import { fetchIPFS } from 'utils/ipfs';
 
-const InlineIPFSField = style(IPFSField)({
-  display: 'inline !important',
+const LoadingIPFSField = style(IPFSField)({
+  display: 'inline-block !important',
   '& div': {
-    display: 'inline !important',
+    display: 'inline-block !important',
   },
+});
+
+const InlineIPFSField = style(LoadingIPFSField)({
   '& div::before': {
     content: "'\"'",
   },
@@ -35,6 +38,18 @@ const fetchIFPSFromRule = async (rule: string) => {
   return result || rule;
 };
 
+const isConfigureAction = ({
+  to,
+  queueAddress,
+  functionName,
+}: {
+  to: string;
+  queueAddress: string;
+  functionName: string;
+}) => {
+  return to === queueAddress && functionName === 'configure';
+};
+
 export const DecodedActionData: React.FC<DecodedActionDataProps> = ({
   to,
   functionName,
@@ -42,13 +57,19 @@ export const DecodedActionData: React.FC<DecodedActionDataProps> = ({
   queueAddress,
 }) => {
   const key = 'rules(bytes)';
-  const [replacement, updateReplacement] = useState<Record<string, any>>({
-    [key]: <InlineIPFSField value={undefined} loading={true} />,
+  const [replacement, updateReplacement] = useState<Record<string, any> | undefined>(() => {
+    const initialState = isConfigureAction({ to, functionName, queueAddress })
+      ? {
+          [key]: <LoadingIPFSField value={undefined} loading={true} />,
+        }
+      : undefined;
+
+    return initialState;
   });
 
   useEffect(() => {
     async function fetch() {
-      if (to === queueAddress && functionName === 'configure') {
+      if (isConfigureAction({ to, functionName, queueAddress })) {
         const rule = data['Argument #1 (tuple)'][key];
         const ipfs = await fetchIFPSFromRule(rule);
         updateReplacement({
