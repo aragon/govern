@@ -79,36 +79,54 @@ const CreateDaoBasicInfo: React.FC<{
             Existing Token
           </div>
           {!isExistingToken ? (
-            <Grid>
-              <GridItem gridColumn={'1/2'}>
-                <StyledText name={'title4'} style={{ marginTop: spacing }}>
-                  Token name
-                </StyledText>
-                <StyledText name={'body3'}>Enter your token name</StyledText>
-                <TextInput
-                  wide
-                  value={tokenName}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    updateBasicInfo('tokenName', e.target.value);
-                  }}
-                  placeholder={'Enter your token name...'}
-                />
-              </GridItem>
-              <GridItem gridColumn={'2/3'}>
-                <StyledText name={'title4'} style={{ marginTop: spacing }}>
-                  Token symbol
-                </StyledText>
-                <StyledText name={'body3'}>Enter your token symbol</StyledText>
-                <TextInput
-                  wide
-                  value={tokenSymbol}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    updateBasicInfo('tokenSymbol', e.target.value);
-                  }}
-                  placeholder={'Enter your token symbol'}
-                />
-              </GridItem>
-            </Grid>
+            <div>
+              <Grid>
+                <GridItem gridColumn={'1/2'}>
+                  <StyledText name={'title4'} style={{ marginTop: spacing }}>
+                    Token name
+                  </StyledText>
+                  <StyledText name={'body3'}>Enter your token name</StyledText>
+                  <TextInput
+                    wide
+                    value={tokenName}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      updateBasicInfo('tokenName', e.target.value);
+                    }}
+                    placeholder={'Enter your token name...'}
+                  />
+                </GridItem>
+                <GridItem gridColumn={'2/3'}>
+                  <StyledText name={'title4'} style={{ marginTop: spacing }}>
+                    Token symbol
+                  </StyledText>
+                  <StyledText name={'body3'}>Enter your token symbol</StyledText>
+                  <TextInput
+                    wide
+                    value={tokenSymbol}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      updateBasicInfo('tokenSymbol', e.target.value);
+                    }}
+                    placeholder={'Enter your token symbol'}
+                  />
+                </GridItem>
+              </Grid>
+              <StyledText name={'title4'} style={{ marginTop: spacing }}>
+                Amount of tokens
+              </StyledText>
+              <StyledText name={'body3'}>
+                Enter amount of tokens to be minted (they will be sent to your wallet address)...
+              </StyledText>
+              <TextInput
+                wide
+                type={'number'}
+                value={tokenMintAmount?.toString()}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  // typeof e.target.value === 'number' &&
+                  updateBasicInfo('tokenMintAmount', BigNumber.from(e.target.value));
+                }}
+                placeholder={'Enter amount'}
+              />
+            </div>
           ) : (
             <div>
               <StyledText name={'title4'} style={{ marginTop: spacing }}>
@@ -125,21 +143,7 @@ const CreateDaoBasicInfo: React.FC<{
               />
             </div>
           )}
-          <StyledText name={'title4'} style={{ marginTop: spacing }}>
-            Amount of tokens
-          </StyledText>
-          <StyledText name={'body3'}>
-            Enter amount of tokens to be minted (they will be sent to your wallet address)...
-          </StyledText>
-          <TextInput
-            wide
-            value={tokenMintAmount?.toString()}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              // typeof e.target.value === 'number' &&
-              updateBasicInfo('tokenMintAmount', BigNumber.from(e.target.value));
-            }}
-            placeholder={'Enter amount'}
-          />
+
           <Box shadow style={{ marginTop: spacing }}>
             <label
               style={{

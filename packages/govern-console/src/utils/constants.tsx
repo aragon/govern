@@ -16,6 +16,8 @@ export const RINKEBY_NODE_URL = 'https://rinkeby.eth.aragon.network/';
 export const ETHERSCAN_API_KEY = 'HS2AR94Q6G6RYIYHR7VRCZGP6E382K4BDC ';
 export const IPFS_GATEWAY = 'https://ipfs.io/ipfs';
 
+export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+
 export const DEFAULT_DAO_CONFIG: { [chainId in ChainId]: DaoConfig } = {
   // TODO: "resolver" to be changed once it is available for mainnet
   [ChainId.MAINNET]: {

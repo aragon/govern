@@ -16,7 +16,7 @@ import { ChainId, CiruclarProgressStatus } from '../../utils/types';
 import { validateToken } from '../../utils/validations';
 import { CreateDaoStatus } from './CreateDao';
 import { CreateDaoProgressProps } from './CreateDaoProgress';
-import { ContractReceipt } from 'ethers';
+// import { ContractReceipt } from 'ethers';
 
 interface FormInputs {
   /**
@@ -165,57 +165,56 @@ const CreateDaoForm: React.FC<FormProps> = ({
     }
 
     // if the vocdoni is activated, we also register the token in the aragon voice.
-    let registerTokenCallback = undefined;
+    // let registerTokenCallback = undefined;
     if (params.useVocdoni) {
       // update progress
       setProgress({ ...progress });
 
       // TODO: Typescript doesn't allow `Function` type instead of any...
-      registerTokenCallback = async (registerToken: any) => {
-        // update progress
-        progress.progressStatus = {
-          create: CiruclarProgressStatus.Done,
-          register: CiruclarProgressStatus.InProgress,
-        };
-        setProgress({ ...progress });
+      // registerTokenCallback = async (registerToken: any) => {
+      //   // update progress
+      //   progress.progressStatus = {
+      //     create: CiruclarProgressStatus.Done,
+      //     register: CiruclarProgressStatus.InProgress,
+      //   };
+      //   setProgress({ ...progress });
 
-        const result: ContractReceipt | undefined = await registerToken();
-        if (typeof result === 'undefined' || result.status === 1) {
-          // handle token already registed
-          progress.progressStatus.register = CiruclarProgressStatus.Done;
-          setProgress({ ...progress });
-          setTimeout(() => {
-            setCreateDaoStatus(CreateDaoStatus.Successful);
-          }, 2000); // delay 2 seconds, so user can obeserve each progress result.
-        } else {
-          // update progress
-          progress.progressStatus.register = CiruclarProgressStatus.Failed;
-          setProgress({ ...progress });
-          setTimeout(() => {
-            setCreateDaoStatus(CreateDaoStatus.Failed);
-          }, 2000);
-        }
-      };
+      //   const result: ContractReceipt | undefined = await registerToken();
+      //   if (typeof result === 'undefined' || result.status === 1) {
+      //     // handle token already registed
+      //     progress.progressStatus.register = CiruclarProgressStatus.Done;
+      //     setProgress({ ...progress });
+      //     setTimeout(() => {
+      //       setCreateDaoStatus(CreateDaoStatus.Successful);
+      //     }, 2000); // delay 2 seconds, so user can obeserve each progress result.
+      //   } else {
+      //     // update progress
+      //     progress.progressStatus.register = CiruclarProgressStatus.Failed;
+      //     setProgress({ ...progress });
+      //     setTimeout(() => {
+      //       setCreateDaoStatus(CreateDaoStatus.Failed);
+      //     }, 2000);
+      //   }
+      // };
     } else {
       // update progress
       progress.isTokenRegister = false;
       setProgress({ ...progress });
     }
 
-    const createDaoParams: CreateDaoParams = {
-      name: params.daoName,
-      token,
-      config: params.daoConfig,
-      useProxies: params.useProxy,
-      useVocdoni: params.useVocdoni,
-    };
+    // const createDaoParams: CreateDaoParams = {
+    //   name: params.daoName,
+    //   token,
+    //   config: params.daoConfig,
+    //   useProxies: params.useProxy,
+    // };
 
     try {
       setCreateDaoStatus(CreateDaoStatus.InProgress);
 
-      const result: any = await createDao(createDaoParams, {}, registerTokenCallback);
+      // const result: any = await createDao(createDaoParams, {} /*, registerTokenCallback*/);
 
-      await result.wait();
+      // await result.wait();
 
       setCreatedDaoRoute(params.daoName);
 

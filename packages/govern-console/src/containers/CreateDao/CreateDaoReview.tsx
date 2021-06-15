@@ -24,13 +24,16 @@ const CreateDaoReview: React.FC<{
   const { basicInfo, config, collaterals } = useCreateDao();
 
   const basicInfoArray = useMemo(() => {
-    return Object.entries(basicInfo).map((entry) => {
-      const obj: { name: string; value: string } = {
+    const filter = basicInfo.isExistingToken
+      ? ['isExistingToken', 'tokenName', 'tokenSymbol', 'tokenMintAmount']
+      : ['isExistingToken', 'tokenAddress'];
+
+    return Object.entries(basicInfo)
+      .filter((entry) => !filter.includes(entry[0]))
+      .map((entry) => ({
         name: formatParamNames[entry[0]?.toString()],
         value: entry[1]?.toString(),
-      };
-      return obj;
-    });
+      }));
   }, [basicInfo]);
 
   const configArray = useMemo(() => {
@@ -47,23 +50,34 @@ const CreateDaoReview: React.FC<{
       }
     };
 
-    return Object.entries(config).map((entry) => {
-      const obj: { name: string; value: string } = {
+    const filter = !config.isRuleFile
+      ? ['maxCalldataSize', 'isRuleFile', 'ruleFile']
+      : ['maxCalldataSize', 'isRuleFile', 'ruleText'];
+
+    return Object.entries(config)
+      .filter((entry) => !filter.includes(entry[0]))
+      .map((entry) => ({
         name: formatParamNames[entry[0]?.toString()],
         value: formatValue(entry[0], entry[1]),
-      };
-      return obj;
-    });
+      }));
   }, [config]);
 
   const CollateralArray = useMemo(() => {
-    return Object.entries(collaterals).map((entry) => {
-      const obj: { name: string; value: string } = {
+    const formatValue = (name: string, value: any) => {
+      if (
+        (name === 'scheduleAddress' && collaterals.isScheduleNewDaoToken) ||
+        (name === 'challengeAddress' && collaterals.isChallengeNewDaoToken)
+      )
+        return 'The contract address will be avaible after the creation process';
+      return value;
+    };
+    const filter = collaterals.isAnyAddress ? ['executionAddressList'] : [];
+    return Object.entries(collaterals)
+      .filter((entry) => !filter.includes(entry[0]))
+      .map((entry) => ({
         name: formatParamNames[entry[0]?.toString()],
-        value: entry[1]?.toString(),
-      };
-      return obj;
-    });
+        value: formatValue(entry[0], entry[1]?.toString()),
+      }));
   }, [collaterals]);
 
   const cardText = (

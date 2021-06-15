@@ -45,6 +45,7 @@ const formatParamNames: { [key: string]: string } = {
   ruleFile: 'Rule File',
   ruleText: 'Rule Text',
   resolver: 'Resolver',
+  maxCalldataSize: 'Max Call Data Size',
 
   scheduleAddress: 'Schedule Address',
   scheduleAmount: 'Schedule Amount',

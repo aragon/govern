@@ -86,7 +86,7 @@ const CreateDaoCollateral: React.FC<{
           <StyledText name={'body3'}>
             Which token do you want to use for schedule execution?
           </StyledText>
-          <div style={{ marginTop: 8 }}>
+          <div style={{ marginTop: 8, marginBottom: 8 }}>
             Custom Token{' '}
             <Switch
               checked={isScheduleNewDaoToken}
@@ -96,35 +96,24 @@ const CreateDaoCollateral: React.FC<{
             />{' '}
             New DAO Token
           </div>
-          {!isScheduleNewDaoToken ? (
-            <div>
-              <StyledText name={'body3'}>Token contract address</StyledText>
-              <TextInput
-                wide
-                placeholder={'Contract address...'}
-                value={scheduleAddress}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  updateCollaterals('scheduleAddress', e.target.value);
-                }}
-              />
-            </div>
-          ) : (
-            <div>
-              <StyledText name={'body3'}>Token contract address</StyledText>
-              <TextInput
-                wide
-                disabled={true}
-                placeholder={'The contract address will be avaible after the creation process'}
-                value={scheduleAddress}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  updateCollaterals('scheduleAddress', e.target.value);
-                }}
-              />
-            </div>
-          )}
+          <StyledText name={'body3'}>Token contract address</StyledText>
+          <TextInput
+            wide
+            disabled={isScheduleNewDaoToken}
+            placeholder={
+              isScheduleNewDaoToken
+                ? 'The contract address will be avaible after the creation process'
+                : 'Contract address...'
+            }
+            value={!isScheduleNewDaoToken ? scheduleAddress : ''}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              updateCollaterals('scheduleAddress', e.target.value);
+            }}
+          />
           <StyledText name={'body3'}>Token amount</StyledText>
           <TextInput
             wide
+            type={'number'}
             placeholder={'Token amount...'}
             value={scheduleAmount}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -148,31 +137,23 @@ const CreateDaoCollateral: React.FC<{
             New DAO Token
           </div>
           <StyledText name={'body3'}>Token contract address</StyledText>
-          {!isChallengeNewDaoToken ? (
-            <div>
-              <TextInput
-                wide
-                placeholder={'Contract address...'}
-                value={challengeAddress}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  updateCollaterals('challengeAddress', e.target.value);
-                }}
-              />
-            </div>
-          ) : (
-            <TextInput
-              wide
-              disabled={true}
-              placeholder={'The contract address will be avaible after the creation process'}
-              value={scheduleAddress}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                updateCollaterals('scheduleAddress', e.target.value);
-              }}
-            />
-          )}
+          <TextInput
+            wide
+            disabled={isChallengeNewDaoToken}
+            placeholder={
+              isChallengeNewDaoToken
+                ? 'The contract address will be avaible after the creation process'
+                : 'Contract address...'
+            }
+            value={!isChallengeNewDaoToken ? scheduleAddress : ''}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              updateCollaterals('scheduleAddress', e.target.value);
+            }}
+          />
           <StyledText name={'body3'}>Token amount</StyledText>
           <TextInput
             wide
+            type={'number'}
             placeholder={'Token amount...'}
             value={challengeAmount}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -205,7 +186,8 @@ const CreateDaoCollateral: React.FC<{
                 marginTop: '20px',
               }}
             >
-              Please be aware that any address has permission to excute scheduels.
+              If you select ”Any Address”, then everybody can schedule executions in your DAO.
+              Please be sure you understand the impact of this selection.
             </Info>
           ) : (
             <div>
@@ -240,6 +222,7 @@ const CreateDaoCollateral: React.FC<{
               <Button
                 mode={'secondary'}
                 size={'large'}
+                disabled={executionAddressList.length === 10}
                 label={'Add new address'}
                 icon={<IconPlus />}
                 display={'all'}

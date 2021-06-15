@@ -58,6 +58,7 @@ const CreateDaoConfig: React.FC<{
           </StyledText>
           <TextInput
             wide
+            type={'number'}
             placeholder={'Amount'}
             value={executionDelay}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {

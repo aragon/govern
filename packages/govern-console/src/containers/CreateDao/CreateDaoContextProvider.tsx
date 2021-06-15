@@ -10,7 +10,7 @@ export interface ICreateDaoBasicInfo {
   tokenName: string;
   tokenSymbol: string;
   tokenAddress: string;
-  tokenMintAmount: BigNumber | null;
+  tokenMintAmount: BigNumber | string;
   isProxy: boolean;
 }
 
@@ -20,15 +20,16 @@ export interface ICreateDaoConfig {
   ruleFile: any;
   ruleText: BytesLike;
   resolver: string;
+  maxCalldataSize: number;
 }
 
 export interface ICreateDaoCollaterals {
-  scheduleAddress: string;
-  scheduleAmount: BigNumber | null;
   isScheduleNewDaoToken: boolean;
-  challengeAddress: string;
-  challengeAmount: BigNumber | null;
+  scheduleAddress: string;
+  scheduleAmount: BigNumber | string;
   isChallengeNewDaoToken: boolean;
+  challengeAddress: string;
+  challengeAmount: BigNumber | string;
   isAnyAddress: boolean;
   executionAddressList: string[];
 }
@@ -58,7 +59,7 @@ const CreateDaoProvider: React.FC = ({ children }) => {
     tokenName: '',
     tokenSymbol: '',
     tokenAddress: '',
-    tokenMintAmount: null,
+    tokenMintAmount: '',
     isProxy: true,
   });
 
@@ -68,15 +69,16 @@ const CreateDaoProvider: React.FC = ({ children }) => {
     ruleFile: '',
     ruleText: defaultConfig.rules,
     resolver: defaultConfig.resolver,
+    maxCalldataSize: defaultConfig.maxCalldataSize,
   });
 
   const [collaterals, setCollaterals] = useState<ICreateDaoCollaterals>({
+    isScheduleNewDaoToken: false,
     scheduleAddress: defaultConfig.scheduleDeposit.token,
     scheduleAmount: BigNumber.from(defaultConfig.scheduleDeposit.amount),
-    isScheduleNewDaoToken: false,
+    isChallengeNewDaoToken: false,
     challengeAddress: defaultConfig.challengeDeposit.token,
     challengeAmount: BigNumber.from(defaultConfig.challengeDeposit.amount),
-    isChallengeNewDaoToken: true,
     isAnyAddress: false,
     executionAddressList: [''],
   });
