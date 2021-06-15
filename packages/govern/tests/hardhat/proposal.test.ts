@@ -29,8 +29,8 @@ const vetoAbi = [
 
 // use rinkeby addresses as the tests run on a hardhat network forked from rinkeby
 const tokenAddress = '0x9fB402A33761b88D5DcbA55439e6668Ec8D4F2E8'
-const registryAddress = '0x91209b1352E1aD3abF7C7b74A899F3b118287f9D' //'0x7714e0a2A2DA090C2bbba9199A54B903bB83A73d'
-const daoFactoryAddress = '0x93731ce6db7f1ab978c722f3bcda494d12dcc0a1' //'0x53B7C20e6e4617FC5f8E1d113F0abFb2FCE1D5E2'
+const registryAddress = '0x93731ce6db7f1ab978c722f3bcda494d12dcc0a1' //'0x7714e0a2A2DA090C2bbba9199A54B903bB83A73d'
+const daoFactoryAddress = '0x91209b1352E1aD3abF7C7b74A899F3b118287f9D' //'0x53B7C20e6e4617FC5f8E1d113F0abFb2FCE1D5E2'
 const emptyBytes = '0x'
 
 const noCollateral = {
@@ -187,19 +187,17 @@ describe('Proposal', function () {
     testToken = await createTestToken()
     arbitrator = await createArbitratorMock(testToken.address)
     daoConfig.resolver = arbitrator.address
+
     const [owner, addr1, addr2] = await ethers.getSigners()
     const accessList = [owner.address, addr1.address, addr2.address]
-    const ZERO_ADDRESS = '0x' + '00'.repeat(20)
-    const ZERO_BYTES32 = '0x' + '00'.repeat(32)
 
     const token = {
-      tokenAddress: ZERO_ADDRESS,
       tokenName: 'unicorn',
       tokenSymbol: 'MAG',
       tokenDecimals: 6,
-      mintAddress: ZERO_ADDRESS,
+      mintAddress: owner.address,
       mintAmount: 100,
-      merkleRoot: ZERO_BYTES32,
+      merkleRoot: '0x' + '00'.repeat(32),
       merkleMintAmount: 0,
     }
 
@@ -207,21 +205,18 @@ describe('Proposal', function () {
       name: 'unicorn',
       token,
       config: daoConfig,
-      scheduleAccessList: [],
+      scheduleAccessList: accessList,
       useProxies: false,
     }
 
     const options = { provider: network.provider, daoFactoryAddress }
-    console.log('params, options', params, options)
     const result = await createDao(params, options)
-
     const receipt = await result.wait()
     expect(receipt.status).to.equal(1)
     expect(result.hash).to.equal(receipt.transactionHash)
 
     // get executor and queue address from register event
     const iface = new ethers.utils.Interface(registryAbi)
-
     const args = receipt.logs
       .filter(({ address }) => address === registryAddress)
       .map((log: any) => iface.parseLog(log))

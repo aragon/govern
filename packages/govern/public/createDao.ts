@@ -25,7 +25,7 @@ const token = `
     string tokenSymbol,
     address mintAddress,
     uint256 mintAmount,
-    byte32 merkleRoot,
+    bytes32 merkleRoot,
     uint256 merkleMintAmount,
   )`
 
@@ -108,11 +108,11 @@ export async function createDao(
       !args.token.tokenSymbol ||
       !args.token.tokenDecimals ||
       !args.token.mintAddress ||
-      !args.token.mintAmount
+      !args.token.merkleRoot
 
     if (tokenIsMissingInfo) {
       throw new Error(
-        'Missing token name, decimals, symbol, mintAmount and/or mintAddress'
+        'Missing token name, decimals, symbol, mintAddress, mintAmount and/or merkleRoot'
       )
     }
     token = {
@@ -133,8 +133,8 @@ export async function createDao(
   const signer = await new providers.Web3Provider(
     options.provider || window.ethereum
   ).getSigner()
-  const contract = new Contract(factoryAddress, factoryAbi, signer)
 
+  const contract = new Contract(factoryAddress, factoryAbi, signer)
   const GovernRegistry = new Contract(
     config.governRegistry,
     registryAbi,
