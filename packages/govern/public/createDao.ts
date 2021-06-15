@@ -17,26 +17,149 @@ export const ContainerConfig = `
     uint256 maxCalldataSize
   )`
 
-const token = `
-  tuple(
-    address tokenAddress, 
-    uint8 tokenDecimals, 
-    string tokenName, 
-    string tokenSymbol,
-    address mintAddress,
-    uint256 mintAmount,
-    bytes32 merkleRoot,
-    uint256 merkleMintAmount,
-  )`
-
 const factoryAbi = [
-  `function newGovern(
-    string _name, 
-    ${token} _token, 
-    ${ContainerConfig} _config,
-    address[] _scheduleAccessList,
-    bool _useProxies
-  )`,
+  {
+    inputs: [
+      {
+        internalType: 'string',
+        name: '_name',
+        type: 'string',
+      },
+      {
+        components: [
+          {
+            internalType: 'contract IERC20',
+            name: 'tokenAddress',
+            type: 'address',
+          },
+          {
+            internalType: 'uint8',
+            name: 'tokenDecimals',
+            type: 'uint8',
+          },
+          {
+            internalType: 'string',
+            name: 'tokenName',
+            type: 'string',
+          },
+          {
+            internalType: 'string',
+            name: 'tokenSymbol',
+            type: 'string',
+          },
+          {
+            internalType: 'address',
+            name: 'mintAddress',
+            type: 'address',
+          },
+          {
+            internalType: 'uint256',
+            name: 'mintAmount',
+            type: 'uint256',
+          },
+          {
+            internalType: 'bytes32',
+            name: 'merkleRoot',
+            type: 'bytes32',
+          },
+          {
+            internalType: 'uint256',
+            name: 'merkleMintAmount',
+            type: 'uint256',
+          },
+        ],
+        internalType: 'struct TokenLib.TokenConfig',
+        name: '_token',
+        type: 'tuple',
+      },
+      {
+        components: [
+          {
+            internalType: 'uint256',
+            name: 'executionDelay',
+            type: 'uint256',
+          },
+          {
+            components: [
+              {
+                internalType: 'address',
+                name: 'token',
+                type: 'address',
+              },
+              {
+                internalType: 'uint256',
+                name: 'amount',
+                type: 'uint256',
+              },
+            ],
+            internalType: 'struct ERC3000Data.Collateral',
+            name: 'scheduleDeposit',
+            type: 'tuple',
+          },
+          {
+            components: [
+              {
+                internalType: 'address',
+                name: 'token',
+                type: 'address',
+              },
+              {
+                internalType: 'uint256',
+                name: 'amount',
+                type: 'uint256',
+              },
+            ],
+            internalType: 'struct ERC3000Data.Collateral',
+            name: 'challengeDeposit',
+            type: 'tuple',
+          },
+          {
+            internalType: 'address',
+            name: 'resolver',
+            type: 'address',
+          },
+          {
+            internalType: 'bytes',
+            name: 'rules',
+            type: 'bytes',
+          },
+          {
+            internalType: 'uint256',
+            name: 'maxCalldataSize',
+            type: 'uint256',
+          },
+        ],
+        internalType: 'struct ERC3000Data.Config',
+        name: '_config',
+        type: 'tuple',
+      },
+      {
+        internalType: 'address[]',
+        name: '_scheduleAccessList',
+        type: 'address[]',
+      },
+      {
+        internalType: 'bool',
+        name: '_useProxies',
+        type: 'bool',
+      },
+    ],
+    name: 'newGovern',
+    outputs: [
+      {
+        internalType: 'contract Govern',
+        name: 'govern',
+        type: 'address',
+      },
+      {
+        internalType: 'contract GovernQueue',
+        name: 'queue',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
 ]
 
 const registryAbi = [
