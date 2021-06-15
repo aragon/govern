@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import cardMainImage from '../../images/pngs/review_create_dao@2x.png';
-import { CreateDaoSteps, stepsNames, formatParamNames } from './Shared';
-import { useCreateDao } from './CreateDaoContextProvider';
+import { CreateDaoSteps, stepsNames, formatParamNames } from './utils/Shared';
+import { useCreateDaoContext } from './utils/CreateDaoContextProvider';
 import {
   useLayout,
   Grid,
@@ -21,7 +21,7 @@ const CreateDaoReview: React.FC<{
   setActiveStep: React.Dispatch<React.SetStateAction<CreateDaoSteps>>;
 }> = ({ setActiveStep }) => {
   const { layoutName } = useLayout();
-  const { basicInfo, config, collaterals } = useCreateDao();
+  const { basicInfo, config, collaterals } = useCreateDaoContext();
 
   const basicInfoArray = useMemo(() => {
     const filter = basicInfo.isExistingToken

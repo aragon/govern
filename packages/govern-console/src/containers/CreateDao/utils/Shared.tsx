@@ -57,7 +57,7 @@ const formatParamNames: { [key: string]: string } = {
   executionAddressList: 'Excutors Addresses',
 };
 
-export type BasicInfoIndexType =
+export type BasicInfoArg =
   | 'daoIdentifier'
   | 'isExistingToken'
   | 'tokenName'
@@ -66,14 +66,9 @@ export type BasicInfoIndexType =
   | 'tokenMintAmount'
   | 'isProxy';
 
-export type ConfigIndexType =
-  | 'executionDelay'
-  | 'isRuleFile'
-  | 'ruleFile'
-  | 'ruleText'
-  | 'resolver';
+export type ConfigArgs = 'executionDelay' | 'isRuleFile' | 'ruleFile' | 'ruleText' | 'resolver';
 
-export type CollateralsIndexType =
+export type CollateralsArgs =
   | 'scheduleAddress'
   | 'scheduleAmount'
   | 'isScheduleNewDaoToken'

@@ -1,7 +1,7 @@
 import React from 'react';
 import { BigNumber } from 'ethers';
-import { CreateDaoSteps, accordionItems, stepsNames, BasicInfoIndexType } from './Shared';
-import { useCreateDao, ICreateDaoBasicInfo } from './CreateDaoContextProvider';
+import { CreateDaoSteps, accordionItems, stepsNames, BasicInfoArg } from './utils/Shared';
+import { useCreateDaoContext, ICreateDaoBasicInfo } from './utils/CreateDaoContextProvider';
 import {
   useLayout,
   Grid,
@@ -22,7 +22,7 @@ const CreateDaoBasicInfo: React.FC<{
 }> = ({ setActiveStep }) => {
   const { layoutName } = useLayout();
   const spacing = SPACING[layoutName];
-  const { basicInfo, setBasicInfo } = useCreateDao();
+  const { basicInfo, setBasicInfo } = useCreateDaoContext();
 
   const {
     daoIdentifier,
@@ -34,7 +34,7 @@ const CreateDaoBasicInfo: React.FC<{
     isProxy,
   } = basicInfo;
 
-  const updateBasicInfo = (indexType: BasicInfoIndexType, value: any) => {
+  const updateBasicInfo = (indexType: BasicInfoArg, value: any) => {
     const NewBasicInfo: ICreateDaoBasicInfo = { ...basicInfo };
     (NewBasicInfo[indexType] as any) = value;
     setBasicInfo(NewBasicInfo);

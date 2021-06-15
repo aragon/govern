@@ -7,7 +7,6 @@ import ConsoleMainPage from 'containers/Console/ConsoleMainPage';
 import DaoMainPage from 'containers/DAO/DaoMainPage';
 import ProposalDetails from 'containers/ProposalDetails/ProposalDetails';
 import NewProposal from 'containers/NewProposal/NewProposal';
-import CreateDaoOld from 'containers/CreateDAO_old/CreateDao';
 import DaoSettings from 'containers/DAOSettings/DAOSettings';
 import { ModalsProvider } from 'containers/HomePage/ModalsContext';
 import { Main } from '@aragon/ui';
@@ -44,9 +43,6 @@ const HomePage = () => {
           </Route>
           <Route exact path="/daos/:daoName/dao-settings">
             <DaoSettings onClickBack={() => history.goBack()} />
-          </Route>
-          <Route exact path="/create-dao-old">
-            <CreateDaoOld />
           </Route>
           <Route exact path="/create-dao">
             <CreateDao />

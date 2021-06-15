@@ -1,6 +1,6 @@
 import React from 'react';
-import { CreateDaoSteps, accordionItems, stepsNames, CollateralsIndexType } from './Shared';
-import { useCreateDao, ICreateDaoCollaterals } from './CreateDaoContextProvider';
+import { CreateDaoSteps, accordionItems, stepsNames, CollateralsArgs } from './utils/Shared';
+import { useCreateDaoContext, ICreateDaoCollaterals } from './utils/CreateDaoContextProvider';
 import {
   useLayout,
   Grid,
@@ -25,7 +25,7 @@ const CreateDaoCollateral: React.FC<{
 }> = ({ setActiveStep }) => {
   const { layoutName } = useLayout();
   const spacing = SPACING[layoutName];
-  const { collaterals, setCollaterals } = useCreateDao();
+  const { collaterals, setCollaterals } = useCreateDaoContext();
   const {
     scheduleAddress,
     scheduleAmount,
@@ -37,7 +37,7 @@ const CreateDaoCollateral: React.FC<{
     executionAddressList,
   } = collaterals;
 
-  const updateCollaterals = (indexType: CollateralsIndexType, value: any) => {
+  const updateCollaterals = (indexType: CollateralsArgs, value: any) => {
     console.log('updateCollaterals', indexType, value);
     const newCollaterals: ICreateDaoCollaterals = { ...collaterals };
     (newCollaterals[indexType] as any) = value;

@@ -46,7 +46,7 @@ export interface CreateDaoContext {
   setCollaterals: (collaterals: ICreateDaoCollaterals) => void;
 }
 
-const UseCreateDaoContext = React.createContext<CreateDaoContext | null>(null);
+const UseCreateDao = React.createContext<CreateDaoContext | null>(null);
 
 const CreateDaoProvider: React.FC = ({ children }) => {
   const walletContext: any = useWallet();
@@ -96,13 +96,11 @@ const CreateDaoProvider: React.FC = ({ children }) => {
     }),
     [basicInfo, config, collaterals],
   );
-  return (
-    <UseCreateDaoContext.Provider value={contextValue}>{children}</UseCreateDaoContext.Provider>
-  );
+  return <UseCreateDao.Provider value={contextValue}>{children}</UseCreateDao.Provider>;
 };
 
-function useCreateDao(): CreateDaoContext {
-  return useContext(UseCreateDaoContext) as CreateDaoContext;
+function useCreateDaoContext(): CreateDaoContext {
+  return useContext(UseCreateDao) as CreateDaoContext;
 }
 
-export { CreateDaoProvider, useCreateDao };
+export { CreateDaoProvider, useCreateDaoContext };

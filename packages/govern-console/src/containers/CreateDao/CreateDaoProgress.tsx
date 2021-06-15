@@ -1,9 +1,9 @@
 import React, { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import progressImage from '../../images/svgs/CreateDaoInProgress.svg';
-import { CreateDaoSteps } from './Shared';
+import { CreateDaoSteps } from './utils/Shared';
 import { ZERO_ADDRESS } from '../../utils/constants';
-import { useCreateDao } from './CreateDaoContextProvider';
-import ProgressComponent from './ProgressComponent';
+import { useCreateDaoContext } from './utils/CreateDaoContextProvider';
+import ProgressComponent from './components/ProgressComponent';
 import { CiruclarProgressStatus } from 'utils/types';
 import {
   createDao,
@@ -14,112 +14,18 @@ import {
   isTokenRegistered,
 } from '@aragon/govern';
 import { addToIpfs } from 'utils/ipfs';
-import { Button, StyledText, useTheme, SPACING, useLayout } from '@aragon/ui';
 import { BytesLike } from '@ethersproject/bytes';
 import { useWallet } from 'AugmentedWallet';
-import { useHistory } from 'react-router';
-
-// TODO: move to own file
-const FailAction: React.FC<{
-  setActiveStep: React.Dispatch<React.SetStateAction<CreateDaoSteps>>;
-}> = ({ setActiveStep }) => {
-  const theme = useTheme();
-  return (
-    <div>
-      <StyledText name={'body2'}>Somthing went wrong</StyledText>
-      <StyledText name={'body2'} style={{ color: theme.disabled }}>
-        Please review your DAO inputs and try again.
-      </StyledText>
-      <Button
-        size={'large'}
-        mode={'secondary'}
-        style={{ marginTop: 20 }}
-        onClick={() => setActiveStep(CreateDaoSteps.Review)}
-      >
-        Go back
-      </Button>
-    </div>
-  );
-};
-
-const SuccessAction: React.FC<{
-  isNewDaoTokenRegistered: boolean;
-  daoTokenAddress: string;
-  tokenRegister: () => void;
-  daoIdentifier: string;
-}> = ({ isNewDaoTokenRegistered, daoTokenAddress, tokenRegister, daoIdentifier }) => {
-  const { layoutName } = useLayout();
-  const theme = useTheme();
-  const history = useHistory();
-
-  const goToDaoPage = () => history.push('daos/' + daoIdentifier);
-  return (
-    <div>
-      <StyledText name={'body2'}>
-        Your DAO is ready. Do you wanna register your token in Aragon Voice?
-      </StyledText>
-      <StyledText name={'body2'} style={{ color: theme.disabled }}>
-        This allows you create governance proposals easy with 0 gass price
-      </StyledText>
-      {isNewDaoTokenRegistered ? (
-        <div>
-          <Button
-            size={'large'}
-            mode={'primary'}
-            style={{
-              marginTop: 20,
-              marginLeft: layoutName !== 'small' ? SPACING[layoutName] : '0px',
-            }}
-            onClick={goToDaoPage}
-          >
-            Token already Registered, go to DAO page
-          </Button>
-        </div>
-      ) : (
-        <div>
-          <Button size={'large'} mode={'secondary'} style={{ marginTop: 20 }} onClick={goToDaoPage}>
-            Don't register token
-          </Button>
-          <Button
-            size={'large'}
-            mode={'primary'}
-            style={{
-              marginTop: 20,
-              marginLeft: layoutName !== 'small' ? SPACING[layoutName] : '0px',
-            }}
-            onClick={() => tokenRegister()}
-          >
-            Yes, register token
-          </Button>
-        </div>
-      )}
-    </div>
-  );
-};
-
-const RegisterSuccessAction: React.FC<{ daoIdentifier: string }> = ({ daoIdentifier }) => {
-  const { layoutName } = useLayout();
-  const history = useHistory();
-
-  const goToDaoPage = () => history.push('daos/' + daoIdentifier);
-  return (
-    <Button
-      size={'large'}
-      mode={'primary'}
-      style={{ marginTop: 20, marginLeft: layoutName !== 'small' ? SPACING[layoutName] : '0px' }}
-      onClick={goToDaoPage}
-    >
-      Amazing, all ready. Let’s start
-    </Button>
-  );
-};
+import FailAction from './components/FailAction';
+import SuccessAction from './components/SuccessAction';
+import RegisterSuccessAction from './components/RegisterSuccessAction';
 
 const CreateDaoProgress: React.FC<{
   setActiveStep: React.Dispatch<React.SetStateAction<CreateDaoSteps>>;
 }> = ({ setActiveStep }) => {
   const walletContext: any = useWallet();
   const { provider, account } = walletContext;
-  const { basicInfo, config, collaterals } = useCreateDao();
+  const { basicInfo, config, collaterals } = useCreateDaoContext();
   const [progressList, setProgressList] = useState([
     { status: CiruclarProgressStatus.InProgress, text: 'Uploading rules to IPFS' },
     { status: CiruclarProgressStatus.Disabled, text: 'Creating DAO' },

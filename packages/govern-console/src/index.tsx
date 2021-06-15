@@ -12,7 +12,7 @@ import { lightTheme } from './AragonTheme';
 import './index.css';
 
 // move to env files.
-const subgraphUri = 'https://thegraph.com/explorer/subgraph/aragon/aragon-govern-rinkeby-staging'; // 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby';
+const subgraphUri = 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby-staging';
 
 function mergeFunction(existing: [], incoming: []) {
   if (!incoming) return existing;

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { CreateDaoSteps, accordionItems, stepsNames, ConfigIndexType } from './Shared';
-import { useCreateDao, ICreateDaoConfig } from './CreateDaoContextProvider';
+import { CreateDaoSteps, accordionItems, stepsNames, ConfigArgs } from './utils/Shared';
+import { useCreateDaoContext, ICreateDaoConfig } from './utils/CreateDaoContextProvider';
 import {
   useLayout,
   Grid,
@@ -29,10 +29,10 @@ const CreateDaoConfig: React.FC<{
   const { layoutName } = useLayout();
   const spacing = SPACING[layoutName];
   const [resolverLock, setResolverLock] = useState(false);
-  const { config, setConfig } = useCreateDao();
+  const { config, setConfig } = useCreateDaoContext();
   const { executionDelay, isRuleFile, ruleText, resolver } = config;
 
-  const updateConfig = (indexType: ConfigIndexType, value: any) => {
+  const updateConfig = (indexType: ConfigArgs, value: any) => {
     const newConfig: ICreateDaoConfig = { ...config };
     (newConfig[indexType] as any) = value;
     setConfig(newConfig);
