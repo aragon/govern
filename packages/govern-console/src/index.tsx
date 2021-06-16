@@ -11,8 +11,9 @@ import reportWebVitals from './reportWebVitals';
 import { lightTheme } from './AragonTheme';
 import './index.css';
 
-// move to env files.
-const subgraphUri = 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby-staging';
+import { networkEnvironment } from './environment';
+
+const { subgraphUrl } = networkEnvironment;
 
 function mergeFunction(existing: [], incoming: []) {
   if (!incoming) return existing;
@@ -21,7 +22,7 @@ function mergeFunction(existing: [], incoming: []) {
 }
 
 const client = new ApolloClient({
-  uri: subgraphUri,
+  uri: subgraphUrl,
   cache: new InMemoryCache({
     typePolicies: {
       GovernQueue: {

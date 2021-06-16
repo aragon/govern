@@ -313,10 +313,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     proposalInfo?.config.resolver,
   );
 
-  const {
-    getProposalData,
-    data: proposalDetailsData,
-  } = useLazyProposalQuery();
+  const { getProposalData, data: proposalDetailsData } = useLazyProposalQuery();
 
   // USE EFFECTS
   useEffect(() => {
@@ -384,29 +381,32 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     }
   };
 
-  const challengeProposal = useCallback(async (challengeReason: string, challengeReasonFile: any) => {
-    // TODO: add modal
-    const reason = challengeReasonFile ? challengeReasonFile[0] : challengeReason;
-    const reasonCid = await addToIpfs(reason);
+  const challengeProposal = useCallback(
+    async (challengeReason: string, challengeReasonFile: any) => {
+      // TODO: add modal
+      const reason = challengeReasonFile ? challengeReasonFile[0] : challengeReason;
+      const reasonCid = await addToIpfs(reason);
 
-    const proposalParams = getProposalParams(proposalInfo);
+      const proposalParams = getProposalParams(proposalInfo);
 
-    if (proposalInstance) {
-      try {
-        transactionsQueue.current = await proposalInstance.challenge(proposalParams, reasonCid);
-      } catch (error) {
-        enqueueSnackbar(error.message, { variant: 'error' });
-        return;
+      if (proposalInstance) {
+        try {
+          transactionsQueue.current = await proposalInstance.challenge(proposalParams, reasonCid);
+        } catch (error) {
+          enqueueSnackbar(error.message, { variant: 'error' });
+          return;
+        }
       }
-    }
 
-    dispatch({
-      type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
-      payload: {
-        transactionList: transactionsQueue.current,
-      },
-    });
-  }, [proposalInstance, transactionsQueue]);
+      dispatch({
+        type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
+        payload: {
+          transactionList: transactionsQueue.current,
+        },
+      });
+    },
+    [proposalInstance, transactionsQueue],
+  );
 
   const executeProposal = useCallback(async () => {
     const proposalParams = getProposalParams(proposalInfo);
@@ -422,20 +422,25 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     });
   }, [proposalInstance, transactionsQueue]);
 
-  const resolveProposal = useCallback(async (disputeId: number) => {
-    const proposalParams = getProposalParams(proposalInfo);
+  const resolveProposal = useCallback(
+    async (disputeId: number) => {
+      const proposalParams = getProposalParams(proposalInfo);
 
-    if (proposalInstance) {
-      transactionsQueue.current = [...(await proposalInstance.resolve(proposalParams, disputeId))];
-    }
+      if (proposalInstance) {
+        transactionsQueue.current = [
+          ...(await proposalInstance.resolve(proposalParams, disputeId)),
+        ];
+      }
 
-    dispatch({
-      type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
-      payload: {
-        transactionList: transactionsQueue.current,
-      },
-    });
-  }, [proposalInstance, transactionsQueue]);
+      dispatch({
+        type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
+        payload: {
+          transactionList: transactionsQueue.current,
+        },
+      });
+    },
+    [proposalInstance, transactionsQueue],
+  );
 
   const proposalStates: any = {};
   if (proposalInfo) {
@@ -636,7 +641,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
           {
             <ResolveWidget
               disabled={!isConnected}
-              containerEventExecute={proposalStates['ContainerEventResolve']}
+              containerEventResolve={proposalStates['ContainerEventResolve']}
               disputeId={
                 proposalStates['ContainerEventChallenge']
                   ? proposalStates['ContainerEventChallenge'].disputeId

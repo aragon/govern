@@ -11,6 +11,7 @@ import { useEffect } from 'react';
 import { getTruncatedAccountAddress } from 'utils/account';
 import { useSnackbar } from 'notistack';
 import detectEthereumProvider from '@metamask/detect-provider';
+import { networkEnvironment } from 'environment';
 
 const WalletWrapper = styled(Card)({
   background: '#FFFFFF',
@@ -69,8 +70,8 @@ const Wallet = ({}) => {
   //   connectWalletAndSetStatus('injected');
   // }, []);
   useEffect(() => {
-    if (chainId !== 4) {
-      setNetworkStatus('unsupported');
+    if (chainId !== networkEnvironment.chainId) {
+      setNetworkStatus('wrong-network');
     } else if (error) {
       if (error.message.includes('Unsupported chain')) {
         setNetworkStatus('unsupported');

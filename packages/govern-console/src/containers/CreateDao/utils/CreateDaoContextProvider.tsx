@@ -1,8 +1,6 @@
 import React, { useMemo, useState, useContext } from 'react';
 import { BigNumber, BytesLike } from 'ethers';
-import { DEFAULT_DAO_CONFIG } from 'utils/constants';
-import { useWallet } from 'AugmentedWallet';
-import { DaoConfig } from '@aragon/govern';
+import { networkEnvironment } from 'environment';
 
 export interface ICreateDaoBasicInfo {
   daoIdentifier: string;
@@ -52,9 +50,7 @@ export interface CreateDaoContext {
 const UseCreateDao = React.createContext<CreateDaoContext | null>(null);
 
 const CreateDaoProvider: React.FC = ({ children }) => {
-  const walletContext: any = useWallet();
-  const { chainId } = walletContext;
-  const defaultConfig: DaoConfig = (DEFAULT_DAO_CONFIG as any)[chainId];
+  const { defaultDaoConfig: defaultConfig } = networkEnvironment;
 
   const [basicInfo, setBasicInfo] = useState<ICreateDaoBasicInfo>({
     daoIdentifier: '',
