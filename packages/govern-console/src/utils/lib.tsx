@@ -19,11 +19,15 @@ export function toUTF8Bytes(data: string): utils.BytesLike | null {
   }
 }
 
+// example: formatUnits(100, 3) = 0.1
 export function formatUnits(amount: BigNumberish, decimals: number) {
-  if (!decimals) return amount.toString();
+  if (amount.toString().includes('.') || !decimals) {
+    return amount.toString();
+  }
   return ethers.utils.formatUnits(amount, decimals);
 }
 
+// example: parseUnits(100, 3) = 100000
 export function parseUnits(amount: BigNumberish, decimals: number) {
   return ethers.utils.parseUnits(amount.toString(), decimals);
 }

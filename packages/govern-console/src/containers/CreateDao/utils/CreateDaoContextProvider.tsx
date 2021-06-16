@@ -7,8 +7,9 @@ export interface ICreateDaoBasicInfo {
   isExistingToken: boolean;
   tokenName: string;
   tokenSymbol: string;
+  tokenDecimals: number;
   tokenAddress: string;
-  tokenMintAmount: BigNumber | null;
+  tokenMintAmount: BigNumber | string;
   isProxy: boolean;
 }
 
@@ -18,15 +19,18 @@ export interface ICreateDaoConfig {
   ruleFile: any;
   ruleText: BytesLike;
   resolver: string;
+  maxCalldataSize: number;
 }
 
 export interface ICreateDaoCollaterals {
-  scheduleAddress: string;
-  scheduleAmount: BigNumber | null;
   isScheduleNewDaoToken: boolean;
-  challengeAddress: string;
-  challengeAmount: BigNumber | null;
+  scheduleAddress: string;
+  scheduleAmount: BigNumber | string;
+  scheduleDecimals: number;
   isChallengeNewDaoToken: boolean;
+  challengeAddress: string;
+  challengeAmount: BigNumber | string;
+  challengeDecimals: number;
   isAnyAddress: boolean;
   executionAddressList: string[];
 }
@@ -43,7 +47,7 @@ export interface CreateDaoContext {
   setCollaterals: (collaterals: ICreateDaoCollaterals) => void;
 }
 
-const UseCreateDaoContext = React.createContext<CreateDaoContext | null>(null);
+const UseCreateDao = React.createContext<CreateDaoContext | null>(null);
 
 const CreateDaoProvider: React.FC = ({ children }) => {
   const { defaultDaoConfig: defaultConfig } = networkEnvironment;
@@ -54,7 +58,8 @@ const CreateDaoProvider: React.FC = ({ children }) => {
     tokenName: '',
     tokenSymbol: '',
     tokenAddress: '',
-    tokenMintAmount: null,
+    tokenDecimals: 18,
+    tokenMintAmount: '',
     isProxy: true,
   });
 
@@ -64,15 +69,18 @@ const CreateDaoProvider: React.FC = ({ children }) => {
     ruleFile: '',
     ruleText: defaultConfig.rules,
     resolver: defaultConfig.resolver,
+    maxCalldataSize: defaultConfig.maxCalldataSize,
   });
 
   const [collaterals, setCollaterals] = useState<ICreateDaoCollaterals>({
+    isScheduleNewDaoToken: false,
     scheduleAddress: defaultConfig.scheduleDeposit.token,
     scheduleAmount: BigNumber.from(defaultConfig.scheduleDeposit.amount),
-    isScheduleNewDaoToken: false,
+    scheduleDecimals: 18, // TODO: this should be coming from the config
+    isChallengeNewDaoToken: false,
     challengeAddress: defaultConfig.challengeDeposit.token,
     challengeAmount: BigNumber.from(defaultConfig.challengeDeposit.amount),
-    isChallengeNewDaoToken: true,
+    challengeDecimals: 18, // TODO: this should be coming from the config
     isAnyAddress: false,
     executionAddressList: [''],
   });
@@ -90,13 +98,11 @@ const CreateDaoProvider: React.FC = ({ children }) => {
     }),
     [basicInfo, config, collaterals],
   );
-  return (
-    <UseCreateDaoContext.Provider value={contextValue}>{children}</UseCreateDaoContext.Provider>
-  );
+  return <UseCreateDao.Provider value={contextValue}>{children}</UseCreateDao.Provider>;
 };
 
-function useCreateDao(): CreateDaoContext {
-  return useContext(UseCreateDaoContext) as CreateDaoContext;
+function useCreateDaoContext(): CreateDaoContext {
+  return useContext(UseCreateDao) as CreateDaoContext;
 }
 
-export { CreateDaoProvider, useCreateDao };
+export { CreateDaoProvider, useCreateDaoContext };

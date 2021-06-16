@@ -1,7 +1,14 @@
 import React, { useMemo } from 'react';
 import cardMainImage from '../../images/pngs/review_create_dao@2x.png';
-import { CreateDaoSteps, stepsNames, formatParamNames } from './Shared';
-import { useCreateDao } from './CreateDaoContextProvider';
+import {
+  CreateDaoSteps,
+  stepsNames,
+  formatParamNames,
+  configArray,
+  basicInfoArray,
+  collateralArray,
+} from './utils/Shared';
+import { useCreateDaoContext } from './utils/CreateDaoContextProvider';
 import {
   useLayout,
   Grid,
@@ -21,50 +28,14 @@ const CreateDaoReview: React.FC<{
   setActiveStep: React.Dispatch<React.SetStateAction<CreateDaoSteps>>;
 }> = ({ setActiveStep }) => {
   const { layoutName } = useLayout();
-  const { basicInfo, config, collaterals } = useCreateDao();
+  const { basicInfo, config, collaterals } = useCreateDaoContext();
 
-  const basicInfoArray = useMemo(() => {
-    return Object.entries(basicInfo).map((entry) => {
-      const obj: { name: string; value: string } = {
-        name: formatParamNames[entry[0]?.toString()],
-        value: entry[1]?.toString(),
-      };
-      return obj;
-    });
-  }, [basicInfo]);
+  // prepare data for the <DataView>
+  const basicInfoData = useMemo(() => basicInfoArray(basicInfo), [basicInfo]);
+  const configData = useMemo(() => configArray(config), [config]);
+  const collateralData = useMemo(() => collateralArray(collaterals), [collaterals]);
 
-  const configArray = useMemo(() => {
-    const formatValue = (name: string, value: any) => {
-      switch (name) {
-        case 'ruleText':
-          return toUtf8String(value);
-
-        case 'ruleFile':
-          return value.name;
-
-        default:
-          return value.toString();
-      }
-    };
-
-    return Object.entries(config).map((entry) => {
-      const obj: { name: string; value: string } = {
-        name: formatParamNames[entry[0]?.toString()],
-        value: formatValue(entry[0], entry[1]),
-      };
-      return obj;
-    });
-  }, [config]);
-
-  const CollateralArray = useMemo(() => {
-    return Object.entries(collaterals).map((entry) => {
-      const obj: { name: string; value: string } = {
-        name: formatParamNames[entry[0]?.toString()],
-        value: entry[1]?.toString(),
-      };
-      return obj;
-    });
-  }, [collaterals]);
+  console.log(configData, config, ' configData');
 
   const cardText = (
     <div>
@@ -119,13 +90,13 @@ const CreateDaoReview: React.FC<{
 
           <DataView
             fields={['', '']}
-            entries={basicInfoArray}
+            entries={basicInfoData}
             renderEntry={({ name, value }: { name: string; value: string }) => {
               return [
-                <StyledText name={'body3'} key={'basicInfoArray'}>
+                <StyledText name={'body3'} key={'basicInfoData'}>
                   {name}
                 </StyledText>,
-                <StyledText name={'body3'} key={'basicInfoArrayb'}>
+                <StyledText name={'body3'} key={'basicInfoDatab'}>
                   {value}
                 </StyledText>,
               ];
@@ -149,13 +120,13 @@ const CreateDaoReview: React.FC<{
 
           <DataView
             fields={['', '']}
-            entries={configArray}
+            entries={configData}
             renderEntry={({ name, value }: { name: string; value: string }) => {
               return [
-                <StyledText name={'body3'} key={'configArray'}>
+                <StyledText name={'body3'} key={'configData'}>
                   {name}
                 </StyledText>,
-                <StyledText name={'body3'} key={'configArrayb'}>
+                <StyledText name={'body3'} key={'configDatab'}>
                   {value}
                 </StyledText>,
               ];
@@ -164,7 +135,9 @@ const CreateDaoReview: React.FC<{
 
           <Grid columns={'2'} columnWidth={'1fr'} style={{ marginTop: 20 }}>
             <GridItem gridRow={'1'} alignHorizontal={'flex-start'}>
-              <StyledText name={layoutName !== 'small' ? 'title3' : 'title4'}>Config</StyledText>
+              <StyledText name={layoutName !== 'small' ? 'title3' : 'title4'}>
+                Collaterals
+              </StyledText>
             </GridItem>
             <GridItem gridRow={'1'} alignHorizontal={'flex-end'}>
               <ButtonText
@@ -179,13 +152,13 @@ const CreateDaoReview: React.FC<{
 
           <DataView
             fields={['', '']}
-            entries={CollateralArray}
+            entries={collateralData}
             renderEntry={({ name, value }: { name: string; value: string }) => {
               return [
-                <StyledText name={'body3'} key={'CollateralArray'}>
+                <StyledText name={'body3'} key={'collateralData'}>
                   {name}
                 </StyledText>,
-                <StyledText name={'body3'} key={'CollateralArrayb'}>
+                <StyledText name={'body3'} key={'collateralDatab'}>
                   {value}
                 </StyledText>,
               ];

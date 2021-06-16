@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 import { getTruncatedAccountAddress } from 'utils/account';
 import { useSnackbar } from 'notistack';
 import detectEthereumProvider from '@metamask/detect-provider';
-import { networkEnvironment } from 'environment'
+import { networkEnvironment } from 'environment';
 
 const WalletWrapper = styled(Card)({
   background: '#FFFFFF',

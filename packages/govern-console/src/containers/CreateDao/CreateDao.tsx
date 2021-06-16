@@ -5,8 +5,8 @@ import CreateDaoConfig from './CreateDaoConfig';
 import CreateDaoCollateral from './CreateDaoCollateral';
 import CreateDaoReview from './CreateDaoReview';
 import CreateDaoProgress from './CreateDaoProgress';
-import { CreateDaoSteps } from './Shared';
-import { CreateDaoProvider } from './CreateDaoContextProvider';
+import { CreateDaoSteps } from './utils/Shared';
+import { CreateDaoProvider } from './utils/CreateDaoContextProvider';
 
 const CreateDao: React.FC = () => {
   const [activeStep, setActiveStep] = useState<CreateDaoSteps>(CreateDaoSteps.BasicInfo);
