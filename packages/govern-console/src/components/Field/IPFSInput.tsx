@@ -17,25 +17,27 @@ import {
   GridItem,
   Accordion,
   TextInput,
-  Switch,
-  Checkbox,
+  TextCopy,
   Box,
   Button,
   StyledText,
-  Steps,
-  IconBlank,
-  Info,
-  Link,
   SPACING,
-  IconArrowLeft,
-  Split,
+  ContentSwitcher,
 } from '@aragon/ui';
 
 export interface IPFSInputProps {
   /**
-   * Label of the field
+   * to be removed
    */
-  label: string;
+  label?: string;
+  /**
+   * Title of the field
+   */
+  title?: string;
+  /**
+   * Sub Title of the field
+   */
+  subtitle?: string;
   /**
    * Placeholder
    */
@@ -73,7 +75,8 @@ export interface IPFSInputProps {
 }
 
 export const IPFSInput: React.FC<IPFSInputProps> = ({
-  label,
+  title,
+  subtitle,
   placeholder,
   textInputName,
   fileInputName,
@@ -104,53 +107,54 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
 
   return (
     <React.Fragment>
-      <div style={{ marginTop: 8 }}>
-        Text{' '}
+      <StyledText name={'title2'}>{title}</StyledText>
+      <StyledText name={'body3'}>{subtitle}</StyledText>
+      <div
+        style={{
+          width: 'fit-content',
+          display: 'flex',
+          flexDirection: 'row',
+          marginTop: SPACING[layoutName],
+          verticalAlign: 'middle',
+          lineHeight: '40px',
+        }}
+      >
         <Controller
           name={isFileChosen}
           control={control}
           defaultValue={false}
           render={({ field: { onChange, value } }) => (
-            <Switch checked={value} onChange={onChange} />
+            <ContentSwitcher
+              onChange={onChange}
+              selected={value}
+              items={['Text', 'File']}
+              paddingSettings={{
+                horizontal: SPACING[layoutName] * 2,
+                vertical: SPACING[layoutName] / 4,
+              }}
+            />
           )}
-        />{' '}
-        File
+        />
       </div>
-      {
-        // TODO: Sarkawt This is where I put ipfsURI if it's a file. make it per your design.
-        // {ipfsURI && (
-        //   <InputSubTitle>
-        //     Current file:
-        //     <a href={ipfsURI} target="_blank" rel="noreferrer noopener">
-        //       View
-        //     </a>
-        //   </InputSubTitle>
-        // )}
-      }
-
-      {/* <InputSubTitle>{label}</InputSubTitle> */}
       {!watch(isFileChosen) ? (
-        <div>
-          <StyledText name={'title4'} style={{ marginTop: spacing }}>
-            Text
-          </StyledText>
-          <StyledText name={'body3'}>{label}</StyledText>
-          <Controller
-            name={textInputName}
-            control={control}
-            defaultValue={''}
-            shouldUnregister={shouldUnregister}
-            rules={{ required: 'This is required.' }}
-            render={({ field: { onChange, value }, fieldState: { error } }) => (
-              <TextInput.Multiline
-                wide
-                placeholder={'Enter Rules...'}
-                value={value}
-                onChange={onChange}
-              />
-            )}
-          />
-        </div>
+        <Controller
+          name={textInputName}
+          control={control}
+          defaultValue={''}
+          shouldUnregister={shouldUnregister}
+          rules={{ required: 'This is required.' }}
+          render={({ field: { onChange, value }, fieldState: { error } }) => (
+            <InputField
+              label=""
+              onInputChange={onChange}
+              value={value}
+              height={'100px'}
+              placeholder={placeholder}
+              error={!!error}
+              helperText={error ? error.message : null}
+            />
+          )}
+        />
       ) : (
         <div>
           <StyledText name={'title4'} style={{ marginTop: spacing }}>
@@ -174,6 +178,14 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
 
           <p>{errors[fileInputName] && errors[fileInputName].message}</p>
         </div>
+      )}
+      {ipfsURI && (
+        <StyledText name={'body2'}>
+          Current file:
+          <a href={ipfsURI} target="_blank" rel="noreferrer noopener">
+            View Document
+          </a>
+        </StyledText>
       )}
     </React.Fragment>
   );

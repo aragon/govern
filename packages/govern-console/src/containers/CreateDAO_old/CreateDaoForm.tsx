@@ -197,20 +197,20 @@ const CreateDaoForm: React.FC<FormProps> = ({
       setProgress({ ...progress });
     }
 
-    const createDaoParams: CreateDaoParams = {
-      name: params.daoName,
-      token,
-      config: params.daoConfig,
-      useProxies: params.useProxy,
-      useVocdoni: params.useVocdoni,
-    };
+    // const createDaoParams: CreateDaoParams = {
+    //   name: params.daoName,
+    //   token,
+    //   config: params.daoConfig,
+    //   useProxies: params.useProxy,
+    //   // useVocdoni: params.useVocdoni,
+    // };
 
     try {
       setCreateDaoStatus(CreateDaoStatus.InProgress);
 
-      const result: any = await createDao(createDaoParams, {}, registerTokenCallback);
+      // const result: any = await createDao(createDaoParams, {}, registerTokenCallback);
 
-      await result.wait();
+      // await result.wait();
 
       setCreatedDaoRoute(params.daoName);
 

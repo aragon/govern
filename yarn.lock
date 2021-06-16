@@ -86,7 +86,11 @@
 
 "@aragon/ui@https://github.com/aragon/ui.git#v2":
   version "1.7.0"
+<<<<<<< Updated upstream
   resolved "https://github.com/aragon/ui.git#bdd7880e5ea9f48040eb841377986f0b350758b9"
+=======
+  resolved "https://github.com/aragon/ui.git#33b9fea61abe39d957a91232e82d7b4068e12f48"
+>>>>>>> Stashed changes
   dependencies:
     "@babel/runtime" "^7.3.1"
     airbnb-prop-types "^2.9.0"
