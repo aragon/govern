@@ -1,28 +1,14 @@
-/* eslint-disable */
-import React, { useState, useEffect } from 'react';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
-import TextField, { StandardTextFieldProps } from '@material-ui/core/TextField';
-import { styled } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import { InputField } from 'components/InputFields/InputField';
-import { ANButton } from 'components/Button/ANButton';
-import { HelpButton } from 'components/HelpButton/HelpButton';
+import React from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
-import { BlueSwitch } from 'components/Switchs/BlueSwitch';
-import { addToIpfs } from 'utils/ipfs';
-import { OptionTextStyle, InputSubTitle } from 'components/Titles/styles';
 import {
   useLayout,
-  Grid,
-  GridItem,
-  Accordion,
   TextInput,
-  TextCopy,
-  Box,
-  Button,
   StyledText,
   SPACING,
   ContentSwitcher,
+  Grid,
+  GridItem,
+  RADII,
 } from '@aragon/ui';
 
 export interface IPFSInputProps {
@@ -41,7 +27,7 @@ export interface IPFSInputProps {
   /**
    * Placeholder
    */
-  placeholder: string;
+  placeholder?: string;
   /**
    * name of the text type input field in the controller.
    */
@@ -77,19 +63,16 @@ export interface IPFSInputProps {
 export const IPFSInput: React.FC<IPFSInputProps> = ({
   title,
   subtitle,
-  placeholder,
   textInputName,
   fileInputName,
   isFile = null,
   shouldUnregister = true,
   ipfsURI,
-  ...props
 }) => {
   const {
     register,
     control,
     watch,
-    getValues,
     formState: { errors },
     trigger,
   } = useFormContext();
@@ -97,25 +80,23 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
   const { layoutName } = useLayout();
   const spacing = SPACING[layoutName];
 
-  const onChange = (e: any) => {
+  const onChange = () => {
     trigger(fileInputName);
   };
-
-  useEffect(() => {}, []);
 
   const isFileChosen = isFile || `is_file_${fileInputName}`;
 
   return (
-    <React.Fragment>
-      <StyledText name={'title2'}>{title}</StyledText>
-      <StyledText name={'body3'}>{subtitle}</StyledText>
+    <div>
+      {title && <StyledText name={'title2'}>{title}</StyledText>}
+      {subtitle && <StyledText name={'body2'}>{subtitle}</StyledText>}
       <div
         style={{
           width: 'fit-content',
           display: 'flex',
           flexDirection: 'row',
-          marginTop: SPACING[layoutName],
           verticalAlign: 'middle',
+          margin: `${SPACING['small']}px 0 ${SPACING['medium']}px 0`,
           lineHeight: '40px',
         }}
       >
@@ -129,8 +110,8 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
               selected={value}
               items={['Text', 'File']}
               paddingSettings={{
-                horizontal: SPACING[layoutName] * 2,
-                vertical: SPACING[layoutName] / 4,
+                horizontal: spacing * 2,
+                vertical: spacing / 4,
               }}
             />
           )}
@@ -144,22 +125,18 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
           shouldUnregister={shouldUnregister}
           rules={{ required: 'This is required.' }}
           render={({ field: { onChange, value }, fieldState: { error } }) => (
-            <InputField
-              label=""
-              onInputChange={onChange}
+            <TextInput.Multiline
+              wide
+              placeholder={'Enter Rules...'}
               value={value}
-              height={'100px'}
-              placeholder={placeholder}
-              error={!!error}
-              helperText={error ? error.message : null}
+              onChange={onChange}
+              status={!!error ? 'error' : 'normal'}
+              error={error ? error.message : null}
             />
           )}
         />
       ) : (
         <div>
-          <StyledText name={'title4'} style={{ marginTop: spacing }}>
-            File
-          </StyledText>
           <StyledText name={'body3'}>Upload file</StyledText>
 
           {
@@ -167,7 +144,7 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
               {...register(fileInputName, {
                 shouldUnregister: shouldUnregister,
                 required: 'This is required.',
-                validate: (value) => {
+                validate: () => {
                   return true;
                 },
               })}
@@ -180,13 +157,34 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
         </div>
       )}
       {ipfsURI && (
-        <StyledText name={'body2'}>
-          Current file:
-          <a href={ipfsURI} target="_blank" rel="noreferrer noopener">
-            View Document
-          </a>
-        </StyledText>
+        <div
+          style={{
+            background: 'rgb(102, 218, 255, 0.07)',
+            borderRadius: RADII[layoutName],
+          }}
+        >
+          <Grid>
+            <GridItem
+              gridColumn={'1/2'}
+              alignHorizontal={layoutName !== 'small' ? 'flex-start' : 'center'}
+            >
+              <StyledText name={'body2'} style={{ padding: spacing }}>
+                Current file:
+              </StyledText>
+            </GridItem>
+            <GridItem
+              gridColumn={'2/3'}
+              alignHorizontal={layoutName !== 'small' ? 'flex-end' : 'center'}
+            >
+              <StyledText name={'body2'} style={{ padding: spacing }}>
+                <a href={ipfsURI} target="_blank" rel="noreferrer noopener">
+                  View Document
+                </a>
+              </StyledText>
+            </GridItem>
+          </Grid>
+        </div>
       )}
-    </React.Fragment>
+    </div>
   );
 };

@@ -91,7 +91,7 @@ const CreateDaoConfig: React.FC<{
               validate: (value) => (parseInt(value) > 0 ? true : 'Value must be positive'),
             }}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
-              <TextInput.Titled
+              <TextInput
                 wide
                 value={value}
                 placeholder={'Amount'}
@@ -142,7 +142,7 @@ const CreateDaoConfig: React.FC<{
                     validate: async (value) => validateContract(value, provider),
                   }}
                   render={({ field: { onChange, value }, fieldState: { error } }) => (
-                    <TextInput.Titled
+                    <TextInput
                       wide
                       disabled={!resolverLock}
                       value={value}

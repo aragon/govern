@@ -1,7 +1,6 @@
 import React, { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import progressImage from '../../images/svgs/CreateDaoInProgress.svg';
 import { CreateDaoSteps } from './utils/Shared';
-import { ZERO_ADDRESS } from '../../utils/constants';
 import { useCreateDaoContext } from './utils/CreateDaoContextProvider';
 import ProgressComponent from './components/ProgressComponent';
 import { CiruclarProgressStatus } from 'utils/types';
@@ -25,6 +24,7 @@ import RegisterSuccessAction from './components/RegisterSuccessAction';
 const CreateDaoProgress: React.FC<{
   setActiveStep: React.Dispatch<React.SetStateAction<CreateDaoSteps>>;
 }> = ({ setActiveStep }) => {
+  const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
   const walletContext: any = useWallet();
   const { provider, account } = walletContext;
   const { basicInfo, config, collaterals } = useCreateDaoContext();

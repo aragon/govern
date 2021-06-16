@@ -81,7 +81,7 @@ const CreateDaoBasicInfo: React.FC<{
             defaultValue={daoIdentifier}
             rules={{ required: 'This is required.' }}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
-              <TextInput.Titled
+              <TextInput
                 wide
                 value={value}
                 placeholder={'Enter DAO identifier'}
@@ -123,7 +123,7 @@ const CreateDaoBasicInfo: React.FC<{
                     shouldUnregister={true}
                     rules={{ required: 'This is required.' }}
                     render={({ field: { onChange, value }, fieldState: { error } }) => (
-                      <TextInput.Titled
+                      <TextInput
                         wide
                         value={value}
                         placeholder={'Enter your token name...'}
@@ -146,7 +146,7 @@ const CreateDaoBasicInfo: React.FC<{
                     shouldUnregister={true}
                     rules={{ required: 'This is required.' }}
                     render={({ field: { onChange, value }, fieldState: { error } }) => (
-                      <TextInput.Titled
+                      <TextInput
                         wide
                         value={value}
                         placeholder={'Enter your token symbol...'}
@@ -185,7 +185,7 @@ const CreateDaoBasicInfo: React.FC<{
                   validate: async (value) => validateAmountForDecimals(value, tokenDecimals),
                 }}
                 render={({ field: { onChange, value }, fieldState: { error } }) => (
-                  <TextInput.Titled
+                  <TextInput
                     wide
                     type={'number'}
                     value={value}
@@ -213,7 +213,7 @@ const CreateDaoBasicInfo: React.FC<{
                   validate: async (value) => validateToken(value, provider),
                 }}
                 render={({ field: { onChange, value }, fieldState: { error } }) => (
-                  <TextInput.Titled
+                  <TextInput
                     wide
                     value={value}
                     placeholder={'Enter token address'}

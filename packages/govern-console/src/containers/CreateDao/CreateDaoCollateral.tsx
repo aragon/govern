@@ -163,7 +163,7 @@ const CreateDaoCollateral: React.FC<{
               },
             }}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
-              <TextInput.Titled
+              <TextInput
                 wide
                 disabled={watch('isScheduleNewDaoToken')}
                 placeholder={
@@ -190,7 +190,7 @@ const CreateDaoCollateral: React.FC<{
                 validateAmountForDecimals(value, watch('scheduleDecimals')),
             }}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
-              <TextInput.Titled
+              <TextInput
                 wide
                 type={'number'}
                 placeholder={'Token amount...'}
@@ -242,7 +242,7 @@ const CreateDaoCollateral: React.FC<{
               },
             }}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
-              <TextInput.Titled
+              <TextInput
                 wide
                 disabled={watch('isChallengeNewDaoToken')}
                 placeholder={
@@ -268,7 +268,7 @@ const CreateDaoCollateral: React.FC<{
                 validateAmountForDecimals(value, watch('challengeDecimals')),
             }}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
-              <TextInput.Titled
+              <TextInput
                 wide
                 type={'number'}
                 placeholder={'Token amount...'}
@@ -323,7 +323,7 @@ const CreateDaoCollateral: React.FC<{
                         defaultValue={item.value}
                         rules={{ required: 'This is required.' }}
                         render={({ field: { onChange, value }, fieldState: { error } }) => (
-                          <TextInput.Titled
+                          <TextInput
                             wide
                             value={value}
                             onChange={onChange}
