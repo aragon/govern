@@ -1,24 +1,10 @@
 import React, { memo, useState, useEffect } from 'react';
-import {
-  useLayout,
-  Grid,
-  GridItem,
-  Accordion,
-  Field,
-  TextInput,
-  Checkbox,
-  IconAdd,
-  Box,
-  Button,
-  StyledText,
-  SPACING,
-  Link,
-} from '@aragon/ui';
-import backButtonIcon from 'images/back-btn.svg';
-import { HelpButton } from 'components/HelpButton/HelpButton';
+import { IconAdd, Box, Button, StyledText, Link, TextInput } from '@aragon/ui';
+import { PageName } from 'utils/HelpText';
+import PageContent from 'components/PageContent/PageContent';
+import ActionList from 'components/ActionList/ActionList';
 import { NewActionModal } from 'components/Modal/NewActionModal';
 import { AddActionsModal } from 'components/Modal/AddActionsModal';
-import { InputField } from 'components/InputFields/InputField';
 import { useParams, useHistory } from 'react-router-dom';
 import { ContractReceipt, utils } from 'ethers';
 import { useWallet } from 'AugmentedWallet';
@@ -26,7 +12,7 @@ import { buildConfig } from 'utils/ERC3000';
 import { CustomTransaction, abiItem, actionType, ActionToSchedule } from 'utils/types';
 import { useSnackbar } from 'notistack';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
-import { useForm, FormProvider, Controller } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import { Proposal, ReceiptType, ActionType } from '@aragon/govern';
 import { proposalDetailsUrl } from 'utils/urls';
 import { addToIpfs } from 'utils/ipfs';
@@ -34,6 +20,11 @@ import { useFacadeProposal } from 'hooks/proposal-hooks';
 import { IPFSInput } from 'components/Field/IPFSInput';
 import { settingsUrl } from 'utils/urls';
 import { useDaoQuery } from 'hooks/query-hooks';
+import styled from 'styled-components';
+
+const Field = styled('div')({
+  margin: '20px 0',
+});
 
 interface FormInputs {
   proof: string;
@@ -41,85 +32,8 @@ interface FormInputs {
   title: string;
 }
 
-export interface AddedActionsProps {
-  /**
-   * Added actions
-   */
-  selectedActions?: any;
-  onAddInputToAction: any;
-  actionsToSchedule: any;
-}
-
-const AddedActions: React.FC<AddedActionsProps> = ({ selectedActions, onAddInputToAction }) => {
-  const actionDivStyle = {
-    width: '862px',
-    border: '2px solid #E2ECF5',
-    borderRadius: '10px',
-    paddingLeft: '24px',
-    paddingRight: '24px',
-    paddingBottom: '22px',
-    paddingTop: '22px',
-    marginTop: '18px',
-  };
-
-  const actionNameDivStyle = {
-    paddingBottom: '21px',
-    borderBottom: '2px solid #E2ECF5',
-  };
-
-  return selectedActions.map((action: any, index: number) => {
-    return (
-      <div style={{ marginTop: '24px' }} key={action.name}>
-        <div>
-          <StyledText name={'title2'}>Contract Address</StyledText>
-          <StyledText name={'body2'}>{action.contractAddress}</StyledText>
-        </div>
-        <div style={actionDivStyle}>
-          <div style={actionNameDivStyle}>
-            <StyledText name={'body2'}>{action.name}</StyledText>
-          </div>
-          {action.item.inputs.map((input: any, num: number) => {
-            const element = (
-              <div key={input.name}>
-                <div style={{ marginTop: '20px' }}>
-                  <StyledText name={'title2'}>
-                    {input.name}({input.type})
-                  </StyledText>
-                </div>
-                <div style={{ marginTop: '20px' }}>
-                  <InputField
-                    label=""
-                    onInputChange={(val) => {
-                      onAddInputToAction(
-                        val,
-                        action.contractAddress,
-                        action.abi,
-                        index,
-                        num,
-                        action.name,
-                      );
-                    }}
-                    // value={actionsToSchedule[index]?.params[num] || ''}
-                    height="46px"
-                    width="814px"
-                    placeholder={input.name}
-                  ></InputField>
-                </div>
-              </div>
-            );
-            return element;
-          })}
-        </div>
-      </div>
-    );
-  });
-};
-
 const NewExecution: React.FC = () => {
   const history = useHistory();
-
-  const { layoutName } = useLayout();
-  const spacing = SPACING[layoutName];
 
   const { daoName } = useParams<any>();
   //TODO daoname empty handling
@@ -131,7 +45,12 @@ const NewExecution: React.FC = () => {
 
   // form
   const methods = useForm<FormInputs>();
-  const { getValues, handleSubmit, control } = methods;
+  const {
+    getValues,
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = methods;
 
   const [selectedActions, updateSelectedOptions] = useState([]);
   const [isInputModalOpen, setInputModalOpen] = useState(false);
@@ -237,7 +156,7 @@ const NewExecution: React.FC = () => {
 
   const validate = () => {
     if (actionsToSchedule.length === 0) {
-      enqueueSnackbar('At least one action is needed to schedule a proposal.', {
+      enqueueSnackbar('At least one action is needed to schedule an execution.', {
         variant: 'error',
       });
       return false;
@@ -316,54 +235,47 @@ const NewExecution: React.FC = () => {
   };
 
   return (
-    <Grid layout={true}>
-      <GridItem gridColumn={'2/13'} gridRow={'1/4'}>
-        <Box>
-          <StyledText name={'title2'}>New Execution</StyledText>
-          <StyledText name={'body2'}>
-            This execution will use the current{' '}
-            <Link onClick={() => history.push(settingsUrl(daoName))}>DAO Settings</Link>
-          </StyledText>
-
-          <FormProvider {...methods}>
-            <StyledText name={'title2'}>Title</StyledText>{' '}
-            <Controller
-              name="title"
-              control={control}
-              defaultValue={''}
-              rules={{ required: 'This is required.' }}
-              render={({ field: { onChange, value }, fieldState: { error } }) => (
-                <InputField
-                  label=""
-                  onInputChange={onChange}
-                  value={value}
-                  height={'100px'}
-                  placeholder="Type execution title"
-                  error={!!error}
-                  helperText={error ? error.message : null}
-                />
-              )}
+    <PageContent pageName={PageName.NEW_EXECUTION}>
+      <Box>
+        <StyledText name={'title2'}>New execution</StyledText>
+        <StyledText name={'body3'}>
+          This execution will use the current{' '}
+          <Link onClick={() => history.push(settingsUrl(daoName))}>DAO Settings</Link>
+        </StyledText>
+        <FormProvider {...methods}>
+          <Field>
+            <StyledText name={'title4'}>Title</StyledText>{' '}
+            <TextInput
+              {...register('title', { required: 'This is required.' })}
+              wide
+              title=""
+              placeholder="Type execution title"
+              status={errors['title'] ? 'error' : 'normal'}
+              error={errors['title']?.message}
             />
-            <StyledText name={'title2'}>Justification</StyledText>{' '}
+          </Field>
+          <Field>
+            <StyledText name={'title4'}>Justification</StyledText>{' '}
+            <StyledText name={'body3'}>
+              Insert the reason for scheduling this execution so DAO members can understand it.
+            </StyledText>
             <IPFSInput
-              label="Enter the justification for changes"
-              placeholder="Justification Reason..."
+              label=""
+              placeholder="Please insert the reason why you want to execute this"
               textInputName="proof"
               fileInputName="proofFile"
             />
-            <br></br>
-            <StyledText name={'title2'}>Actions</StyledText>
-            {selectedActions.length === 0 ? (
-              <StyledText name={'body2'}>No actions defined Yet</StyledText>
-            ) : (
-              <div>
-                <AddedActions
-                  selectedActions={selectedActions}
-                  onAddInputToAction={onAddInputToAction}
-                  actionsToSchedule={actionsToSchedule}
-                />
-              </div>
-            )}
+          </Field>
+          <Field>
+            <StyledText name={'title4'}>Actions</StyledText>
+            <StyledText name={'body3'}>
+              Add as many actions (smart contract interactions) you want for this execution.
+            </StyledText>
+            <ActionList
+              selectedActions={selectedActions}
+              onAddInputToAction={onAddInputToAction}
+              actionsToSchedule={actionsToSchedule}
+            />
             <br />
             <Button
               mode={'secondary'}
@@ -371,55 +283,33 @@ const NewExecution: React.FC = () => {
               label={'Add new action'}
               onClick={handleInputModalOpen}
             ></Button>
-            <br />
-            <Button
-              wide
-              size={'large'}
-              mode={'primary'}
-              disabled={!isConnected}
-              onClick={handleSubmit(() => onSchedule())}
-              style={{ marginTop: spacing }}
-            >
-              Schedule
-            </Button>
-            {isInputModalOpen && (
-              <NewActionModal
-                onCloseModal={handleInputModalClose}
-                onGenerate={onGenerateActionsFromAbi}
-                open={isInputModalOpen}
-              ></NewActionModal>
-            )}
-            {isActionModalOpen && (
-              <AddActionsModal
-                onCloseModal={handleActionModalClose}
-                open={isActionModalOpen}
-                onAddActions={onAddNewActions}
-                actions={abiFunctions as any}
-              ></AddActionsModal>
-            )}
-          </FormProvider>
-        </Box>
-      </GridItem>
-      <GridItem
-        gridRow={layoutName === 'large' ? '1' : undefined}
-        gridColumn={layoutName === 'large' ? '13/17' : '1 / -1'}
-      >
-        <Accordion
-          items={[[<div key={1}>Row content</div>, <div key={2}>Expandable content</div>]]}
-        ></Accordion>
-        <Accordion items={['accordionItems']}></Accordion>
-        <Accordion items={['accordionItems']}></Accordion>
-      </GridItem>
-      <GridItem
-        gridRow={layoutName === 'large' ? '2' : undefined}
-        gridColumn={layoutName === 'large' ? '13/17' : '1 / -1'}
-      >
-        {/* TODO: To be moved to its own component*/}
-        <Box style={{ background: '#8991FF', opacity: 0.5 }}>
-          <h5 style={{ color: '#20232C' }}>Need Help?</h5>
-        </Box>
-      </GridItem>
-    </Grid>
+          </Field>
+          <Button
+            wide
+            size={'large'}
+            mode={'primary'}
+            disabled={!isConnected}
+            onClick={handleSubmit(() => onSchedule())}
+            label={'Schedule'}
+          ></Button>
+          {isInputModalOpen && (
+            <NewActionModal
+              onCloseModal={handleInputModalClose}
+              onGenerate={onGenerateActionsFromAbi}
+              open={isInputModalOpen}
+            ></NewActionModal>
+          )}
+          {isActionModalOpen && (
+            <AddActionsModal
+              onCloseModal={handleActionModalClose}
+              open={isActionModalOpen}
+              onAddActions={onAddNewActions}
+              actions={abiFunctions as any}
+            ></AddActionsModal>
+          )}
+        </FormProvider>
+      </Box>
+    </PageContent>
   );
 };
 
