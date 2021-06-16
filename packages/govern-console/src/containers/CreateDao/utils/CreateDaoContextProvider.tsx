@@ -9,6 +9,7 @@ export interface ICreateDaoBasicInfo {
   isExistingToken: boolean;
   tokenName: string;
   tokenSymbol: string;
+  tokenDecimals: number;
   tokenAddress: string;
   tokenMintAmount: BigNumber | string;
   isProxy: boolean;
@@ -27,9 +28,11 @@ export interface ICreateDaoCollaterals {
   isScheduleNewDaoToken: boolean;
   scheduleAddress: string;
   scheduleAmount: BigNumber | string;
+  scheduleDecimals: number;
   isChallengeNewDaoToken: boolean;
   challengeAddress: string;
   challengeAmount: BigNumber | string;
+  challengeDecimals: number;
   isAnyAddress: boolean;
   executionAddressList: string[];
 }
@@ -59,6 +62,7 @@ const CreateDaoProvider: React.FC = ({ children }) => {
     tokenName: '',
     tokenSymbol: '',
     tokenAddress: '',
+    tokenDecimals: 18,
     tokenMintAmount: '',
     isProxy: true,
   });
@@ -76,9 +80,11 @@ const CreateDaoProvider: React.FC = ({ children }) => {
     isScheduleNewDaoToken: false,
     scheduleAddress: defaultConfig.scheduleDeposit.token,
     scheduleAmount: BigNumber.from(defaultConfig.scheduleDeposit.amount),
+    scheduleDecimals: 18, // TODO: this should be coming from the config
     isChallengeNewDaoToken: false,
     challengeAddress: defaultConfig.challengeDeposit.token,
     challengeAmount: BigNumber.from(defaultConfig.challengeDeposit.amount),
+    challengeDecimals: 18, // TODO: this should be coming from the config
     isAnyAddress: false,
     executionAddressList: [''],
   });

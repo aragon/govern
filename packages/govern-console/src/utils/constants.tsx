@@ -1,6 +1,5 @@
 import { DaoConfig } from '@aragon/govern';
 import { ChainId } from './types';
-import { toUtf8Bytes } from '@ethersproject/strings';
 
 export const ARAGON_VOICE_URL: { [chainId in ChainId]: string } = {
   [ChainId.MAINNET]: 'https://voice.aragon.org',
@@ -31,7 +30,7 @@ export const DEFAULT_DAO_CONFIG: { [chainId in ChainId]: DaoConfig } = {
       amount: '10000000000000000000',
     },
     resolver: '0xC464EB732A1D2f5BbD705727576065C91B2E9f18',
-    rules: toUtf8Bytes('No main agreement has been defined'), // we use Bytes (ArrayLike<number>) instead of string hex
+    rules: 'No main agreement has been defined', // we use Bytes (ArrayLike<number>) instead of string hex
     maxCalldataSize: 100000, // initial maxCalldatasize
   },
 
@@ -46,7 +45,7 @@ export const DEFAULT_DAO_CONFIG: { [chainId in ChainId]: DaoConfig } = {
       amount: '10000000000000000000',
     },
     resolver: '0xC464EB732A1D2f5BbD705727576065C91B2E9f18',
-    rules: toUtf8Bytes('No main agreement has been defined'),
+    rules: 'No main agreement has been defined',
     maxCalldataSize: 100000,
   },
 };

@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import TextField, { StandardTextFieldProps } from '@material-ui/core/TextField';
 import { styled } from '@material-ui/core/styles';
@@ -11,6 +11,25 @@ import { useFormContext, Controller } from 'react-hook-form';
 import { BlueSwitch } from 'components/Switchs/BlueSwitch';
 import { addToIpfs } from 'utils/ipfs';
 import { OptionTextStyle, InputSubTitle } from 'components/Titles/styles';
+import {
+  useLayout,
+  Grid,
+  GridItem,
+  Accordion,
+  TextInput,
+  Switch,
+  Checkbox,
+  Box,
+  Button,
+  StyledText,
+  Steps,
+  IconBlank,
+  Info,
+  Link,
+  SPACING,
+  IconArrowLeft,
+  Split,
+} from '@aragon/ui';
 
 export interface IPFSInputProps {
   /**
@@ -72,91 +91,86 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
     trigger,
   } = useFormContext();
 
+  const { layoutName } = useLayout();
+  const spacing = SPACING[layoutName];
+
   const onChange = (e: any) => {
     trigger(fileInputName);
   };
+
+  useEffect(() => {}, []);
 
   const isFileChosen = isFile || `is_file_${fileInputName}`;
 
   return (
     <React.Fragment>
-      <div
-        style={{
-          width: 'fit-content',
-          display: 'flex',
-          flexDirection: 'row',
-          marginTop: '23px',
-          verticalAlign: 'middle',
-          lineHeight: '40px',
-        }}
-      >
-        <OptionTextStyle>{'Text'}</OptionTextStyle>
-        <div style={{ marginLeft: '20px' }}>
+      <div style={{ marginTop: 8 }}>
+        Text{' '}
+        <Controller
+          name={isFileChosen}
+          control={control}
+          defaultValue={false}
+          render={({ field: { onChange, value } }) => (
+            <Switch checked={value} onChange={onChange} />
+          )}
+        />{' '}
+        File
+      </div>
+      {
+        // TODO: Sarkawt This is where I put ipfsURI if it's a file. make it per your design.
+        // {ipfsURI && (
+        //   <InputSubTitle>
+        //     Current file:
+        //     <a href={ipfsURI} target="_blank" rel="noreferrer noopener">
+        //       View
+        //     </a>
+        //   </InputSubTitle>
+        // )}
+      }
+
+      {/* <InputSubTitle>{label}</InputSubTitle> */}
+      {!watch(isFileChosen) ? (
+        <div>
+          <StyledText name={'title4'} style={{ marginTop: spacing }}>
+            Text
+          </StyledText>
+          <StyledText name={'body3'}>{label}</StyledText>
           <Controller
-            name={isFileChosen}
+            name={textInputName}
             control={control}
-            defaultValue={false}
-            render={({ field: { onChange, value } }) => (
-              <BlueSwitch onChange={onChange} value={value} />
+            defaultValue={''}
+            shouldUnregister={shouldUnregister}
+            rules={{ required: 'This is required.' }}
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <TextInput.Multiline
+                wide
+                placeholder={'Enter Rules...'}
+                value={value}
+                onChange={onChange}
+              />
             )}
           />
         </div>
-        <OptionTextStyle>{'File'}</OptionTextStyle>
-      </div>
-      {ipfsURI && (
-        <InputSubTitle>
-          Current file:
-          <a href={ipfsURI} target="_blank" rel="noreferrer noopener">
-            View
-          </a>
-        </InputSubTitle>
-      )}
-      <InputSubTitle>{label}</InputSubTitle>
-      {!watch(isFileChosen) ? (
-        <Controller
-          name={textInputName}
-          control={control}
-          defaultValue={''}
-          shouldUnregister={shouldUnregister}
-          rules={{ required: 'This is required.' }}
-          render={({ field: { onChange, value }, fieldState: { error } }) => (
-            <InputField
-              label=""
-              onInputChange={onChange}
-              value={value}
-              height={'100px'}
-              placeholder={placeholder}
-              error={!!error}
-              helperText={error ? error.message : null}
-            />
-          )}
-        />
       ) : (
         <div>
-          <div
-            style={{
-              width: 'inherited',
-              display: 'flex',
-              flexDirection: 'row',
-              verticalAlign: 'middle',
-              lineHeight: '40px',
-              marginTop: '17px',
-            }}
-          >
-            {
-              <input
-                {...register(fileInputName, {
-                  shouldUnregister: shouldUnregister,
-                  required: 'This is required.',
-                  validate: (value) => {
-                    return true;
-                  },
-                })}
-                type="file"
-                onChange={onChange}
-              />
-            }
-          </div>
+          <StyledText name={'title4'} style={{ marginTop: spacing }}>
+            File
+          </StyledText>
+          <StyledText name={'body3'}>Upload file</StyledText>
+
+          {
+            <input
+              {...register(fileInputName, {
+                shouldUnregister: shouldUnregister,
+                required: 'This is required.',
+                validate: (value) => {
+                  return true;
+                },
+              })}
+              type="file"
+              onChange={onChange}
+            />
+          }
 
           <p>{errors[fileInputName] && errors[fileInputName].message}</p>
         </div>

@@ -10,7 +10,7 @@ import NewProposal from 'containers/NewProposal/NewProposal';
 import DaoSettings from 'containers/DAOSettings/DAOSettings';
 import { ModalsProvider } from 'containers/HomePage/ModalsContext';
 import { Main } from '@aragon/ui';
-import CreateDao from '../CreateDao/CreateDao';
+import CreateDao from '../CreateDAO/CreateDao';
 import { useState } from 'react';
 
 const HomePage = () => {

@@ -5,6 +5,8 @@ import { ZERO_ADDRESS } from '../../utils/constants';
 import { useCreateDaoContext } from './utils/CreateDaoContextProvider';
 import ProgressComponent from './components/ProgressComponent';
 import { CiruclarProgressStatus } from 'utils/types';
+import { parseUnits } from 'utils/lib';
+
 import {
   createDao,
   CreateDaoParams,
@@ -60,11 +62,14 @@ const CreateDaoProgress: React.FC<{
       };
     } else {
       token = {
-        tokenDecimals: 6,
+        tokenDecimals: basicInfo.tokenDecimals,
         tokenName: basicInfo.tokenName,
         tokenSymbol: basicInfo.tokenSymbol,
         mintAddress: account.address,
-        mintAmount: basicInfo.tokenMintAmount.toString(),
+        mintAmount:
+          basicInfo.tokenDecimals > 0
+            ? parseUnits(basicInfo.tokenMintAmount, basicInfo.tokenDecimals)
+            : basicInfo.tokenMintAmount,
         merkleRoot: '0x' + '00'.repeat(32),
         merkleMintAmount: 0,
       };
@@ -75,11 +80,17 @@ const CreateDaoProgress: React.FC<{
       executionDelay: config.executionDelay,
       scheduleDeposit: {
         token: collaterals.isScheduleNewDaoToken ? ZERO_ADDRESS : collaterals.scheduleAddress,
-        amount: collaterals.scheduleAmount,
+        amount:
+          collaterals.scheduleDecimals > 0
+            ? parseUnits(collaterals.scheduleAmount, collaterals.scheduleDecimals)
+            : collaterals.scheduleAmount,
       },
       challengeDeposit: {
         token: collaterals.isChallengeNewDaoToken ? ZERO_ADDRESS : collaterals.challengeAddress,
-        amount: collaterals.challengeAmount,
+        amount:
+          collaterals.challengeDecimals > 0
+            ? parseUnits(collaterals.challengeAmount, collaterals.challengeDecimals)
+            : collaterals.challengeAmount,
       },
       resolver: config.resolver,
       rules: rule,
@@ -94,10 +105,13 @@ const CreateDaoProgress: React.FC<{
       scheduleAccessList: collaterals.isAnyAddress ? [] : collaterals.executionAddressList,
       useProxies: basicInfo.isProxy,
     };
-  }, [basicInfo, config, collaterals, rule]);
+  }, [basicInfo, config, collaterals, rule, account]);
 
   const tokenRegister = useCallback(async () => {
-    if (daoTokenAddress === '0x') return console.log('wrong address', daoTokenAddress);
+    if (daoTokenAddress === '0x') {
+      console.log('wrong address', daoTokenAddress);
+      return;
+    }
 
     const newList = [...progressList];
     const registerProgressPosition = progressList.length;
@@ -134,7 +148,7 @@ const CreateDaoProgress: React.FC<{
     const uploadToIpfs = async () => {
       const newList = [...progressList];
       try {
-        const ruleCid = await addToIpfs(config.isRuleFile ? config.ruleFile : config.ruleText);
+        const ruleCid = await addToIpfs(config.isRuleFile ? config.ruleFile[0] : config.ruleText);
         SetRule(ruleCid);
         newList[0].status = CiruclarProgressStatus.Done;
         setProgressList(newList);

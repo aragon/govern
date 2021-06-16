@@ -1,3 +1,9 @@
+import {
+  ICreateDaoBasicInfo,
+  ICreateDaoConfig,
+  ICreateDaoCollaterals,
+} from './CreateDaoContextProvider';
+
 enum CreateDaoSteps {
   BasicInfo,
   Config,
@@ -62,6 +68,7 @@ export type BasicInfoArg =
   | 'isExistingToken'
   | 'tokenName'
   | 'tokenSymbol'
+  | 'tokenDecimals'
   | 'tokenAddress'
   | 'tokenMintAmount'
   | 'isProxy';
@@ -78,4 +85,70 @@ export type CollateralsArgs =
   | 'isAnyAddress'
   | 'executionAddressList';
 
-export { accordionItems, stepsNames, formatParamNames, CreateDaoSteps };
+const basicInfoArray = (basicInfo: ICreateDaoBasicInfo) => {
+  const filters: (keyof ICreateDaoBasicInfo)[] = basicInfo.isExistingToken
+    ? ['tokenDecimals', 'isExistingToken', 'tokenName', 'tokenSymbol', 'tokenMintAmount']
+    : ['tokenDecimals', 'isExistingToken', 'tokenAddress'];
+
+  return Object.entries(basicInfo)
+    .filter((entry) => !filters.includes(entry[0] as any))
+    .map((entry) => ({
+      name: formatParamNames[entry[0]?.toString()],
+      value: entry[1]?.toString(),
+    }));
+};
+
+const configArray = (config: ICreateDaoConfig) => {
+  const formatValue = (name: string, value: any) => {
+    switch (name) {
+      case 'ruleFile':
+        return value[0].name;
+
+      default:
+        return value.toString();
+    }
+  };
+
+  const filters: (keyof ICreateDaoConfig)[] = !config.isRuleFile
+    ? ['maxCalldataSize', 'isRuleFile', 'ruleFile']
+    : ['maxCalldataSize', 'isRuleFile', 'ruleText'];
+
+  return Object.entries(config)
+    .filter((entry) => !filters.includes(entry[0] as any))
+    .map((entry) => ({
+      name: formatParamNames[entry[0]?.toString()],
+      value: formatValue(entry[0], entry[1]),
+    }));
+};
+
+const collateralArray = (collaterals: ICreateDaoCollaterals) => {
+  const formatValue = (name: string, value: any) => {
+    if (
+      (name === 'scheduleAddress' && collaterals.isScheduleNewDaoToken) ||
+      (name === 'challengeAddress' && collaterals.isChallengeNewDaoToken)
+    )
+      return 'The contract address will be available after the creation process';
+    return value;
+  };
+
+  const filters: (keyof ICreateDaoCollaterals)[] = collaterals.isAnyAddress
+    ? ['scheduleDecimals', 'challengeDecimals', 'executionAddressList']
+    : ['scheduleDecimals', 'challengeDecimals'];
+
+  return Object.entries(collaterals)
+    .filter((entry) => !filters.includes(entry[0] as any))
+    .map((entry) => ({
+      name: formatParamNames[entry[0]?.toString()],
+      value: formatValue(entry[0], entry[1]?.toString()),
+    }));
+};
+
+export {
+  accordionItems,
+  stepsNames,
+  formatParamNames,
+  CreateDaoSteps,
+  basicInfoArray,
+  collateralArray,
+  configArray,
+};

@@ -184,6 +184,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
 
     // Upload rules to ipfs
     const rules = getValues('rulesFile') ? getValues('rulesFile')[0] : newConfig.rules.toString();
+    console.log(getValues('rulesFile'), ' rulesfile');
     newConfig.rules = await addToIpfs(rules);
 
     // Upload proof to ipfs
@@ -464,8 +465,8 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
             </InputTitle>
 
             <IPFSInput
-              label="Provide the base rules under what your DAO should be ran"
-              placeholder="DAO rules and agreement.."
+              label="Rules in text"
+              placeholder="Enter rules"
               ipfsURI={rulesIpfsUrl?.endpoint}
               shouldUnregister={false}
               textInputName="daoConfig.rules"

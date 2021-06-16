@@ -1,7 +1,10 @@
-import React from 'react';
-import { BigNumber } from 'ethers';
-import { CreateDaoSteps, accordionItems, stepsNames, BasicInfoArg } from './utils/Shared';
+import React, { useEffect } from 'react';
+import { CreateDaoSteps, accordionItems, stepsNames } from './utils/Shared';
 import { useCreateDaoContext, ICreateDaoBasicInfo } from './utils/CreateDaoContextProvider';
+import { useForm, Controller } from 'react-hook-form';
+import { validateToken, validateAmountForDecimals } from 'utils/validations';
+import { useWallet } from 'AugmentedWallet';
+
 import {
   useLayout,
   Grid,
@@ -14,6 +17,7 @@ import {
   Button,
   StyledText,
   Steps,
+  Info,
   SPACING,
 } from '@aragon/ui';
 
@@ -24,20 +28,36 @@ const CreateDaoBasicInfo: React.FC<{
   const spacing = SPACING[layoutName];
   const { basicInfo, setBasicInfo } = useCreateDaoContext();
 
+  const context: any = useWallet();
+  const { provider } = context;
+
+  const methods = useForm<ICreateDaoBasicInfo>();
+  const { control, setValue, watch, getValues, trigger } = methods;
+
   const {
     daoIdentifier,
     isExistingToken,
     tokenName,
     tokenSymbol,
     tokenAddress,
+    tokenDecimals,
     tokenMintAmount,
     isProxy,
   } = basicInfo;
 
-  const updateBasicInfo = (indexType: BasicInfoArg, value: any) => {
-    const NewBasicInfo: ICreateDaoBasicInfo = { ...basicInfo };
-    (NewBasicInfo[indexType] as any) = value;
-    setBasicInfo(NewBasicInfo);
+  useEffect(() => {
+    setValue('isExistingToken', isExistingToken);
+  }, [isExistingToken]);
+
+  const moveToNextStep = async () => {
+    const validate = await trigger();
+
+    if (!validate) return;
+
+    const basicInfoUpdated = { ...basicInfo, ...getValues() };
+    console.log(basicInfoUpdated, ' ararrr');
+    setBasicInfo(basicInfoUpdated);
+    setActiveStep(CreateDaoSteps.Config);
   };
 
   return (
@@ -55,13 +75,21 @@ const CreateDaoBasicInfo: React.FC<{
 
           <StyledText name={'title4'}>DAO identifier</StyledText>
           <StyledText name={'body3'}>Enter the indentifier of your DAO</StyledText>
-          <TextInput
-            wide
-            value={daoIdentifier}
-            placeholder={'Enter DAO identifier'}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              updateBasicInfo('daoIdentifier', e.target.value);
-            }}
+          <Controller
+            name="daoIdentifier"
+            control={control}
+            defaultValue={daoIdentifier}
+            rules={{ required: 'This is required.' }}
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <TextInput.Titled
+                wide
+                value={value}
+                placeholder={'Enter DAO identifier'}
+                onChange={onChange}
+                status={!!error ? 'error' : 'normal'}
+                error={error ? error.message : null}
+              />
+            )}
           />
 
           <StyledText name={'title4'} style={{ marginTop: spacing }}>
@@ -70,15 +98,17 @@ const CreateDaoBasicInfo: React.FC<{
           <StyledText name={'body3'}>Create and define a token for your DAO</StyledText>
           <div style={{ marginTop: 8 }}>
             New Token{' '}
-            <Switch
-              checked={isExistingToken}
-              onChange={() => {
-                updateBasicInfo('isExistingToken', !isExistingToken);
-              }}
-            />{' '}
+            <Controller
+              name="isExistingToken"
+              control={control}
+              defaultValue={isExistingToken}
+              render={({ field: { onChange, value } }) => (
+                <Switch checked={value} onChange={onChange} />
+              )}
+            />
             Existing Token
           </div>
-          {!isExistingToken ? (
+          {!watch('isExistingToken') ? (
             <div>
               <Grid>
                 <GridItem gridColumn={'1/2'}>
@@ -86,13 +116,22 @@ const CreateDaoBasicInfo: React.FC<{
                     Token name
                   </StyledText>
                   <StyledText name={'body3'}>Enter your token name</StyledText>
-                  <TextInput
-                    wide
-                    value={tokenName}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      updateBasicInfo('tokenName', e.target.value);
-                    }}
-                    placeholder={'Enter your token name...'}
+                  <Controller
+                    name="tokenName"
+                    control={control}
+                    defaultValue={tokenName}
+                    shouldUnregister={true}
+                    rules={{ required: 'This is required.' }}
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                      <TextInput.Titled
+                        wide
+                        value={value}
+                        placeholder={'Enter your token name...'}
+                        onChange={onChange}
+                        status={!!error ? 'error' : 'normal'}
+                        error={error ? error.message : null}
+                      />
+                    )}
                   />
                 </GridItem>
                 <GridItem gridColumn={'2/3'}>
@@ -100,13 +139,22 @@ const CreateDaoBasicInfo: React.FC<{
                     Token symbol
                   </StyledText>
                   <StyledText name={'body3'}>Enter your token symbol</StyledText>
-                  <TextInput
-                    wide
-                    value={tokenSymbol}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      updateBasicInfo('tokenSymbol', e.target.value);
-                    }}
-                    placeholder={'Enter your token symbol'}
+                  <Controller
+                    name="tokenSymbol"
+                    control={control}
+                    defaultValue={tokenSymbol}
+                    shouldUnregister={true}
+                    rules={{ required: 'This is required.' }}
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                      <TextInput.Titled
+                        wide
+                        value={value}
+                        placeholder={'Enter your token symbol...'}
+                        onChange={onChange}
+                        status={!!error ? 'error' : 'normal'}
+                        error={error ? error.message : null}
+                      />
+                    )}
                   />
                 </GridItem>
               </Grid>
@@ -116,15 +164,37 @@ const CreateDaoBasicInfo: React.FC<{
               <StyledText name={'body3'}>
                 Enter amount of tokens to be minted (they will be sent to your wallet address)...
               </StyledText>
-              <TextInput
-                wide
-                type={'number'}
-                value={tokenMintAmount?.toString()}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  // typeof e.target.value === 'number' &&
-                  updateBasicInfo('tokenMintAmount', BigNumber.from(e.target.value));
+              <Info
+                mode={'warning'}
+                title={''}
+                style={{
+                  marginTop: '20px',
                 }}
-                placeholder={'Enter amount'}
+              >
+                The created token will use {tokenDecimals} decimals. For the amount, Don't append
+                0's.
+              </Info>
+
+              <Controller
+                name="tokenMintAmount"
+                control={control}
+                defaultValue={tokenMintAmount}
+                shouldUnregister={true}
+                rules={{
+                  required: 'This is required.',
+                  validate: async (value) => validateAmountForDecimals(value, tokenDecimals),
+                }}
+                render={({ field: { onChange, value }, fieldState: { error } }) => (
+                  <TextInput.Titled
+                    wide
+                    type={'number'}
+                    value={value}
+                    onChange={onChange}
+                    placeholder={'Enter amount'}
+                    status={!!error ? 'error' : 'normal'}
+                    error={error ? error.message : null}
+                  />
+                )}
               />
             </div>
           ) : (
@@ -133,13 +203,25 @@ const CreateDaoBasicInfo: React.FC<{
                 Token Address
               </StyledText>
               <StyledText name={'body3'}>Enter your token address</StyledText>
-              <TextInput
-                wide
-                value={tokenAddress}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  updateBasicInfo('tokenAddress', e.target.value);
+              <Controller
+                name="tokenAddress"
+                control={control}
+                defaultValue={tokenAddress}
+                shouldUnregister={true}
+                rules={{
+                  required: 'This is required.',
+                  validate: async (value) => validateToken(value, provider),
                 }}
-                placeholder={'Enter token address'}
+                render={({ field: { onChange, value }, fieldState: { error } }) => (
+                  <TextInput.Titled
+                    wide
+                    value={value}
+                    placeholder={'Enter token address'}
+                    onChange={onChange}
+                    status={!!error ? 'error' : 'normal'}
+                    error={error ? error.message : null}
+                  />
+                )}
               />
             </div>
           )}
@@ -151,7 +233,14 @@ const CreateDaoBasicInfo: React.FC<{
                 alignItems: 'center',
               }}
             >
-              <Checkbox checked={isProxy} onChange={() => updateBasicInfo('isProxy', !isProxy)} />
+              <Controller
+                name="isProxy"
+                control={control}
+                defaultValue={isProxy}
+                render={({ field: { onChange, value } }) => (
+                  <Checkbox checked={value} onChange={onChange} />
+                )}
+              />
               <span style={{ marginLeft: '4px' }}>Use Aragon Proxies</span>
             </label>
             <div style={{ marginLeft: 32 }}>
@@ -164,9 +253,7 @@ const CreateDaoBasicInfo: React.FC<{
             wide
             size={'large'}
             mode={'secondary'}
-            onClick={() => {
-              setActiveStep(CreateDaoSteps.Config);
-            }}
+            onClick={moveToNextStep}
             style={{ marginTop: spacing }}
           >
             Next Step

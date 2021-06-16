@@ -1,13 +1,17 @@
-import React, { useState } from 'react';
-import { CreateDaoSteps, accordionItems, stepsNames, ConfigArgs } from './utils/Shared';
+import React, { useState, useEffect } from 'react';
+import { CreateDaoSteps, accordionItems, stepsNames } from './utils/Shared';
 import { useCreateDaoContext, ICreateDaoConfig } from './utils/CreateDaoContextProvider';
+import { useForm, Controller, FormProvider } from 'react-hook-form';
+import { validateContract } from 'utils/validations';
+import { useWallet } from 'AugmentedWallet';
+import { IPFSInput } from 'components/Field/IPFSInput';
+
 import {
   useLayout,
   Grid,
   GridItem,
   Accordion,
   TextInput,
-  Switch,
   Checkbox,
   Box,
   Button,
@@ -20,8 +24,6 @@ import {
   IconArrowLeft,
   Split,
 } from '@aragon/ui';
-import { toUTF8String } from 'utils/lib';
-import { toUtf8Bytes } from '@ethersproject/strings';
 
 const CreateDaoConfig: React.FC<{
   setActiveStep: React.Dispatch<React.SetStateAction<CreateDaoSteps>>;
@@ -30,12 +32,36 @@ const CreateDaoConfig: React.FC<{
   const spacing = SPACING[layoutName];
   const [resolverLock, setResolverLock] = useState(false);
   const { config, setConfig } = useCreateDaoContext();
-  const { executionDelay, isRuleFile, ruleText, resolver } = config;
+  const { executionDelay, isRuleFile, ruleFile, ruleText, resolver } = config;
 
-  const updateConfig = (indexType: ConfigArgs, value: any) => {
-    const newConfig: ICreateDaoConfig = { ...config };
-    (newConfig[indexType] as any) = value;
+  const context: any = useWallet();
+  const { provider } = context;
+
+  const methods = useForm<ICreateDaoConfig>();
+  const { control, setValue, getValues, trigger } = methods;
+
+  const updateResolverLock = (lock: boolean) => {
+    if (!lock) {
+      setValue('resolver', resolver);
+    }
+    setResolverLock(lock);
+  };
+
+  useEffect(() => {
+    setValue('ruleText', ruleText);
+    setValue('isRuleFile', isRuleFile);
+    setValue('ruleFile', ruleFile);
+  }, [ruleText]);
+
+  const moveToNextStep = async () => {
+    const validate = await trigger();
+
+    if (!validate) return;
+
+    const newConfig = { ...config, ...getValues() };
+
     setConfig(newConfig);
+    setActiveStep(CreateDaoSteps.Collateral);
   };
 
   return (
@@ -56,14 +82,24 @@ const CreateDaoConfig: React.FC<{
             Amount of time any action in your DAO will be available to be challenged before bein
             executed
           </StyledText>
-          <TextInput
-            wide
-            type={'number'}
-            placeholder={'Amount'}
-            value={executionDelay}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              updateConfig('executionDelay', e.target.value);
+          <Controller
+            name="executionDelay"
+            control={control}
+            defaultValue={executionDelay}
+            rules={{
+              required: 'This is required.',
+              validate: (value) => (parseInt(value) > 0 ? true : 'Value must be positive'),
             }}
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <TextInput.Titled
+                wide
+                value={value}
+                placeholder={'Amount'}
+                onChange={onChange}
+                status={!!error ? 'error' : 'normal'}
+                error={error ? error.message : null}
+              />
+            )}
           />
 
           <StyledText name={'title4'} style={{ marginTop: spacing }}>
@@ -74,49 +110,18 @@ const CreateDaoConfig: React.FC<{
             but should follow pre defined rules. Please provide the main agreement for your DAO (In
             text, or upload a file).
           </StyledText>
-          <div style={{ marginTop: 8 }}>
-            Text{' '}
-            <Switch
-              checked={isRuleFile}
-              onChange={() => {
-                updateConfig('isRuleFile', !isRuleFile);
-              }}
-            />{' '}
-            File
-          </div>
-          {!isRuleFile ? (
-            <div>
-              <StyledText name={'title4'} style={{ marginTop: spacing }}>
-                Text
-              </StyledText>
-              <StyledText name={'body3'}>Rules in text</StyledText>
-              <TextInput.Multiline
-                wide
-                placeholder={'Enter Rules...'}
-                value={toUTF8String(ruleText)}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  updateConfig('ruleText', toUtf8Bytes(e.target.value));
-                }}
-              />
-            </div>
-          ) : (
-            <div>
-              <StyledText name={'title4'} style={{ marginTop: spacing }}>
-                File
-              </StyledText>
-              <StyledText name={'body3'}>Upload file</StyledText>
-              <input
-                type={'file'}
-                // value={ruleFile.name}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  const files: FileList | null = e.target.files;
-                  if (files) {
-                    updateConfig('ruleFile', files[0]);
-                  }
-                }}
-              />
-            </div>
-          )}
+          <FormProvider {...methods}>
+            <IPFSInput
+              label="Rules in text"
+              placeholder="Enter rules"
+              // ipfsURI={rulesIpfsUrl?.endpoint}
+              shouldUnregister={false}
+              isFile="isRuleFile"
+              textInputName="ruleText"
+              fileInputName="ruleFile"
+            />
+          </FormProvider>
+
           <StyledText name={'title4'} style={{ marginTop: spacing }}>
             Resolver
           </StyledText>
@@ -128,16 +133,27 @@ const CreateDaoConfig: React.FC<{
           <Box>
             <Grid>
               <GridItem gridColumn={'1/6'} gridRow={'1'}>
-                <TextInput
-                  wide
-                  disabled={!resolverLock}
-                  value={resolver}
-                  placeholder={'Resolver address'}
-                  adornment={<IconBlank />}
-                  adornmentPosition="end"
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    updateConfig('resolver', e.target.value);
+                <Controller
+                  name="resolver"
+                  control={control}
+                  defaultValue={resolver}
+                  rules={{
+                    required: 'This is required.',
+                    validate: async (value) => validateContract(value, provider),
                   }}
+                  render={({ field: { onChange, value }, fieldState: { error } }) => (
+                    <TextInput.Titled
+                      wide
+                      disabled={!resolverLock}
+                      value={value}
+                      placeholder={'Resolver address'}
+                      adornment={<IconBlank />}
+                      adornmentPosition="end"
+                      onChange={onChange}
+                      status={!!error ? 'error' : 'normal'}
+                      error={error ? error.message : null}
+                    />
+                  )}
                 />
               </GridItem>
               <GridItem
@@ -155,9 +171,7 @@ const CreateDaoConfig: React.FC<{
                 >
                   <Checkbox
                     checked={resolverLock}
-                    onChange={() => {
-                      setResolverLock(!resolverLock);
-                    }}
+                    onChange={() => updateResolverLock(!resolverLock)}
                   />
                   <span
                     style={{
@@ -200,9 +214,7 @@ const CreateDaoConfig: React.FC<{
                 style={{ marginTop: spacing, width: '100%' }}
                 size={'large'}
                 mode={'secondary'}
-                onClick={() => {
-                  setActiveStep(CreateDaoSteps.Collateral);
-                }}
+                onClick={moveToNextStep}
               >
                 Next Step
               </Button>

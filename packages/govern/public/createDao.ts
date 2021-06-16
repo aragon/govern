@@ -248,6 +248,10 @@ export async function createDao(
       tokenDecimals: 18,
       tokenName: '',
       tokenSymbol: '',
+      mintAddress: constants.AddressZero,
+      mintAmount: 0,
+      merkleRoot: '0x' + '00'.repeat(32),
+      merkleMintAmount: 0
     }
   }
 
@@ -276,7 +280,7 @@ export async function createDao(
       }
     )
   }
-
+  
   const result = contract.newGovern(
     args.name,
     token,
