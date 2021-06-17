@@ -4,14 +4,14 @@ import { useCreateDaoContext, ICreateDaoBasicInfo } from './utils/CreateDaoConte
 import { useForm, Controller } from 'react-hook-form';
 import { validateToken, validateAmountForDecimals } from 'utils/validations';
 import { useWallet } from 'AugmentedWallet';
-
+import { PROXY_CONTRACT_URL } from '../../utils/constants';
 import {
   useLayout,
   Grid,
   GridItem,
   Accordion,
   TextInput,
-  Switch,
+  ContentSwitcher,
   Checkbox,
   Box,
   Button,
@@ -19,6 +19,7 @@ import {
   Steps,
   Info,
   SPACING,
+  Link,
 } from '@aragon/ui';
 
 const CreateDaoBasicInfo: React.FC<{
@@ -47,7 +48,7 @@ const CreateDaoBasicInfo: React.FC<{
 
   useEffect(() => {
     setValue('isExistingToken', isExistingToken);
-  }, [isExistingToken]);
+  }, [isExistingToken, setValue]);
 
   const moveToNextStep = async () => {
     const validate = await trigger();
@@ -64,145 +65,132 @@ const CreateDaoBasicInfo: React.FC<{
     <Grid layout={true}>
       <GridItem gridColumn={'1/13'} gridRow={'1/4'}>
         <Box>
-          <Grid columns={'4'} columnWidth={'1fr'}>
-            <GridItem gridColumn={'2/5'}>
-              <Steps steps={stepsNames} activeIdx={0} showProgress={true} />
-            </GridItem>
-            <GridItem gridColumn={'1/2'} gridRow={'1'} alignVertical={'center'}>
-              <StyledText name={'title2'}>Create DAO</StyledText>
-            </GridItem>
-          </Grid>
+          <div style={{ display: 'grid', gridGap: spacing }}>
+            <Grid columns={'4'} columnWidth={'1fr'}>
+              <GridItem gridColumn={'2/5'}>
+                <Steps steps={stepsNames} activeIdx={0} showProgress={true} />
+              </GridItem>
+              <GridItem gridColumn={'1/2'} gridRow={'1'} alignVertical={'center'}>
+                <StyledText name={'title2'}>Create DAO</StyledText>
+              </GridItem>
+            </Grid>
 
-          <StyledText name={'title4'}>DAO identifier</StyledText>
-          <StyledText name={'body3'}>Enter the indentifier of your DAO</StyledText>
-          <Controller
-            name="daoIdentifier"
-            control={control}
-            defaultValue={daoIdentifier}
-            rules={{ required: 'This is required.' }}
-            render={({ field: { onChange, value }, fieldState: { error } }) => (
-              <TextInput
-                wide
-                value={value}
-                placeholder={'Enter DAO identifier'}
-                onChange={onChange}
-                status={!!error ? 'error' : 'normal'}
-                error={error ? error.message : null}
-              />
-            )}
-          />
-
-          <StyledText name={'title4'} style={{ marginTop: spacing }}>
-            Create token
-          </StyledText>
-          <StyledText name={'body3'}>Create and define a token for your DAO</StyledText>
-          <div style={{ marginTop: 8 }}>
-            New Token{' '}
             <Controller
-              name="isExistingToken"
+              name="daoIdentifier"
               control={control}
-              defaultValue={isExistingToken}
-              render={({ field: { onChange, value } }) => (
-                <Switch checked={value} onChange={onChange} />
+              defaultValue={daoIdentifier}
+              rules={{ required: 'This is required.' }}
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
+                <TextInput
+                  title="DAO identifier"
+                  subtitle="Enter the indentifier of your DAO (Use only lower capital characters, without space)"
+                  wide
+                  value={value}
+                  placeholder={'Enter DAO identifier'}
+                  onChange={onChange}
+                  status={!!error ? 'error' : 'normal'}
+                  error={error ? error.message : null}
+                />
               )}
             />
-            Existing Token
-          </div>
-          {!watch('isExistingToken') ? (
             <div>
-              <Grid>
-                <GridItem gridColumn={'1/2'}>
-                  <StyledText name={'title4'} style={{ marginTop: spacing }}>
-                    Token name
-                  </StyledText>
-                  <StyledText name={'body3'}>Enter your token name</StyledText>
-                  <Controller
-                    name="tokenName"
-                    control={control}
-                    defaultValue={tokenName}
-                    shouldUnregister={true}
-                    rules={{ required: 'This is required.' }}
-                    render={({ field: { onChange, value }, fieldState: { error } }) => (
-                      <TextInput
-                        wide
-                        value={value}
-                        placeholder={'Enter your token name...'}
-                        onChange={onChange}
-                        status={!!error ? 'error' : 'normal'}
-                        error={error ? error.message : null}
-                      />
-                    )}
-                  />
-                </GridItem>
-                <GridItem gridColumn={'2/3'}>
-                  <StyledText name={'title4'} style={{ marginTop: spacing }}>
-                    Token symbol
-                  </StyledText>
-                  <StyledText name={'body3'}>Enter your token symbol</StyledText>
-                  <Controller
-                    name="tokenSymbol"
-                    control={control}
-                    defaultValue={tokenSymbol}
-                    shouldUnregister={true}
-                    rules={{ required: 'This is required.' }}
-                    render={({ field: { onChange, value }, fieldState: { error } }) => (
-                      <TextInput
-                        wide
-                        value={value}
-                        placeholder={'Enter your token symbol...'}
-                        onChange={onChange}
-                        status={!!error ? 'error' : 'normal'}
-                        error={error ? error.message : null}
-                      />
-                    )}
-                  />
-                </GridItem>
-              </Grid>
-              <StyledText name={'title4'} style={{ marginTop: spacing }}>
-                Amount of tokens
+              <StyledText name={'title2'}>Create token</StyledText>
+              <StyledText name={'body2'}>
+                Create a new ERC-20 token for your DAO, or use an existing one
               </StyledText>
-              <StyledText name={'body3'}>
-                Enter amount of tokens to be minted (they will be sent to your wallet address)...
-              </StyledText>
-              <Info
-                mode={'warning'}
-                title={''}
-                style={{
-                  marginTop: '20px',
-                }}
-              >
-                The created token will use {tokenDecimals} decimals. For the amount, Don't append
-                0's.
-              </Info>
-
               <Controller
-                name="tokenMintAmount"
+                name="isExistingToken"
                 control={control}
-                defaultValue={tokenMintAmount}
-                shouldUnregister={true}
-                rules={{
-                  required: 'This is required.',
-                  validate: async (value) => validateAmountForDecimals(value, tokenDecimals),
-                }}
-                render={({ field: { onChange, value }, fieldState: { error } }) => (
-                  <TextInput
-                    wide
-                    type={'number'}
-                    value={value}
+                defaultValue={isExistingToken}
+                render={({ field: { onChange, value } }) => (
+                  <ContentSwitcher
                     onChange={onChange}
-                    placeholder={'Enter amount'}
-                    status={!!error ? 'error' : 'normal'}
-                    error={error ? error.message : null}
+                    selected={value}
+                    items={['New Token', 'Existing Token']}
+                    paddingSettings={{
+                      horizontal: spacing * 2,
+                      vertical: spacing / 4,
+                    }}
                   />
                 )}
               />
             </div>
-          ) : (
-            <div>
-              <StyledText name={'title4'} style={{ marginTop: spacing }}>
-                Token Address
-              </StyledText>
-              <StyledText name={'body3'}>Enter your token address</StyledText>
+
+            {!watch('isExistingToken') ? (
+              <>
+                <Grid>
+                  <GridItem gridColumn={'1/2'}>
+                    <Controller
+                      name="tokenName"
+                      control={control}
+                      defaultValue={tokenName}
+                      shouldUnregister={true}
+                      rules={{ required: 'This is required.' }}
+                      render={({ field: { onChange, value }, fieldState: { error } }) => (
+                        <TextInput
+                          title="Token name"
+                          subtitle="Enter your token name"
+                          wide
+                          value={value}
+                          placeholder={'Enter your token name...'}
+                          onChange={onChange}
+                          status={!!error ? 'error' : 'normal'}
+                          error={error ? error.message : null}
+                        />
+                      )}
+                    />
+                  </GridItem>
+                  <GridItem gridColumn={'2/3'}>
+                    <Controller
+                      name="tokenSymbol"
+                      control={control}
+                      defaultValue={tokenSymbol}
+                      shouldUnregister={true}
+                      rules={{ required: 'This is required.' }}
+                      render={({ field: { onChange, value }, fieldState: { error } }) => (
+                        <TextInput
+                          title="Token symbol"
+                          subtitle="Enter your token symbol"
+                          wide
+                          value={value}
+                          placeholder={'Enter your token symbol...'}
+                          onChange={onChange}
+                          status={!!error ? 'error' : 'normal'}
+                          error={error ? error.message : null}
+                        />
+                      )}
+                    />
+                  </GridItem>
+                </Grid>
+                <Controller
+                  name="tokenMintAmount"
+                  control={control}
+                  defaultValue={tokenMintAmount}
+                  shouldUnregister={true}
+                  rules={{
+                    required: 'This is required.',
+                    validate: async (value) => validateAmountForDecimals(value, tokenDecimals),
+                  }}
+                  render={({ field: { onChange, value }, fieldState: { error } }) => (
+                    <TextInput
+                      title="Amount of tokens"
+                      subtitle="Enter amount of tokens to be minted (they will be sent to your wallet address)..."
+                      wide
+                      type={'number'}
+                      value={value}
+                      onChange={onChange}
+                      placeholder={'Enter amount'}
+                      status={!!error ? 'error' : 'normal'}
+                      error={error ? error.message : null}
+                    />
+                  )}
+                />
+                <Info mode={'warning'} title={''}>
+                  The created token will use {tokenDecimals} decimals. For the amount, Don't append
+                  0's.
+                </Info>
+              </>
+            ) : (
               <Controller
                 name="tokenAddress"
                 control={control}
@@ -214,6 +202,8 @@ const CreateDaoBasicInfo: React.FC<{
                 }}
                 render={({ field: { onChange, value }, fieldState: { error } }) => (
                   <TextInput
+                    title="Token Address"
+                    subtitle="Enter your token address"
                     wide
                     value={value}
                     placeholder={'Enter token address'}
@@ -223,41 +213,35 @@ const CreateDaoBasicInfo: React.FC<{
                   />
                 )}
               />
-            </div>
-          )}
+            )}
 
-          <Box shadow style={{ marginTop: spacing }}>
-            <label
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              <Controller
-                name="isProxy"
-                control={control}
-                defaultValue={isProxy}
-                render={({ field: { onChange, value } }) => (
-                  <Checkbox checked={value} onChange={onChange} />
-                )}
-              />
-              <span style={{ marginLeft: '4px' }}>Use Aragon Proxies</span>
-            </label>
-            <div style={{ marginLeft: 32 }}>
-              Use Proxies for the deployment - This will enable your DAO to use the already deployed
-              code of the Govern Executer and Queue, and heavily decrease gas costs for your DAO
-              deployment.
-            </div>
-          </Box>
-          <Button
-            wide
-            size={'large'}
-            mode={'secondary'}
-            onClick={moveToNextStep}
-            style={{ marginTop: spacing }}
-          >
-            Next Step
-          </Button>
+            <Box shadow>
+              <label
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
+                <Controller
+                  name="isProxy"
+                  control={control}
+                  defaultValue={isProxy}
+                  render={({ field: { onChange, value } }) => (
+                    <Checkbox checked={value} onChange={onChange} />
+                  )}
+                />
+                <span style={{ marginLeft: '4px' }}>Use Aragon Proxies</span>
+              </label>
+              <div style={{ marginLeft: 32 }}>
+                Use <Link href={PROXY_CONTRACT_URL}>Proxies</Link> for the deployment - This will
+                enable your DAO to use the already deployed code of the Govern Executer and Queue,
+                and heavily decrease gas costs for your DAO deployment.
+              </div>
+            </Box>
+            <Button wide size={'large'} mode={'secondary'} onClick={moveToNextStep}>
+              Next Step
+            </Button>
+          </div>
         </Box>
       </GridItem>
       <GridItem

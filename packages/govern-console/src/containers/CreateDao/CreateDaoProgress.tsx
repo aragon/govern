@@ -21,6 +21,8 @@ import FailAction from './components/FailAction';
 import SuccessAction from './components/SuccessAction';
 import RegisterSuccessAction from './components/RegisterSuccessAction';
 
+declare let window: any;
+
 const CreateDaoProgress: React.FC<{
   setActiveStep: React.Dispatch<React.SetStateAction<CreateDaoSteps>>;
 }> = ({ setActiveStep }) => {
@@ -143,6 +145,7 @@ const CreateDaoProgress: React.FC<{
   // so it start trying to create the DAO once componentDidMount
   // first by uploading rules to IPFS
   // second by actually creating the DAO
+  /* eslint-disable */
   useEffect(() => {
     console.log('start creating doa');
     const uploadToIpfs = async () => {
@@ -196,6 +199,7 @@ const CreateDaoProgress: React.FC<{
     };
     callCreateDao();
   }, [rule]);
+  /* eslint-disable */
 
   useEffect(() => {
     switch (showAction) {
