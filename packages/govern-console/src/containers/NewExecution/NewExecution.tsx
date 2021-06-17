@@ -1,8 +1,8 @@
-import React, { memo, useState, useEffect } from 'react';
+import React, { memo, useState, useEffect, useReducer } from 'react';
 import { IconAdd, Box, Button, StyledText, Link, TextInput } from '@aragon/ui';
 import { PageName } from 'utils/HelpText';
 import PageContent from 'components/PageContent/PageContent';
-import ActionList from 'components/ActionList/ActionList';
+import ActionList, { ActionOperation } from 'components/ActionList/ActionList';
 import { NewActionModal } from 'components/Modal/NewActionModal';
 import { AddActionsModal } from 'components/Modal/AddActionsModal';
 import { useParams, useHistory } from 'react-router-dom';
@@ -32,6 +32,31 @@ interface FormInputs {
   title: string;
 }
 
+const selectedActionsReducer = (state: any, op: ActionOperation) => {
+  switch (op.type) {
+    case 'add':
+      return [...state, ...op.actions] as any;
+    case 'remove':
+      return state.filter((_: any, index: number) => index !== op.index);
+    case 'move-up':
+    case 'move-down':
+      const newActions = [...state];
+      if (
+        (op.type === 'move-up' && op.index > 0) ||
+        (op.type === 'move-down' && op.index < state.length - 1)
+      ) {
+        const swapIndex = op.type === 'move-up' ? op.index - 1 : op.index + 1;
+        [newActions[swapIndex], newActions[op.index]] = [
+          newActions[op.index],
+          newActions[swapIndex],
+        ];
+      }
+      return newActions;
+    default:
+      return [...state];
+  }
+};
+
 const NewExecution: React.FC = () => {
   const history = useHistory();
 
@@ -52,7 +77,7 @@ const NewExecution: React.FC = () => {
     formState: { errors },
   } = methods;
 
-  const [selectedActions, updateSelectedOptions] = useState([]);
+  const [selectedActions, dispatchActionChanges] = useReducer(selectedActionsReducer, []);
   const [isInputModalOpen, setInputModalOpen] = useState(false);
   const [isActionModalOpen, setActionModalOpen] = useState(false);
   const [daoDetails, updateDaoDetails] = useState<any>();
@@ -94,7 +119,7 @@ const NewExecution: React.FC = () => {
   const onAddNewActions = (actions: any) => {
     handleActionModalClose();
     const newActions = [...selectedActions, ...actions] as any;
-    updateSelectedOptions(newActions);
+    dispatchActionChanges({ type: 'add', actions: newActions });
     const initialActions: ActionToSchedule[] = newActions.map((actionItem: actionType) => {
       const { contractAddress, name, item, abi } = actionItem;
       const { inputs } = item;
@@ -273,6 +298,7 @@ const NewExecution: React.FC = () => {
             </StyledText>
             <ActionList
               selectedActions={selectedActions}
+              onActionChange={dispatchActionChanges}
               onAddInputToAction={onAddInputToAction}
               actionsToSchedule={actionsToSchedule}
             />
