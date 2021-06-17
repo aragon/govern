@@ -7,7 +7,6 @@ import twitterIcon from 'images/svgs/twitter.svg';
 import telegramIcon from 'images/svgs/telegrama.svg';
 import { useHistory } from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
-import React from 'react';
 
 const FooterWrapperDiv = styled('div')({
   width: 'auto',

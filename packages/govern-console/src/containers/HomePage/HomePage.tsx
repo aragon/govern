@@ -1,6 +1,5 @@
 import { Switch, Route } from 'react-router-dom';
 import { useHistory } from 'react-router-dom';
-// import { styled } from '@material-ui/core/styles';
 import Header from 'components/Header/Header';
 import Footer from 'components/Footer/Footer';
 import ConsoleMainPage from 'containers/Console/ConsoleMainPage';
@@ -11,23 +10,22 @@ import DaoSettings from 'containers/DAOSettings/DAOSettings';
 import { ModalsProvider } from 'containers/HomePage/ModalsContext';
 import { Main } from '@aragon/ui';
 import CreateDao from 'containers/CreateDao/CreateDao';
-import { useState } from 'react';
 
 const HomePage = () => {
   const history = useHistory();
-  const [themeMode, setThemeMode] = useState('light');
-  const toggleThemeMode = () => {
-    if (themeMode === 'light') {
-      setThemeMode('dark');
-    } else {
-      setThemeMode('light');
-    }
-  };
+  // const [themeMode, setThemeMode] = useState('light');
+  // const toggleThemeMode = () => {
+  //   if (themeMode === 'light') {
+  //     setThemeMode('dark');
+  //   } else {
+  //     setThemeMode('light');
+  //   }
+  // };
 
   return (
     <ModalsProvider>
-      <Main theme={themeMode}>
-        <Header toggleTheme={toggleThemeMode} themeMode={themeMode} />
+      <Main theme={'light'}>
+        <Header />
         <Switch>
           <Route exact path="/">
             <ConsoleMainPage />
