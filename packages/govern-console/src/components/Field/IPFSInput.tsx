@@ -10,6 +10,7 @@ import {
   GridItem,
   RADII,
 } from '@aragon/ui';
+import { toUtf8String } from 'ethers/lib/utils';
 
 export interface IPFSInputProps {
   /**
@@ -128,7 +129,7 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
             <TextInput.Multiline
               wide
               placeholder={'Enter Rules...'}
-              value={value}
+              value={typeof value !== 'string' ? toUtf8String(value) : value}
               onChange={onChange}
               status={!!error ? 'error' : 'normal'}
               error={error ? error.message : null}

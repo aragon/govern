@@ -34,6 +34,9 @@ import {
   StyledText,
   SPACING,
   useTheme,
+  Link,
+  IconBlank,
+  Checkbox,
 } from '@aragon/ui';
 
 export interface DaoSettingFormProps {
@@ -88,6 +91,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
   const [rulesIpfsUrl, setRulesIpfsUrl] = useState<ipfsMetadata & string>();
   const [scheduleDecimals, setScheduleDecimals] = useState<number>(0);
   const [challengeDecimals, setChallengeDecimals] = useState<number>(0);
+  const [resolverLock, setResolverLock] = useState(false);
   const cardText = (
     <div>
       <StyledText name={'title2'}>Your DAO settings</StyledText>
@@ -98,6 +102,13 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
     </div>
   );
   const cardIamge = <img style={{ width: '150px' }} src={cardMainImage}></img>;
+
+  const updateResolverLock = (lock: boolean) => {
+    if (!lock) {
+      setValue('daoConfig.resolver', config.resolver);
+    }
+    setResolverLock(lock);
+  };
 
   useEffect(() => {
     if (dao) {
@@ -167,7 +178,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
 
     // Upload rules to ipfs
     const rules = getValues('rulesFile') ? getValues('rulesFile')[0] : newConfig.rules.toString();
-    console.log(getValues('rulesFile'), ' rulesfile');
+    // console.log(getValues('rulesFile'), ' rulesfile');
     newConfig.rules = await addToIpfs(rules);
 
     // Upload proof to ipfs
@@ -239,6 +250,70 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
             <TextCopy title={'DAO Govern Executor Address'} value={daoAddresses.executorAddress} />
             <TextCopy title={'DAO Govern Executor Address'} value={daoAddresses.token} />
             <FormProvider {...methods}>
+              <div>
+                <StyledText name={'title4'}>Resolver</StyledText>
+                <StyledText name={'body3'}>
+                  The resolver is a smart contract that can handle disputes in your DAO and follows
+                  the ERC3k interface. By default your DAO will use Aragon Court as a resolver.{' '}
+                  <Link href="https://court.aragon.org/">Learn more</Link>
+                </StyledText>
+                <Box>
+                  <Grid>
+                    <GridItem gridColumn={'1/6'} gridRow={'1'}>
+                      <Controller
+                        name="daoConfig.resolver"
+                        control={control}
+                        defaultValue={''}
+                        rules={{
+                          required: 'This is required.',
+                          validate: (value) => {
+                            return validateContract(value, provider);
+                          },
+                        }}
+                        render={({ field: { onChange, value }, fieldState: { error } }) => (
+                          <TextInput
+                            wide
+                            disabled={!resolverLock}
+                            value={value}
+                            placeholder={'Resolver address'}
+                            adornment={<IconBlank />}
+                            adornmentPosition="end"
+                            onChange={onChange}
+                            status={!!error ? 'error' : 'normal'}
+                            error={error ? error.message : null}
+                          />
+                        )}
+                      />
+                    </GridItem>
+                    <GridItem
+                      gridColumn={'6/7'}
+                      gridRow={'1'}
+                      alignVertical={'center'}
+                      alignHorizontal={'center'}
+                    >
+                      <label
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <Checkbox
+                          checked={resolverLock}
+                          onChange={() => updateResolverLock(!resolverLock)}
+                        />
+                        <span
+                          style={{
+                            marginLeft: '4px',
+                          }}
+                        >
+                          Override default resolver
+                        </span>
+                      </label>
+                    </GridItem>
+                  </Grid>
+                </Box>
+              </div>
               <Controller
                 name="daoConfig.executionDelay"
                 control={control}
@@ -385,7 +460,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
                   />
                 )}
               />
-              <Controller
+              {/* <Controller
                 name="daoConfig.resolver"
                 control={control}
                 defaultValue={''}
@@ -407,7 +482,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
                     error={error ? error.message : null}
                   />
                 )}
-              />
+              /> */}
               <IPFSInput
                 title="Justification"
                 subtitle="Please provide the reasons for this DAO settings change as this will trigger an action on the executor queue"
