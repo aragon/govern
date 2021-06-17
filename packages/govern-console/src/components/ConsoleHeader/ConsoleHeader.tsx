@@ -50,8 +50,8 @@ export const ConsoleHeader: React.FC = () => {
   const history = useHistory();
   const [searchString, updateSearchString] = useState<string>('');
 
-  const onInputChange = (val: string) => {
-    updateSearchString(val);
+  const onInputChange = (event: any) => {
+    updateSearchString(event.target.value);
   };
 
   const onGotoDao = () => {
@@ -87,7 +87,6 @@ export const ConsoleHeader: React.FC = () => {
                 wide
                 placeholder="DAO Name"
                 onChange={onInputChange}
-                id="search-input"
                 onKeyDown={onEnterKey}
               />
             }
