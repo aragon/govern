@@ -4,13 +4,15 @@ import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
 import MuiDialogActions from '@material-ui/core/DialogActions';
 import IconButton from '@material-ui/core/IconButton';
-import { ANButton } from '../../components/Button/ANButton';
 import { InputField } from '../../components/InputFields/InputField';
-import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import { styled, Theme, withStyles, WithStyles, createStyles } from '@material-ui/core/styles';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
+import { Button } from '@aragon/ui';
+import { actionType } from 'utils/types';
+import { useReducer } from 'react';
+import { useCallback } from 'react';
 
 export interface AddActionsModalProps {
   /**
@@ -28,8 +30,18 @@ export interface AddActionsModalProps {
   /**
    * What happens when clicked on generate
    */
-  actions: [];
+  actions: actionType[];
 }
+
+const actionStyle = {
+  display: 'flex',
+  paddingTop: '23px',
+  paddingLeft: '21px',
+  paddingRight: '21px',
+  paddingBottom: '23px',
+  justifyContent: 'space-between',
+  borderBottom: '2px solid #E2ECF5',
+};
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -92,6 +104,16 @@ const DialogActions = withStyles({
   },
 })(MuiDialogActions);
 
+enum ActionType {
+  ADD = 'add',
+  DELETE = 'delete',
+}
+
+type CounterAction = {
+  type: ActionType;
+  index: number;
+};
+
 export const DialogTitle = withStyles(styles)((props: DialogTitleProps) => {
   const { children, classes, onClose, ...other } = props;
   return (
@@ -106,31 +128,16 @@ export const DialogTitle = withStyles(styles)((props: DialogTitleProps) => {
   );
 });
 
-const IncrementorDecrementorButtons: React.FC<any> = ({
-  onIncrementAction,
-  onDecrementAction,
-  action,
-}) => {
-  const [counter, setCounter] = useState<number>(0);
+const IncrementorDecrementorButtons: React.FC<any> = ({ counter, decrement, increment }) => {
+  const mode = 'secondary';
   return (
     <ButtonGroup size="small" aria-label="small outlined button group">
-      {counter > 0 && (
-        <Button
-          onClick={() => {
-            setCounter(counter - 1);
-            onDecrementAction(action);
-          }}
-        >
-          -
-        </Button>
-      )}
-      {counter > 0 && <Button disabled>{counter}</Button>}
-      <Button
-        onClick={() => {
-          setCounter(counter + 1);
-          onIncrementAction(action);
-        }}
-      >
+      <Button mode={mode} onClick={counter > 0 ? decrement : undefined}>
+        -
+      </Button>
+
+      <Button mode={mode}>{counter.toString()}</Button>
+      <Button mode={mode} onClick={increment}>
         +
       </Button>
     </ButtonGroup>
@@ -146,57 +153,54 @@ const ActionText = styled(Typography)(({ theme }) => ({
   fontStyle: 'normal',
 }));
 
+const counterReducer = (state: number[], action: CounterAction) => {
+  switch (action.type) {
+    case ActionType.ADD: {
+      const newState = state.slice();
+      newState[action.index]++;
+      return newState;
+    }
+    case ActionType.DELETE: {
+      const newState = state.slice();
+      newState[action.index]--;
+      return newState;
+    }
+    default:
+      return state;
+  }
+};
+
 export const AddActionsModal: React.FC<AddActionsModalProps> = ({
   open,
   onCloseModal,
   onAddActions,
   actions,
 }) => {
-  const [shownActions, setShownActions] = useState<any>(actions);
-  const [selectedActions, setSelectedActions] = useState<any>([]);
-  const actionStyle = {
-    display: 'flex',
-    paddingTop: '23px',
-    paddingLeft: '21px',
-    paddingRight: '21px',
-    paddingBottom: '23px',
-    justifyContent: 'space-between',
-    borderBottom: '2px solid #E2ECF5',
-  };
-
-  const onIncrementAction = (action: any) => {
-    const tempActions = [...selectedActions, action];
-    setSelectedActions(tempActions);
-  };
-
-  const onDecrementAction = (action: any) => {
-    const temp = [];
-    let isNotDeleted = true;
-    for (const actionItem of selectedActions) {
-      const { name } = actionItem;
-      if (name === action.name && isNotDeleted) {
-        isNotDeleted = false;
-      } else {
-        temp.push(actionItem);
-      }
-    }
-    setSelectedActions(temp);
-  };
+  const [counters, dispatchCounterAction] = useReducer(counterReducer, [], () =>
+    actions.map(() => 0),
+  );
+  const [shownActions, setShownActions] = useState<number[]>(actions.map((a, i) => i));
 
   const searchActions = (value: string) => {
     if (value === '') {
-      setShownActions(actions);
+      setShownActions(actions.map((a, i) => i));
       return;
     }
-    const searchedActions = [];
-    for (const action of shownActions) {
+    const searchedActions = actions.reduce((matched, action, index) => {
       const functionName = action.name.toLowerCase();
-      if (functionName.includes(value)) {
-        searchedActions.push(action);
-      }
-    }
+      return functionName.includes(value) ? [...matched, index] : matched;
+    }, [] as number[]);
     setShownActions(searchedActions);
   };
+
+  const submitSelectedActions = useCallback(() => {
+    const selectedActions = counters
+      .map((count, index) => {
+        return count > 0 ? actions[index] : null;
+      })
+      .filter(Boolean);
+    onAddActions(selectedActions);
+  }, [actions, counters, onAddActions]);
 
   return (
     <MuiDialog open={open}>
@@ -221,13 +225,13 @@ export const AddActionsModal: React.FC<AddActionsModalProps> = ({
               border: '2px solid #E2ECF5',
             }}
           >
-            {shownActions.map((action: any) => (
-              <div style={actionStyle} key={action.name}>
-                <ActionText>{action.name}</ActionText>
+            {shownActions.map((index: number) => (
+              <div style={actionStyle} key={index}>
+                <ActionText>{actions[index].name}</ActionText>
                 <IncrementorDecrementorButtons
-                  action={action}
-                  onIncrementAction={onIncrementAction}
-                  onDecrementAction={onDecrementAction}
+                  counter={counters[index]}
+                  decrement={() => dispatchCounterAction({ type: ActionType.DELETE, index })}
+                  increment={() => dispatchCounterAction({ type: ActionType.ADD, index })}
                 ></IncrementorDecrementorButtons>
               </div>
             ))}
@@ -235,13 +239,13 @@ export const AddActionsModal: React.FC<AddActionsModalProps> = ({
         )}
       </DialogContent>
       <DialogActions>
-        <ANButton
-          buttonType="primary"
-          width={'100%'}
-          height={'45px'}
-          onClick={() => onAddActions(selectedActions)}
+        <Button
+          mode="primary"
+          size="large"
+          wide
+          onClick={submitSelectedActions}
           label="Add Action"
-        ></ANButton>
+        ></Button>
       </DialogActions>
     </MuiDialog>
   );

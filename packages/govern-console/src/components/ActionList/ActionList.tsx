@@ -1,5 +1,7 @@
-import React, { memo, FormEvent } from 'react';
-import { TextInput, Card, Box, ButtonIcon, IconUp, IconDown, IconCross } from '@aragon/ui';
+import React, { memo } from 'react';
+import { Card, Box, useTheme, ButtonIcon, IconUp, IconDown, IconRemove } from '@aragon/ui';
+import { ActionInputs } from './ActionInputs';
+import { actionType } from 'utils/types';
 
 export type ActionChangeType = 'remove' | 'move-up' | 'move-down';
 export type ActionOperation =
@@ -10,45 +12,52 @@ export type ActionOperation =
   | { type: ActionChangeType; index: number };
 
 type ActionListProps = {
+  fields: Array<actionType & { id: string }>;
+  swap: (indexA: number, indexB: number) => void;
+  remove: (index?: number) => void;
+  register: any;
   selectedActions?: any;
-  onActionChange: (op: ActionOperation) => void;
-  onAddInputToAction: any;
-  actionsToSchedule: any;
 };
 
 type ActionHeaderProps = {
   contractAddress: string;
-  dispatchChange: (type: ActionChangeType) => void;
+  index: number;
+  count: number;
+  swap: (indexA: number, indexB: number) => void;
+  remove: (index?: number) => void;
 };
 
 const ActionHeader: React.FC<ActionHeaderProps> = memo(function ActionHeader({
   contractAddress,
-  dispatchChange,
+  index,
+  count,
+  swap,
+  remove,
 }) {
+  const theme = useTheme();
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
       <div style={{ alignSelf: 'center' }}>Contract: {contractAddress}</div>
       <div>
-        <ButtonIcon label="Up" onClick={() => dispatchChange('move-up')}>
-          <IconUp css={``} />
+        <ButtonIcon label="Up" onClick={index > 0 ? () => swap(index, index - 1) : undefined}>
+          <IconUp color={theme.primary} />
         </ButtonIcon>
-        <ButtonIcon label="Down" onClick={() => dispatchChange('move-down')}>
-          <IconDown />
+        <ButtonIcon
+          label="Down"
+          onClick={index < count - 1 ? () => swap(index, index + 1) : undefined}
+        >
+          <IconDown color={theme.primary} />
         </ButtonIcon>
-        <ButtonIcon display="icon" label="Remove" onClick={() => dispatchChange('remove')}>
-          <IconCross />
+        <ButtonIcon label="Remove" onClick={() => remove(index)}>
+          <IconRemove color={theme.primary} />
         </ButtonIcon>
       </div>
     </div>
   );
 });
 
-const ActionList: React.FC<ActionListProps> = ({
-  selectedActions,
-  onAddInputToAction,
-  onActionChange,
-}) => {
-  if (selectedActions.length === 0) {
+const ActionList: React.FC<ActionListProps> = ({ fields, swap, remove, register }) => {
+  if (fields && fields.length === 0) {
     return (
       <Card width="auto" height="120px">
         No action yet.
@@ -56,46 +65,28 @@ const ActionList: React.FC<ActionListProps> = ({
     );
   }
 
-  return selectedActions.map((action: any, index: number) => {
-    return (
-      <Box
-        key={`action-${index}`}
-        heading={
-          <ActionHeader
-            contractAddress={action.contractAddress}
-            dispatchChange={(type: ActionChangeType) => {
-              onActionChange({ type, index });
-            }}
-          />
-        }
-      >
-        <Box heading={action.name}>
-          {action.item.inputs.map((input: any, num: number) => {
-            const element = (
-              <TextInput
-                key={`input-${index}-${num}`}
-                subtitle={input.type}
-                type={input.type}
-                onChange={(e: FormEvent<HTMLInputElement>) => {
-                  onAddInputToAction(
-                    e.currentTarget.value,
-                    action.contractAddress,
-                    action.abi,
-                    index,
-                    num,
-                    action.name,
-                  );
-                }}
-                wide
-                placeholder={input.name}
-              />
-            );
-            return element;
-          })}
+  return (
+    <>
+      {fields.map((action, index: number) => (
+        <Box
+          key={action.id}
+          heading={
+            <ActionHeader
+              contractAddress={action.contractAddress}
+              index={index}
+              count={fields.length}
+              remove={remove}
+              swap={swap}
+            />
+          }
+        >
+          <Box heading={action.name}>
+            <ActionInputs action={action} index={index} register={register}></ActionInputs>
+          </Box>
         </Box>
-      </Box>
-    );
-  });
+      ))}
+    </>
+  );
 };
 
 export default memo(ActionList);

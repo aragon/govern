@@ -1,15 +1,15 @@
-import React, { memo, useState, useEffect, useReducer } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import { IconAdd, Box, Button, StyledText, Link, TextInput } from '@aragon/ui';
 import { PageName } from 'utils/HelpText';
 import PageContent from 'components/PageContent/PageContent';
-import ActionList, { ActionOperation } from 'components/ActionList/ActionList';
+import ActionList from 'components/ActionList/ActionList';
 import { NewActionModal } from 'components/Modal/NewActionModal';
 import { AddActionsModal } from 'components/Modal/AddActionsModal';
 import { useParams, useHistory } from 'react-router-dom';
 import { ContractReceipt, utils } from 'ethers';
 import { useWallet } from 'AugmentedWallet';
 import { buildConfig } from 'utils/ERC3000';
-import { CustomTransaction, abiItem, actionType, ActionToSchedule } from 'utils/types';
+import { CustomTransaction, abiItem, actionType } from 'utils/types';
 import { useSnackbar } from 'notistack';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import { useForm, FormProvider } from 'react-hook-form';
@@ -21,6 +21,7 @@ import { IPFSInput } from 'components/Field/IPFSInput';
 import { settingsUrl } from 'utils/urls';
 import { useDaoQuery } from 'hooks/query-hooks';
 import styled from 'styled-components';
+import { useFieldArray } from 'react-hook-form';
 
 const Field = styled('div')({
   margin: '20px 0',
@@ -30,32 +31,8 @@ interface FormInputs {
   proof: string;
   proofFile: any;
   title: string;
+  actions: actionType[];
 }
-
-const selectedActionsReducer = (state: any, op: ActionOperation) => {
-  switch (op.type) {
-    case 'add':
-      return [...state, ...op.actions] as any;
-    case 'remove':
-      return state.filter((_: any, index: number) => index !== op.index);
-    case 'move-up':
-    case 'move-down':
-      const newActions = [...state];
-      if (
-        (op.type === 'move-up' && op.index > 0) ||
-        (op.type === 'move-down' && op.index < state.length - 1)
-      ) {
-        const swapIndex = op.type === 'move-up' ? op.index - 1 : op.index + 1;
-        [newActions[swapIndex], newActions[op.index]] = [
-          newActions[op.index],
-          newActions[swapIndex],
-        ];
-      }
-      return newActions;
-    default:
-      return [...state];
-  }
-};
 
 const NewExecution: React.FC = () => {
   const history = useHistory();
@@ -71,18 +48,22 @@ const NewExecution: React.FC = () => {
   // form
   const methods = useForm<FormInputs>();
   const {
+    control,
     getValues,
     handleSubmit,
     register,
     formState: { errors },
   } = methods;
 
-  const [selectedActions, dispatchActionChanges] = useReducer(selectedActionsReducer, []);
+  const { fields, append, swap, remove } = useFieldArray({
+    control,
+    name: 'actions',
+  });
+
   const [isInputModalOpen, setInputModalOpen] = useState(false);
   const [isActionModalOpen, setActionModalOpen] = useState(false);
   const [daoDetails, updateDaoDetails] = useState<any>();
-  const [abiFunctions, setAbiFunctions] = useState([]);
-  const [actionsToSchedule, setActionsToSchedule] = useState([]);
+  const [abiFunctions, setAbiFunctions] = useState<actionType[]>([]);
 
   useEffect(() => {
     if (dao) {
@@ -118,44 +99,8 @@ const NewExecution: React.FC = () => {
 
   const onAddNewActions = (actions: any) => {
     handleActionModalClose();
-    const newActions = [...selectedActions, ...actions] as any;
-    dispatchActionChanges({ type: 'add', actions: newActions });
-    const initialActions: ActionToSchedule[] = newActions.map((actionItem: actionType) => {
-      const { contractAddress, name, item, abi } = actionItem;
-      const { inputs } = item;
-      const numberOfInputs = inputs.length;
-      const params = {};
-      const data = {
-        contractAddress,
-        name,
-        params,
-        abi,
-        numberOfInputs,
-      };
-      return data as ActionToSchedule;
-    });
-    setActionsToSchedule(initialActions as []);
+    append(actions);
   };
-
-  const onAddInputToAction = (
-    value: string,
-    contractAddress: string,
-    abi: any[],
-    functionIndex: number,
-    inputIndex: number,
-  ) => {
-    const actions: any[] = actionsToSchedule;
-    const { params } = actions[functionIndex];
-    params[inputIndex] = value;
-    delete actions[functionIndex].params;
-    actions[functionIndex] = {
-      params,
-      ...actions[functionIndex],
-    };
-    setActionsToSchedule(actions as []);
-    // actionsToSchedule.current = actions as [];
-  };
-  // const onScheduleProposal = () => {};
 
   const onGenerateActionsFromAbi = async (contractAddress: string, abi: any[]) => {
     const functions = [] as any;
@@ -174,13 +119,13 @@ const NewExecution: React.FC = () => {
     });
 
     setAbiFunctions(functions);
-    // abiFunctions.current = functions;
     handleInputModalClose();
     handleActionModalOpen();
   };
 
   const validate = () => {
-    if (actionsToSchedule.length === 0) {
+    const actions = getValues('actions');
+    if (!actions || actions.length === 0) {
       enqueueSnackbar('At least one action is needed to schedule an execution.', {
         variant: 'error',
       });
@@ -191,13 +136,12 @@ const NewExecution: React.FC = () => {
 
   const onSchedule = () => {
     if (!validate()) return;
-    const actions: any[] = actionsToSchedule.map((item: any) => {
+
+    const actions: any[] = getValues('actions').map((item: any) => {
       const { abi, contractAddress, name, params } = item;
       const abiInterface = new utils.Interface(abi);
-      const functionParameters = [];
-      for (const key in params) {
-        functionParameters.push(params[key]);
-      }
+      const functionParameters = params.map((param: any) => param.value);
+
       console.log('functionParams', functionParameters);
       const calldata = abiInterface.encodeFunctionData(name, functionParameters);
       const data = {
@@ -296,12 +240,7 @@ const NewExecution: React.FC = () => {
             <StyledText name={'body3'}>
               Add as many actions (smart contract interactions) you want for this execution.
             </StyledText>
-            <ActionList
-              selectedActions={selectedActions}
-              onActionChange={dispatchActionChanges}
-              onAddInputToAction={onAddInputToAction}
-              actionsToSchedule={actionsToSchedule}
-            />
+            <ActionList fields={fields} swap={swap} remove={remove} register={register} />
             <br />
             <Button
               mode={'secondary'}
@@ -330,7 +269,7 @@ const NewExecution: React.FC = () => {
               onCloseModal={handleActionModalClose}
               open={isActionModalOpen}
               onAddActions={onAddNewActions}
-              actions={abiFunctions as any}
+              actions={abiFunctions}
             ></AddActionsModal>
           )}
         </FormProvider>
