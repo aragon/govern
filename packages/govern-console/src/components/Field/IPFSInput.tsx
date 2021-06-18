@@ -9,6 +9,7 @@ import {
   Grid,
   GridItem,
   RADII,
+  useTheme,
 } from '@aragon/ui';
 import { toUtf8String } from 'ethers/lib/utils';
 
@@ -77,7 +78,7 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
     formState: { errors },
     trigger,
   } = useFormContext();
-
+  const theme = useTheme();
   const { layoutName } = useLayout();
   const spacing = SPACING[layoutName];
 
@@ -154,7 +155,9 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
             />
           }
 
-          <p>{errors[fileInputName] && errors[fileInputName].message}</p>
+          <p style={{ color: theme.red }}>
+            {errors[fileInputName] && errors[fileInputName].message}
+          </p>
         </div>
       )}
       {ipfsURI && (
