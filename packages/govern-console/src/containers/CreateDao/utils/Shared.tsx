@@ -1,3 +1,4 @@
+import { toUtf8String } from 'ethers/lib/utils';
 import {
   ICreateDaoBasicInfo,
   ICreateDaoConfig,
@@ -104,6 +105,9 @@ const configArray = (config: ICreateDaoConfig) => {
       case 'ruleFile':
         return value[0].name;
 
+      case 'ruleText':
+        return value && typeof value !== 'string' ? toUtf8String(value) : value;
+
       default:
         return value.toString();
     }
@@ -128,18 +132,26 @@ const collateralArray = (collaterals: ICreateDaoCollaterals) => {
       (name === 'challengeAddress' && collaterals.isChallengeNewDaoToken)
     )
       return 'The contract address will be available after the creation process';
+
+    if (
+      name === 'isScheduleNewDaoToken' ||
+      name === 'isChallengeNewDaoToken' ||
+      name === 'isAnyAddress'
+    )
+      return Boolean(value).toString();
+
     return value;
   };
 
   const filters: (keyof ICreateDaoCollaterals)[] = collaterals.isAnyAddress
     ? ['scheduleDecimals', 'challengeDecimals', 'executionAddressList']
-    : ['scheduleDecimals', 'challengeDecimals'];
+    : ['scheduleDecimals', 'challengeDecimals', 'isAnyAddress'];
 
   return Object.entries(collaterals)
     .filter((entry) => !filters.includes(entry[0] as any))
     .map((entry) => ({
       name: formatParamNames[entry[0]?.toString()],
-      value: formatValue(entry[0], entry[1]?.toString()),
+      value: formatValue(entry[0], entry[1]),
     }));
 };
 

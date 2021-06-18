@@ -1,7 +1,6 @@
 import React, { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import progressImage from '../../images/svgs/CreateDaoInProgress.svg';
 import { CreateDaoSteps } from './utils/Shared';
-import { ZERO_ADDRESS } from '../../utils/constants';
 import { useCreateDaoContext } from './utils/CreateDaoContextProvider';
 import ProgressComponent from './components/ProgressComponent';
 import { CiruclarProgressStatus } from 'utils/types';
@@ -22,9 +21,12 @@ import FailAction from './components/FailAction';
 import SuccessAction from './components/SuccessAction';
 import RegisterSuccessAction from './components/RegisterSuccessAction';
 
+declare let window: any;
+
 const CreateDaoProgress: React.FC<{
   setActiveStep: React.Dispatch<React.SetStateAction<CreateDaoSteps>>;
 }> = ({ setActiveStep }) => {
+  const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
   const walletContext: any = useWallet();
   const { provider, account } = walletContext;
   const { basicInfo, config, collaterals } = useCreateDaoContext();
@@ -143,6 +145,7 @@ const CreateDaoProgress: React.FC<{
   // so it start trying to create the DAO once componentDidMount
   // first by uploading rules to IPFS
   // second by actually creating the DAO
+  /* eslint-disable */
   useEffect(() => {
     console.log('start creating doa');
     const uploadToIpfs = async () => {
@@ -196,6 +199,7 @@ const CreateDaoProgress: React.FC<{
     };
     callCreateDao();
   }, [rule]);
+  /* eslint-disable */
 
   useEffect(() => {
     switch (showAction) {

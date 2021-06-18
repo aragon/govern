@@ -6,7 +6,7 @@ const SuccessAction: React.FC<{
   daoTokenAddress: string;
   tokenRegister: () => void;
   daoIdentifier: string;
-}> = ({ isNewDaoTokenRegistered, daoTokenAddress, tokenRegister, daoIdentifier }) => {
+}> = ({ isNewDaoTokenRegistered, tokenRegister, daoIdentifier }) => {
   const { layoutName } = useLayout();
   const theme = useTheme();
   const history = useHistory();

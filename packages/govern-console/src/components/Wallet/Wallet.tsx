@@ -1,17 +1,12 @@
-/* eslint-disable */
-import React, { useState } from 'react';
-import { ANButton } from 'components/Button/ANButton';
+import { useState } from 'react';
 import { styled } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import { useWallet } from 'use-wallet';
-import connectedUserIcon from 'images/connected-user-icon.svg';
 import { AddressIdentifier } from 'components/AddressIdentifier/AddressIdentifier';
-import Typography from '@material-ui/core/Typography';
 import { useEffect } from 'react';
-import { getTruncatedAccountAddress } from 'utils/account';
 import { useSnackbar } from 'notistack';
-import detectEthereumProvider from '@metamask/detect-provider';
 import { networkEnvironment } from 'environment';
+import { Button } from '@aragon/ui';
 
 const WalletWrapper = styled(Card)({
   background: '#FFFFFF',
@@ -43,25 +38,11 @@ const ConnectedAccount = styled('div')({
   cursor: 'pointer',
 });
 //TODO add the icon for logged in users
-const IconHolder = styled('img')({
-  width: '24px',
-  height: '24px',
-});
-const AccountAddress = styled(Typography)({
-  fontFamily: 'Manrope',
-  fontStyle: 'normal',
-  fontWeight: 500,
-  fontSize: '16px',
-  lineHeight: '22px',
-  color: '#20232C',
-  cursor: 'pointer',
-  textAlign: 'center',
-  width: '100%',
-});
+declare let window: any;
 
 const Wallet = ({}) => {
   const context: any = useWallet();
-  const { account, balance, chainId, connect, error, reset, status, provider } = context;
+  const { account, chainId, connect, error, reset, status } = context;
   const [networkStatus, setNetworkStatus] = useState<string>(status);
   const [userAccount, setUserAccount] = useState<string>(status);
   const { enqueueSnackbar } = useSnackbar();
@@ -86,7 +67,7 @@ const Wallet = ({}) => {
     } else {
       setNetworkStatus('disconnected');
     }
-  }, [status]);
+  }, [status, chainId, enqueueSnackbar, error]);
 
   useEffect(() => {
     if (status === 'disconnected') {
@@ -107,18 +88,7 @@ const Wallet = ({}) => {
         });
       }
     }
-  }, [error]);
-  useEffect(() => {
-    if (window && window.ethereum) {
-      connectWalletAndSetStatus('injected');
-    }
-  }, [window]);
-
-  useEffect(() => {
-    if (account) {
-      setUserAccount(account);
-    }
-  }, [account]);
+  }, [status, error, enqueueSnackbar]);
 
   const connectWalletAndSetStatus = async (type: string) => {
     try {
@@ -129,6 +99,21 @@ const Wallet = ({}) => {
       console.log('error', error);
     }
   };
+
+  //TODO: not suitable connectWalletAndSetStatus has to re-thought
+  /* eslint-disable */
+  useEffect(() => {
+    if (window && window.ethereum) {
+      connectWalletAndSetStatus('injected');
+    }
+  }, [window]);
+  /* eslint-disable */
+
+  useEffect(() => {
+    if (account) {
+      setUserAccount(account);
+    }
+  }, [account]);
 
   if (networkStatus === 'connected') {
     return (
@@ -150,16 +135,15 @@ const Wallet = ({}) => {
   } else if (networkStatus === 'unsupported') {
     return (
       <WalletWrapper>
-        <ANButton
-          buttonType="secondary"
+        <Button
+          size="large"
+          type="secondary"
           onClick={() => {
             connectWalletAndSetStatus('injected');
             // connect('injected');
             // setActivatingConnector(ConnectorNames.Injected);
           }}
           label={'Connect Account'}
-          height={'48px'}
-          width={'174px'}
           disabled={status === 'connecting'}
         />
       </WalletWrapper>
@@ -167,16 +151,15 @@ const Wallet = ({}) => {
   } else if (networkStatus === 'connection-error') {
     return (
       <WalletWrapper>
-        <ANButton
-          buttonType="secondary"
+        <Button
+          size="large"
+          type="secondary"
           onClick={() => {
             connectWalletAndSetStatus('injected');
             // connect('injected');
             // setActivatingConnector(ConnectorNames.Injected);
           }}
           label={'Connect Account'}
-          height={'48px'}
-          width={'174px'}
           disabled={status === 'connecting'}
         />
       </WalletWrapper>
@@ -184,8 +167,9 @@ const Wallet = ({}) => {
   } else {
     return (
       // <WalletWrapper>
-      <ANButton
-        buttonType="secondary"
+      <Button
+        size="large"
+        type="secondary"
         onClick={() => {
           connectWalletAndSetStatus('injected');
           // connect('injected');
