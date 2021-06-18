@@ -118,8 +118,8 @@ const DaoMainPage: React.FC = () => {
     history.push(`/proposals/${daoName}/${proposal.id}`);
   };
 
-  const goToNewProposal = () => {
-    history.push(`/daos/${daoName}/new-proposal`);
+  const goToNewExecution = () => {
+    history.push(`/daos/${daoName}/new-execution`);
   };
 
   if (loadingDao) {
@@ -152,7 +152,7 @@ const DaoMainPage: React.FC = () => {
                 }}
               >
                 {isProposalPage ? (
-                  <PageLabelSelected>Proposals</PageLabelSelected>
+                  <PageLabelSelected>Executions</PageLabelSelected>
                 ) : (
                   <PageLabel onClick={() => onPageChange('proposal')}>Proposal</PageLabel>
                 )}
@@ -176,11 +176,11 @@ const DaoMainPage: React.FC = () => {
                     }}
                   >
                     <ANButton
-                      label="New Proposal"
+                      label="New Execution"
                       buttonType="primary"
                       height="46px"
                       width="142px"
-                      onClick={goToNewProposal}
+                      onClick={goToNewExecution}
                       style={{ marginRight: '12px' }}
                     ></ANButton>
                   </div>
@@ -214,7 +214,7 @@ const DaoMainPage: React.FC = () => {
                   >
                     {queueNonce !== visibleProposalList.length ? (
                       <ANButton
-                        label="Load More Proposals"
+                        label="Load More Executions"
                         buttonType="secondary"
                         height="46px"
                         width="196px"

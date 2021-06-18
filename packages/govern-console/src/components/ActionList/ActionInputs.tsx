@@ -17,7 +17,6 @@ export const ActionInputs: React.FC<ActionInputsProps> = memo(function ActionInp
   action,
   register,
 }) {
-  console.log('action inputs', action);
   return (
     <>
       {action.item.inputs.map((input: any, num: number) => {
