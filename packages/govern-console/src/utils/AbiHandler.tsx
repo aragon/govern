@@ -68,12 +68,14 @@ function decodeInput(name: string, input: any, value: any, accum: any) {
 export default class AbiHandler {
   private readonly network: string;
   private readonly baseUrl: string;
+  private cache: Record<string, any>;
 
   constructor(networkName: string) {
     this.network = networkName.toLowerCase();
     this.baseUrl = `https://api${
       this.network === 'mainnet' ? '' : `-${this.network}`
     }.etherscan.io/api?apikey=${ETHERSCAN_API_KEY}`;
+    this.cache = {};
   }
 
   /**
@@ -83,6 +85,10 @@ export default class AbiHandler {
    * @returns {string|null} the contract abi
    */
   async get(address: string): Promise<string | null> {
+    if (this.cache[address]) {
+      return this.cache[address];
+    }
+
     const endpoint = `${this.baseUrl}&module=contract&action=getabi&address=${address}`;
 
     try {
@@ -98,6 +104,7 @@ export default class AbiHandler {
         const json = await response.json();
         if (json.message === 'OK') {
           if (AbiHandler.isValidAbi(json.result) === true) {
+            this.cache[address] = json.result;
             return json.result;
           }
         }

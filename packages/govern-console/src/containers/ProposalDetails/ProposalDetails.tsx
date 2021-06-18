@@ -21,6 +21,7 @@ import { useFacadeProposal } from 'hooks/proposal-hooks';
 import { useLazyProposalQuery, useDaoQuery } from 'hooks/query-hooks';
 import { ipfsMetadata } from 'utils/types';
 import { formatUnits } from 'utils/lib';
+import { DecodedActionData } from './components/DecodedActionData';
 
 // widget components
 import ChallengeWidget from './components/ChallengeWidget';
@@ -156,6 +157,9 @@ const InfoValuePre = styled('pre')({
   color: '#20232C',
   overflow: 'auto',
   margin: '0',
+  '& a': {
+    color: '#0094FF',
+  },
 });
 
 export const InfoValueDivBlock = styled('div')(({ maxlines }: { maxlines?: number }) => ({
@@ -222,7 +226,6 @@ const ActionDiv = styled('div')({
   borderRadius: '12px',
   width: '100%',
   overflow: 'hidden',
-  cursor: 'pointer',
   '& > div': {
     alignItems: 'center',
     width: '100%',
@@ -243,6 +246,7 @@ const ActionDiv = styled('div')({
 });
 
 const CollapsedDiv = styled('div')({
+  cursor: 'pointer',
   display: 'block',
   width: '100%',
   paddingLeft: '23px',
@@ -290,7 +294,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   const { enqueueSnackbar } = useSnackbar();
 
   const [proposalInfo, updateProposalInfo] = React.useState<any>(null);
-  const [abiCache, updateAbiCache] = React.useState<any>({});
   const [decodedData, updateDecodedData] = React.useState<any>({});
   const [decoding, setDecoding] = React.useState(false);
   const [isExpanded, updateIsExpanded] = React.useState<any>({});
@@ -365,11 +368,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     if (cloneObject[index] && !decodedData[index] && abiHandler) {
       setDecoding(true);
       const action = proposalInfo.payload.actions[index];
-      let abi = abiCache[index];
-      if (abi === undefined) {
-        abi = await abiHandler.get(action.to);
-        updateAbiCache({ ...abiCache, [action.to]: abi });
-      }
+      const abi = await abiHandler.get(action.to);
 
       if (abi) {
         const data = AbiHandler.decode(abi, action.data);
@@ -563,13 +562,12 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                 return (
                   <ActionDiv
                     key={index}
-                    onClick={() => toggleDiv(index)}
                     id={'action' + index}
                     style={{
                       height: 'auto',
                     }}
                   >
-                    <CollapsedDiv id="collapsed-div">
+                    <CollapsedDiv id="collapsed-div" onClick={() => toggleDiv(index)}>
                       <InfoWrapper id="to-div">
                         <InfoKeyDiv>to</InfoKeyDiv>
                         <InfoValueDivInline>
@@ -606,7 +604,12 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                             <InfoWrapper id="data-div">
                               <InfoKeyDiv>arguments</InfoKeyDiv>
                               <InfoValuePre>
-                                {JSON.stringify(decodedData[index].inputData, null, 2)}
+                                <DecodedActionData
+                                  to={action.to}
+                                  queueAddress={daoDetails?.queue.address}
+                                  functionName={decodedData[index].functionName}
+                                  data={decodedData[index].inputData}
+                                />
                               </InfoValuePre>
                             </InfoWrapper>
                           </React.Fragment>
