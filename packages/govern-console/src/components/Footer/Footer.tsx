@@ -8,13 +8,6 @@ import telegramIcon from 'images/svgs/telegrama.svg';
 import { useHistory } from 'react-router-dom';
 import { Grid, GridItem, useLayout } from '@aragon/ui';
 
-const FooterWrapperDiv = styled('div')({
-  width: 'auto',
-  height: '60px',
-  marginTop: '30px',
-  // background: '#FFFFFF'
-});
-
 const Logo = styled('div')({
   display: 'flex',
   flexDirection: 'row',
