@@ -145,9 +145,11 @@ export async function fetchIPFS(uriOrCid: string) {
         content.push(chunk);
       }
 
+      const buffer = Buffer.concat(content);
+
       if (file.path.includes('metadata')) {
         try {
-          data.metadata = JSON.parse(new TextDecoder().decode(Buffer.concat(content)));
+          data.metadata = JSON.parse(new TextDecoder().decode(buffer));
         } catch (err) {}
       } else {
         data.endpoint = IPFS_GATEWAY + file.path;
@@ -157,9 +159,10 @@ export async function fetchIPFS(uriOrCid: string) {
         // to get the text representation by saving bandwith.
         if (Object.values(FILE_EXTS).includes(extension)) {
           try {
-            data.text = new TextDecoder().decode(Buffer.concat(content));
+            data.text = new TextDecoder().decode(buffer);
           } catch (err) {}
-        } // if the path name doesn't have .txt extension
+        }
+        // if the path name doesn't have .txt extension
         // or doesn't include path at all, fetch is needed
         // to determine the type and gets its text if it's text/plain
         else {
@@ -173,7 +176,7 @@ export async function fetchIPFS(uriOrCid: string) {
 
           if (MIME_TYPES.includes(blob.type)) {
             try {
-              data.text = new TextDecoder().decode(content[0]);
+              data.text = new TextDecoder().decode(buffer);
             } catch (err) {}
           }
         }
