@@ -72,7 +72,6 @@ const NewExecution: React.FC = () => {
   const onCloseActionModal = useCallback(
     (actions: any) => {
       if (actions) {
-        console.log('appending actions', actions);
         append(actions);
       }
       setShowActionModal(false);
@@ -94,25 +93,36 @@ const NewExecution: React.FC = () => {
   const onSchedule = () => {
     if (!validate()) return;
 
+    const errors: string[] = [];
     const values = getValues('actions');
     console.log('schedule with ', values);
+
     const actions = values.map((item) => {
       const { sighash, signature, contractAddress, inputs } = item;
       const abiInterface = new utils.Interface([`function ${signature}`]);
-
       const functionParameters = inputs.map((input) => input.value);
 
-      console.log('functionParams', functionParameters);
-      const calldata = abiInterface.encodeFunctionData(sighash, functionParameters);
-      const data = {
+      let calldata = '';
+      try {
+        calldata = abiInterface.encodeFunctionData(sighash, functionParameters);
+      } catch (err) {
+        errors.push(err.message);
+      }
+      const data: ActionType = {
         to: contractAddress,
         value: 0,
         data: calldata,
       };
       return data;
     });
-    console.log(actions, ' actions here');
-    scheduleProposal(actions);
+
+    if (errors.length > 0) {
+      enqueueSnackbar('Error encoding action data, please double check your action input.', {
+        variant: 'error',
+      });
+    } else {
+      scheduleProposal(actions!);
+    }
   };
 
   const scheduleProposal = async (actions: ActionType[]) => {
