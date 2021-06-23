@@ -1,22 +1,21 @@
 import React, { memo } from 'react';
-import { Card, Box, useTheme, ButtonIcon, IconUp, IconDown, IconRemove } from '@aragon/ui';
-import { ActionInputs } from './ActionInputs';
-import { actionType } from 'utils/types';
-
-export type ActionChangeType = 'remove' | 'move-up' | 'move-down';
-export type ActionOperation =
-  | {
-      type: 'add';
-      actions: any;
-    }
-  | { type: ActionChangeType; index: number };
+import {
+  TextInput,
+  Card,
+  Box,
+  useTheme,
+  ButtonIcon,
+  IconUp,
+  IconDown,
+  IconCross,
+} from '@aragon/ui';
+import { ActionItem } from 'utils/types';
+import { Controller, useFormContext } from 'react-hook-form';
 
 type ActionListProps = {
-  fields: Array<actionType & { id: string }>;
+  actions: Array<ActionItem & { id: string }>;
   swap: (indexA: number, indexB: number) => void;
-  remove: (index?: number) => void;
-  register: any;
-  selectedActions?: any;
+  remove: (index: number) => void;
 };
 
 type ActionHeaderProps = {
@@ -24,7 +23,7 @@ type ActionHeaderProps = {
   index: number;
   count: number;
   swap: (indexA: number, indexB: number) => void;
-  remove: (index?: number) => void;
+  remove: (index: number) => void;
 };
 
 const ActionHeader: React.FC<ActionHeaderProps> = memo(function ActionHeader({
@@ -49,15 +48,17 @@ const ActionHeader: React.FC<ActionHeaderProps> = memo(function ActionHeader({
           <IconDown color={theme.primary} />
         </ButtonIcon>
         <ButtonIcon label="Remove" onClick={() => remove(index)}>
-          <IconRemove color={theme.primary} />
+          <IconCross color={theme.red} />
         </ButtonIcon>
       </div>
     </div>
   );
 });
 
-const ActionList: React.FC<ActionListProps> = ({ fields, swap, remove, register }) => {
-  if (fields && fields.length === 0) {
+const ActionList: React.FC<ActionListProps> = ({ actions, swap, remove }) => {
+  const { control } = useFormContext();
+
+  if (actions && actions.length === 0) {
     return (
       <Card width="auto" height="120px">
         No action yet.
@@ -67,21 +68,42 @@ const ActionList: React.FC<ActionListProps> = ({ fields, swap, remove, register 
 
   return (
     <>
-      {fields.map((action, index: number) => (
+      {actions.map((action, index: number) => (
         <Box
           key={action.id}
           heading={
             <ActionHeader
               contractAddress={action.contractAddress}
               index={index}
-              count={fields.length}
+              count={actions.length}
               remove={remove}
               swap={swap}
             />
           }
         >
           <Box heading={action.name}>
-            <ActionInputs action={action} index={index} register={register}></ActionInputs>
+            {action.inputs.map((input: any, num: number) => {
+              const element = (
+                <Controller
+                  key={`actions.${index}.inputs.${num}.value`}
+                  name={`actions.${index}.inputs.${num}.value` as const}
+                  control={control}
+                  defaultValue={input.value}
+                  render={({ field: { onChange, value }, fieldState: { error } }) => (
+                    <TextInput
+                      wide
+                      value={value}
+                      onChange={onChange}
+                      subtitle={input.type}
+                      placeholder={input.name}
+                      status={error ? 'error' : 'normal'}
+                      error={error ? error.message : null}
+                    />
+                  )}
+                />
+              );
+              return element;
+            })}
           </Box>
         </Box>
       ))}

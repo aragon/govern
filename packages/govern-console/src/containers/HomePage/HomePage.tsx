@@ -34,7 +34,7 @@ const HomePage = () => {
           <Route exact path="/daos/:daoName">
             <DaoMainPage />
           </Route>
-          <Route exact path="/proposals/:daoName/:id">
+          <Route exact path="/daos/:daoName/executions/:id">
             <ProposalDetails onClickBack={() => history.goBack()} />
           </Route>
           <Route exact path="/daos/:daoName/new-execution">

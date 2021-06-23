@@ -1,18 +1,17 @@
-import React, { memo, useState, useEffect } from 'react';
+import React, { memo, useState, useEffect, useCallback } from 'react';
 import { IconAdd, Box, Button, StyledText, Link, TextInput } from '@aragon/ui';
 import { PageName } from 'utils/HelpText';
 import PageContent from 'components/PageContent/PageContent';
 import ActionList from 'components/ActionList/ActionList';
-import { NewActionModal } from 'components/Modal/NewActionModal';
-import { AddActionsModal } from 'components/Modal/AddActionsModal';
+import { ActionBuilder } from 'components/ActionBuilder/ActionBuilder';
 import { useParams, useHistory } from 'react-router-dom';
 import { ContractReceipt, utils } from 'ethers';
 import { useWallet } from 'AugmentedWallet';
 import { buildConfig } from 'utils/ERC3000';
-import { CustomTransaction, abiItem, actionType } from 'utils/types';
+import { CustomTransaction, ActionItem } from 'utils/types';
 import { useSnackbar } from 'notistack';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
-import { useForm, FormProvider } from 'react-hook-form';
+import { useForm, FormProvider, Controller, useFieldArray } from 'react-hook-form';
 import { Proposal, ReceiptType, ActionType } from '@aragon/govern';
 import { proposalDetailsUrl } from 'utils/urls';
 import { addToIpfs } from 'utils/ipfs';
@@ -21,7 +20,6 @@ import { IPFSInput } from 'components/Field/IPFSInput';
 import { settingsUrl } from 'utils/urls';
 import { useDaoQuery } from 'hooks/query-hooks';
 import styled from 'styled-components';
-import { useFieldArray } from 'react-hook-form';
 
 const Field = styled('div')({
   margin: '20px 0',
@@ -31,15 +29,14 @@ interface FormInputs {
   proof: string;
   proofFile: any;
   title: string;
-  actions: actionType[];
+  actions: ActionItem[];
 }
 
 const NewExecution: React.FC = () => {
   const history = useHistory();
 
-  const { daoName } = useParams<any>();
   //TODO daoname empty handling
-
+  const { daoName } = useParams<any>();
   const { data: dao } = useDaoQuery(daoName);
 
   const { enqueueSnackbar } = useSnackbar();
@@ -47,23 +44,14 @@ const NewExecution: React.FC = () => {
 
   // form
   const methods = useForm<FormInputs>();
-  const {
-    control,
-    getValues,
-    handleSubmit,
-    register,
-    formState: { errors },
-  } = methods;
-
+  const { control, getValues, handleSubmit } = methods;
   const { fields, append, swap, remove } = useFieldArray({
     control,
     name: 'actions',
   });
 
-  const [isInputModalOpen, setInputModalOpen] = useState(false);
-  const [isActionModalOpen, setActionModalOpen] = useState(false);
   const [daoDetails, updateDaoDetails] = useState<any>();
-  const [abiFunctions, setAbiFunctions] = useState<actionType[]>([]);
+  const [showActionModal, setShowActionModal] = useState(false);
 
   useEffect(() => {
     if (dao) {
@@ -81,47 +69,16 @@ const NewExecution: React.FC = () => {
 
   const transactionsQueue = React.useRef<CustomTransaction[]>([]);
 
-  const handleInputModalOpen = () => {
-    setInputModalOpen(true);
-  };
-
-  const handleInputModalClose = () => {
-    setInputModalOpen(false);
-  };
-
-  const handleActionModalOpen = () => {
-    setActionModalOpen(true);
-  };
-
-  const handleActionModalClose = () => {
-    setActionModalOpen(false);
-  };
-
-  const onAddNewActions = (actions: any) => {
-    handleActionModalClose();
-    append(actions);
-  };
-
-  const onGenerateActionsFromAbi = async (contractAddress: string, abi: any[]) => {
-    const functions = [] as any;
-    await abi.forEach((item: abiItem) => {
-      const { name, type, stateMutability } = item;
-      if (type === 'function' && stateMutability !== 'view' && stateMutability !== 'pure') {
-        const data = {
-          abi,
-          name,
-          type,
-          item,
-          contractAddress,
-        };
-        functions.push(data);
+  const onCloseActionModal = useCallback(
+    (actions: any) => {
+      if (actions) {
+        console.log('appending actions', actions);
+        append(actions);
       }
-    });
-
-    setAbiFunctions(functions);
-    handleInputModalClose();
-    handleActionModalOpen();
-  };
+      setShowActionModal(false);
+    },
+    [append],
+  );
 
   const validate = () => {
     const actions = getValues('actions');
@@ -137,13 +94,16 @@ const NewExecution: React.FC = () => {
   const onSchedule = () => {
     if (!validate()) return;
 
-    const actions: any[] = getValues('actions').map((item: any) => {
-      const { abi, contractAddress, name, params } = item;
-      const abiInterface = new utils.Interface(abi);
-      const functionParameters = params.map((param: any) => param.value);
+    const values = getValues('actions');
+    console.log('schedule with ', values);
+    const actions = values.map((item) => {
+      const { sighash, signature, contractAddress, inputs } = item;
+      const abiInterface = new utils.Interface([`function ${signature}`]);
+
+      const functionParameters = inputs.map((input) => input.value);
 
       console.log('functionParams', functionParameters);
-      const calldata = abiInterface.encodeFunctionData(name, functionParameters);
+      const calldata = abiInterface.encodeFunctionData(sighash, functionParameters);
       const data = {
         to: contractAddress,
         value: 0,
@@ -213,14 +173,24 @@ const NewExecution: React.FC = () => {
         </StyledText>
         <FormProvider {...methods}>
           <Field>
-            <StyledText name={'title4'}>Title</StyledText>{' '}
-            <TextInput
-              {...register('title', { required: 'This is required.' })}
-              wide
-              title=""
-              placeholder="Type execution title"
-              status={errors['title'] ? 'error' : 'normal'}
-              error={errors['title']?.message}
+            <Controller
+              name="title"
+              control={control}
+              rules={{
+                required: 'This is required.',
+              }}
+              defaultValue=""
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
+                <TextInput
+                  wide
+                  title="Title"
+                  value={value}
+                  placeholder="Type execution title"
+                  onChange={onChange}
+                  status={error ? 'error' : 'normal'}
+                  error={error ? error.message : null}
+                />
+              )}
             />
           </Field>
           <Field>
@@ -240,13 +210,13 @@ const NewExecution: React.FC = () => {
             <StyledText name={'body3'}>
               Add as many actions (smart contract interactions) you want for this execution.
             </StyledText>
-            <ActionList fields={fields} swap={swap} remove={remove} register={register} />
+            <ActionList actions={fields} swap={swap} remove={remove} />
             <br />
             <Button
               mode={'secondary'}
               icon={<IconAdd />}
               label={'Add new action'}
-              onClick={handleInputModalOpen}
+              onClick={() => setShowActionModal(true)}
             ></Button>
           </Field>
           <Button
@@ -254,23 +224,11 @@ const NewExecution: React.FC = () => {
             size={'large'}
             mode={'primary'}
             disabled={!isConnected}
-            onClick={handleSubmit(() => onSchedule())}
+            onClick={handleSubmit(onSchedule)}
             label={'Schedule'}
           ></Button>
-          {isInputModalOpen && (
-            <NewActionModal
-              onCloseModal={handleInputModalClose}
-              onGenerate={onGenerateActionsFromAbi}
-              open={isInputModalOpen}
-            ></NewActionModal>
-          )}
-          {isActionModalOpen && (
-            <AddActionsModal
-              onCloseModal={handleActionModalClose}
-              open={isActionModalOpen}
-              onAddActions={onAddNewActions}
-              actions={abiFunctions}
-            ></AddActionsModal>
+          {showActionModal && (
+            <ActionBuilder visible={showActionModal} onClose={onCloseActionModal}></ActionBuilder>
           )}
         </FormProvider>
       </Box>

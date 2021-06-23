@@ -11,6 +11,7 @@ import NoDaoFound from './NoDaoFound';
 import { formatDate } from 'utils/date';
 import { getState, getStateColor } from 'utils/states';
 import { useDaoQuery, useLazyProposalListQuery } from 'hooks/query-hooks';
+import { proposalDetailsUrl } from 'utils/urls';
 
 //* Styled Components List
 const DaoPageMainDiv = styled(Paper)(({ theme }) => ({
@@ -115,7 +116,7 @@ const DaoMainPage: React.FC = () => {
   }, [loadingDao, dao, getQueueData]);
 
   const onClickProposal = (proposal: any) => {
-    history.push(`/proposals/${daoName}/${proposal.id}`);
+    history.push(proposalDetailsUrl(daoName, proposal.id));
   };
 
   const goToNewExecution = () => {
