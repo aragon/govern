@@ -5,7 +5,6 @@ import Footer from 'components/Footer/Footer';
 import ConsoleMainPage from 'containers/Console/ConsoleMainPage';
 import DaoMainPage from 'containers/DAO/DaoMainPage';
 import ProposalDetails from 'containers/ProposalDetails/ProposalDetails';
-import NewProposal from 'containers/NewProposal/NewProposal';
 import NewExecution from 'containers/NewExecution/NewExecution';
 import DaoSettings from 'containers/DAOSettings/DAOSettings';
 import { ModalsProvider } from 'containers/HomePage/ModalsContext';
@@ -39,9 +38,6 @@ const HomePage = () => {
           </Route>
           <Route exact path="/daos/:daoName/new-execution">
             <NewExecution />
-          </Route>
-          <Route exact path="/daos/:daoName/new-proposal">
-            <NewProposal onClickBack={() => history.goBack()} />
           </Route>
           <Route exact path="/daos/:daoName/dao-settings">
             <DaoSettings onClickBack={() => history.goBack()} />

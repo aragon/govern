@@ -98,7 +98,7 @@ export const AbiForm: React.FC = () => {
           }}
         >
           <IconWarning />
-          <div>Contract not verified, you need insert the input function ABI</div>
+          <div>Contract not verified, please insert the input function ABI</div>
         </div>
       </section>
       <section>
