@@ -89,6 +89,9 @@ const ActionList: React.FC<ActionListProps> = ({ actions, swap, remove }) => {
                   name={`actions.${index}.inputs.${num}.value` as const}
                   control={control}
                   defaultValue={input.value}
+                  rules={{
+                    required: 'This is required.',
+                  }}
                   render={({ field: { onChange, value }, fieldState: { error } }) => (
                     <TextInput
                       wide
