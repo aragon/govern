@@ -2,7 +2,7 @@ import React, { memo, useState, useEffect, useCallback } from 'react';
 import { IconAdd, Box, Button, StyledText, Link, TextInput } from '@aragon/ui';
 import { PageName } from 'utils/HelpText';
 import PageContent from 'components/PageContent/PageContent';
-import ActionList from 'components/ActionList/ActionList';
+import ActionList from 'containers/NewExecution/ActionList';
 import { ActionBuilder } from 'components/ActionBuilder/ActionBuilder';
 import { useParams, useHistory } from 'react-router-dom';
 import { ContractReceipt, utils } from 'ethers';

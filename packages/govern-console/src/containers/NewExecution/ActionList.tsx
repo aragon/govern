@@ -94,8 +94,8 @@ const ActionList: React.FC<ActionListProps> = ({ actions, swap, remove }) => {
                       wide
                       value={value}
                       onChange={onChange}
-                      subtitle={input.type}
-                      placeholder={input.name}
+                      subtitle={input.name}
+                      placeholder={input.type}
                       status={error ? 'error' : 'normal'}
                       error={error ? error.message : null}
                     />
