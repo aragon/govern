@@ -1,8 +1,7 @@
 import React, { useCallback } from 'react';
-import { DropDown, Button, TextInput, StyledText, useTheme } from '@aragon/ui';
+import { Grid, GridItem, DropDown, Button, TextInput, StyledText, useTheme } from '@aragon/ui';
 import { ActionBuilderCloseHandler } from 'utils/types';
 import { Hint } from 'components/Hint/Hint';
-import { ActionBuilderContent } from '../ActionBuilderContent';
 import { useForm, Controller } from 'react-hook-form';
 import { validateAmountForToken, validateToken } from 'utils/validations';
 import { useWallet } from 'AugmentedWallet';
@@ -62,12 +61,12 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
   );
 
   return (
-    <ActionBuilderContent>
-      <section>
+    <Grid columns={1}>
+      <GridItem>
         <StyledText name="title1">Withdraw assets</StyledText>
         <Hint>Helptext TBD</Hint>
-      </section>
-      <section>
+      </GridItem>
+      <GridItem>
         <Controller
           name="recipient"
           control={control}
@@ -88,8 +87,8 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
             />
           )}
         />
-      </section>
-      <section>
+      </GridItem>
+      <GridItem>
         <StyledText name="title2">Token</StyledText>
         <Hint>Choose which token you would like to withdraw.</Hint>
         <Controller
@@ -103,9 +102,9 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
             </div>
           )}
         />
-      </section>
+      </GridItem>
       {isOtherToken(selectedToken) && (
-        <section>
+        <GridItem>
           <Controller
             name="tokenContractAddress"
             control={control}
@@ -128,10 +127,10 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
               />
             )}
           />
-        </section>
+        </GridItem>
       )}
 
-      <section>
+      <GridItem>
         <Controller
           name="withdrawalAmount"
           control={control}
@@ -154,13 +153,15 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
             />
           )}
         />
-      </section>
-      <Button
-        size="large"
-        mode="primary"
-        label="Save"
-        onClick={handleSubmit(buildActions)}
-      ></Button>
-    </ActionBuilderContent>
+      </GridItem>
+      <GridItem>
+        <Button
+          size="large"
+          mode="primary"
+          label="Save action now"
+          onClick={handleSubmit(buildActions)}
+        ></Button>
+      </GridItem>
+    </Grid>
   );
 };

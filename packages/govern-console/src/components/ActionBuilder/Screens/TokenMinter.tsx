@@ -4,6 +4,8 @@ import {
   StyledText,
   TextInput,
   ContentSwitcher,
+  Grid,
+  GridItem,
   useLayout,
   SPACING,
   TextCopy,
@@ -62,17 +64,12 @@ export const TokenMinter: React.FC<TokenMinterProps> = ({ onClick }) => {
   }, [onClick, getValues, dao, provider]);
 
   return (
-    <div
-      css={`
-        display: grid;
-        row-gap: ${spacing}px;
-      `}
-    >
-      <section>
+    <Grid columns={1}>
+      <GridItem>
         <StyledText name="title1">Mint Tokens</StyledText>
         <Hint>Helptext TBD</Hint>
-      </section>
-      <section>
+      </GridItem>
+      <GridItem>
         <StyledText name="title2">Who should receive minted tokens?</StyledText>
         <Controller
           name="recipient"
@@ -90,16 +87,16 @@ export const TokenMinter: React.FC<TokenMinterProps> = ({ onClick }) => {
             />
           )}
         />
-      </section>
+      </GridItem>
 
       {recipient === Recipient.Executor ? (
-        <section>
+        <GridItem>
           <StyledText name="title2">Recipient address</StyledText>
           <Hint>The assets will be transfered to this address.</Hint>
           <TextCopy value={dao?.executor.address} />
-        </section>
+        </GridItem>
       ) : (
-        <section>
+        <GridItem>
           <Controller
             name="tokenAddress"
             control={control}
@@ -122,10 +119,10 @@ export const TokenMinter: React.FC<TokenMinterProps> = ({ onClick }) => {
               />
             )}
           />
-        </section>
+        </GridItem>
       )}
 
-      <section>
+      <GridItem>
         <Controller
           name="mintAmount"
           control={control}
@@ -147,12 +144,14 @@ export const TokenMinter: React.FC<TokenMinterProps> = ({ onClick }) => {
             />
           )}
         />
-      </section>
-      <Button
-        mode={'primary'}
-        label="Save action now"
-        onClick={handleSubmit(submitActionData)}
-      ></Button>
-    </div>
+      </GridItem>
+      <GridItem>
+        <Button
+          mode={'primary'}
+          label="Save action now"
+          onClick={handleSubmit(submitActionData)}
+        ></Button>
+      </GridItem>
+    </Grid>
   );
 };

@@ -1,8 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { SearchInput, StyledText, Button, useTheme, Box } from '@aragon/ui';
+import { Grid, GridItem, SearchInput, StyledText, Button, useTheme, Box } from '@aragon/ui';
 import { useActionBuilderState } from '../ActionBuilderStateProvider';
 import { getTruncatedAccountAddress } from 'utils/account';
-import { ActionBuilderContent } from '../ActionBuilderContent';
 import { Stepper } from 'components/Stepper/Stepper';
 import { Hint } from 'components/Hint/Hint';
 import AbiHandler from 'utils/AbiHandler';
@@ -95,13 +94,13 @@ export const FunctionSelector: React.FC<FunctionSelectorProps> = ({ onClick }) =
   }, [contractAddress, onClick, functions]);
 
   return (
-    <ActionBuilderContent>
-      <section>
+    <Grid columns={1}>
+      <GridItem>
         <StyledText name="title1">
           Contract: {getTruncatedAccountAddress(contractAddress)}
         </StyledText>
-      </section>
-      <section>
+      </GridItem>
+      <GridItem>
         <SearchInput wide placeholder="Search function" onChange={doSearch}></SearchInput>
         <Box
           style={{ border: `1px solid ${theme.border}`, maxHeight: '380px', overflow: 'scroll' }}
@@ -133,10 +132,10 @@ export const FunctionSelector: React.FC<FunctionSelectorProps> = ({ onClick }) =
             Please select at least one function.
           </div>
         </Box>
-      </section>
-      <section>
+      </GridItem>
+      <GridItem>
         <Button wide mode={'primary'} label="Choose" onClick={submitActions}></Button>
-      </section>
-    </ActionBuilderContent>
+      </GridItem>
+    </Grid>
   );
 };

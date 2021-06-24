@@ -12,7 +12,7 @@ export const Hint: React.FC<HintProps> = ({ children }) => {
     <div
       css={`
         color: ${theme.hint};
-        ${textStyle('body3')};
+        ${textStyle('body2')};
       `}
     >
       {children}

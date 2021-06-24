@@ -7,6 +7,8 @@ import {
   useLayout,
   SPACING,
   IconWarning,
+  Grid,
+  GridItem,
 } from '@aragon/ui';
 import { Controller, useForm } from 'react-hook-form';
 import { validateContract, validateAbi } from 'utils/validations';
@@ -14,7 +16,6 @@ import { useWallet } from 'AugmentedWallet';
 import { useActionBuilderState } from '../ActionBuilderStateProvider';
 import { utils } from 'ethers';
 import AbiHandler from 'utils/AbiHandler';
-import { ActionBuilderContent } from '../ActionBuilderContent';
 
 type FormInput = {
   contractAddress: string;
@@ -55,9 +56,11 @@ export const AbiForm: React.FC = () => {
   }, [networkName, contractAddress, provider, setValue, setWarning]);
 
   return (
-    <ActionBuilderContent>
-      <StyledText name="title1">Choose contract</StyledText>
-      <section>
+    <Grid columns={1}>
+      <GridItem>
+        <StyledText name="title1">Choose contract</StyledText>
+      </GridItem>
+      <GridItem>
         <StyledText name="title2">Input contract address</StyledText>
         <div
           css={`
@@ -100,8 +103,8 @@ export const AbiForm: React.FC = () => {
           <IconWarning />
           <div>Contract not verified, please insert the input function ABI</div>
         </div>
-      </section>
-      <section>
+      </GridItem>
+      <GridItem>
         <Controller
           name="abi"
           control={control}
@@ -125,15 +128,15 @@ export const AbiForm: React.FC = () => {
             />
           )}
         />
-      </section>
-      <section>
+      </GridItem>
+      <GridItem>
         <Button
           mode={'primary'}
           wide
           label="Choose"
           onClick={handleSubmit(gotoNextScreen)}
         ></Button>
-      </section>
-    </ActionBuilderContent>
+      </GridItem>
+    </Grid>
   );
 };

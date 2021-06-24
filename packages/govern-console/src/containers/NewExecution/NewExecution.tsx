@@ -1,5 +1,5 @@
-import React, { memo, useState, useEffect, useCallback } from 'react';
-import { IconAdd, Box, Button, StyledText, Link, TextInput } from '@aragon/ui';
+import React, { memo, useState, useCallback } from 'react';
+import { IconAdd, Grid, GridItem, Button, StyledText, Link, TextInput } from '@aragon/ui';
 import { PageName } from 'utils/HelpText';
 import PageContent from 'components/PageContent/PageContent';
 import ActionList from 'containers/NewExecution/ActionList';
@@ -19,11 +19,6 @@ import { useFacadeProposal } from 'hooks/proposal-hooks';
 import { IPFSInput } from 'components/Field/IPFSInput';
 import { settingsUrl } from 'utils/urls';
 import { useDaoQuery } from 'hooks/query-hooks';
-import styled from 'styled-components';
-
-const Field = styled('div')({
-  margin: '20px 0',
-});
 
 interface FormInputs {
   proof: string;
@@ -37,7 +32,7 @@ const NewExecution: React.FC = () => {
 
   //TODO daoname empty handling
   const { daoName } = useParams<any>();
-  const { data: dao } = useDaoQuery(daoName);
+  const { data: daoDetails } = useDaoQuery(daoName);
 
   const { enqueueSnackbar } = useSnackbar();
   const { dispatch } = React.useContext(ModalsContext);
@@ -50,14 +45,7 @@ const NewExecution: React.FC = () => {
     name: 'actions',
   });
 
-  const [daoDetails, updateDaoDetails] = useState<any>();
   const [showActionModal, setShowActionModal] = useState(false);
-
-  useEffect(() => {
-    if (dao) {
-      updateDaoDetails(dao);
-    }
-  }, [dao]);
 
   const context: any = useWallet();
   const { account, isConnected } = context;
@@ -121,7 +109,7 @@ const NewExecution: React.FC = () => {
         variant: 'error',
       });
     } else {
-      scheduleProposal(actions!);
+      scheduleProposal(actions);
     }
   };
 
@@ -151,6 +139,7 @@ const NewExecution: React.FC = () => {
         );
       } catch (error) {
         enqueueSnackbar(error.message, { variant: 'error' });
+        return;
       }
     }
 
@@ -158,9 +147,6 @@ const NewExecution: React.FC = () => {
       type: ActionTypes.OPEN_TRANSACTIONS_MODAL,
       payload: {
         transactionList: transactionsQueue.current,
-        onTransactionFailure: () => {
-          /* do nothing */
-        },
         onTransactionSuccess: (_, receipt: ContractReceipt) => {
           containerHash = Proposal.getContainerHashFromReceipt(receipt, ReceiptType.Scheduled);
         },
@@ -175,14 +161,16 @@ const NewExecution: React.FC = () => {
 
   return (
     <PageContent pageName={PageName.NEW_EXECUTION}>
-      <Box>
-        <StyledText name={'title2'}>New execution</StyledText>
-        <StyledText name={'body3'}>
-          This execution will use the current{' '}
-          <Link onClick={() => history.push(settingsUrl(daoName))}>DAO Settings</Link>
-        </StyledText>
+      <Grid columns={1}>
+        <GridItem>
+          <StyledText name={'title1'}>New execution</StyledText>
+          <StyledText name={'body3'}>
+            This execution will use the current{' '}
+            <Link onClick={() => history.push(settingsUrl(daoName))}>DAO Settings</Link>
+          </StyledText>
+        </GridItem>
         <FormProvider {...methods}>
-          <Field>
+          <GridItem>
             <Controller
               name="title"
               control={control}
@@ -202,9 +190,9 @@ const NewExecution: React.FC = () => {
                 />
               )}
             />
-          </Field>
-          <Field>
-            <StyledText name={'title4'}>Justification</StyledText>{' '}
+          </GridItem>
+          <GridItem>
+            <StyledText name={'title2'}>Justification</StyledText>{' '}
             <StyledText name={'body3'}>
               Insert the reason for scheduling this execution so DAO members can understand it.
             </StyledText>
@@ -214,9 +202,9 @@ const NewExecution: React.FC = () => {
               textInputName="proof"
               fileInputName="proofFile"
             />
-          </Field>
-          <Field>
-            <StyledText name={'title4'}>Actions</StyledText>
+          </GridItem>
+          <GridItem>
+            <StyledText name={'title2'}>Actions</StyledText>
             <StyledText name={'body3'}>
               Add as many actions (smart contract interactions) you want for this execution.
             </StyledText>
@@ -228,7 +216,7 @@ const NewExecution: React.FC = () => {
               label={'Add new action'}
               onClick={() => setShowActionModal(true)}
             ></Button>
-          </Field>
+          </GridItem>
           <Button
             wide
             size={'large'}
@@ -241,7 +229,7 @@ const NewExecution: React.FC = () => {
             <ActionBuilder visible={showActionModal} onClose={onCloseActionModal}></ActionBuilder>
           )}
         </FormProvider>
-      </Box>
+      </Grid>
     </PageContent>
   );
 };
