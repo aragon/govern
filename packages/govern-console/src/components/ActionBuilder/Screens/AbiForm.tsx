@@ -14,7 +14,6 @@ import { Controller, useForm } from 'react-hook-form';
 import { validateContract, validateAbi } from 'utils/validations';
 import { useWallet } from 'AugmentedWallet';
 import { useActionBuilderState } from '../ActionBuilderStateProvider';
-import { utils } from 'ethers';
 import AbiHandler from 'utils/AbiHandler';
 
 type FormInput = {
@@ -30,7 +29,7 @@ export const AbiForm: React.FC = () => {
   const theme = useTheme();
 
   const methods = useForm<FormInput>();
-  const { control, handleSubmit, getValues, setValue } = methods;
+  const { control, handleSubmit, trigger, getValues, setValue } = methods;
 
   const { contractAddress, gotoFunctionSelector } = useActionBuilderState();
   const [warning, setWarning] = useState(false);
@@ -41,11 +40,13 @@ export const AbiForm: React.FC = () => {
   }, [getValues, gotoFunctionSelector]);
 
   const fetchAbi = useCallback(async () => {
-    const address =
-      contractAddress && utils.isAddress(contractAddress)
-        ? contractAddress
-        : await provider.resolveName(contractAddress);
+    const validationResult = await trigger('contractAddress');
+    if (validationResult === false) {
+      // address is invalid
+      return;
+    }
 
+    const address = getValues('contractAddress');
     const abiHandler = new AbiHandler(networkName);
     const abi = await abiHandler.get(address);
     if (abi) {
@@ -53,7 +54,7 @@ export const AbiForm: React.FC = () => {
     } else {
       setWarning(true);
     }
-  }, [networkName, contractAddress, provider, setValue, setWarning]);
+  }, [networkName, trigger, getValues, setValue, setWarning]);
 
   return (
     <Grid columns={1}>
@@ -77,7 +78,7 @@ export const AbiForm: React.FC = () => {
             defaultValue={contractAddress}
             rules={{
               required: 'This is required.',
-              validate: async (value) => validateContract(value, provider),
+              validate: async (value) => await validateContract(value, provider),
             }}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <TextInput
