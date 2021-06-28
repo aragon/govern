@@ -34,10 +34,30 @@ const ActionHeader: React.FC<ActionHeaderProps> = memo(function ActionHeader({
   remove,
 }) {
   const theme = useTheme();
+
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-      <div style={{ alignSelf: 'center' }}>Contract: {contractAddress}</div>
-      <div>
+    <div
+      style={{
+        display: 'grid',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+        gridTemplateColumns: '3fr 1fr',
+      }}
+    >
+      <div
+        style={{
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          width: '1fr',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        Contract: {contractAddress}
+      </div>
+      <div
+        style={{ display: 'grid', gridTemplateColumns: '30px 30px 30px', justifyContent: 'end' }}
+      >
         <ButtonIcon label="Up" onClick={index > 0 ? () => swap(index, index - 1) : undefined}>
           <IconUp color={theme.primary} />
         </ButtonIcon>
