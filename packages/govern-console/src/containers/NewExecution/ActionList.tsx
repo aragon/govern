@@ -4,13 +4,16 @@ import {
   Card,
   Box,
   useTheme,
+  useLayout,
   ButtonIcon,
   IconUp,
   IconDown,
   IconCross,
+  GU,
 } from '@aragon/ui';
 import { ActionItem } from 'utils/types';
 import { Controller, useFormContext } from 'react-hook-form';
+import { getTruncatedAccountAddress } from 'utils/account';
 
 type ActionListProps = {
   actions: Array<ActionItem & { id: string }>;
@@ -34,6 +37,7 @@ const ActionHeader: React.FC<ActionHeaderProps> = memo(function ActionHeader({
   remove,
 }) {
   const theme = useTheme();
+  const { layoutName } = useLayout();
 
   return (
     <div
@@ -42,34 +46,39 @@ const ActionHeader: React.FC<ActionHeaderProps> = memo(function ActionHeader({
         justifyContent: 'space-between',
         alignItems: 'center',
         width: '100%',
-        gridTemplateColumns: '3fr 1fr',
+        gridAutoFlow: `${layoutName === 'small' ? 'row' : 'column'}`,
+        gridTemplateColumns: `${layoutName === 'small' ? '1fr' : 'auto 100px'}`,
       }}
     >
-      <div
-        style={{
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          width: '1fr',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        Contract: {contractAddress}
+      <div>
+        Contract:{' '}
+        <span>
+          {layoutName === 'small' ? getTruncatedAccountAddress(contractAddress) : contractAddress}
+        </span>
       </div>
       <div
-        style={{ display: 'grid', gridTemplateColumns: '30px 30px 30px', justifyContent: 'end' }}
+        style={{
+          display: 'grid',
+          gridAutoFlow: 'column',
+          justifyContent: `${layoutName === 'small' ? 'space-between' : 'end'}`,
+        }}
       >
-        <ButtonIcon label="Up" onClick={index > 0 ? () => swap(index, index - 1) : undefined}>
-          <IconUp color={theme.primary} />
-        </ButtonIcon>
-        <ButtonIcon
-          label="Down"
-          onClick={index < count - 1 ? () => swap(index, index + 1) : undefined}
-        >
-          <IconDown color={theme.primary} />
-        </ButtonIcon>
-        <ButtonIcon label="Remove" onClick={() => remove(index)}>
-          <IconCross color={theme.red} />
-        </ButtonIcon>
+        <div>
+          <ButtonIcon label="Up" onClick={index > 0 ? () => swap(index, index - 1) : undefined}>
+            <IconUp color={theme.primary} />
+          </ButtonIcon>
+          <ButtonIcon
+            label="Down"
+            onClick={index < count - 1 ? () => swap(index, index + 1) : undefined}
+          >
+            <IconDown color={theme.primary} />
+          </ButtonIcon>
+        </div>
+        <div>
+          <ButtonIcon label="Remove" onClick={() => remove(index)}>
+            <IconCross color={theme.red} />
+          </ButtonIcon>
+        </div>
       </div>
     </div>
   );
@@ -80,16 +89,21 @@ const ActionList: React.FC<ActionListProps> = ({ actions, swap, remove }) => {
 
   if (actions && actions.length === 0) {
     return (
-      <Card width="auto" height="120px">
+      <Card width="auto" height={`${15 * GU}px`}>
         No action yet.
       </Card>
     );
   }
 
   return (
-    <>
+    <div>
       {actions.map((action, index: number) => (
         <Box
+          css={`
+            & > h1 {
+              height: auto !important;
+            }
+          `}
           key={action.id}
           heading={
             <ActionHeader
@@ -130,7 +144,7 @@ const ActionList: React.FC<ActionListProps> = ({ actions, swap, remove }) => {
           </Box>
         </Box>
       ))}
-    </>
+    </div>
   );
 };
 
