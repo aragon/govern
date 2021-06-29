@@ -4,7 +4,7 @@ import {
   Frozen as FrozenEvent,
   Granted as GrantedEvent,
   Revoked as RevokedEvent,
-  ETHDeposited as ETHDepositedEvent,
+  // ETHDeposited as ETHDepositedEvent,
 } from '../generated/templates/Govern/Govern'
 import { Govern } from '../generated/schema'
 import { frozenRoles, roleGranted, roleRevoked } from './lib/MiniACL'
@@ -20,13 +20,13 @@ export function handleExecuted(event: ExecutedEvent): void {
   govern.save()
 }
 
-export function handleETHDeposited(event: ETHDepositedEvent): void {
-  // This would be useful if we store in the subgraph who deposited
-  // and how much
-  // let govern = loadOrCreateGovern(event.address)
-  // govern.balance = event.params.value
-  // govern.save()
-}
+// export function handleETHDeposited(event: ETHDepositedEvent): void {
+//   // This would be useful if we store in the subgraph who deposited
+//   // and how much
+//   // let govern = loadOrCreateGovern(event.address)
+//   // govern.balance = event.params.value
+//   // govern.save()
+// }
 
 // MiniACL Events
 
