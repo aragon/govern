@@ -1,15 +1,14 @@
 {
   "site": {
-    "id": "15a86cf1-2b97-4c1d-bd70-349a5a60daad",
+    "id": "7bba8cde-0bdc-440b-9699-de74d7efe20a",
     "team": "aragonone-team",
     "platform": "ipfs",
     "source": "ipfs",
-    "name": "dark-butterfly-6166"
+    "name": "winter-flower-8324"
   },
   "build": {
     "baseDir": "",
     "publicDir": "build",
-    "command": "yarn install --frozen-lockfile && yarn build",
     "rootDir": ""
   }
 }

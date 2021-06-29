@@ -1,0 +1,14 @@
+{
+    "site": {
+      "id": "7bba8cde-0bdc-440b-9699-de74d7efe20a",
+      "team": "aragonone-team",
+      "platform": "ipfs",
+      "source": "ipfs",
+      "name": "winter-flower-8324"
+    },
+    "build": {
+      "baseDir": "",
+      "publicDir": "build",
+      "rootDir": ""
+    }
+  }
