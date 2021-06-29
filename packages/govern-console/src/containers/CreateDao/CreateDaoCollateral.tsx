@@ -31,7 +31,7 @@ const CreateDaoCollateral: React.FC<{
 }> = ({ setActiveStep }) => {
   const { layoutName } = useLayout();
   const spacing = SPACING[layoutName];
-  const { collaterals, setCollaterals } = useCreateDaoContext();
+  const { collaterals, setCollaterals, basicInfo } = useCreateDaoContext();
   const {
     scheduleAddress,
     scheduleAmount,
@@ -44,6 +44,8 @@ const CreateDaoCollateral: React.FC<{
     isAnyAddress,
     executionAddressList,
   } = collaterals;
+
+  const isExistingToken = basicInfo.isExistingToken;
 
   const context: any = useWallet();
   const { provider } = context;
@@ -74,6 +76,12 @@ const CreateDaoCollateral: React.FC<{
     setValue('scheduleAmount', formatUnits(scheduleAmount, scheduleDecimals));
     setValue('challengeAmount', formatUnits(challengeAmount, challengeDecimals));
   }, [scheduleAmount, scheduleDecimals, challengeAmount, challengeDecimals, setValue]);
+
+  useEffect(() => {
+    setValue('isAnyAddress', isAnyAddress);
+  }, [isAnyAddress, setValue]);
+
+  console.log(watch('isAnyAddress'), ' finalone');
 
   const moveToNextStep = async () => {
     await trigger();
@@ -125,22 +133,24 @@ const CreateDaoCollateral: React.FC<{
                 Which token do you want to use for schedule execution?
               </StyledText>
 
-              <Controller
-                name="isScheduleNewDaoToken"
-                control={control}
-                defaultValue={isScheduleNewDaoToken}
-                render={({ field: { onChange, value } }) => (
-                  <ContentSwitcher
-                    onChange={onChange}
-                    selected={value}
-                    items={['New Token', 'Existing Token']}
-                    paddingSettings={{
-                      horizontal: spacing * 2,
-                      vertical: spacing / 4,
-                    }}
-                  />
-                )}
-              />
+              {!isExistingToken && (
+                <Controller
+                  name="isScheduleNewDaoToken"
+                  control={control}
+                  defaultValue={isScheduleNewDaoToken}
+                  render={({ field: { onChange, value } }) => (
+                    <ContentSwitcher
+                      onChange={onChange}
+                      selected={value}
+                      items={['Custom Token', 'New Token']}
+                      paddingSettings={{
+                        horizontal: spacing * 2,
+                        vertical: spacing / 4,
+                      }}
+                    />
+                  )}
+                />
+              )}
 
               <Controller
                 name="scheduleAddress"
@@ -209,22 +219,24 @@ const CreateDaoCollateral: React.FC<{
               <StyledText name={'body3'}>
                 Which token do you want to use for challange collateral?
               </StyledText>
-              <Controller
-                name="isChallengeNewDaoToken"
-                control={control}
-                defaultValue={isChallengeNewDaoToken}
-                render={({ field: { onChange, value } }) => (
-                  <ContentSwitcher
-                    onChange={onChange}
-                    selected={value}
-                    items={['New Token', 'Existing Token']}
-                    paddingSettings={{
-                      horizontal: spacing * 2,
-                      vertical: spacing / 4,
-                    }}
-                  />
-                )}
-              />
+              {!isExistingToken && (
+                <Controller
+                  name="isChallengeNewDaoToken"
+                  control={control}
+                  defaultValue={isChallengeNewDaoToken}
+                  render={({ field: { onChange, value } }) => (
+                    <ContentSwitcher
+                      onChange={onChange}
+                      selected={value}
+                      items={['Custom Token', 'New Token']}
+                      paddingSettings={{
+                        horizontal: spacing * 2,
+                        vertical: spacing / 4,
+                      }}
+                    />
+                  )}
+                />
+              )}
               <Controller
                 name="challengeAddress"
                 control={control}
@@ -309,6 +321,7 @@ const CreateDaoCollateral: React.FC<{
                 )}
               />
             </div>
+            {console.log(watch('isAnyAddress'), ' awesome')}
             {watch('isAnyAddress') ? (
               <Info mode={'warning'} title={''}>
                 If you select ”Any Address”, then everybody can schedule executions in your DAO.
