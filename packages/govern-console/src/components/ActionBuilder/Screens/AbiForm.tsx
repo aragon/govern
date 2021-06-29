@@ -4,11 +4,12 @@ import {
   Button,
   TextInput,
   useTheme,
-  useLayout,
-  SPACING,
   IconWarning,
   Grid,
   GridItem,
+  Help,
+  useLayout,
+  SPACING,
 } from '@aragon/ui';
 import { Controller, useForm } from 'react-hook-form';
 import { validateContract, validateAbi } from 'utils/validations';
@@ -24,12 +25,13 @@ type FormInput = {
 export const AbiForm: React.FC = () => {
   const context: any = useWallet();
   const { provider, networkName } = context;
+
+  const theme = useTheme();
   const { layoutName } = useLayout();
   const spacing = SPACING[layoutName];
-  const theme = useTheme();
 
   const methods = useForm<FormInput>();
-  const { control, handleSubmit, trigger, getValues, setValue } = methods;
+  const { control, handleSubmit, trigger, getValues } = methods;
 
   const { contractAddress, gotoFunctionSelector } = useActionBuilderState();
   const [warning, setWarning] = useState(false);
@@ -50,49 +52,46 @@ export const AbiForm: React.FC = () => {
     const abiHandler = new AbiHandler(networkName);
     const abi = await abiHandler.get(address);
     if (abi) {
-      setValue('abi', abi);
+      gotoFunctionSelector(address, abi);
     } else {
       setWarning(true);
     }
-  }, [networkName, trigger, getValues, setValue, setWarning]);
+  }, [networkName, trigger, getValues, gotoFunctionSelector, setWarning]);
 
   return (
-    <Grid columns={1}>
+    <Grid>
       <GridItem>
         <StyledText name="title1">Choose contract</StyledText>
       </GridItem>
       <GridItem>
         <StyledText name="title2">Input contract address</StyledText>
-        <div
-          css={`
-            display: grid;
-            grid-template-columns: auto 0.2fr;
-            column-gap: ${spacing}px;
-            align-items: center;
-          `}
-        >
-          <Controller
-            name="contractAddress"
-            control={control}
-            shouldUnregister={true}
-            defaultValue={contractAddress}
-            rules={{
-              required: 'This is required.',
-              validate: async (value) => await validateContract(value, provider),
-            }}
-            render={({ field: { onChange, value }, fieldState: { error } }) => (
-              <TextInput
-                wide
-                value={value}
-                placeholder="Type contract address"
-                onChange={onChange}
-                status={error ? 'error' : 'normal'}
-                error={error ? error.message : null}
-              />
-            )}
-          />
-          <Button label="Search" onClick={fetchAbi}></Button>
-        </div>
+        <Grid columns="4" columnWidth="1fr" alignVertical="center">
+          <GridItem gridColumn="1/4">
+            <Controller
+              name="contractAddress"
+              control={control}
+              shouldUnregister={true}
+              defaultValue={contractAddress}
+              rules={{
+                required: 'This is required.',
+                validate: async (value) => await validateContract(value, provider),
+              }}
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
+                <TextInput
+                  wide
+                  value={value}
+                  placeholder="Type contract address"
+                  onChange={onChange}
+                  status={error ? 'error' : 'normal'}
+                  error={error ? error.message : null}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem gridColum="4/5" alignVertical="center">
+            <Button label="Search" onClick={fetchAbi}></Button>
+          </GridItem>
+        </Grid>
         <div
           style={{
             opacity: `${warning ? 1 : 0}`,
@@ -106,6 +105,16 @@ export const AbiForm: React.FC = () => {
         </div>
       </GridItem>
       <GridItem>
+        <StyledText name="title2">
+          <div style={{ display: 'flex', columnGap: `${spacing}px`, alignItems: 'center' }}>
+            <div>Input function ABI </div>
+            <div>
+              <Help hint="What is an ABI?">
+                An ABI is the specification used to interact with Ethereum smart contracts
+              </Help>
+            </div>
+          </div>
+        </StyledText>
         <Controller
           name="abi"
           control={control}
@@ -120,7 +129,6 @@ export const AbiForm: React.FC = () => {
               wide
               style={{ minHeight: '200px' }}
               multiline
-              title="Input function ABI"
               value={value}
               placeholder="Function ABI"
               onChange={onChange}

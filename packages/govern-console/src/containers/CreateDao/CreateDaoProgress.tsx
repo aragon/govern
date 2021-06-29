@@ -6,6 +6,10 @@ import ProgressComponent from './components/ProgressComponent';
 import { CiruclarProgressStatus } from 'utils/types';
 import { parseUnits } from 'utils/lib';
 
+import { networkEnvironment } from 'environment';
+
+const { daoFactoryAddress } = networkEnvironment;
+
 import {
   createDao,
   CreateDaoParams,
@@ -178,7 +182,7 @@ const CreateDaoProgress: React.FC<{
             createDaoParams,
             {
               provider: window.ethereum,
-              daoFactoryAddress: '0x91209b1352E1aD3abF7C7b74A899F3b118287f9D',
+              daoFactoryAddress: daoFactoryAddress,
             },
             updateNewDaoTokenAddress,
           );

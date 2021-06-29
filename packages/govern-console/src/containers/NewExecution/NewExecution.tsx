@@ -87,7 +87,7 @@ const NewExecution: React.FC = () => {
 
     const actions = values.map((item) => {
       const { sighash, signature, contractAddress, inputs } = item;
-      const abiInterface = new utils.Interface([`function ${signature}`]);
+      const abiInterface = new utils.Interface([`${signature}`]);
       const functionParameters = inputs.map((input) => input.value);
 
       let calldata = '';
@@ -161,7 +161,7 @@ const NewExecution: React.FC = () => {
 
   return (
     <PageContent pageName={PageName.NEW_EXECUTION}>
-      <Grid columns={1}>
+      <Grid>
         <GridItem>
           <StyledText name={'title1'}>New execution</StyledText>
           <StyledText name={'body3'}>

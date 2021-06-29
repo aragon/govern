@@ -9,6 +9,7 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
       networkName: 'mainnet',
       subgraphUrl: 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-mainnet',
       voiceUrl: 'https://voice.aragon.org/',
+      daoFactoryAddress: '0x897b8DeeA74AD703B6d3DA25ed9A3a23fC5629EF',
       defaultDaoConfig: {
         executionDelay: 86400, // defaults to one day - how many seconds to wait before being able to call execute.
         scheduleDeposit: {
@@ -37,6 +38,7 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
       networkName: 'rinkeby',
       subgraphUrl: 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby',
       voiceUrl: 'http://voice-rinkeby.aragon.org/',
+      daoFactoryAddress: '0x897b8DeeA74AD703B6d3DA25ed9A3a23fC5629EF',
       defaultDaoConfig: {
         executionDelay: 180,
         scheduleDeposit: {
@@ -65,6 +67,7 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
       networkName: 'rinkeby',
       subgraphUrl: 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby-staging',
       voiceUrl: 'http://voice-rinkeby.aragon.org/',
+      daoFactoryAddress: '0x897b8DeeA74AD703B6d3DA25ed9A3a23fC5629EF',
       defaultDaoConfig: {
         executionDelay: 180,
         scheduleDeposit: {

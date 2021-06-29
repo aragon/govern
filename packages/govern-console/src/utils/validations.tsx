@@ -86,3 +86,15 @@ export const validateContract = async (address: string, provider: any): Promise<
 export const validateAbi = (abi: string): ValidateResult => {
   return Abi.isValidAbi(abi) ? true : 'Contract ABI is not valid.';
 };
+
+/**
+ * validates if the number is positive.
+ * @param num number
+ * @returns <ValidateResult>
+ */
+export const positiveNumber = (num: number | string): ValidateResult => {
+  if (typeof num === 'string') {
+    num = parseInt(num);
+  }
+  return num > 0 ? true : 'Value must be positive';
+};

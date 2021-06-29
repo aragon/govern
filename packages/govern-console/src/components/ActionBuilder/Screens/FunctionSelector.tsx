@@ -30,9 +30,9 @@ export const FunctionSelector: React.FC<FunctionSelectorProps> = ({ onClick }) =
       const iface = new utils.Interface(abi);
       const functions = Object.entries(iface.functions)
         .filter(([_, fragment]) => !fragment.constant)
-        .map(([key, fragment]) => ({
+        .map(([_key, fragment]) => ({
           name: fragment.name,
-          signature: key,
+          signature: fragment.format(utils.FormatTypes.full),
           count: 0,
           show: true,
         }));
@@ -94,7 +94,7 @@ export const FunctionSelector: React.FC<FunctionSelectorProps> = ({ onClick }) =
   }, [contractAddress, onClick, functions]);
 
   return (
-    <Grid columns={1}>
+    <Grid>
       <GridItem>
         <StyledText name="title1">
           Contract: {getTruncatedAccountAddress(contractAddress)}

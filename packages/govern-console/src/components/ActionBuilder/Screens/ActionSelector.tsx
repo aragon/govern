@@ -20,7 +20,7 @@ const actions: ActionOption[] = [
   {
     title: 'External contract',
     subTitle: 'Interact with any contract on the blockchain and access any functionality',
-    state: 'chooseContract',
+    state: 'abiForm',
   },
 ];
 

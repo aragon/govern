@@ -20,7 +20,7 @@ import { getToken } from '@aragon/govern';
 import { ActionBuilderCloseHandler } from 'utils/types';
 import { useActionBuilderState } from '../ActionBuilderStateProvider';
 
-const functionSignature = 'mint(address recipient, uint amount)';
+const functionSignature = 'function mint(address recipient, uint amount)';
 
 enum Recipient {
   Executor = 0,
@@ -55,8 +55,15 @@ export const TokenMinter: React.FC<TokenMinterProps> = ({ onClick }) => {
     const tokenRecipient =
       formValues.recipient === Recipient.Executor ? dao?.executor.address : formValues.tokenAddress;
 
-    const { tokenDecimals } = await getToken(dao?.token, provider);
-    const amount = utils.parseUnits(formValues.mintAmount, tokenDecimals);
+    let decimals = 0;
+    try {
+      const { tokenDecimals } = await getToken(dao?.token, provider);
+      decimals = tokenDecimals || 0;
+    } catch (err) {
+      console.log('failed to get token info', dao?.token, err.message);
+    }
+
+    const amount = utils.parseUnits(formValues.mintAmount, decimals);
     const values = [tokenRecipient, amount];
 
     const action = AbiHandler.mapToAction(functionSignature, dao?.token, values);
@@ -64,7 +71,7 @@ export const TokenMinter: React.FC<TokenMinterProps> = ({ onClick }) => {
   }, [onClick, getValues, dao, provider]);
 
   return (
-    <Grid columns={1}>
+    <Grid>
       <GridItem>
         <StyledText name="title1">Mint Tokens</StyledText>
         <Hint>Helptext TBD</Hint>

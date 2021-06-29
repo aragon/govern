@@ -70,6 +70,7 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
   isFile = null,
   shouldUnregister = true,
   ipfsURI,
+  placeholder,
 }) => {
   const {
     register,
@@ -129,7 +130,7 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
           render={({ field: { onChange, value }, fieldState: { error } }) => (
             <TextInput.Multiline
               wide
-              placeholder={'Enter Rules...'}
+              placeholder={placeholder}
               value={typeof value !== 'string' ? toUtf8String(value) : value}
               onChange={onChange}
               status={!!error ? 'error' : 'normal'}
