@@ -87,7 +87,7 @@ const NewExecution: React.FC = () => {
 
     const actions = values.map((item) => {
       const { sighash, signature, contractAddress, inputs } = item;
-      const abiInterface = new utils.Interface([`function ${signature}`]);
+      const abiInterface = new utils.Interface([`${signature}`]);
       const functionParameters = inputs.map((input) => input.value);
 
       let calldata = '';

@@ -172,8 +172,8 @@ export default class AbiHandler {
    * @returns
    */
   static mapToAction(signature: string, contractAddress: string, values: any): ActionItem {
-    const fragment = utils.FunctionFragment.from(signature);
-    const abiInterface = new utils.Interface([`function ${signature}`]);
+    const fragment = utils.Fragment.from(signature) as utils.FunctionFragment;
+    const abiInterface = new utils.Interface([`${signature}`]);
     const inputs = fragment.inputs.map((item, i) => ({
       name: item.name,
       type: item.format(),

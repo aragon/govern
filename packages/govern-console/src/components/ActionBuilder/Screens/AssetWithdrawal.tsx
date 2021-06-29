@@ -14,7 +14,7 @@ const { withdrawalTokens } = networkEnvironment;
 const TOKEN_SYMBOLS = Object.keys(withdrawalTokens).concat('Other...');
 const TOKEN_ADDRESSES = Object.values(withdrawalTokens);
 
-const transferSignature = 'transfer(address destination, uint amount)';
+const transferSignature = 'function transfer(address destination, uint amount)';
 
 type AssetWithdrawalProps = {
   onClick: ActionBuilderCloseHandler;
@@ -42,8 +42,16 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
     const { token, recipient, tokenContractAddress, withdrawalAmount } = getValues();
 
     const contractAddress = isOtherToken(token) ? tokenContractAddress : TOKEN_ADDRESSES[token];
-    const { tokenDecimals } = await getToken(contractAddress, provider);
-    const amount = utils.parseUnits(String(withdrawalAmount), tokenDecimals);
+
+    let decimals = 0;
+    try {
+      const { tokenDecimals } = await getToken(contractAddress, provider);
+      decimals = tokenDecimals || 0;
+    } catch (err) {
+      console.log('failed to get token info', contractAddress, err.message);
+    }
+
+    const amount = utils.parseUnits(String(withdrawalAmount), decimals);
     const values = [recipient, amount];
 
     const action = AbiHandler.mapToAction(transferSignature, contractAddress, values);
