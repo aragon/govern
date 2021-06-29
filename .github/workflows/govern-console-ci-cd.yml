@@ -44,12 +44,12 @@ jobs:
         run: mv fleek/console.mainnet.json .fleek.json
         if: github.ref == 'refs/heads/master'
 
-      # - name: deploy console
-      #   id: deploy
-      #   uses: fleekhq/action-deploy@v0.1.4-beta2
-      #   with:
-      #     apiKey: ${{ secrets.FLEEK_API_KEY }}
-      #     workDir: ${{env.working-directory}}
+      - name: deploy console
+        id: deploy
+        uses: fleekhq/action-deploy@v0.1.4-beta2
+        with:
+          apiKey: ${{ secrets.FLEEK_API_KEY }}
+          workDir: ${{env.working-directory}}
 
   build-and-deploy-storybook:
     runs-on: ubuntu-latest
