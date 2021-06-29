@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { styled } from '@material-ui/core/styles';
 import MUICard from '@material-ui/core/Card';
 import MUITypography from '@material-ui/core/Typography';
-import { ANButton } from '../Button/ANButton';
-import SettingIconImage from '../../images/svgs/Setting_Icon.svg';
 import { settingsUrl } from 'utils/urls';
+import { Button, IconSettings, Grid } from '@aragon/ui';
+import { ActionBuilder } from 'components/ActionBuilder/ActionBuilder';
 
 export interface DaoHeaderProps {
   /**
@@ -45,6 +45,8 @@ const HeaderValue = styled(MUITypography)(({ theme }) => ({
 
 export const DaoHeader: React.FC<DaoHeaderProps> = ({ daoName }) => {
   const history = useHistory();
+  const [isDepositDialogOpen, setDepositDialogOpen] = useState(false);
+
   const goToSettingPage = () => {
     history.push(settingsUrl(daoName));
   };
@@ -63,31 +65,31 @@ export const DaoHeader: React.FC<DaoHeaderProps> = ({ daoName }) => {
           <HeaderLabel>DAO Name</HeaderLabel>
           <HeaderValue>{daoName}</HeaderValue>
         </div>
-        <div
+        <Grid
           style={{
             marginRight: '60px',
           }}
         >
-          <ANButton
-            label={
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'space-evenly',
-                }}
-              >
-                <img src={SettingIconImage} />
-                <div style={{ marginLeft: '10px' }}>DAO Settings</div>
-              </div>
-            }
-            buttonType={'secondary'}
-            backgroundColor={'#FFFFFF'}
-            labelColor={'#20232C'}
+          <Button
+            size="large"
+            mode="secondary"
+            label="DAO Settings"
+            icon={<IconSettings />}
             onClick={goToSettingPage}
-          />
-        </div>
+          ></Button>
+          <Button
+            size="large"
+            mode="secondary"
+            label="Deposit"
+            onClick={() => setDepositDialogOpen(true)}
+          ></Button>
+        </Grid>
       </div>
+      <ActionBuilder
+        initialState="deposit"
+        visible={isDepositDialogOpen}
+        onClose={() => setDepositDialogOpen(false)}
+      ></ActionBuilder>
     </DaoHeaderCard>
   );
 };

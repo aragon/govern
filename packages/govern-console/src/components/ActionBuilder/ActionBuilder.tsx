@@ -10,6 +10,7 @@ import { ActionBuilderModal } from './ActionBuilderModal';
 import { ActionBuilderStateProvider, useActionBuilderState } from './ActionBuilderStateProvider';
 import { useParams } from 'react-router-dom';
 import { useDaoQuery } from 'hooks/query-hooks';
+import { Deposit } from 'components/ActionBuilder/Screens/Deposit';
 
 type ActionBuilderProps = {
   initialState?: State;
@@ -24,6 +25,8 @@ const ActionBuilderSwitcher: React.FC<ActionBuilderProps> = ({ visible, onClose 
     <ActionBuilderModal visible={visible} onClose={onClose}>
       {() => {
         switch (state) {
+          case 'deposit':
+            return <Deposit onClick={onClose}></Deposit>;
           case 'chooseAction':
             return <ActionSelector></ActionSelector>;
           case 'mintTokens':
