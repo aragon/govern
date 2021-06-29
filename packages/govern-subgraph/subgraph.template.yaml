@@ -70,8 +70,8 @@ templates:
       eventHandlers:
         - event: Executed(indexed address,(address,uint256,bytes)[],bytes32,bytes32,bytes[])
           handler: handleExecuted
-        - event: ETHDeposited(indexed address,uint256)
-          handler: handleETHDeposited
+        # - event: ETHDeposited(indexed address,uint256)
+        #   handler: handleETHDeposited
         - event: Frozen(indexed bytes4,indexed address)
           handler: handleFrozen
         - event: Granted(indexed bytes4,indexed address,indexed address,address)

@@ -248,7 +248,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
           <div style={{ display: 'grid', gridGap: spacing }}>
             <StyledText name={'title1'}>DAO Settings</StyledText>
             <TextCopy title={'DAO Govern Executor Address'} value={daoAddresses.executorAddress} />
-            <TextCopy title={'DAO Govern Executor Address'} value={daoAddresses.token} />
+            <TextCopy title={'DAO Token address'} value={daoAddresses.token} />
             <FormProvider {...methods}>
               <div>
                 <StyledText name={'title4'}>Resolver</StyledText>
