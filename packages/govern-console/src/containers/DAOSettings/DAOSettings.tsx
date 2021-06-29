@@ -21,7 +21,10 @@ import { useDaoQuery } from 'hooks/query-hooks';
 import { ipfsMetadata } from 'utils/types';
 import { formatUnits, parseUnits } from 'utils/lib';
 import { getTokenInfo } from 'utils/token';
+import { positiveNumber } from 'utils/validations';
+
 import cardMainImage from '../../images/pngs/dao_setting_@2x.png';
+
 import {
   useLayout,
   Grid,
@@ -318,7 +321,10 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
                 name="daoConfig.executionDelay"
                 control={control}
                 defaultValue={''}
-                rules={{ required: 'This is required.' }}
+                rules={{
+                  required: 'This is required.',
+                  validate: (value) => positiveNumber(value),
+                }}
                 render={({ field: { onChange, value }, fieldState: { error } }) => (
                   <TextInput
                     title={'Execution Delay'}
@@ -486,7 +492,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
               <IPFSInput
                 title="Justification"
                 subtitle="Please provide the reasons for this DAO settings change as this will trigger an action on the executor queue"
-                placeholder="Justification Reason..."
+                placeholder="Please insert the reason why you want to execute this"
                 textInputName="proof"
                 fileInputName="proofFile"
               />

@@ -5,6 +5,7 @@ import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { validateContract } from 'utils/validations';
 import { useWallet } from 'AugmentedWallet';
 import { IPFSInput } from 'components/Field/IPFSInput';
+import { positiveNumber } from 'utils/validations';
 
 import {
   useLayout,
@@ -78,7 +79,7 @@ const CreateDaoConfig: React.FC<{
               defaultValue={executionDelay}
               rules={{
                 required: 'This is required.',
-                validate: (value) => (parseInt(value) > 0 ? true : 'Value must be positive'),
+                validate: (value) => positiveNumber(value),
               }}
               render={({ field: { onChange, value }, fieldState: { error } }) => (
                 <TextInput
@@ -101,7 +102,7 @@ const CreateDaoConfig: React.FC<{
                 subtitle="Your DAO have optimistic capabilities, meaning that actions can happen without voting,
               but should follow pre defined rules. Please provide the main agreement for your DAO (In
               text, or upload a file)."
-                placeholder="Enter rules"
+                placeholder="Please insert the reason why you want to execute this"
                 // ipfsURI={rulesIpfsUrl?.endpoint}
                 shouldUnregister={false}
                 isFile="isRuleFile"
