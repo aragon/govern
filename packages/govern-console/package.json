@@ -55,15 +55,15 @@
   "scripts": {
     "sync-assets": "copy-aragon-ui-assets ./public",
     "analyze": "source-map-explorer 'build/static/js/*.js'",
-    "start": "yarn sync-assets && react-scripts start",
+    "start": "yarn sync-assets && react-app-rewired start",
     "start:mainnet": "cross-env REACT_APP_ENVIRONMENT=mainnet yarn start",
     "start:rinkeby": "cross-env REACT_APP_ENVIRONMENT=rinkeby yarn start",
     "start:staging": "cross-env REACT_APP_ENVIRONMENT=staging yarn start",
-    "build": "yarn sync-assets && react-scripts build",
+    "build": "yarn sync-assets && react-app-rewired build",
     "build:mainnet": "cross-env REACT_APP_ENVIRONMENT=mainnet yarn build",
     "build:rinkeby": "cross-env REACT_APP_ENVIRONMENT=rinkeby yarn build",
     "build:staging": "cross-env REACT_APP_ENVIRONMENT=staging yarn build",
-    "test": "react-scripts test",
+    "test": "react-app-rewired test",
     "eject": "react-scripts eject",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public",
@@ -105,11 +105,14 @@
     "@typescript-eslint/eslint-plugin": "^4.19.0",
     "@typescript-eslint/parser": "^4.19.0",
     "babel-loader": "8.1.0",
+    "babel-plugin-styled-components": "^1.12.0",
     "cross-env": "^7.0.3",
+    "customize-cra": "^1.0.0",
     "eslint-config-prettier": "4.1.0",
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-react-hooks": "^4.2.0",
     "husky": "^5.2.0",
-    "prettier": "^2.2.1"
+    "prettier": "^2.2.1",
+    "react-app-rewired": "^2.1.8"
   }
 }

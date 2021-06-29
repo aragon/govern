@@ -1,6 +1,7 @@
 import { ValidateResult } from 'react-hook-form';
 import Abi from './AbiHandler';
 import { isTokenERC20 } from 'utils/token';
+import { getToken } from '@aragon/govern';
 
 /**
  * Validate if address is an ERC20 token
@@ -43,6 +44,24 @@ export const validateAmountForDecimals = (amount: string, decimals: number) => {
 
   return true;
 };
+
+export const validateAmountForToken = async (
+  address: string,
+  amount: string,
+  provider: any,
+): Promise<ValidateResult> => {
+  let decimals = 0;
+  try {
+    const { tokenDecimals } = await getToken(address, provider);
+    decimals = tokenDecimals ?? decimals;
+  } catch (error) {
+    /* since token decimal is an optional for ERC20,
+    will use 0 decimal to validate instead
+     */
+  }
+  return validateAmountForDecimals(amount, decimals);
+};
+
 /**
  * Check if contract is a contract
  *
