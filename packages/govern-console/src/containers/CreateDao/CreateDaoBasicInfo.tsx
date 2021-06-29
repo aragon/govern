@@ -56,7 +56,6 @@ const CreateDaoBasicInfo: React.FC<{
     if (!validate) return;
 
     const basicInfoUpdated = { ...basicInfo, ...getValues() };
-    console.log(basicInfoUpdated, ' ararrr');
     setBasicInfo(basicInfoUpdated);
     setActiveStep(CreateDaoSteps.Config);
   };
@@ -162,6 +161,10 @@ const CreateDaoBasicInfo: React.FC<{
                     />
                   </GridItem>
                 </Grid>
+                <Info mode={'warning'} title={''}>
+                  The created token will use {tokenDecimals} decimals. For the amount, Don't append
+                  0's.
+                </Info>
                 <Controller
                   name="tokenMintAmount"
                   control={control}
@@ -185,10 +188,6 @@ const CreateDaoBasicInfo: React.FC<{
                     />
                   )}
                 />
-                <Info mode={'warning'} title={''}>
-                  The created token will use {tokenDecimals} decimals. For the amount, Don't append
-                  0's.
-                </Info>
               </>
             ) : (
               <Controller
