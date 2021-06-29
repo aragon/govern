@@ -59,7 +59,7 @@ export const AbiForm: React.FC = () => {
   }, [networkName, trigger, getValues, gotoFunctionSelector, setWarning]);
 
   return (
-    <Grid columns={1}>
+    <Grid>
       <GridItem>
         <StyledText name="title1">Choose contract</StyledText>
       </GridItem>

@@ -69,7 +69,7 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
   );
 
   return (
-    <Grid columns={1}>
+    <Grid>
       <GridItem>
         <StyledText name="title1">Withdraw assets</StyledText>
         <Hint>Helptext TBD</Hint>

@@ -94,7 +94,7 @@ export const FunctionSelector: React.FC<FunctionSelectorProps> = ({ onClick }) =
   }, [contractAddress, onClick, functions]);
 
   return (
-    <Grid columns={1}>
+    <Grid>
       <GridItem>
         <StyledText name="title1">
           Contract: {getTruncatedAccountAddress(contractAddress)}

@@ -71,7 +71,7 @@ export const TokenMinter: React.FC<TokenMinterProps> = ({ onClick }) => {
   }, [onClick, getValues, dao, provider]);
 
   return (
-    <Grid columns={1}>
+    <Grid>
       <GridItem>
         <StyledText name="title1">Mint Tokens</StyledText>
         <Hint>Helptext TBD</Hint>

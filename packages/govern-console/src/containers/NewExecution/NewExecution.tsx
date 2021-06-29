@@ -161,7 +161,7 @@ const NewExecution: React.FC = () => {
 
   return (
     <PageContent pageName={PageName.NEW_EXECUTION}>
-      <Grid columns={1}>
+      <Grid>
         <GridItem>
           <StyledText name={'title1'}>New execution</StyledText>
           <StyledText name={'body3'}>
