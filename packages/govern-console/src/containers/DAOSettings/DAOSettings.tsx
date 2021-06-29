@@ -38,6 +38,7 @@ import {
   IconBlank,
   Checkbox,
 } from '@aragon/ui';
+import HelpComponent from 'components/HelpComponent/HelpComponent';
 
 export interface DaoSettingFormProps {
   /**
@@ -521,9 +522,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
         gridRow={layoutName === 'large' ? '2' : '3'}
         gridColumn={layoutName === 'large' ? '13/17' : '1 / -1'}
       >
-        <Box style={{ background: '#8991FF', opacity: 0.5 }}>
-          <h5 style={{ color: '#20232C' }}>Need Help?</h5>
-        </Box>
+        <HelpComponent />
       </GridItem>
     </Grid>
   );
