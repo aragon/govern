@@ -10,25 +10,22 @@ import "@aragon/govern-core/contracts/GovernRegistry.sol";
 import "@aragon/govern-token/contracts/GovernTokenFactory.sol";
 import "@aragon/govern-token/contracts/interfaces/IERC20.sol";
 import "@aragon/govern-token/contracts/GovernMinter.sol";
+import "@aragon/govern-token/contracts/libraries/TokenLib.sol";
 
 import "./core-factories/GovernFactory.sol";
 import "./core-factories/GovernQueueFactory.sol";
 
 contract GovernBaseFactory {
     address internal constant ANY_ADDR = address(-1);
+    uint256 internal constant MAX_SCHEDULE_ACCESS_LIST_ALLOWED = 10;
+    
+    string private constant ERROR_SCHEDULE_LIST_EXCEEDED = "basefactory: schedule list exceeded";
 
     GovernFactory public governFactory;
     GovernQueueFactory public queueFactory;
     GovernTokenFactory public tokenFactory;
     GovernRegistry public registry;
-
-    struct Token {
-        IERC20 tokenAddress;
-        uint8  tokenDecimals;
-        string tokenName;
-        string tokenSymbol;
-    }
-
+    
     constructor(
         GovernRegistry _registry,
         GovernFactory _governFactory,
@@ -42,11 +39,14 @@ contract GovernBaseFactory {
     }
 
     function newGovern(
-        string calldata _name,
-        Token calldata _token,
+        TokenLib.TokenConfig calldata _token,
+        address[] calldata _scheduleAccessList,
+        bool _useProxies,
         ERC3000Data.Config calldata _config,
-        bool _useProxies
+        string calldata _name
     ) external returns (Govern govern, GovernQueue queue) {
+        require(_scheduleAccessList.length <= MAX_SCHEDULE_ACCESS_LIST_ALLOWED, ERROR_SCHEDULE_LIST_EXCEEDED);
+
         bytes32 salt = _useProxies ? keccak256(abi.encodePacked(_name)) : bytes32(0);
 
         queue = queueFactory.newQueue(address(this), _config, salt);
@@ -58,26 +58,63 @@ contract GovernBaseFactory {
         if (address(token) == address(0)) {
             (token, minter) = tokenFactory.newToken(
                 govern,
-                _token.tokenName,
-                _token.tokenSymbol,
-                _token.tokenDecimals,
-                msg.sender,
-                1 * 10 ** 18,
+                _token,
                 _useProxies
             );
+
+            // if both(scheduleDeposit and challengeDeposit) are non-zero, 
+            // they have already been set and no need for a config change.
+            if (_config.scheduleDeposit.token == address(0) || _config.challengeDeposit.token == address(0)) {
+                // give base factory the permission so that it can change 
+                // the config with new token in the same transaction
+                queue.grant(queue.configure.selector, address(this));
+                
+                ERC3000Data.Config memory newConfig = ERC3000Data.Config({
+                    executionDelay: _config.executionDelay,
+                    scheduleDeposit: ERC3000Data.Collateral({
+                        token: _config.scheduleDeposit.token != address(0) ? _config.scheduleDeposit.token : address(token),
+                        amount: _config.scheduleDeposit.amount
+                    }),
+                    challengeDeposit: ERC3000Data.Collateral({
+                        token:  _config.challengeDeposit.token != address(0) ? _config.challengeDeposit.token : address(token),
+                        amount: _config.challengeDeposit.amount
+                    }),
+                    resolver: _config.resolver,
+                    rules: _config.rules,
+                    maxCalldataSize: _config.maxCalldataSize
+                });
+
+                queue.configure(newConfig);
+                queue.revoke(queue.configure.selector, address(this));
+            }
         }
 
         registry.register(govern, queue, token, address(minter), _name, "");
-
-        ACLData.BulkItem[] memory items = new ACLData.BulkItem[](7);
-        items[0] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.schedule.selector, ANY_ADDR);
-        items[1] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.execute.selector, ANY_ADDR);
-        items[2] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.challenge.selector, ANY_ADDR);
-        items[3] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.configure.selector, address(govern));
-        items[4] = ACLData.BulkItem(ACLData.BulkOp.Revoke, queue.ROOT_ROLE(), address(this));
-        items[5] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.ROOT_ROLE(), address(govern));
-        items[6] = ACLData.BulkItem(ACLData.BulkOp.Freeze, queue.ROOT_ROLE(), address(0));
         
+        uint256 bulkSize = _scheduleAccessList.length == 0 ? 7 : 6 + _scheduleAccessList.length;
+        ACLData.BulkItem[] memory items = new ACLData.BulkItem[](bulkSize);
+        
+        items[0] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.execute.selector, ANY_ADDR);
+        items[1] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.challenge.selector, ANY_ADDR);
+        items[2] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.configure.selector, address(govern));
+        items[3] = ACLData.BulkItem(ACLData.BulkOp.Revoke, queue.ROOT_ROLE(), address(this));
+        items[4] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.ROOT_ROLE(), address(govern));
+        items[5] = ACLData.BulkItem(ACLData.BulkOp.Freeze, queue.ROOT_ROLE(), address(0));
+
+        // If the schedule access list is empty, anyone can schedule
+        // otherwise, only the addresses specified are allowed.
+        if (_scheduleAccessList.length == 0) { 
+            items[6] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.schedule.selector, ANY_ADDR);
+        } else { 
+            for (uint256 i = 0; i < _scheduleAccessList.length; i++) {
+                items[6 + i] = ACLData.BulkItem(
+                    ACLData.BulkOp.Grant, 
+                    queue.schedule.selector, 
+                    _scheduleAccessList[i]
+                );
+            }
+        }
+
         queue.bulk(items);
     }
     
