@@ -11,6 +11,7 @@ import {
 } from '@aragon/ui';
 import { toUtf8String } from 'ethers/lib/utils';
 import { useEffect } from 'react';
+import { ipfsMetadata } from 'utils/types';
 
 export interface IPFSInputProps {
   /**
@@ -58,7 +59,7 @@ export interface IPFSInputProps {
   /**
    * IPFS gateway url of the file.
    */
-  ipfsURI?: string;
+  ipfsMetadata?: ipfsMetadata;
 }
 
 export const IPFSInput: React.FC<IPFSInputProps> = ({
@@ -68,7 +69,7 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
   fileInputName,
   isFile,
   shouldUnregister = true,
-  ipfsURI,
+  ipfsMetadata,
   placeholder,
 }) => {
   const {
@@ -91,12 +92,12 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
         name: value[Number(key)].name,
         url: null,
       }));
-    } else if (ipfsURI) {
+    } else if (ipfsMetadata?.endpoint) {
       return [
         {
           // status: ipfsURI && 'success',
-          name: ipfsURI && 'Current file:',
-          url: ipfsURI && ipfsURI,
+          name: ipfsMetadata.endpoint && 'Current file:',
+          url: ipfsMetadata.endpoint && ipfsMetadata.endpoint,
         },
       ];
     }
@@ -108,6 +109,14 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
       setValue(fileInputName, files);
     }
   }, [files, setValue, fileInputName]);
+
+  useEffect(() => {
+    if (ipfsMetadata?.text) {
+      setValue(textInputName, ipfsMetadata.text);
+    } else if (ipfsMetadata?.endpoint) {
+      setValue(isFileChosen, true);
+    }
+  }, [setValue, ipfsMetadata, isFileChosen, textInputName]);
 
   return (
     <div>
@@ -199,9 +208,6 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
           {...register(fileInputName, {
             shouldUnregister: shouldUnregister,
             required: 'This is required.',
-            validate: () => {
-              return true;
-            },
           })}
           onChange={setFiles}
           value={formatValue(getValues(fileInputName))}

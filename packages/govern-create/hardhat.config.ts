@@ -28,7 +28,7 @@ const config: HardhatUserConfig = {
     deployer: 0,
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_KEY,
+    apiKey: 'WQ7EFJVI6QCN9XKY3ET6IS4S7IX8CJ8QCW',
   },
   networks: {
     hardhat: {

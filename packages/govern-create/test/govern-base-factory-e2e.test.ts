@@ -36,7 +36,7 @@ const tokenConfig = {
   mintAddress: ZERO_ADDRESS,
   mintAmount: 100,
   merkleRoot: ZERO_BYTES32,
-  merkleMintAmount:0
+  merkleMintAmount: 0
 }
 
 const GAS_TARGET = network.name !== 'hardhat' ? 5.5e6 : 20e6
@@ -45,10 +45,10 @@ const GAS_TARGET_PROXY = network.name !== 'hardhat' ? 6e5 : 2e6
 const SCHEDULE_LIST_LIMIT = 10
 
 describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
-  let signers:any, owner:any, signer1: any, signer2:any
+  let signers: any, owner: any, signer1: any, signer2: any
   let governBaseFactory: any
 
-  let governQueueFactory:any, governTokenFactory:any, governRegistry:any, governFactory:any
+  let governQueueFactory: any, governTokenFactory: any, governRegistry: any, governFactory: any
 
   // Merge the abis so base factory's transaction can still get all the events decoded
   async function getMergedABI() {
@@ -64,7 +64,7 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
     const governQueueArtifact = await hre.artifacts.readArtifact('GovernQueue');
 
     return {
-      abi:[
+      abi: [
         ...baseFactoryArtifact.abi,
         ...tokenFactoryArtifact.abi.filter((f: any) => f.type === 'event'),
         ...minterArtifact.abi.filter((f: any) => f.type === 'event'),
@@ -76,21 +76,24 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
   }
 
   // This changes the ERC3000DefaultConfig 
-  function updateConfig({ scheduleToken, challengeToken }: {scheduleToken: string, challengeToken: string}) {
+  function updateConfig(
+    { scheduleToken, challengeToken, scheduleAmount, challengeAmount }: 
+    { scheduleToken: string, challengeToken: string, scheduleAmount?: number, challengeAmount?: number }
+  ) {
     return {
       ...ERC3000DefaultConfig,
       scheduleDeposit: {
         token: scheduleToken,
-        amount: ERC3000DefaultConfig.scheduleDeposit.amount
+        amount: scheduleAmount || ERC3000DefaultConfig.scheduleDeposit.amount
       },
       challengeDeposit: {
         token: challengeToken,
-        amount: ERC3000DefaultConfig.challengeDeposit.amount,
+        amount: challengeAmount || ERC3000DefaultConfig.challengeDeposit.amount,
       }
     }
   }
 
-  async function updateContainer({ submitter, config }: {submitter: string, config: any}) {
+  async function updateContainer({ submitter, config }: { submitter: string, config: any }) {
     return {
       payload: {
         ...container.payload,
@@ -123,7 +126,7 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
   async function getDeployments(tx: any) {
     const { events } = await tx.wait()
     const { executor, queue, token } = events.find(
-      ({ event }: {event:any}) => event === EVENTS.REGISTERED
+      ({ event }: { event: any }) => event === EVENTS.REGISTERED
     ).args
     return {
       queue: await ethers.getContractAt('GovernQueue', queue),
@@ -134,7 +137,7 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
 
   before(async () => {
     await deployments.fixture()
-    
+
     signers = await ethers.getSigners()
     owner = await signers[0].getAddress()
     signer1 = await signers[1].getAddress()
@@ -160,7 +163,7 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
       (await deployments.get('GovernFactory')).address
     )) as GovernRegistry
 
-    
+
     const { abi, baseFactoryBytecode } = await getMergedABI();
 
     const GovernBaseFactory = new ethers.ContractFactory(abi, baseFactoryBytecode, signers[0]);
@@ -171,7 +174,7 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
       governQueueFactory.address,
       governTokenFactory.address
     );
-  
+
   })
 
   describe('dao deployments with permission checking', async () => {
@@ -187,7 +190,8 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
     })
 
     it(`should deploy dao with new token, set schedule collateral to user's token, challenge collatral to new token`, async () => {
-      const tx =  await governBaseFactory.newGovern(
+      const scheduleAmount = 20;
+      const tx = await governBaseFactory.newGovern(
         {
           ...tokenConfig,
           mintAddress: owner,
@@ -196,23 +200,32 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
         true,
         {
           ...ERC3000DefaultConfig,
+          scheduleDeposit: {
+            ...ERC3000DefaultConfig.challengeDeposit,
+            token: ZERO_ADDRESS,
+            amount: scheduleAmount // any amount more than 0
+          },
           challengeDeposit: {
             ...ERC3000DefaultConfig.challengeDeposit,
             token: CUSTOM_ADDRESS
           }
         },
-        'eagle1',
+        'eagle1'
       )
 
       const { token, queue } = await getDeployments(tx);
-      
-      const config = updateConfig({scheduleToken: token.address, challengeToken: CUSTOM_ADDRESS})
+
+      const config = updateConfig({
+        scheduleToken: token.address,
+        challengeToken: CUSTOM_ADDRESS,
+        scheduleAmount: scheduleAmount
+      })
 
       await expect(tx).to.emit(queue, EVENTS.CONFIGURED)
-      .withArgs(getConfigHash(config), governBaseFactory.address, updateConfigForArgs(config))
-      
+        .withArgs(getConfigHash(config), governBaseFactory.address, updateConfigForArgs(config))
+
       await expect(queue.configure(ERC3000DefaultConfig)).to.be.revertedWith(ERRORS.ACL_AUTH)
-      
+
       // TODO: Giorgi
       // connect from governbasefactory and call configure , it should again revert as above.
       // connect from govern and call configure, it should succeed
@@ -220,9 +233,9 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
     })
 
     it(`should deploy dao with custom token and change config with this token`, async () => {
-      const config = updateConfig({scheduleToken: CUSTOM_ADDRESS, challengeToken: CUSTOM_ADDRESS})
+      const config = updateConfig({ scheduleToken: CUSTOM_ADDRESS, challengeToken: CUSTOM_ADDRESS })
 
-      const tx =  await governBaseFactory.newGovern(
+      const tx = await governBaseFactory.newGovern(
         {
           ...tokenConfig,
           tokenAddress: CUSTOM_ADDRESS,
@@ -237,11 +250,11 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
       const { queue } = await getDeployments(tx);
 
       await expect(tx).to.emit(queue, EVENTS.CONFIGURED)
-      .withArgs(getConfigHash(config), governQueueFactory.address, updateConfigForArgs(config))
+        .withArgs(getConfigHash(config), governQueueFactory.address, updateConfigForArgs(config))
     })
 
     it('deploys dao with schedule access list and checks permissions', async () => {
-      const tx =  await governBaseFactory.newGovern(
+      const tx = await governBaseFactory.newGovern(
         {
           ...tokenConfig,
           mintAddress: owner,
@@ -253,48 +266,48 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
       )
 
       const { token, queue } = await getDeployments(tx);
-      
-      const config = updateConfig({scheduleToken: token.address, challengeToken: token.address})
-      let container = await updateContainer({ submitter: owner, config: config})
-      
+
+      const config = updateConfig({ scheduleToken: token.address, challengeToken: token.address })
+      let container = await updateContainer({ submitter: owner, config: config })
+
       // calling schedule from different address than address 
       // that was specified in schedule access list should revert
       await expect(queue.schedule(container)).to.be.revertedWith(ERRORS.ACL_AUTH);
-    
+
       // call schedule from the address that was passed as schedule list access
       // if this doesn't fail, it means it was allowed
-      container = await updateContainer({ submitter: signer1, config: config})
-      await expect(await (queue.connect(signers[1]).schedule(container)) )
+      container = await updateContainer({ submitter: signer1, config: config })
+      await expect(await (queue.connect(signers[1]).schedule(container)))
     })
   })
-  
+
   const options = [
     {
-      useProxies:false,
+      useProxies: false,
       deployToken: false,
       title: "Deploys Dao with custom token and doesn't use proxies",
       GAS_TARGET: GAS_TARGET
     },
     {
-      useProxies:true,
+      useProxies: true,
       deployToken: false,
       title: "Deploys Dao with custom token and uses proxies",
       GAS_TARGET: GAS_TARGET_PROXY
     },
     {
-      useProxies:true,
+      useProxies: true,
       deployToken: true,
       title: "Deploys Dao with new token and uses proxies",
       GAS_TARGET: GAS_TARGET_PROXY
     },
     {
-      useProxies:false,
+      useProxies: false,
       deployToken: true,
       title: "Deploys Dao with new token and doesn't use proxies",
       GAS_TARGET: GAS_TARGET
-    }, 
+    },
     {
-      useProxies:false,
+      useProxies: false,
       deployToken: true,
       title: "Deploys Dao with new token, doesn't use proxies and uses merkle distributor",
       merkleRoot: '0x' + '11'.repeat(32),
@@ -305,7 +318,7 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
   describe("GAS Cost Check Tests", async () => {
     options.forEach(async (item, index) => {
       it(`${item.title}`, async () => {
-        const tx =  await governBaseFactory.newGovern(
+        const tx = await governBaseFactory.newGovern(
           {
             ...tokenConfig,
             tokenAddress: item.deployToken ? ZERO_ADDRESS : CUSTOM_ADDRESS,
@@ -318,10 +331,10 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
         )
         await expect(tx).to.emit(governRegistry, EVENTS.REGISTERED)
         await expect(tx).to.emit(governRegistry, EVENTS.SET_METADATA)
-      
+
         const { hash } = await tx
         const { gasUsed } = await waffle.provider.getTransactionReceipt(hash)
-    
+
         expect(gasUsed).to.be.lte(item.GAS_TARGET)
       })
     })
