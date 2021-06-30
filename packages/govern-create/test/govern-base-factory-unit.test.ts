@@ -74,7 +74,6 @@ describe('Govern Base Factory with mocked contracts', function () {
     const mintAmount = 100
 
     const tx = await GovernBaseFactory.newGovern(
-      name,
       {
         tokenAddress: deployToken ? zeroAddress : customAddress,
         tokenName: 'Eagle Token',
@@ -85,9 +84,10 @@ describe('Govern Base Factory with mocked contracts', function () {
         merkleRoot: '0x'+'00'.repeat(32),
         merkleMintAmount:0
       },
-      ERC3000DefaultConfig,
       [],
-      useProxies
+      useProxies,
+      ERC3000DefaultConfig,
+      name,
     )
 
     await expect(tx)
@@ -116,6 +116,7 @@ describe('Govern Base Factory with mocked contracts', function () {
         GovernFactoryMock.address,
         GovernQueueFactoryMock.address,
         deployToken ? GovernTokenFactoryMock.address : customAddress,
+        deployToken ? GovernTokenFactoryMock.address : zeroAddress,
         name,
         '0x'
       )

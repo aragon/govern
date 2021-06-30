@@ -18,8 +18,8 @@ abstract contract IERC3000Registry {
      * @param token Governance token of the DAO
      * @param initialMetadata Additional data to store for this DAO
      */
-    function register(IERC3000Executor executor, IERC3000 queue, IERC20 token, string calldata name, bytes calldata initialMetadata) virtual external;
-    event Registered(IERC3000Executor indexed executor, IERC3000 queue, IERC20 indexed token, address indexed registrant, string name);
+    function register(IERC3000Executor executor, IERC3000 queue, IERC20 token, address minter, string calldata name, bytes calldata initialMetadata) virtual external;
+    event Registered(IERC3000Executor indexed executor, IERC3000 queue, IERC20 indexed token, address minter, address indexed registrant, string name);
 
     /**
      * @notice Sets or updates the metadata of a DAO

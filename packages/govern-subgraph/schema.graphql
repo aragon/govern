@@ -13,6 +13,7 @@ type Dao @entity {
   queue: GovernQueue!
   executor: Govern!
   token: String!
+  minter: String
   registrant: String!
   createdAt: BigInt!
 }

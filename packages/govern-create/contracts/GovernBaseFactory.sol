@@ -9,6 +9,7 @@ import "@aragon/govern-core/contracts/GovernRegistry.sol";
 
 import "@aragon/govern-token/contracts/GovernTokenFactory.sol";
 import "@aragon/govern-token/contracts/interfaces/IERC20.sol";
+import "@aragon/govern-token/contracts/GovernMinter.sol";
 import "@aragon/govern-token/contracts/libraries/TokenLib.sol";
 
 import "./core-factories/GovernFactory.sol";
@@ -38,11 +39,11 @@ contract GovernBaseFactory {
     }
 
     function newGovern(
-        string calldata _name,
         TokenLib.TokenConfig calldata _token,
-        ERC3000Data.Config calldata _config,
         address[] calldata _scheduleAccessList,
-        bool _useProxies
+        bool _useProxies,
+        ERC3000Data.Config calldata _config,
+        string calldata _name
     ) external returns (Govern govern, GovernQueue queue) {
         require(_scheduleAccessList.length <= MAX_SCHEDULE_ACCESS_LIST_ALLOWED, ERROR_SCHEDULE_LIST_EXCEEDED);
 
@@ -52,8 +53,10 @@ contract GovernBaseFactory {
         govern = governFactory.newGovern(queue, salt);
 
         IERC20 token = _token.tokenAddress;
+        GovernMinter minter;
+
         if (address(token) == address(0)) {
-            (token,) = tokenFactory.newToken(
+            (token, minter) = tokenFactory.newToken(
                 govern,
                 _token,
                 _useProxies
@@ -86,7 +89,7 @@ contract GovernBaseFactory {
             }
         }
 
-        registry.register(govern, queue, token, _name, "");
+        registry.register(govern, queue, token, address(minter), _name, "");
         
         uint256 bulkSize = _scheduleAccessList.length == 0 ? 7 : 6 + _scheduleAccessList.length;
         ACLData.BulkItem[] memory items = new ACLData.BulkItem[](bulkSize);

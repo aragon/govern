@@ -177,22 +177,23 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
   describe('dao deployments with permission checking', async () => {
     it(`reverts if schedule access list is more than allowed`, async () => {
       const tx = governBaseFactory.newGovern(
-        'eagle',
         tokenConfig,
-        ERC3000DefaultConfig,
         Array(SCHEDULE_LIST_LIMIT + 1).fill(owner),
         true,
+        ERC3000DefaultConfig,
+        'eagle',
       )
       await expect(tx).to.be.revertedWith(ERRORS.SCHEDULE_EXCEEDED)
     })
 
     it(`should deploy dao with new token, set schedule collateral to user's token, challenge collatral to new token`, async () => {
       const tx =  await governBaseFactory.newGovern(
-        'eagle1',
         {
           ...tokenConfig,
           mintAddress: owner,
         },
+        [],
+        true,
         {
           ...ERC3000DefaultConfig,
           challengeDeposit: {
@@ -200,8 +201,7 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
             token: CUSTOM_ADDRESS
           }
         },
-        [],
-        true,
+        'eagle1',
       )
 
       const { token, queue } = await getDeployments(tx);
@@ -223,15 +223,15 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
       const config = updateConfig({scheduleToken: CUSTOM_ADDRESS, challengeToken: CUSTOM_ADDRESS})
 
       const tx =  await governBaseFactory.newGovern(
-        'eagle2',
         {
           ...tokenConfig,
           tokenAddress: CUSTOM_ADDRESS,
           mintAddress: owner,
         },
-        config,
         [],
         true,
+        config,
+        'eagle2',
       )
 
       const { queue } = await getDeployments(tx);
@@ -242,14 +242,14 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
 
     it('deploys dao with schedule access list and checks permissions', async () => {
       const tx =  await governBaseFactory.newGovern(
-        'eagle3',
         {
           ...tokenConfig,
           mintAddress: owner,
         },
-        ERC3000DefaultConfig,
         [signer1],
         true,
+        ERC3000DefaultConfig,
+        'eagle3',
       )
 
       const { token, queue } = await getDeployments(tx);
@@ -306,15 +306,15 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
     options.forEach(async (item, index) => {
       it(`${item.title}`, async () => {
         const tx =  await governBaseFactory.newGovern(
-          `DAO${index}`,
           {
             ...tokenConfig,
             tokenAddress: item.deployToken ? ZERO_ADDRESS : CUSTOM_ADDRESS,
             merkleRoot: item.merkleRoot ? CUSTOM_BYTES32 : ZERO_BYTES32
           },
-          ERC3000DefaultConfig,
           [signer1],
           item.useProxies,
+          ERC3000DefaultConfig,
+          `DAO${index}`,
         )
         await expect(tx).to.emit(governRegistry, EVENTS.REGISTERED)
         await expect(tx).to.emit(governRegistry, EVENTS.SET_METADATA)
