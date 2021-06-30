@@ -26,10 +26,7 @@ const actions: ActionOption[] = [
 ];
 
 const haveMinter = (dao: any): boolean => {
-  let result = dao?.minter && utils.isAddress(dao.minter) && dao.minter !== constants.AddressZero;
-
-  // temporary until we have dao.minter available in subgraph
-  result = true;
+  const result = dao?.minter && utils.isAddress(dao.minter) && dao.minter !== constants.AddressZero;
   return result;
 };
 
