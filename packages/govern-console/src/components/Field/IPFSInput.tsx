@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
 import {
   useLayout,
@@ -6,15 +6,10 @@ import {
   StyledText,
   SPACING,
   ContentSwitcher,
-  Grid,
-  GridItem,
-  RADII,
   useTheme,
   FileInput,
-  filesArgs,
 } from '@aragon/ui';
 import { toUtf8String } from 'ethers/lib/utils';
-import { useEffect } from 'react';
 
 export interface IPFSInputProps {
   /**
@@ -74,13 +69,7 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
   shouldUnregister = true,
   ipfsURI,
 }) => {
-  const {
-    register,
-    control,
-    watch,
-    formState: { errors },
-    trigger,
-  } = useFormContext();
+  const { control, watch } = useFormContext();
   const { layoutName } = useLayout();
   const spacing = SPACING[layoutName];
   const theme = useTheme();
