@@ -116,36 +116,3 @@ contract GovernBaseFactory {
     }
     
 }
-
-
-
-// tokenAddress: 0x….000000
-// ScheduleDeposit : {
-//     Token: newToken
-// }
-
-// ChallengeDeposit : {
-//     Token: customToken
-// }
-
-// =====================
-
-// tokenAddress: 0x….000000
-// ScheduleDeposit : {
-//     Token: newToken
-// }
-
-// ChallengeDeposit : {
-//     Token: newToken
-// }
-
-// =====================
-
-// tokenAddress: 0x….000000
-// ScheduleDeposit : {
-//     Token: Custom Token
-// }
-
-// ChallengeDeposit : {
-//     Token:  Custom Token
-// }
