@@ -28,6 +28,8 @@ contract Govern is IERC3000Executor, AdaptiveERC165, ERC1271, ACL {
     string private constant ERROR_TOKEN_DEPOSIT_FAILED = "GOVERN_TOKEN_DEPOSIT_FAILED";
     string private constant ERROR_TOO_MANY_ACTIONS = "GOVERN_TOO_MANY_ACTIONS";
     string private constant ERROR_ACTION_CALL_FAILED = "GOVERN_ACTION_CALL_FAILED";
+    string private constant ERROR_TOKEN_WITHDRAW_FAILED = "GOVERN_TOKEN_WITHDRAW_FAILED";
+    string private constant ERROR_ETH_WITHDRAW_FAILED = "GOVERN_ETH_WITHDRAW_FAILED";
 
     bytes4 internal constant EXEC_ROLE = this.exec.selector;
     bytes4 internal constant REGISTER_STANDARD_ROLE = this.registerStandardAndCallback.selector;
@@ -36,8 +38,8 @@ contract Govern is IERC3000Executor, AdaptiveERC165, ERC1271, ACL {
 
     ERC1271 signatureValidator;
 
-    // event ETHDeposited(address indexed sender, uint256 value);
-    event Deposited(address indexed sender, address indexed token, uint256 amount, string _reference);
+    event Deposited(address indexed sender, address indexed token, uint256 amount, string indexed _reference);
+    event Withdrawn(address indexed token, address indexed to, uint256 amount);
 
     constructor(address _initialExecutor) ACL(address(this)) public {
         initialize(_initialExecutor);
@@ -63,7 +65,7 @@ contract Govern is IERC3000Executor, AdaptiveERC165, ERC1271, ACL {
     function deposit(address _token, uint256 _amount, string calldata _reference) external payable {
         require(_amount > 0, ERROR_DEPOSIT_AMOUNT_ZERO);
 
-        if(_token == address(0)) {
+        if (_token == address(0)) {
             require(msg.value == _amount, ERROR_ETH_DEPOSIT_AMOUNT_MISMATCH);
         } else {
             require(_token.isContract(), ERROR_TOKEN_NOT_CONTRACT);
@@ -71,6 +73,16 @@ contract Govern is IERC3000Executor, AdaptiveERC165, ERC1271, ACL {
         }
         emit Deposited(msg.sender, _token, _amount, _reference);
     }
+
+    function withdraw(address _token, address _to, uint256 _amount) private {
+        if (_token == address(0)) {
+            require(to.call{value: _amount}(""), ERROR_ETH_WITHDRAW_FAILED);
+        } else {
+            require(ERC20(_token).safeTransfer(_to, _amount), ERROR_TOKEN_WITHDRAW_FAILED);
+        }
+        emit Withdrawn(_token, _to, _amount);
+    }
+
 
     function exec(ERC3000Data.Action[] memory actions, bytes32 allowFailuresMap, bytes32 memo) override public auth(EXEC_ROLE) returns (bytes32, bytes[] memory) {
         require(actions.length <= MAX_ACTIONS, ERROR_TOO_MANY_ACTIONS); // need to limit since we use 256-bit bitmaps
