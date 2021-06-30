@@ -5,11 +5,11 @@ import Footer from 'components/Footer/Footer';
 import ConsoleMainPage from 'containers/Console/ConsoleMainPage';
 import DaoMainPage from 'containers/DAO/DaoMainPage';
 import ProposalDetails from 'containers/ProposalDetails/ProposalDetails';
-import NewProposal from 'containers/NewProposal/NewProposal';
+import NewExecution from 'containers/NewExecution/NewExecution';
 import DaoSettings from 'containers/DAOSettings/DAOSettings';
 import { ModalsProvider } from 'containers/HomePage/ModalsContext';
 import { Main } from '@aragon/ui';
-import CreateDao from 'containers/CreateDao/CreateDao';
+import CreateDao from 'containers/CreateDAO/CreateDao';
 
 const HomePage = () => {
   const history = useHistory();
@@ -33,11 +33,11 @@ const HomePage = () => {
           <Route exact path="/daos/:daoName">
             <DaoMainPage />
           </Route>
-          <Route exact path="/proposals/:daoName/:id">
+          <Route exact path="/daos/:daoName/executions/:id">
             <ProposalDetails onClickBack={() => history.goBack()} />
           </Route>
-          <Route exact path="/daos/:daoName/new-proposal">
-            <NewProposal onClickBack={() => history.goBack()} />
+          <Route exact path="/daos/:daoName/new-execution">
+            <NewExecution />
           </Route>
           <Route exact path="/daos/:daoName/dao-settings">
             <DaoSettings onClickBack={() => history.goBack()} />

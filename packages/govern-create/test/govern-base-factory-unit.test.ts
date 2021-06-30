@@ -18,8 +18,8 @@ import {
   GovernBaseFactory__factory,
 } from '../typechain'
 
-const zeroAddress = '0x0000000000000000000000000000000000000000'
-const customAddress = '0x1111111111111111111111111111111111111111'
+const zeroAddress = ethers.constants.AddressZero
+const customAddress = '0x'+'11'.repeat(20)
 
 describe('Govern Base Factory with mocked contracts', function () {
   let GovernFactoryMock: GovernFactoryMock
@@ -71,6 +71,8 @@ describe('Govern Base Factory with mocked contracts', function () {
         : '0x' + '0'.repeat(64)
     }
 
+    const mintAmount = 100
+
     const tx = await GovernBaseFactory.newGovern(
       name,
       {
@@ -78,8 +80,13 @@ describe('Govern Base Factory with mocked contracts', function () {
         tokenName: 'Eagle Token',
         tokenSymbol: 'EAG',
         tokenDecimals: 18,
+        mintAddress: owner,
+        mintAmount: mintAmount,
+        merkleRoot: '0x'+'00'.repeat(32),
+        merkleMintAmount:0
       },
       ERC3000DefaultConfig,
+      [],
       useProxies
     )
 
@@ -98,7 +105,7 @@ describe('Govern Base Factory with mocked contracts', function () {
           'EAG',
           18,
           owner,
-          BigNumber.from(10).pow(BigNumber.from(18)),
+          mintAmount,
           useProxies
         )
     }

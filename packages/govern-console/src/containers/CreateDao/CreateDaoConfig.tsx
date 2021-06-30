@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { CreateDaoSteps, accordionItems, stepsNames } from './utils/Shared';
 import { useCreateDaoContext, ICreateDaoConfig } from './utils/CreateDaoContextProvider';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { validateContract } from 'utils/validations';
 import { useWallet } from 'AugmentedWallet';
 import { IPFSInput } from 'components/Field/IPFSInput';
+import { positiveNumber } from 'utils/validations';
 
 import {
   useLayout,
@@ -30,28 +31,22 @@ const CreateDaoConfig: React.FC<{
 }> = ({ setActiveStep }) => {
   const { layoutName } = useLayout();
   const spacing = SPACING[layoutName];
-  const [resolverLock, setResolverLock] = useState(false);
+  // const [resolverLock, setResolverLock] = useState(false);
   const { config, setConfig } = useCreateDaoContext();
-  const { executionDelay, isRuleFile, ruleFile, ruleText, resolver } = config;
+  const { executionDelay, isRuleFile, ruleFile, ruleText, resolver, customResolver } = config;
 
   const context: any = useWallet();
   const { provider } = context;
 
   const methods = useForm<ICreateDaoConfig>();
-  const { control, setValue, getValues, trigger } = methods;
-
-  const updateResolverLock = (lock: boolean) => {
-    if (!lock) {
-      setValue('resolver', resolver);
-    }
-    setResolverLock(lock);
-  };
+  const { control, setValue, getValues, trigger, watch } = methods;
 
   useEffect(() => {
     setValue('ruleText', ruleText);
     setValue('isRuleFile', isRuleFile);
     setValue('ruleFile', ruleFile);
-  }, [ruleText, isRuleFile, ruleFile, setValue]);
+    setValue('customResolver', customResolver);
+  }, [ruleText, isRuleFile, ruleFile, resolver, customResolver, setValue]);
 
   const moveToNextStep = async () => {
     const validate = await trigger();
@@ -84,7 +79,7 @@ const CreateDaoConfig: React.FC<{
               defaultValue={executionDelay}
               rules={{
                 required: 'This is required.',
-                validate: (value) => (parseInt(value) > 0 ? true : 'Value must be positive'),
+                validate: (value) => positiveNumber(value),
               }}
               render={({ field: { onChange, value }, fieldState: { error } }) => (
                 <TextInput
@@ -107,7 +102,7 @@ const CreateDaoConfig: React.FC<{
                 subtitle="Your DAO have optimistic capabilities, meaning that actions can happen without voting,
               but should follow pre defined rules. Please provide the main agreement for your DAO (In
               text, or upload a file)."
-                placeholder="Enter rules"
+                placeholder="Please insert the reason why you want to execute this"
                 // ipfsURI={rulesIpfsUrl?.endpoint}
                 shouldUnregister={false}
                 isFile="isRuleFile"
@@ -137,7 +132,7 @@ const CreateDaoConfig: React.FC<{
                       render={({ field: { onChange, value }, fieldState: { error } }) => (
                         <TextInput
                           wide
-                          disabled={!resolverLock}
+                          disabled={!watch('customResolver')}
                           value={value}
                           placeholder={'Resolver address'}
                           adornment={<IconBlank />}
@@ -163,8 +158,8 @@ const CreateDaoConfig: React.FC<{
                       }}
                     >
                       <Checkbox
-                        checked={resolverLock}
-                        onChange={() => updateResolverLock(!resolverLock)}
+                        checked={watch('customResolver')}
+                        onChange={() => setValue('customResolver', !getValues('customResolver'))}
                       />
                       <span
                         style={{
