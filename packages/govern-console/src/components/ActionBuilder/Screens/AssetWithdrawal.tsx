@@ -8,11 +8,9 @@ import { useWallet } from 'AugmentedWallet';
 import AbiHandler from 'utils/AbiHandler';
 import { utils } from 'ethers';
 import { getToken } from '@aragon/govern';
-import { networkEnvironment } from 'environment';
-const { withdrawalTokens } = networkEnvironment;
+import { CuratedTokens } from 'utils/CuratedTokens';
 
-const TOKEN_SYMBOLS = Object.keys(withdrawalTokens).concat('Other...');
-const TOKEN_ADDRESSES = Object.values(withdrawalTokens);
+const curatedTokens = new CuratedTokens();
 
 const transferSignature = 'function transfer(address destination, uint amount)';
 
@@ -27,8 +25,6 @@ type WithdrawalFormData = {
   withdrawalAmount: number;
 };
 
-const isOtherToken = (tokenIndex: number) => tokenIndex === TOKEN_ADDRESSES.length;
-
 export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => {
   const theme = useTheme();
   const context: any = useWallet();
@@ -40,8 +36,7 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
 
   const buildActions = useCallback(async () => {
     const { token, recipient, tokenContractAddress, withdrawalAmount } = getValues();
-
-    const contractAddress = isOtherToken(token) ? tokenContractAddress : TOKEN_ADDRESSES[token];
+    const contractAddress = curatedTokens.getTokenAddress(token, tokenContractAddress);
 
     let decimals = 0;
     try {
@@ -62,7 +57,7 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
   const validateAmount = useCallback(
     (value: string) => {
       const { token, tokenContractAddress } = getValues();
-      const contractAddress = isOtherToken(token) ? tokenContractAddress : TOKEN_ADDRESSES[token];
+      const contractAddress = curatedTokens.getTokenAddress(token, tokenContractAddress);
       return validateAmountForToken(contractAddress, value, provider);
     },
     [provider, getValues],
@@ -105,13 +100,18 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
           defaultValue={0}
           render={({ field: { onChange, value }, fieldState: { error } }) => (
             <div>
-              <DropDown wide items={TOKEN_SYMBOLS} selected={value} onChange={onChange} />
+              <DropDown
+                wide
+                items={curatedTokens.getTokenSymbols()}
+                selected={value}
+                onChange={onChange}
+              />
               {error ? <div style={{ color: `${theme.red}` }}>{error.message}</div> : null}
             </div>
           )}
         />
       </GridItem>
-      {isOtherToken(selectedToken) && (
+      {curatedTokens.isCustomToken(selectedToken) && (
         <GridItem>
           <Controller
             name="tokenContractAddress"

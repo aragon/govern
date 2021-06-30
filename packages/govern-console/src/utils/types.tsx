@@ -78,6 +78,7 @@ export type ipfsMetadata = {
 export type ContractId = 'queue' | 'minter' | 'executor' | 'external';
 export type ActionBuilderCloseHandler = (actions?: any) => void;
 export type ActionBuilderState =
+  | 'processTransaction'
   | 'deposit'
   | 'withdrawAssets'
   | 'mintTokens'

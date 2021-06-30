@@ -66,7 +66,7 @@ export const TokenMinter: React.FC<TokenMinterProps> = ({ onClick }) => {
     const amount = utils.parseUnits(formValues.mintAmount, decimals);
     const values = [tokenRecipient, amount];
 
-    const action = AbiHandler.mapToAction(functionSignature, dao?.token, values);
+    const action = AbiHandler.mapToAction(functionSignature, dao?.minter, values);
     onClick(action);
   }, [onClick, getValues, dao, provider]);
 

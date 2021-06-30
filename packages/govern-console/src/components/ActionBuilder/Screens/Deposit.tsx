@@ -13,7 +13,6 @@ import {
   useLayout,
   SPACING,
 } from '@aragon/ui';
-import { ActionBuilderCloseHandler } from 'utils/types';
 import { Hint } from 'components/Hint/Hint';
 import { useForm, Controller } from 'react-hook-form';
 import { validateAmountForToken, validateToken } from 'utils/validations';
@@ -22,18 +21,14 @@ import { Contract, utils } from 'ethers';
 import { getToken } from '@aragon/govern';
 import { useActionBuilderState } from '../ActionBuilderStateProvider';
 import { getTruncatedAccountAddress } from 'utils/account';
+import { CuratedTokens } from 'utils/CuratedTokens';
+import { useSnackbar } from 'notistack';
+import { getErrorFromException } from 'utils/HelperFunctions';
+import { CustomTransaction, CustomTransactionStatus } from 'utils/types';
 
-import { networkEnvironment } from 'environment';
-const { withdrawalTokens } = networkEnvironment;
-
-const TOKEN_SYMBOLS = Object.keys(withdrawalTokens).concat('Other...');
-const TOKEN_ADDRESSES = Object.values(withdrawalTokens);
+const curatedTokens = new CuratedTokens();
 
 const transferAbi = ['function transfer(address destination, uint amount)'];
-
-type DepositProps = {
-  onClick: ActionBuilderCloseHandler;
-};
 
 type DepositFormData = {
   token: number;
@@ -41,9 +36,7 @@ type DepositFormData = {
   depositAmount: number;
 };
 
-const isOtherToken = (tokenIndex: number) => tokenIndex === TOKEN_ADDRESSES.length;
-
-export const Deposit: React.FC<DepositProps> = ({ onClick }) => {
+export const Deposit: React.FC = () => {
   const theme = useTheme();
   const { layoutName } = useLayout();
   const spacing = SPACING[layoutName];
@@ -55,28 +48,37 @@ export const Deposit: React.FC<DepositProps> = ({ onClick }) => {
   const { control, handleSubmit, watch, getValues } = methods;
   const selectedToken = watch('token', 0);
 
-  const { dao } = useActionBuilderState();
+  const { dao, gotoProcessTransaction } = useActionBuilderState();
+  const { enqueueSnackbar } = useSnackbar();
 
   const buildActions = useCallback(async () => {
     const { token, tokenContractAddress, depositAmount } = getValues();
 
     try {
-      const contractAddress = isOtherToken(token) ? tokenContractAddress : TOKEN_ADDRESSES[token];
+      const contractAddress = curatedTokens.getTokenAddress(token, tokenContractAddress);
       const { tokenDecimals } = await getToken(contractAddress, provider);
       const amount = utils.parseUnits(String(depositAmount), tokenDecimals);
       const contract = new Contract(contractAddress, transferAbi, account.signer);
-      const tx = await contract.transfer(account?.address, amount);
-      await tx.wait();
-      onClick();
+      const tx: CustomTransaction = {
+        tx: () => contract.transfer(account?.address, amount),
+        message: 'Deposit asset',
+        status: CustomTransactionStatus.Pending,
+      };
+
+      gotoProcessTransaction([tx]);
     } catch (err) {
       console.log('deposit error', err);
+      const errorMessage = getErrorFromException(err);
+      enqueueSnackbar(errorMessage, {
+        variant: 'error',
+      });
     }
-  }, [onClick, getValues, provider, account]);
+  }, [getValues, provider, account, enqueueSnackbar, gotoProcessTransaction]);
 
   const validateAmount = useCallback(
     (value: string) => {
       const { token, tokenContractAddress } = getValues();
-      const contractAddress = isOtherToken(token) ? tokenContractAddress : TOKEN_ADDRESSES[token];
+      const contractAddress = curatedTokens.getTokenAddress(token, tokenContractAddress);
       return validateAmountForToken(contractAddress, value, provider);
     },
     [provider, getValues],
@@ -117,29 +119,34 @@ export const Deposit: React.FC<DepositProps> = ({ onClick }) => {
                 `}
               />
             }
-            label={getTruncatedAccountAddress(account?.address)}
+            label={getTruncatedAccountAddress(account?.address || 'not-connected')}
           ></Button>
-          <Tag background={theme.green} mode="activity" size="normal">
+          <Tag background={`${theme.green}`} mode="activity" size="normal">
             <h1 style={{ margin: spacing }}>{networkName}</h1>
           </Tag>
         </div>
       </GridItem>
       <GridItem>
         <StyledText name="title2">Token</StyledText>
-        <Hint>Choose which token you would like to withdraw.</Hint>
+        <Hint>Choose which token you would like to deposit.</Hint>
         <Controller
           name="token"
           control={control}
           defaultValue={0}
           render={({ field: { onChange, value }, fieldState: { error } }) => (
             <div>
-              <DropDown wide items={TOKEN_SYMBOLS} selected={value} onChange={onChange} />
+              <DropDown
+                wide
+                items={curatedTokens.getTokenSymbols()}
+                selected={value}
+                onChange={onChange}
+              />
               {error ? <div style={{ color: `${theme.red}` }}>{error.message}</div> : null}
             </div>
           )}
         />
       </GridItem>
-      {isOtherToken(selectedToken) && (
+      {curatedTokens.isCustomToken(selectedToken) && (
         <GridItem>
           <Controller
             name="tokenContractAddress"
@@ -154,7 +161,7 @@ export const Deposit: React.FC<DepositProps> = ({ onClick }) => {
               <TextInput
                 wide
                 title="Token contract address"
-                subtitle="Insert contract address of token to be withdrawn."
+                subtitle="Insert contract address of token to be deposited."
                 value={value}
                 placeholder="Type contract address"
                 onChange={onChange}
@@ -194,7 +201,7 @@ export const Deposit: React.FC<DepositProps> = ({ onClick }) => {
         <Button
           size="large"
           mode="primary"
-          label="Save action now"
+          label="Deposit assets now"
           onClick={handleSubmit(buildActions)}
         ></Button>
       </GridItem>

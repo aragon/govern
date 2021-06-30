@@ -3,6 +3,7 @@ import { CustomTransaction, CustomTransactionStatus } from 'utils/types';
 import produce from 'immer';
 import TransactionDialog from 'components/Dialog/TransactionDialog';
 import FailureDialog from 'components/Dialog/FailureDialog';
+import { getErrorFromException } from 'utils/HelperFunctions';
 
 enum TransactionKeeperState {
   Initial,
@@ -10,18 +11,6 @@ enum TransactionKeeperState {
   Success,
   Failure,
 }
-
-const getErrorFromException = (ex: any): string => {
-  let errorMessage = ex.error?.message || ex.reason || ex.message;
-  if (!errorMessage) {
-    try {
-      errorMessage = JSON.stringify(ex);
-    } catch {
-      errorMessage = 'Unknown error';
-    }
-  }
-  return errorMessage;
-};
 
 export interface TransactionKeeperProps {
   transactionList: CustomTransaction[];

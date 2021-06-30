@@ -1,5 +1,6 @@
 import React, { ReactNode, createContext, useMemo, useState, useContext, useCallback } from 'react';
 import { ActionBuilderState, ContractId } from 'utils/types';
+import { CustomTransaction } from 'utils/types';
 
 type ActionBuilderStateProviderProps = {
   children: ReactNode;
@@ -12,10 +13,12 @@ type ActionBuilderStateContext = {
   contractAddress: string | null;
   abi: string | null;
   dao: any;
+  transactions: CustomTransaction[];
   gotoState: (newState: ActionBuilderState) => void;
   updateAbi: (newAbi: string) => void;
   gotoAbiForm: (contractId: ContractId) => void;
   gotoFunctionSelector: (contractAddress: string, abi: string) => void;
+  gotoProcessTransaction: (transactions: CustomTransaction[]) => void;
 };
 
 const defaultState: ActionBuilderState = 'chooseAction';
@@ -36,6 +39,8 @@ const ActionBuilderStateProvider: React.FC<ActionBuilderStateProviderProps> = ({
 
   const [abi, setAbi] = useState<ActionBuilderStateContext['abi']>(null);
 
+  const [transactions, setTransactions] = useState<ActionBuilderStateContext['transactions']>([]);
+
   const updateAbi = useCallback(
     (abi: string) => {
       setAbi(abi);
@@ -54,7 +59,7 @@ const ActionBuilderStateProvider: React.FC<ActionBuilderStateProviderProps> = ({
     (id: ContractId) => {
       const addressMap: Record<ContractId, string> = {
         executor: dao.executor.address,
-        minter: dao.token,
+        minter: dao.minter,
         queue: dao.queue.address,
         external: '',
       };
@@ -81,18 +86,39 @@ const ActionBuilderStateProvider: React.FC<ActionBuilderStateProviderProps> = ({
     [setState, setContractAddress],
   );
 
+  const gotoProcessTransaction = useCallback(
+    (transactions: CustomTransaction[]) => {
+      setTransactions(transactions);
+      setState('processTransaction');
+    },
+    [setTransactions, setState],
+  );
+
   const contextValue = useMemo(
     (): ActionBuilderStateContext => ({
       state,
       contractAddress,
       abi,
       dao,
+      transactions,
       gotoState,
       updateAbi,
       gotoAbiForm,
       gotoFunctionSelector,
+      gotoProcessTransaction,
     }),
-    [state, contractAddress, dao, abi, gotoState, updateAbi, gotoAbiForm, gotoFunctionSelector],
+    [
+      state,
+      contractAddress,
+      dao,
+      abi,
+      transactions,
+      gotoState,
+      updateAbi,
+      gotoAbiForm,
+      gotoFunctionSelector,
+      gotoProcessTransaction,
+    ],
   );
 
   return (

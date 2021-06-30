@@ -10,6 +10,7 @@ import { ActionBuilderStateProvider, useActionBuilderState } from './ActionBuild
 import { useParams } from 'react-router-dom';
 import { useDaoQuery } from 'hooks/query-hooks';
 import { Deposit } from 'components/ActionBuilder/Screens/Deposit';
+import TransactionKeeper from 'components/TransactionKeeper/TransactionKeeper';
 
 type ActionBuilderProps = {
   initialState?: State;
@@ -18,14 +19,14 @@ type ActionBuilderProps = {
 };
 
 const ActionBuilderSwitcher: React.FC<ActionBuilderProps> = ({ visible, onClose }) => {
-  const { state } = useActionBuilderState();
+  const { state, transactions } = useActionBuilderState();
 
   return (
     <ActionBuilderModal visible={visible} onClose={onClose}>
       {() => {
         switch (state) {
           case 'deposit':
-            return <Deposit onClick={onClose}></Deposit>;
+            return <Deposit></Deposit>;
           case 'chooseAction':
             return <ActionSelector></ActionSelector>;
           case 'mintTokens':
@@ -36,6 +37,13 @@ const ActionBuilderSwitcher: React.FC<ActionBuilderProps> = ({ visible, onClose 
             return <FunctionSelector onClick={onClose}></FunctionSelector>;
           case 'abiForm':
             return <AbiForm></AbiForm>;
+          case 'processTransaction':
+            return (
+              <TransactionKeeper
+                transactionList={transactions}
+                closeModal={onClose}
+              ></TransactionKeeper>
+            );
           default:
             return null;
         }

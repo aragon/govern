@@ -2,7 +2,7 @@ import { Bytes } from 'ethers';
 export type EnvironmentName = 'mainnet' | 'rinkeby' | 'staging';
 type ChainId = 1 | 4;
 
-type TokenSymbol = 'DAI' | 'USDT' | 'USDC';
+export type TokenSymbol = 'DAI' | 'USDT' | 'USDC';
 type TokenAddress = string;
 
 type Collateral = {
@@ -24,5 +24,5 @@ export interface EnvironmentConfig {
     rules: Bytes;
     maxCalldataSize: number;
   };
-  withdrawalTokens: Record<TokenSymbol, TokenAddress>;
+  curatedTokens: Record<TokenSymbol, TokenAddress>;
 }

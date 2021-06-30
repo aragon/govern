@@ -1,12 +1,5 @@
 import { format } from 'date-fns';
 
-export function getTruncatedAccountAddress(account: string | null) {
-  if (account === null) return '';
-  return (
-    account.substring(0, 5) + '...' + account.substring(account.length - 5, account.length - 1)
-  );
-}
-
 export function getFormattedDate(date?: number | string) {
   try {
     if (!date) date = Date.now();
@@ -18,7 +11,7 @@ export function getFormattedDate(date?: number | string) {
   }
 }
 
-export function isIPFShash(value: string): boolean {
+export function isIPFShash(_value: string): boolean {
   // check for value being an ipfs hash
   return false;
 }
@@ -36,3 +29,15 @@ export function isIPFShash(value: string): boolean {
 //     return value;
 //   }
 // }
+
+export function getErrorFromException(ex: any): string {
+  let errorMessage = ex.error?.message || ex.reason || ex.message;
+  if (!errorMessage) {
+    try {
+      errorMessage = JSON.stringify(ex);
+    } catch {
+      errorMessage = 'Unknown error';
+    }
+  }
+  return errorMessage;
+}

@@ -3,6 +3,7 @@ import { Box, StyledText } from '@aragon/ui';
 import { Hint } from 'components/Hint/Hint';
 import { ActionBuilderState } from 'utils/types';
 import { useActionBuilderState } from '../ActionBuilderStateProvider';
+import { utils, constants } from 'ethers';
 
 type ActionOption = {
   title: ReactNode;
@@ -24,12 +25,23 @@ const actions: ActionOption[] = [
   },
 ];
 
+const haveMinter = (dao: any): boolean => {
+  let result = dao?.minter && utils.isAddress(dao.minter) && dao.minter !== constants.AddressZero;
+
+  // temporary until we have dao.minter available in subgraph
+  result = true;
+  return result;
+};
+
 export const ActionSelector = () => {
-  const { gotoState } = useActionBuilderState();
+  const { gotoState, dao } = useActionBuilderState();
   return (
     <>
       <StyledText name={'title1'}>Select Action</StyledText>
       {actions.map((action, i) => {
+        if (action.state === 'mintTokens' && !haveMinter(dao)) {
+          return null;
+        }
         return (
           <Box key={i} shadow>
             <div style={{ cursor: 'pointer' }} onClick={() => gotoState(action.state)}>

@@ -211,19 +211,19 @@ const NewExecution: React.FC = () => {
             <ActionList actions={fields} swap={swap} remove={remove} />
             <br />
             <Button
-              mode={'secondary'}
+              mode="secondary"
               icon={<IconAdd />}
-              label={'Add new action'}
+              label="Add new action"
               onClick={() => setShowActionModal(true)}
             ></Button>
           </GridItem>
           <Button
             wide
-            size={'large'}
-            mode={'primary'}
+            size="large"
+            mode="primary"
             disabled={!isConnected}
             onClick={handleSubmit(onSchedule)}
-            label={'Schedule'}
+            label="Schedule"
           ></Button>
           {showActionModal && (
             <ActionBuilder visible={showActionModal} onClose={onCloseActionModal}></ActionBuilder>
