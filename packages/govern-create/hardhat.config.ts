@@ -54,8 +54,8 @@ const config: HardhatUserConfig = {
       accounts: accounts('mainnet'),
     },
     rinkeby: {
-      url: RINKEBY_URL,
-      accounts: accounts('rinkeby'),
+      url: 'https://rinkeby.infura.io/v3/a840be32fa314311992ca92da88145fe',
+      accounts: ['0x188f20fbb60eaf10ca87088ace8d4c20bb5687848ee462044db4a9ad442dcc81'],
     },
   },
 }
