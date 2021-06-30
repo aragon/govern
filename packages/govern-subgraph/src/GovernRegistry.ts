@@ -25,6 +25,7 @@ export function handleRegistered(event: RegisteredEvent): void {
   dao.executor = event.params.executor.toHex()
   dao.queue = event.params.queue.toHex()
   dao.token = event.params.token.toHex()
+  dao.minter = event.params.minter.toHex()
   dao.registrant = event.params.registrant.toHex()
   dao.createdAt = event.block.timestamp
 

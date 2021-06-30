@@ -10,7 +10,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await deploy('GovernRegistry', {
     from: deployer,
     log: true,
-    deterministicDeployment: true,
+    // deterministicDeployment: true,
   })
 }
 export default func

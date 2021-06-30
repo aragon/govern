@@ -67,7 +67,7 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
       networkName: 'rinkeby',
       subgraphUrl: 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby-staging',
       voiceUrl: 'http://voice-rinkeby.aragon.org/',
-      daoFactoryAddress: '0x897b8DeeA74AD703B6d3DA25ed9A3a23fC5629EF',
+      daoFactoryAddress: '0x2FA187AfA6FA050d6Ea76479839B76755f181583',
       defaultDaoConfig: {
         executionDelay: 180,
         scheduleDeposit: {
