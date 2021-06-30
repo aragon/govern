@@ -1,11 +1,12 @@
 import React from 'react';
 import { Box, Button, StyledText, Split } from '@aragon/ui';
+import helpFaceImage from 'images/pngs/help_face_@2x.png';
 
 function HelpComponent() {
   return (
-    <Box style={{ border: 'none', backgroundColor: '#8991FF09' }}>
+    <Box style={{ border: 'none', backgroundColor: '#8991FF1A' }}>
       <Split
-        primary={<img />}
+        primary={<img src={helpFaceImage} style={{ width: 71, height: 39 }} />}
         secondary={
           <div>
             <StyledText name="title3">Need help?</StyledText>
@@ -13,7 +14,9 @@ function HelpComponent() {
           </div>
         }
       />
-      <Button type="primary">Chat with the Aragon Experts</Button>
+      <Button wide type="primary">
+        Chat with the Aragon Experts
+      </Button>
     </Box>
   );
 }

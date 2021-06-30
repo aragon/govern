@@ -241,7 +241,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
 
   return (
     <Grid layout={true}>
-      <GridItem gridColumn={'1/13'} gridRow={layoutName === 'large' ? '1/4' : '2'}>
+      <GridItem gridColumn={'1/12'} gridRow={layoutName === 'large' ? '1/4' : '2'}>
         <Box>
           <BackButton onClick={() => history.goBack()}>
             <img src={backButtonIcon} />
@@ -513,14 +513,14 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
       </GridItem>
       <GridItem
         gridRow={'1'}
-        gridColumn={layoutName === 'large' ? '13/17' : '1 / -1'}
+        gridColumn={layoutName === 'large' ? '12/17' : '1 / -1'}
         alignHorizontal={'center'}
       >
-        <EmptyStateCard illustration={cardIamge} text={cardText} />
+        <EmptyStateCard illustration={cardIamge} text={cardText} style={{ width: '100%' }} />
       </GridItem>
       <GridItem
         gridRow={layoutName === 'large' ? '2' : '3'}
-        gridColumn={layoutName === 'large' ? '13/17' : '1 / -1'}
+        gridColumn={layoutName === 'large' ? '12/17' : '1 / -1'}
       >
         <HelpComponent />
       </GridItem>
