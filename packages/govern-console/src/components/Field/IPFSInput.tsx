@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
 import {
   useLayout,
@@ -10,8 +10,11 @@ import {
   GridItem,
   RADII,
   useTheme,
+  FileInput,
+  filesArgs,
 } from '@aragon/ui';
 import { toUtf8String } from 'ethers/lib/utils';
+import { useEffect } from 'react';
 
 export interface IPFSInputProps {
   /**
@@ -78,20 +81,37 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
     formState: { errors },
     trigger,
   } = useFormContext();
-  const theme = useTheme();
   const { layoutName } = useLayout();
   const spacing = SPACING[layoutName];
-
-  const onChange = () => {
-    trigger(fileInputName);
-  };
-
+  const theme = useTheme();
   const isFileChosen = isFile || `is_file_${fileInputName}`;
+
+  const formatValue = (value: FileList) => {
+    if (typeof value !== 'string') {
+      return Object.keys(value).map((key) => ({
+        // status: 'loading',
+        name: value[Number(key)].name,
+        url: null,
+      }));
+    } else if (ipfsURI) {
+      return [
+        {
+          // status: ipfsURI && 'success',
+          name: ipfsURI && 'Current file:',
+          url: ipfsURI && ipfsURI,
+        },
+      ];
+    }
+  };
 
   return (
     <div>
       {title && <StyledText name={'title2'}>{title}</StyledText>}
-      {subtitle && <StyledText name={'body2'}>{subtitle}</StyledText>}
+      {subtitle && (
+        <StyledText name={'body2'} style={{ color: theme.disabledContent }}>
+          {subtitle}
+        </StyledText>
+      )}
       <div
         style={{
           width: 'fit-content',
@@ -138,56 +158,21 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
           )}
         />
       ) : (
-        <div>
-          <StyledText name={'body3'}>Upload file</StyledText>
-
-          {
-            <input
-              {...register(fileInputName, {
-                shouldUnregister: shouldUnregister,
-                required: 'This is required.',
-                validate: () => {
-                  return true;
-                },
-              })}
-              type="file"
+        <Controller
+          name={fileInputName}
+          control={control}
+          defaultValue={''}
+          shouldUnregister={shouldUnregister}
+          rules={{ required: 'This is required.' }}
+          render={({ field: { onChange, value }, fieldState: { error } }) => (
+            <FileInput
               onChange={onChange}
+              value={formatValue(value)}
+              status={!!error ? 'error' : 'normal'}
+              error={error ? error.message : null}
             />
-          }
-
-          <p style={{ color: theme.red }}>
-            {errors[fileInputName] && errors[fileInputName].message}
-          </p>
-        </div>
-      )}
-      {ipfsURI && (
-        <div
-          style={{
-            background: 'rgb(102, 218, 255, 0.07)',
-            borderRadius: RADII[layoutName],
-          }}
-        >
-          <Grid>
-            <GridItem
-              gridColumn={'1/2'}
-              alignHorizontal={layoutName !== 'small' ? 'flex-start' : 'center'}
-            >
-              <StyledText name={'body2'} style={{ padding: spacing }}>
-                Current file:
-              </StyledText>
-            </GridItem>
-            <GridItem
-              gridColumn={'2/3'}
-              alignHorizontal={layoutName !== 'small' ? 'flex-end' : 'center'}
-            >
-              <StyledText name={'body2'} style={{ padding: spacing }}>
-                <a href={ipfsURI} target="_blank" rel="noreferrer noopener">
-                  View Document
-                </a>
-              </StyledText>
-            </GridItem>
-          </Grid>
-        </div>
+          )}
+        />
       )}
     </div>
   );
