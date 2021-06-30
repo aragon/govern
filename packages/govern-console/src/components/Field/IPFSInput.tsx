@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
 import {
   useLayout,
@@ -10,6 +10,7 @@ import {
   FileInput,
 } from '@aragon/ui';
 import { toUtf8String } from 'ethers/lib/utils';
+import { useEffect } from 'react';
 
 export interface IPFSInputProps {
   /**
@@ -65,19 +66,26 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
   subtitle,
   textInputName,
   fileInputName,
-  isFile = null,
+  isFile,
   shouldUnregister = true,
   ipfsURI,
   placeholder,
 }) => {
-  const { control, watch } = useFormContext();
+  const {
+    control,
+    watch,
+    getValues,
+    register,
+    setValue,
+    formState: { errors },
+  } = useFormContext();
   const { layoutName } = useLayout();
   const spacing = SPACING[layoutName];
   const theme = useTheme();
   const isFileChosen = isFile || `is_file_${fileInputName}`;
 
-  const formatValue = (value: FileList) => {
-    if (typeof value !== 'string') {
+  const formatValue = (value: any) => {
+    if (value && typeof value !== 'string') {
       return Object.keys(value).map((key) => ({
         // status: 'loading',
         name: value[Number(key)].name,
@@ -93,6 +101,13 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
       ];
     }
   };
+
+  const [files, setFiles] = useState();
+  useEffect(() => {
+    if (files) {
+      setValue(fileInputName, files);
+    }
+  }, [files, setValue, fileInputName]);
 
   return (
     <div>
@@ -140,7 +155,11 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
             <TextInput.Multiline
               wide
               placeholder={placeholder}
-              value={typeof value !== 'string' ? toUtf8String(value) : value}
+              value={
+                typeof value !== 'string' && !(value instanceof FileList)
+                  ? toUtf8String(value)
+                  : value
+              }
               onChange={onChange}
               status={!!error ? 'error' : 'normal'}
               error={error ? error.message : null}
@@ -148,20 +167,46 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
           )}
         />
       ) : (
-        <Controller
-          name={fileInputName}
-          control={control}
-          defaultValue={''}
-          shouldUnregister={shouldUnregister}
-          rules={{ required: 'This is required.' }}
-          render={({ field: { onChange, value }, fieldState: { error } }) => (
-            <FileInput
-              onChange={onChange}
-              value={formatValue(value)}
-              status={!!error ? 'error' : 'normal'}
-              error={error ? error.message : null}
-            />
-          )}
+        // bug: investigate more to see why it is not working with controlled component
+        // and why it shares the same value with previous component
+
+        // <Controller
+        //   name={fileInputName}
+        //   control={control}
+        //   defaultValue={''}
+        //   shouldUnregister={shouldUnregister}
+        //   rules={{ required: 'This is required.' }}
+        //   render={({ field: { onChange, value }, fieldState: { error } }) => {
+        //     console.log(
+        //       'FileInput value',
+        //       value,
+        //       'getValues(fileInputName)',
+        //       getValues(fileInputName),
+        //     );
+        //     return (
+        //       <FileInput
+        //         onChange={onChange}
+        //         value={formatValue(value)}
+        //         status={!!error ? 'error' : 'normal'}
+        //         error={error ? error.message : null}
+        //       />
+        //     );
+        //   }}
+        // />
+
+        // a work arround is using register and handle onChange and value manually:
+        <FileInput
+          {...register(fileInputName, {
+            shouldUnregister: shouldUnregister,
+            required: 'This is required.',
+            validate: () => {
+              return true;
+            },
+          })}
+          onChange={setFiles}
+          value={formatValue(getValues(fileInputName))}
+          status={!!errors[fileInputName] ? 'error' : 'normal'}
+          error={errors[fileInputName] ? errors[fileInputName].message : null}
         />
       )}
     </div>
