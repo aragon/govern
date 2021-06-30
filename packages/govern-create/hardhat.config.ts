@@ -28,7 +28,8 @@ const config: HardhatUserConfig = {
     deployer: 0,
   },
   etherscan: {
-    apiKey: 'WQ7EFJVI6QCN9XKY3ET6IS4S7IX8CJ8QCW',
+    apiKey: process.env.ETHERSCAN_KEY,
+    // WQ7EFJVI6QCN9XKY3ET6IS4S7IX8CJ8QCW TODO:GIORGI remove later
   },
   networks: {
     hardhat: {
