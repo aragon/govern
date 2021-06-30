@@ -315,14 +315,14 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
         returns (bytes32)
     {
         // validate collaterals by calling balanceOf on their interface
-        if(_config.challengeDeposit.amount != 0) {
+        if(_config.challengeDeposit.amount != 0 && _config.challengeDeposit.token != address(0)) {
             (bool ok, bytes memory value) = _config.challengeDeposit.token.call(
                 abi.encodeWithSelector(ERC20.balanceOf.selector, address(this))
             );
             require(ok && value.length > 0, "queue: bad config");
         }
 
-        if(_config.scheduleDeposit.amount != 0) {
+        if(_config.scheduleDeposit.amount != 0 && _config.scheduleDeposit.token != address(0)) {
             (bool ok, bytes memory value) = _config.scheduleDeposit.token.call(
                 abi.encodeWithSelector(ERC20.balanceOf.selector, address(this))
             );

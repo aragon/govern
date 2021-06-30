@@ -91,7 +91,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
     executorAddress: '',
     token: '',
   });
-  const [rulesIpfsUrl, setRulesIpfsUrl] = useState<ipfsMetadata & string>();
+  const [ipfsMetadata, setIpfsMetadata] = useState<ipfsMetadata>();
   const [scheduleDecimals, setScheduleDecimals] = useState<number>(0);
   const [challengeDecimals, setChallengeDecimals] = useState<number>(0);
   const [resolverLock, setResolverLock] = useState(false);
@@ -163,7 +163,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
         // config.rules IPFS handling with utf8string fallback.
         const ipfsRules = await fetchIPFS(_config.rules);
         if (ipfsRules) {
-          setRulesIpfsUrl(ipfsRules);
+          setIpfsMetadata(ipfsRules);
           formConfig.rules = ipfsRules.text || '';
         } else {
           formConfig.rules = toUTF8String(_config.rules) || _config.rules;
@@ -346,7 +346,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
                 title={'Rules / Agreement'}
                 subtitle="Your DAO have optimistic capabilities, meaning that actions can happen without voting, but should follow pre defined rules. Please provide the main agreement for your DAO (In text, or upload a file)."
                 placeholder="DAO rules and agreement.."
-                ipfsURI={rulesIpfsUrl?.endpoint}
+                ipfsMetadata={ipfsMetadata}
                 shouldUnregister={false}
                 textInputName="daoConfig.rules"
                 fileInputName="rulesFile"

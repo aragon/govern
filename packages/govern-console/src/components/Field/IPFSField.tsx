@@ -34,9 +34,11 @@ export const IPFSField: React.FC<FieldProps> = ({ value, loading, ...props }) =>
             <span>{value.text}</span>
           </React.Fragment>
         ) : (
-          <a href={value.endpoint} target="_blank" rel="noreferrer noopener">
-            View
-          </a>
+          value?.endpoint && (
+            <a href={value.endpoint} target="_blank" rel="noreferrer noopener">
+              View
+            </a>
+          )
         );
       })()}
     </div>

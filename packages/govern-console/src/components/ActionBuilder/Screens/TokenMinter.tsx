@@ -112,7 +112,6 @@ export const TokenMinter: React.FC<TokenMinterProps> = ({ onClick }) => {
             defaultValue=""
             rules={{
               required: 'This is required.',
-              validate: (value) => validateToken(value, provider),
             }}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <TextInput
