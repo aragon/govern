@@ -163,7 +163,7 @@ const factoryAbi = [
 ]
 
 const registryAbi = [
-  'event Registered(address indexed executor, address queue, address indexed token, address indexed registrant, string name)',
+  'event Registered(address indexed executor, address queue, address indexed token, address minter, address indexed registrant, string name)',
 ]
 
 const tokenAbi = ['function balanceOf(address who) view returns (uint256)']

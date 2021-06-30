@@ -9,6 +9,7 @@ import "@aragon/govern-core/contracts/GovernRegistry.sol";
 
 import "@aragon/govern-token/contracts/GovernTokenFactory.sol";
 import "@aragon/govern-token/contracts/interfaces/IERC20.sol";
+import "@aragon/govern-token/contracts/GovernMinter.sol";
 
 import "./core-factories/GovernFactory.sol";
 import "./core-factories/GovernQueueFactory.sol";
@@ -52,8 +53,10 @@ contract GovernBaseFactory {
         govern = governFactory.newGovern(queue, salt);
 
         IERC20 token = _token.tokenAddress;
+        GovernMinter minter;
+
         if (address(token) == address(0)) {
-            (token,) = tokenFactory.newToken(
+            (token, minter) = tokenFactory.newToken(
                 govern,
                 _token.tokenName,
                 _token.tokenSymbol,
@@ -64,7 +67,7 @@ contract GovernBaseFactory {
             );
         }
 
-        registry.register(govern, queue, token, _name, "");
+        registry.register(govern, queue, token, address(minter), _name, "");
 
         ACLData.BulkItem[] memory items = new ACLData.BulkItem[](7);
         items[0] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.schedule.selector, ANY_ADDR);
