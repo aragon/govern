@@ -39,7 +39,7 @@ contract Govern is IERC3000Executor, AdaptiveERC165, ERC1271, ACL {
     ERC1271 signatureValidator;
 
     event Deposited(address indexed sender, address indexed token, uint256 amount, string indexed _reference);
-    event Withdrawn(address indexed token, address indexed to, uint256 amount);
+    event Withdrawn(address indexed token, address indexed to, uint256 amount, string indexed _reference);
 
     constructor(address _initialExecutor) ACL(address(this)) public {
         initialize(_initialExecutor);
@@ -74,13 +74,14 @@ contract Govern is IERC3000Executor, AdaptiveERC165, ERC1271, ACL {
         emit Deposited(msg.sender, _token, _amount, _reference);
     }
 
-    function withdraw(address _token, address _to, uint256 _amount) private {
+    function withdraw(address _token, address _to, uint256 _amount, string memory _reference) private {
         if (_token == address(0)) {
-            require(to.call{value: _amount}(""), ERROR_ETH_WITHDRAW_FAILED);
+            (bool ok, ) = _to.call{value: _amount}("");
+            require(ok, ERROR_ETH_WITHDRAW_FAILED);
         } else {
             require(ERC20(_token).safeTransfer(_to, _amount), ERROR_TOKEN_WITHDRAW_FAILED);
         }
-        emit Withdrawn(_token, _to, _amount);
+        emit Withdrawn(_token, _to, _amount, _reference);
     }
 
 
