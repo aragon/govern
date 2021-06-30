@@ -1,6 +1,5 @@
 import React, { ReactNode, createContext, useMemo, useState, useContext, useCallback } from 'react';
-import { ActionBuilderState, ContractId } from 'utils/types';
-import { CustomTransaction } from 'utils/types';
+import { ActionBuilderState, CustomTransaction } from 'utils/types';
 
 type ActionBuilderStateProviderProps = {
   children: ReactNode;
@@ -15,8 +14,6 @@ type ActionBuilderStateContext = {
   dao: any;
   transactions: CustomTransaction[];
   gotoState: (newState: ActionBuilderState) => void;
-  updateAbi: (newAbi: string) => void;
-  gotoAbiForm: (contractId: ContractId) => void;
   gotoFunctionSelector: (contractAddress: string, abi: string) => void;
   gotoProcessTransaction: (transactions: CustomTransaction[]) => void;
 };
@@ -38,43 +35,13 @@ const ActionBuilderStateProvider: React.FC<ActionBuilderStateProviderProps> = ({
   >(null);
 
   const [abi, setAbi] = useState<ActionBuilderStateContext['abi']>(null);
-
   const [transactions, setTransactions] = useState<ActionBuilderStateContext['transactions']>([]);
-
-  const updateAbi = useCallback(
-    (abi: string) => {
-      setAbi(abi);
-    },
-    [setAbi],
-  );
 
   const gotoState = useCallback(
     (newState: ActionBuilderState) => {
       setState(newState);
     },
     [setState],
-  );
-
-  const toContractAddress = useCallback(
-    (id: ContractId) => {
-      const addressMap: Record<ContractId, string> = {
-        executor: dao.executor.address,
-        minter: dao.minter,
-        queue: dao.queue.address,
-        external: '',
-      };
-      return addressMap[id];
-    },
-    [dao],
-  );
-
-  const gotoAbiForm = useCallback(
-    (id: ContractId) => {
-      const address = toContractAddress(id);
-      setContractAddress(address);
-      setState('abiForm');
-    },
-    [setContractAddress, setState, toContractAddress],
   );
 
   const gotoFunctionSelector = useCallback(
@@ -102,8 +69,6 @@ const ActionBuilderStateProvider: React.FC<ActionBuilderStateProviderProps> = ({
       dao,
       transactions,
       gotoState,
-      updateAbi,
-      gotoAbiForm,
       gotoFunctionSelector,
       gotoProcessTransaction,
     }),
@@ -114,8 +79,6 @@ const ActionBuilderStateProvider: React.FC<ActionBuilderStateProviderProps> = ({
       abi,
       transactions,
       gotoState,
-      updateAbi,
-      gotoAbiForm,
       gotoFunctionSelector,
       gotoProcessTransaction,
     ],

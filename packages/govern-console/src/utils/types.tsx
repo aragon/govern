@@ -75,7 +75,6 @@ export type ipfsMetadata = {
 };
 
 // Action builder types
-export type ContractId = 'queue' | 'minter' | 'executor' | 'external';
 export type ActionBuilderCloseHandler = (actions?: any) => void;
 export type ActionBuilderState =
   | 'processTransaction'
