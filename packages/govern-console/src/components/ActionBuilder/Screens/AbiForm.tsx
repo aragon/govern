@@ -33,7 +33,7 @@ export const AbiForm: React.FC = () => {
   const methods = useForm<FormInput>();
   const { control, handleSubmit, trigger, getValues } = methods;
 
-  const { contractAddress, gotoFunctionSelector } = useActionBuilderState();
+  const { gotoFunctionSelector } = useActionBuilderState();
   const [warning, setWarning] = useState(false);
 
   const gotoNextScreen = useCallback(() => {
@@ -71,7 +71,7 @@ export const AbiForm: React.FC = () => {
               name="contractAddress"
               control={control}
               shouldUnregister={true}
-              defaultValue={contractAddress}
+              defaultValue=""
               rules={{
                 required: 'This is required.',
                 validate: async (value) => await validateContract(value, provider),

@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import { styled } from '@material-ui/core/styles';
 import MUICard from '@material-ui/core/Card';
 import MUITypography from '@material-ui/core/Typography';
-import { ANButton } from '../Button/ANButton';
-import SettingIconImage from '../../images/svgs/Setting_Icon.svg';
 import { settingsUrl } from 'utils/urls';
+import { Button, IconSettings, Grid } from '@aragon/ui';
+import { ActionBuilder } from 'components/ActionBuilder/ActionBuilder';
+import { useWallet } from 'AugmentedWallet';
+import { useSnackbar } from 'notistack';
 
 export interface DaoHeaderProps {
   /**
@@ -45,9 +47,26 @@ const HeaderValue = styled(MUITypography)(({ theme }) => ({
 
 export const DaoHeader: React.FC<DaoHeaderProps> = ({ daoName }) => {
   const history = useHistory();
+  const [isDepositDialogOpen, setDepositDialogOpen] = useState(false);
+
+  const context: any = useWallet();
+  const { isConnected } = context;
+  const { enqueueSnackbar } = useSnackbar();
+
   const goToSettingPage = () => {
     history.push(settingsUrl(daoName));
   };
+
+  const openDepositDialog = useCallback(() => {
+    if (!isConnected) {
+      enqueueSnackbar('Please connect your account.', {
+        variant: 'error',
+      });
+
+      return;
+    }
+    setDepositDialogOpen(true);
+  }, [setDepositDialogOpen, enqueueSnackbar, isConnected]);
 
   return (
     <DaoHeaderCard>
@@ -63,31 +82,33 @@ export const DaoHeader: React.FC<DaoHeaderProps> = ({ daoName }) => {
           <HeaderLabel>DAO Name</HeaderLabel>
           <HeaderValue>{daoName}</HeaderValue>
         </div>
-        <div
+        <Grid
           style={{
             marginRight: '60px',
           }}
         >
-          <ANButton
-            label={
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'space-evenly',
-                }}
-              >
-                <img src={SettingIconImage} />
-                <div style={{ marginLeft: '10px' }}>DAO Settings</div>
-              </div>
-            }
-            buttonType={'secondary'}
-            backgroundColor={'#FFFFFF'}
-            labelColor={'#20232C'}
+          <Button
+            size="large"
+            mode="secondary"
+            label="DAO Settings"
+            icon={<IconSettings />}
             onClick={goToSettingPage}
-          />
-        </div>
+          ></Button>
+          <Button
+            size="large"
+            mode="secondary"
+            label="Deposit"
+            onClick={openDepositDialog}
+          ></Button>
+        </Grid>
       </div>
+      {isDepositDialogOpen && (
+        <ActionBuilder
+          initialState="deposit"
+          visible={isDepositDialogOpen}
+          onClose={() => setDepositDialogOpen(false)}
+        ></ActionBuilder>
+      )}
     </DaoHeaderCard>
   );
 };

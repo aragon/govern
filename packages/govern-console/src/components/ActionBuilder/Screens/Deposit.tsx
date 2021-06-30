@@ -1,58 +1,79 @@
 import React, { useCallback } from 'react';
-import { Grid, GridItem, DropDown, Button, TextInput, StyledText, useTheme } from '@aragon/ui';
-import { ActionBuilderCloseHandler } from 'utils/types';
+import {
+  EthIdenticon,
+  RADIUS,
+  Tag,
+  Grid,
+  GridItem,
+  DropDown,
+  Button,
+  TextInput,
+  StyledText,
+  useTheme,
+  useLayout,
+  SPACING,
+} from '@aragon/ui';
 import { Hint } from 'components/Hint/Hint';
 import { useForm, Controller } from 'react-hook-form';
 import { validateAmountForToken, validateToken } from 'utils/validations';
 import { useWallet } from 'AugmentedWallet';
-import AbiHandler from 'utils/AbiHandler';
-import { utils } from 'ethers';
+import { Contract, utils } from 'ethers';
 import { getToken } from '@aragon/govern';
+import { useActionBuilderState } from '../ActionBuilderStateProvider';
+import { getTruncatedAccountAddress } from 'utils/account';
 import { CuratedTokens } from 'utils/CuratedTokens';
+import { useSnackbar } from 'notistack';
+import { getErrorFromException } from 'utils/HelperFunctions';
+import { CustomTransaction, CustomTransactionStatus } from 'utils/types';
 
 const curatedTokens = new CuratedTokens();
 
-const transferSignature = 'function transfer(address destination, uint amount)';
+const transferAbi = ['function transfer(address destination, uint amount)'];
 
-type AssetWithdrawalProps = {
-  onClick: ActionBuilderCloseHandler;
-};
-
-type WithdrawalFormData = {
-  recipient: string;
+type DepositFormData = {
   token: number;
   tokenContractAddress: string;
-  withdrawalAmount: number;
+  depositAmount: number;
 };
 
-export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => {
+export const Deposit: React.FC = () => {
   const theme = useTheme();
-  const context: any = useWallet();
-  const { provider } = context;
+  const { layoutName } = useLayout();
+  const spacing = SPACING[layoutName];
 
-  const methods = useForm<WithdrawalFormData>();
+  const context: any = useWallet();
+  const { provider, account, networkName } = context;
+
+  const methods = useForm<DepositFormData>();
   const { control, handleSubmit, watch, getValues } = methods;
   const selectedToken = watch('token', 0);
 
+  const { dao, gotoProcessTransaction } = useActionBuilderState();
+  const { enqueueSnackbar } = useSnackbar();
+
   const buildActions = useCallback(async () => {
-    const { token, recipient, tokenContractAddress, withdrawalAmount } = getValues();
-    const contractAddress = curatedTokens.getTokenAddress(token, tokenContractAddress);
+    const { token, tokenContractAddress, depositAmount } = getValues();
 
-    let decimals = 0;
     try {
+      const contractAddress = curatedTokens.getTokenAddress(token, tokenContractAddress);
       const { tokenDecimals } = await getToken(contractAddress, provider);
-      decimals = tokenDecimals || 0;
+      const amount = utils.parseUnits(String(depositAmount), tokenDecimals);
+      const contract = new Contract(contractAddress, transferAbi, account.signer);
+      const tx: CustomTransaction = {
+        tx: () => contract.transfer(account?.address, amount),
+        message: 'Deposit asset',
+        status: CustomTransactionStatus.Pending,
+      };
+
+      gotoProcessTransaction([tx]);
     } catch (err) {
-      console.log('failed to get token info', contractAddress, err.message);
+      console.log('deposit error', err);
+      const errorMessage = getErrorFromException(err);
+      enqueueSnackbar(errorMessage, {
+        variant: 'error',
+      });
     }
-
-    const amount = utils.parseUnits(String(withdrawalAmount), decimals);
-    const values = [recipient, amount];
-
-    const action = AbiHandler.mapToAction(transferSignature, contractAddress, values);
-
-    onClick(action);
-  }, [onClick, getValues, provider]);
+  }, [getValues, provider, account, enqueueSnackbar, gotoProcessTransaction]);
 
   const validateAmount = useCallback(
     (value: string) => {
@@ -66,34 +87,48 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
   return (
     <Grid>
       <GridItem>
-        <StyledText name="title1">Withdraw assets</StyledText>
-        <Hint>Helptext TBD</Hint>
+        <StyledText name="title1">Deposit assets</StyledText>
+        <Hint>
+          This will create a request on your wallet to transfer the amount of tokens to the govern
+          executor address ({dao?.executor.address})
+        </Hint>
       </GridItem>
       <GridItem>
-        <Controller
-          name="recipient"
-          control={control}
-          defaultValue=""
-          rules={{
-            required: 'This is required.',
+        <StyledText name="title2">Wallet</StyledText>
+        <div
+          style={{
+            display: 'flex',
+            columnGap: `${spacing}px`,
+            flexFlow: 'row nowrap',
+            justifyContent: 'start',
+            alignItems: 'center',
           }}
-          render={({ field: { onChange, value }, fieldState: { error } }) => (
-            <TextInput
-              wide
-              title="Recipient address"
-              subtitle="The assets will be transfered to this address."
-              value={value}
-              placeholder="Type recipent address"
-              onChange={onChange}
-              status={error ? 'error' : 'normal'}
-              error={error ? error.message : null}
-            />
-          )}
-        />
+        >
+          <Button
+            css={`
+              color: ${theme.black};
+            `}
+            size="large"
+            mode="secondary"
+            icon={
+              <EthIdenticon
+                address={account?.address || 'Not Connected'}
+                radius={RADIUS}
+                css={`
+                  display: block;
+                `}
+              />
+            }
+            label={getTruncatedAccountAddress(account?.address || 'not-connected')}
+          ></Button>
+          <Tag background={`${theme.green}`} mode="activity" size="normal">
+            <h1 style={{ margin: spacing }}>{networkName}</h1>
+          </Tag>
+        </div>
       </GridItem>
       <GridItem>
         <StyledText name="title2">Token</StyledText>
-        <Hint>Choose which token you would like to withdraw.</Hint>
+        <Hint>Choose which token you would like to deposit.</Hint>
         <Controller
           name="token"
           control={control}
@@ -126,7 +161,7 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
               <TextInput
                 wide
                 title="Token contract address"
-                subtitle="Insert contract address of token to be withdrawn."
+                subtitle="Insert contract address of token to be deposited."
                 value={value}
                 placeholder="Type contract address"
                 onChange={onChange}
@@ -140,7 +175,7 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
 
       <GridItem>
         <Controller
-          name="withdrawalAmount"
+          name="depositAmount"
           control={control}
           defaultValue=""
           rules={{
@@ -152,7 +187,7 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
               wide
               type="number"
               title="Amount"
-              subtitle="Define how many tokens you want to withdraw."
+              subtitle="Define how many tokens you want to deposit."
               value={value}
               placeholder={0}
               onChange={onChange}
@@ -166,7 +201,7 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
         <Button
           size="large"
           mode="primary"
-          label="Save action now"
+          label="Deposit assets now"
           onClick={handleSubmit(buildActions)}
         ></Button>
       </GridItem>

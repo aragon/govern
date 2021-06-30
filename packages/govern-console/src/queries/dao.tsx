@@ -36,6 +36,7 @@ export const DAO_BY_NAME = gql`
       }
       token
       registrant
+      minter
     }
   }
 `;

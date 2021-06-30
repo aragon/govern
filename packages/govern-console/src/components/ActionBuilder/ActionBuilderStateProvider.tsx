@@ -1,5 +1,5 @@
 import React, { ReactNode, createContext, useMemo, useState, useContext, useCallback } from 'react';
-import { ActionBuilderState, ContractId } from 'utils/types';
+import { ActionBuilderState, CustomTransaction } from 'utils/types';
 
 type ActionBuilderStateProviderProps = {
   children: ReactNode;
@@ -12,10 +12,10 @@ type ActionBuilderStateContext = {
   contractAddress: string | null;
   abi: string | null;
   dao: any;
+  transactions: CustomTransaction[];
   gotoState: (newState: ActionBuilderState) => void;
-  updateAbi: (newAbi: string) => void;
-  gotoAbiForm: (contractId: ContractId) => void;
   gotoFunctionSelector: (contractAddress: string, abi: string) => void;
+  gotoProcessTransaction: (transactions: CustomTransaction[]) => void;
 };
 
 const defaultState: ActionBuilderState = 'chooseAction';
@@ -35,41 +35,13 @@ const ActionBuilderStateProvider: React.FC<ActionBuilderStateProviderProps> = ({
   >(null);
 
   const [abi, setAbi] = useState<ActionBuilderStateContext['abi']>(null);
-
-  const updateAbi = useCallback(
-    (abi: string) => {
-      setAbi(abi);
-    },
-    [setAbi],
-  );
+  const [transactions, setTransactions] = useState<ActionBuilderStateContext['transactions']>([]);
 
   const gotoState = useCallback(
     (newState: ActionBuilderState) => {
       setState(newState);
     },
     [setState],
-  );
-
-  const toContractAddress = useCallback(
-    (id: ContractId) => {
-      const addressMap: Record<ContractId, string> = {
-        executor: dao.executor.address,
-        minter: dao.token,
-        queue: dao.queue.address,
-        external: '',
-      };
-      return addressMap[id];
-    },
-    [dao],
-  );
-
-  const gotoAbiForm = useCallback(
-    (id: ContractId) => {
-      const address = toContractAddress(id);
-      setContractAddress(address);
-      setState('abiForm');
-    },
-    [setContractAddress, setState, toContractAddress],
   );
 
   const gotoFunctionSelector = useCallback(
@@ -81,18 +53,35 @@ const ActionBuilderStateProvider: React.FC<ActionBuilderStateProviderProps> = ({
     [setState, setContractAddress],
   );
 
+  const gotoProcessTransaction = useCallback(
+    (transactions: CustomTransaction[]) => {
+      setTransactions(transactions);
+      setState('processTransaction');
+    },
+    [setTransactions, setState],
+  );
+
   const contextValue = useMemo(
     (): ActionBuilderStateContext => ({
       state,
       contractAddress,
       abi,
       dao,
+      transactions,
       gotoState,
-      updateAbi,
-      gotoAbiForm,
       gotoFunctionSelector,
+      gotoProcessTransaction,
     }),
-    [state, contractAddress, dao, abi, gotoState, updateAbi, gotoAbiForm, gotoFunctionSelector],
+    [
+      state,
+      contractAddress,
+      dao,
+      abi,
+      transactions,
+      gotoState,
+      gotoFunctionSelector,
+      gotoProcessTransaction,
+    ],
   );
 
   return (

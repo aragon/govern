@@ -20,7 +20,7 @@ import { getToken } from '@aragon/govern';
 import { ActionBuilderCloseHandler } from 'utils/types';
 import { useActionBuilderState } from '../ActionBuilderStateProvider';
 
-const functionSignature = 'function mint(address recipient, uint amount)';
+const functionSignature = 'function mint(address to, uint256 amount, bytes calldata context)';
 
 enum Recipient {
   Executor = 0,
@@ -64,9 +64,10 @@ export const TokenMinter: React.FC<TokenMinterProps> = ({ onClick }) => {
     }
 
     const amount = utils.parseUnits(formValues.mintAmount, decimals);
-    const values = [tokenRecipient, amount];
+    const context = '0x';
+    const values = [tokenRecipient, amount, context];
 
-    const action = AbiHandler.mapToAction(functionSignature, dao?.token, values);
+    const action = AbiHandler.mapToAction(functionSignature, dao?.minter, values);
     onClick(action);
   }, [onClick, getValues, dao, provider]);
 

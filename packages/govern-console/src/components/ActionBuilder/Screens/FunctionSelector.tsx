@@ -19,6 +19,11 @@ type FunctionItem = {
   count: number;
 };
 
+const formatSignature = (signature: string, functionName: string): string => {
+  const regex = new RegExp(`^.*${functionName}`, 'i');
+  return signature.replace(regex, '');
+};
+
 export const FunctionSelector: React.FC<FunctionSelectorProps> = ({ onClick }) => {
   const theme = useTheme();
   const { contractAddress, abi } = useActionBuilderState();
@@ -117,7 +122,7 @@ export const FunctionSelector: React.FC<FunctionSelectorProps> = ({ onClick }) =
               >
                 <div>
                   <StyledText name="title3">{item.name}</StyledText>
-                  <Hint>{item.signature.replace(item.name, '')}</Hint>
+                  <Hint>{formatSignature(item.signature, item.name)}</Hint>
                 </div>
                 <Stepper
                   min={0}
