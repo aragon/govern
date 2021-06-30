@@ -23,6 +23,10 @@ export {
   ReceiptType,
 } from './proposal'
 
+export {
+  registerToken,
+  isTokenRegistered,
+} from '../internal/actions/RegisterToken'
 // Types
 
 export {

@@ -1,8 +1,10 @@
 import React, { useEffect, useContext, useMemo } from 'react';
-import { ethers, providers as EthersProviders } from 'ethers';
+import { providers as EthersProviders } from 'ethers';
 import { UseWalletProvider, useWallet } from 'use-wallet';
 import { Account } from 'utils/types';
 import { INFURA_PROJECT_ID } from 'utils/constants';
+import { networkEnvironment } from 'environment';
+const { chainId } = networkEnvironment;
 
 const WalletAugmentedContext = React.createContext({});
 
@@ -14,10 +16,8 @@ function useWalletAugmented() {
 const WalletAugmented: React.FC<unknown> = ({ children }) => {
   const wallet = useWallet();
   const ethereum: any = wallet.ethereum;
-  const fallbackProvider = ethers.getDefaultProvider('rinkeby', {
-    infura: INFURA_PROJECT_ID,
-  });
-  const [provider, updateProvider] = React.useState(fallbackProvider);
+  const fallbackProvider = new EthersProviders.InfuraProvider(chainId, INFURA_PROJECT_ID);
+  const [provider, updateProvider] = React.useState<EthersProviders.Provider>(fallbackProvider);
   const injectedProvider = useMemo(
     () => (ethereum ? new EthersProviders.Web3Provider(ethereum) : null),
     [ethereum],
@@ -53,7 +53,7 @@ const WalletAugmented: React.FC<unknown> = ({ children }) => {
 
 const WalletProvider: React.FC<unknown> = ({ children }) => {
   return (
-    <UseWalletProvider chainId={4}>
+    <UseWalletProvider chainId={chainId}>
       <WalletAugmented>{children}</WalletAugmented>
     </UseWalletProvider>
   );

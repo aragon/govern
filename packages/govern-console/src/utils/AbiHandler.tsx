@@ -1,5 +1,6 @@
 import { utils, BigNumber } from 'ethers';
 import { ETHERSCAN_API_KEY } from './constants';
+import { ActionItem } from 'utils/types';
 
 // TODO: discuss with Giorgi to move this to a standalone library so that
 // this module can be shared by Court as it's currently a duplicate of
@@ -68,12 +69,14 @@ function decodeInput(name: string, input: any, value: any, accum: any) {
 export default class AbiHandler {
   private readonly network: string;
   private readonly baseUrl: string;
+  private cache: Record<string, any>;
 
   constructor(networkName: string) {
     this.network = networkName.toLowerCase();
     this.baseUrl = `https://api${
       this.network === 'mainnet' ? '' : `-${this.network}`
     }.etherscan.io/api?apikey=${ETHERSCAN_API_KEY}`;
+    this.cache = {};
   }
 
   /**
@@ -83,6 +86,10 @@ export default class AbiHandler {
    * @returns {string|null} the contract abi
    */
   async get(address: string): Promise<string | null> {
+    if (this.cache[address]) {
+      return this.cache[address];
+    }
+
     const endpoint = `${this.baseUrl}&module=contract&action=getabi&address=${address}`;
 
     try {
@@ -98,6 +105,7 @@ export default class AbiHandler {
         const json = await response.json();
         if (json.message === 'OK') {
           if (AbiHandler.isValidAbi(json.result) === true) {
+            this.cache[address] = json.result;
             return json.result;
           }
         }
@@ -153,5 +161,34 @@ export default class AbiHandler {
     } catch (e) {}
 
     return false;
+  }
+
+  /**
+   * map an array of values (if not provided, use empty string) to ActionItem format
+   *
+   * @param {string} signature function signature from abi
+   * @param {string} contractAddress contract address
+   * @param {array} values to be encoded into action
+   * @returns
+   */
+  static mapToAction(signature: string, contractAddress: string, values: any): ActionItem {
+    const fragment = utils.Fragment.from(signature) as utils.FunctionFragment;
+    const abiInterface = new utils.Interface([`${signature}`]);
+    const inputs = fragment.inputs.map((item, i) => ({
+      name: item.name,
+      type: item.format(),
+      baseType: item.baseType,
+      value: values && values[i] ? values[i] : '',
+    }));
+    const sighash = abiInterface.getSighash(fragment);
+    const action: ActionItem = {
+      sighash,
+      signature,
+      contractAddress,
+      name: fragment.name,
+      inputs,
+    };
+
+    return action;
   }
 }

@@ -11,6 +11,7 @@ import NoDaoFound from './NoDaoFound';
 import { formatDate } from 'utils/date';
 import { getState, getStateColor } from 'utils/states';
 import { useDaoQuery, useLazyProposalListQuery } from 'hooks/query-hooks';
+import { proposalDetailsUrl } from 'utils/urls';
 
 //* Styled Components List
 const DaoPageMainDiv = styled(Paper)(({ theme }) => ({
@@ -115,11 +116,11 @@ const DaoMainPage: React.FC = () => {
   }, [loadingDao, dao, getQueueData]);
 
   const onClickProposal = (proposal: any) => {
-    history.push(`/proposals/${daoName}/${proposal.id}`);
+    history.push(proposalDetailsUrl(daoName, proposal.id));
   };
 
-  const goToNewProposal = () => {
-    history.push(`/daos/${daoName}/new-proposal`);
+  const goToNewExecution = () => {
+    history.push(`/daos/${daoName}/new-execution`);
   };
 
   if (loadingDao) {
@@ -152,7 +153,7 @@ const DaoMainPage: React.FC = () => {
                 }}
               >
                 {isProposalPage ? (
-                  <PageLabelSelected>Proposals</PageLabelSelected>
+                  <PageLabelSelected>Executions</PageLabelSelected>
                 ) : (
                   <PageLabel onClick={() => onPageChange('proposal')}>Proposal</PageLabel>
                 )}
@@ -176,11 +177,11 @@ const DaoMainPage: React.FC = () => {
                     }}
                   >
                     <ANButton
-                      label="New Proposal"
+                      label="New Execution"
                       buttonType="primary"
                       height="46px"
                       width="142px"
-                      onClick={goToNewProposal}
+                      onClick={goToNewExecution}
                       style={{ marginRight: '12px' }}
                     ></ANButton>
                   </div>
@@ -214,7 +215,7 @@ const DaoMainPage: React.FC = () => {
                   >
                     {queueNonce !== visibleProposalList.length ? (
                       <ANButton
-                        label="Load More Proposals"
+                        label="Load More Executions"
                         buttonType="secondary"
                         height="46px"
                         width="196px"

@@ -2,10 +2,9 @@ import { styled } from '@material-ui/core/styles';
 import governIcon from 'images/aragon-icon.svg';
 import Wallet from 'components/Wallet/Wallet';
 import { useHistory } from 'react-router-dom';
-// import { ANButton } from 'components/Button/ANButton';
-// import { Label } from '../Labels/Label';
-import { useWallet } from '../../AugmentedWallet';
-import { Button, IconStar, IconStarFilled, Tag, useTheme } from '@aragon/ui';
+import { Button, StyledText } from '@aragon/ui';
+
+import { networkEnvironment } from 'environment';
 
 const HeaderWrapperDiv = styled('div')({
   height: '106px',
@@ -37,11 +36,9 @@ const RigtSideContainer = styled('div')({
   gap: '10px',
 });
 
-const Header = ({ ...props }) => {
-  const theme = useTheme();
+const Header = () => {
   const history = useHistory();
-  const context: any = useWallet();
-  const { networkName } = context;
+  const { networkName } = networkEnvironment;
 
   const redirectToHomePage = () => {
     history.push('/');
@@ -58,22 +55,12 @@ const Header = ({ ...props }) => {
           <img src={governIcon} width="210px" />
         </Title>
         <RigtSideContainer id="account">
-          <Button
-            onClick={props.toggleTheme}
-            icon={props.themeMode === 'light' ? <IconStar /> : <IconStarFilled />}
-          />
-          <Tag
-            label={`${networkName} network`}
-            color={theme.primaryContent}
-            background={theme.primary}
-          />
+          <StyledText name="body1">Network:{networkName.toUpperCase()}</StyledText>
           <Wallet />
           <Button
             size={'large'}
             onClick={goToCreateDaoPage}
             label={'Create DAO'}
-            height={'48px'}
-            width={'174px'}
             disabled={status === 'connecting'}
           />
         </RigtSideContainer>

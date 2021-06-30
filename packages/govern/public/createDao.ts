@@ -1,6 +1,5 @@
 import { Contract, utils, providers, BigNumberish, constants } from 'ethers'
 import Configuration from '../internal/configuration/Configuration'
-import { registerToken } from '../internal/actions/RegisterToken'
 
 export const ContainerConfig = `
   tuple(
@@ -18,21 +17,149 @@ export const ContainerConfig = `
     uint256 maxCalldataSize
   )`
 
-const token = `
-  tuple(
-    address tokenAddress, 
-    uint8 tokenDecimals, 
-    string tokenName, 
-    string tokenSymbol
-  )`
-
 const factoryAbi = [
-  `function newGovern(
-    string _name, 
-    ${token} _token, 
-    ${ContainerConfig} _config, 
-    bool _useProxies
-  )`,
+  {
+    inputs: [
+      {
+        internalType: 'string',
+        name: '_name',
+        type: 'string',
+      },
+      {
+        components: [
+          {
+            internalType: 'contract IERC20',
+            name: 'tokenAddress',
+            type: 'address',
+          },
+          {
+            internalType: 'uint8',
+            name: 'tokenDecimals',
+            type: 'uint8',
+          },
+          {
+            internalType: 'string',
+            name: 'tokenName',
+            type: 'string',
+          },
+          {
+            internalType: 'string',
+            name: 'tokenSymbol',
+            type: 'string',
+          },
+          {
+            internalType: 'address',
+            name: 'mintAddress',
+            type: 'address',
+          },
+          {
+            internalType: 'uint256',
+            name: 'mintAmount',
+            type: 'uint256',
+          },
+          {
+            internalType: 'bytes32',
+            name: 'merkleRoot',
+            type: 'bytes32',
+          },
+          {
+            internalType: 'uint256',
+            name: 'merkleMintAmount',
+            type: 'uint256',
+          },
+        ],
+        internalType: 'struct TokenLib.TokenConfig',
+        name: '_token',
+        type: 'tuple',
+      },
+      {
+        components: [
+          {
+            internalType: 'uint256',
+            name: 'executionDelay',
+            type: 'uint256',
+          },
+          {
+            components: [
+              {
+                internalType: 'address',
+                name: 'token',
+                type: 'address',
+              },
+              {
+                internalType: 'uint256',
+                name: 'amount',
+                type: 'uint256',
+              },
+            ],
+            internalType: 'struct ERC3000Data.Collateral',
+            name: 'scheduleDeposit',
+            type: 'tuple',
+          },
+          {
+            components: [
+              {
+                internalType: 'address',
+                name: 'token',
+                type: 'address',
+              },
+              {
+                internalType: 'uint256',
+                name: 'amount',
+                type: 'uint256',
+              },
+            ],
+            internalType: 'struct ERC3000Data.Collateral',
+            name: 'challengeDeposit',
+            type: 'tuple',
+          },
+          {
+            internalType: 'address',
+            name: 'resolver',
+            type: 'address',
+          },
+          {
+            internalType: 'bytes',
+            name: 'rules',
+            type: 'bytes',
+          },
+          {
+            internalType: 'uint256',
+            name: 'maxCalldataSize',
+            type: 'uint256',
+          },
+        ],
+        internalType: 'struct ERC3000Data.Config',
+        name: '_config',
+        type: 'tuple',
+      },
+      {
+        internalType: 'address[]',
+        name: '_scheduleAccessList',
+        type: 'address[]',
+      },
+      {
+        internalType: 'bool',
+        name: '_useProxies',
+        type: 'bool',
+      },
+    ],
+    name: 'newGovern',
+    outputs: [
+      {
+        internalType: 'contract Govern',
+        name: 'govern',
+        type: 'address',
+      },
+      {
+        internalType: 'contract GovernQueue',
+        name: 'queue',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
 ]
 
 const registryAbi = [
@@ -48,6 +175,10 @@ export type Token = {
   tokenDecimals: number
   tokenName: string
   tokenSymbol: string
+  mintAddress: string
+  mintAmount: BigNumberish | string
+  merkleRoot: utils.BytesLike
+  merkleMintAmount: BigNumberish | string
 }
 
 export type TokenDeposit = {
@@ -68,8 +199,8 @@ export type CreateDaoParams = {
   name: string
   token: Partial<Token>
   config: DaoConfig
+  scheduleAccessList: string[]
   useProxies?: boolean
-  useVocdoni?: boolean // not used yet
 }
 
 export type CreateDaoOptions = {
@@ -84,23 +215,32 @@ export type CreateDaoOptions = {
  *
  * @param {options} options to overwrite with eip1193 provider and DAO factory address
  *
+ * @param {(tokenAddress: string) => void} registeredDaoTokenCallback
+ *
  * @returns {Promise<TransactionResponse>} transaction response object
  */
 export async function createDao(
   args: CreateDaoParams,
   options: CreateDaoOptions = {},
-  registerTokenCallback?: Function
+  registeredDaoTokenCallback?: (tokenAddress: string) => void
 ): Promise<providers.TransactionResponse> {
   let token: Partial<Token>
   if (!args.token.tokenAddress) {
-    const tokenIsMissingInfo = !args.token.tokenName || !args.token.tokenSymbol || !args.token.tokenDecimals
+    const tokenIsMissingInfo =
+      !args.token.tokenName ||
+      !args.token.tokenSymbol ||
+      !args.token.tokenDecimals ||
+      !args.token.mintAddress ||
+      !args.token.merkleRoot
 
     if (tokenIsMissingInfo) {
-      throw new Error('Missing token name, decimals and/or symbol')
+      throw new Error(
+        'Missing token name, decimals, symbol, mintAddress, mintAmount and/or merkleRoot'
+      )
     }
     token = {
       tokenAddress: constants.AddressZero,
-      ...args.token
+      ...args.token,
     }
   } else {
     token = {
@@ -108,6 +248,10 @@ export async function createDao(
       tokenDecimals: 18,
       tokenName: '',
       tokenSymbol: '',
+      mintAddress: constants.AddressZero,
+      mintAmount: 0,
+      merkleRoot: '0x' + '00'.repeat(32),
+      merkleMintAmount: 0
     }
   }
 
@@ -116,31 +260,32 @@ export async function createDao(
   const signer = await new providers.Web3Provider(
     options.provider || window.ethereum
   ).getSigner()
-  const contract = new Contract(factoryAddress, factoryAbi, signer)
 
+  const contract = new Contract(factoryAddress, factoryAbi, signer)
   const GovernRegistry = new Contract(
     config.governRegistry,
     registryAbi,
     signer
   )
 
-  if (typeof registerTokenCallback === 'function') {
+  if (typeof registeredDaoTokenCallback === 'function') {
     GovernRegistry.on(
       'Registered',
       async (govern, queue, token, registrant, name) => {
         // not our DAO, wait for next one
         if (name !== args.name) return
 
-        const ERC20 = new Contract(token, tokenAbi, signer)
-        registerTokenCallback(() => registerToken(signer, ERC20))
+        // send back token address
+        registeredDaoTokenCallback(token)
       }
     )
   }
-
+  
   const result = contract.newGovern(
     args.name,
     token,
     args.config,
+    args.scheduleAccessList,
     args.useProxies
   )
 
