@@ -64,7 +64,7 @@ export const TokenMinter: React.FC<TokenMinterProps> = ({ onClick }) => {
     }
 
     const amount = utils.parseUnits(formValues.mintAmount, decimals);
-    const context = utils.hexlify(utils.toUtf8Bytes('Minted through Aragon Console'));
+    const context = '0x';
     const values = [tokenRecipient, amount, context];
 
     const action = AbiHandler.mapToAction(functionSignature, dao?.minter, values);
