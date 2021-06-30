@@ -60,12 +60,13 @@ describe('GovernRegistry', function () {
         erc3kExec.address,
         erc3k.address,
         NO_TOKEN,
+        NO_TOKEN,
         'MyName',
         '0x00'
       )
     )
       .to.emit(governRegistry, EVENTS.REGISTERED)
-      .withArgs(erc3kExec.address, erc3k.address, NO_TOKEN, current, 'MyName')
+      .withArgs(erc3kExec.address, erc3k.address, NO_TOKEN, NO_TOKEN, current, 'MyName')
       .to.emit(governRegistry, EVENTS.SET_METADATA)
       .withArgs(erc3kExec.address, '0x00')
 
@@ -77,6 +78,7 @@ describe('GovernRegistry', function () {
       erc3kExec.address,
       erc3k.address,
       `0x${'00'.repeat(20)}`,
+      `0x${'00'.repeat(20)}`,
       'MyName',
       '0x00'
     )
@@ -85,6 +87,7 @@ describe('GovernRegistry', function () {
       governRegistry.register(
         erc3kExec.address,
         erc3k.address,
+        `0x${'00'.repeat(20)}`,
         `0x${'00'.repeat(20)}`,
         'MyName',
         '0x00'
