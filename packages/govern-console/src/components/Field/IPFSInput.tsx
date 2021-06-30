@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
 import {
   useLayout,
@@ -6,12 +6,11 @@ import {
   StyledText,
   SPACING,
   ContentSwitcher,
-  Grid,
-  GridItem,
-  RADII,
   useTheme,
+  FileInput,
 } from '@aragon/ui';
 import { toUtf8String } from 'ethers/lib/utils';
+import { useEffect } from 'react';
 
 export interface IPFSInputProps {
   /**
@@ -67,32 +66,57 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
   subtitle,
   textInputName,
   fileInputName,
-  isFile = null,
+  isFile,
   shouldUnregister = true,
   ipfsURI,
   placeholder,
 }) => {
   const {
-    register,
     control,
     watch,
+    getValues,
+    register,
+    setValue,
     formState: { errors },
-    trigger,
   } = useFormContext();
-  const theme = useTheme();
   const { layoutName } = useLayout();
   const spacing = SPACING[layoutName];
+  const theme = useTheme();
+  const isFileChosen = isFile || `is_file_${fileInputName}`;
 
-  const onChange = () => {
-    trigger(fileInputName);
+  const formatValue = (value: any) => {
+    if (value && typeof value !== 'string') {
+      return Object.keys(value).map((key) => ({
+        // status: 'loading',
+        name: value[Number(key)].name,
+        url: null,
+      }));
+    } else if (ipfsURI) {
+      return [
+        {
+          // status: ipfsURI && 'success',
+          name: ipfsURI && 'Current file:',
+          url: ipfsURI && ipfsURI,
+        },
+      ];
+    }
   };
 
-  const isFileChosen = isFile || `is_file_${fileInputName}`;
+  const [files, setFiles] = useState();
+  useEffect(() => {
+    if (files) {
+      setValue(fileInputName, files);
+    }
+  }, [files, setValue, fileInputName]);
 
   return (
     <div>
       {title && <StyledText name={'title2'}>{title}</StyledText>}
-      {subtitle && <StyledText name={'body2'}>{subtitle}</StyledText>}
+      {subtitle && (
+        <StyledText name={'body2'} style={{ color: theme.disabledContent }}>
+          {subtitle}
+        </StyledText>
+      )}
       <div
         style={{
           width: 'fit-content',
@@ -131,7 +155,11 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
             <TextInput.Multiline
               wide
               placeholder={placeholder}
-              value={typeof value !== 'string' ? toUtf8String(value) : value}
+              value={
+                typeof value !== 'string' && !(value instanceof FileList)
+                  ? toUtf8String(value)
+                  : value
+              }
               onChange={onChange}
               status={!!error ? 'error' : 'normal'}
               error={error ? error.message : null}
@@ -139,56 +167,47 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
           )}
         />
       ) : (
-        <div>
-          <StyledText name={'body3'}>Upload file</StyledText>
+        // bug: investigate more to see why it is not working with controlled component
+        // and why it shares the same value with previous component
 
-          {
-            <input
-              {...register(fileInputName, {
-                shouldUnregister: shouldUnregister,
-                required: 'This is required.',
-                validate: () => {
-                  return true;
-                },
-              })}
-              type="file"
-              onChange={onChange}
-            />
-          }
+        // <Controller
+        //   name={fileInputName}
+        //   control={control}
+        //   defaultValue={''}
+        //   shouldUnregister={shouldUnregister}
+        //   rules={{ required: 'This is required.' }}
+        //   render={({ field: { onChange, value }, fieldState: { error } }) => {
+        //     console.log(
+        //       'FileInput value',
+        //       value,
+        //       'getValues(fileInputName)',
+        //       getValues(fileInputName),
+        //     );
+        //     return (
+        //       <FileInput
+        //         onChange={onChange}
+        //         value={formatValue(value)}
+        //         status={!!error ? 'error' : 'normal'}
+        //         error={error ? error.message : null}
+        //       />
+        //     );
+        //   }}
+        // />
 
-          <p style={{ color: theme.red }}>
-            {errors[fileInputName] && errors[fileInputName].message}
-          </p>
-        </div>
-      )}
-      {ipfsURI && (
-        <div
-          style={{
-            background: 'rgb(102, 218, 255, 0.07)',
-            borderRadius: RADII[layoutName],
-          }}
-        >
-          <Grid>
-            <GridItem
-              gridColumn={'1/2'}
-              alignHorizontal={layoutName !== 'small' ? 'flex-start' : 'center'}
-            >
-              <StyledText name={'body2'} style={{ padding: spacing }}>
-                Current file:
-              </StyledText>
-            </GridItem>
-            <GridItem
-              gridColumn={'2/3'}
-              alignHorizontal={layoutName !== 'small' ? 'flex-end' : 'center'}
-            >
-              <StyledText name={'body2'} style={{ padding: spacing }}>
-                <a href={ipfsURI} target="_blank" rel="noreferrer noopener">
-                  View Document
-                </a>
-              </StyledText>
-            </GridItem>
-          </Grid>
-        </div>
+        // a work arround is using register and handle onChange and value manually:
+        <FileInput
+          {...register(fileInputName, {
+            shouldUnregister: shouldUnregister,
+            required: 'This is required.',
+            validate: () => {
+              return true;
+            },
+          })}
+          onChange={setFiles}
+          value={formatValue(getValues(fileInputName))}
+          status={!!errors[fileInputName] ? 'error' : 'normal'}
+          error={errors[fileInputName] ? errors[fileInputName].message : null}
+        />
       )}
     </div>
   );
