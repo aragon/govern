@@ -105,11 +105,11 @@ const CreateDaoProgress: React.FC<{
 
     // CreateDaoParams
     return {
-      name: basicInfo.daoIdentifier,
       token,
-      config: daoConfig,
       scheduleAccessList: collaterals.isAnyAddress ? [] : collaterals.executionAddressList,
       useProxies: basicInfo.isProxy,
+      config: daoConfig,
+      name: basicInfo.daoIdentifier,
     };
   }, [basicInfo, config, collaterals, rule, account]);
 
