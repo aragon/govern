@@ -24,12 +24,14 @@ import {
   IconPlus,
   IconArrowLeft,
   SPACING,
+  useTheme,
 } from '@aragon/ui';
 
 const CreateDaoCollateral: React.FC<{
   setActiveStep: React.Dispatch<React.SetStateAction<CreateDaoSteps>>;
 }> = ({ setActiveStep }) => {
   const { layoutName } = useLayout();
+  const theme = useTheme();
   const spacing = SPACING[layoutName];
   const { collaterals, setCollaterals, basicInfo } = useCreateDaoContext();
   const {
@@ -110,12 +112,15 @@ const CreateDaoCollateral: React.FC<{
             </Grid>
 
             <div>
-              <StyledText name={'title4'}>Collaterals</StyledText>
-              <StyledText name={'body3'}>
+              <StyledText name={'title2'}>Collaterals</StyledText>
+              <StyledText name={'body2'} style={{ color: theme.disabledContent }}>
                 In order to schedule or challenge executions, any member must provide this amount of
                 collateral, so they have stake in the game and act with the best interest of your
                 DAO. By{' '}
-                <StyledText name={'body1'} style={{ display: 'inline' }}>
+                <StyledText
+                  name={'title2'}
+                  style={{ display: 'inline', fontWeight: 700, color: theme.black }}
+                >
                   default Aragon Console uses DAI
                 </StyledText>{' '}
                 as a collateral token. If you want to change this, provide another contract address
