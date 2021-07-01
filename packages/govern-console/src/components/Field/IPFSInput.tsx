@@ -92,7 +92,7 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
         name: value[Number(key)].name,
         url: null,
       }));
-    } else if (ipfsMetadata?.endpoint) {
+    } else if (ipfsMetadata?.endpoint && !ipfsMetadata?.text) {
       return [
         {
           // status: ipfsURI && 'success',
