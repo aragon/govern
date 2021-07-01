@@ -21,6 +21,7 @@ import {
   SPACING,
   Link,
 } from '@aragon/ui';
+import HelpComponent from 'components/HelpComponent/HelpComponent';
 
 const CreateDaoBasicInfo: React.FC<{
   setActiveStep: React.Dispatch<React.SetStateAction<CreateDaoSteps>>;
@@ -63,7 +64,7 @@ const CreateDaoBasicInfo: React.FC<{
 
   return (
     <Grid layout={true}>
-      <GridItem gridColumn={'1/13'} gridRow={'1/4'}>
+      <GridItem gridColumn={layoutName === 'large' ? '1/12' : '1/-1'} gridRow={'1/4'}>
         <Box>
           <div style={{ display: 'grid', gridGap: spacing }}>
             <Grid columns={'4'} columnWidth={'1fr'}>
@@ -246,18 +247,15 @@ const CreateDaoBasicInfo: React.FC<{
       </GridItem>
       <GridItem
         gridRow={layoutName === 'large' ? '1' : undefined}
-        gridColumn={layoutName === 'large' ? '13/17' : '1 / -1'}
+        gridColumn={layoutName === 'large' ? '12/17' : '1 / -1'}
       >
         <Accordion items={accordionItems}></Accordion>
       </GridItem>
       <GridItem
         gridRow={layoutName === 'large' ? '2' : undefined}
-        gridColumn={layoutName === 'large' ? '13/17' : '1 / -1'}
+        gridColumn={layoutName === 'large' ? '12/17' : '1 / -1'}
       >
-        {/* TODO: To be moved to its own component*/}
-        <Box style={{ background: '#8991FF', opacity: 0.5 }}>
-          <h5 style={{ color: '#20232C' }}>Need Help?</h5>
-        </Box>
+        <HelpComponent />
       </GridItem>
     </Grid>
   );

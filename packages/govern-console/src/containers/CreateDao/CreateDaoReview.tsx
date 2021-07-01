@@ -23,11 +23,14 @@ import {
   DataView,
   Modal,
   AddressField,
+  useTheme,
 } from '@aragon/ui';
+import HelpComponent from 'components/HelpComponent/HelpComponent';
 
 const CreateDaoReview: React.FC<{
   setActiveStep: React.Dispatch<React.SetStateAction<CreateDaoSteps>>;
 }> = ({ setActiveStep }) => {
+  const theme = useTheme();
   const { layoutName } = useLayout();
   const { basicInfo, config, collaterals } = useCreateDaoContext();
   const [opened, setOpened] = useState(false);
@@ -60,8 +63,8 @@ const CreateDaoReview: React.FC<{
 
   const cardText = (
     <div>
-      <StyledText name={'title3'}>Please, take your time and review all the info!</StyledText>
-      <StyledText name={'body3'}>
+      <StyledText name={'title1'}>Please, take your time and review all the info!</StyledText>
+      <StyledText name={'body2'} style={{ color: theme.disabledContent }}>
         This is an important step for your DAO, we need to take care every information is perfect
       </StyledText>
     </div>
@@ -82,7 +85,22 @@ const CreateDaoReview: React.FC<{
         ))}
       </Modal>
       <Grid layout={true}>
-        <GridItem gridColumn={'1/13'} gridRow={layoutName === 'large' ? '1/4' : '2'}>
+        <GridItem
+          gridRow={'1'}
+          gridColumn={layoutName === 'large' ? '12/17' : '1/-1'}
+          alignHorizontal={'center'}
+        >
+          <EmptyStateCard
+            illustration={cardIamge}
+            text={cardText}
+            style={{ width: '100%', padding: 24 }}
+          />
+        </GridItem>
+
+        <GridItem
+          gridColumn={layoutName === 'large' ? '1/12' : '1/-1'}
+          gridRow={layoutName === 'large' ? '1/4' : '2'}
+        >
           <Box>
             <Grid columns={'4'} columnWidth={'1fr'}>
               <GridItem gridColumn={'2/5'}>
@@ -211,20 +229,12 @@ const CreateDaoReview: React.FC<{
             </Button>
           </Box>
         </GridItem>
-        <GridItem
-          gridRow={'1'}
-          gridColumn={layoutName === 'large' ? '13/17' : '1 / -1'}
-          alignHorizontal={'center'}
-        >
-          <EmptyStateCard illustration={cardIamge} text={cardText} />
-        </GridItem>
+
         <GridItem
           gridRow={layoutName === 'large' ? '2' : '3'}
-          gridColumn={layoutName === 'large' ? '13/17' : '1 / -1'}
+          gridColumn={layoutName === 'large' ? '12/17' : '1 / -1'}
         >
-          <Box style={{ background: '#8991FF', opacity: 0.5 }}>
-            <h5 style={{ color: '#20232C' }}>Need Help?</h5>
-          </Box>
+          <HelpComponent />
         </GridItem>
       </Grid>
     </>

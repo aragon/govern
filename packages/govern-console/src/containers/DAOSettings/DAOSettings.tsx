@@ -95,8 +95,8 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
   const [resolverLock, setResolverLock] = useState(false);
   const cardText = (
     <div>
-      <StyledText name={'title2'}>Your DAO settings</StyledText>
-      <StyledText name={'body2'}>
+      <StyledText name={'title1'}>Your DAO settings</StyledText>
+      <StyledText name={'body2'} style={{ color: theme.disabledContent }}>
         Message about the importancy of permissions on your DAO, bla bla, explaining the settings
         etc.
       </StyledText>
@@ -241,7 +241,22 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
 
   return (
     <Grid layout={true}>
-      <GridItem gridColumn={'1/12'} gridRow={layoutName === 'large' ? '1/4' : '2'}>
+      <GridItem
+        gridRow={'1'}
+        gridColumn={layoutName === 'large' ? '12/17' : '1/-1'}
+        alignHorizontal={'center'}
+      >
+        <EmptyStateCard
+          illustration={cardIamge}
+          text={cardText}
+          style={{ width: '100%', padding: 47 }}
+        />
+      </GridItem>
+
+      <GridItem
+        gridColumn={layoutName === 'large' ? '1/12' : '1/-1'}
+        gridRow={layoutName === 'large' ? '1/4' : '2'}
+      >
         <Box>
           <BackButton onClick={() => history.goBack()}>
             <img src={backButtonIcon} />
@@ -511,13 +526,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
           </div>
         </Box>
       </GridItem>
-      <GridItem
-        gridRow={'1'}
-        gridColumn={layoutName === 'large' ? '12/17' : '1 / -1'}
-        alignHorizontal={'center'}
-      >
-        <EmptyStateCard illustration={cardIamge} text={cardText} style={{ width: '100%' }} />
-      </GridItem>
+
       <GridItem
         gridRow={layoutName === 'large' ? '2' : '3'}
         gridColumn={layoutName === 'large' ? '12/17' : '1 / -1'}
