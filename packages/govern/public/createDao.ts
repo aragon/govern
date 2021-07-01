@@ -284,6 +284,7 @@ export type CreateDaoParams = {
 export type CreateDaoOptions = {
   provider?: any
   daoFactoryAddress?: string
+  governRegistry?: string
 }
 
 /**
@@ -341,18 +342,16 @@ export async function createDao(
 
   const contract = new Contract(factoryAddress, factoryAbi, signer)
   const GovernRegistry = new Contract(
-    config.governRegistry,
+    options.governRegistry || config.governRegistry,
     registryAbi,
     signer
   )
-
   if (typeof registeredDaoTokenCallback === 'function') {
     GovernRegistry.on(
       'Registered',
-      async (govern, queue, token, registrant, name) => {
+      async (govern, queue, token, minter, registrant, name) => {
         // not our DAO, wait for next one
         if (name !== args.name) return
-
         // send back token address
         registeredDaoTokenCallback(token)
       }

@@ -463,7 +463,8 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
           labelText={getState(proposalInfo.state, proposalInfo.payload.executionTime)}
         />
       </ProposalStatus>
-      <ProposalId>{proposalInfo.id}</ProposalId>
+      {/* <ProposalId>{proposalInfo.id}</ProposalId> */}
+      <ProposalId>{proof?.metadata && proof.metadata.title}</ProposalId>
       <DateDisplay>{formatDate(proposalInfo.createdAt)}</DateDisplay>
       <DetailsWrapper>
         <ProposalDetailsWrapper id="proposal_wrapper">
@@ -542,10 +543,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
             <InfoValueDivInline>
               {proposalInfo.payload.executor.address || 'No executor ID'}
             </InfoValueDivInline>
-          </InfoWrapper>
-          <InfoWrapper>
-            <InfoKeyDiv>AllowFailuresMap:</InfoKeyDiv>
-            <InfoValueDivInline>{proposalInfo.payload.allowFailuresMap}</InfoValueDivInline>
           </InfoWrapper>
           <InfoWrapper>
             <InfoKeyDiv>Justification:</InfoKeyDiv>
