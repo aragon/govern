@@ -48,7 +48,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
   };
 
   return (
-    <Box shadow onClick={onClickProposalCard}>
+    <Box shadow onClick={onClickProposalCard} style={{ cursor: 'pointer' }}>
       <Label labelColor={proposalStatusColor} labelText={proposalStatus} />
       <StyledText
         name="header6"
