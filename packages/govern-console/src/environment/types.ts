@@ -16,6 +16,7 @@ export interface EnvironmentConfig {
   subgraphUrl: string;
   voiceUrl: string;
   daoFactoryAddress: string;
+  governRegistryAddress: string;
   defaultDaoConfig: {
     executionDelay: number;
     scheduleDeposit: Collateral;

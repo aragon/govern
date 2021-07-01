@@ -83,8 +83,6 @@ const CreateDaoCollateral: React.FC<{
     setValue('isAnyAddress', isAnyAddress);
   }, [isAnyAddress, setValue]);
 
-  console.log(watch('isAnyAddress'), ' finalone');
-
   const moveToNextStep = async () => {
     await trigger();
 
@@ -116,15 +114,8 @@ const CreateDaoCollateral: React.FC<{
               <StyledText name={'body2'} style={{ color: theme.disabledContent }}>
                 In order to schedule or challenge executions, any member must provide this amount of
                 collateral, so they have stake in the game and act with the best interest of your
-                DAO. By{' '}
-                <StyledText
-                  name={'title2'}
-                  style={{ display: 'inline', fontWeight: 700, color: theme.black }}
-                >
-                  default Aragon Console uses DAI
-                </StyledText>{' '}
-                as a collateral token. If you want to change this, provide another contract address
-                in or use your newly created DAO Token.
+                DAO. By default Aragon Console uses DAI as a collateral token. If you want to change
+                this, provide another contract address in or use your newly created DAO Token.
               </StyledText>
             </div>
 
@@ -326,7 +317,6 @@ const CreateDaoCollateral: React.FC<{
                 )}
               />
             </div>
-            {console.log(watch('isAnyAddress'), ' awesome')}
             {watch('isAnyAddress') ? (
               <Info mode={'warning'} title={''}>
                 If you select ”Any Address”, then everybody can schedule executions in your DAO.
