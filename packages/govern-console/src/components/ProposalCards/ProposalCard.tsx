@@ -1,6 +1,6 @@
 import React from 'react';
 import { Label } from '../Labels/Label';
-import { useLayout, Box, StyledText, useTheme } from '@aragon/ui';
+import { Box, StyledText, useTheme } from '@aragon/ui';
 
 export interface ProposalCardProps {
   /**
