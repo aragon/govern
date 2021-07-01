@@ -50,10 +50,27 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
   return (
     <Box shadow onClick={onClickProposalCard}>
       <Label labelColor={proposalStatusColor} labelText={proposalStatus} />
-      <StyledText name="header6" style={{ lineHeight: 1.25, marginTop: GU }}>
+      <StyledText
+        name="header6"
+        style={{
+          lineHeight: 1.25,
+          marginTop: GU,
+          overflow: 'hidden',
+          whiteSpace: 'nowrap',
+          textOverflow: 'ellipsis',
+        }}
+      >
         {proposalTitle || getSlicedTransactionHash()}{' '}
       </StyledText>
-      <StyledText name="title3" style={{ color: theme.disabledContent }}>
+      <StyledText
+        name="title3"
+        style={{
+          color: theme.disabledContent,
+          overflow: 'hidden',
+          whiteSpace: 'nowrap',
+          textOverflow: 'ellipsis',
+        }}
+      >
         {proposalDate}
       </StyledText>
     </Box>
