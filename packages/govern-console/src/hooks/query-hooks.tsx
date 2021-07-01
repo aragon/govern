@@ -10,8 +10,13 @@ import {
 
 const POLL_INTERVAL = 5000;
 
+// TODO: All the queries use `no-cache` strategy for simplicity.
+// The better approach is `cache-and-network`, but then merging will
+// need to be taken care of. So for simplicity, `no-cache` is good for now.
+
 export function useDaoQuery(daoName: string) {
   const { data, loading, error } = useQuery(DAO_BY_NAME, {
+    fetchPolicy: 'no-cache',
     variables: { name: daoName },
   });
 
@@ -31,6 +36,7 @@ export function useDaoQuery(daoName: string) {
 
 export function useDaosQuery() {
   const { data, fetchMore, loading, error } = useQuery(DAO_LIST, {
+    fetchPolicy: 'no-cache',
     variables: {
       offset: 0,
       limit: 12,
@@ -41,7 +47,9 @@ export function useDaosQuery() {
 }
 
 export function useGovernRegistryQuery() {
-  const { data, loading, error } = useQuery(GOVERN_REGISTRY);
+  const { data, loading, error } = useQuery(GOVERN_REGISTRY, {
+    fetchPolicy: 'no-cache',
+  });
 
   return {
     data,
@@ -54,7 +62,7 @@ export function useLazyProposalQuery() {
   const [proposalData, setProposalData] = useState<any>(null);
 
   const [getProposalData, { loading }] = useLazyQuery(PROPOSAL_DETAILS, {
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'no-cache',
     notifyOnNetworkStatusChange: true,
     pollInterval: POLL_INTERVAL,
     onCompleted: (newData) => {
@@ -68,7 +76,9 @@ export function useLazyProposalQuery() {
 
 export function useLazyProposalListQuery() {
   // const [proposalList, setProposalList] = useState<any>(null);
-  const [getQueueData, { loading, data, error, fetchMore }] = useLazyQuery(PROPOSAL_LIST);
+  const [getQueueData, { loading, data, error, fetchMore }] = useLazyQuery(PROPOSAL_LIST, {
+    fetchPolicy: 'no-cache',
+  });
 
   // onCompleted doesn't work with lazyQuery when clicked on `fetchMore`.
   // https://github.com/apollographql/apollo-client/issues/6636
