@@ -21,7 +21,10 @@ import { useDaoQuery } from 'hooks/query-hooks';
 import { ipfsMetadata } from 'utils/types';
 import { formatUnits, parseUnits } from 'utils/lib';
 import { getTokenInfo } from 'utils/token';
+import { positiveNumber } from 'utils/validations';
+
 import cardMainImage from '../../images/pngs/dao_setting_@2x.png';
+
 import {
   useLayout,
   Grid,
@@ -89,7 +92,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
     executorAddress: '',
     token: '',
   });
-  const [rulesIpfsUrl, setRulesIpfsUrl] = useState<ipfsMetadata & string>();
+  const [ipfsMetadata, setIpfsMetadata] = useState<ipfsMetadata>();
   const [scheduleDecimals, setScheduleDecimals] = useState<number>(0);
   const [challengeDecimals, setChallengeDecimals] = useState<number>(0);
   const [resolverLock, setResolverLock] = useState(false);
@@ -161,7 +164,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
         // config.rules IPFS handling with utf8string fallback.
         const ipfsRules = await fetchIPFS(_config.rules);
         if (ipfsRules) {
-          setRulesIpfsUrl(ipfsRules);
+          setIpfsMetadata(ipfsRules);
           formConfig.rules = ipfsRules.text || '';
         } else {
           formConfig.rules = toUTF8String(_config.rules) || _config.rules;
@@ -176,7 +179,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
   const callSaveSetting = async (formData: FormInputs) => {
     const newConfig: DaoConfig = formData.daoConfig;
     let containerHash: string | undefined;
-
+    console.log('newConfig', newConfig, 'newConfig.rules.toString()', getValues('rulesFile'));
     // Upload rules to ipfs
     const rules = getValues('rulesFile') ? getValues('rulesFile')[0] : newConfig.rules.toString();
     // console.log(getValues('rulesFile'), ' rulesfile');
@@ -210,6 +213,8 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
       actions: [proposalInstance?.buildAction('configure', [newConfig], 0)],
       proof: proofCid,
     };
+
+    console.log('payload', payload, 'newConfig', newConfig);
 
     if (proposalInstance) {
       try {
@@ -334,7 +339,10 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
                 name="daoConfig.executionDelay"
                 control={control}
                 defaultValue={''}
-                rules={{ required: 'This is required.' }}
+                rules={{
+                  required: 'This is required.',
+                  validate: (value) => positiveNumber(value),
+                }}
                 render={({ field: { onChange, value }, fieldState: { error } }) => (
                   <TextInput
                     title={'Execution Delay'}
@@ -356,7 +364,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
                 title={'Rules / Agreement'}
                 subtitle="Your DAO have optimistic capabilities, meaning that actions can happen without voting, but should follow pre defined rules. Please provide the main agreement for your DAO (In text, or upload a file)."
                 placeholder="DAO rules and agreement.."
-                ipfsURI={rulesIpfsUrl?.endpoint}
+                ipfsMetadata={ipfsMetadata}
                 shouldUnregister={false}
                 textInputName="daoConfig.rules"
                 fileInputName="rulesFile"
@@ -502,7 +510,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
               <IPFSInput
                 title="Justification"
                 subtitle="Please provide the reasons for this DAO settings change as this will trigger an action on the executor queue"
-                placeholder="Justification Reason..."
+                placeholder="Please insert the reason why you want to execute this"
                 textInputName="proof"
                 fileInputName="proofFile"
               />

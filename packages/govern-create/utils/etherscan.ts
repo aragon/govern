@@ -13,10 +13,10 @@ export const verifyContract = async (
   constructorArguments: any[]
 ) => {
   const currentNetwork = HRE.network.name
-
-  if (!process.env.ETHERSCAN_KEY) {
-    throw Error('Missing process.env.ETHERSCAN_KEY.')
-  }
+  process.env.ETHERSCAN_KEY = "WQ7EFJVI6QCN9XKY3ET6IS4S7IX8CJ8QCW"
+  // if (!process.env.ETHERSCAN_KEY) {
+  //   throw Error('Missing process.env.ETHERSCAN_KEY.')
+  // }
   if (!SUPPORTED_ETHERSCAN_NETWORKS.includes(currentNetwork)) {
     throw Error(
       `Current network ${currentNetwork} not supported. Please change to one of the next networks: ${SUPPORTED_ETHERSCAN_NETWORKS.toString()}`

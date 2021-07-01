@@ -20,6 +20,7 @@ export interface ICreateDaoConfig {
   ruleText: BytesLike;
   resolver: string;
   maxCalldataSize: number;
+  customResolver: boolean; // true if the user has entered new resolver.
 }
 
 export interface ICreateDaoCollaterals {
@@ -70,6 +71,7 @@ const CreateDaoProvider: React.FC = ({ children }) => {
     ruleText: defaultConfig.rules,
     resolver: defaultConfig.resolver,
     maxCalldataSize: defaultConfig.maxCalldataSize,
+    customResolver: false,
   });
 
   const [collaterals, setCollaterals] = useState<ICreateDaoCollaterals>({

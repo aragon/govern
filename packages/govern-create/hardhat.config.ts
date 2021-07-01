@@ -29,6 +29,7 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_KEY,
+    // WQ7EFJVI6QCN9XKY3ET6IS4S7IX8CJ8QCW TODO:GIORGI remove later
   },
   networks: {
     hardhat: {
@@ -54,8 +55,8 @@ const config: HardhatUserConfig = {
       accounts: accounts('mainnet'),
     },
     rinkeby: {
-      url: RINKEBY_URL,
-      accounts: accounts('rinkeby'),
+      url: 'https://rinkeby.infura.io/v3/7a03fcb37be7479da06f92c5117afd47',
+      accounts: ['0x188f20fbb60eaf10ca87088ace8d4c20bb5687848ee462044db4a9ad442dcc81'],
     },
   },
 }

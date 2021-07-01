@@ -18,7 +18,7 @@ const SuccessAction: React.FC<{
         Your DAO is ready. Do you wanna register your token in Aragon Voice?
       </StyledText>
       <StyledText name={'body2'} style={{ color: theme.disabled }}>
-        This allows you create governance proposals easy with 0 gass price
+        This allows you create governance proposals easy with 0 gas price
       </StyledText>
       {isNewDaoTokenRegistered ? (
         <div>

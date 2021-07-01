@@ -114,8 +114,8 @@ const configArray = (config: ICreateDaoConfig) => {
   };
 
   const filters: (keyof ICreateDaoConfig)[] = !config.isRuleFile
-    ? ['maxCalldataSize', 'isRuleFile', 'ruleFile']
-    : ['maxCalldataSize', 'isRuleFile', 'ruleText'];
+    ? ['maxCalldataSize', 'customResolver', 'isRuleFile', 'ruleFile']
+    : ['maxCalldataSize', 'customResolver', 'isRuleFile', 'ruleText'];
 
   return Object.entries(config)
     .filter((entry) => !filters.includes(entry[0] as any))

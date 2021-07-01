@@ -39,6 +39,21 @@ export type actionType = {
   type: string;
 };
 
+export type ParamType = {
+  type: string;
+  baseType: string;
+  name?: string;
+  value: any;
+};
+
+export type ActionItem = {
+  signature: string;
+  sighash: string;
+  contractAddress: string;
+  name: string;
+  inputs: ParamType[];
+};
+
 export type ActionToSchedule = {
   contractAddress: string;
   name: string;
@@ -54,7 +69,19 @@ export type Account = {
 
 export type ipfsMetadata = {
   metadata: any;
-  text: string;
-  endpoint: string;
+  text: string | null;
+  endpoint: string | null;
   error: any;
 };
+
+// Action builder types
+export type ActionBuilderCloseHandler = (actions?: any) => void;
+export type ActionBuilderState =
+  | 'processTransaction'
+  | 'deposit'
+  | 'withdrawAssets'
+  | 'mintTokens'
+  | 'chooseContract'
+  | 'chooseAction'
+  | 'abiForm'
+  | 'chooseFunctions';

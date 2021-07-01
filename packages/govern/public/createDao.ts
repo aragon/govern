@@ -19,151 +19,229 @@ export const ContainerConfig = `
 
 const factoryAbi = [
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: 'string',
-        name: '_name',
-        type: 'string',
+        "internalType": "contract GovernRegistry",
+        "name": "_registry",
+        "type": "address"
       },
       {
-        components: [
-          {
-            internalType: 'contract IERC20',
-            name: 'tokenAddress',
-            type: 'address',
-          },
-          {
-            internalType: 'uint8',
-            name: 'tokenDecimals',
-            type: 'uint8',
-          },
-          {
-            internalType: 'string',
-            name: 'tokenName',
-            type: 'string',
-          },
-          {
-            internalType: 'string',
-            name: 'tokenSymbol',
-            type: 'string',
-          },
-          {
-            internalType: 'address',
-            name: 'mintAddress',
-            type: 'address',
-          },
-          {
-            internalType: 'uint256',
-            name: 'mintAmount',
-            type: 'uint256',
-          },
-          {
-            internalType: 'bytes32',
-            name: 'merkleRoot',
-            type: 'bytes32',
-          },
-          {
-            internalType: 'uint256',
-            name: 'merkleMintAmount',
-            type: 'uint256',
-          },
-        ],
-        internalType: 'struct TokenLib.TokenConfig',
-        name: '_token',
-        type: 'tuple',
+        "internalType": "contract GovernFactory",
+        "name": "_governFactory",
+        "type": "address"
       },
       {
-        components: [
-          {
-            internalType: 'uint256',
-            name: 'executionDelay',
-            type: 'uint256',
-          },
-          {
-            components: [
-              {
-                internalType: 'address',
-                name: 'token',
-                type: 'address',
-              },
-              {
-                internalType: 'uint256',
-                name: 'amount',
-                type: 'uint256',
-              },
-            ],
-            internalType: 'struct ERC3000Data.Collateral',
-            name: 'scheduleDeposit',
-            type: 'tuple',
-          },
-          {
-            components: [
-              {
-                internalType: 'address',
-                name: 'token',
-                type: 'address',
-              },
-              {
-                internalType: 'uint256',
-                name: 'amount',
-                type: 'uint256',
-              },
-            ],
-            internalType: 'struct ERC3000Data.Collateral',
-            name: 'challengeDeposit',
-            type: 'tuple',
-          },
-          {
-            internalType: 'address',
-            name: 'resolver',
-            type: 'address',
-          },
-          {
-            internalType: 'bytes',
-            name: 'rules',
-            type: 'bytes',
-          },
-          {
-            internalType: 'uint256',
-            name: 'maxCalldataSize',
-            type: 'uint256',
-          },
-        ],
-        internalType: 'struct ERC3000Data.Config',
-        name: '_config',
-        type: 'tuple',
+        "internalType": "contract GovernQueueFactory",
+        "name": "_queueFactory",
+        "type": "address"
       },
       {
-        internalType: 'address[]',
-        name: '_scheduleAccessList',
-        type: 'address[]',
-      },
-      {
-        internalType: 'bool',
-        name: '_useProxies',
-        type: 'bool',
-      },
+        "internalType": "contract GovernTokenFactory",
+        "name": "_tokenFactory",
+        "type": "address"
+      }
     ],
-    name: 'newGovern',
-    outputs: [
-      {
-        internalType: 'contract Govern',
-        name: 'govern',
-        type: 'address',
-      },
-      {
-        internalType: 'contract GovernQueue',
-        name: 'queue',
-        type: 'address',
-      },
-    ],
-    stateMutability: 'nonpayable',
-    type: 'function',
+    "stateMutability": "nonpayable",
+    "type": "constructor"
   },
+  {
+    "inputs": [],
+    "name": "governFactory",
+    "outputs": [
+      {
+        "internalType": "contract GovernFactory",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "contract IERC20",
+            "name": "tokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint8",
+            "name": "tokenDecimals",
+            "type": "uint8"
+          },
+          {
+            "internalType": "string",
+            "name": "tokenName",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "tokenSymbol",
+            "type": "string"
+          },
+          {
+            "internalType": "address",
+            "name": "mintAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "mintAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "merkleRoot",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint256",
+            "name": "merkleMintAmount",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct TokenLib.TokenConfig",
+        "name": "_token",
+        "type": "tuple"
+      },
+      {
+        "internalType": "address[]",
+        "name": "_scheduleAccessList",
+        "type": "address[]"
+      },
+      {
+        "internalType": "bool",
+        "name": "_useProxies",
+        "type": "bool"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "executionDelay",
+            "type": "uint256"
+          },
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+              },
+              {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct ERC3000Data.Collateral",
+            "name": "scheduleDeposit",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+              },
+              {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct ERC3000Data.Collateral",
+            "name": "challengeDeposit",
+            "type": "tuple"
+          },
+          {
+            "internalType": "address",
+            "name": "resolver",
+            "type": "address"
+          },
+          {
+            "internalType": "bytes",
+            "name": "rules",
+            "type": "bytes"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxCalldataSize",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct ERC3000Data.Config",
+        "name": "_config",
+        "type": "tuple"
+      },
+      {
+        "internalType": "string",
+        "name": "_name",
+        "type": "string"
+      }
+    ],
+    "name": "newGovern",
+    "outputs": [
+      {
+        "internalType": "contract Govern",
+        "name": "govern",
+        "type": "address"
+      },
+      {
+        "internalType": "contract GovernQueue",
+        "name": "queue",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "queueFactory",
+    "outputs": [
+      {
+        "internalType": "contract GovernQueueFactory",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "registry",
+    "outputs": [
+      {
+        "internalType": "contract GovernRegistry",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "tokenFactory",
+    "outputs": [
+      {
+        "internalType": "contract GovernTokenFactory",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
 ]
 
 const registryAbi = [
-  'event Registered(address indexed executor, address queue, address indexed token, address indexed registrant, string name)',
+  'event Registered(address indexed executor, address queue, address indexed token, address minter, address indexed registrant, string name)',
 ]
 
 const tokenAbi = ['function balanceOf(address who) view returns (uint256)']
@@ -206,6 +284,7 @@ export type CreateDaoParams = {
 export type CreateDaoOptions = {
   provider?: any
   daoFactoryAddress?: string
+  governRegistry?: string
 }
 
 /**
@@ -263,18 +342,16 @@ export async function createDao(
 
   const contract = new Contract(factoryAddress, factoryAbi, signer)
   const GovernRegistry = new Contract(
-    config.governRegistry,
+    options.governRegistry || config.governRegistry,
     registryAbi,
     signer
   )
-
   if (typeof registeredDaoTokenCallback === 'function') {
     GovernRegistry.on(
       'Registered',
-      async (govern, queue, token, registrant, name) => {
+      async (govern, queue, token, minter, registrant, name) => {
         // not our DAO, wait for next one
         if (name !== args.name) return
-
         // send back token address
         registeredDaoTokenCallback(token)
       }
@@ -282,11 +359,11 @@ export async function createDao(
   }
   
   const result = contract.newGovern(
-    args.name,
     token,
-    args.config,
     args.scheduleAccessList,
-    args.useProxies
+    args.useProxies,
+    args.config,
+    args.name,
   )
 
   return result

@@ -6,12 +6,12 @@ import {
   StyledText,
   SPACING,
   ContentSwitcher,
-  Grid,
-  GridItem,
-  RADII,
   useTheme,
+  FileInput,
 } from '@aragon/ui';
 import { toUtf8String } from 'ethers/lib/utils';
+import { useEffect } from 'react';
+import { ipfsMetadata } from 'utils/types';
 
 export interface IPFSInputProps {
   /**
@@ -59,7 +59,7 @@ export interface IPFSInputProps {
   /**
    * IPFS gateway url of the file.
    */
-  ipfsURI?: string;
+  ipfsMetadata?: ipfsMetadata;
 }
 
 export const IPFSInput: React.FC<IPFSInputProps> = ({
@@ -67,31 +67,52 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
   subtitle,
   textInputName,
   fileInputName,
-  isFile = null,
+  isFile,
   shouldUnregister = true,
-  ipfsURI,
+  ipfsMetadata,
+  placeholder,
 }) => {
-  const {
-    register,
-    control,
-    watch,
-    formState: { errors },
-    trigger,
-  } = useFormContext();
-  const theme = useTheme();
+  const { control, watch, setValue } = useFormContext();
   const { layoutName } = useLayout();
   const spacing = SPACING[layoutName];
+  const theme = useTheme();
+  const isFileChosen = isFile || `is_file_${fileInputName}`;
 
-  const onChange = () => {
-    trigger(fileInputName);
+  const formatValue = (value: any) => {
+    if (value && typeof value !== 'string') {
+      return Object.keys(value).map((key) => ({
+        // status: 'loading',
+        name: value[Number(key)].name,
+        url: null,
+      }));
+    } else if (ipfsMetadata?.endpoint && !ipfsMetadata?.text) {
+      return [
+        {
+          // status: ipfsURI && 'success',
+          name: ipfsMetadata.endpoint && 'Current file:',
+          url: ipfsMetadata.endpoint && ipfsMetadata.endpoint,
+        },
+      ];
+    }
   };
 
-  const isFileChosen = isFile || `is_file_${fileInputName}`;
+  useEffect(() => {
+    if (ipfsMetadata?.text) {
+      setValue(textInputName, ipfsMetadata.text);
+    } else if (ipfsMetadata?.endpoint) {
+      setValue(isFileChosen, true);
+      setValue(fileInputName, ipfsMetadata.endpoint);
+    }
+  }, [setValue, ipfsMetadata, isFileChosen, textInputName, fileInputName]);
 
   return (
     <div>
       {title && <StyledText name={'title2'}>{title}</StyledText>}
-      {subtitle && <StyledText name={'body2'}>{subtitle}</StyledText>}
+      {subtitle && (
+        <StyledText name={'body2'} style={{ color: theme.disabledContent }}>
+          {subtitle}
+        </StyledText>
+      )}
       <div
         style={{
           width: 'fit-content',
@@ -121,6 +142,7 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
       </div>
       {!watch(isFileChosen) ? (
         <Controller
+          key={`key-${textInputName}`}
           name={textInputName}
           control={control}
           defaultValue={''}
@@ -129,8 +151,12 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
           render={({ field: { onChange, value }, fieldState: { error } }) => (
             <TextInput.Multiline
               wide
-              placeholder={'Enter Rules...'}
-              value={typeof value !== 'string' ? toUtf8String(value) : value}
+              placeholder={placeholder}
+              value={
+                typeof value !== 'string' && !(value instanceof FileList)
+                  ? toUtf8String(value)
+                  : value
+              }
               onChange={onChange}
               status={!!error ? 'error' : 'normal'}
               error={error ? error.message : null}
@@ -138,56 +164,22 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
           )}
         />
       ) : (
-        <div>
-          <StyledText name={'body3'}>Upload file</StyledText>
-
-          {
-            <input
-              {...register(fileInputName, {
-                shouldUnregister: shouldUnregister,
-                required: 'This is required.',
-                validate: () => {
-                  return true;
-                },
-              })}
-              type="file"
+        <Controller
+          key={`key-${fileInputName}`}
+          name={fileInputName}
+          control={control}
+          defaultValue={''}
+          shouldUnregister={shouldUnregister}
+          rules={{ required: 'This is required.' }}
+          render={({ field: { onChange, value }, fieldState: { error } }) => (
+            <FileInput
               onChange={onChange}
+              value={formatValue(value)}
+              status={!!error ? 'error' : 'normal'}
+              error={error ? error.message : null}
             />
-          }
-
-          <p style={{ color: theme.red }}>
-            {errors[fileInputName] && errors[fileInputName].message}
-          </p>
-        </div>
-      )}
-      {ipfsURI && (
-        <div
-          style={{
-            background: 'rgb(102, 218, 255, 0.07)',
-            borderRadius: RADII[layoutName],
-          }}
-        >
-          <Grid>
-            <GridItem
-              gridColumn={'1/2'}
-              alignHorizontal={layoutName !== 'small' ? 'flex-start' : 'center'}
-            >
-              <StyledText name={'body2'} style={{ padding: spacing }}>
-                Current file:
-              </StyledText>
-            </GridItem>
-            <GridItem
-              gridColumn={'2/3'}
-              alignHorizontal={layoutName !== 'small' ? 'flex-end' : 'center'}
-            >
-              <StyledText name={'body2'} style={{ padding: spacing }}>
-                <a href={ipfsURI} target="_blank" rel="noreferrer noopener">
-                  View Document
-                </a>
-              </StyledText>
-            </GridItem>
-          </Grid>
-        </div>
+          )}
+        />
       )}
     </div>
   );

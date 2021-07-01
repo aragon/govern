@@ -1,0 +1,4 @@
+{
+  "plugins": [["styled-components", { "displayName": true }]]
+}
+

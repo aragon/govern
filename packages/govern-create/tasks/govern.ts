@@ -60,17 +60,18 @@ task('deploy-govern', 'Deploys a Govern instance')
             'GovernBaseFactory',
             (await deployments.get('GovernBaseFactory')).address
           )
-
+      
+      // TODO: newGovern has been changed, this needs to reflect.
       const tx = await baseFactoryContract.newGovern(
-        name,
         {
           tokenAddress: token,
           tokenName: tokenName || name,
           tokenSymbol: tokenSymbol,
           tokenDecimals: 18,
         },
-        ERC3000DefaultConfig,
         useProxies,
+        ERC3000DefaultConfig,
+        name,
         {
           gasLimit: useProxies ? 2e6 : 9e6,
           gasPrice: 2e9,

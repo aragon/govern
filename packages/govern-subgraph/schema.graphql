@@ -13,12 +13,34 @@ type Dao @entity {
   queue: GovernQueue!
   executor: Govern!
   token: String!
+  minter: String
   registrant: String!
   createdAt: BigInt!
 }
 
+type Deposit @entity {
+  id: ID!
+  sender: Bytes!
+  amount: BigInt!
+  token: Bytes!
+  reference: String!
+  govern: Govern!
+}
+
+type Withdraw @entity {
+  id: ID!
+  from: Bytes!
+  to: Bytes!
+  amount: BigInt!
+  token: Bytes!
+  reference: String!
+  govern: Govern!
+}
+
 type Govern @entity {
   id: ID!
+  deposits: [Deposit!]! @derivedFrom(field: "govern")
+  withdraws: [Withdraw!]! @derivedFrom(field: "govern")
   address: Bytes!
   metadata: Bytes
   roles: [Role!]!

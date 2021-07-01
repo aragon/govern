@@ -22,6 +22,7 @@
     "plugin:prettier/recommended"
   ],
   "rules": {
+    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
     "prettier/prettier": "error",

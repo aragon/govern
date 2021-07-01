@@ -24,6 +24,7 @@ import {
   IconPlus,
   IconArrowLeft,
   SPACING,
+  useTheme,
 } from '@aragon/ui';
 import HelpComponent from 'components/HelpComponent/HelpComponent';
 
@@ -31,8 +32,9 @@ const CreateDaoCollateral: React.FC<{
   setActiveStep: React.Dispatch<React.SetStateAction<CreateDaoSteps>>;
 }> = ({ setActiveStep }) => {
   const { layoutName } = useLayout();
+  const theme = useTheme();
   const spacing = SPACING[layoutName];
-  const { collaterals, setCollaterals } = useCreateDaoContext();
+  const { collaterals, setCollaterals, basicInfo } = useCreateDaoContext();
   const {
     scheduleAddress,
     scheduleAmount,
@@ -45,6 +47,8 @@ const CreateDaoCollateral: React.FC<{
     isAnyAddress,
     executionAddressList,
   } = collaterals;
+
+  const isExistingToken = basicInfo.isExistingToken;
 
   const context: any = useWallet();
   const { provider } = context;
@@ -76,6 +80,10 @@ const CreateDaoCollateral: React.FC<{
     setValue('challengeAmount', formatUnits(challengeAmount, challengeDecimals));
   }, [scheduleAmount, scheduleDecimals, challengeAmount, challengeDecimals, setValue]);
 
+  useEffect(() => {
+    setValue('isAnyAddress', isAnyAddress);
+  }, [isAnyAddress, setValue]);
+
   const moveToNextStep = async () => {
     await trigger();
 
@@ -103,16 +111,12 @@ const CreateDaoCollateral: React.FC<{
             </Grid>
 
             <div>
-              <StyledText name={'title4'}>Collaterals</StyledText>
-              <StyledText name={'body3'}>
+              <StyledText name={'title2'}>Collaterals</StyledText>
+              <StyledText name={'body2'} style={{ color: theme.disabledContent }}>
                 In order to schedule or challenge executions, any member must provide this amount of
                 collateral, so they have stake in the game and act with the best interest of your
-                DAO. By{' '}
-                <StyledText name={'body1'} style={{ display: 'inline' }}>
-                  default Aragon Console uses DAI
-                </StyledText>{' '}
-                as a collateral token. If you want to change this, provide another contract address
-                in or use your newly created DAO Token.
+                DAO. By default Aragon Console uses DAI as a collateral token. If you want to change
+                this, provide another contract address in or use your newly created DAO Token.
               </StyledText>
             </div>
 
@@ -126,22 +130,24 @@ const CreateDaoCollateral: React.FC<{
                 Which token do you want to use for schedule execution?
               </StyledText>
 
-              <Controller
-                name="isScheduleNewDaoToken"
-                control={control}
-                defaultValue={isScheduleNewDaoToken}
-                render={({ field: { onChange, value } }) => (
-                  <ContentSwitcher
-                    onChange={onChange}
-                    selected={value}
-                    items={['New Token', 'Existing Token']}
-                    paddingSettings={{
-                      horizontal: spacing * 2,
-                      vertical: spacing / 4,
-                    }}
-                  />
-                )}
-              />
+              {!isExistingToken && (
+                <Controller
+                  name="isScheduleNewDaoToken"
+                  control={control}
+                  defaultValue={isScheduleNewDaoToken}
+                  render={({ field: { onChange, value } }) => (
+                    <ContentSwitcher
+                      onChange={onChange}
+                      selected={value}
+                      items={['Custom Token', 'New Token']}
+                      paddingSettings={{
+                        horizontal: spacing * 2,
+                        vertical: spacing / 4,
+                      }}
+                    />
+                  )}
+                />
+              )}
 
               <Controller
                 name="scheduleAddress"
@@ -210,22 +216,24 @@ const CreateDaoCollateral: React.FC<{
               <StyledText name={'body3'}>
                 Which token do you want to use for challange collateral?
               </StyledText>
-              <Controller
-                name="isChallengeNewDaoToken"
-                control={control}
-                defaultValue={isChallengeNewDaoToken}
-                render={({ field: { onChange, value } }) => (
-                  <ContentSwitcher
-                    onChange={onChange}
-                    selected={value}
-                    items={['New Token', 'Existing Token']}
-                    paddingSettings={{
-                      horizontal: spacing * 2,
-                      vertical: spacing / 4,
-                    }}
-                  />
-                )}
-              />
+              {!isExistingToken && (
+                <Controller
+                  name="isChallengeNewDaoToken"
+                  control={control}
+                  defaultValue={isChallengeNewDaoToken}
+                  render={({ field: { onChange, value } }) => (
+                    <ContentSwitcher
+                      onChange={onChange}
+                      selected={value}
+                      items={['Custom Token', 'New Token']}
+                      paddingSettings={{
+                        horizontal: spacing * 2,
+                        vertical: spacing / 4,
+                      }}
+                    />
+                  )}
+                />
+              )}
               <Controller
                 name="challengeAddress"
                 control={control}

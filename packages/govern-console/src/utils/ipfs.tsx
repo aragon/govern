@@ -2,6 +2,7 @@ import CID from 'cids';
 import { toUTF8String } from 'utils/lib';
 import { IPFS_GATEWAY } from './constants';
 import { create } from 'ipfs-http-client';
+import { ipfsMetadata } from 'utils/types';
 
 let ipfs: any = null;
 
@@ -124,7 +125,7 @@ export async function fetchIPFS(uriOrCid: string) {
   const IPFS_GATEWAY = 'https://ipfs.io/ipfs/';
 
   // endpoint/text can be array for supporting multiple files
-  const data: any = {
+  const data: ipfsMetadata = {
     metadata: null,
     endpoint: null,
     text: null,

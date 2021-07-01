@@ -2,6 +2,9 @@ import { Bytes } from 'ethers';
 export type EnvironmentName = 'mainnet' | 'rinkeby' | 'staging';
 type ChainId = 1 | 4;
 
+export type TokenSymbol = 'DAI' | 'USDT' | 'USDC';
+type TokenAddress = string;
+
 type Collateral = {
   token: string;
   amount: string;
@@ -13,6 +16,7 @@ export interface EnvironmentConfig {
   subgraphUrl: string;
   voiceUrl: string;
   daoFactoryAddress: string;
+  governRegistryAddress: string;
   defaultDaoConfig: {
     executionDelay: number;
     scheduleDeposit: Collateral;
@@ -21,4 +25,5 @@ export interface EnvironmentConfig {
     rules: Bytes;
     maxCalldataSize: number;
   };
+  curatedTokens: Record<TokenSymbol, TokenAddress>;
 }
