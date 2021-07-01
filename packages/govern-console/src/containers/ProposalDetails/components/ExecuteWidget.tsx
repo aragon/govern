@@ -5,6 +5,7 @@ import { formatDate } from 'utils/date';
 import { InfoKeyDiv, InfoValueDivInline } from '../ProposalDetails';
 import { Widget, WidgetRow, InfoWrapper, TitleText } from './SharedStyles';
 import { eligibleExecution } from 'utils/states';
+import { Box, Button } from '@aragon/ui';
 
 const ExecuteWidget: React.FC<any> = ({
   disabled,
@@ -36,16 +37,16 @@ const ExecuteWidget: React.FC<any> = ({
 
   return (
     <>
-      <Widget>
+      <Box shadow>
         {isEligible ? (
           <>
             <WidgetRow marginBottom="9px">
-              <ANButton
-                buttonType="primary"
-                label="Execute"
+              <Button
+                wide
+                type="primary"
                 disabled={disabled}
-                height="45px"
-                width="372px"
+                size="large"
+                label="Execute"
                 style={{ margin: 'auto' }}
                 onClick={() => onExecuteProposal()}
               />
@@ -59,7 +60,7 @@ const ExecuteWidget: React.FC<any> = ({
             </InfoWrapper>
           </WidgetRow>
         )}
-      </Widget>
+      </Box>
     </>
   );
 };
