@@ -12,13 +12,12 @@ import {
 } from '@aragon/ui';
 import { Hint } from 'components/Hint/Hint';
 import { useForm, Controller } from 'react-hook-form';
-import { validateAmountForToken, validateToken } from 'utils/validations';
+import { validateAmountForDecimals, validateAddress } from 'utils/validations';
 import AbiHandler from 'utils/AbiHandler';
 import { useWallet } from 'AugmentedWallet';
-import { utils } from 'ethers';
-import { getToken } from '@aragon/govern';
 import { ActionBuilderCloseHandler } from 'utils/types';
 import { useActionBuilderState } from '../ActionBuilderStateProvider';
+import { Asset } from 'utils/Asset';
 
 const functionSignature = 'function mint(address to, uint256 amount, bytes calldata context)';
 
@@ -29,7 +28,7 @@ enum Recipient {
 
 export interface IMintToken {
   recipient: Recipient;
-  tokenAddress: string;
+  recipientAddress: string;
   mintAmount: string;
 }
 
@@ -51,25 +50,25 @@ export const TokenMinter: React.FC<TokenMinterProps> = ({ onClick }) => {
   const recipient = watch('recipient', 0);
 
   const submitActionData = useCallback(async () => {
-    const formValues = getValues();
+    const { recipientAddress, mintAmount } = getValues();
     const tokenRecipient =
-      formValues.recipient === Recipient.Executor ? dao?.executor.address : formValues.tokenAddress;
+      recipient === Recipient.Executor ? dao?.executor.address : recipientAddress;
 
-    let decimals = 0;
-    try {
-      const { tokenDecimals } = await getToken(dao?.token, provider);
-      decimals = tokenDecimals || 0;
-    } catch (err) {
-      console.log('failed to get token info', dao?.token, err.message);
-    }
-
-    const amount = utils.parseUnits(formValues.mintAmount, decimals);
+    const asset = await Asset.createFromAddress(dao?.token, mintAmount, provider);
     const context = '0x';
-    const values = [tokenRecipient, amount, context];
+    const values = [tokenRecipient, asset.amount, context];
 
     const action = AbiHandler.mapToAction(functionSignature, dao?.minter, values);
     onClick(action);
-  }, [onClick, getValues, dao, provider]);
+  }, [onClick, getValues, dao, provider, recipient]);
+
+  const validateAmount = useCallback(
+    async (value: string) => {
+      const asset = await Asset.createFromAddress(dao?.token, value, provider);
+      return validateAmountForDecimals(value, asset.decimals);
+    },
+    [provider, dao],
+  );
 
   return (
     <Grid>
@@ -106,13 +105,13 @@ export const TokenMinter: React.FC<TokenMinterProps> = ({ onClick }) => {
       ) : (
         <GridItem>
           <Controller
-            name="tokenAddress"
+            name="recipientAddress"
             control={control}
             shouldUnregister={true}
             defaultValue=""
             rules={{
               required: 'This is required.',
-              validate: (value) => validateToken(value, provider),
+              validate: validateAddress,
             }}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <TextInput
@@ -137,7 +136,7 @@ export const TokenMinter: React.FC<TokenMinterProps> = ({ onClick }) => {
           defaultValue=""
           rules={{
             required: 'This is required.',
-            validate: (value) => validateAmountForToken(dao?.token, value, provider),
+            validate: validateAmount,
           }}
           render={({ field: { onChange, value }, fieldState: { error } }) => (
             <TextInput

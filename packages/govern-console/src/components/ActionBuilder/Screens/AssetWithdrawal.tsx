@@ -3,14 +3,14 @@ import { Grid, GridItem, DropDown, Button, TextInput, StyledText, useTheme } fro
 import { ActionBuilderCloseHandler } from 'utils/types';
 import { Hint } from 'components/Hint/Hint';
 import { useForm, Controller } from 'react-hook-form';
-import { validateAmountForToken, validateToken } from 'utils/validations';
+import { validateAmountForDecimals, validateToken } from 'utils/validations';
 import { useWallet } from 'AugmentedWallet';
 import AbiHandler from 'utils/AbiHandler';
-import { utils } from 'ethers';
-import { getToken } from '@aragon/govern';
-import { CuratedTokens } from 'utils/CuratedTokens';
+import { Asset, OTHER_TOKEN_SYMBOL } from 'utils/Asset';
 
-const curatedTokens = new CuratedTokens();
+import { networkEnvironment } from 'environment';
+const { curatedTokens } = networkEnvironment;
+const withdrawalAssets = Object.keys(curatedTokens).concat([OTHER_TOKEN_SYMBOL]);
 
 const transferSignature = 'function transfer(address destination, uint amount)';
 
@@ -22,7 +22,7 @@ type WithdrawalFormData = {
   recipient: string;
   token: number;
   tokenContractAddress: string;
-  withdrawalAmount: number;
+  withdrawalAmount: string;
 };
 
 export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => {
@@ -36,29 +36,30 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
 
   const buildActions = useCallback(async () => {
     const { token, recipient, tokenContractAddress, withdrawalAmount } = getValues();
-    const contractAddress = curatedTokens.getTokenAddress(token, tokenContractAddress);
 
-    let decimals = 0;
-    try {
-      const { tokenDecimals } = await getToken(contractAddress, provider);
-      decimals = tokenDecimals || 0;
-    } catch (err) {
-      console.log('failed to get token info', contractAddress, err.message);
-    }
+    const asset = await Asset.createFromSymbol(
+      withdrawalAssets[token],
+      tokenContractAddress,
+      withdrawalAmount,
+      provider,
+    );
+    const values = [recipient, asset.amount];
 
-    const amount = utils.parseUnits(String(withdrawalAmount), decimals);
-    const values = [recipient, amount];
-
-    const action = AbiHandler.mapToAction(transferSignature, contractAddress, values);
+    const action = AbiHandler.mapToAction(transferSignature, asset.address, values);
 
     onClick(action);
   }, [onClick, getValues, provider]);
 
   const validateAmount = useCallback(
-    (value: string) => {
+    async (value: string) => {
       const { token, tokenContractAddress } = getValues();
-      const contractAddress = curatedTokens.getTokenAddress(token, tokenContractAddress);
-      return validateAmountForToken(contractAddress, value, provider);
+      const asset = await Asset.createFromSymbol(
+        withdrawalAssets[token],
+        tokenContractAddress,
+        value,
+        provider,
+      );
+      return validateAmountForDecimals(value, asset.decimals);
     },
     [provider, getValues],
   );
@@ -100,18 +101,13 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
           defaultValue={0}
           render={({ field: { onChange, value }, fieldState: { error } }) => (
             <div>
-              <DropDown
-                wide
-                items={curatedTokens.getTokenSymbols()}
-                selected={value}
-                onChange={onChange}
-              />
+              <DropDown wide items={withdrawalAssets} selected={value} onChange={onChange} />
               {error ? <div style={{ color: `${theme.red}` }}>{error.message}</div> : null}
             </div>
           )}
         />
       </GridItem>
-      {curatedTokens.isCustomToken(selectedToken) && (
+      {Asset.isOtherToken(withdrawalAssets[selectedToken]) && (
         <GridItem>
           <Controller
             name="tokenContractAddress"
