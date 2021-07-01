@@ -1,6 +1,6 @@
 import React from 'react';
 import { Label } from '../Labels/Label';
-import { Box, StyledText, useTheme } from '@aragon/ui';
+import { Box, StyledText, useTheme, GU } from '@aragon/ui';
 
 export interface ProposalCardProps {
   /**
@@ -50,7 +50,9 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
   return (
     <Box shadow onClick={onClickProposalCard}>
       <Label labelColor={proposalStatusColor} labelText={proposalStatus} />
-      <StyledText name="header6">{proposalTitle || getSlicedTransactionHash()}</StyledText>
+      <StyledText name="header6" style={{ lineHeight: 1.25, marginTop: GU }}>
+        {proposalTitle || getSlicedTransactionHash()}{' '}
+      </StyledText>
       <StyledText name="title3" style={{ color: theme.disabledContent }}>
         {proposalDate}
       </StyledText>
