@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
 import {
   useLayout,
@@ -72,14 +72,7 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
   ipfsMetadata,
   placeholder,
 }) => {
-  const {
-    control,
-    watch,
-    getValues,
-    register,
-    setValue,
-    formState: { errors },
-  } = useFormContext();
+  const { control, watch, setValue } = useFormContext();
   const { layoutName } = useLayout();
   const spacing = SPACING[layoutName];
   const theme = useTheme();
@@ -103,20 +96,14 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
     }
   };
 
-  const [files, setFiles] = useState();
-  useEffect(() => {
-    if (files) {
-      setValue(fileInputName, files);
-    }
-  }, [files, setValue, fileInputName]);
-
   useEffect(() => {
     if (ipfsMetadata?.text) {
       setValue(textInputName, ipfsMetadata.text);
     } else if (ipfsMetadata?.endpoint) {
       setValue(isFileChosen, true);
+      setValue(fileInputName, ipfsMetadata.endpoint);
     }
-  }, [setValue, ipfsMetadata, isFileChosen, textInputName]);
+  }, [setValue, ipfsMetadata, isFileChosen, textInputName, fileInputName]);
 
   return (
     <div>
@@ -155,6 +142,7 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
       </div>
       {!watch(isFileChosen) ? (
         <Controller
+          key={`key-${textInputName}`}
           name={textInputName}
           control={control}
           defaultValue={''}
@@ -176,43 +164,21 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
           )}
         />
       ) : (
-        // bug: investigate more to see why it is not working with controlled component
-        // and why it shares the same value with previous component
-
-        // <Controller
-        //   name={fileInputName}
-        //   control={control}
-        //   defaultValue={''}
-        //   shouldUnregister={shouldUnregister}
-        //   rules={{ required: 'This is required.' }}
-        //   render={({ field: { onChange, value }, fieldState: { error } }) => {
-        //     console.log(
-        //       'FileInput value',
-        //       value,
-        //       'getValues(fileInputName)',
-        //       getValues(fileInputName),
-        //     );
-        //     return (
-        //       <FileInput
-        //         onChange={onChange}
-        //         value={formatValue(value)}
-        //         status={!!error ? 'error' : 'normal'}
-        //         error={error ? error.message : null}
-        //       />
-        //     );
-        //   }}
-        // />
-
-        // a work arround is using register and handle onChange and value manually:
-        <FileInput
-          {...register(fileInputName, {
-            shouldUnregister: shouldUnregister,
-            required: 'This is required.',
-          })}
-          onChange={setFiles}
-          value={formatValue(getValues(fileInputName))}
-          status={!!errors[fileInputName] ? 'error' : 'normal'}
-          error={errors[fileInputName] ? errors[fileInputName].message : null}
+        <Controller
+          key={`key-${fileInputName}`}
+          name={fileInputName}
+          control={control}
+          defaultValue={''}
+          shouldUnregister={shouldUnregister}
+          rules={{ required: 'This is required.' }}
+          render={({ field: { onChange, value }, fieldState: { error } }) => (
+            <FileInput
+              onChange={onChange}
+              value={formatValue(value)}
+              status={!!error ? 'error' : 'normal'}
+              error={error ? error.message : null}
+            />
+          )}
         />
       )}
     </div>
