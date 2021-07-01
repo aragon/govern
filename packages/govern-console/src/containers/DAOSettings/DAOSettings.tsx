@@ -178,7 +178,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
   const callSaveSetting = async (formData: FormInputs) => {
     const newConfig: DaoConfig = formData.daoConfig;
     let containerHash: string | undefined;
-
+    console.log('newConfig', newConfig, 'newConfig.rules.toString()', getValues('rulesFile'));
     // Upload rules to ipfs
     const rules = getValues('rulesFile') ? getValues('rulesFile')[0] : newConfig.rules.toString();
     // console.log(getValues('rulesFile'), ' rulesfile');
@@ -212,6 +212,8 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
       actions: [proposalInstance?.buildAction('configure', [newConfig], 0)],
       proof: proofCid,
     };
+
+    console.log('payload', payload, 'newConfig', newConfig);
 
     if (proposalInstance) {
       try {

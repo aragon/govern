@@ -12,7 +12,7 @@ import {
 } from '@aragon/ui';
 import { Hint } from 'components/Hint/Hint';
 import { useForm, Controller } from 'react-hook-form';
-import { validateAmountForToken, validateToken } from 'utils/validations';
+import { validateAmountForToken } from 'utils/validations';
 import AbiHandler from 'utils/AbiHandler';
 import { useWallet } from 'AugmentedWallet';
 import { utils } from 'ethers';

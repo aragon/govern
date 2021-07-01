@@ -110,9 +110,8 @@ const CreateDaoConfig: React.FC<{
                 subtitle="Your DAO have optimistic capabilities, meaning that actions can happen without voting,
               but should follow pre defined rules. Please provide the main agreement for your DAO (In
               text, or upload a file)."
-                placeholder="Please insert the reason why you want to execute this"
-                // ipfsURI={rulesIpfsUrl?.endpoint}
                 shouldUnregister={false}
+                placeholder="Please insert the reason why you want to execute this"
                 isFile="isRuleFile"
                 textInputName="ruleText"
                 fileInputName="ruleFile"
