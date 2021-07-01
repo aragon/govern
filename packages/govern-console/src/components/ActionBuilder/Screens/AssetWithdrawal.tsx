@@ -47,7 +47,7 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
   const spacing = SPACING[layoutName];
 
   const context: any = useWallet();
-  const { provider, account } = context;
+  const { provider } = context;
 
   const { dao } = useActionBuilderState();
   const { enqueueSnackbar } = useSnackbar();
@@ -86,7 +86,7 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
         variant: 'error',
       });
     }
-  }, [onClick, getValues, enqueueSnackbar, dao, account, provider]);
+  }, [onClick, getValues, enqueueSnackbar, dao, provider]);
 
   const validateAmount = useCallback(
     async (value: string) => {
