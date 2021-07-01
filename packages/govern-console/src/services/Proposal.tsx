@@ -50,7 +50,7 @@ export default class FacadeProposal {
         const container = buildContainer(payload, config);
         return this.proposal.schedule(container);
       },
-      message: 'Schedules a proposal',
+      message: 'Schedule execution',
       status: CustomTransactionStatus.Pending,
     };
 
