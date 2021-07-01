@@ -1,18 +1,33 @@
 import React, { useCallback } from 'react';
-import { Grid, GridItem, DropDown, Button, TextInput, StyledText, useTheme } from '@aragon/ui';
+import {
+  Grid,
+  GridItem,
+  DropDown,
+  Button,
+  TextInput,
+  StyledText,
+  useTheme,
+  Tag,
+  SPACING,
+  useLayout,
+} from '@aragon/ui';
 import { ActionBuilderCloseHandler } from 'utils/types';
 import { Hint } from 'components/Hint/Hint';
 import { useForm, Controller } from 'react-hook-form';
 import { validateAmountForDecimals, validateToken } from 'utils/validations';
 import { useWallet } from 'AugmentedWallet';
 import AbiHandler from 'utils/AbiHandler';
-import { Asset, OTHER_TOKEN_SYMBOL } from 'utils/Asset';
+import { Asset, ETH, OTHER_TOKEN_SYMBOL } from 'utils/Asset';
+import { useActionBuilderState } from '../ActionBuilderStateProvider';
+import { useSnackbar } from 'notistack';
+import { getErrorFromException } from 'utils/HelperFunctions';
 
 import { networkEnvironment } from 'environment';
 const { curatedTokens } = networkEnvironment;
-const withdrawalAssets = Object.keys(curatedTokens).concat([OTHER_TOKEN_SYMBOL]);
+const withdrawalAssets = Object.keys(curatedTokens).concat([ETH.symbol, OTHER_TOKEN_SYMBOL]);
 
-const transferSignature = 'function transfer(address destination, uint amount)';
+const withdrawSignature =
+  'function withdraw(address token, address from, address to, uint256 amount, string memory reference)';
 
 type AssetWithdrawalProps = {
   onClick: ActionBuilderCloseHandler;
@@ -23,43 +38,71 @@ type WithdrawalFormData = {
   token: number;
   tokenContractAddress: string;
   withdrawalAmount: string;
+  reference?: string;
 };
 
 export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => {
   const theme = useTheme();
+  const { layoutName } = useLayout();
+  const spacing = SPACING[layoutName];
+
   const context: any = useWallet();
-  const { provider } = context;
+  const { provider, account } = context;
+
+  const { dao } = useActionBuilderState();
+  const { enqueueSnackbar } = useSnackbar();
 
   const methods = useForm<WithdrawalFormData>();
   const { control, handleSubmit, watch, getValues } = methods;
   const selectedToken = watch('token', 0);
 
+  // build the action data to be scheduled
   const buildActions = useCallback(async () => {
-    const { token, recipient, tokenContractAddress, withdrawalAmount } = getValues();
-
-    const asset = await Asset.createFromSymbol(
-      withdrawalAssets[token],
+    const {
+      token,
+      recipient,
       tokenContractAddress,
       withdrawalAmount,
-      provider,
-    );
-    const values = [recipient, asset.amount];
+      reference = '',
+    } = getValues();
 
-    const action = AbiHandler.mapToAction(transferSignature, asset.address, values);
-
-    onClick(action);
-  }, [onClick, getValues, provider]);
-
-  const validateAmount = useCallback(
-    async (value: string) => {
-      const { token, tokenContractAddress } = getValues();
+    try {
       const asset = await Asset.createFromSymbol(
         withdrawalAssets[token],
         tokenContractAddress,
-        value,
+        withdrawalAmount,
         provider,
       );
-      return validateAmountForDecimals(value, asset.decimals);
+
+      const from = await account?.signer.getAddress();
+      const values = [asset.address, from, recipient, asset.amount, reference];
+      const action = AbiHandler.mapToAction(withdrawSignature, dao?.executor.address, values);
+
+      onClick(action);
+    } catch (err) {
+      console.log('withdrawal error', err);
+      const errorMessage = getErrorFromException(err);
+      enqueueSnackbar(errorMessage, {
+        variant: 'error',
+      });
+    }
+  }, [onClick, getValues, enqueueSnackbar, dao, account, provider]);
+
+  const validateAmount = useCallback(
+    async (value: string) => {
+      try {
+        const { token, tokenContractAddress } = getValues();
+        const asset = await Asset.createFromSymbol(
+          withdrawalAssets[token],
+          tokenContractAddress,
+          value,
+          provider,
+        );
+        return validateAmountForDecimals(value, asset.decimals);
+      } catch (err) {
+        console.log('Error validiting amount', value, err);
+        return 'Error validiting amount';
+      }
     },
     [provider, getValues],
   );
@@ -151,6 +194,33 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
               subtitle="Define how many tokens you want to withdraw."
               value={value}
               placeholder={0}
+              onChange={onChange}
+              status={error ? 'error' : 'normal'}
+              error={error ? error.message : null}
+            />
+          )}
+        />
+      </GridItem>
+      <GridItem>
+        <StyledText name="title2">
+          <span style={{ marginRight: `${spacing}px` }}>Reference</span>
+          <Tag
+            color={`${theme.black}`}
+            uppercase={false}
+            mode="indicator"
+            size="normal"
+            label="Optional"
+          ></Tag>
+        </StyledText>
+        <Controller
+          name="reference"
+          control={control}
+          defaultValue=""
+          render={({ field: { onChange, value }, fieldState: { error } }) => (
+            <TextInput
+              wide
+              multiline
+              value={value}
               onChange={onChange}
               status={error ? 'error' : 'normal'}
               error={error ? error.message : null}

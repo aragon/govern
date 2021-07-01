@@ -1,13 +1,10 @@
-import { CustomTransaction, CustomTransactionStatus } from 'utils/types';
-import { Contract, Signer, BigNumber, BigNumberish } from 'ethers';
+import { CustomTransaction, CustomTransactionStatus, Account } from 'utils/types';
+import { Contract, Signer, BigNumberish } from 'ethers';
+import { erc20ApprovalTransaction } from 'utils/transactionHelper';
 import { Asset } from 'utils/Asset';
 
 const EXECUTOR_ABI = [
   'function deposit(address token, uint256 amount, string calldata reference) external payable',
-];
-const TOKEN_ABI = [
-  'function approve(address spender, uint256 amount)',
-  'function allowance(address owner, address spender) public view returns (uint256 remaining)',
 ];
 
 /**
@@ -52,24 +49,24 @@ export class Executor {
       return [];
     }
 
-    const signer = this.executor.signer;
-    const tokenContract = new Contract(asset.address, TOKEN_ABI, signer);
-    const owner = await signer.getAddress();
-    const allowance: BigNumber = await tokenContract.allowance(owner, this.executor.address);
+    try {
+      const signer = this.executor.signer;
+      const address = await signer.getAddress();
+      const spender = this.executor.address;
+      const account: Account = { address, signer };
 
-    if (asset.amount.lte(allowance)) {
-      return [];
+      const approvalTransactions = await erc20ApprovalTransaction(
+        asset.address,
+        asset.amount,
+        spender,
+        account,
+      );
+
+      return approvalTransactions;
+    } catch (error) {
+      console.log('Error creating approval transactions', error);
+      throw new Error(error);
     }
-
-    const transactions: CustomTransaction[] = [];
-    if (allowance.gt(0)) {
-      transactions.push(this.buildApprovalForAmount(tokenContract, 0, '0', asset.symbol));
-    }
-
-    transactions.push(
-      this.buildApprovalForAmount(tokenContract, asset.amount, asset.displayAmount, asset.symbol),
-    );
-    return transactions;
   }
 
   /**

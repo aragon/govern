@@ -19,6 +19,7 @@ import { useFacadeProposal } from 'hooks/proposal-hooks';
 import { IPFSInput } from 'components/Field/IPFSInput';
 import { settingsUrl } from 'utils/urls';
 import { useDaoQuery } from 'hooks/query-hooks';
+import { Error } from 'utils/Error';
 
 interface FormInputs {
   proof: string;
@@ -56,6 +57,16 @@ const NewExecution: React.FC = () => {
   );
 
   const transactionsQueue = React.useRef<CustomTransaction[]>([]);
+
+  const openActionModal = useCallback(() => {
+    if (isConnected) {
+      setShowActionModal(true);
+    } else {
+      enqueueSnackbar(Error.ConnectAccount, {
+        variant: 'error',
+      });
+    }
+  }, [isConnected, setShowActionModal, enqueueSnackbar]);
 
   const onCloseActionModal = useCallback(
     (actions: any) => {
@@ -214,7 +225,7 @@ const NewExecution: React.FC = () => {
               mode="secondary"
               icon={<IconAdd />}
               label="Add new action"
-              onClick={() => setShowActionModal(true)}
+              onClick={openActionModal}
             ></Button>
           </GridItem>
           <Button
