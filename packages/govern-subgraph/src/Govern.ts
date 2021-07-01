@@ -4,9 +4,10 @@ import {
   Frozen as FrozenEvent,
   Granted as GrantedEvent,
   Revoked as RevokedEvent,
-  // ETHDeposited as ETHDepositedEvent,
+  Deposited as DepositedEvent,
+  Withdrawn as WithdrawnEvent,
 } from '../generated/templates/Govern/Govern'
-import { Govern, Deposit } from '../generated/schema'
+import { Govern, Deposit, Withdraw } from '../generated/schema'
 import { frozenRoles, roleGranted, roleRevoked } from './lib/MiniACL'
 import { loadOrCreateContainer } from './GovernQueue'
 import { handleContainerEventExecute } from './utils/events'
@@ -21,43 +22,27 @@ export function handleExecuted(event: ExecutedEvent): void {
   govern.save()
 }
 
-// emit Deposited(msg.sender, _token, _amount, _reference);
+export function handleDeposited(event: DepositedEvent): void {
+  let deposit = new Deposit(buildId(event));
+  deposit.reference = event.params._reference.toHexString();
+  deposit.sender = event.params.sender;
+  deposit.amount = event.params.amount;
+  deposit.token = event.params.token;
+  deposit.save();
+}
 
-// export function handleDeposited(event: Deposited): void {
-//   // This would be useful if we store in the subgraph who deposited
-//   // and how much
-//   let govern = loadOrCreateGovern(event.address)
+export function handleWithdrawn(event: WithdrawnEvent): void {
+  let withdraw = new Withdraw(buildId(event));
+  withdraw.reference = event.params._reference.toHexString();
+  withdraw.from = event.params.from;
+  withdraw.to = event.params.to;
+  withdraw.amount = event.params.amount;
+  withdraw.token = event.params.token;
   
-//   // govern.balance = event.params.value
-//   // govern.save()
-// }
-
-// export function handleETHDeposited(event: DepositedEvent): void {
-//   // This would be useful if we store in the subgraph who deposited
-//   // and how much
-//   let govern = loadOrCreateGovern(event.address)
-//   let deposit = new Deposit(buildId(event));
-  
-//   deposit.amount = event.params.amount;
-//   deposit.token = event.params.token;
-//   deposit.sender = event.params.sender;
-//   deposit.reference = event.params._reference;
-//   deposit.save();
-//   govern.save();
-
-//   // govern.balance = event.params.value
-//   // govern.save()
-// }
-// export function handleETHDeposited(event: ETHDepositedEvent): void {
-//   // This would be useful if we store in the subgraph who deposited
-//   // and how much
-//   // let govern = loadOrCreateGovern(event.address)
-//   // govern.balance = event.params.value
-//   // govern.save()
-// }
+  withdraw.save();
+}
 
 // MiniACL Events
-
 export function handleFrozen(event: FrozenEvent): void {
   let govern = loadOrCreateGovern(event.address)
 

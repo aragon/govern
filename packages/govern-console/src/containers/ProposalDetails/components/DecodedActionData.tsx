@@ -73,7 +73,8 @@ export const DecodedActionData: React.FC<DecodedActionDataProps> = ({
         const rule = data['Argument #1 (tuple)'][key];
         const ipfs = await fetchIFPSFromRule(rule);
         updateReplacement({
-          [key]: <InlineIPFSField value={ipfs} loading={false} />,
+          // TODO:GIORGI
+          // [key]: <InlineIPFSField value={ipfs} loading={false} />,
         });
       }
     }

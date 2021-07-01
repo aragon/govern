@@ -8,7 +8,7 @@ import { parseUnits } from 'utils/lib';
 
 import { networkEnvironment } from 'environment';
 
-const { daoFactoryAddress } = networkEnvironment;
+const { daoFactoryAddress, governRegistryAddress } = networkEnvironment;
 
 import {
   createDao,
@@ -183,6 +183,7 @@ const CreateDaoProgress: React.FC<{
             {
               provider: window.ethereum,
               daoFactoryAddress: daoFactoryAddress,
+              governRegistry: governRegistryAddress,
             },
             updateNewDaoTokenAddress,
           );

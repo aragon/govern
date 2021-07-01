@@ -69,8 +69,8 @@ export type Account = {
 
 export type ipfsMetadata = {
   metadata: any;
-  text: string;
-  endpoint: string;
+  text: string | null;
+  endpoint: string | null;
   error: any;
 };
 

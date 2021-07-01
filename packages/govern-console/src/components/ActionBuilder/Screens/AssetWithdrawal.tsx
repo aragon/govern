@@ -74,9 +74,9 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
         provider,
       );
 
-      const from = await account?.signer.getAddress();
-      const values = [asset.address, from, recipient, asset.amount, reference];
-      const action = AbiHandler.mapToAction(withdrawSignature, dao?.executor.address, values);
+      const executor = dao?.executor.address;
+      const values = [asset.address, executor, recipient, asset.amount, reference];
+      const action = AbiHandler.mapToAction(withdrawSignature, executor, values);
 
       onClick(action);
     } catch (err) {
