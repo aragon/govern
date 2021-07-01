@@ -24,21 +24,24 @@ export function handleExecuted(event: ExecutedEvent): void {
 
 export function handleDeposited(event: DepositedEvent): void {
   let deposit = new Deposit(buildId(event));
+  let govern = loadOrCreateGovern(event.address)
   deposit.reference = event.params._reference.toHexString();
   deposit.sender = event.params.sender;
   deposit.amount = event.params.amount;
   deposit.token = event.params.token;
+  deposit.govern = govern.id;
   deposit.save();
 }
 
 export function handleWithdrawn(event: WithdrawnEvent): void {
   let withdraw = new Withdraw(buildId(event));
+  let govern = loadOrCreateGovern(event.address)
   withdraw.reference = event.params._reference.toHexString();
   withdraw.from = event.params.from;
   withdraw.to = event.params.to;
   withdraw.amount = event.params.amount;
   withdraw.token = event.params.token;
-  
+  withdraw.govern = govern.id;
   withdraw.save();
 }
 

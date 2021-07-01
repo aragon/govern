@@ -39,8 +39,8 @@ type Withdraw @entity {
 
 type Govern @entity {
   id: ID!
-  deposits: [Deposit!] @derivedFrom(field: "govern")
-  withdraws: [Withdraw!] @derivedFrom(field: "govern")
+  deposits: [Deposit!]! @derivedFrom(field: "govern")
+  withdraws: [Withdraw!]! @derivedFrom(field: "govern")
   address: Bytes!
   metadata: Bytes
   roles: [Role!]!
