@@ -36,16 +36,21 @@ const CreateDao: React.FC = () => {
     }
   }, [activeStep]);
 
-  return (
-    <CreateDaoProvider>
-      <PageContent
-        pageName={PageName.CREATE_DAO}
-        card={activeStep === CreateDaoSteps.Review && <ReviewCard />}
-      >
-        {activeView}
-      </PageContent>
-    </CreateDaoProvider>
-  );
+  const getPageContent = (active: CreateDaoSteps) => {
+    if (active !== CreateDaoSteps.Progress) {
+      return (
+        <PageContent
+          pageName={PageName.CREATE_DAO}
+          card={activeStep === CreateDaoSteps.Review && <ReviewCard />}
+        >
+          {activeView}
+        </PageContent>
+      );
+    }
+    return activeView;
+  };
+
+  return <CreateDaoProvider>{getPageContent(activeStep)}</CreateDaoProvider>;
 };
 
 export default CreateDao;

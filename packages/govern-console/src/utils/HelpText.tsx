@@ -36,13 +36,15 @@ export const HelpText: Record<string, Array<ReactNode>> = {
     [
       'Is a DAO free?',
       <div key={'acordion-item-1'} style={{ padding: 20 }}>
-        somthing about Is a DAO free?
+        Lorem ipsum dolor amet ipsum amet dolores ipsum amet dolores ipsum dolor amet ipsum amet
+        amet dolores ipsum amet dolores ipsum amet.
       </div>,
     ],
     [
       'What I can do with my DAO',
       <div key={'acordion-item-2'} style={{ padding: 20 }}>
-        somthing about Is a DAO free?
+        Lorem ipsum dolor amet ipsum amet dolores ipsum amet dolores ipsum dolor amet ipsum amet
+        amet dolores ipsum amet dolores ipsum amet.
       </div>,
     ],
   ],
