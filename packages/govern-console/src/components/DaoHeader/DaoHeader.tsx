@@ -8,6 +8,7 @@ import { Button, IconSettings, Grid } from '@aragon/ui';
 import { ActionBuilder } from 'components/ActionBuilder/ActionBuilder';
 import { useWallet } from 'AugmentedWallet';
 import { useSnackbar } from 'notistack';
+import { Error } from 'utils/Error';
 
 export interface DaoHeaderProps {
   /**
@@ -59,7 +60,7 @@ export const DaoHeader: React.FC<DaoHeaderProps> = ({ daoName }) => {
 
   const openDepositDialog = useCallback(() => {
     if (!isConnected) {
-      enqueueSnackbar('Please connect your account.', {
+      enqueueSnackbar(Error.ConnectAccount, {
         variant: 'error',
       });
 
