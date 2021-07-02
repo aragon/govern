@@ -11,7 +11,7 @@ export function getFormattedDate(date?: number | string) {
   }
 }
 
-export function isIPFShash(_value: string): boolean {
+export function isIPFShash(/*_value: string*/): boolean {
   // check for value being an ipfs hash
   return false;
 }

@@ -1,5 +1,5 @@
 import React, { memo, useState, useCallback } from 'react';
-import { IconAdd, Grid, GridItem, Button, StyledText, Link, TextInput } from '@aragon/ui';
+import { IconAdd, Grid, GridItem, Button, StyledText, Link, TextInput, Box } from '@aragon/ui';
 import { PageName } from 'utils/HelpText';
 import PageContent from 'components/PageContent/PageContent';
 import ActionList from 'containers/NewExecution/ActionList';
@@ -155,75 +155,77 @@ const NewExecution: React.FC = () => {
 
   return (
     <PageContent pageName={PageName.NEW_EXECUTION}>
-      <Grid>
-        <GridItem>
-          <StyledText name={'title1'}>New execution</StyledText>
-          <StyledText name={'body3'}>
-            This execution will use the current{' '}
-            <Link onClick={() => history.push(settingsUrl(daoName))}>DAO Settings</Link>
-          </StyledText>
-        </GridItem>
-        <FormProvider {...methods}>
+      <Box>
+        <Grid>
           <GridItem>
-            <Controller
-              name="title"
-              control={control}
-              rules={{
-                required: 'This is required.',
-              }}
-              defaultValue=""
-              render={({ field: { onChange, value }, fieldState: { error } }) => (
-                <TextInput
-                  wide
-                  title="Title"
-                  value={value}
-                  placeholder="Type execution title"
-                  onChange={onChange}
-                  status={error ? 'error' : 'normal'}
-                  error={error ? error.message : null}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem>
-            <StyledText name={'title2'}>Justification</StyledText>{' '}
+            <StyledText name={'title1'}>New execution</StyledText>
             <StyledText name={'body3'}>
-              Insert the reason for scheduling this execution so DAO members can understand it.
+              This execution will use the current{' '}
+              <Link onClick={() => history.push(settingsUrl(daoName))}>DAO Settings</Link>
             </StyledText>
-            <IPFSInput
-              label=""
-              placeholder="Please insert the reason why you want to execute this"
-              textInputName="proof"
-              fileInputName="proofFile"
-            />
           </GridItem>
-          <GridItem>
-            <StyledText name={'title2'}>Actions</StyledText>
-            <StyledText name={'body3'}>
-              Add as many actions (smart contract interactions) you want for this execution.
-            </StyledText>
-            <ActionList actions={fields} swap={swap} remove={remove} />
-            <br />
+          <FormProvider {...methods}>
+            <GridItem>
+              <Controller
+                name="title"
+                control={control}
+                rules={{
+                  required: 'This is required.',
+                }}
+                defaultValue=""
+                render={({ field: { onChange, value }, fieldState: { error } }) => (
+                  <TextInput
+                    wide
+                    title="Title"
+                    value={value}
+                    placeholder="Type execution title"
+                    onChange={onChange}
+                    status={error ? 'error' : 'normal'}
+                    error={error ? error.message : null}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem>
+              <StyledText name={'title2'}>Justification</StyledText>{' '}
+              <StyledText name={'body3'}>
+                Insert the reason for scheduling this execution so DAO members can understand it.
+              </StyledText>
+              <IPFSInput
+                label=""
+                placeholder="Please insert the reason why you want to execute this"
+                textInputName="proof"
+                fileInputName="proofFile"
+              />
+            </GridItem>
+            <GridItem>
+              <StyledText name={'title2'}>Actions</StyledText>
+              <StyledText name={'body3'}>
+                Add as many actions (smart contract interactions) you want for this execution.
+              </StyledText>
+              <ActionList actions={fields} swap={swap} remove={remove} />
+              <br />
+              <Button
+                mode="secondary"
+                icon={<IconAdd />}
+                label="Add new action"
+                onClick={openActionModal}
+              ></Button>
+            </GridItem>
             <Button
-              mode="secondary"
-              icon={<IconAdd />}
-              label="Add new action"
-              onClick={openActionModal}
+              wide
+              size="large"
+              mode="primary"
+              disabled={!isConnected}
+              onClick={handleSubmit(onSchedule)}
+              label="Schedule"
             ></Button>
-          </GridItem>
-          <Button
-            wide
-            size="large"
-            mode="primary"
-            disabled={!isConnected}
-            onClick={handleSubmit(onSchedule)}
-            label="Schedule"
-          ></Button>
-          {showActionModal && (
-            <ActionBuilder visible={showActionModal} onClose={onCloseActionModal}></ActionBuilder>
-          )}
-        </FormProvider>
-      </Grid>
+            {showActionModal && (
+              <ActionBuilder visible={showActionModal} onClose={onCloseActionModal}></ActionBuilder>
+            )}
+          </FormProvider>
+        </Grid>
+      </Box>
     </PageContent>
   );
 };

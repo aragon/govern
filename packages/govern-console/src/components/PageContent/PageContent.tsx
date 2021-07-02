@@ -1,34 +1,35 @@
 import React, { memo, ReactNode } from 'react';
-import { Grid, GridItem, useLayout, Accordion, Box } from '@aragon/ui';
+import { Grid, GridItem, useLayout, Accordion } from '@aragon/ui';
 import { HelpText, PageName } from 'utils/HelpText';
+import HelpComponent from 'components/HelpComponent/HelpComponent';
 
 type PageContentProps = {
-  pageName: PageName;
   children: ReactNode;
+  pageName?: PageName;
+  card?: ReactNode;
 };
 
-const PageContent: React.FC<PageContentProps> = ({ pageName, children }) => {
+const PageContent: React.FC<PageContentProps> = ({ pageName, children, card }) => {
   const { layoutName } = useLayout();
+
+  const sideTopComponent = card || (pageName && <Accordion items={HelpText[pageName]}></Accordion>);
 
   return (
     <Grid layout={true}>
-      <GridItem gridColumn={'1/13'} gridRow={'1/4'}>
+      <GridItem gridColumn={layoutName === 'large' ? '1/12' : '1/-1'} gridRow={'1/4'}>
         {children}
       </GridItem>
       <GridItem
         gridRow={layoutName === 'large' ? '1' : undefined}
-        gridColumn={layoutName === 'large' ? '13/17' : '1 / -1'}
+        gridColumn={layoutName === 'large' ? '12/17' : '1 / -1'}
       >
-        <Accordion items={HelpText[pageName]}></Accordion>
+        {sideTopComponent}
       </GridItem>
       <GridItem
         gridRow={layoutName === 'large' ? '2' : undefined}
-        gridColumn={layoutName === 'large' ? '13/17' : '1 / -1'}
+        gridColumn={layoutName === 'large' ? '12/17' : '1 / -1'}
       >
-        {/* TODO: To be moved to its own component*/}
-        <Box style={{ background: '#8991FF', opacity: 0.5 }}>
-          <h5 style={{ color: '#20232C' }}>Need Help?</h5>
-        </Box>
+        <HelpComponent />
       </GridItem>
     </Grid>
   );
