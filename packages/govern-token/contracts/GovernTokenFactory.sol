@@ -66,12 +66,15 @@ contract GovernTokenFactory {
         bytes4 mintRole = minter.mint.selector ^ minter.merkleMint.selector;
         bytes4 rootRole = minter.ROOT_ROLE();
 
-        ACLData.BulkItem[] memory items = new ACLData.BulkItem[](4);
+        ACLData.BulkItem[] memory items = new ACLData.BulkItem[](5);
 
         items[0] = ACLData.BulkItem(ACLData.BulkOp.Grant, mintRole, address(_governExecutor));
         items[1] = ACLData.BulkItem(ACLData.BulkOp.Grant, rootRole, address(_governExecutor));
         items[2] = ACLData.BulkItem(ACLData.BulkOp.Revoke, mintRole, address(this));
         items[3] = ACLData.BulkItem(ACLData.BulkOp.Revoke, rootRole, address(this));
+        // freeze mint role, so no one can give/change mintRole permissions 
+        // to anyone else other than govern Executor
+        items[4] = ACLData.BulkItem(ACLData.BulkOp.Freeze, mintRole, address(0));
 
         minter.bulk(items);
 

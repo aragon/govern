@@ -15,25 +15,24 @@ import {
 } from '@aragon/ui';
 import { Hint } from 'components/Hint/Hint';
 import { useForm, Controller } from 'react-hook-form';
-import { validateAmountForToken, validateToken } from 'utils/validations';
+import { validateAmountForDecimals, validateToken, validateBalance } from 'utils/validations';
 import { useWallet } from 'AugmentedWallet';
-import { Contract, utils } from 'ethers';
-import { getToken } from '@aragon/govern';
 import { useActionBuilderState } from '../ActionBuilderStateProvider';
 import { getTruncatedAccountAddress } from 'utils/account';
-import { CuratedTokens } from 'utils/CuratedTokens';
 import { useSnackbar } from 'notistack';
 import { getErrorFromException } from 'utils/HelperFunctions';
-import { CustomTransaction, CustomTransactionStatus } from 'utils/types';
+import { Executor } from 'services/Executor';
+import { Asset, ETH, OTHER_TOKEN_SYMBOL } from 'utils/Asset';
+import { networkEnvironment } from 'environment';
+const { curatedTokens } = networkEnvironment;
 
-const curatedTokens = new CuratedTokens();
-
-const transferAbi = ['function transfer(address destination, uint amount)'];
+const depositAssets = Object.keys(curatedTokens).concat([ETH.symbol, OTHER_TOKEN_SYMBOL]);
 
 type DepositFormData = {
   token: number;
   tokenContractAddress: string;
-  depositAmount: number;
+  depositAmount: string;
+  reference?: string;
 };
 
 export const Deposit: React.FC = () => {
@@ -52,20 +51,18 @@ export const Deposit: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
 
   const buildActions = useCallback(async () => {
-    const { token, tokenContractAddress, depositAmount } = getValues();
+    const { token, tokenContractAddress, depositAmount, reference = '' } = getValues();
 
     try {
-      const contractAddress = curatedTokens.getTokenAddress(token, tokenContractAddress);
-      const { tokenDecimals } = await getToken(contractAddress, provider);
-      const amount = utils.parseUnits(String(depositAmount), tokenDecimals);
-      const contract = new Contract(contractAddress, transferAbi, account.signer);
-      const tx: CustomTransaction = {
-        tx: () => contract.transfer(account?.address, amount),
-        message: 'Deposit asset',
-        status: CustomTransactionStatus.Pending,
-      };
-
-      gotoProcessTransaction([tx]);
+      const executor = new Executor(dao.executor.address, account.signer);
+      const asset = await Asset.createFromSymbol(
+        depositAssets[token],
+        tokenContractAddress,
+        depositAmount,
+        provider,
+      );
+      const transactions = await executor.deposit(asset, reference);
+      gotoProcessTransaction(transactions);
     } catch (err) {
       console.log('deposit error', err);
       const errorMessage = getErrorFromException(err);
@@ -73,15 +70,32 @@ export const Deposit: React.FC = () => {
         variant: 'error',
       });
     }
-  }, [getValues, provider, account, enqueueSnackbar, gotoProcessTransaction]);
+  }, [getValues, account, dao, provider, enqueueSnackbar, gotoProcessTransaction]);
 
   const validateAmount = useCallback(
-    (value: string) => {
-      const { token, tokenContractAddress } = getValues();
-      const contractAddress = curatedTokens.getTokenAddress(token, tokenContractAddress);
-      return validateAmountForToken(contractAddress, value, provider);
+    async (value: string) => {
+      const { token: selectedIndex, tokenContractAddress } = getValues();
+      try {
+        const asset = await Asset.createFromSymbol(
+          depositAssets[selectedIndex],
+          tokenContractAddress,
+          value,
+          provider,
+        );
+
+        const result = validateAmountForDecimals(value, asset.decimals);
+        if (result !== true) {
+          return result;
+        }
+
+        const owner = await account?.signer?.getAddress();
+        return validateBalance(asset, owner, provider);
+      } catch (err) {
+        console.log('Error validating amount', err);
+        return 'Error validating amount';
+      }
     },
-    [provider, getValues],
+    [provider, getValues, account],
   );
 
   return (
@@ -89,7 +103,7 @@ export const Deposit: React.FC = () => {
       <GridItem>
         <StyledText name="title1">Deposit assets</StyledText>
         <Hint>
-          This will create a request on your wallet to transfer the amount of tokens to the govern
+          This will create a request on your wallet to transfer the amount of assets to the govern
           executor address ({dao?.executor.address})
         </Hint>
       </GridItem>
@@ -128,25 +142,20 @@ export const Deposit: React.FC = () => {
       </GridItem>
       <GridItem>
         <StyledText name="title2">Token</StyledText>
-        <Hint>Choose which token you would like to deposit.</Hint>
+        <Hint>Choose which asset you would like to deposit.</Hint>
         <Controller
           name="token"
           control={control}
           defaultValue={0}
           render={({ field: { onChange, value }, fieldState: { error } }) => (
             <div>
-              <DropDown
-                wide
-                items={curatedTokens.getTokenSymbols()}
-                selected={value}
-                onChange={onChange}
-              />
+              <DropDown wide items={depositAssets} selected={value} onChange={onChange} />
               {error ? <div style={{ color: `${theme.red}` }}>{error.message}</div> : null}
             </div>
           )}
         />
       </GridItem>
-      {curatedTokens.isCustomToken(selectedToken) && (
+      {Asset.isOtherToken(depositAssets[selectedToken]) && (
         <GridItem>
           <Controller
             name="tokenContractAddress"
@@ -186,10 +195,38 @@ export const Deposit: React.FC = () => {
             <TextInput
               wide
               type="number"
+              min="1"
               title="Amount"
-              subtitle="Define how many tokens you want to deposit."
+              subtitle="Define the amount of assets you want to deposit."
               value={value}
               placeholder={0}
+              onChange={onChange}
+              status={error ? 'error' : 'normal'}
+              error={error ? error.message : null}
+            />
+          )}
+        />
+      </GridItem>
+      <GridItem>
+        <StyledText name="title2">
+          <span style={{ marginRight: `${spacing}px` }}>Reference</span>
+          <Tag
+            color={`${theme.black}`}
+            uppercase={false}
+            mode="indicator"
+            size="normal"
+            label="Optional"
+          ></Tag>
+        </StyledText>
+        <Controller
+          name="reference"
+          control={control}
+          defaultValue=""
+          render={({ field: { onChange, value }, fieldState: { error } }) => (
+            <TextInput
+              wide
+              multiline
+              value={value}
               onChange={onChange}
               status={error ? 'error' : 'normal'}
               error={error ? error.message : null}

@@ -1,5 +1,15 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Grid, GridItem, SearchInput, StyledText, Button, useTheme, Box } from '@aragon/ui';
+import {
+  Grid,
+  GridItem,
+  SearchInput,
+  StyledText,
+  Button,
+  useTheme,
+  Box,
+  SPACING,
+  useLayout,
+} from '@aragon/ui';
 import { useActionBuilderState } from '../ActionBuilderStateProvider';
 import { getTruncatedAccountAddress } from 'utils/account';
 import { Stepper } from 'components/Stepper/Stepper';
@@ -26,6 +36,9 @@ const formatSignature = (signature: string, functionName: string): string => {
 
 export const FunctionSelector: React.FC<FunctionSelectorProps> = ({ onClick }) => {
   const theme = useTheme();
+  const { layoutName } = useLayout();
+  const spacing = SPACING[layoutName];
+
   const { contractAddress, abi } = useActionBuilderState();
   const [error, setError] = useState(false);
   const [functions, setFunctions] = useState<FunctionItem[]>([]);
@@ -108,7 +121,12 @@ export const FunctionSelector: React.FC<FunctionSelectorProps> = ({ onClick }) =
       <GridItem>
         <SearchInput wide placeholder="Search function" onChange={doSearch}></SearchInput>
         <Box
-          style={{ border: `1px solid ${theme.border}`, maxHeight: '380px', overflow: 'scroll' }}
+          style={{
+            border: `1px solid ${theme.border}`,
+            maxHeight: '380px',
+            overflow: 'scroll',
+            marginTop: `${spacing}px`,
+          }}
         >
           {functions.map((item, index) => {
             if (!item.show) return null;
@@ -120,7 +138,7 @@ export const FunctionSelector: React.FC<FunctionSelectorProps> = ({ onClick }) =
                   justify-content: space-between;
                 `}
               >
-                <div>
+                <div style={{ maxWidth: '350px', wordBreak: 'break-all' }}>
                   <StyledText name="title3">{item.name}</StyledText>
                   <Hint>{formatSignature(item.signature, item.name)}</Hint>
                 </div>
