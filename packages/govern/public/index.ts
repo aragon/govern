@@ -13,7 +13,6 @@ export {
   Token,
   TokenDeposit,
 } from './createDao'
-export { getToken } from './token'
 export {
   Proposal,
   ProposalParams,
