@@ -20,6 +20,8 @@ import { ipfsMetadata } from 'utils/types';
 import { styled } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 
+import { Box, Button } from '@aragon/ui';
+
 interface FormInputs {
   reason: string;
   isReasonFile: boolean;
@@ -114,7 +116,7 @@ const ChallengeWidget: React.FC<any> = ({
   }
 
   return (
-    <Widget>
+    <Box shadow>
       <InputSubTitle>
         Challenge Reason{' '}
         <HelpButton
@@ -131,19 +133,17 @@ const ChallengeWidget: React.FC<any> = ({
           textInputName="reason"
           fileInputName="reasonFile"
         />
-        <WidgetRow marginBottom="9px">
-          <ANButton
-            buttonType="primary"
-            label="Challenge"
-            disabled={disabled}
-            height="45px"
-            width="372px"
-            style={{ margin: 'auto', marginTop: '10px' }}
-            onClick={handleSubmit(submit)}
-          />
-        </WidgetRow>
+        <Button
+          wide
+          type="primary"
+          label="Challenge"
+          disabled={disabled}
+          size="large"
+          style={{ marginTop: '10px' }}
+          onClick={handleSubmit(submit)}
+        />
       </FormProvider>
-    </Widget>
+    </Box>
   );
 };
 
