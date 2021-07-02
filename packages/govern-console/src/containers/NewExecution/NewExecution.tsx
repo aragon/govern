@@ -5,7 +5,7 @@ import PageContent from 'components/PageContent/PageContent';
 import ActionList from 'containers/NewExecution/ActionList';
 import { ActionBuilder } from 'components/ActionBuilder/ActionBuilder';
 import { useParams, useHistory } from 'react-router-dom';
-import { ContractReceipt, utils } from 'ethers';
+import { ContractReceipt } from 'ethers';
 import { useWallet } from 'AugmentedWallet';
 import { buildConfig } from 'utils/ERC3000';
 import { CustomTransaction, ActionItem } from 'utils/types';
@@ -20,6 +20,7 @@ import { IPFSInput } from 'components/Field/IPFSInput';
 import { settingsUrl } from 'utils/urls';
 import { useDaoQuery } from 'hooks/query-hooks';
 import { Error } from 'utils/Error';
+import AbiHandler from 'utils/AbiHandler';
 
 interface FormInputs {
   proof: string;
@@ -92,35 +93,17 @@ const NewExecution: React.FC = () => {
   const onSchedule = () => {
     if (!validate()) return;
 
-    const errors: string[] = [];
-    const values = getValues('actions');
-    console.log('schedule with ', values);
+    const actions = getValues('actions');
+    console.log('schedule with ', actions);
 
-    const actions = values.map((item) => {
-      const { sighash, signature, contractAddress, inputs } = item;
-      const abiInterface = new utils.Interface([`${signature}`]);
-      const functionParameters = inputs.map((input) => input.value);
-
-      let calldata = '';
-      try {
-        calldata = abiInterface.encodeFunctionData(sighash, functionParameters);
-      } catch (err) {
-        errors.push(err.message);
-      }
-      const data: ActionType = {
-        to: contractAddress,
-        value: 0,
-        data: calldata,
-      };
-      return data;
-    });
-
-    if (errors.length > 0) {
+    try {
+      const encodedActions = AbiHandler.encodeActions(actions);
+      scheduleProposal(encodedActions);
+    } catch (err) {
+      console.log('Failed to encode action data', err);
       enqueueSnackbar('Error encoding action data, please double check your action input.', {
         variant: 'error',
       });
-    } else {
-      scheduleProposal(actions);
     }
   };
 

@@ -1,6 +1,7 @@
 import { utils, BigNumber } from 'ethers';
 import { ETHERSCAN_API_KEY } from './constants';
 import { ActionItem } from 'utils/types';
+import { ActionType } from '@aragon/govern';
 
 // TODO: discuss with Giorgi to move this to a standalone library so that
 // this module can be shared by Court as it's currently a duplicate of
@@ -10,6 +11,8 @@ type DecodedData = {
   functionName: string;
   inputData: any;
 };
+
+const COMPLEX_TYPES = new Set(['array', 'tuple']);
 
 /**
  * Format number and BigNumber as string and return other values as is
@@ -176,7 +179,7 @@ export default class AbiHandler {
     const abiInterface = new utils.Interface([`${signature}`]);
     const inputs = fragment.inputs.map((item, i) => ({
       name: item.name,
-      type: item.format(),
+      type: item.format(utils.FormatTypes.full),
       baseType: item.baseType,
       value: values && values[i] ? values[i] : '',
     }));
@@ -187,8 +190,36 @@ export default class AbiHandler {
       contractAddress,
       name: fragment.name,
       inputs,
+      payable: fragment.payable,
+      payableAmount: '',
     };
 
     return action;
+  }
+
+  /**
+   * Encode action data to be passed to the Govern Queue for scheduling
+   * @param actions data to be encoded
+   * @returns ActionType[] array of actions with encoded calldata
+   */
+  static encodeActions(actions: ActionItem[]): ActionType[] {
+    const encodedActions = actions.map((item) => {
+      const { sighash, signature, contractAddress, inputs = [] } = item;
+      const abiInterface = new utils.Interface([`${signature}`]);
+      const functionParameters = inputs.map((input) => {
+        return COMPLEX_TYPES.has(input.baseType) ? JSON.parse(input.value) : input.value;
+      });
+
+      const payableAmount = item.payable && item.payableAmount ? item.payableAmount : '0';
+      const calldata = abiInterface.encodeFunctionData(sighash, functionParameters);
+      const data: ActionType = {
+        to: contractAddress,
+        value: utils.parseEther(payableAmount),
+        data: calldata,
+      };
+      return data;
+    });
+
+    return encodedActions;
   }
 }

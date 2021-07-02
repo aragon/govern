@@ -52,6 +52,8 @@ export type ActionItem = {
   contractAddress: string;
   name: string;
   inputs: ParamType[];
+  payable: boolean;
+  payableAmount: string;
 };
 
 export type ActionToSchedule = {
