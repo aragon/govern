@@ -160,7 +160,7 @@ const ActionList: React.FC<ActionListProps> = ({ actions, swap, remove }) => {
                         color: `${theme.disabledContent}`,
                       }}
                     >
-                      <div>payableAmount</div>
+                      <div>payable amount</div>
                       <div>
                         <Help hint="What is payableAmount?">
                           The amount of ether to forward to the contract
