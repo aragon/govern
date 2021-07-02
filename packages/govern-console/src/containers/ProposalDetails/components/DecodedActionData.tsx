@@ -33,11 +33,6 @@ interface DecodedActionDataProps {
   queueAddress: string;
 }
 
-const fetchIFPSFromRule = async (rule: string) => {
-  const result = await fetchIPFS(rule);
-  return result || rule;
-};
-
 const isConfigureAction = ({
   to,
   queueAddress,
@@ -71,10 +66,9 @@ export const DecodedActionData: React.FC<DecodedActionDataProps> = ({
     async function fetch() {
       if (isConfigureAction({ to, functionName, queueAddress })) {
         const rule = data['Argument #1 (tuple)'][key];
-        const ipfs = await fetchIFPSFromRule(rule);
+        const ipfs = await fetchIPFS(rule);
         updateReplacement({
-          // TODO:GIORGI
-          // [key]: <InlineIPFSField value={ipfs} loading={false} />,
+          [key]: <InlineIPFSField value={ipfs || rule} loading={false} />,
         });
       }
     }

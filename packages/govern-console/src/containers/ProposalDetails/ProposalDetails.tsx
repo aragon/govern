@@ -514,10 +514,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
           <div style={{ height: '32px', width: '100%' }} />
 
           <TitleText>Payload</TitleText>
-          <InfoWrapper>
-            <InfoKeyDiv>Nonce:</InfoKeyDiv>
-            <InfoValueDivInline>{proposalInfo.payload.nonce}</InfoValueDivInline>
-          </InfoWrapper>
           {(() => {
             if (proof?.metadata) {
               return (

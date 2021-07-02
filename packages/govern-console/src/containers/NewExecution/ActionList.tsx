@@ -10,6 +10,10 @@ import {
   IconDown,
   IconCross,
   GU,
+  Grid,
+  StyledText,
+  Help,
+  SPACING,
 } from '@aragon/ui';
 import { ActionItem } from 'utils/types';
 import { Controller, useFormContext } from 'react-hook-form';
@@ -86,6 +90,9 @@ const ActionHeader: React.FC<ActionHeaderProps> = memo(function ActionHeader({
 
 const ActionList: React.FC<ActionListProps> = ({ actions, swap, remove }) => {
   const { control } = useFormContext();
+  const theme = useTheme();
+  const { layoutName } = useLayout();
+  const spacing = SPACING[layoutName];
 
   if (actions && actions.length === 0) {
     return (
@@ -116,31 +123,69 @@ const ActionList: React.FC<ActionListProps> = ({ actions, swap, remove }) => {
           }
         >
           <Box heading={action.name}>
-            {action.inputs.map((input: any, num: number) => {
-              const element = (
-                <Controller
-                  key={`actions.${index}.inputs.${num}.value`}
-                  name={`actions.${index}.inputs.${num}.value` as const}
-                  control={control}
-                  defaultValue={input.value}
-                  rules={{
-                    required: 'This is required.',
-                  }}
-                  render={({ field: { onChange, value }, fieldState: { error } }) => (
-                    <TextInput
-                      wide
-                      value={value}
-                      onChange={onChange}
-                      subtitle={input.name}
-                      placeholder={input.type}
-                      status={error ? 'error' : 'normal'}
-                      error={error ? error.message : null}
-                    />
-                  )}
-                />
-              );
-              return element;
-            })}
+            <Grid>
+              {action.inputs.map((input: any, num: number) => {
+                const element = (
+                  <Controller
+                    key={`actions.${index}.inputs.${num}.value`}
+                    name={`actions.${index}.inputs.${num}.value` as const}
+                    control={control}
+                    defaultValue={input.value}
+                    rules={{
+                      required: 'This is required.',
+                    }}
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                      <TextInput
+                        wide
+                        value={value}
+                        onChange={onChange}
+                        subtitle={input.name}
+                        placeholder={input.type}
+                        status={error ? 'error' : 'normal'}
+                        error={error ? error.message : null}
+                      />
+                    )}
+                  />
+                );
+                return element;
+              })}
+              {action.payable && (
+                <div>
+                  <StyledText name="body2">
+                    <div
+                      style={{
+                        display: 'flex',
+                        columnGap: `${spacing}px`,
+                        alignItems: 'center',
+                        color: `${theme.disabledContent}`,
+                      }}
+                    >
+                      <div>payable amount</div>
+                      <div>
+                        <Help hint="What is payableAmount?">
+                          The amount of ether to forward to the contract
+                        </Help>
+                      </div>
+                    </div>
+                  </StyledText>
+                  <Controller
+                    name={`actions.${index}.payableAmount` as const}
+                    control={control}
+                    defaultValue={action.payableAmount}
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                      <TextInput
+                        wide
+                        value={value}
+                        onChange={onChange}
+                        placeholder="ether"
+                        status={error ? 'error' : 'normal'}
+                        error={error ? error.message : null}
+                      />
+                    )}
+                  />
+                </div>
+              )}
+            </Grid>
           </Box>
         </Box>
       ))}
