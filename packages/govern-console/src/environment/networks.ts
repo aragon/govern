@@ -39,7 +39,7 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
       networkName: 'rinkeby',
       subgraphUrl: 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby',
       voiceUrl: 'http://voice-rinkeby.aragon.org/',
-      daoFactoryAddress: '0xB1203d3CD4231c2e48bA2E70ab0E61D8e9F645B0',
+      daoFactoryAddress: '0xF159b15093931B7431633d26E7290e14a2f09f81',
       governRegistryAddress: '0x4fe12c45ea84b1ae828615ccbc958c8e8f38edd8', // TODO: GIORGI update this
       defaultDaoConfig: {
         executionDelay: 180,
