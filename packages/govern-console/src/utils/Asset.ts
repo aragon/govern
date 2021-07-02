@@ -1,7 +1,7 @@
 import { BigNumber, providers } from 'ethers';
 import { TokenSymbol } from 'environment/types';
 import { constants, utils } from 'ethers';
-import { getToken } from '@aragon/govern';
+import { getTokenInfo } from 'utils/token';
 import { networkEnvironment } from 'environment';
 const { curatedTokens } = networkEnvironment;
 
@@ -40,15 +40,8 @@ export class Asset {
     displayAmount: string,
     provider: providers.Web3Provider,
   ) {
-    try {
-      const token = await getToken(address, provider);
-      return new Asset(token.tokenSymbol, token.tokenDecimals, address, displayAmount);
-    } catch (err) {
-      console.log('error getting token information', address, err);
-      // if decimal is not available, set to 0
-      // if symbol not available, set to 0
-      return new Asset('', 0, address, displayAmount);
-    }
+    const { symbol, decimals } = await getTokenInfo(address, provider);
+    return new Asset(symbol || '', decimals || 0, address, displayAmount);
   }
 
   /**

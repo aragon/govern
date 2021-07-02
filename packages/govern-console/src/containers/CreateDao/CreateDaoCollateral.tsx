@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { CreateDaoSteps, accordionItems, stepsNames } from './utils/Shared';
+import { CreateDaoSteps, stepsNames } from './utils/Shared';
 import { useCreateDaoContext } from './utils/CreateDaoContextProvider';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { validateToken, validateAmountForDecimals } from 'utils/validations';
@@ -11,7 +11,6 @@ import {
   useLayout,
   Grid,
   GridItem,
-  Accordion,
   TextInput,
   ContentSwitcher,
   Box,
@@ -96,321 +95,314 @@ const CreateDaoCollateral: React.FC<{
   };
 
   return (
-    <Grid layout={true}>
-      <GridItem gridColumn={'1/13'} gridRow={'1/4'}>
-        <Box>
-          <div style={{ display: 'grid', gridGap: spacing }}>
-            <Grid columns={'4'} columnWidth={'1fr'}>
-              <GridItem gridColumn={'2/5'}>
-                <Steps steps={stepsNames} activeIdx={2} showProgress={true} />
-              </GridItem>
-              <GridItem gridColumn={'1/2'} gridRow={'1'} alignVertical={'center'}>
-                <StyledText name={'title2'}>Create DAO</StyledText>
-              </GridItem>
-            </Grid>
+    <Box>
+      <div style={{ display: 'grid', gridGap: spacing }}>
+        <Grid columns={'4'} columnWidth={'1fr'}>
+          <GridItem gridColumn={'2/5'}>
+            <Steps steps={stepsNames} activeIdx={2} showProgress={true} />
+          </GridItem>
+          <GridItem gridColumn={'1/2'} gridRow={'1'} alignVertical={'center'}>
+            <StyledText name={'title2'}>Create DAO</StyledText>
+          </GridItem>
+        </Grid>
 
-            <div>
-              <StyledText name={'title2'}>Collaterals</StyledText>
-              <StyledText name={'body2'} style={{ color: theme.disabledContent }}>
-                In order to schedule or challenge executions, any member must provide this amount of
-                collateral, so they have stake in the game and act with the best interest of your
-                DAO. By default Aragon Console uses DAI as a collateral token. If you want to change
-                this, provide another contract address in or use your newly created DAO Token.
-              </StyledText>
-            </div>
+        <div>
+          <StyledText name={'title2'}>Collaterals</StyledText>
+          <StyledText name={'body2'} style={{ color: theme.disabledContent }}>
+            In order to schedule or challenge executions, any member must provide this amount of
+            collateral, so they have stake in the game and act with the best interest of your DAO.
+            By default Aragon Console uses DAI as a collateral token. If you want to change this,
+            provide another contract address in or use your newly created DAO Token.
+          </StyledText>
+        </div>
 
-            <Info mode={'warning'} title={''}>
-              Hey, this is an important step, please check that all the information entered is
-              correct.
-            </Info>
-            <div>
-              <StyledText name={'title4'}>Schedule execution collateral token</StyledText>
-              <StyledText name={'body3'}>
-                Which token do you want to use for schedule execution?
-              </StyledText>
+        <Info mode={'warning'} title={''}>
+          Hey, this is an important step, please check that all the information entered is correct.
+        </Info>
+        <div>
+          <StyledText name={'title4'}>Schedule execution collateral token</StyledText>
+          <StyledText name={'body3'}>
+            Which token do you want to use for schedule execution?
+          </StyledText>
 
-              {!isExistingToken && (
-                <Controller
-                  name="isScheduleNewDaoToken"
-                  control={control}
-                  defaultValue={isScheduleNewDaoToken}
-                  render={({ field: { onChange, value } }) => (
-                    <ContentSwitcher
-                      onChange={onChange}
-                      selected={value}
-                      items={['Custom Token', 'New Token']}
-                      paddingSettings={{
-                        horizontal: spacing * 2,
-                        vertical: spacing / 4,
-                      }}
-                    />
-                  )}
-                />
-              )}
-
-              <Controller
-                name="scheduleAddress"
-                control={control}
-                defaultValue={scheduleAddress}
-                rules={{
-                  required: 'This is required.',
-                  validate: async (value) => {
-                    const v = await validateToken(value, provider);
-                    if (v !== true) {
-                      return v;
-                    }
-
-                    let { decimals } = await getTokenInfo(value, provider);
-                    decimals = decimals || 0;
-
-                    setValue('scheduleDecimals', decimals);
-
-                    await trigger('scheduleAmount');
-                  },
-                }}
-                render={({ field: { onChange, value }, fieldState: { error } }) => (
-                  <TextInput
-                    subtitle="Token contract address"
-                    wide
-                    disabled={watch('isScheduleNewDaoToken')}
-                    placeholder={
-                      watch('isScheduleNewDaoToken')
-                        ? 'The contract address will be avaible after the creation process'
-                        : 'Contract address...'
-                    }
-                    value={!watch('isScheduleNewDaoToken') ? value : ''}
-                    onChange={onChange}
-                    status={!!error ? 'error' : 'normal'}
-                    error={error ? error.message : null}
-                  />
-                )}
-              />
-
-              <Controller
-                name="scheduleAmount"
-                control={control}
-                defaultValue={scheduleAmount}
-                rules={{
-                  required: 'This is required.',
-                  validate: async (value) =>
-                    validateAmountForDecimals(value, watch('scheduleDecimals')),
-                }}
-                render={({ field: { onChange, value }, fieldState: { error } }) => (
-                  <TextInput
-                    subtitle="Token amount"
-                    wide
-                    type={'number'}
-                    placeholder={'Token amount...'}
-                    value={value}
-                    onChange={onChange}
-                    status={!!error ? 'error' : 'normal'}
-                    error={error ? error.message : null}
-                  />
-                )}
-              />
-            </div>
-
-            <div>
-              <StyledText name={'title4'}>Challenge collateral token</StyledText>
-              <StyledText name={'body3'}>
-                Which token do you want to use for challange collateral?
-              </StyledText>
-              {!isExistingToken && (
-                <Controller
-                  name="isChallengeNewDaoToken"
-                  control={control}
-                  defaultValue={isChallengeNewDaoToken}
-                  render={({ field: { onChange, value } }) => (
-                    <ContentSwitcher
-                      onChange={onChange}
-                      selected={value}
-                      items={['Custom Token', 'New Token']}
-                      paddingSettings={{
-                        horizontal: spacing * 2,
-                        vertical: spacing / 4,
-                      }}
-                    />
-                  )}
-                />
-              )}
-              <Controller
-                name="challengeAddress"
-                control={control}
-                defaultValue={challengeAddress}
-                rules={{
-                  required: 'This is required.',
-                  validate: async (value) => {
-                    const v = await validateToken(value, provider);
-                    if (v !== true) {
-                      return v;
-                    }
-
-                    let { decimals } = await getTokenInfo(value, provider);
-                    decimals = decimals || 0;
-
-                    setValue('challengeDecimals', decimals);
-
-                    await trigger('challengeAmount');
-                  },
-                }}
-                render={({ field: { onChange, value }, fieldState: { error } }) => (
-                  <TextInput
-                    subtitle="Token contract address"
-                    wide
-                    disabled={watch('isChallengeNewDaoToken')}
-                    placeholder={
-                      watch('isChallengeNewDaoToken')
-                        ? 'The contract address will be avaible after the creation process'
-                        : 'Contract address...'
-                    }
-                    value={!watch('isChallengeNewDaoToken') ? value : ''}
-                    onChange={onChange}
-                    status={!!error ? 'error' : 'normal'}
-                    error={error ? error.message : null}
-                  />
-                )}
-              />
-              <Controller
-                name="challengeAmount"
-                control={control}
-                defaultValue={challengeAmount}
-                rules={{
-                  required: 'This is required.',
-                  validate: async (value) =>
-                    validateAmountForDecimals(value, watch('challengeDecimals')),
-                }}
-                render={({ field: { onChange, value }, fieldState: { error } }) => (
-                  <TextInput
-                    subtitle="Token amount"
-                    wide
-                    type={'number'}
-                    placeholder={'Token amount...'}
-                    value={value}
-                    onChange={onChange}
-                    status={!!error ? 'error' : 'normal'}
-                    error={error ? error.message : null}
-                  />
-                )}
-              />
-            </div>
-            <div>
-              <StyledText name={'title4'}>Schedule execution permissions</StyledText>
-              <StyledText name={'body3'}>
-                If you want you can define the list of addresses that have permission to schedule
-                executions in your DAO, so it is not open for anyone
-              </StyledText>
-
-              <Controller
-                name="isAnyAddress"
-                control={control}
-                defaultValue={isAnyAddress}
-                render={({ field: { onChange, value } }) => (
-                  <ContentSwitcher
-                    onChange={onChange}
-                    selected={value}
-                    items={['Address List', 'Any Address']}
-                    paddingSettings={{
-                      horizontal: spacing * 2,
-                      vertical: spacing / 4,
-                    }}
-                  />
-                )}
-              />
-            </div>
-            {watch('isAnyAddress') ? (
-              <Info mode={'warning'} title={''}>
-                If you select ”Any Address”, then everybody can schedule executions in your DAO.
-                Please be sure you understand the impact of this selection.
-              </Info>
-            ) : (
-              <div>
-                {fields.map((item: any, index: any) => {
-                  return (
-                    <Split
-                      key={item.id}
-                      primary={
-                        <Controller
-                          name={`executionAddressList[${index}].value`}
-                          control={control}
-                          defaultValue={item.value}
-                          rules={{ required: 'This is required.' }}
-                          render={({ field: { onChange, value }, fieldState: { error } }) => (
-                            <TextInput
-                              wide
-                              value={value}
-                              onChange={onChange}
-                              status={!!error ? 'error' : 'normal'}
-                              error={error ? error.message : null}
-                            />
-                          )}
-                        />
-                      }
-                      secondary={
-                        <Button
-                          mode={'secondary'}
-                          size={'large'}
-                          disabled={fields.length === 1}
-                          icon={<IconMinus />}
-                          onClick={() => {
-                            remove(index);
-                          }}
-                        />
-                      }
-                    />
-                  );
-                })}
-                <Button
-                  mode={'secondary'}
-                  size={'large'}
-                  disabled={executionAddressList.length === 10}
-                  label={'Add new address'}
-                  icon={<IconPlus />}
-                  display={'all'}
-                  onClick={() => {
-                    append({ value: '' });
+          {!isExistingToken && (
+            <Controller
+              name="isScheduleNewDaoToken"
+              control={control}
+              defaultValue={isScheduleNewDaoToken}
+              render={({ field: { onChange, value } }) => (
+                <ContentSwitcher
+                  onChange={onChange}
+                  selected={value}
+                  items={['Custom Token', 'New Token']}
+                  paddingSettings={{
+                    horizontal: spacing * 2,
+                    vertical: spacing / 4,
                   }}
                 />
-              </div>
+              )}
+            />
+          )}
+
+          <Controller
+            name="scheduleAddress"
+            control={control}
+            defaultValue={scheduleAddress}
+            rules={{
+              required: 'This is required.',
+              validate: async (value) => {
+                const v = await validateToken(value, provider);
+                if (v !== true) {
+                  return v;
+                }
+
+                let { decimals } = await getTokenInfo(value, provider);
+                decimals = decimals || 0;
+
+                setValue('scheduleDecimals', decimals);
+
+                await trigger('scheduleAmount');
+              },
+            }}
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <TextInput
+                subtitle="Token contract address"
+                wide
+                disabled={watch('isScheduleNewDaoToken')}
+                placeholder={
+                  watch('isScheduleNewDaoToken')
+                    ? 'The contract address will be avaible after the creation process'
+                    : 'Contract address...'
+                }
+                value={!watch('isScheduleNewDaoToken') ? value : ''}
+                onChange={onChange}
+                status={!!error ? 'error' : 'normal'}
+                error={error ? error.message : null}
+              />
             )}
+          />
 
-            <Split
-              width={'100%'}
-              primary={
-                <Button
-                  size={'large'}
-                  mode={'secondary'}
-                  onClick={() => {
-                    setActiveStep(CreateDaoSteps.Config);
+          <Controller
+            name="scheduleAmount"
+            control={control}
+            defaultValue={scheduleAmount}
+            rules={{
+              required: 'This is required.',
+              validate: async (value) =>
+                validateAmountForDecimals(value, watch('scheduleDecimals')),
+            }}
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <TextInput
+                subtitle="Token amount"
+                wide
+                type={'number'}
+                placeholder={'Token amount...'}
+                value={value}
+                onChange={onChange}
+                status={!!error ? 'error' : 'normal'}
+                error={error ? error.message : null}
+              />
+            )}
+          />
+        </div>
+
+        <div>
+          <StyledText name={'title4'}>Challenge collateral token</StyledText>
+          <StyledText name={'body3'}>
+            Which token do you want to use for challange collateral?
+          </StyledText>
+          {!isExistingToken && (
+            <Controller
+              name="isChallengeNewDaoToken"
+              control={control}
+              defaultValue={isChallengeNewDaoToken}
+              render={({ field: { onChange, value } }) => (
+                <ContentSwitcher
+                  onChange={onChange}
+                  selected={value}
+                  items={['Custom Token', 'New Token']}
+                  paddingSettings={{
+                    horizontal: spacing * 2,
+                    vertical: spacing / 4,
                   }}
-                  icon={<IconArrowLeft />}
-                  label={'back'}
-                  display={'all'}
                 />
-              }
-              secondary={
-                <Button wide size={'large'} mode={'secondary'} onClick={moveToNextStep}>
-                  Next Step
-                </Button>
-              }
+              )}
+            />
+          )}
+          <Controller
+            name="challengeAddress"
+            control={control}
+            defaultValue={challengeAddress}
+            rules={{
+              required: 'This is required.',
+              validate: async (value) => {
+                const v = await validateToken(value, provider);
+                if (v !== true) {
+                  return v;
+                }
+
+                let { decimals } = await getTokenInfo(value, provider);
+                decimals = decimals || 0;
+
+                setValue('challengeDecimals', decimals);
+
+                await trigger('challengeAmount');
+              },
+            }}
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <TextInput
+                subtitle="Token contract address"
+                wide
+                disabled={watch('isChallengeNewDaoToken')}
+                placeholder={
+                  watch('isChallengeNewDaoToken')
+                    ? 'The contract address will be avaible after the creation process'
+                    : 'Contract address...'
+                }
+                value={!watch('isChallengeNewDaoToken') ? value : ''}
+                onChange={onChange}
+                status={!!error ? 'error' : 'normal'}
+                error={error ? error.message : null}
+              />
+            )}
+          />
+          <Controller
+            name="challengeAmount"
+            control={control}
+            defaultValue={challengeAmount}
+            rules={{
+              required: 'This is required.',
+              validate: async (value) =>
+                validateAmountForDecimals(value, watch('challengeDecimals')),
+            }}
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <TextInput
+                subtitle="Token amount"
+                wide
+                type={'number'}
+                placeholder={'Token amount...'}
+                value={value}
+                onChange={onChange}
+                status={!!error ? 'error' : 'normal'}
+                error={error ? error.message : null}
+              />
+            )}
+          />
+        </div>
+        <div>
+          <StyledText name={'title4'}>Schedule execution permissions</StyledText>
+          <StyledText name={'body3'}>
+            If you want you can define the list of addresses that have permission to schedule
+            executions in your DAO, so it is not open for anyone
+          </StyledText>
+
+          <Controller
+            name="isAnyAddress"
+            control={control}
+            defaultValue={isAnyAddress}
+            render={({ field: { onChange, value } }) => (
+              <ContentSwitcher
+                onChange={onChange}
+                selected={value}
+                items={['Address List', 'Any Address']}
+                paddingSettings={{
+                  horizontal: spacing * 2,
+                  vertical: spacing / 4,
+                }}
+              />
+            )}
+          />
+        </div>
+        {watch('isAnyAddress') ? (
+          <Info mode={'warning'} title={''}>
+            If you select ”Any Address”, then everybody can schedule executions in your DAO. Please
+            be sure you understand the impact of this selection.
+          </Info>
+        ) : (
+          <div>
+            {fields.map((item: any, index: any) => {
+              return (
+                <div
+                  key={item.id}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      gap: 16,
+                      marginTop: 8,
+                    }}
+                  >
+                    <Controller
+                      name={`executionAddressList[${index}].value`}
+                      control={control}
+                      defaultValue={item.value}
+                      rules={{ required: 'This is required.' }}
+                      render={({ field: { onChange, value }, fieldState: { error } }) => (
+                        <TextInput
+                          wide
+                          value={value}
+                          onChange={onChange}
+                          status={!!error ? 'error' : 'normal'}
+                          error={error ? error.message : null}
+                        />
+                      )}
+                    />
+                    <Button
+                      mode={'secondary'}
+                      size={'large'}
+                      disabled={fields.length === 1}
+                      icon={<IconMinus />}
+                      onClick={() => {
+                        remove(index);
+                      }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+            <Button
+              wide={false}
+              mode={'secondary'}
+              size={'large'}
+              disabled={fields.length >= 10}
+              label={'Add new address'}
+              icon={<IconPlus />}
+              display={'all'}
+              onClick={() => {
+                append({ value: '' });
+              }}
+              style={{ marginTop: 16 }}
             />
           </div>
-        </Box>
-      </GridItem>
-      <GridItem
-        gridRow={layoutName === 'large' ? '1' : undefined}
-        gridColumn={layoutName === 'large' ? '13/17' : '1 / -1'}
-      >
-        <Accordion items={accordionItems}></Accordion>
-      </GridItem>
-      <GridItem
-        gridRow={layoutName === 'large' ? '2' : undefined}
-        gridColumn={layoutName === 'large' ? '13/17' : '1 / -1'}
-      >
-        <Box style={{ background: '#8991FF', opacity: 0.5 }}>
-          <h5 style={{ color: '#20232C' }}>Need Help?</h5>
-        </Box>
-      </GridItem>
-    </Grid>
+        )}
+
+        <Split
+          width={'100%'}
+          primary={
+            <Button
+              size={'large'}
+              mode={'secondary'}
+              onClick={() => {
+                setActiveStep(CreateDaoSteps.Config);
+              }}
+              icon={<IconArrowLeft />}
+              label={'back'}
+              display={'all'}
+            />
+          }
+          secondary={
+            <Button wide size={'large'} mode={'secondary'} onClick={moveToNextStep}>
+              Next Step
+            </Button>
+          }
+        />
+      </div>
+    </Box>
   );
 };
 

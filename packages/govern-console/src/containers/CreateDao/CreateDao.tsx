@@ -7,6 +7,9 @@ import CreateDaoReview from './CreateDaoReview';
 import CreateDaoProgress from './CreateDaoProgress';
 import { CreateDaoSteps } from './utils/Shared';
 import { CreateDaoProvider } from './utils/CreateDaoContextProvider';
+import PageContent from 'components/PageContent/PageContent';
+import { PageName } from 'utils/HelpText';
+import ReviewCard from './components/ReviewCard';
 
 const CreateDao: React.FC = () => {
   const [activeStep, setActiveStep] = useState<CreateDaoSteps>(CreateDaoSteps.BasicInfo);
@@ -33,7 +36,21 @@ const CreateDao: React.FC = () => {
     }
   }, [activeStep]);
 
-  return <CreateDaoProvider>{activeView}</CreateDaoProvider>;
+  const getPageContent = (active: CreateDaoSteps) => {
+    if (active !== CreateDaoSteps.Progress) {
+      return (
+        <PageContent
+          pageName={PageName.CREATE_DAO}
+          card={activeStep === CreateDaoSteps.Review && <ReviewCard />}
+        >
+          {activeView}
+        </PageContent>
+      );
+    }
+    return activeView;
+  };
+
+  return <CreateDaoProvider>{getPageContent(activeStep)}</CreateDaoProvider>;
 };
 
 export default CreateDao;

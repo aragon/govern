@@ -23,13 +23,10 @@ import { formatUnits, parseUnits } from 'utils/lib';
 import { getTokenInfo } from 'utils/token';
 import { positiveNumber } from 'utils/validations';
 
-import cardMainImage from '../../images/pngs/dao_setting_@2x.png';
-
 import {
   useLayout,
   Grid,
   GridItem,
-  EmptyStateCard,
   TextInput,
   TextCopy,
   Box,
@@ -41,6 +38,8 @@ import {
   IconBlank,
   Checkbox,
 } from '@aragon/ui';
+import PageContent from 'components/PageContent/PageContent';
+import SettingsCard from './components/SettingsCard';
 
 export interface DaoSettingFormProps {
   /**
@@ -95,16 +94,6 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
   const [scheduleDecimals, setScheduleDecimals] = useState<number>(0);
   const [challengeDecimals, setChallengeDecimals] = useState<number>(0);
   const [resolverLock, setResolverLock] = useState(false);
-  const cardText = (
-    <div>
-      <StyledText name={'title2'}>Your DAO settings</StyledText>
-      <StyledText name={'body2'}>
-        Message about the importancy of permissions on your DAO, bla bla, explaining the settings
-        etc.
-      </StyledText>
-    </div>
-  );
-  const cardIamge = <img style={{ width: '150px' }} src={cardMainImage}></img>;
 
   const updateResolverLock = (lock: boolean) => {
     if (!lock) {
@@ -244,231 +233,230 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
   };
 
   return (
-    <Grid layout={true}>
-      <GridItem gridColumn={'1/13'} gridRow={layoutName === 'large' ? '1/4' : '2'}>
-        <Box>
-          <BackButton onClick={() => history.goBack()}>
-            <img src={backButtonIcon} />
-          </BackButton>
-          <div style={{ display: 'grid', gridGap: spacing }}>
-            <StyledText name={'title1'}>DAO Settings</StyledText>
-            <TextCopy title={'DAO Govern Executor Address'} value={daoAddresses.executorAddress} />
-            <TextCopy title={'DAO Token address'} value={daoAddresses.token} />
-            <FormProvider {...methods}>
-              <div>
-                <StyledText name={'title4'}>Resolver</StyledText>
-                <StyledText name={'body3'}>
-                  The resolver is a smart contract that can handle disputes in your DAO and follows
-                  the ERC3k interface. By default your DAO will use Aragon Court as a resolver.{' '}
-                  <Link href="https://court.aragon.org/">Learn more</Link>
-                </StyledText>
-                <Box>
-                  <Grid>
-                    <GridItem gridColumn={'1/6'} gridRow={'1'}>
-                      <Controller
-                        name="daoConfig.resolver"
-                        control={control}
-                        defaultValue={''}
-                        rules={{
-                          required: 'This is required.',
-                          validate: (value) => {
-                            return validateContract(value, provider);
-                          },
-                        }}
-                        render={({ field: { onChange, value }, fieldState: { error } }) => (
-                          <TextInput
-                            wide
-                            disabled={!resolverLock}
-                            value={value}
-                            placeholder={'Resolver address'}
-                            adornment={<IconBlank />}
-                            adornmentPosition="end"
-                            onChange={onChange}
-                            status={!!error ? 'error' : 'normal'}
-                            error={error ? error.message : null}
-                          />
-                        )}
-                      />
-                    </GridItem>
-                    <GridItem
-                      gridColumn={'6/7'}
-                      gridRow={'1'}
-                      alignVertical={'center'}
-                      alignHorizontal={'center'}
+    <PageContent card={<SettingsCard />}>
+      <Box>
+        <BackButton onClick={() => history.goBack()}>
+          <img src={backButtonIcon} />
+        </BackButton>
+        <div style={{ display: 'grid', gridGap: spacing }}>
+          <StyledText name={'title1'}>DAO Settings</StyledText>
+          <TextCopy title={'DAO Govern Executor Address'} value={daoAddresses.executorAddress} />
+          <TextCopy title={'DAO Token address'} value={daoAddresses.token} />
+          <FormProvider {...methods}>
+            <div>
+              <StyledText name={'title4'}>Resolver</StyledText>
+              <StyledText name={'body3'}>
+                The resolver is a smart contract that can handle disputes in your DAO and follows
+                the ERC3k interface. By default your DAO will use Aragon Court as a resolver.{' '}
+                <Link href="https://court.aragon.org/">Learn more</Link>
+              </StyledText>
+              <Box>
+                <Grid>
+                  <GridItem gridColumn={'1/6'} gridRow={'1'}>
+                    <Controller
+                      name="daoConfig.resolver"
+                      control={control}
+                      defaultValue={''}
+                      rules={{
+                        required: 'This is required.',
+                        validate: (value) => {
+                          return validateContract(value, provider);
+                        },
+                      }}
+                      render={({ field: { onChange, value }, fieldState: { error } }) => (
+                        <TextInput
+                          wide
+                          disabled={!resolverLock}
+                          value={value}
+                          placeholder={'Resolver address'}
+                          adornment={<IconBlank />}
+                          adornmentPosition="end"
+                          onChange={onChange}
+                          status={!!error ? 'error' : 'normal'}
+                          error={error ? error.message : null}
+                        />
+                      )}
+                    />
+                  </GridItem>
+                  <GridItem
+                    gridColumn={'6/7'}
+                    gridRow={'1'}
+                    alignVertical={'center'}
+                    alignHorizontal={'center'}
+                  >
+                    <label
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
                     >
-                      <label
+                      <Checkbox
+                        checked={resolverLock}
+                        onChange={() => updateResolverLock(!resolverLock)}
+                      />
+                      <span
                         style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
+                          marginLeft: '4px',
                         }}
                       >
-                        <Checkbox
-                          checked={resolverLock}
-                          onChange={() => updateResolverLock(!resolverLock)}
-                        />
-                        <span
-                          style={{
-                            marginLeft: '4px',
-                          }}
-                        >
-                          Override default resolver
-                        </span>
-                      </label>
-                    </GridItem>
-                  </Grid>
-                </Box>
-              </div>
-              <Controller
-                name="daoConfig.executionDelay"
-                control={control}
-                defaultValue={''}
-                rules={{
-                  required: 'This is required.',
-                  validate: (value) => positiveNumber(value),
-                }}
-                render={({ field: { onChange, value }, fieldState: { error } }) => (
-                  <TextInput
-                    title={'Execution Delay'}
-                    subtitle={
-                      'Amount of time any action in your DAO will be available to be challenged before bein executed'
-                    }
-                    type="number"
-                    onChange={onChange}
-                    value={value.toString()}
-                    wide
-                    placeholder={'350s'}
-                    status={!!error ? 'error' : 'normal'}
-                    error={error ? error.message : null}
-                  />
-                )}
-              />
-
-              <IPFSInput
-                title={'Rules / Agreement'}
-                subtitle="Your DAO have optimistic capabilities, meaning that actions can happen without voting, but should follow pre defined rules. Please provide the main agreement for your DAO (In text, or upload a file)."
-                placeholder="DAO rules and agreement.."
-                ipfsMetadata={ipfsMetadata}
-                shouldUnregister={false}
-                textInputName="daoConfig.rules"
-                fileInputName="rulesFile"
-              />
-
-              <div>
-                <StyledText name={'title2'}>Collaterals</StyledText>
-                <StyledText name={'body2'} style={{ color: theme.disabledContent }}>
-                  {
-                    'In order to schedule or challenge executions, any member must provide this amount of collateral, so they have stake in the game and act with the best interest of your DAO'
+                        Override default resolver
+                      </span>
+                    </label>
+                  </GridItem>
+                </Grid>
+              </Box>
+            </div>
+            <Controller
+              name="daoConfig.executionDelay"
+              control={control}
+              defaultValue={''}
+              rules={{
+                required: 'This is required.',
+                validate: (value) => positiveNumber(value),
+              }}
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
+                <TextInput
+                  title={'Execution Delay'}
+                  subtitle={
+                    'Amount of time any action in your DAO will be available to be challenged before bein executed'
                   }
-                </StyledText>
-              </div>
+                  type="number"
+                  onChange={onChange}
+                  value={value.toString()}
+                  wide
+                  placeholder={'350s'}
+                  status={!!error ? 'error' : 'normal'}
+                  error={error ? error.message : null}
+                />
+              )}
+            />
 
-              <Controller
-                name="daoConfig.scheduleDeposit.token"
-                control={control}
-                defaultValue=""
-                rules={{
-                  required: 'This is required.',
-                  validate: async (value) => {
-                    const v = await validateToken(value, provider);
-                    if (v !== true) {
-                      return v;
-                    }
+            <IPFSInput
+              title={'Rules / Agreement'}
+              subtitle="Your DAO have optimistic capabilities, meaning that actions can happen without voting, but should follow pre defined rules. Please provide the main agreement for your DAO (In text, or upload a file)."
+              placeholder="DAO rules and agreement.."
+              ipfsMetadata={ipfsMetadata}
+              shouldUnregister={false}
+              textInputName="daoConfig.rules"
+              fileInputName="rulesFile"
+            />
 
-                    let { decimals } = await getTokenInfo(value, provider);
-                    decimals = decimals || 0;
+            <div>
+              <StyledText name={'title2'}>Collaterals</StyledText>
+              <StyledText name={'body2'} style={{ color: theme.disabledContent }}>
+                {
+                  'In order to schedule or challenge executions, any member must provide this amount of collateral, so they have stake in the game and act with the best interest of your DAO'
+                }
+              </StyledText>
+            </div>
 
-                    setScheduleDecimals(decimals);
-                    await trigger('daoConfig.scheduleDeposit.amount');
-                  },
-                }}
-                render={({ field: { onChange, value }, fieldState: { error } }) => (
-                  <TextInput
-                    title="Schedule execution collateral"
-                    onChange={onChange}
-                    value={value}
-                    wide
-                    placeholder={'0x'}
-                    status={!!error ? 'error' : 'normal'}
-                    error={error ? error.message : null}
-                  />
-                )}
-              />
-              <Controller
-                name="daoConfig.scheduleDeposit.amount"
-                control={control}
-                defaultValue={''}
-                rules={{
-                  required: 'This is required.',
-                  validate: (value) => validateAmountForDecimals(value, scheduleDecimals),
-                }}
-                render={({ field: { onChange, value }, fieldState: { error } }) => (
-                  <TextInput
-                    title={'Token amount'}
-                    type="number"
-                    onChange={onChange}
-                    value={value.toString()}
-                    wide
-                    placeholder={'10.0'}
-                    status={!!error ? 'error' : 'normal'}
-                    error={error ? error.message : null}
-                  />
-                )}
-              />
-              <Controller
-                name="daoConfig.challengeDeposit.token"
-                control={control}
-                defaultValue=""
-                rules={{
-                  required: 'This is required.',
-                  validate: async (value) => {
-                    const v = await validateToken(value, provider);
-                    if (v !== true) {
-                      return v;
-                    }
+            <Controller
+              name="daoConfig.scheduleDeposit.token"
+              control={control}
+              defaultValue=""
+              rules={{
+                required: 'This is required.',
+                validate: async (value) => {
+                  const v = await validateToken(value, provider);
+                  if (v !== true) {
+                    return v;
+                  }
 
-                    let { decimals } = await getTokenInfo(value, provider);
-                    decimals = decimals || 0;
+                  let { decimals } = await getTokenInfo(value, provider);
+                  decimals = decimals || 0;
 
-                    setChallengeDecimals(decimals);
+                  setScheduleDecimals(decimals);
+                  await trigger('daoConfig.scheduleDeposit.amount');
+                },
+              }}
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
+                <TextInput
+                  title="Schedule execution collateral"
+                  onChange={onChange}
+                  value={value}
+                  wide
+                  placeholder={'0x'}
+                  status={!!error ? 'error' : 'normal'}
+                  error={error ? error.message : null}
+                />
+              )}
+            />
+            <Controller
+              name="daoConfig.scheduleDeposit.amount"
+              control={control}
+              defaultValue={''}
+              rules={{
+                required: 'This is required.',
+                validate: (value) => validateAmountForDecimals(value, scheduleDecimals),
+              }}
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
+                <TextInput
+                  title={'Token amount'}
+                  type="number"
+                  onChange={onChange}
+                  value={value.toString()}
+                  wide
+                  placeholder={'10.0'}
+                  status={!!error ? 'error' : 'normal'}
+                  error={error ? error.message : null}
+                />
+              )}
+            />
+            <Controller
+              name="daoConfig.challengeDeposit.token"
+              control={control}
+              defaultValue=""
+              rules={{
+                required: 'This is required.',
+                validate: async (value) => {
+                  const v = await validateToken(value, provider);
+                  if (v !== true) {
+                    return v;
+                  }
 
-                    await trigger('daoConfig.challengeDeposit.amount');
-                  },
-                }}
-                render={({ field: { onChange, value }, fieldState: { error } }) => (
-                  <TextInput
-                    title="Challenge collateral token contract address"
-                    onInputChange={onChange}
-                    value={value}
-                    wide
-                    placeholder={'0x'}
-                    status={!!error ? 'error' : 'normal'}
-                    error={error ? error.message : null}
-                  />
-                )}
-              />
-              <Controller
-                name="daoConfig.challengeDeposit.amount"
-                control={control}
-                defaultValue={''}
-                rules={{
-                  required: 'This is required.',
-                  validate: (value) => validateAmountForDecimals(value, challengeDecimals),
-                }}
-                render={({ field: { onChange, value }, fieldState: { error } }) => (
-                  <TextInput
-                    type="number"
-                    title="Token amount"
-                    onChange={onChange}
-                    value={value.toString()}
-                    wide
-                    placeholder={'10.0'}
-                    status={!!error ? 'error' : 'normal'}
-                    error={error ? error.message : null}
-                  />
-                )}
-              />
-              {/* <Controller
+                  let { decimals } = await getTokenInfo(value, provider);
+                  decimals = decimals || 0;
+
+                  setChallengeDecimals(decimals);
+
+                  await trigger('daoConfig.challengeDeposit.amount');
+                },
+              }}
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
+                <TextInput
+                  title="Challenge collateral token contract address"
+                  onInputChange={onChange}
+                  value={value}
+                  wide
+                  placeholder={'0x'}
+                  status={!!error ? 'error' : 'normal'}
+                  error={error ? error.message : null}
+                />
+              )}
+            />
+            <Controller
+              name="daoConfig.challengeDeposit.amount"
+              control={control}
+              defaultValue={''}
+              rules={{
+                required: 'This is required.',
+                validate: (value) => validateAmountForDecimals(value, challengeDecimals),
+              }}
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
+                <TextInput
+                  type="number"
+                  title="Token amount"
+                  onChange={onChange}
+                  value={value.toString()}
+                  wide
+                  placeholder={'10.0'}
+                  status={!!error ? 'error' : 'normal'}
+                  error={error ? error.message : null}
+                />
+              )}
+            />
+            {/* <Controller
                 name="daoConfig.resolver"
                 control={control}
                 defaultValue={''}
@@ -491,49 +479,33 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
                   />
                 )}
               /> */}
-              <IPFSInput
-                title="Justification"
-                subtitle="Please provide the reasons for this DAO settings change as this will trigger an action on the executor queue"
-                placeholder="Please insert the reason why you want to execute this"
-                textInputName="proof"
-                fileInputName="proofFile"
-              />
+            <IPFSInput
+              title="Justification"
+              subtitle="Please provide the reasons for this DAO settings change as this will trigger an action on the executor queue"
+              placeholder="Please insert the reason why you want to execute this"
+              textInputName="proof"
+              fileInputName="proofFile"
+            />
 
-              <div
-                style={{
-                  justifyContent: 'center',
-                  display: 'flex',
-                }}
-              >
-                <Button
-                  size={layoutName}
-                  disabled={!isConnected}
-                  label={'Schedule configuration changes'}
-                  buttonType={'primary'}
-                  onClick={handleSubmit(callSaveSetting)}
-                  wide
-                />
-              </div>
-            </FormProvider>
-          </div>
-        </Box>
-      </GridItem>
-      <GridItem
-        gridRow={'1'}
-        gridColumn={layoutName === 'large' ? '13/17' : '1 / -1'}
-        alignHorizontal={'center'}
-      >
-        <EmptyStateCard illustration={cardIamge} text={cardText} />
-      </GridItem>
-      <GridItem
-        gridRow={layoutName === 'large' ? '2' : '3'}
-        gridColumn={layoutName === 'large' ? '13/17' : '1 / -1'}
-      >
-        <Box style={{ background: '#8991FF', opacity: 0.5 }}>
-          <h5 style={{ color: '#20232C' }}>Need Help?</h5>
-        </Box>
-      </GridItem>
-    </Grid>
+            <div
+              style={{
+                justifyContent: 'center',
+                display: 'flex',
+              }}
+            >
+              <Button
+                size={layoutName}
+                disabled={!isConnected}
+                label={'Schedule configuration changes'}
+                buttonType={'primary'}
+                onClick={handleSubmit(callSaveSetting)}
+                wide
+              />
+            </div>
+          </FormProvider>
+        </div>
+      </Box>
+    </PageContent>
   );
 };
 
