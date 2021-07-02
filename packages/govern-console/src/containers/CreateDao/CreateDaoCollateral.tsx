@@ -327,9 +327,21 @@ const CreateDaoCollateral: React.FC<{
               <div>
                 {fields.map((item: any, index: any) => {
                   return (
-                    <Split
+                    <div
                       key={item.id}
-                      primary={
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          gap: 16,
+                          marginTop: 8,
+                        }}
+                      >
                         <Controller
                           name={`executionAddressList[${index}].value`}
                           control={control}
@@ -345,8 +357,6 @@ const CreateDaoCollateral: React.FC<{
                             />
                           )}
                         />
-                      }
-                      secondary={
                         <Button
                           mode={'secondary'}
                           size={'large'}
@@ -356,20 +366,22 @@ const CreateDaoCollateral: React.FC<{
                             remove(index);
                           }}
                         />
-                      }
-                    />
+                      </div>
+                    </div>
                   );
                 })}
                 <Button
+                  wide={false}
                   mode={'secondary'}
                   size={'large'}
-                  disabled={executionAddressList.length === 10}
+                  disabled={fields.length >= 10}
                   label={'Add new address'}
                   icon={<IconPlus />}
                   display={'all'}
                   onClick={() => {
                     append({ value: '' });
                   }}
+                  style={{ marginTop: 16 }}
                 />
               </div>
             )}
