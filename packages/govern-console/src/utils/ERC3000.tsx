@@ -69,7 +69,7 @@ export const buildContainer = (payload: Payload, config: DaoConfig): ProposalPar
     submitter: payload.submitter,
     executor: payload.executor,
     actions: payload.actions || [],
-    allowFailuresMap: payload.allowFailuresMap || ethers.utils.hexZeroPad('0x0', 32),
+    allowFailuresMap: '0x1111111111111111111111111111111111111111111111111111111111111111',
     proof: payload.proof || toUtf8Bytes('0x'),
   };
 
