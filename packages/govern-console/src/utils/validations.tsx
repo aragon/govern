@@ -107,7 +107,7 @@ export const validateBalance = async (
 ): Promise<ValidateResult> => {
   let balance = BigNumber.from(0);
 
-  if (Asset.isEth(asset.symbol)) {
+  if (asset.isEth()) {
     balance = await provider.getBalance(ownerAddress);
   } else {
     const contract = new Contract(asset.address, erc20TokenABI, provider);

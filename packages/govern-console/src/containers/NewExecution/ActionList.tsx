@@ -162,7 +162,7 @@ const ActionList: React.FC<ActionListProps> = ({ actions, swap, remove }) => {
                     >
                       <div>payable amount</div>
                       <div>
-                        <Help hint="What is payableAmount?">
+                        <Help hint="What is payable amount?">
                           The amount of ether to forward to the contract
                         </Help>
                       </div>
