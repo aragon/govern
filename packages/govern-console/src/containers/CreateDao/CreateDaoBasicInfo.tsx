@@ -168,7 +168,7 @@ const CreateDaoBasicInfo: React.FC<{
               shouldUnregister={true}
               rules={{
                 required: 'This is required.',
-                validate: async (value) => validateAmountForDecimals(value, tokenDecimals),
+                validate: (value) => validateAmountForDecimals(value, tokenDecimals),
               }}
               render={({ field: { onChange, value }, fieldState: { error } }) => (
                 <TextInput
@@ -193,7 +193,7 @@ const CreateDaoBasicInfo: React.FC<{
             shouldUnregister={true}
             rules={{
               required: 'This is required.',
-              validate: async (value) => validateToken(value, provider),
+              validate: (value) => validateToken(value, provider),
             }}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <TextInput
