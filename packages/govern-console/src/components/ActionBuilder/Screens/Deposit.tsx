@@ -12,6 +12,7 @@ import {
   useTheme,
   useLayout,
   SPACING,
+  useToast,
 } from '@aragon/ui';
 import { Hint } from 'components/Hint/Hint';
 import { useForm, Controller } from 'react-hook-form';
@@ -19,7 +20,6 @@ import { validateAmountForDecimals, validateToken, validateBalance } from 'utils
 import { useWallet } from 'AugmentedWallet';
 import { useActionBuilderState } from '../ActionBuilderStateProvider';
 import { getTruncatedAccountAddress } from 'utils/account';
-import { useSnackbar } from 'notistack';
 import { getErrorFromException } from 'utils/HelperFunctions';
 import { Executor } from 'services/Executor';
 import { Asset, AssetLabel, ETH, OTHER_TOKEN_SYMBOL } from 'utils/Asset';
@@ -51,7 +51,7 @@ export const Deposit: React.FC = () => {
   const selectedToken = watch('token', 0);
 
   const { dao, gotoProcessTransaction } = useActionBuilderState();
-  const { enqueueSnackbar } = useSnackbar();
+  const toast = useToast();
 
   const buildActions = useCallback(async () => {
     const { token, tokenContractAddress, depositAmount, reference = '' } = getValues();
@@ -69,11 +69,9 @@ export const Deposit: React.FC = () => {
     } catch (err) {
       console.log('deposit error', err);
       const errorMessage = getErrorFromException(err);
-      enqueueSnackbar(errorMessage, {
-        variant: 'error',
-      });
+      toast(errorMessage);
     }
-  }, [getValues, account, dao, provider, enqueueSnackbar, gotoProcessTransaction]);
+  }, [getValues, account, dao, provider, toast, gotoProcessTransaction]);
 
   const validateAmount = useCallback(
     async (value: string) => {

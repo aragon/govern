@@ -4,10 +4,9 @@ import { styled } from '@material-ui/core/styles';
 import MUICard from '@material-ui/core/Card';
 import MUITypography from '@material-ui/core/Typography';
 import { settingsUrl } from 'utils/urls';
-import { Button, IconSettings, Grid } from '@aragon/ui';
+import { Button, IconSettings, Grid, useToast } from '@aragon/ui';
 import { ActionBuilder } from 'components/ActionBuilder/ActionBuilder';
 import { useWallet } from 'AugmentedWallet';
-import { useSnackbar } from 'notistack';
 import { Error } from 'utils/Error';
 
 export interface DaoHeaderProps {
@@ -52,7 +51,7 @@ export const DaoHeader: React.FC<DaoHeaderProps> = ({ daoName }) => {
 
   const context: any = useWallet();
   const { isConnected } = context;
-  const { enqueueSnackbar } = useSnackbar();
+  const toast = useToast();
 
   const goToSettingPage = () => {
     history.push(settingsUrl(daoName));
@@ -60,14 +59,11 @@ export const DaoHeader: React.FC<DaoHeaderProps> = ({ daoName }) => {
 
   const openDepositDialog = useCallback(() => {
     if (!isConnected) {
-      enqueueSnackbar(Error.ConnectAccount, {
-        variant: 'error',
-      });
-
+      toast(Error.ConnectAccount);
       return;
     }
     setDepositDialogOpen(true);
-  }, [setDepositDialogOpen, enqueueSnackbar, isConnected]);
+  }, [setDepositDialogOpen, toast, isConnected]);
 
   return (
     <DaoHeaderCard>

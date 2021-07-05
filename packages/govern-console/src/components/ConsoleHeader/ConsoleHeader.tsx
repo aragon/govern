@@ -4,8 +4,7 @@ import MUICard from '@material-ui/core/Card';
 import MUITypography from '@material-ui/core/Typography';
 import { useHistory } from 'react-router-dom';
 import consoleHeaderGraphic from 'images/console-header.svg';
-import { useSnackbar } from 'notistack';
-import { Button, TextInput, Split, useLayout, SPACING } from '@aragon/ui';
+import { Button, TextInput, Split, useLayout, useToast, SPACING } from '@aragon/ui';
 
 const ConsoleHeaderCard = styled(MUICard)(({ theme }) => ({
   background: theme.custom.daoHeader.background,
@@ -46,7 +45,7 @@ const ConsoleImage = styled('img')({
 
 export const ConsoleHeader: React.FC = () => {
   const { layoutName } = useLayout();
-  const { enqueueSnackbar } = useSnackbar();
+  const toast = useToast();
   const history = useHistory();
   const [searchString, updateSearchString] = useState<string>('');
 
@@ -58,9 +57,7 @@ export const ConsoleHeader: React.FC = () => {
     if (searchString.length > 0) {
       history.push(`daos/${searchString}`);
     } else {
-      enqueueSnackbar('Invalid Dao Name. At least one letter should be entered.', {
-        variant: 'error',
-      });
+      toast('Invalid Dao Name. At least one letter should be entered.');
     }
   };
 
