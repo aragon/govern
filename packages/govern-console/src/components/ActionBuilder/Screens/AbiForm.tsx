@@ -3,13 +3,14 @@ import {
   StyledText,
   Button,
   TextInput,
-  useTheme,
   IconWarning,
   Grid,
   GridItem,
   Help,
+  useTheme,
   useLayout,
   SPACING,
+  Info,
 } from '@aragon/ui';
 import { Controller, useForm } from 'react-hook-form';
 import { validateContract, validateAbi } from 'utils/validations';
@@ -29,12 +30,13 @@ export const AbiForm: React.FC = () => {
   const theme = useTheme();
   const { layoutName } = useLayout();
   const spacing = SPACING[layoutName];
+  const compact = layoutName === 'small';
 
   const methods = useForm<FormInput>();
-  const { control, handleSubmit, trigger, getValues } = methods;
+  const { control, handleSubmit, trigger, getValues, formState } = methods;
 
   const { gotoFunctionSelector } = useActionBuilderState();
-  const [warning, setWarning] = useState(false);
+  const [showAbi, setShowAbi] = useState(false);
 
   const gotoNextScreen = useCallback(() => {
     const formData = getValues();
@@ -54,9 +56,9 @@ export const AbiForm: React.FC = () => {
     if (abi) {
       gotoFunctionSelector(address, abi);
     } else {
-      setWarning(true);
+      setShowAbi(true);
     }
-  }, [networkName, trigger, getValues, gotoFunctionSelector, setWarning]);
+  }, [networkName, trigger, getValues, gotoFunctionSelector, setShowAbi]);
 
   return (
     <Grid>
@@ -65,8 +67,18 @@ export const AbiForm: React.FC = () => {
       </GridItem>
       <GridItem>
         <StyledText name="title2">Input contract address</StyledText>
-        <Grid columns="4" columnWidth="1fr" alignVertical="center">
-          <GridItem gridColumn="1/4">
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'baseline',
+            alignContent: 'stretch',
+            columnGap: `${spacing}px`,
+            rowGap: `${spacing}px`,
+            flexFlow: 'row wrap',
+          }}
+        >
+          <div style={{ flex: '1', minWidth: '400px' }}>
             <Controller
               name="contractAddress"
               control={control}
@@ -87,65 +99,69 @@ export const AbiForm: React.FC = () => {
                 />
               )}
             />
-          </GridItem>
-          <GridItem gridColum="4/5" alignVertical="center">
-            <Button label="Search" onClick={fetchAbi}></Button>
-          </GridItem>
-        </Grid>
-        <div
-          style={{
-            opacity: `${warning ? 1 : 0}`,
-            color: `${theme.warning}`,
-            display: 'grid',
-            gridTemplateColumns: '30px 1fr',
-          }}
-        >
-          <IconWarning />
-          <div>Contract not verified, please insert the input function ABI</div>
+          </div>
+          <div style={{ width: `${compact ? '100%' : 'auto'}` }}>
+            <Button wide label="Search" onClick={fetchAbi}></Button>
+            {!compact && formState.errors.contractAddress && (
+              <div style={{ opacity: 0 }}>filler</div>
+            )}
+          </div>
         </div>
       </GridItem>
-      <GridItem>
-        <StyledText name="title2">
-          <div style={{ display: 'flex', columnGap: `${spacing}px`, alignItems: 'center' }}>
-            <div>Input function ABI </div>
-            <div>
-              <Help hint="What is an ABI?">
-                An ABI is the specification used to interact with Ethereum smart contracts
-              </Help>
-            </div>
-          </div>
-        </StyledText>
-        <Controller
-          name="abi"
-          control={control}
-          shouldUnregister={true}
-          defaultValue=""
-          rules={{
-            required: 'This is required.',
-            validate: async (value) => validateAbi(value),
-          }}
-          render={({ field: { onChange, value }, fieldState: { error } }) => (
-            <TextInput
-              wide
-              style={{ minHeight: '200px' }}
-              multiline
-              value={value}
-              placeholder="Function ABI"
-              onChange={onChange}
-              status={error ? 'error' : 'normal'}
-              error={error ? error.message : null}
+      {showAbi && (
+        <Grid>
+          <GridItem>
+            <Info mode="warning" borderColor={`${theme.warningSurface}`}>
+              <div style={{ display: 'flex', alignItems: 'center', columnGap: '5px' }}>
+                <IconWarning></IconWarning>
+                <span>Contract not verified, please insert the input function ABI</span>
+              </div>
+            </Info>
+          </GridItem>
+          <GridItem>
+            <StyledText name="title2">
+              <div style={{ display: 'flex', columnGap: `${spacing}px`, alignItems: 'center' }}>
+                <div>Input function ABI </div>
+                <div>
+                  <Help hint="What is an ABI?">
+                    An ABI is the specification used to interact with Ethereum smart contracts
+                  </Help>
+                </div>
+              </div>
+            </StyledText>
+            <Controller
+              name="abi"
+              control={control}
+              shouldUnregister={true}
+              defaultValue=""
+              rules={{
+                required: 'This is required.',
+                validate: async (value) => validateAbi(value),
+              }}
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
+                <TextInput
+                  wide
+                  style={{ minHeight: '200px' }}
+                  multiline
+                  value={value}
+                  placeholder="Function ABI"
+                  onChange={onChange}
+                  status={error ? 'error' : 'normal'}
+                  error={error ? error.message : null}
+                />
+              )}
             />
-          )}
-        />
-      </GridItem>
-      <GridItem>
-        <Button
-          mode={'primary'}
-          wide
-          label="Choose"
-          onClick={handleSubmit(gotoNextScreen)}
-        ></Button>
-      </GridItem>
+          </GridItem>
+          <GridItem>
+            <Button
+              mode={'primary'}
+              wide
+              label="Choose"
+              onClick={handleSubmit(gotoNextScreen)}
+            ></Button>
+          </GridItem>
+        </Grid>
+      )}
     </Grid>
   );
 };

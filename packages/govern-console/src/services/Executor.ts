@@ -45,7 +45,7 @@ export class Executor {
    * @returns CustomTransaction[]
    */
   private async buildApprovalTransactions(asset: Asset): Promise<CustomTransaction[]> {
-    if (Asset.isEth(asset.symbol)) {
+    if (asset.isEth()) {
       return [];
     }
 
@@ -76,7 +76,7 @@ export class Executor {
    * @returns CustomTransaction[] transactions for depositing the asset
    */
   public async deposit(asset: Asset, reference: string): Promise<CustomTransaction[]> {
-    const value = Asset.isEth(asset.symbol) ? asset.amount : 0;
+    const value = asset.isEth() ? asset.amount : 0;
 
     // token allowance and approval
     const approvalTransactions = await this.buildApprovalTransactions(asset);

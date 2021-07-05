@@ -17,14 +17,17 @@ import { useForm, Controller } from 'react-hook-form';
 import { validateAmountForDecimals, validateToken } from 'utils/validations';
 import { useWallet } from 'AugmentedWallet';
 import AbiHandler from 'utils/AbiHandler';
-import { Asset, ETH, OTHER_TOKEN_SYMBOL } from 'utils/Asset';
+import { Asset, AssetLabel, ETH, OTHER_TOKEN_SYMBOL } from 'utils/Asset';
 import { useActionBuilderState } from '../ActionBuilderStateProvider';
 import { useSnackbar } from 'notistack';
 import { getErrorFromException } from 'utils/HelperFunctions';
 
 import { networkEnvironment } from 'environment';
 const { curatedTokens } = networkEnvironment;
-const withdrawalAssets = Object.keys(curatedTokens).concat([ETH.symbol, OTHER_TOKEN_SYMBOL]);
+const withdrawalAssets = Object.keys(curatedTokens).concat([
+  ETH.symbol,
+  OTHER_TOKEN_SYMBOL,
+]) as Array<AssetLabel>;
 
 const withdrawSignature =
   'function withdraw(address token, address from, address to, uint256 amount, string memory reference)';
@@ -67,7 +70,7 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
     } = getValues();
 
     try {
-      const asset = await Asset.createFromSymbol(
+      const asset = await Asset.createFromDropdownLabel(
         withdrawalAssets[token],
         tokenContractAddress,
         withdrawalAmount,
@@ -92,7 +95,7 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
     async (value: string) => {
       try {
         const { token, tokenContractAddress } = getValues();
-        const asset = await Asset.createFromSymbol(
+        const asset = await Asset.createFromDropdownLabel(
           withdrawalAssets[token],
           tokenContractAddress,
           value,
