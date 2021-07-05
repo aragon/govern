@@ -1,4 +1,4 @@
-import governIcon from 'images/aragon-icon.svg';
+import governIcon from 'images/svgs/aragon-icon.svg';
 import Wallet from 'components/Wallet/Wallet';
 import { useHistory } from 'react-router-dom';
 import { Button, StyledText, IconEdit, useLayout } from '@aragon/ui';
