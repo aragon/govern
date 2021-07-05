@@ -1,11 +1,11 @@
 import React, { memo, useState, useCallback } from 'react';
-import { IconAdd, Grid, GridItem, Button, StyledText, Link, TextInput } from '@aragon/ui';
+import { IconAdd, Grid, GridItem, Button, StyledText, Link, TextInput, Box } from '@aragon/ui';
 import { PageName } from 'utils/HelpText';
 import PageContent from 'components/PageContent/PageContent';
 import ActionList from 'containers/NewExecution/ActionList';
 import { ActionBuilder } from 'components/ActionBuilder/ActionBuilder';
 import { useParams, useHistory } from 'react-router-dom';
-import { ContractReceipt, utils } from 'ethers';
+import { ContractReceipt } from 'ethers';
 import { useWallet } from 'AugmentedWallet';
 import { buildConfig } from 'utils/ERC3000';
 import { CustomTransaction, ActionItem } from 'utils/types';
@@ -19,6 +19,8 @@ import { useFacadeProposal } from 'hooks/proposal-hooks';
 import { IPFSInput } from 'components/Field/IPFSInput';
 import { settingsUrl } from 'utils/urls';
 import { useDaoQuery } from 'hooks/query-hooks';
+import { Error } from 'utils/Error';
+import AbiHandler from 'utils/AbiHandler';
 
 interface FormInputs {
   proof: string;
@@ -57,6 +59,16 @@ const NewExecution: React.FC = () => {
 
   const transactionsQueue = React.useRef<CustomTransaction[]>([]);
 
+  const openActionModal = useCallback(() => {
+    if (isConnected) {
+      setShowActionModal(true);
+    } else {
+      enqueueSnackbar(Error.ConnectAccount, {
+        variant: 'error',
+      });
+    }
+  }, [isConnected, setShowActionModal, enqueueSnackbar]);
+
   const onCloseActionModal = useCallback(
     (actions: any) => {
       if (actions) {
@@ -81,35 +93,17 @@ const NewExecution: React.FC = () => {
   const onSchedule = () => {
     if (!validate()) return;
 
-    const errors: string[] = [];
-    const values = getValues('actions');
-    console.log('schedule with ', values);
+    const actions = getValues('actions');
+    console.log('schedule with ', actions);
 
-    const actions = values.map((item) => {
-      const { sighash, signature, contractAddress, inputs } = item;
-      const abiInterface = new utils.Interface([`${signature}`]);
-      const functionParameters = inputs.map((input) => input.value);
-
-      let calldata = '';
-      try {
-        calldata = abiInterface.encodeFunctionData(sighash, functionParameters);
-      } catch (err) {
-        errors.push(err.message);
-      }
-      const data: ActionType = {
-        to: contractAddress,
-        value: 0,
-        data: calldata,
-      };
-      return data;
-    });
-
-    if (errors.length > 0) {
+    try {
+      const encodedActions = AbiHandler.encodeActions(actions);
+      scheduleProposal(encodedActions);
+    } catch (err) {
+      console.log('Failed to encode action data', err);
       enqueueSnackbar('Error encoding action data, please double check your action input.', {
         variant: 'error',
       });
-    } else {
-      scheduleProposal(actions);
     }
   };
 
@@ -161,75 +155,77 @@ const NewExecution: React.FC = () => {
 
   return (
     <PageContent pageName={PageName.NEW_EXECUTION}>
-      <Grid>
-        <GridItem>
-          <StyledText name={'title1'}>New execution</StyledText>
-          <StyledText name={'body3'}>
-            This execution will use the current{' '}
-            <Link onClick={() => history.push(settingsUrl(daoName))}>DAO Settings</Link>
-          </StyledText>
-        </GridItem>
-        <FormProvider {...methods}>
+      <Box>
+        <Grid>
           <GridItem>
-            <Controller
-              name="title"
-              control={control}
-              rules={{
-                required: 'This is required.',
-              }}
-              defaultValue=""
-              render={({ field: { onChange, value }, fieldState: { error } }) => (
-                <TextInput
-                  wide
-                  title="Title"
-                  value={value}
-                  placeholder="Type execution title"
-                  onChange={onChange}
-                  status={error ? 'error' : 'normal'}
-                  error={error ? error.message : null}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem>
-            <StyledText name={'title2'}>Justification</StyledText>{' '}
+            <StyledText name={'title1'}>New execution</StyledText>
             <StyledText name={'body3'}>
-              Insert the reason for scheduling this execution so DAO members can understand it.
+              This execution will use the current{' '}
+              <Link onClick={() => history.push(settingsUrl(daoName))}>DAO Settings</Link>
             </StyledText>
-            <IPFSInput
-              label=""
-              placeholder="Please insert the reason why you want to execute this"
-              textInputName="proof"
-              fileInputName="proofFile"
-            />
           </GridItem>
-          <GridItem>
-            <StyledText name={'title2'}>Actions</StyledText>
-            <StyledText name={'body3'}>
-              Add as many actions (smart contract interactions) you want for this execution.
-            </StyledText>
-            <ActionList actions={fields} swap={swap} remove={remove} />
-            <br />
+          <FormProvider {...methods}>
+            <GridItem>
+              <Controller
+                name="title"
+                control={control}
+                rules={{
+                  required: 'This is required.',
+                }}
+                defaultValue=""
+                render={({ field: { onChange, value }, fieldState: { error } }) => (
+                  <TextInput
+                    wide
+                    title="Title"
+                    value={value}
+                    placeholder="Type execution title"
+                    onChange={onChange}
+                    status={error ? 'error' : 'normal'}
+                    error={error ? error.message : null}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem>
+              <StyledText name={'title2'}>Justification</StyledText>{' '}
+              <StyledText name={'body3'}>
+                Insert the reason for scheduling this execution so DAO members can understand it.
+              </StyledText>
+              <IPFSInput
+                label=""
+                placeholder="Please insert the reason why you want to execute this"
+                textInputName="proof"
+                fileInputName="proofFile"
+              />
+            </GridItem>
+            <GridItem>
+              <StyledText name={'title2'}>Actions</StyledText>
+              <StyledText name={'body3'}>
+                Add as many actions (smart contract interactions) you want for this execution.
+              </StyledText>
+              <ActionList actions={fields} swap={swap} remove={remove} />
+              <br />
+              <Button
+                mode="secondary"
+                icon={<IconAdd />}
+                label="Add new action"
+                onClick={openActionModal}
+              ></Button>
+            </GridItem>
             <Button
-              mode="secondary"
-              icon={<IconAdd />}
-              label="Add new action"
-              onClick={() => setShowActionModal(true)}
+              wide
+              size="large"
+              mode="primary"
+              disabled={!isConnected}
+              onClick={handleSubmit(onSchedule)}
+              label="Schedule"
             ></Button>
-          </GridItem>
-          <Button
-            wide
-            size="large"
-            mode="primary"
-            disabled={!isConnected}
-            onClick={handleSubmit(onSchedule)}
-            label="Schedule"
-          ></Button>
-          {showActionModal && (
-            <ActionBuilder visible={showActionModal} onClose={onCloseActionModal}></ActionBuilder>
-          )}
-        </FormProvider>
-      </Grid>
+            {showActionModal && (
+              <ActionBuilder visible={showActionModal} onClose={onCloseActionModal}></ActionBuilder>
+            )}
+          </FormProvider>
+        </Grid>
+      </Box>
     </PageContent>
   );
 };

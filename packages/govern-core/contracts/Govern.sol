@@ -32,6 +32,8 @@ contract Govern is IERC3000Executor, AdaptiveERC165, ERC1271, ACL {
     string private constant ERROR_ETH_WITHDRAW_FAILED = "GOVERN_ETH_WITHDRAW_FAILED";
 
     bytes4 internal constant EXEC_ROLE = this.exec.selector;
+    bytes4 internal constant WITHDRAW_ROLE = this.withdraw.selector;
+
     bytes4 internal constant REGISTER_STANDARD_ROLE = this.registerStandardAndCallback.selector;
     bytes4 internal constant SET_SIGNATURE_VALIDATOR_ROLE = this.setSignatureValidator.selector;
     uint256 internal constant MAX_ACTIONS = 256;
@@ -47,6 +49,11 @@ contract Govern is IERC3000Executor, AdaptiveERC165, ERC1271, ACL {
 
     function initialize(address _initialExecutor) public initACL(address(this)) onlyInit("govern") {
         _grant(EXEC_ROLE, address(_initialExecutor));
+        _grant(WITHDRAW_ROLE, address(this));
+
+        // freeze the withdraw so that only GovernExecutor can call
+        _freeze(WITHDRAW_ROLE);
+
         _grant(REGISTER_STANDARD_ROLE, address(this));
         _grant(SET_SIGNATURE_VALIDATOR_ROLE, address(this));
 
@@ -74,7 +81,7 @@ contract Govern is IERC3000Executor, AdaptiveERC165, ERC1271, ACL {
         emit Deposited(msg.sender, _token, _amount, _reference);
     }
 
-    function withdraw(address _token, address _from, address _to, uint256 _amount, string memory _reference) private {
+    function withdraw(address _token, address _from, address _to, uint256 _amount, string memory _reference) public auth(WITHDRAW_ROLE) {
         if (_token == address(0)) {
             (bool ok, ) = _to.call{value: _amount}("");
             require(ok, ERROR_ETH_WITHDRAW_FAILED);
@@ -83,7 +90,6 @@ contract Govern is IERC3000Executor, AdaptiveERC165, ERC1271, ACL {
         }
         emit Withdrawn(_token, _to, _from, _amount, _reference);
     }
-
 
     function exec(ERC3000Data.Action[] memory actions, bytes32 allowFailuresMap, bytes32 memo) override public auth(EXEC_ROLE) returns (bytes32, bytes[] memory) {
         require(actions.length <= MAX_ACTIONS, ERROR_TOO_MANY_ACTIONS); // need to limit since we use 256-bit bitmaps

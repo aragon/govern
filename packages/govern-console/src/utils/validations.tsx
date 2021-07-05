@@ -1,7 +1,9 @@
 import { ValidateResult } from 'react-hook-form';
 import Abi from './AbiHandler';
 import { isTokenERC20 } from 'utils/token';
-import { getToken } from '@aragon/govern';
+import { utils, Contract, BigNumber, providers } from 'ethers';
+import { erc20TokenABI } from 'abis/erc20';
+import { Asset } from 'utils/Asset';
 
 /**
  * Validate if address is an ERC20 token
@@ -45,23 +47,6 @@ export const validateAmountForDecimals = (amount: string, decimals: number) => {
   return true;
 };
 
-export const validateAmountForToken = async (
-  address: string,
-  amount: string,
-  provider: any,
-): Promise<ValidateResult> => {
-  let decimals = 0;
-  try {
-    const { tokenDecimals } = await getToken(address, provider);
-    decimals = tokenDecimals ?? decimals;
-  } catch (error) {
-    /* since token decimal is an optional for ERC20,
-    will use 0 decimal to validate instead
-     */
-  }
-  return validateAmountForDecimals(amount, decimals);
-};
-
 /**
  * Check if contract is a contract
  *
@@ -97,4 +82,37 @@ export const positiveNumber = (num: number | string): ValidateResult => {
     num = parseInt(num);
   }
   return num > 0 ? true : 'Value must be positive';
+};
+
+/**
+ * check if the address is valid
+ * @param address address to be validated
+ * @returns <ValidateResult> true if valid, error message if invalid
+ */
+export const validateAddress = (address: string): ValidateResult => {
+  return utils.isAddress(address) ? true : 'Invalid address';
+};
+
+/**
+ * validate that the asset balance of the owner is greater or equal to the amount
+ * @param asset asset to be verified
+ * @param ownerAddress owner address to be validated
+ * @param provider interface to node
+ * @returns  <ValidateResult> true if valid, error message if invalid
+ */
+export const validateBalance = async (
+  asset: Asset,
+  ownerAddress: string,
+  provider: providers.Web3Provider,
+): Promise<ValidateResult> => {
+  let balance = BigNumber.from(0);
+
+  if (Asset.isEth(asset.symbol)) {
+    balance = await provider.getBalance(ownerAddress);
+  } else {
+    const contract = new Contract(asset.address, erc20TokenABI, provider);
+    balance = await contract.balanceOf(ownerAddress);
+  }
+
+  return BigNumber.from(asset.amount).lte(balance) ? true : 'Insufficient balance';
 };
