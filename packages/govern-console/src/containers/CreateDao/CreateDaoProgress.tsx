@@ -42,10 +42,10 @@ const CreateDaoProgress: React.FC<{
   const [showAction, setShowAction] = useState<'none' | 'fail' | 'register' | 'finish'>('none');
   const [rule, SetRule] = useState<BytesLike>('');
   const [isNewDaoTokenRegistered, setIsNewDaoTokenRegistered] = useState(false);
-  const [daoTokenAddress, setDaoContractAddress] = useState('0x');
+  const [daoTokenAddress, setDaoTokenAddress] = useState('0x');
 
   const updateNewDaoTokenAddress = (value: string) => {
-    setDaoContractAddress(value);
+    setDaoTokenAddress(value);
   };
 
   useEffect(() => {
@@ -54,10 +54,16 @@ const CreateDaoProgress: React.FC<{
         const isRegistered = await isTokenRegistered(provider.getSigner(), daoTokenAddress);
         console.log('useEffect checkIfRegistered', daoTokenAddress, isRegistered);
         setIsNewDaoTokenRegistered(isRegistered);
+
+        // update create dao status
+        const newList = [...progressList];
+        newList[1].status = CiruclarProgressStatus.Done;
+        setProgressList(newList);
+        setShowAction('register');
       }
     };
     checkIfRegistered();
-  }, [daoTokenAddress, provider]);
+  }, [daoTokenAddress, provider, progressList]);
 
   const createDaoParams: CreateDaoParams = useMemo(() => {
     // token
@@ -190,10 +196,7 @@ const CreateDaoProgress: React.FC<{
           await result.wait();
           console.log('callCreateDao', result);
 
-          const newList2 = [...progressList];
-          newList2[1].status = CiruclarProgressStatus.Done;
-          setProgressList(newList2);
-          setShowAction('register');
+          if (basicInfo.isExistingToken) updateNewDaoTokenAddress(basicInfo.tokenAddress);
         } catch (error) {
           console.log('error', error);
           newList[1].status = CiruclarProgressStatus.Failed;
