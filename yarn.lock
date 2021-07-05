@@ -86,7 +86,7 @@
 
 "@aragon/ui@https://github.com/aragon/ui.git#v2":
   version "1.7.0"
-  resolved "https://github.com/aragon/ui.git#983236510f8a42a982455874be244e077f4ca1d2"
+  resolved "https://github.com/aragon/ui.git#5bbf47923e5e6d3bf1c8421cebd4d57e769f848d"
   dependencies:
     "@babel/runtime" "^7.3.1"
     airbnb-prop-types "^2.9.0"

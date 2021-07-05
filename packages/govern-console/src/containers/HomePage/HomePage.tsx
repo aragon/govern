@@ -24,7 +24,7 @@ const HomePage = () => {
 
   return (
     <ModalsProvider>
-      <Main theme={'light'}>
+      <Main theme={'light'} toastProps={{ top: true, position: 'center' }}>
         <Header />
         <Switch>
           <Route exact path="/">

@@ -6,6 +6,7 @@ import { validateToken, validateAmountForDecimals } from 'utils/validations';
 import { useWallet } from 'AugmentedWallet';
 import { getTokenInfo } from 'utils/token';
 import { formatUnits } from 'utils/lib';
+import { MAX_SCHEDULE_ACCESS_LIST_ALLOWED } from 'utils/constants';
 
 import {
   useLayout,
@@ -369,7 +370,7 @@ const CreateDaoCollateral: React.FC<{
               wide={false}
               mode={'secondary'}
               size={'large'}
-              disabled={fields.length >= 10}
+              disabled={fields.length >= MAX_SCHEDULE_ACCESS_LIST_ALLOWED}
               label={'Add new address'}
               icon={<IconPlus />}
               display={'all'}
