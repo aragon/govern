@@ -3,6 +3,7 @@ import { useWallet } from 'use-wallet';
 import { useEffect } from 'react';
 import { networkEnvironment } from 'environment';
 import { Button, EthIdenticon, useLayout, IconConnect, useToast } from '@aragon/ui';
+import { getTruncatedAccountAddress } from 'utils/account';
 
 //TODO add the icon for logged in users
 declare let window: any;
@@ -26,9 +27,7 @@ const Wallet = ({}) => {
       }
     } else if (status === 'connected') {
       setNetworkStatus('connected');
-      toast('Your wallet is successfully connected.', {
-        variant: 'success',
-      });
+      toast('Your wallet is successfully connected.');
     } else {
       setNetworkStatus('disconnected');
     }
@@ -40,17 +39,11 @@ const Wallet = ({}) => {
     }
     if (error) {
       if (error.message.includes('Unsupported chain')) {
-        toast('Please select the correct chain in your wallet.', {
-          variant: 'error',
-        });
+        toast('Please select the correct chain in your wallet.');
       } else if (error.message.includes('window.ethereum')) {
-        toast('Please install a wallet.', {
-          variant: 'error',
-        });
+        toast('Please install a wallet.');
       } else {
-        toast(error.message, {
-          variant: 'error',
-        });
+        toast(error.message);
       }
     }
   }, [status, error, toast]);
@@ -80,28 +73,12 @@ const Wallet = ({}) => {
     }
   }, [account]);
 
-  const getDisplayText = (displayText: string, isAddress: boolean) => {
-    if (isAddress) {
-      const formattedAddress =
-        displayText.slice(0, 5) +
-        '...' +
-        displayText.slice(displayText.length - 5, displayText.length - 1);
-      return formattedAddress;
-    } else {
-      let formattedName = displayText;
-      if (displayText.length > 20) {
-        formattedName = displayText.slice(0, 19);
-      }
-      return formattedName;
-    }
-  };
-
   if (networkStatus === 'connected') {
     return (
       <Button
         size="large"
         mode="secondary"
-        label={getDisplayText(userAccount, true)}
+        label={getTruncatedAccountAddress(userAccount)}
         icon={<EthIdenticon address={userAccount} scale={1.5} radius={50} />}
         display={layoutName === 'small' ? 'icon' : 'all'}
         onClick={() => {
