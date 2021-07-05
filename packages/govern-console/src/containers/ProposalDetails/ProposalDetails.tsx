@@ -11,10 +11,9 @@ import { CustomTransaction } from 'utils/types';
 import { getProposalParams } from 'utils/ERC3000';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import AbiHandler from 'utils/AbiHandler';
-import { toUTF8Bytes } from 'utils/lib';
 import { formatDate } from 'utils/date';
 import { getState, getStateColor } from 'utils/states';
-import { useSnackbar } from 'notistack';
+import { useToast } from '@aragon/ui';
 import { IPFSField } from 'components/Field/IPFSField';
 import { addToIpfs, fetchIPFS } from 'utils/ipfs';
 import { useFacadeProposal } from 'hooks/proposal-hooks';
@@ -291,7 +290,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
   const { networkName, isConnected } = context;
 
   const { dispatch } = React.useContext(ModalsContext);
-  const { enqueueSnackbar } = useSnackbar();
+  const toast = useToast();
 
   const [proposalInfo, updateProposalInfo] = React.useState<any>(null);
   const [decodedData, updateDecodedData] = React.useState<any>({});
@@ -392,7 +391,8 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
         try {
           transactionsQueue.current = await proposalInstance.challenge(proposalParams, reasonCid);
         } catch (error) {
-          enqueueSnackbar(error.message, { variant: 'error' });
+          console.log('Failed challenging', error);
+          toast(error.message);
           return;
         }
       }

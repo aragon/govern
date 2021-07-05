@@ -5,7 +5,7 @@ import { InputField } from 'components/InputFields/InputField';
 import { useHistory } from 'react-router-dom';
 import MUITypography from '@material-ui/core/Typography';
 import daoNoutFound from 'images/dao-not-found.svg';
-import { useSnackbar } from 'notistack';
+import { useToast } from '@aragon/ui';
 
 const VerticalAlignWrapper = styled('div')({
   height: 'fit-content',
@@ -55,15 +55,13 @@ const NotFoundImage = styled('img')({
 
 const NoDaoFound: React.FC = () => {
   const history = useHistory();
-  const { enqueueSnackbar } = useSnackbar();
+  const toast = useToast();
 
   const onGotoDao = () => {
     if (daoSearchText.length > 0) {
       history.push(`${daoSearchText}`);
     } else {
-      enqueueSnackbar('Invalid Dao Name. At least one letter should be entered.', {
-        variant: 'error',
-      });
+      toast('Invalid Dao Name. At least one letter should be entered.');
     }
   };
 

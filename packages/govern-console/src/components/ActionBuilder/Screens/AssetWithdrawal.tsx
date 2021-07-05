@@ -10,6 +10,7 @@ import {
   Tag,
   SPACING,
   useLayout,
+  useToast,
 } from '@aragon/ui';
 import { ActionBuilderCloseHandler } from 'utils/types';
 import { Hint } from 'components/Hint/Hint';
@@ -19,7 +20,6 @@ import { useWallet } from 'AugmentedWallet';
 import AbiHandler from 'utils/AbiHandler';
 import { Asset, AssetLabel, ETH, OTHER_TOKEN_SYMBOL } from 'utils/Asset';
 import { useActionBuilderState } from '../ActionBuilderStateProvider';
-import { useSnackbar } from 'notistack';
 import { getErrorFromException } from 'utils/HelperFunctions';
 
 import { networkEnvironment } from 'environment';
@@ -53,7 +53,7 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
   const { provider } = context;
 
   const { dao } = useActionBuilderState();
-  const { enqueueSnackbar } = useSnackbar();
+  const toast = useToast();
 
   const methods = useForm<WithdrawalFormData>();
   const { control, handleSubmit, watch, getValues } = methods;
@@ -85,11 +85,9 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
     } catch (err) {
       console.log('withdrawal error', err);
       const errorMessage = getErrorFromException(err);
-      enqueueSnackbar(errorMessage, {
-        variant: 'error',
-      });
+      toast(errorMessage);
     }
-  }, [onClick, getValues, enqueueSnackbar, dao, provider]);
+  }, [onClick, getValues, toast, dao, provider]);
 
   const validateAmount = useCallback(
     async (value: string) => {
