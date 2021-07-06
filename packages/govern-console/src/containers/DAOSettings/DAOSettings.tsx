@@ -11,7 +11,7 @@ import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { ContractReceipt } from 'ethers';
 import { validateToken, validateContract, validateAmountForDecimals } from 'utils/validations';
 import { Proposal, ReceiptType } from '@aragon/govern';
-import { useSnackbar } from 'notistack';
+import { useToast } from '@aragon/ui';
 import { toUTF8String } from 'utils/lib';
 import { proposalDetailsUrl } from 'utils/urls';
 import { addToIpfs, fetchIPFS } from 'utils/ipfs';
@@ -78,7 +78,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
   const context: any = useWallet();
   const { account, isConnected, provider } = context;
   const { dispatch } = React.useContext(ModalsContext);
-  const { enqueueSnackbar } = useSnackbar();
+  const toast = useToast();
   const methods = useForm<FormInputs>();
   const { control, setValue, getValues, handleSubmit, trigger } = methods;
   const { daoName } = useParams<ParamTypes>();
@@ -229,7 +229,8 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
       try {
         transactionsQueue.current = await proposalInstance.schedule(payload, buildConfig(config));
       } catch (error) {
-        enqueueSnackbar(error.message, { variant: 'error' });
+        console.log('Failed scheduling dao changes', error);
+        toast(error.message);
         return;
       }
     }

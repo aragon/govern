@@ -19,7 +19,10 @@ function HelpComponent() {
   return (
     <Box style={{ border: 'none', backgroundColor: '#8991FF1A' }}>
       <Grid columns={'4'} columnWidth={'1fr'} gap={14}>
-        <GridItem gridColumn={'1/2'} alignHorizontal={layoutName !== 'large' && 'center'}>
+        <GridItem
+          gridColumn={'1/2'}
+          alignHorizontal={layoutName !== 'large' ? 'center' : undefined}
+        >
           <img
             src={helpFaceImage}
             style={{ width: 76, height: 48, marginTop: layoutName === 'large' ? 3 * GU : GU }}
