@@ -12,7 +12,7 @@ import { ContractReceipt } from 'ethers';
 import { validateToken, validateContract, validateAmountForDecimals } from 'utils/validations';
 import { Proposal, ReceiptType } from '@aragon/govern';
 import { useSnackbar } from 'notistack';
-import { toUTF8Bytes, toUTF8String } from 'utils/lib';
+import { toUTF8String } from 'utils/lib';
 import { proposalDetailsUrl } from 'utils/urls';
 import { addToIpfs, fetchIPFS } from 'utils/ipfs';
 import { IPFSInput } from 'components/Field/IPFSInput';
@@ -39,7 +39,6 @@ import {
 } from '@aragon/ui';
 import PageContent from 'components/PageContent/PageContent';
 import SettingsCard from './components/SettingsCard';
-import { ethers } from 'ethers';
 
 export interface DaoSettingFormProps {
   /**
@@ -175,10 +174,9 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
       getValues('rulesFile') &&
       !(getValues('rulesFile') instanceof FileList)
     ) {
-      // console.log('file not changed');
       return false;
     }
-    // console.log('there is change');
+    // TODO: do a similar chack if text not changed
     return true;
   };
 

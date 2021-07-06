@@ -50,15 +50,15 @@ const CreateDaoProgress: React.FC<{
 
   useEffect(() => {
     const checkIfRegistered = async () => {
-      if (daoTokenAddress !== '0x') {
+      if (daoTokenAddress !== '0x' && progressList[1].status !== CiruclarProgressStatus.Done) {
         const isRegistered = await isTokenRegistered(provider.getSigner(), daoTokenAddress);
         console.log('useEffect checkIfRegistered', daoTokenAddress, isRegistered);
         setIsNewDaoTokenRegistered(isRegistered);
 
         // update create dao status
-        const newList = [...progressList];
-        newList[1].status = CiruclarProgressStatus.Done;
-        setProgressList(newList);
+        const newList2 = [...progressList];
+        newList2[1].status = CiruclarProgressStatus.Done;
+        setProgressList(newList2);
         setShowAction('register');
       }
     };
