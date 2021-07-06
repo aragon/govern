@@ -1,10 +1,10 @@
 import React, { ReactNode } from 'react';
 import { Box, Grid, GridItem, StyledText, Info } from '@aragon/ui';
-import { CiruclarProgressStatus } from 'utils/types';
+import { CircularProgressStatus } from 'utils/types';
 import { ANCircularProgressWithCaption } from 'components/CircularProgress/ANCircularProgressWithCaption';
 
 export interface ICreateDaoProgress {
-  status: CiruclarProgressStatus;
+  status: CircularProgressStatus;
   text: string;
 }
 export interface ICreateDaoProgressModal {

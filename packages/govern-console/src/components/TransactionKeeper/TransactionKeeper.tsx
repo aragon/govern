@@ -33,45 +33,37 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
   ]);
   const [errorMessage, setErrorMessage] = React.useState('');
 
-  const updateTransaction = React.useCallback(
-    (updatedTransaction: CustomTransaction, updatedTransactionIndex: number) => {
-      console.log('updating transaction' + updatedTransactionIndex);
-      const updatedTransactions = transactions.map((transaction, index) =>
-        index === updatedTransactionIndex ? updatedTransaction : transaction,
-      );
-      updateTransactions([...updatedTransactions]);
+  const updateTransactionStatus = React.useCallback(
+    (txIndex: number, newStatus: CustomTransactionStatus) => {
+      const txs = [...transactions];
+      txs[txIndex].status = newStatus;
+      updateTransactions(txs);
     },
     [transactions],
   );
 
   const executeTransactions = React.useCallback(async () => {
-    console.log('Executing transactions');
     setState(TransactionKeeperState.Processing);
     let index = 0;
     let isQueueAborted = false;
     for (const transaction of transactions) {
       if (isQueueAborted) return;
       try {
-        let updatedTransaction = produce(transaction, (draft) => {
-          draft.status = CustomTransactionStatus.InProgress;
-        });
-        updateTransaction(updatedTransaction, index);
+        updateTransactionStatus(index, CustomTransactionStatus.InProgress);
         const transactionResponse: any = await transaction.tx();
         const transactionReceipt = await transactionResponse.wait();
-        updatedTransaction = produce(transaction, (draft) => {
-          draft.status = CustomTransactionStatus.Successful;
-        });
-        updateTransaction(updatedTransaction, index);
+        updateTransactionStatus(index, CustomTransactionStatus.Successful);
         if (typeof onTransactionSuccess === 'function') {
-          onTransactionSuccess(updatedTransaction, transactionReceipt);
+          onTransactionSuccess(transactions[index], transactionReceipt);
         }
       } catch (ex) {
         const updatedTransaction = produce(transaction, (draft) => {
           draft.status = CustomTransactionStatus.Failed;
         });
-        // TODO add a condition to check if we need to stop executing transactions based on a transaction level propoerty. This propeorty if needed is to be added to CustomTransactions type. CustomTransaction.abortQueueOnFailure = true/false
+        // TODO add a condition to check if we need to stop executing transactions based on a transaction level propoerty.
+        // This propeorty if needed is to be added to CustomTransactions type. CustomTransaction.abortQueueOnFailure = true/false
         isQueueAborted = true;
-        updateTransaction(updatedTransaction, index);
+        updateTransactionStatus(index, CustomTransactionStatus.Failed);
         setState(TransactionKeeperState.Failure);
         const message = getErrorFromException(ex);
         if (typeof onTransactionFailure === 'function') {
@@ -84,7 +76,7 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
     if (!isQueueAborted) {
       setState(TransactionKeeperState.Success);
     }
-  }, [transactions, onTransactionFailure, onTransactionSuccess, updateTransaction]);
+  }, [transactions, onTransactionFailure, onTransactionSuccess, updateTransactionStatus]);
 
   switch (state) {
     case TransactionKeeperState.Initial: {

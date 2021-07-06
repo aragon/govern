@@ -22,7 +22,6 @@ import { ipfsMetadata } from 'utils/types';
 import { formatUnits, parseUnits } from 'utils/lib';
 import { getTokenInfo } from 'utils/token';
 import { positiveNumber } from 'utils/validations';
-
 import {
   useLayout,
   Grid,
@@ -58,6 +57,7 @@ interface ParamTypes {
 interface FormInputs {
   daoConfig: DaoConfig;
   proof: string;
+  isRuleFile: boolean;
   rulesFile: any;
   proofFile: any;
 }
@@ -164,14 +164,24 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
     _load();
   }, [daoDetails, provider, config, setValue]);
 
+  const getRule = async (isRuleFile: number | boolean, textRule: string) => {
+    if (Number(isRuleFile) === 1) {
+      if (getValues('rulesFile') instanceof FileList) {
+        return await addToIpfs(getValues('rulesFile')[0]);
+      }
+    } else {
+      if (textRule !== ipfsMetadata?.text) {
+        return await addToIpfs(textRule);
+      }
+    }
+    return config.rules;
+  };
+
   const callSaveSetting = async (formData: FormInputs) => {
     const newConfig: DaoConfig = formData.daoConfig;
     let containerHash: string | undefined;
-    console.log('newConfig', newConfig, 'newConfig.rules.toString()', getValues('rulesFile'));
-    // Upload rules to ipfs
-    const rules = getValues('rulesFile') ? getValues('rulesFile')[0] : newConfig.rules.toString();
-    // console.log(getValues('rulesFile'), ' rulesfile');
-    newConfig.rules = await addToIpfs(rules);
+
+    newConfig.rules = await getRule(getValues('isRuleFile'), newConfig.rules.toString());
 
     // Upload proof to ipfs
     const proof = getValues('proofFile') ? getValues('proofFile')[0] : getValues('proof');
@@ -202,13 +212,10 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
       proof: proofCid,
     };
 
-    console.log('payload', payload, 'newConfig', newConfig);
-
     if (proposalInstance) {
       try {
         transactionsQueue.current = await proposalInstance.schedule(payload, buildConfig(config));
       } catch (error) {
-        console.log('Failed scheduling dao changes', error);
         toast(error.message);
         return;
       }
@@ -341,6 +348,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
               shouldUnregister={false}
               textInputName="daoConfig.rules"
               fileInputName="rulesFile"
+              isFile="isRuleFile"
             />
 
             <div>
@@ -427,7 +435,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
               render={({ field: { onChange, value }, fieldState: { error } }) => (
                 <TextInput
                   title="Challenge collateral token contract address"
-                  onInputChange={onChange}
+                  onChange={onChange}
                   value={value}
                   wide
                   placeholder={'0x'}
