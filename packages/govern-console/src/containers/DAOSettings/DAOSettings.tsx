@@ -164,27 +164,33 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
     _load();
   }, [daoDetails, provider, config, setValue]);
 
-  const shouldUpload = (isRuleFile: number | boolean) => {
-    if (
-      Number(isRuleFile) === 1 &&
-      getValues('rulesFile') &&
-      !(getValues('rulesFile') instanceof FileList)
-    ) {
-      return false;
+  const shouldUpload = (isRuleFile: number | boolean, textRule: string) => {
+    if (Number(isRuleFile) === 1) {
+      if (getValues('rulesFile') && !(getValues('rulesFile') instanceof FileList)) {
+        // console.log('no file change');
+        return false;
+      }
+    } else {
+      if (textRule === ipfsMetadata?.text) {
+        // console.log('no text change');
+        return false;
+      }
     }
-    // TODO: do a similar chack if text not changed
+    // console.log('there is change');
     return true;
   };
 
   const callSaveSetting = async (formData: FormInputs) => {
     const newConfig: DaoConfig = formData.daoConfig;
     let containerHash: string | undefined;
+
     // Upload rules to ipfs
-    if (shouldUpload(getValues('isRuleFile'))) {
+    if (shouldUpload(getValues('isRuleFile'), newConfig.rules.toString())) {
       const rules =
         getValues('rulesFile') instanceof FileList
           ? getValues('rulesFile')[0]
           : newConfig.rules.toString();
+      // console.log('rules', rules);
       newConfig.rules = await addToIpfs(rules);
     } else {
       newConfig.rules = config.rules;
