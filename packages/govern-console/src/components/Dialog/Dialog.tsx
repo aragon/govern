@@ -1,9 +1,9 @@
 import React from 'react';
-import { ANButton } from 'components/Button/ANButton';
 import { CloseButton } from 'components/Button/CloseButton';
 import { ANWrappedPaper } from 'components/WrapperPaper/ANWrapperPaper';
 import { styled } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import { Button } from '@aragon/ui';
 
 export interface DialogProps {
   /**
@@ -92,10 +92,11 @@ const Dialog: React.FC<DialogProps> = ({
               display: 'flex',
             }}
           >
-            <ANButton
-              width={'446px'}
+            <Button
+              wide
               label={button.label}
-              buttonType="primary"
+              mode="primary"
+              size="large"
               style={{ marginTop: 40 }}
               onClick={button.onClick}
             />

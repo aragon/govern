@@ -443,7 +443,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
               render={({ field: { onChange, value }, fieldState: { error } }) => (
                 <TextInput
                   title="Challenge collateral token contract address"
-                  onInputChange={onChange}
+                  onChange={onChange}
                   value={value}
                   wide
                   placeholder={'0x'}

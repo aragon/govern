@@ -2,7 +2,7 @@ import React from 'react';
 import Dialog from './Dialog';
 import { CustomTransaction } from 'utils/types';
 import TransactionList from './TransactionList';
-import { styled } from '@material-ui/core/styles';
+import { Info } from '@aragon/ui';
 
 export interface TransactionDialogProps {
   /**
@@ -36,17 +36,6 @@ export interface TransactionDialogProps {
   onClose?: () => void;
 }
 
-const Info = styled('div')({
-  color: '#5863FF',
-  textAlign: 'center',
-  fontSize: '16px',
-  marginTop: '40px',
-  width: '100%',
-  lineHeight: '51px',
-  background: '#ECFAFF',
-  borderRadius: '10px',
-});
-
 const TransactionDialog: React.FC<TransactionDialogProps> = ({
   title,
   info,
@@ -65,7 +54,11 @@ const TransactionDialog: React.FC<TransactionDialogProps> = ({
   return (
     <Dialog onClose={onClose} title={title} button={button}>
       <TransactionList transactions={transactions}></TransactionList>
-      {info && <Info>{info}</Info>}
+      {info && (
+        <Info mode={'info'} title={''} style={{ marginTop: 40 }}>
+          {info}
+        </Info>
+      )}
     </Dialog>
   );
 };

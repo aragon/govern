@@ -49,16 +49,16 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
     for (const transaction of transactions) {
       if (isQueueAborted) return;
       try {
-        const updatedTransaction = produce(transaction, (draft) => {
+        let updatedTransaction = produce(transaction, (draft) => {
           draft.status = CustomTransactionStatus.InProgress;
         });
         updateTransaction(updatedTransaction, index);
         const transactionResponse: any = await transaction.tx();
         const transactionReceipt = await transactionResponse.wait();
-        const updatedTransaction2 = produce(transaction, (draft) => {
+        updatedTransaction = produce(transaction, (draft) => {
           draft.status = CustomTransactionStatus.Successful;
         });
-        updateTransaction(updatedTransaction2, index);
+        updateTransaction(updatedTransaction, index);
         if (typeof onTransactionSuccess === 'function') {
           onTransactionSuccess(updatedTransaction, transactionReceipt);
         }
