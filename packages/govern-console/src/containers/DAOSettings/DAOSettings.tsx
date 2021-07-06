@@ -12,7 +12,7 @@ import { ContractReceipt } from 'ethers';
 import { validateToken, validateContract, validateAmountForDecimals } from 'utils/validations';
 import { Proposal, ReceiptType } from '@aragon/govern';
 import { useSnackbar } from 'notistack';
-import { toUTF8String } from 'utils/lib';
+import { toUTF8Bytes, toUTF8String } from 'utils/lib';
 import { proposalDetailsUrl } from 'utils/urls';
 import { addToIpfs, fetchIPFS } from 'utils/ipfs';
 import { IPFSInput } from 'components/Field/IPFSInput';
@@ -22,7 +22,6 @@ import { ipfsMetadata } from 'utils/types';
 import { formatUnits, parseUnits } from 'utils/lib';
 import { getTokenInfo } from 'utils/token';
 import { positiveNumber } from 'utils/validations';
-
 import {
   useLayout,
   Grid,
@@ -40,6 +39,7 @@ import {
 } from '@aragon/ui';
 import PageContent from 'components/PageContent/PageContent';
 import SettingsCard from './components/SettingsCard';
+import { ethers } from 'ethers';
 
 export interface DaoSettingFormProps {
   /**
@@ -58,6 +58,7 @@ interface ParamTypes {
 interface FormInputs {
   daoConfig: DaoConfig;
   proof: string;
+  isRuleFile: boolean;
   rulesFile: any;
   proofFile: any;
 }
@@ -101,6 +102,10 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
     }
     setResolverLock(lock);
   };
+
+  useEffect(() => {
+    console.log('config', config);
+  }, [config]);
 
   useEffect(() => {
     if (dao) {
@@ -164,14 +169,32 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
     _load();
   }, [daoDetails, provider, config, setValue]);
 
+  const shouldUpload = (isRuleFile: number | boolean) => {
+    if (
+      Number(isRuleFile) === 1 &&
+      getValues('rulesFile') &&
+      !(getValues('rulesFile') instanceof FileList)
+    ) {
+      // console.log('file not changed');
+      return false;
+    }
+    // console.log('there is change');
+    return true;
+  };
+
   const callSaveSetting = async (formData: FormInputs) => {
     const newConfig: DaoConfig = formData.daoConfig;
     let containerHash: string | undefined;
-    console.log('newConfig', newConfig, 'newConfig.rules.toString()', getValues('rulesFile'));
     // Upload rules to ipfs
-    const rules = getValues('rulesFile') ? getValues('rulesFile')[0] : newConfig.rules.toString();
-    // console.log(getValues('rulesFile'), ' rulesfile');
-    newConfig.rules = await addToIpfs(rules);
+    if (shouldUpload(getValues('isRuleFile'))) {
+      const rules =
+        getValues('rulesFile') instanceof FileList
+          ? getValues('rulesFile')[0]
+          : newConfig.rules.toString();
+      newConfig.rules = await addToIpfs(rules);
+    } else {
+      newConfig.rules = config.rules;
+    }
 
     // Upload proof to ipfs
     const proof = getValues('proofFile') ? getValues('proofFile')[0] : getValues('proof');
@@ -340,6 +363,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
               shouldUnregister={false}
               textInputName="daoConfig.rules"
               fileInputName="rulesFile"
+              isFile="isRuleFile"
             />
 
             <div>
