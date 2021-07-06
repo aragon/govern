@@ -57,7 +57,7 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
         padding: 2,
         borderRadius: 10,
         margin: 'auto',
-        width: 'fit-content',
+        width: '100%',
       }}
     >
       <TransactionListWrapper>
