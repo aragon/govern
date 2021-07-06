@@ -2,14 +2,14 @@ import { makeStyles } from '@material-ui/core/styles';
 import CircularProgress, { CircularProgressProps } from '@material-ui/core/CircularProgress';
 import blueTickImage from '../../images/svgs/Blue_tick.svg';
 import crossImage from '../../images/svgs/cross.svg';
-import { CiruclarProgressStatus } from 'utils/types';
+import { CircularProgressStatus } from 'utils/types';
 import React from 'react';
 
 export interface ANCircularProgressProps extends CircularProgressProps {
   /**
    * Status of the Circular Progress
    */
-  status?: CiruclarProgressStatus;
+  status?: CircularProgressStatus;
 }
 
 const useStyle = makeStyles({
@@ -54,7 +54,7 @@ export const ANCircularProgress = (props: ANCircularProgressProps) => {
   };
 
   switch (props.status) {
-    case CiruclarProgressStatus.Disabled:
+    case CircularProgressStatus.Disabled:
       return (
         <>
           <CircularProgress
@@ -70,10 +70,10 @@ export const ANCircularProgress = (props: ANCircularProgressProps) => {
           />
         </>
       );
-    case CiruclarProgressStatus.InProgress:
+    case CircularProgressStatus.InProgress:
       return getCircularProgress();
 
-    case CiruclarProgressStatus.Done:
+    case CircularProgressStatus.Done:
       return (
         <>
           <img src={blueTickImage} />
@@ -81,7 +81,7 @@ export const ANCircularProgress = (props: ANCircularProgressProps) => {
       );
       break;
 
-    case CiruclarProgressStatus.Failed:
+    case CircularProgressStatus.Failed:
       return (
         <>
           <img src={crossImage} style={{ width: 20, height: 20 }} />

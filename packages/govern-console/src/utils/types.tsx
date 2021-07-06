@@ -5,7 +5,7 @@ export enum CustomTransactionStatus {
   Failed,
 }
 
-export enum CiruclarProgressStatus {
+export enum CircularProgressStatus {
   Disabled,
   InProgress,
   Done,

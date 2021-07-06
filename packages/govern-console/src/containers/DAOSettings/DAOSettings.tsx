@@ -167,16 +167,13 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
   const getRule = async (isRuleFile: number | boolean, textRule: string) => {
     if (Number(isRuleFile) === 1) {
       if (getValues('rulesFile') instanceof FileList) {
-        // console.log('there is file change', getValues('rulesFile'));
         return await addToIpfs(getValues('rulesFile')[0]);
       }
     } else {
       if (textRule !== ipfsMetadata?.text) {
-        // console.log('there is text change', textRule);
         return await addToIpfs(textRule);
       }
     }
-    // console.log('no change', config.rules);
     return config.rules;
   };
 
@@ -219,7 +216,6 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
       try {
         transactionsQueue.current = await proposalInstance.schedule(payload, buildConfig(config));
       } catch (error) {
-        // console.log('Failed scheduling dao changes', error);
         toast(error.message);
         return;
       }

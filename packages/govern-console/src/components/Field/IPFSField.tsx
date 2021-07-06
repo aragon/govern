@@ -2,7 +2,7 @@ import React from 'react';
 import { toUTF8String } from 'utils/lib';
 import { ipfsMetadata } from 'utils/types';
 import { ANCircularProgressWithCaption } from 'components/CircularProgress/ANCircularProgressWithCaption';
-import { CiruclarProgressStatus } from 'utils/types';
+import { CircularProgressStatus } from 'utils/types';
 
 interface FieldProps {
   value: (ipfsMetadata & string) | undefined;
@@ -14,7 +14,7 @@ export const IPFSField: React.FC<FieldProps> = ({ value, loading, ...props }) =>
     <div {...props} style={{ display: 'flex' }}>
       {(() => {
         if (loading) {
-          return <ANCircularProgressWithCaption state={CiruclarProgressStatus.InProgress} />;
+          return <ANCircularProgressWithCaption state={CircularProgressStatus.InProgress} />;
         }
 
         if (typeof value === 'undefined') {

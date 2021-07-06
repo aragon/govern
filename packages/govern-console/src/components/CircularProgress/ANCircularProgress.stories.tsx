@@ -18,5 +18,5 @@ const Template: Story<ANCircularProgressProps> = (args) => <ANCircularProgress {
 export const an_Circularprogress = Template.bind({});
 
 an_Circularprogress.args = {
-  status: 1, // or import CiruclarProgressStatus enum
+  status: 1, // or import CircularProgressStatus enum
 };
