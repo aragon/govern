@@ -1,8 +1,8 @@
 export enum CustomTransactionStatus {
-  Successful,
-  Failed,
   Pending,
   InProgress,
+  Successful,
+  Failed,
 }
 
 export enum CiruclarProgressStatus {
