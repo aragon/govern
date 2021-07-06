@@ -35,7 +35,7 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
 
   const updateTransaction = React.useCallback(
     (updatedTransaction: CustomTransaction, updatedTransactionIndex: number) => {
-      console.log('updating transaction' + updatedTransactionIndex);
+      // console.log('updating transaction' + updatedTransactionIndex);
       const updatedTransactions = transactions.map((transaction, index) =>
         index === updatedTransactionIndex ? updatedTransaction : transaction,
       );
@@ -45,7 +45,7 @@ const TransactionKeeper: React.FC<TransactionKeeperProps> = ({
   );
 
   const executeTransactions = React.useCallback(async () => {
-    console.log('Executing transactions');
+    // console.log('Executing transactions');
     setState(TransactionKeeperState.Processing);
     let index = 0;
     let isQueueAborted = false;

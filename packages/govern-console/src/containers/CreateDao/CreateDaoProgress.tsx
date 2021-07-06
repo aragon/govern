@@ -52,7 +52,6 @@ const CreateDaoProgress: React.FC<{
     const checkIfRegistered = async () => {
       if (daoTokenAddress !== '0x' && progressList[1].status !== CiruclarProgressStatus.Done) {
         const isRegistered = await isTokenRegistered(provider.getSigner(), daoTokenAddress);
-        console.log('useEffect checkIfRegistered', daoTokenAddress, isRegistered);
         setIsNewDaoTokenRegistered(isRegistered);
 
         // update create dao status
@@ -157,7 +156,6 @@ const CreateDaoProgress: React.FC<{
   // second by actually creating the DAO
   /* eslint-disable */
   useEffect(() => {
-    console.log('start creating doa');
     const uploadToIpfs = async () => {
       const newList = [...progressList];
       try {
@@ -183,7 +181,6 @@ const CreateDaoProgress: React.FC<{
         try {
           newList[1].status = CiruclarProgressStatus.InProgress;
           setProgressList(newList);
-          console.log('callCreateDao createDaoParams', createDaoParams);
           const result: any = await createDao(
             createDaoParams,
             {
@@ -194,7 +191,6 @@ const CreateDaoProgress: React.FC<{
             updateNewDaoTokenAddress,
           );
           await result.wait();
-          console.log('callCreateDao', result);
 
           if (basicInfo.isExistingToken) updateNewDaoTokenAddress(basicInfo.tokenAddress);
         } catch (error) {

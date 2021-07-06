@@ -103,10 +103,6 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
   };
 
   useEffect(() => {
-    console.log('config', config);
-  }, [config]);
-
-  useEffect(() => {
     if (dao) {
       updateDaoDetails(dao);
     }
@@ -223,13 +219,11 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
       proof: proofCid,
     };
 
-    console.log('payload', payload, 'newConfig', newConfig);
-
     if (proposalInstance) {
       try {
         transactionsQueue.current = await proposalInstance.schedule(payload, buildConfig(config));
       } catch (error) {
-        console.log('Failed scheduling dao changes', error);
+        // console.log('Failed scheduling dao changes', error);
         toast(error.message);
         return;
       }
