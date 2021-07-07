@@ -56,7 +56,7 @@ const Header = () => {
           onClick={goToCreateDaoPage}
           label={'Create DAO'}
           icon={<IconEdit />}
-          display={layoutName === 'small' ? 'icon' : 'all'}
+          display={layoutName === 'small' ? 'icon' : 'label'}
           disabled={status === 'connecting'}
         />
       </RigtSideContainer>
