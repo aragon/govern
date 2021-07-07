@@ -12,6 +12,7 @@ const FILE_EXTS = {
 
 const MIME_TYPES = ['text/plain'];
 
+// Fleek IPFS That also handles pinning...
 function createIpfs() {
   if (!ipfs) {
     ipfs = create({
@@ -110,7 +111,7 @@ export function getIpfsCid(uriOrCid: string) {
 export function getIpfsUrl(uriOrCid: string) {
   let cid: string | null = uriOrCid.replace(/^ipfs:/, '');
   cid = getIpfsCid(cid);
-  return cid ? `${IPFS_GATEWAY}/${cid}` : null;
+  return cid ? `${IPFS_GATEWAY}${cid}` : null;
 }
 
 export async function fetchIPFS(uriOrCid: string) {
@@ -121,8 +122,6 @@ export async function fetchIPFS(uriOrCid: string) {
   if (!cid) {
     return null;
   }
-
-  const IPFS_GATEWAY = 'https://ipfs.io/ipfs/';
 
   // endpoint/text can be array for supporting multiple files
   const data: ipfsMetadata = {

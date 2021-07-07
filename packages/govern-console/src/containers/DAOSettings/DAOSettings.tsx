@@ -22,6 +22,9 @@ import { ipfsMetadata } from 'utils/types';
 import { formatUnits, parseUnits } from 'utils/lib';
 import { getTokenInfo } from 'utils/token';
 import { positiveNumber } from 'utils/validations';
+import { ANCircularProgressWithCaption } from 'components/CircularProgress/ANCircularProgressWithCaption';
+import { CircularProgressStatus } from 'utils/types';
+
 import {
   useLayout,
   Grid,
@@ -91,6 +94,8 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
     token: '',
   });
   const [ipfsMetadata, setIpfsMetadata] = useState<ipfsMetadata>();
+  const [ipfsRulesLoading, setIpfsRulesLoading] = useState<boolean>(true);
+
   const [scheduleDecimals, setScheduleDecimals] = useState<number>(0);
   const [challengeDecimals, setChallengeDecimals] = useState<number>(0);
   const [resolverLock, setResolverLock] = useState(false);
@@ -122,6 +127,18 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
   }, []);
 
   useEffect(() => {
+    const _loadRules = async (rules: string) => {
+      // config.rules IPFS handling with utf8string fallback.
+      const ipfsRules = await fetchIPFS(rules);
+      setIpfsRulesLoading(false);
+      if (ipfsRules) {
+        setIpfsMetadata(ipfsRules);
+        setValue('daoConfig.rules', ipfsRules.text || '');
+      } else {
+        setValue('daoConfig.rules', toUTF8String(rules) || rules);
+      }
+    };
+
     const _load = async () => {
       // config is also used as a check in order to set and populate
       // the UI with current Dao's config only once
@@ -149,16 +166,8 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
           _config.challengeDeposit.amount,
           _config.challengeDeposit.decimals,
         );
-        // config.rules IPFS handling with utf8string fallback.
-        const ipfsRules = await fetchIPFS(_config.rules);
-        if (ipfsRules) {
-          setIpfsMetadata(ipfsRules);
-          formConfig.rules = ipfsRules.text || '';
-        } else {
-          formConfig.rules = toUTF8String(_config.rules) || _config.rules;
-        }
-
         setValue('daoConfig', formConfig);
+        _loadRules(_config.rules);
       }
     };
     _load();
@@ -340,16 +349,23 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
               )}
             />
 
-            <IPFSInput
-              title={'Rules / Agreement'}
-              subtitle="Your DAO have optimistic capabilities, meaning that actions can happen without voting, but should follow pre defined rules. Please provide the main agreement for your DAO (In text, or upload a file)."
-              placeholder="DAO rules and agreement.."
-              ipfsMetadata={ipfsMetadata}
-              shouldUnregister={false}
-              textInputName="daoConfig.rules"
-              fileInputName="rulesFile"
-              isFile="isRuleFile"
-            />
+            {ipfsRulesLoading ? (
+              <ANCircularProgressWithCaption
+                caption="Fetching Rules from IPFS"
+                state={CircularProgressStatus.InProgress}
+              />
+            ) : (
+              <IPFSInput
+                title={'Rules / Agreement'}
+                subtitle="Your DAO have optimistic capabilities, meaning that actions can happen without voting, but should follow pre defined rules. Please provide the main agreement for your DAO (In text, or upload a file)."
+                placeholder="DAO rules and agreement.."
+                ipfsMetadata={ipfsMetadata}
+                shouldUnregister={false}
+                textInputName="daoConfig.rules"
+                fileInputName="rulesFile"
+                isFile="isRuleFile"
+              />
+            )}
 
             <div>
               <StyledText name={'title2'}>Collaterals</StyledText>
