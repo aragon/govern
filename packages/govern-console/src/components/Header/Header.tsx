@@ -1,7 +1,7 @@
 import governIcon from 'images/svgs/aragon-icon.svg';
 import Wallet from 'components/Wallet/Wallet';
 import { useHistory } from 'react-router-dom';
-import { Button, StyledText, IconEdit, useLayout } from '@aragon/ui';
+import { Button, StyledText, IconCirclePlus, useLayout } from '@aragon/ui';
 import styled from 'styled-components';
 import { networkEnvironment } from 'environment';
 
@@ -55,7 +55,7 @@ const Header = () => {
           size={'large'}
           onClick={goToCreateDaoPage}
           label={'Create DAO'}
-          icon={<IconEdit />}
+          icon={<IconCirclePlus />}
           display={layoutName === 'small' ? 'icon' : 'label'}
           disabled={status === 'connecting'}
         />
