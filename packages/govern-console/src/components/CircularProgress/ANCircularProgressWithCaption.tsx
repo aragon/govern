@@ -1,5 +1,5 @@
 import { ANCircularProgress } from './ANCircularProgress';
-import { CiruclarProgressStatus } from 'utils/types';
+import { CircularProgressStatus } from 'utils/types';
 import React from 'react';
 
 export interface ANProgressCationPropos {
@@ -11,15 +11,15 @@ export interface ANProgressCationPropos {
   /**
    * Status of the circular progress
    */
-  state: CiruclarProgressStatus;
+  state: CircularProgressStatus;
 }
 
 export const ANCircularProgressWithCaption = (props: ANProgressCationPropos) => {
-  const getTextColor = (state: CiruclarProgressStatus) => {
+  const getTextColor = (state: CircularProgressStatus) => {
     switch (state) {
-      case CiruclarProgressStatus.Disabled:
+      case CircularProgressStatus.Disabled:
         return '#B4C1E4';
-      case CiruclarProgressStatus.Failed:
+      case CircularProgressStatus.Failed:
         return '#FF6A60';
       default:
         return '#00C2FF';

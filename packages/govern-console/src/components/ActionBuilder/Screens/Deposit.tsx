@@ -12,6 +12,7 @@ import {
   useTheme,
   useLayout,
   SPACING,
+  useToast,
 } from '@aragon/ui';
 import { Hint } from 'components/Hint/Hint';
 import { useForm, Controller } from 'react-hook-form';
@@ -19,14 +20,16 @@ import { validateAmountForDecimals, validateToken, validateBalance } from 'utils
 import { useWallet } from 'AugmentedWallet';
 import { useActionBuilderState } from '../ActionBuilderStateProvider';
 import { getTruncatedAccountAddress } from 'utils/account';
-import { useSnackbar } from 'notistack';
 import { getErrorFromException } from 'utils/HelperFunctions';
 import { Executor } from 'services/Executor';
-import { Asset, ETH, OTHER_TOKEN_SYMBOL } from 'utils/Asset';
+import { Asset, AssetLabel, ETH, OTHER_TOKEN_SYMBOL } from 'utils/Asset';
 import { networkEnvironment } from 'environment';
 const { curatedTokens } = networkEnvironment;
 
-const depositAssets = Object.keys(curatedTokens).concat([ETH.symbol, OTHER_TOKEN_SYMBOL]);
+const depositAssets = Object.keys(curatedTokens).concat([
+  ETH.symbol,
+  OTHER_TOKEN_SYMBOL,
+]) as Array<AssetLabel>;
 
 type DepositFormData = {
   token: number;
@@ -48,14 +51,14 @@ export const Deposit: React.FC = () => {
   const selectedToken = watch('token', 0);
 
   const { dao, gotoProcessTransaction } = useActionBuilderState();
-  const { enqueueSnackbar } = useSnackbar();
+  const toast = useToast();
 
   const buildActions = useCallback(async () => {
     const { token, tokenContractAddress, depositAmount, reference = '' } = getValues();
 
     try {
       const executor = new Executor(dao.executor.address, account.signer);
-      const asset = await Asset.createFromSymbol(
+      const asset = await Asset.createFromDropdownLabel(
         depositAssets[token],
         tokenContractAddress,
         depositAmount,
@@ -66,17 +69,15 @@ export const Deposit: React.FC = () => {
     } catch (err) {
       console.log('deposit error', err);
       const errorMessage = getErrorFromException(err);
-      enqueueSnackbar(errorMessage, {
-        variant: 'error',
-      });
+      toast(errorMessage);
     }
-  }, [getValues, account, dao, provider, enqueueSnackbar, gotoProcessTransaction]);
+  }, [getValues, account, dao, provider, toast, gotoProcessTransaction]);
 
   const validateAmount = useCallback(
     async (value: string) => {
       const { token: selectedIndex, tokenContractAddress } = getValues();
       try {
-        const asset = await Asset.createFromSymbol(
+        const asset = await Asset.createFromDropdownLabel(
           depositAssets[selectedIndex],
           tokenContractAddress,
           value,

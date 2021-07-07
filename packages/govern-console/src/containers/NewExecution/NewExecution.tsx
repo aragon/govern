@@ -1,5 +1,15 @@
 import React, { memo, useState, useCallback } from 'react';
-import { IconAdd, Grid, GridItem, Button, StyledText, Link, TextInput, Box } from '@aragon/ui';
+import {
+  IconAdd,
+  Grid,
+  GridItem,
+  Button,
+  StyledText,
+  Link,
+  TextInput,
+  Box,
+  useToast,
+} from '@aragon/ui';
 import { PageName } from 'utils/HelpText';
 import PageContent from 'components/PageContent/PageContent';
 import ActionList from 'containers/NewExecution/ActionList';
@@ -9,7 +19,6 @@ import { ContractReceipt } from 'ethers';
 import { useWallet } from 'AugmentedWallet';
 import { buildConfig } from 'utils/ERC3000';
 import { CustomTransaction, ActionItem } from 'utils/types';
-import { useSnackbar } from 'notistack';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import { useForm, FormProvider, Controller, useFieldArray } from 'react-hook-form';
 import { Proposal, ReceiptType, ActionType } from '@aragon/govern';
@@ -36,7 +45,7 @@ const NewExecution: React.FC = () => {
   const { daoName } = useParams<any>();
   const { data: daoDetails } = useDaoQuery(daoName);
 
-  const { enqueueSnackbar } = useSnackbar();
+  const toast = useToast();
   const { dispatch } = React.useContext(ModalsContext);
 
   // form
@@ -63,11 +72,9 @@ const NewExecution: React.FC = () => {
     if (isConnected) {
       setShowActionModal(true);
     } else {
-      enqueueSnackbar(Error.ConnectAccount, {
-        variant: 'error',
-      });
+      toast(Error.ConnectAccount);
     }
-  }, [isConnected, setShowActionModal, enqueueSnackbar]);
+  }, [isConnected, setShowActionModal, toast]);
 
   const onCloseActionModal = useCallback(
     (actions: any) => {
@@ -82,9 +89,7 @@ const NewExecution: React.FC = () => {
   const validate = () => {
     const actions = getValues('actions');
     if (!actions || actions.length === 0) {
-      enqueueSnackbar('At least one action is needed to schedule an execution.', {
-        variant: 'error',
-      });
+      toast('At least one action is needed to schedule an execution.');
       return false;
     }
     return true;
@@ -94,16 +99,12 @@ const NewExecution: React.FC = () => {
     if (!validate()) return;
 
     const actions = getValues('actions');
-    console.log('schedule with ', actions);
-
     try {
       const encodedActions = AbiHandler.encodeActions(actions);
       scheduleProposal(encodedActions);
     } catch (err) {
       console.log('Failed to encode action data', err);
-      enqueueSnackbar('Error encoding action data, please double check your action input.', {
-        variant: 'error',
-      });
+      toast('Error encoding action data, please double check your action input.');
     }
   };
 
@@ -132,7 +133,8 @@ const NewExecution: React.FC = () => {
           buildConfig(daoDetails.queue.config),
         );
       } catch (error) {
-        enqueueSnackbar(error.message, { variant: 'error' });
+        console.log('Failed scheduling', error);
+        toast(error.message);
         return;
       }
     }

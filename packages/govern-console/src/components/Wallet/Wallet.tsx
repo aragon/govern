@@ -1,55 +1,21 @@
 import { useState } from 'react';
-import { styled } from '@material-ui/core/styles';
-import Card from '@material-ui/core/Card';
 import { useWallet } from 'use-wallet';
-import { AddressIdentifier } from 'components/AddressIdentifier/AddressIdentifier';
 import { useEffect } from 'react';
-import { useSnackbar } from 'notistack';
 import { networkEnvironment } from 'environment';
-import { Button } from '@aragon/ui';
+import { Button, EthIdenticon, useLayout, IconConnect, useToast } from '@aragon/ui';
+import { getTruncatedAccountAddress } from 'utils/account';
 
-const WalletWrapper = styled(Card)({
-  background: '#FFFFFF',
-  height: '48px',
-  width: '178px',
-  // border: '2px solid #252b3e',
-  boxSizing: 'border-box',
-  // boxShadow: '0px 3px 3px rgba(180, 193, 228, 0.35)',
-  boxShadow: 'none',
-  borderRadius: '8px',
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-});
-const ConnectedAccount = styled('div')({
-  height: '48px',
-  width: '174px',
-  background: '#FFFFFF',
-  border: '2px solid #EFF1F7',
-  boxSizing: 'border-box',
-  boxShadow: '0px 3px 3px rgba(180, 193, 228, 0.35)',
-  borderRadius: '8px',
-  justifyContent: 'center',
-  alignItems: 'center',
-  // padding: '13px 20px',
-  display: 'flex',
-  flexDirection: 'row',
-  cursor: 'pointer',
-});
 //TODO add the icon for logged in users
 declare let window: any;
 
 const Wallet = ({}) => {
   const context: any = useWallet();
+  const { layoutName } = useLayout();
+  const toast = useToast();
   const { account, chainId, connect, error, reset, status } = context;
   const [networkStatus, setNetworkStatus] = useState<string>(status);
   const [userAccount, setUserAccount] = useState<string>(status);
-  const { enqueueSnackbar } = useSnackbar();
 
-  // useEffect(() => {
-  //   connectWalletAndSetStatus('injected');
-  // }, []);
   useEffect(() => {
     if (chainId !== networkEnvironment.chainId) {
       setNetworkStatus('wrong-network');
@@ -61,13 +27,11 @@ const Wallet = ({}) => {
       }
     } else if (status === 'connected') {
       setNetworkStatus('connected');
-      enqueueSnackbar('Your wallet is successfully connected.', {
-        variant: 'success',
-      });
+      toast('Your wallet is successfully connected.');
     } else {
       setNetworkStatus('disconnected');
     }
-  }, [status, chainId, enqueueSnackbar, error]);
+  }, [status, chainId, toast, error]);
 
   useEffect(() => {
     if (status === 'disconnected') {
@@ -75,20 +39,14 @@ const Wallet = ({}) => {
     }
     if (error) {
       if (error.message.includes('Unsupported chain')) {
-        enqueueSnackbar('Please select the correct chain in your wallet.', {
-          variant: 'error',
-        });
+        toast('Please select the correct chain in your wallet.');
       } else if (error.message.includes('window.ethereum')) {
-        enqueueSnackbar('Please install a wallet.', {
-          variant: 'error',
-        });
+        toast('Please install a wallet.');
       } else {
-        enqueueSnackbar(error.message, {
-          variant: 'error',
-        });
+        toast(error.message);
       }
     }
-  }, [status, error, enqueueSnackbar]);
+  }, [status, error, toast]);
 
   const connectWalletAndSetStatus = async (type: string) => {
     try {
@@ -117,70 +75,58 @@ const Wallet = ({}) => {
 
   if (networkStatus === 'connected') {
     return (
-      <WalletWrapper>
-        <ConnectedAccount
-          onClick={() => {
-            reset();
-          }}
-        >
-          {/* <IconHolder src={connectedUserIcon} /> */}
-          <AddressIdentifier
-            isAddress={true}
-            displayText={userAccount || ''}
-            componentSize={'medium'}
-          />
-        </ConnectedAccount>
-      </WalletWrapper>
+      <Button
+        size="large"
+        mode="secondary"
+        label={getTruncatedAccountAddress(userAccount)}
+        icon={<EthIdenticon address={userAccount} scale={1.5} radius={50} />}
+        display={layoutName === 'small' ? 'icon' : 'all'}
+        onClick={() => {
+          reset();
+        }}
+      />
     );
   } else if (networkStatus === 'unsupported') {
     return (
-      <WalletWrapper>
-        <Button
-          size="large"
-          type="secondary"
-          onClick={() => {
-            connectWalletAndSetStatus('injected');
-            // connect('injected');
-            // setActivatingConnector(ConnectorNames.Injected);
-          }}
-          label={'Connect Account'}
-          disabled={status === 'connecting'}
-        />
-      </WalletWrapper>
+      <Button
+        size="large"
+        mode="secondary"
+        onClick={() => {
+          connectWalletAndSetStatus('injected');
+        }}
+        label={'Connect Account'}
+        icon={<IconConnect />}
+        display={layoutName === 'small' ? 'icon' : 'all'}
+        disabled={status === 'connecting'}
+      />
     );
   } else if (networkStatus === 'connection-error') {
     return (
-      <WalletWrapper>
-        <Button
-          size="large"
-          type="secondary"
-          onClick={() => {
-            connectWalletAndSetStatus('injected');
-            // connect('injected');
-            // setActivatingConnector(ConnectorNames.Injected);
-          }}
-          label={'Connect Account'}
-          disabled={status === 'connecting'}
-        />
-      </WalletWrapper>
+      <Button
+        size="large"
+        mode="secondary"
+        onClick={() => {
+          connectWalletAndSetStatus('injected');
+        }}
+        label={'Connect Account'}
+        icon={<IconConnect />}
+        display={layoutName === 'small' ? 'icon' : 'all'}
+        disabled={status === 'connecting'}
+      />
     );
   } else {
     return (
-      // <WalletWrapper>
       <Button
         size="large"
-        type="secondary"
+        mode="secondary"
         onClick={() => {
           connectWalletAndSetStatus('injected');
-          // connect('injected');
-          // setActivatingConnector(ConnectorNames.Injected);
         }}
         label={'Connect Account'}
-        height={'48px'}
-        width={'174px'}
+        icon={<IconConnect />}
+        display={layoutName === 'small' ? 'icon' : 'all'}
         disabled={status === 'connecting'}
       />
-      // </WalletWrapper>
     );
   }
 };

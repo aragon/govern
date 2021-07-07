@@ -2,7 +2,7 @@ import React, { useState, useEffect, memo } from 'react';
 import { styled } from '@material-ui/core/styles';
 import { ConsoleHeader } from 'components/ConsoleHeader/ConsoleHeader';
 import { DaoCard } from 'components/DaoCards/DaoCard';
-import { ANButton } from 'components/Button/ANButton';
+import { Button } from '@aragon/ui';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import { useHistory } from 'react-router-dom';
@@ -102,14 +102,7 @@ const ConsoleMainPage: React.FC = () => {
         }}
       >
         {totalDaoCount !== visibleDaoList.length ? (
-          <ANButton
-            label="Load More DAOs"
-            buttonType="secondary"
-            height="46px"
-            width="163px"
-            labelColor="#00C2FF"
-            onClick={loadMore}
-          ></ANButton>
+          <Button label="Load More DAOs" mode="secondary" size="large" onClick={loadMore}></Button>
         ) : null}
       </div>
     </ConsoleMainDiv>

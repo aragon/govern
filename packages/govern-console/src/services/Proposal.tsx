@@ -28,7 +28,7 @@ export default class FacadeProposal {
       tx: () => {
         return this.proposal.challenge(container, reason);
       },
-      message: 'Challenges a proposal',
+      message: 'Challenge execution',
       status: CustomTransactionStatus.Pending,
     };
 
@@ -63,7 +63,7 @@ export default class FacadeProposal {
       tx: () => {
         return this.proposal.execute(container);
       },
-      message: 'Executes a proposal',
+      message: 'Execute',
       status: CustomTransactionStatus.Pending,
     };
 

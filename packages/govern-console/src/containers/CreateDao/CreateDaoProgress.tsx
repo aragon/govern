@@ -3,9 +3,9 @@ import progressImage from '../../images/svgs/CreateDaoInProgress.svg';
 import { CreateDaoSteps } from './utils/Shared';
 import { useCreateDaoContext } from './utils/CreateDaoContextProvider';
 import ProgressComponent from './components/ProgressComponent';
-import { CiruclarProgressStatus } from 'utils/types';
+import { CircularProgressStatus } from 'utils/types';
 import { parseUnits } from 'utils/lib';
-
+import { constants } from 'ethers';
 import { networkEnvironment } from 'environment';
 
 const { daoFactoryAddress, governRegistryAddress } = networkEnvironment;
@@ -30,34 +30,38 @@ declare let window: any;
 const CreateDaoProgress: React.FC<{
   setActiveStep: React.Dispatch<React.SetStateAction<CreateDaoSteps>>;
 }> = ({ setActiveStep }) => {
-  const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
   const walletContext: any = useWallet();
   const { provider, account } = walletContext;
   const { basicInfo, config, collaterals } = useCreateDaoContext();
   const [progressList, setProgressList] = useState([
-    { status: CiruclarProgressStatus.InProgress, text: 'Uploading rules to IPFS' },
-    { status: CiruclarProgressStatus.Disabled, text: 'Creating DAO' },
+    { status: CircularProgressStatus.InProgress, text: 'Uploading rules to IPFS' },
+    { status: CircularProgressStatus.Disabled, text: 'Creating DAO' },
   ]);
   const [action, setAction] = useState<ReactNode | null>(null);
   const [showAction, setShowAction] = useState<'none' | 'fail' | 'register' | 'finish'>('none');
   const [rule, SetRule] = useState<BytesLike>('');
   const [isNewDaoTokenRegistered, setIsNewDaoTokenRegistered] = useState(false);
-  const [daoTokenAddress, setDaoContractAddress] = useState('0x');
+  const [daoTokenAddress, setDaoTokenAddress] = useState('0x');
 
   const updateNewDaoTokenAddress = (value: string) => {
-    setDaoContractAddress(value);
+    setDaoTokenAddress(value);
   };
 
   useEffect(() => {
     const checkIfRegistered = async () => {
-      if (daoTokenAddress !== '0x') {
+      if (daoTokenAddress !== '0x' && progressList[1].status !== CircularProgressStatus.Done) {
         const isRegistered = await isTokenRegistered(provider.getSigner(), daoTokenAddress);
-        console.log('useEffect checkIfRegistered', daoTokenAddress, isRegistered);
         setIsNewDaoTokenRegistered(isRegistered);
+
+        // update create dao status
+        const newList2 = [...progressList];
+        newList2[1].status = CircularProgressStatus.Done;
+        setProgressList(newList2);
+        setShowAction('register');
       }
     };
     checkIfRegistered();
-  }, [daoTokenAddress, provider]);
+  }, [daoTokenAddress, provider, progressList]);
 
   const createDaoParams: CreateDaoParams = useMemo(() => {
     // token
@@ -85,14 +89,18 @@ const CreateDaoProgress: React.FC<{
     const daoConfig: DaoConfig = {
       executionDelay: config.executionDelay,
       scheduleDeposit: {
-        token: collaterals.isScheduleNewDaoToken ? ZERO_ADDRESS : collaterals.scheduleAddress,
+        token: collaterals.isScheduleNewDaoToken
+          ? constants.AddressZero
+          : collaterals.scheduleAddress,
         amount:
           collaterals.scheduleDecimals > 0
             ? parseUnits(collaterals.scheduleAmount, collaterals.scheduleDecimals)
             : collaterals.scheduleAmount,
       },
       challengeDeposit: {
-        token: collaterals.isChallengeNewDaoToken ? ZERO_ADDRESS : collaterals.challengeAddress,
+        token: collaterals.isChallengeNewDaoToken
+          ? constants.AddressZero
+          : collaterals.challengeAddress,
         amount:
           collaterals.challengeDecimals > 0
             ? parseUnits(collaterals.challengeAmount, collaterals.challengeDecimals)
@@ -122,7 +130,7 @@ const CreateDaoProgress: React.FC<{
     const newList = [...progressList];
     const registerProgressPosition = progressList.length;
     newList.push({
-      status: CiruclarProgressStatus.InProgress,
+      status: CircularProgressStatus.InProgress,
       text: 'Register token in Aragon Voice',
     });
     setProgressList(newList);
@@ -130,14 +138,14 @@ const CreateDaoProgress: React.FC<{
     try {
       await registerToken(provider.getSigner(), daoTokenAddress);
       // if register successfull
-      newList[registerProgressPosition].status = CiruclarProgressStatus.Done;
+      newList[registerProgressPosition].status = CircularProgressStatus.Done;
       setProgressList([...newList]);
       // setAction(<RegisterSuccessAction daoIdentifier={basicInfo.daoIdentifier} />);
       setShowAction('finish');
     } catch (error) {
       console.log('error', error);
       // if register fail
-      newList[registerProgressPosition].status = CiruclarProgressStatus.Failed;
+      newList[registerProgressPosition].status = CircularProgressStatus.Failed;
       setProgressList([...newList]);
       // TODO: in this case what we do with failed register
       setShowAction('register');
@@ -151,17 +159,16 @@ const CreateDaoProgress: React.FC<{
   // second by actually creating the DAO
   /* eslint-disable */
   useEffect(() => {
-    console.log('start creating doa');
     const uploadToIpfs = async () => {
       const newList = [...progressList];
       try {
         const ruleCid = await addToIpfs(config.isRuleFile ? config.ruleFile[0] : config.ruleText);
         SetRule(ruleCid);
-        newList[0].status = CiruclarProgressStatus.Done;
+        newList[0].status = CircularProgressStatus.Done;
         setProgressList(newList);
       } catch (error) {
         console.log('error', error);
-        newList[0].status = CiruclarProgressStatus.Failed;
+        newList[0].status = CircularProgressStatus.Failed;
         setProgressList(newList);
         setShowAction('fail');
         return;
@@ -175,9 +182,8 @@ const CreateDaoProgress: React.FC<{
       if (rule !== '') {
         const newList = [...progressList];
         try {
-          newList[1].status = CiruclarProgressStatus.InProgress;
+          newList[1].status = CircularProgressStatus.InProgress;
           setProgressList(newList);
-          console.log('callCreateDao createDaoParams', createDaoParams);
           const result: any = await createDao(
             createDaoParams,
             {
@@ -188,15 +194,11 @@ const CreateDaoProgress: React.FC<{
             updateNewDaoTokenAddress,
           );
           await result.wait();
-          console.log('callCreateDao', result);
 
-          const newList2 = [...progressList];
-          newList2[1].status = CiruclarProgressStatus.Done;
-          setProgressList(newList2);
-          setShowAction('register');
+          if (basicInfo.isExistingToken) updateNewDaoTokenAddress(basicInfo.tokenAddress);
         } catch (error) {
           console.log('error', error);
-          newList[1].status = CiruclarProgressStatus.Failed;
+          newList[1].status = CircularProgressStatus.Failed;
           setProgressList(newList);
           setShowAction('fail');
         }
