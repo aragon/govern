@@ -6,6 +6,7 @@ import { BigNumberish } from '@ethersproject/bignumber';
 import { Account } from 'utils/types';
 import { getTokenInfo } from 'utils/token';
 import { formatUnits } from 'utils/lib';
+import { toBigNum } from 'utils/lib';
 
 /**
  * @param token address of the token
@@ -26,12 +27,12 @@ export async function erc20ApprovalTransaction(
     return [];
   }
 
-  const amountInBigNumber: BigNumber = ethers.BigNumber.from(amount);
+  const amountInBigNumber: BigNumber = toBigNum(amount);
 
   const contract = new ethers.Contract(token, erc20TokenABI, account.signer);
 
-  let allowance: BigNumber = ethers.BigNumber.from(0);
-  let userBalance: BigNumber = ethers.BigNumber.from(0);
+  let allowance: BigNumber = toBigNum(0);
+  let userBalance: BigNumber = toBigNum(0);
   let amountForHuman: string = amount.toString();
 
   const tokenInfo = await getTokenInfo(token, account.signer);
