@@ -13,13 +13,18 @@ import './index.css';
 
 import { networkEnvironment } from './environment';
 
-const { subgraphUrl } = networkEnvironment;
+const { subgraphUrl, courtSubgraphUrl } = networkEnvironment;
 
 function mergeFunction(existing: [], incoming: []) {
   if (!incoming) return existing;
   if (!existing) return incoming;
   return [...existing, ...incoming];
 }
+
+export const courtClient = new ApolloClient({
+  uri: courtSubgraphUrl,
+  cache: new InMemoryCache({}),
+});
 
 const client = new ApolloClient({
   uri: subgraphUrl,

@@ -1,5 +1,4 @@
 import { EnvironmentConfig, EnvironmentName } from './types';
-import { utils } from 'ethers';
 
 const networks = new Map<EnvironmentName, EnvironmentConfig>([
   [
@@ -8,9 +7,11 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
       chainId: 1,
       networkName: 'mainnet',
       subgraphUrl: 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-mainnet',
+      courtSubgraphUrl: 'https://api.thegraph.com/subgraphs/name/aragon/aragon-court-v2-mainnet',
+      courtUrl: 'https://court.aragon.org/#',
       voiceUrl: 'https://voice.aragon.org/',
       daoFactoryAddress: '0x897b8DeeA74AD703B6d3DA25ed9A3a23fC5629EF', // TODO: GIORGI update this
-      governRegistryAddress: '0x4fe12c45ea84b1ae828615ccbc958c8e8f38edd8', // TODO: GIORGI update this
+      governRegistryAddress: '0x4fe12c45ea84b1ae828615ccbc958c8e8f38edd8', // TODO: GIORGI update this,
       defaultDaoConfig: {
         executionDelay: 86400, // defaults to one day - how many seconds to wait before being able to call execute.
         scheduleDeposit: {
@@ -22,7 +23,7 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
           amount: '10000000000000000000',
         },
         resolver: '0xC464EB732A1D2f5BbD705727576065C91B2E9f18',
-        rules: utils.toUtf8Bytes('No main agreement has been defined'), // we use Bytes (ArrayLike<number>) instead of string hex
+        rules: 'No main agreement has been defined', // we use Bytes (ArrayLike<number>) instead of string hex
         maxCalldataSize: 100000, // initial maxCalldatasize
       },
       curatedTokens: {
@@ -38,6 +39,8 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
       chainId: 4,
       networkName: 'rinkeby',
       subgraphUrl: 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby',
+      courtSubgraphUrl: 'https://api.thegraph.com/subgraphs/name/aragon/aragon-court-v2-rinkeby',
+      courtUrl: 'https://court-rinkeby.aragon.org/#',
       voiceUrl: 'http://voice-rinkeby.aragon.org/',
       daoFactoryAddress: '0xF159b15093931B7431633d26E7290e14a2f09f81',
       governRegistryAddress: '0x4fe12c45ea84b1ae828615ccbc958c8e8f38edd8', // TODO: GIORGI update this
@@ -52,7 +55,7 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
           amount: '10000000000000000000',
         },
         resolver: '0xC464EB732A1D2f5BbD705727576065C91B2E9f18',
-        rules: utils.toUtf8Bytes('No main agreement has been defined'),
+        rules: 'No main agreement has been defined',
         maxCalldataSize: 100000,
       },
       curatedTokens: {
@@ -68,6 +71,8 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
       chainId: 4,
       networkName: 'rinkeby',
       subgraphUrl: 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby-staging',
+      courtSubgraphUrl: 'https://api.thegraph.com/subgraphs/name/aragon/aragon-court-v2-staging',
+      courtUrl: 'https://court-rinkeby-staging.aragon.org/#',
       voiceUrl: 'http://voice-rinkeby.aragon.org/',
       daoFactoryAddress: '0x2FA187AfA6FA050d6Ea76479839B76755f181583',
       governRegistryAddress: '0x4fe12c45ea84b1ae828615ccbc958c8e8f38edd8', // TODO: GIORGI update this
@@ -81,8 +86,8 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
           token: '0xc7AD46e0b8a400Bb3C915120d284AafbA8fc4735',
           amount: '10000000000000000000',
         },
-        resolver: '0xC464EB732A1D2f5BbD705727576065C91B2E9f18',
-        rules: utils.toUtf8Bytes('No main agreement has been defined'),
+        resolver: '0xD2c15eCd1751C2cE8b02ab2D95db32E662517D61',
+        rules: 'No main agreement has been defined',
         maxCalldataSize: 100000,
       },
       curatedTokens: {
