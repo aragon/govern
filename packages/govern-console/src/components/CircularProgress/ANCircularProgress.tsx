@@ -30,7 +30,7 @@ export const ANCircularProgress = (props: ANCircularProgressProps) => {
 
   const getCircularProgress = () => {
     return (
-      <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div>
         <svg style={{ width: 0, height: 0 }}>
           <linearGradient id="linearColors" x1="0" y1="0" x2="1" y2="1">
             <stop offset="20%" stopColor="rgb(0, 194, 255)" />

@@ -18,12 +18,11 @@ export interface ANProgressCationPropos {
 const Container = styled.div`
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
 `;
 
 const Progress = styled.div`
-  display: flex;
-  align-items: center;
+  margin-top: ${GU / 2}px;
 `;
 
 const Caption = styled.div`
