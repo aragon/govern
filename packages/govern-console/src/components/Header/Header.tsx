@@ -1,7 +1,8 @@
 import governIcon from 'images/svgs/aragon-icon.svg';
 import Wallet from 'components/Wallet/Wallet';
+import { BetaLabel } from 'components/Labels/BetaLabel';
 import { useHistory } from 'react-router-dom';
-import { Button, StyledText, IconCirclePlus, useLayout } from '@aragon/ui';
+import { Button, StyledText, IconCirclePlus, useLayout, GU } from '@aragon/ui';
 import styled from 'styled-components';
 import { networkEnvironment } from 'environment';
 
@@ -16,6 +17,8 @@ const Title = styled.div`
   display: flex;
   width: fit-content;
   cursor: pointer;
+  align-items: center;
+  column-gap: ${GU}px;
 `;
 
 const RigtSideContainer = styled.div`
@@ -45,6 +48,7 @@ const Header = () => {
     <NavBar>
       <Title id="navbar_title" onClick={redirectToHomePage}>
         <img src={governIcon} width={layoutName !== 'small' ? '182px' : '162px'} />
+        <BetaLabel>Beta</BetaLabel>
       </Title>
       <RigtSideContainer id="account">
         {layoutName !== 'small' && (

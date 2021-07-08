@@ -31,3 +31,7 @@ export function formatUnits(amount: BigNumberish, decimals: number) {
 export function parseUnits(amount: BigNumberish, decimals: number) {
   return ethers.utils.parseUnits(amount.toString(), decimals);
 }
+
+export function toBigNum(value: BigNumberish) {
+  return ethers.BigNumber.from(value);
+}
