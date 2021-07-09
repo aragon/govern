@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { CreateDaoSteps, stepsNames } from './utils/Shared';
+import { CreateDaoSteps } from './utils/Shared';
 import { useCreateDaoContext, ICreateDaoConfig } from './utils/CreateDaoContextProvider';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { validateContract } from 'utils/validations';
@@ -16,18 +16,20 @@ import {
   Box,
   Button,
   StyledText,
-  Steps,
   IconBlank,
   Info,
   Link,
   SPACING,
   IconArrowLeft,
   Split,
+  useTheme,
 } from '@aragon/ui';
+import StepsHeader from './components/StepsHeader';
 
 const CreateDaoConfig: React.FC<{
   setActiveStep: React.Dispatch<React.SetStateAction<CreateDaoSteps>>;
 }> = ({ setActiveStep }) => {
+  const theme = useTheme();
   const { layoutName } = useLayout();
   const spacing = SPACING[layoutName];
   // const [resolverLock, setResolverLock] = useState(false);
@@ -38,14 +40,7 @@ const CreateDaoConfig: React.FC<{
   const { provider } = context;
 
   const methods = useForm<ICreateDaoConfig>();
-  const {
-    control,
-    setValue,
-    getValues,
-    trigger,
-    watch,
-    formState: { errors },
-  } = methods;
+  const { control, setValue, getValues, trigger, watch } = methods;
 
   useEffect(() => {
     setValue('ruleText', ruleText);
@@ -55,7 +50,6 @@ const CreateDaoConfig: React.FC<{
   }, [ruleText, isRuleFile, ruleFile, resolver, customResolver, setValue]);
 
   const moveToNextStep = async () => {
-    console.log(errors, ' errors');
     const validate = await trigger();
 
     if (!validate) return;
@@ -69,14 +63,7 @@ const CreateDaoConfig: React.FC<{
   return (
     <Box>
       <div style={{ display: 'grid', gridGap: spacing }}>
-        <Grid columns={'4'} columnWidth={'1fr'}>
-          <GridItem gridColumn={'2/5'}>
-            <Steps steps={stepsNames} activeIdx={1} showProgress={true} />
-          </GridItem>
-          <GridItem gridColumn={'1/2'} gridRow={'1'} alignVertical={'center'}>
-            <StyledText name={'title2'}>Create DAO</StyledText>
-          </GridItem>
-        </Grid>
+        <StepsHeader index={1} />
 
         <Controller
           name="executionDelay"
@@ -116,8 +103,8 @@ const CreateDaoConfig: React.FC<{
         </FormProvider>
 
         <div>
-          <StyledText name={'title4'}>Resolver</StyledText>
-          <StyledText name={'body3'}>
+          <StyledText name={'title3'}>Resolver</StyledText>
+          <StyledText name={'title4'} style={{ color: theme.disabledContent }}>
             The resolver is a smart contract that can handle disputes in your DAO and follows the
             ERC3k interface. By default your DAO will use Aragon Court as a resolver.{' '}
             <Link href="https://court.aragon.org/">Learn more</Link>

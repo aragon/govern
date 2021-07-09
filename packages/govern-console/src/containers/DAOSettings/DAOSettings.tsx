@@ -261,8 +261,8 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
           <TextCopy title={'DAO Token address'} value={daoAddresses.token} />
           <FormProvider {...methods}>
             <div>
-              <StyledText name={'title4'}>Resolver</StyledText>
-              <StyledText name={'body3'}>
+              <StyledText name={'title3'}>Resolver</StyledText>
+              <StyledText name={'title4'} style={{ color: theme.disabledContent }}>
                 The resolver is a smart contract that can handle disputes in your DAO and follows
                 the ERC3k interface. By default your DAO will use Aragon Court as a resolver.{' '}
                 <Link href="https://court.aragon.org/">Learn more</Link>
@@ -368,8 +368,8 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
             )}
 
             <div>
-              <StyledText name={'title2'}>Collaterals</StyledText>
-              <StyledText name={'body2'} style={{ color: theme.disabledContent }}>
+              <StyledText name={'title3'}>Collaterals</StyledText>
+              <StyledText name={'title4'} style={{ color: theme.disabledContent }}>
                 {
                   'In order to schedule or challenge executions, any member must provide this amount of collateral, so they have stake in the game and act with the best interest of your DAO'
                 }

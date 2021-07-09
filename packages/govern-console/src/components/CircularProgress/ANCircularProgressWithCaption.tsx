@@ -1,6 +1,7 @@
 import { ANCircularProgress } from './ANCircularProgress';
 import { CircularProgressStatus } from 'utils/types';
-import React from 'react';
+import styled from 'styled-components';
+import { GU, StyledText, useTheme } from '@aragon/ui';
 
 export interface ANProgressCationPropos {
   /**
@@ -14,45 +15,45 @@ export interface ANProgressCationPropos {
   state: CircularProgressStatus;
 }
 
+const Container = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+`;
+
+const Progress = styled.div`
+  margin-top: ${GU}px;
+`;
+
+const Caption = styled.div`
+  margin-top: ${GU / 2}px;
+  margin-left: ${GU}px;
+  word-break: break-word;
+  color: ${(p) => p.color};
+`;
+
 export const ANCircularProgressWithCaption = (props: ANProgressCationPropos) => {
+  const theme = useTheme();
+
   const getTextColor = (state: CircularProgressStatus) => {
     switch (state) {
       case CircularProgressStatus.Disabled:
-        return '#B4C1E4';
+        return theme.disabledContent;
       case CircularProgressStatus.Failed:
-        return '#FF6A60';
+        return theme.red;
       default:
-        return '#00C2FF';
+        return theme.primary;
     }
   };
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'row',
-        margin: '10px',
-        verticalAlign: 'middle',
-        lineHeight: '25px',
-      }}
-    >
-      <div>
+    <Container>
+      <Progress>
         <ANCircularProgress status={props.state} />
-      </div>
-      <div
-        style={{
-          marginLeft: '10px',
-          fontFamily: 'Manrope',
-          fontStyle: 'normal',
-          fontWeight: 500,
-          fontSize: 18,
-          color: getTextColor(props.state),
-          lineHeight: '20px',
-          wordBreak: 'break-word',
-        }}
-      >
-        {props.caption}
-      </div>
-    </div>
+      </Progress>
+      <Caption color={getTextColor(props.state)}>
+        <StyledText name="title3">{props.caption}</StyledText>
+      </Caption>
+    </Container>
   );
 };

@@ -2,20 +2,29 @@ import React from 'react';
 import { CustomTransaction, CustomTransactionStatus } from 'utils/types';
 import { ANCircularProgressWithCaption } from 'components/CircularProgress/ANCircularProgressWithCaption';
 import { CircularProgressStatus } from 'utils/types';
-import { styled } from '@material-ui/core/styles';
+import { GU, RADII } from '@aragon/ui';
+import styled from 'styled-components';
 
 export interface TransactionListProps {
   transactions: CustomTransaction[];
 }
 
-const TransactionListWrapper = styled('ul')({
-  paddingInlineStart: 0,
-  listStyle: 'none',
-});
+const Container = styled.div`
+  background: #f6f9fc;
+  padding: ${2 * GU}px;
+  border-radius: ${RADII['small']}px;
+  margin: auto;
+  width: 100%;
+`;
 
-const TransactionListItem = styled('li')({
-  padding: 0,
-});
+const TransactionListWrapper = styled.ul`
+  padding-inline-start: 0;
+  list-style: none;
+`;
+
+const TransactionListItem = styled.li`
+  padding: 0;
+`;
 
 const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
   const getListItem = (transaction: CustomTransaction) => {
@@ -51,15 +60,7 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
     }
   };
   return (
-    <div
-      style={{
-        background: '#F6F9FC',
-        padding: 2,
-        borderRadius: 10,
-        margin: 'auto',
-        width: '100%',
-      }}
-    >
+    <Container>
       <TransactionListWrapper>
         {transactions.map((transaction) => {
           return (
@@ -69,7 +70,7 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
           );
         })}
       </TransactionListWrapper>
-    </div>
+    </Container>
   );
 };
 

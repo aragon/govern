@@ -36,7 +36,7 @@ const ProgressComponent: React.FC<ICreateDaoProgressModal> = ({
         </GridItem>
         <GridItem gridColumn={'2/4'} gridRow={'1'} alignHorizontal={'flex-start'}>
           {title && <StyledText name={'title1'}>{title}</StyledText>}
-          {subTitle && <StyledText name={'body1'}>{subTitle}</StyledText>}
+          {subTitle && <StyledText name={'body2'}>{subTitle}</StyledText>}
           {progressList &&
             progressList.map((item, index) => (
               <ANCircularProgressWithCaption

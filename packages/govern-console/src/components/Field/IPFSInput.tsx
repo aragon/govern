@@ -1,14 +1,6 @@
 import React from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
-import {
-  useLayout,
-  TextInput,
-  StyledText,
-  SPACING,
-  ContentSwitcher,
-  useTheme,
-  FileInput,
-} from '@aragon/ui';
+import { useLayout, TextInput, SPACING, ContentSwitcher, FileInput } from '@aragon/ui';
 import { toUtf8String } from 'ethers/lib/utils';
 import { useEffect } from 'react';
 import { ipfsMetadata } from 'utils/types';
@@ -75,7 +67,6 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
   const { control, watch, setValue } = useFormContext();
   const { layoutName } = useLayout();
   const spacing = SPACING[layoutName];
-  const theme = useTheme();
   const isFileChosen = isFile || `is_file_${fileInputName}`;
 
   const formatValue = (value: any) => {
@@ -107,20 +98,12 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
 
   return (
     <div>
-      {title && <StyledText name={'title2'}>{title}</StyledText>}
-      {subtitle && (
-        <StyledText name={'body2'} style={{ color: theme.disabledContent }}>
-          {subtitle}
-        </StyledText>
-      )}
       <div
         style={{
-          width: 'fit-content',
           display: 'flex',
           flexDirection: 'row',
           verticalAlign: 'middle',
           margin: `${SPACING['small']}px 0 ${SPACING['medium']}px 0`,
-          lineHeight: '40px',
         }}
       >
         <Controller
@@ -129,6 +112,8 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
           defaultValue={false}
           render={({ field: { onChange, value } }) => (
             <ContentSwitcher
+              title={title}
+              subtitle={subtitle}
               onChange={onChange}
               selected={value}
               items={['Text', 'File']}

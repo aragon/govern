@@ -161,7 +161,7 @@ const NewExecution: React.FC = () => {
         <Grid>
           <GridItem>
             <StyledText name={'title1'}>New execution</StyledText>
-            <StyledText name={'body3'}>
+            <StyledText name={'title4'}>
               This execution will use the current{' '}
               <Link onClick={() => history.push(settingsUrl(daoName))}>DAO Settings</Link>
             </StyledText>
@@ -189,11 +189,9 @@ const NewExecution: React.FC = () => {
               />
             </GridItem>
             <GridItem>
-              <StyledText name={'title2'}>Justification</StyledText>{' '}
-              <StyledText name={'body3'}>
-                Insert the reason for scheduling this execution so DAO members can understand it.
-              </StyledText>
               <IPFSInput
+                title="Justification"
+                subtitle="Insert the reason for scheduling this execution so DAO members can understand it."
                 label=""
                 placeholder="Please insert the reason why you want to execute this"
                 textInputName="proof"
@@ -201,8 +199,8 @@ const NewExecution: React.FC = () => {
               />
             </GridItem>
             <GridItem>
-              <StyledText name={'title2'}>Actions</StyledText>
-              <StyledText name={'body3'}>
+              <StyledText name={'title3'}>Actions</StyledText>
+              <StyledText name={'title4'}>
                 Add as many actions (smart contract interactions) you want for this execution.
               </StyledText>
               <ActionList actions={fields} swap={swap} remove={remove} />

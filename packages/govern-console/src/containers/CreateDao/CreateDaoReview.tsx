@@ -1,12 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import addressIcon from '../../images/connected-user-icon.svg';
-import {
-  CreateDaoSteps,
-  stepsNames,
-  configArray,
-  basicInfoArray,
-  collateralArray,
-} from './utils/Shared';
+import { CreateDaoSteps, configArray, basicInfoArray, collateralArray } from './utils/Shared';
 import { useCreateDaoContext } from './utils/CreateDaoContextProvider';
 import {
   useLayout,
@@ -16,12 +10,12 @@ import {
   Button,
   ButtonText,
   StyledText,
-  Steps,
   Info,
   DataView,
   Modal,
   AddressField,
 } from '@aragon/ui';
+import StepsHeader from './components/StepsHeader';
 
 const CreateDaoReview: React.FC<{
   setActiveStep: React.Dispatch<React.SetStateAction<CreateDaoSteps>>;
@@ -69,14 +63,7 @@ const CreateDaoReview: React.FC<{
       </Modal>
 
       <Box>
-        <Grid columns={'4'} columnWidth={'1fr'}>
-          <GridItem gridColumn={'2/5'}>
-            <Steps steps={stepsNames} activeIdx={3} showProgress={true} />
-          </GridItem>
-          <GridItem gridColumn={'1/2'} gridRow={'1'} alignVertical={'center'}>
-            <StyledText name={'title2'}>Create DAO</StyledText>
-          </GridItem>
-        </Grid>
+        <StepsHeader index={3} />
 
         <Info
           mode={'warning'}

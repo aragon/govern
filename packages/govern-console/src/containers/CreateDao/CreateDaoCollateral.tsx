@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { CreateDaoSteps, stepsNames } from './utils/Shared';
+import { CreateDaoSteps } from './utils/Shared';
 import { useCreateDaoContext } from './utils/CreateDaoContextProvider';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { validateToken, validateAmountForDecimals } from 'utils/validations';
@@ -10,14 +10,11 @@ import { MAX_SCHEDULE_ACCESS_LIST_ALLOWED } from 'utils/constants';
 
 import {
   useLayout,
-  Grid,
-  GridItem,
   TextInput,
   ContentSwitcher,
   Box,
   Button,
   StyledText,
-  Steps,
   Split,
   Info,
   IconMinus,
@@ -26,6 +23,7 @@ import {
   SPACING,
   useTheme,
 } from '@aragon/ui';
+import StepsHeader from './components/StepsHeader';
 
 const CreateDaoCollateral: React.FC<{
   setActiveStep: React.Dispatch<React.SetStateAction<CreateDaoSteps>>;
@@ -98,18 +96,11 @@ const CreateDaoCollateral: React.FC<{
   return (
     <Box>
       <div style={{ display: 'grid', gridGap: spacing }}>
-        <Grid columns={'4'} columnWidth={'1fr'}>
-          <GridItem gridColumn={'2/5'}>
-            <Steps steps={stepsNames} activeIdx={2} showProgress={true} />
-          </GridItem>
-          <GridItem gridColumn={'1/2'} gridRow={'1'} alignVertical={'center'}>
-            <StyledText name={'title2'}>Create DAO</StyledText>
-          </GridItem>
-        </Grid>
+        <StepsHeader index={2} />
 
         <div>
-          <StyledText name={'title2'}>Collaterals</StyledText>
-          <StyledText name={'body2'} style={{ color: theme.disabledContent }}>
+          <StyledText name={'title3'}>Collaterals</StyledText>
+          <StyledText name={'title4'} style={{ color: theme.disabledContent }}>
             In order to schedule or challenge executions, any member must provide this amount of
             collateral, so they have stake in the game and act with the best interest of your DAO.
             By default Aragon Console uses DAI as a collateral token. If you want to change this,
@@ -121,11 +112,6 @@ const CreateDaoCollateral: React.FC<{
           Hey, this is an important step, please check that all the information entered is correct.
         </Info>
         <div>
-          <StyledText name={'title4'}>Schedule execution collateral token</StyledText>
-          <StyledText name={'body3'}>
-            Which token do you want to use for schedule execution?
-          </StyledText>
-
           {!isExistingToken && (
             <Controller
               name="isScheduleNewDaoToken"
@@ -133,6 +119,8 @@ const CreateDaoCollateral: React.FC<{
               defaultValue={isScheduleNewDaoToken}
               render={({ field: { onChange, value } }) => (
                 <ContentSwitcher
+                  title="Schedule execution collateral token"
+                  subtitle="Which token do you want to use for schedule execution?"
                   onChange={onChange}
                   selected={value}
                   items={['Custom Token', 'New Token']}
@@ -208,10 +196,6 @@ const CreateDaoCollateral: React.FC<{
         </div>
 
         <div>
-          <StyledText name={'title4'}>Challenge collateral token</StyledText>
-          <StyledText name={'body3'}>
-            Which token do you want to use for challange collateral?
-          </StyledText>
           {!isExistingToken && (
             <Controller
               name="isChallengeNewDaoToken"
@@ -219,6 +203,8 @@ const CreateDaoCollateral: React.FC<{
               defaultValue={isChallengeNewDaoToken}
               render={({ field: { onChange, value } }) => (
                 <ContentSwitcher
+                  title="Challenge collateral token"
+                  subtitle="Which token do you want to use for challange collateral?"
                   onChange={onChange}
                   selected={value}
                   items={['Custom Token', 'New Token']}
@@ -291,18 +277,15 @@ const CreateDaoCollateral: React.FC<{
           />
         </div>
         <div>
-          <StyledText name={'title4'}>Schedule execution permissions</StyledText>
-          <StyledText name={'body3'}>
-            If you want you can define the list of addresses that have permission to schedule
-            executions in your DAO, so it is not open for anyone
-          </StyledText>
-
           <Controller
             name="isAnyAddress"
             control={control}
             defaultValue={isAnyAddress}
             render={({ field: { onChange, value } }) => (
               <ContentSwitcher
+                title="Schedule execution permissions"
+                subtitle="If you want you can define the list of addresses that have permission to schedule
+                  executions in your DAO, so it is not open for anyone"
                 onChange={onChange}
                 selected={value}
                 items={['Address List', 'Any Address']}
