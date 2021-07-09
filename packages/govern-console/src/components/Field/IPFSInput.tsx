@@ -100,12 +100,10 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
     <div>
       <div
         style={{
-          width: 'fit-content',
           display: 'flex',
           flexDirection: 'row',
           verticalAlign: 'middle',
           margin: `${SPACING['small']}px 0 ${SPACING['medium']}px 0`,
-          lineHeight: '40px',
         }}
       >
         <Controller
