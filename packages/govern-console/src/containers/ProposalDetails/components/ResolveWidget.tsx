@@ -4,14 +4,21 @@ import { PROPOSAL_STATES } from 'utils/states';
 import { InfoKeyDiv, InfoValueDivInline } from '../ProposalDetails';
 import { Widget, WidgetRow, InfoWrapper, TitleText } from './SharedStyles';
 import { formatDate } from 'utils/date';
+import { useDisputeHook } from 'hooks/court-hooks';
+
+import { networkEnvironment } from 'environment';
+const { courtUrl } = networkEnvironment;
 
 const ResolveWidget: React.FC<any> = ({
   disabled,
   containerEventResolve,
   currentState,
+  resolver,
   disputeId,
   onResolveProposal,
 }) => {
+  const { data, isDefaultCourt } = useDisputeHook(disputeId, resolver);
+
   if (containerEventResolve) {
     return (
       <Widget>
@@ -33,8 +40,29 @@ const ResolveWidget: React.FC<any> = ({
       </Widget>
     );
   }
+
   if (currentState !== PROPOSAL_STATES.CHALLENGED) {
     return <></>;
+  }
+
+  if (typeof data === 'undefined' && isDefaultCourt) {
+    return <></>;
+  }
+
+  if (data && data.disputes.length > 0 && data.disputes[0].finalRuling == 0 && isDefaultCourt) {
+    // ruling hasn't been executed yet.
+    return (
+      <Widget>
+        <WidgetRow>
+          <TitleText>Track the status of the dispute</TitleText>
+        </WidgetRow>
+        <WidgetRow>
+          <a href={`${courtUrl}/disputes/${disputeId}`} target="_blank" rel="noopener noreferrer">
+            Click
+          </a>
+        </WidgetRow>
+      </Widget>
+    );
   }
 
   return (

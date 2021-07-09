@@ -2,6 +2,9 @@ import { useState, useMemo } from 'react';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import { DAO_BY_NAME, DAO_LIST, GOVERN_REGISTRY } from 'queries/dao';
 import { PROPOSAL_DETAILS, PROPOSAL_LIST } from 'queries/proposals';
+import { DISPUTE } from 'queries/court';
+import { courtClient } from 'index';
+
 import {
   transformProposalDetails,
   transformProposals,
@@ -83,6 +86,21 @@ export function useLazyProposalListQuery() {
     fetchMore: fetchMore,
     loading,
     data: proposalList,
+    error,
+  };
+}
+
+export function useLazyDisputeQuery(disputId: number) {
+  const [getDispute, { loading, error, data }] = useLazyQuery(DISPUTE, {
+    notifyOnNetworkStatusChange: true,
+    variables: { id: disputId },
+    client: courtClient,
+  });
+
+  return {
+    getDispute,
+    data,
+    loading,
     error,
   };
 }

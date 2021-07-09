@@ -643,6 +643,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
                   ? proposalStates['ContainerEventChallenge'].disputeId
                   : null
               }
+              resolver={proposalInfo.config.resolver}
               currentState={proposalInfo.state}
               executionTime={proposalInfo.payload.executionTime}
               onResolveProposal={resolveProposal}

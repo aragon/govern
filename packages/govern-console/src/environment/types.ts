@@ -14,6 +14,8 @@ export interface EnvironmentConfig {
   chainId: ChainId;
   networkName: string;
   subgraphUrl: string;
+  courtSubgraphUrl: string;
+  courtUrl: string;
   voiceUrl: string;
   daoFactoryAddress: string;
   governRegistryAddress: string;
@@ -22,7 +24,7 @@ export interface EnvironmentConfig {
     scheduleDeposit: Collateral;
     challengeDeposit: Collateral;
     resolver: string;
-    rules: Bytes;
+    rules: string;
     maxCalldataSize: number;
   };
   curatedTokens: Record<TokenSymbol, TokenAddress>;

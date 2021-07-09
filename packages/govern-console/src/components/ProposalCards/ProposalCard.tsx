@@ -41,9 +41,9 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
 
   const getSlicedTransactionHash = () => {
     const hash =
-      transactionHash.slice(0, 6) +
+      transactionHash.substring(0, 6) +
       '...' +
-      transactionHash.slice(transactionHash.length - 5, transactionHash.length - 1);
+      transactionHash.substring(transactionHash.length - 5);
     return hash;
   };
 
