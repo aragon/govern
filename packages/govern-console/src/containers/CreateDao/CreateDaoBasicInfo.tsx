@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { CreateDaoSteps, stepsNames } from './utils/Shared';
+import { CreateDaoSteps } from './utils/Shared';
 import { useCreateDaoContext, ICreateDaoBasicInfo } from './utils/CreateDaoContextProvider';
 import { useForm, Controller } from 'react-hook-form';
 import { validateToken, validateAmountForDecimals } from 'utils/validations';
@@ -15,11 +15,11 @@ import {
   Box,
   Button,
   StyledText,
-  Steps,
   Info,
   SPACING,
   Link,
 } from '@aragon/ui';
+import StepsHeader from './components/StepsHeader';
 
 const CreateDaoBasicInfo: React.FC<{
   setActiveStep: React.Dispatch<React.SetStateAction<CreateDaoSteps>>;
@@ -62,14 +62,7 @@ const CreateDaoBasicInfo: React.FC<{
   return (
     <Box>
       <div style={{ display: 'grid', gridGap: spacing }}>
-        <Grid columns={'4'} columnWidth={'1fr'}>
-          <GridItem gridColumn={'2/5'}>
-            <Steps steps={stepsNames} activeIdx={0} showProgress={true} />
-          </GridItem>
-          <GridItem gridColumn={'1/2'} gridRow={'1'} alignVertical={'center'}>
-            <StyledText name={'title2'}>Create DAO</StyledText>
-          </GridItem>
-        </Grid>
+        <StepsHeader index={0} />
 
         <Controller
           name="daoIdentifier"
@@ -89,28 +82,24 @@ const CreateDaoBasicInfo: React.FC<{
             />
           )}
         />
-        <div>
-          <StyledText name={'title2'}>Create token</StyledText>
-          <StyledText name={'body2'}>
-            Create a new ERC-20 token for your DAO, or use an existing one
-          </StyledText>
-          <Controller
-            name="isExistingToken"
-            control={control}
-            defaultValue={isExistingToken}
-            render={({ field: { onChange, value } }) => (
-              <ContentSwitcher
-                onChange={onChange}
-                selected={value}
-                items={['New Token', 'Existing Token']}
-                paddingSettings={{
-                  horizontal: spacing * 2,
-                  vertical: spacing / 4,
-                }}
-              />
-            )}
-          />
-        </div>
+        <Controller
+          name="isExistingToken"
+          control={control}
+          defaultValue={isExistingToken}
+          render={({ field: { onChange, value } }) => (
+            <ContentSwitcher
+              title="Create token"
+              subtitle="Create a new ERC-20 token for your DAO, or use an existing one"
+              onChange={onChange}
+              selected={value}
+              items={['New Token', 'Existing Token']}
+              paddingSettings={{
+                horizontal: spacing * 2,
+                vertical: spacing / 4,
+              }}
+            />
+          )}
+        />
 
         {!watch('isExistingToken') ? (
           <>

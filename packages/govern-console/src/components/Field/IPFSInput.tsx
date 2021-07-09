@@ -107,12 +107,6 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
 
   return (
     <div>
-      {title && <StyledText name={'title2'}>{title}</StyledText>}
-      {subtitle && (
-        <StyledText name={'body2'} style={{ color: theme.disabledContent }}>
-          {subtitle}
-        </StyledText>
-      )}
       <div
         style={{
           width: 'fit-content',
@@ -129,6 +123,8 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
           defaultValue={false}
           render={({ field: { onChange, value } }) => (
             <ContentSwitcher
+              title={title}
+              subtitle={subtitle}
               onChange={onChange}
               selected={value}
               items={['Text', 'File']}
