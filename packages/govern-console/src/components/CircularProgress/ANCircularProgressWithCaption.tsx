@@ -22,10 +22,11 @@ const Container = styled.div`
 `;
 
 const Progress = styled.div`
-  margin-top: ${GU / 2}px;
+  margin-top: ${GU}px;
 `;
 
 const Caption = styled.div`
+  margin-top: ${GU / 2}px;
   margin-left: ${GU}px;
   word-break: break-word;
   color: ${(p) => p.color};
@@ -51,7 +52,7 @@ export const ANCircularProgressWithCaption = (props: ANProgressCationPropos) => 
         <ANCircularProgress status={props.state} />
       </Progress>
       <Caption color={getTextColor(props.state)}>
-        <StyledText name="title2">{props.caption}</StyledText>
+        <StyledText name="title3">{props.caption}</StyledText>
       </Caption>
     </Container>
   );
