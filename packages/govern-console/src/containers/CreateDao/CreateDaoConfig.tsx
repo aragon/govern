@@ -40,14 +40,7 @@ const CreateDaoConfig: React.FC<{
   const { provider } = context;
 
   const methods = useForm<ICreateDaoConfig>();
-  const {
-    control,
-    setValue,
-    getValues,
-    trigger,
-    watch,
-    formState: { errors },
-  } = methods;
+  const { control, setValue, getValues, trigger, watch } = methods;
 
   useEffect(() => {
     setValue('ruleText', ruleText);
@@ -57,7 +50,6 @@ const CreateDaoConfig: React.FC<{
   }, [ruleText, isRuleFile, ruleFile, resolver, customResolver, setValue]);
 
   const moveToNextStep = async () => {
-    console.log(errors, ' errors');
     const validate = await trigger();
 
     if (!validate) return;

@@ -14,7 +14,6 @@ import {
   Checkbox,
   Box,
   Button,
-  StyledText,
   Info,
   SPACING,
   Link,
