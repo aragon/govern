@@ -6,8 +6,6 @@ enum MethodType {
 
 // TODO: define tracked Events
 export enum EventType {
-  DAO_CREATED = 'dao_created',
-  EXECUTION_CREATED = 'exection_created',
   DEPOSIT_ASSETS_ClICKED = 'deposit_assets_clicked',
 }
 
@@ -20,8 +18,7 @@ export enum EventType {
 function getAnalyticsMethod(methodType: MethodType) {
   const windowAnalytics = (window as any).analytics;
   if (!windowAnalytics) {
-    console.warn('Analytics could not be laoded.');
-    return null;
+    return;
   }
   if (methodType === MethodType.PAGE) return windowAnalytics.page;
   if (methodType === MethodType.IDENTIFY) return windowAnalytics.identify;
@@ -38,7 +35,6 @@ function getAnalyticsMethod(methodType: MethodType) {
 export function trackEvent<T>(eventType: EventType, eventData: T) {
   const trackerMethod = getAnalyticsMethod(MethodType.EVENT);
   if (typeof trackerMethod !== 'function') {
-    console.warn('analytics function not defined');
     return;
   }
   trackerMethod(eventType, eventData);
@@ -53,7 +49,6 @@ export function trackEvent<T>(eventType: EventType, eventData: T) {
 export function trackPage(pathName: string) {
   const trackerMethod = getAnalyticsMethod(MethodType.PAGE);
   if (typeof trackerMethod !== 'function') {
-    console.warn('analytics function not defined');
     return;
   }
   trackerMethod({
@@ -72,7 +67,6 @@ export function trackPage(pathName: string) {
 export function identifyUser(account: string, networkName: string, connector: string) {
   const trackerMethod = getAnalyticsMethod(MethodType.IDENTIFY);
   if (typeof trackerMethod !== 'function') {
-    console.warn('analytics function not defined');
     return;
   }
 

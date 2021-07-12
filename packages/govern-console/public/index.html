@@ -28,8 +28,9 @@
   </body>
   <script>
     !(function () {
+      const analyticsKey = '%REACT_APP_ANALYTICS_KEY%';
       var analytics = (window.analytics = window.analytics || []);
-      if (!analytics.initialize)
+      if (!analytics.initialize && !analyticsKey.includes('REACT_APP_ANALYTICS_KEY'))
         if (analytics.invoked)
           window.console && console.error && console.error('Segment snippet included twice.');
         else {
@@ -77,9 +78,9 @@
             n.parentNode.insertBefore(t, n);
             analytics._loadOptions = e;
           };
-          analytics._writeKey = 'TZnJZV7SG3eKb7aTcBDcoOM8Du9hQTXr';
+          analytics._writeKey = analyticsKey;
           analytics.SNIPPET_VERSION = '4.13.2';
-          analytics.load('TZnJZV7SG3eKb7aTcBDcoOM8Du9hQTXr');
+          analytics.load(analyticsKey);
           analytics.page();
         }
     })();
