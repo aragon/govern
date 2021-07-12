@@ -50,7 +50,7 @@ jobs:
         if: github.ref == 'refs/heads/test-branch'
 
       - name: deploy app on rinkeby's fleek
-        id: deploy
+        id: deploy1
         if: github.ref == 'refs/heads/test-branch'
         uses: fleekhq/action-deploy@v0.1.4-beta2
         with:
@@ -64,7 +64,7 @@ jobs:
         if: github.ref == 'refs/heads/test-branch'
 
       - name: deploy app on rinkeby's staging's fleek
-        id: deploy
+        id: deploy2
         if: github.ref == 'refs/heads/test-branch'
         uses: fleekhq/action-deploy@v0.1.4-beta2
         with:
@@ -78,7 +78,7 @@ jobs:
         if: github.ref == 'refs/heads/master'
 
       - name: deploy console
-        id: deploy
+        id: deploy3
         if: github.ref == 'refs/heads/master'
         uses: fleekhq/action-deploy@v0.1.4-beta2
         with:
