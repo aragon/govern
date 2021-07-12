@@ -10,17 +10,17 @@ import DaoSettings from 'containers/DAOSettings/DAOSettings';
 import { ModalsProvider } from 'containers/HomePage/ModalsContext';
 import { Main } from '@aragon/ui';
 import CreateDao from 'containers/CreateDao/CreateDao';
+import { trackPage } from 'services/analytics';
+import { useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const HomePage = () => {
   const history = useHistory();
-  // const [themeMode, setThemeMode] = useState('light');
-  // const toggleThemeMode = () => {
-  //   if (themeMode === 'light') {
-  //     setThemeMode('dark');
-  //   } else {
-  //     setThemeMode('light');
-  //   }
-  // };
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    trackPage(pathname);
+  }, [pathname]);
 
   return (
     <ModalsProvider>
