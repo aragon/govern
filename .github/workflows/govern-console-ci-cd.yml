@@ -27,12 +27,12 @@ jobs:
         with:
           node-version: 14.15.5
       
-    - name: activate rinkeby's fleek
-      run: mv fleek/console.staging.json .fleek.json
+      - name: activate rinkeby's fleek
+        run: mv fleek/console.rinkeby.staging.json .fleek.json
 
-    - name: deploy app on rinkeby's fleek
-      id: deploy1
-      uses: fleekhq/action-deploy@v0.1.4-beta2
-      with:
-        apiKey: ${{ secrets.FLEEK_API_KEY }}
-        workDir: ${{env.working-directory}}
+      - name: deploy app on rinkeby's fleek
+        id: deploy1
+        uses: fleekhq/action-deploy@v0.1.4-beta2
+        with:
+          apiKey: ${{ secrets.FLEEK_API_KEY }}
+          workDir: ${{env.working-directory}}
