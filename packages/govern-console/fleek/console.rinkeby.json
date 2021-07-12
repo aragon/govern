@@ -9,6 +9,9 @@
   "build": {
     "baseDir": "",
     "publicDir": "build",
-    "rootDir": ""
+    "rootDir": "",
+    "environment": {
+      "REACT_APP_ANALYTICS_KEY": "zQaxB0D8Ujg9Et2x1VU8oKhZ1nyyTsK5"
+    }
   }
 }

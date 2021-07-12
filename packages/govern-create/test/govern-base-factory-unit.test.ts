@@ -2,6 +2,7 @@ import { ethers } from 'hardhat'
 import { expect } from 'chai'
 import { keccak256, solidityPack } from 'ethers/lib/utils'
 import { BigNumber } from 'ethers'
+import { Token } from '@aragon/govern';
 
 import { ERC3000DefaultConfig } from 'erc3k/utils/ERC3000'
 
@@ -73,23 +74,27 @@ describe('Govern Base Factory with mocked contracts', function () {
 
     const mintAmount = 100
 
+    const token: Token = {
+      tokenAddress: deployToken ? zeroAddress : customAddress,
+      tokenName: 'Eagle Token',
+      tokenSymbol: 'EAG',
+      tokenDecimals: 18,
+      mintAddress: owner,
+      mintAmount: mintAmount,
+      merkleRoot: '0x'+'00'.repeat(32),
+      merkleMintAmount:0,
+      merkleTree: '0x',
+      merkleContext: '0x'
+    };
+    
     const tx = await GovernBaseFactory.newGovern(
-      {
-        tokenAddress: deployToken ? zeroAddress : customAddress,
-        tokenName: 'Eagle Token',
-        tokenSymbol: 'EAG',
-        tokenDecimals: 18,
-        mintAddress: owner,
-        mintAmount: mintAmount,
-        merkleRoot: '0x'+'00'.repeat(32),
-        merkleMintAmount:0
-      },
+      token,
       [],
       useProxies,
       ERC3000DefaultConfig,
       name,
     )
-
+    
     await expect(tx)
       .to.emit(GovernQueueFactoryMock, 'NewQueueCalledWith')
       .withArgs(GovernBaseFactory.address, createSalt(name, useProxies)) // TODO: add config check too after the fix about struct emitting is done.

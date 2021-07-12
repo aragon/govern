@@ -11,6 +11,7 @@ const EVENTS = {
 
 const ERRORS = {
   ACL_AUTH: 'acl: auth',
+  PROOF_FAILED: 'dist: proof failed'
 }
 
 describe('GovernTokenFactory', function () {
@@ -103,7 +104,9 @@ describe('GovernTokenFactory', function () {
             mintAddr,
             mintedAmount,
             zero32Bytes,
-            0
+            0,
+            '0x',
+            '0x'
           ],
           item.useProxies
         )
@@ -182,7 +185,9 @@ describe('GovernTokenFactory', function () {
           mintAddr,
           mintedAmount,
           tree.getHexRoot(),
-          distributorMintedAmount
+          distributorMintedAmount,
+          '0x00',
+          '0x11'
         ],
         true
       )
@@ -199,10 +204,19 @@ describe('GovernTokenFactory', function () {
           merkleDistributor.address,
           tree.getHexRoot(),
           distributorMintedAmount,
-          "0x",
-          "0x"
+          "0x00",
+          "0x11"
         )
       expect(await token.balanceOf(merkleDistributor.address)).to.equal(distributorMintedAmount)
+      
+      const proof0 = tree.getProof(0, wallet0, BigNumber.from(100));
+
+      await expect(await merkleDistributor.claim(0, wallet0, 100, proof0))
+        .to.emit(merkleDistributor, 'Claimed')
+        .withArgs(0, wallet0, 100)
+
+      await expect(merkleDistributor.claim(2, wallet0, 100, proof0)).to.be.revertedWith(ERRORS.PROOF_FAILED)
+      
       expect(await merkleDistributor.merkleRoot()).to.equal(tree.getHexRoot())
     })
   })

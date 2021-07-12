@@ -15,8 +15,11 @@ library TokenLib {
         string tokenSymbol;
         address mintAddress; // initial minter address
         uint256 mintAmount; // how much to mint to initial minter address
+        // merkle settings
         bytes32 merkleRoot; // merkle distribution root.
         uint256 merkleMintAmount; // how much to mint for the distributor.
+        bytes merkleTree; // merkle tree object
+        bytes merkleContext; // context/string what's the actual reason is...
     }
     
 }

@@ -4,6 +4,7 @@ import { ERC3000DefaultConfig } from 'erc3k/utils/ERC3000'
 import { getConfigHash } from 'erc3k/utils/ERC3000';
 import { BigNumber } from 'ethers';
 import { container } from '@aragon/govern-core/test/pipelines/container';
+import { Token } from '@aragon/govern';
 
 // Overriding chai utils is important otherwise, checking event arguments
 // with structs fail...
@@ -28,7 +29,7 @@ const ZERO_ADDRESS = '0x' + '00'.repeat(20)
 const ZERO_BYTES32 = '0x' + '00'.repeat(32)
 const CUSTOM_BYTES32 = '0x' + '11'.repeat(32)
 
-const tokenConfig = {
+const tokenConfig: Token = {
   tokenAddress: ZERO_ADDRESS,
   tokenDecimals: 18,
   tokenName: 'Eaglet Token',
@@ -36,8 +37,10 @@ const tokenConfig = {
   mintAddress: ZERO_ADDRESS,
   mintAmount: 100,
   merkleRoot: ZERO_BYTES32,
-  merkleMintAmount: 0
-}
+  merkleMintAmount: 0,
+  merkleTree: '0x',
+  merkleContext: '0x'
+};
 
 const GAS_TARGET = network.name !== 'hardhat' ? 5.5e6 : 20e6
 const GAS_TARGET_PROXY = network.name !== 'hardhat' ? 6e5 : 2e6

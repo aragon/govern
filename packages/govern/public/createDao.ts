@@ -17,231 +17,32 @@ export const ContainerConfig = `
     uint256 maxCalldataSize
   )`
 
+const token = `
+  tuple(
+    address tokenAddress, 
+    uint8 tokenDecimals, 
+    string tokenName, 
+    string tokenSymbol,
+    address mintAddress,
+    uint256 mintAmount,
+    bytes32 merkleRoot,
+    uint256 merkleMintAmount,
+    bytes merkleTree,
+    bytes merkleContext
+  )`
+ 
 const factoryAbi = [
-  {
-    "inputs": [
-      {
-        "internalType": "contract GovernRegistry",
-        "name": "_registry",
-        "type": "address"
-      },
-      {
-        "internalType": "contract GovernFactory",
-        "name": "_governFactory",
-        "type": "address"
-      },
-      {
-        "internalType": "contract GovernQueueFactory",
-        "name": "_queueFactory",
-        "type": "address"
-      },
-      {
-        "internalType": "contract GovernTokenFactory",
-        "name": "_tokenFactory",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
-    "inputs": [],
-    "name": "governFactory",
-    "outputs": [
-      {
-        "internalType": "contract GovernFactory",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "components": [
-          {
-            "internalType": "contract IERC20",
-            "name": "tokenAddress",
-            "type": "address"
-          },
-          {
-            "internalType": "uint8",
-            "name": "tokenDecimals",
-            "type": "uint8"
-          },
-          {
-            "internalType": "string",
-            "name": "tokenName",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "tokenSymbol",
-            "type": "string"
-          },
-          {
-            "internalType": "address",
-            "name": "mintAddress",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "mintAmount",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "merkleRoot",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "uint256",
-            "name": "merkleMintAmount",
-            "type": "uint256"
-          }
-        ],
-        "internalType": "struct TokenLib.TokenConfig",
-        "name": "_token",
-        "type": "tuple"
-      },
-      {
-        "internalType": "address[]",
-        "name": "_scheduleAccessList",
-        "type": "address[]"
-      },
-      {
-        "internalType": "bool",
-        "name": "_useProxies",
-        "type": "bool"
-      },
-      {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "executionDelay",
-            "type": "uint256"
-          },
-          {
-            "components": [
-              {
-                "internalType": "address",
-                "name": "token",
-                "type": "address"
-              },
-              {
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-              }
-            ],
-            "internalType": "struct ERC3000Data.Collateral",
-            "name": "scheduleDeposit",
-            "type": "tuple"
-          },
-          {
-            "components": [
-              {
-                "internalType": "address",
-                "name": "token",
-                "type": "address"
-              },
-              {
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-              }
-            ],
-            "internalType": "struct ERC3000Data.Collateral",
-            "name": "challengeDeposit",
-            "type": "tuple"
-          },
-          {
-            "internalType": "address",
-            "name": "resolver",
-            "type": "address"
-          },
-          {
-            "internalType": "bytes",
-            "name": "rules",
-            "type": "bytes"
-          },
-          {
-            "internalType": "uint256",
-            "name": "maxCalldataSize",
-            "type": "uint256"
-          }
-        ],
-        "internalType": "struct ERC3000Data.Config",
-        "name": "_config",
-        "type": "tuple"
-      },
-      {
-        "internalType": "string",
-        "name": "_name",
-        "type": "string"
-      }
-    ],
-    "name": "newGovern",
-    "outputs": [
-      {
-        "internalType": "contract Govern",
-        "name": "govern",
-        "type": "address"
-      },
-      {
-        "internalType": "contract GovernQueue",
-        "name": "queue",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "queueFactory",
-    "outputs": [
-      {
-        "internalType": "contract GovernQueueFactory",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "registry",
-    "outputs": [
-      {
-        "internalType": "contract GovernRegistry",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "tokenFactory",
-    "outputs": [
-      {
-        "internalType": "contract GovernTokenFactory",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  }
-]
+  `function newGovern(
+    ${token} _token, 
+    address[] _scheduleAccessList,
+    bool _useProxies,
+    ${ContainerConfig} _config, 
+    string _name
+  ) external`,
+];
 
 const registryAbi = [
-  'event Registered(address indexed executor, address queue, address indexed token, address minter, address indexed registrant, string name)',
+  'event Registered(address indexed executor, address queue, address indexed token, address minter, address indexed registrant, string name)'
 ]
 
 const tokenAbi = ['function balanceOf(address who) view returns (uint256)']
@@ -257,6 +58,8 @@ export type Token = {
   mintAmount: BigNumberish | string
   merkleRoot: utils.BytesLike
   merkleMintAmount: BigNumberish | string
+  merkleTree: utils.BytesLike;
+  merkleContext: utils.BytesLike;
 }
 
 export type TokenDeposit = {
@@ -303,19 +106,23 @@ export async function createDao(
   options: CreateDaoOptions = {},
   registeredDaoTokenCallback?: (tokenAddress: string) => void
 ): Promise<providers.TransactionResponse> {
-  let token: Partial<Token>
-  if (!args.token.tokenAddress) {
-    const tokenIsMissingInfo =
-      !args.token.tokenName ||
-      !args.token.tokenSymbol ||
-      !args.token.tokenDecimals ||
-      !args.token.mintAddress ||
-      !args.token.merkleRoot
+  let token: Partial<Token>;
 
-    if (tokenIsMissingInfo) {
-      throw new Error(
-        'Missing token name, decimals, symbol, mintAddress, mintAmount and/or merkleRoot'
-      )
+  const keys: (keyof Partial<Token>)[] = [
+    'tokenName', 
+    'tokenSymbol', 
+    'tokenDecimals', 
+    'mintAddress', 
+    'merkleRoot',
+    'merkleMintAmount',
+    'merkleTree',
+    'merkleContext'
+  ];
+
+  if (!args.token.tokenAddress) {
+    const tokenIsMissingInfo = keys.every(item => args.token.hasOwnProperty(item));
+    if (!tokenIsMissingInfo) {
+      throw new Error(`Missing ${keys.join(' or ')}`)
     }
     token = {
       tokenAddress: constants.AddressZero,
@@ -330,7 +137,9 @@ export async function createDao(
       mintAddress: constants.AddressZero,
       mintAmount: 0,
       merkleRoot: '0x' + '00'.repeat(32),
-      merkleMintAmount: 0
+      merkleMintAmount: 0,
+      merkleTree: '',
+      merkleContext: ''
     }
   }
 

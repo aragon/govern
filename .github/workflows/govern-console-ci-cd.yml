@@ -4,6 +4,7 @@ on:
     paths:
       - 'packages/govern-console/**'
     branches:
+      - 'test-branch'
       - 'develop'
       - 'master'
 
@@ -32,12 +33,45 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Build the app
-        run: CI='' yarn build
+      # =============BUILD GOVERN CONSOLE APP============== 
 
+      - name: Build the app on rinkeby
+        run: CI='' yarn build:rinkeby
+        if: github.ref == 'refs/heads/test-branch'
+
+      - name: Build the app on mainnet
+        run: CI='' yarn build:mainnet
+        if: github.ref == 'refs/heads/master'
+
+      # ==============DEPLOY APP ON RINKEBY====================== 
+      
       - name: activate rinkeby's fleek
         run: mv fleek/console.rinkeby.json .fleek.json
-        if: github.ref == 'refs/heads/develop'
+        if: github.ref == 'refs/heads/test-branch'
+
+      - name: deploy app on rinkeby's fleek
+        id: deploy
+        if: github.ref == 'refs/heads/test-branch'
+        uses: fleekhq/action-deploy@v0.1.4-beta2
+        with:
+          apiKey: ${{ secrets.FLEEK_API_KEY }}
+          workDir: ${{env.working-directory}}
+
+      # ==============DEPLOY APP ON RINKEBY STAGING==============
+
+      - name: activate rinkeby' staging fleek
+        run: mv fleek/console.rinkeby.staging.json .fleek.json
+        if: github.ref == 'refs/heads/test-branch'
+
+      - name: deploy app on rinkeby's staging's fleek
+        id: deploy
+        if: github.ref == 'refs/heads/test-branch'
+        uses: fleekhq/action-deploy@v0.1.4-beta2
+        with:
+          apiKey: ${{ secrets.FLEEK_API_KEY }}
+          workDir: ${{env.working-directory}}
+
+      # ============DEPLOY APP ON MAINNET========================
 
       - name: activate mainnet's fleek
         run: mv fleek/console.mainnet.json .fleek.json
@@ -45,38 +79,7 @@ jobs:
 
       - name: deploy console
         id: deploy
-        uses: fleekhq/action-deploy@v0.1.4-beta2
-        with:
-          apiKey: ${{ secrets.FLEEK_API_KEY }}
-          workDir: ${{env.working-directory}}
-
-  build-and-deploy-storybook:
-    runs-on: ubuntu-latest
-    container: fleek/create-react-app:node-15
-    name: builds and deploys storybook
-    if: github.ref == 'refs/heads/develop'
-    defaults:
-      run:
-        working-directory: ${{env.working-directory}}
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Install node
-        uses: actions/setup-node@v1
-        with:
-          node-version: 14.15.5
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Build the storybook
-        run: CI='' yarn build-storybook
-
-      - name: activate rinkeby's fleek
-        run: mv fleek/storybook.json .fleek.json
-
-      - name: deploy storybook
-        id: deploy
+        if: github.ref == 'refs/heads/master'
         uses: fleekhq/action-deploy@v0.1.4-beta2
         with:
           apiKey: ${{ secrets.FLEEK_API_KEY }}
