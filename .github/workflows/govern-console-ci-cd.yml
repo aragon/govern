@@ -12,7 +12,7 @@ env:
   working-directory: packages/govern-console
 
 jobs:
-  build-and-deploy-console:
+  install-and-build-depedencies:
     runs-on: ubuntu-latest
     container: fleek/create-react-app:node-15
     name: builds and deploys console
@@ -26,61 +26,13 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 14.15.5
-
-      - name: Install dependencies and build govern
-        run: cd ../govern && yarn install --frozen-lockfile && yarn build
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      # =============BUILD GOVERN CONSOLE APP============== 
-
-      - name: Build the app on rinkeby
-        run: CI='' yarn build:rinkeby
-        if: github.ref == 'refs/heads/test-branch'
-
-      - name: Build the app on mainnet
-        run: CI='' yarn build:mainnet
-        if: github.ref == 'refs/heads/master'
-
-      # ==============DEPLOY APP ON RINKEBY====================== 
       
-      - name: activate rinkeby's fleek
-        run: mv fleek/console.rinkeby.json .fleek.json
-        if: github.ref == 'refs/heads/test-branch'
+    - name: activate rinkeby's fleek
+      run: mv fleek/console.staging.json .fleek.json
 
-      - name: deploy app on rinkeby's fleek
-        id: deploy1
-        if: github.ref == 'refs/heads/test-branch'
-        uses: fleekhq/action-deploy@v0.1.4-beta2
-        with:
-          apiKey: ${{ secrets.FLEEK_API_KEY }}
-          workDir: ${{env.working-directory}}
-
-      # ==============DEPLOY APP ON RINKEBY STAGING==============
-
-      - name: activate rinkeby' staging fleek
-        run: mv fleek/console.rinkeby.staging.json .fleek.json
-        if: github.ref == 'refs/heads/test-branch'
-
-      - name: deploy app on rinkeby's staging's fleek
-        id: deploy2
-        if: github.ref == 'refs/heads/test-branch'
-        uses: fleekhq/action-deploy@v0.1.4-beta2
-        with:
-          apiKey: ${{ secrets.FLEEK_API_KEY }}
-          workDir: ${{env.working-directory}}
-
-      # ============DEPLOY APP ON MAINNET========================
-
-      - name: activate mainnet's fleek
-        run: mv fleek/console.mainnet.json .fleek.json
-        if: github.ref == 'refs/heads/master'
-
-      - name: deploy console
-        id: deploy3
-        if: github.ref == 'refs/heads/master'
-        uses: fleekhq/action-deploy@v0.1.4-beta2
-        with:
-          apiKey: ${{ secrets.FLEEK_API_KEY }}
-          workDir: ${{env.working-directory}}
+    - name: deploy app on rinkeby's fleek
+      id: deploy1
+      uses: fleekhq/action-deploy@v0.1.4-beta2
+      with:
+        apiKey: ${{ secrets.FLEEK_API_KEY }}
+        workDir: ${{env.working-directory}}
