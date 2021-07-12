@@ -4,11 +4,12 @@
       "team": "aragonone-team",
       "platform": "ipfs",
       "source": "ipfs",
-      "name": "green-morning-6275"
+      "name": "orange-river-8981"
     },
     "build": {
         "baseDir": "",
         "publicDir": "build",
-        "rootDir": ""
+        "rootDir": "",
+        "command": "yarn build"
     }
   }
