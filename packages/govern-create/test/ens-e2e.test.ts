@@ -196,7 +196,8 @@ class EnsHelper extends Ens {
     await this.commit({ domain, owner, salt, resolver, address })
 
     // need to wait for 1 minute before registering
-    advanceTime(60 * 60)
+    console.log('fast forward time 70s to register domain', domain)
+    await advanceTime(70)
 
     // register the domain
     await this.register({ domain, owner, duration, salt, resolver, address })
