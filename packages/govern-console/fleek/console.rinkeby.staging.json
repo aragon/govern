@@ -1,14 +1,14 @@
 {
     "site": {
-      "id": "5e514f89-c5eb-4cff-a222-940e388d8538",
+      "id": "0bc1e603-dcaf-4f95-8a2c-d28713c3ccd1",
       "team": "aragonone-team",
       "platform": "ipfs",
       "source": "ipfs",
-      "name": "green-morning-6275"
+      "name": "purple-unit-3967"
     },
     "build": {
-        "baseDir": "",
-        "publicDir": "build",
-        "rootDir": ""
+      "baseDir": "",
+      "publicDir": "build",
+      "rootDir": ""
     }
   }
