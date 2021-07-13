@@ -36,8 +36,10 @@ const tokenConfig = {
   mintAddress: ZERO_ADDRESS,
   mintAmount: 100,
   merkleRoot: ZERO_BYTES32,
-  merkleMintAmount: 0
-}
+  merkleMintAmount: 0,
+  merkleTree: '0x',
+  merkleContext: '0x'
+};
 
 const GAS_TARGET = network.name !== 'hardhat' ? 5.5e6 : 20e6
 const GAS_TARGET_PROXY = network.name !== 'hardhat' ? 6e5 : 2e6

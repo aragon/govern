@@ -82,6 +82,8 @@ const CreateDaoProgress: React.FC<{
             : basicInfo.tokenMintAmount,
         merkleRoot: '0x' + '00'.repeat(32),
         merkleMintAmount: 0,
+        merkleTree: '0x',
+        merkleContext: '0x',
       };
     }
 

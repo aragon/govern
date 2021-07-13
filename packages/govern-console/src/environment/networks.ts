@@ -74,8 +74,8 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
       courtSubgraphUrl: 'https://api.thegraph.com/subgraphs/name/aragon/aragon-court-v2-staging',
       courtUrl: 'https://court-rinkeby-staging.aragon.org/#',
       voiceUrl: 'http://voice-rinkeby.aragon.org/',
-      daoFactoryAddress: '0x2FA187AfA6FA050d6Ea76479839B76755f181583',
-      governRegistryAddress: '0x4fe12c45ea84b1ae828615ccbc958c8e8f38edd8', // TODO: GIORGI update this
+      daoFactoryAddress: '0x83778a785eA7d286995Db0D59724BAdc3bb1b206',
+      governRegistryAddress: '0x4e87d3Ef8285fAE290BdEe7435328cD85675204f', // TODO: GIORGI update this
       defaultDaoConfig: {
         executionDelay: 180,
         scheduleDeposit: {

@@ -73,23 +73,27 @@ describe('Govern Base Factory with mocked contracts', function () {
 
     const mintAmount = 100
 
+    const token = {
+      tokenAddress: deployToken ? zeroAddress : customAddress,
+      tokenName: 'Eagle Token',
+      tokenSymbol: 'EAG',
+      tokenDecimals: 18,
+      mintAddress: owner,
+      mintAmount: mintAmount,
+      merkleRoot: '0x'+'00'.repeat(32),
+      merkleMintAmount:0,
+      merkleTree: '0x',
+      merkleContext: '0x'
+    };
+    
     const tx = await GovernBaseFactory.newGovern(
-      {
-        tokenAddress: deployToken ? zeroAddress : customAddress,
-        tokenName: 'Eagle Token',
-        tokenSymbol: 'EAG',
-        tokenDecimals: 18,
-        mintAddress: owner,
-        mintAmount: mintAmount,
-        merkleRoot: '0x'+'00'.repeat(32),
-        merkleMintAmount:0
-      },
+      token,
       [],
       useProxies,
       ERC3000DefaultConfig,
       name,
     )
-
+    
     await expect(tx)
       .to.emit(GovernQueueFactoryMock, 'NewQueueCalledWith')
       .withArgs(GovernBaseFactory.address, createSalt(name, useProxies)) // TODO: add config check too after the fix about struct emitting is done.

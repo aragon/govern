@@ -14,6 +14,10 @@ import './tasks/ens'
 
 import { node_url, accounts, RINKEBY_URL } from './utils/network'
 
+const PRIV_KEYS = process.env.PRIVATE_KEY
+  ? [`0x${process.env.PRIVATE_KEY}`]
+  : []
+
 const config: HardhatUserConfig = {
   solidity: {
     version: '0.6.8',
@@ -52,11 +56,11 @@ const config: HardhatUserConfig = {
     },
     mainnet: {
       url: node_url('mainnet'),
-      accounts: accounts('mainnet'),
+      accounts: PRIV_KEYS,
     },
     rinkeby: {
       url: 'https://rinkeby.infura.io/v3/7a03fcb37be7479da06f92c5117afd47',
-      accounts: ['0x188f20fbb60eaf10ca87088ace8d4c20bb5687848ee462044db4a9ad442dcc81'],
+      accounts: PRIV_KEYS,
     },
   },
 }
