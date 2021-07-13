@@ -4,7 +4,6 @@ import { ERC3000DefaultConfig } from 'erc3k/utils/ERC3000'
 import { getConfigHash } from 'erc3k/utils/ERC3000';
 import { BigNumber } from 'ethers';
 import { container } from '@aragon/govern-core/test/pipelines/container';
-import { Token } from '@aragon/govern';
 
 // Overriding chai utils is important otherwise, checking event arguments
 // with structs fail...
@@ -29,7 +28,7 @@ const ZERO_ADDRESS = '0x' + '00'.repeat(20)
 const ZERO_BYTES32 = '0x' + '00'.repeat(32)
 const CUSTOM_BYTES32 = '0x' + '11'.repeat(32)
 
-const tokenConfig: Token = {
+const tokenConfig = {
   tokenAddress: ZERO_ADDRESS,
   tokenDecimals: 18,
   tokenName: 'Eaglet Token',

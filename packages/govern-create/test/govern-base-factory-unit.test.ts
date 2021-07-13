@@ -2,7 +2,6 @@ import { ethers } from 'hardhat'
 import { expect } from 'chai'
 import { keccak256, solidityPack } from 'ethers/lib/utils'
 import { BigNumber } from 'ethers'
-import { Token } from '@aragon/govern';
 
 import { ERC3000DefaultConfig } from 'erc3k/utils/ERC3000'
 
@@ -74,7 +73,7 @@ describe('Govern Base Factory with mocked contracts', function () {
 
     const mintAmount = 100
 
-    const token: Token = {
+    const token = {
       tokenAddress: deployToken ? zeroAddress : customAddress,
       tokenName: 'Eagle Token',
       tokenSymbol: 'EAG',
