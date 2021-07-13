@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React from 'react';
 import { PROPOSAL_STATES } from 'utils/states';
 import { formatDate } from 'utils/date';
 import { InfoKeyDiv, InfoValueDivInline } from '../ProposalDetails';
@@ -64,4 +64,4 @@ const ExecuteWidget: React.FC<any> = ({
   );
 };
 
-export default memo(ExecuteWidget);
+export default ExecuteWidget;
