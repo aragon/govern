@@ -9,7 +9,6 @@
     "build": {
         "baseDir": "",
         "publicDir": "build",
-        "rootDir": "",
-        "command": "yarn build"
+        "rootDir": ""
     }
   }

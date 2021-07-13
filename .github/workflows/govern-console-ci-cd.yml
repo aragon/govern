@@ -12,10 +12,12 @@ env:
   working-directory: packages/govern-console
 
 jobs:
-  install-and-build-depedencies:
+  build-and-deploy-rinkeby:
     runs-on: ubuntu-latest
     container: fleek/create-react-app:node-15
-    name: builds and deploys console
+    name: builds and deploys console on rinkeby
+    if: github.ref == 'refs/heads/test-branch'
+    environment: Rinkeby
     defaults:
       run:
         working-directory: ${{env.working-directory}}
@@ -27,12 +29,93 @@ jobs:
         with:
           node-version: 14.15.5
       
-      - name: activate rinkeby's fleek
+      - name: Build the Govern
         run: cd ../govern && yarn install --frozen-lockfile && yarn build
+      
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
 
-      - name: Upload math result for job 1
-        uses: actions/upload-artifact@v2
+      - name: Build the app
+        run: CI='' yarn build:rinkeby
+
+      - name: Activate rinkeby's fleek 
+        run: mv fleek/console.rinkeby.json .fleek.json
+
+      - name: deploy console
+        id: deploy
+        uses: fleekhq/action-deploy@v0.1.4-beta2
         with:
-          name: govern
-          path: ../govern
+          apiKey: ${{ secrets.FLEEK_API_KEY }}
+          workDir: ${{env.working-directory}}
+
+  build-and-deploy-rinkeby-staging:
+    runs-on: ubuntu-latest
+    container: fleek/create-react-app:node-15
+    name: builds and deploys console on rinkeby's staging
+    if: github.ref == 'refs/heads/test-branch'
+    defaults:
+      run:
+        working-directory: ${{env.working-directory}}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.15.5
+      
+      - name: Build the Govern
+        run: cd ../govern && yarn install --frozen-lockfile && yarn build
+      
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build the app
+        run: CI='' yarn build:staging
+
+      - name: Activate rinkeby's staging's fleek 
+        run: mv fleek/console.rinkeby.staging.json .fleek.json
+
+      - name: deploy console
+        id: deploy
+        uses: fleekhq/action-deploy@v0.1.4-beta2
+        with:
+          apiKey: ${{ secrets.FLEEK_API_KEY }}
+          workDir: ${{env.working-directory}}
+
+  build-and-deploy-mainnet:
+    runs-on: ubuntu-latest
+    container: fleek/create-react-app:node-15
+    name: builds and deploys console on mainnet
+    if: github.ref == 'refs/heads/master'
+    environment: Mainnet
+    defaults:
+      run:
+        working-directory: ${{env.working-directory}}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.15.5
+      
+      - name: Build the Govern
+        run: cd ../govern && yarn install --frozen-lockfile && yarn build
+      
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build the app
+        run: CI='' yarn build:mainnet
+
+      - name: Activate mainnet's fleek 
+        run: mv fleek/console.mainnet.json .fleek.json
+
+      - name: deploy console
+        id: deploy
+        uses: fleekhq/action-deploy@v0.1.4-beta2
+        with:
+          apiKey: ${{ secrets.FLEEK_API_KEY }}
+          workDir: ${{env.working-directory}}
 
