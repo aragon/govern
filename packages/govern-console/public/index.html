@@ -29,16 +29,7 @@
   <script>
     !(function () {
       const analyticsKey = '%REACT_APP_ANALYTICS_KEY%';
-      console.log(analyticsKey, ' analytics key');
-      
-      if(process && process.env) {
-        console.log(process.env.REACT_APP_ANALYTICS_KEY, ' analytics key');
-      }
-      if(process) {
-        console.log(process.env, ' env good one')
-      }
-
-      
+      console.log(analyticsKey, ' nice 222');
       var analytics = (window.analytics = window.analytics || []);
       if (!analytics.initialize && !analyticsKey.includes('REACT_APP_ANALYTICS_KEY'))
         if (analytics.invoked)

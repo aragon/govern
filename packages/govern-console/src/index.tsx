@@ -15,6 +15,9 @@ import { networkEnvironment } from './environment';
 
 const { subgraphUrl, courtSubgraphUrl } = networkEnvironment;
 
+console.log(process.env, ' all the env variables ');
+console.log(process.env.REACT_APP_ANALYTICS_KEY, ' analytics ');
+
 function mergeFunction(existing: [], incoming: []) {
   if (!incoming) return existing;
   if (!existing) return incoming;
