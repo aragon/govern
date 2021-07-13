@@ -138,8 +138,8 @@ export async function createDao(
       mintAmount: 0,
       merkleRoot: '0x' + '00'.repeat(32),
       merkleMintAmount: 0,
-      merkleTree: '',
-      merkleContext: ''
+      merkleTree: '0x',
+      merkleContext: '0x'
     }
   }
 

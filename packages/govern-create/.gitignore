@@ -9,3 +9,4 @@ deployments
 
 coverage/
 coverage.json
+.env
