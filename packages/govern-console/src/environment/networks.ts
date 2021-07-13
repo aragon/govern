@@ -42,8 +42,8 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
       courtSubgraphUrl: 'https://api.thegraph.com/subgraphs/name/aragon/aragon-court-v2-rinkeby',
       courtUrl: 'https://court-rinkeby.aragon.org/#',
       voiceUrl: 'http://voice-rinkeby.aragon.org/',
-      daoFactoryAddress: '0xF159b15093931B7431633d26E7290e14a2f09f81',
-      governRegistryAddress: '0x4fe12c45ea84b1ae828615ccbc958c8e8f38edd8', // TODO: GIORGI update this
+      daoFactoryAddress: '0x10c12567Ba5894249C39e1fed0105E0A2D88A7f5',
+      governRegistryAddress: '0x23E7dD99f740A893f6b43c20281c4932127e9c79',
       defaultDaoConfig: {
         executionDelay: 180,
         scheduleDeposit: {
@@ -74,8 +74,8 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
       courtSubgraphUrl: 'https://api.thegraph.com/subgraphs/name/aragon/aragon-court-v2-staging',
       courtUrl: 'https://court-rinkeby-staging.aragon.org/#',
       voiceUrl: 'http://voice-rinkeby.aragon.org/',
-      daoFactoryAddress: '0x83778a785eA7d286995Db0D59724BAdc3bb1b206',
-      governRegistryAddress: '0x4e87d3Ef8285fAE290BdEe7435328cD85675204f', // TODO: GIORGI update this
+      daoFactoryAddress: '0xeD98d35b6C2887c8e9B410a9561BBd7f8d6BbD16',
+      governRegistryAddress: '0xb24e94DfDa0A836340b6cA4BFcfe7221327ccE81',
       defaultDaoConfig: {
         executionDelay: 180,
         scheduleDeposit: {
