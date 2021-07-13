@@ -28,11 +28,11 @@ jobs:
           node-version: 14.15.5
       
       - name: activate rinkeby's fleek
-        run: mv fleek/console.rinkeby.staging.json .fleek.json
+        run: cd ../govern && yarn install --frozen-lockfile && yarn build
 
-      - name: deploy app on rinkeby's fleek
-        id: deploy1
-        uses: fleekhq/action-deploy@v0.1.4-beta2
+      - name: Upload math result for job 1
+        uses: actions/upload-artifact@v2
         with:
-          apiKey: ${{ secrets.FLEEK_API_KEY }}
-          workDir: ${{env.working-directory}}
+          name: govern
+          path: ../govern
+
