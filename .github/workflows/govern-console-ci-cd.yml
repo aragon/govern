@@ -37,6 +37,8 @@ jobs:
 
       - name: Build the app
         run: CI='' yarn build:rinkeby
+        env:
+          REACT_APP_ANALYTICS_KEY: ${{ secrets.REACT_APP_ANALYTICS_KEY }}
 
       - name: Activate rinkeby's fleek 
         run: mv fleek/console.rinkeby.json .fleek.json
@@ -108,6 +110,8 @@ jobs:
 
       - name: Build the app
         run: CI='' yarn build:mainnet
+        env:
+          REACT_APP_ANALYTICS_KEY: ${{ secrets.REACT_APP_ANALYTICS_KEY }}
 
       - name: Activate mainnet's fleek 
         run: mv fleek/console.mainnet.json .fleek.json
