@@ -16,7 +16,6 @@ function useWalletAugmented() {
 // Adds Ethers.js to the useWallet() object
 const WalletAugmented: React.FC<unknown> = ({ children }) => {
   const wallet = useWallet();
-  // const { networkName, connector, status, account } = wallet;
   const ethereum: any = wallet.ethereum;
   const fallbackProvider = new EthersProviders.InfuraProvider(chainId, INFURA_PROJECT_ID);
   const [provider, updateProvider] = React.useState<EthersProviders.Provider>(fallbackProvider);
