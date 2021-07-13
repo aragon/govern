@@ -26,6 +26,7 @@
     "compile:cached": "lerna run --stream compile:cached",
     "build:subgraph": "lerna run --scope=@aragon/govern-subgraph --stream build",
     "deploy:subgraph:rinkeby": "lerna run --scope=@aragon/govern-subgraph --stream deploy-rinkeby",
+    "deploy:subgraph:rinkeby:staging": "lerna run --scope=@aragon/govern-subgraph --stream deploy-rinkeby-staging",
     "deploy:subgraph:mainnet": "lerna run --scope=@aragon/govern-subgraph --stream deploy-mainnet"
   },
   "workspaces": {

@@ -35,7 +35,7 @@ else
     graph deploy $FULLNAME \
         --ipfs https://api.thegraph.com/ipfs/ \
         --node https://api.thegraph.com/deploy/ \
-        --access-token d7c0504200384f6c91b50a82ac48acb8 > deploy-output.txt
+        --access-token $GRAPHKEY > deploy-output.txt
 
     SUBGRAPH_ID=$(grep "Build completed:" deploy-output.txt | grep -oE "Qm[a-zA-Z0-9]{44}")
     rm deploy-output.txt
