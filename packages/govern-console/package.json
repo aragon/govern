@@ -11,7 +11,6 @@
     "@material-ui/icons": "^4.11.2",
     "@material-ui/pickers": "^3.3.10",
     "@metamask/detect-provider": "^1.2.0",
-    "@storybook/react": "^6.1.21",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
@@ -65,8 +64,6 @@
     "build:staging": "cross-env REACT_APP_ENVIRONMENT=staging yarn build",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
-    "storybook": "start-storybook -p 6006 -s public",
-    "build-storybook": "build-storybook -s public",
     "lint": "eslint src --ext .tsx",
     "lint:js": "npm run lint:eslint -- . ",
     "lint:error-only": "eslint --quiet \"src/**/*.{ts,tsx}\"",
@@ -97,11 +94,6 @@
     ]
   },
   "devDependencies": {
-    "@storybook/addon-actions": "^6.1.21",
-    "@storybook/addon-essentials": "^6.1.21",
-    "@storybook/addon-links": "^6.1.21",
-    "@storybook/node-logger": "^6.1.21",
-    "@storybook/preset-create-react-app": "^3.1.7",
     "@typescript-eslint/eslint-plugin": "^4.19.0",
     "@typescript-eslint/parser": "^4.19.0",
     "babel-loader": "8.1.0",
