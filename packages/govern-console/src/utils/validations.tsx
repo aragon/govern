@@ -6,6 +6,18 @@ import { erc20TokenABI } from 'abis/erc20';
 import { Asset } from 'utils/Asset';
 
 /**
+ * Validate file size
+ *
+ * @param files <FileList>
+ * @param size <number> file size allowed in MB.
+ * @returns <ValidateResult> true if valid, or error message if invalid
+ */
+export const validateFileSize = async (files: FileList, size: number): Promise<ValidateResult> => {
+  if (files[0].size / 1024 / 1024 <= size) return true;
+  return `File size exceeds ${size}MB.`;
+};
+
+/**
  * Validate if address is an ERC20 token
  *
  * @param address <string> address to be validated

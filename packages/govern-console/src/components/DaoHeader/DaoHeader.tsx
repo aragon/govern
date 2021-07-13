@@ -8,6 +8,7 @@ import { Button, IconSettings, Grid, useToast } from '@aragon/ui';
 import { ActionBuilder } from 'components/ActionBuilder/ActionBuilder';
 import { useWallet } from 'AugmentedWallet';
 import { Error } from 'utils/Error';
+import { trackEvent, EventType } from 'services/analytics';
 
 export interface DaoHeaderProps {
   /**
@@ -62,8 +63,12 @@ export const DaoHeader: React.FC<DaoHeaderProps> = ({ daoName }) => {
       toast(Error.ConnectAccount);
       return;
     }
+    if (daoName) {
+      trackEvent(EventType.DEPOSIT_ASSETS_ClICKED, { dao_name: daoName });
+    }
+
     setDepositDialogOpen(true);
-  }, [setDepositDialogOpen, toast, isConnected]);
+  }, [setDepositDialogOpen, toast, isConnected, daoName]);
 
   return (
     <DaoHeaderCard>
