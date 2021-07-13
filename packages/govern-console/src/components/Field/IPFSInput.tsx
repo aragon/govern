@@ -4,6 +4,7 @@ import { useLayout, TextInput, SPACING, ContentSwitcher, FileInput } from '@arag
 import { toUtf8String } from 'ethers/lib/utils';
 import { useEffect } from 'react';
 import { ipfsMetadata } from 'utils/types';
+import { validateFileSize } from 'utils/validations';
 
 export interface IPFSInputProps {
   /**
@@ -155,7 +156,10 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
           control={control}
           defaultValue={''}
           shouldUnregister={shouldUnregister}
-          rules={{ required: 'This is required.' }}
+          rules={{
+            required: 'This is required.',
+            validate: (value) => validateFileSize(value, 20),
+          }}
           render={({ field: { onChange, value }, fieldState: { error } }) => (
             <FileInput
               onChange={onChange}
