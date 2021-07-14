@@ -8,6 +8,7 @@ import {
   PayloadType,
   ProposalOptions,
   ActionType,
+  Token,
 } from '../../public'
 
 import { Container, ReceiptType } from '../../public/proposal'
@@ -29,8 +30,8 @@ const vetoAbi = [
 
 // use rinkeby addresses as the tests run on a hardhat network forked from rinkeby
 const tokenAddress = '0x9fB402A33761b88D5DcbA55439e6668Ec8D4F2E8'
-const registryAddress = '0x93731ce6db7f1ab978c722f3bcda494d12dcc0a1' //'0x7714e0a2A2DA090C2bbba9199A54B903bB83A73d'
-const daoFactoryAddress = '0x91209b1352E1aD3abF7C7b74A899F3b118287f9D' //'0x53B7C20e6e4617FC5f8E1d113F0abFb2FCE1D5E2'
+const registryAddress = '0xb24e94DfDa0A836340b6cA4BFcfe7221327ccE81'
+const daoFactoryAddress = '0xeD98d35b6C2887c8e9B410a9561BBd7f8d6BbD16'
 const emptyBytes = '0x'
 
 const noCollateral = {
@@ -191,7 +192,7 @@ describe('Proposal', function () {
     const [owner, addr1, addr2] = await ethers.getSigners()
     const accessList = [owner.address, addr1.address, addr2.address]
 
-    const token = {
+    const token: Partial<Token> = {
       tokenName: 'unicorn',
       tokenSymbol: 'MAG',
       tokenDecimals: 6,
@@ -199,6 +200,8 @@ describe('Proposal', function () {
       mintAmount: 100,
       merkleRoot: '0x' + '00'.repeat(32),
       merkleMintAmount: 0,
+      merkleTree: '0x',
+      merkleContext: '0x',
     }
 
     const params: CreateDaoParams = {
@@ -209,7 +212,11 @@ describe('Proposal', function () {
       useProxies: false,
     }
 
-    const options = { provider: network.provider, daoFactoryAddress }
+    const options = {
+      provider: network.provider,
+      daoFactoryAddress,
+      governRegistry: registryAddress,
+    }
     const result = await createDao(params, options)
     const receipt = await result.wait()
     expect(receipt.status).to.equal(1)
@@ -222,8 +229,11 @@ describe('Proposal', function () {
       .map((log: any) => iface.parseLog(log))
       .find(({ name }: { name: string }) => name === 'Registered')
 
-    executor = args?.args[0] as string
-    queueAddress = args?.args[1] as string
+    executor = (args?.args[0] as string) || ''
+    queueAddress = (args?.args[1] as string) || ''
+
+    expect(executor.length).to.be.greaterThan(0)
+    expect(queueAddress.length).to.be.greaterThan(0)
   })
 
   it('schedule should work', async function () {
