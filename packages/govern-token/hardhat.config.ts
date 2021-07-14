@@ -44,6 +44,7 @@ const config: HardhatUserConfig = {
       accounts: {
         mnemonic: 'test test test test test test test test test test test junk',
       },
+      gas: 'auto',
     },
     coverage: {
       url: 'http://localhost:8555',

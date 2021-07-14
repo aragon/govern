@@ -101,7 +101,7 @@ export class Ens {
       : resolver.setAddr(nodehash, address)
   }
 
-  async getOwner(name: string): Promise<string> {
+  getOwner(name: string): Promise<string> {
     const nodehash = utils.namehash(name)
     return this.ens.owner(nodehash)
   }
