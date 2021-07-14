@@ -14,21 +14,8 @@ describe('MerkleDistributor', () => {
     wallet0 = await signers[0].getAddress() // by default, contracts get deployed from the 0th address
     wallet1 = await signers[1].getAddress()
 
-    const ERC20Artifact = await hre.artifacts.readArtifact('TestERC20')
-    TestERC20 = new ethers.ContractFactory(
-      ERC20Artifact.abi,
-      ERC20Artifact.bytecode,
-      signers[0]
-    )
-
-    const distributorArtifact = await hre.artifacts.readArtifact(
-      'MerkleDistributor'
-    )
-    Distributor = new ethers.ContractFactory(
-      distributorArtifact.abi,
-      distributorArtifact.bytecode,
-      signers[0]
-    )
+    TestERC20 = await ethers.getContractFactory('TestERC20')
+    Distributor = await ethers.getContractFactory('MerkleDistributor')
   })
 
   beforeEach('deploy token', async () => {
