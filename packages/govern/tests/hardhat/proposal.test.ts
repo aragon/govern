@@ -229,11 +229,11 @@ describe('Proposal', function () {
       .map((log: any) => iface.parseLog(log))
       .find(({ name }: { name: string }) => name === 'Registered')
 
-    executor = (args?.args[0] as string) || ''
-    queueAddress = (args?.args[1] as string) || ''
+    executor = args?.args[0] as string
+    queueAddress = args?.args[1] as string
 
-    expect(executor.length).to.be.greaterThan(0)
-    expect(queueAddress.length).to.be.greaterThan(0)
+    expect(executor).to.be.a('string').with.length.greaterThan(0)
+    expect(queueAddress).to.be.a('string').with.length.greaterThan(0)
   })
 
   it('schedule should work', async function () {
