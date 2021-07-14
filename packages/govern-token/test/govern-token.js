@@ -25,7 +25,12 @@ describe('GovernToken', async function () {
     holder2 = await signers[3].getAddress()
     newHolder = await signers[4].getAddress()
 
-    GovernToken = await ethers.getContractFactory('GovernToken')
+    const tokenArtifact = await hre.artifacts.readArtifact('GovernToken')
+    GovernToken = new ethers.ContractFactory(
+      tokenArtifact.abi,
+      tokenArtifact.bytecode,
+      signers[0]
+    )
   })
 
   async function itTransfersCorrectly(fn, { from, to, value }) {

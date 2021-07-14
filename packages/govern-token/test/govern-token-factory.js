@@ -6,18 +6,18 @@ const { BigNumber } = require('ethers')
 const EVENTS = {
   MINTED_SINGLE: 'MintedSingle',
   MINTED_MERKLE: 'MintedMerkle',
-  CREATED_TOKEN: 'CreatedToken'
+  CREATED_TOKEN: 'CreatedToken',
 }
 
 const ERRORS = {
   ACL_AUTH: 'acl: auth',
-  PROOF_FAILED: 'dist: proof failed'
+  PROOF_FAILED: 'dist: proof failed',
 }
 
 describe('GovernTokenFactory', function () {
   let signers, owner, governExecutor, mintAddr, governTokenFactory
   let wallet0, wallet1 // distrubutor addresses
-  let zero32Bytes = '0x'+'00'.repeat(32)
+  let zero32Bytes = '0x' + '00'.repeat(32)
 
   before(async () => {
     signers = await ethers.getSigners()
@@ -28,16 +28,23 @@ describe('GovernTokenFactory', function () {
     wallet0 = await signers[3].getAddress()
     wallet1 = await signers[4].getAddress()
 
+    const tokenFactoryArtifact = await hre.artifacts.readArtifact(
+      'GovernTokenFactory'
+    )
+    const minterArtifact = await hre.artifacts.readArtifact('GovernMinter')
 
-    const tokenFactoryArtifact = await hre.artifacts.readArtifact('GovernTokenFactory');
-    const minterArtifact = await hre.artifacts.readArtifact('GovernMinter');
-    
     const mergedAbi = [
       ...tokenFactoryArtifact.abi,
-      ...minterArtifact.abi.filter((f) => f.type === 'event' && f.name === EVENTS.MINTED_MERKLE)
+      ...minterArtifact.abi.filter(
+        (f) => f.type === 'event' && f.name === EVENTS.MINTED_MERKLE
+      ),
     ]
-    const GovernTokenFactory = new ethers.ContractFactory(mergedAbi, tokenFactoryArtifact.bytecode, signers[0]);
-    governTokenFactory = await GovernTokenFactory.deploy();
+    const GovernTokenFactory = new ethers.ContractFactory(
+      mergedAbi,
+      tokenFactoryArtifact.bytecode,
+      signers[0]
+    )
+    governTokenFactory = await GovernTokenFactory.deploy()
   })
 
   async function getTokenAndMinter(tx) {
@@ -45,21 +52,27 @@ describe('GovernTokenFactory', function () {
     const { token, minter } = events.find(
       ({ event }) => event === EVENTS.CREATED_TOKEN
     ).args
+
+    const { abi: tokenAbi } = await hre.artifacts.readArtifact('GovernToken')
+    const { abi: minterAbi } = await hre.artifacts.readArtifact('GovernMinter')
+
     return {
-      token: await ethers.getContractAt('GovernToken', token),
-      minter: await ethers.getContractAt('GovernMinter', minter),
+      token: new ethers.Contract(token, tokenAbi, signers[0]),
+      minter: new ethers.Contract(minter, minterAbi, signers[0]),
     }
   }
 
   async function getMerkleDistributor(tx) {
-    const { events } = await tx.wait();
+    const { events } = await tx.wait()
     try {
       const { distributor } = events.find(
         ({ event }) => event === EVENTS.MINTED_MERKLE
       ).args
-      return ethers.getContractAt('MerkleDistributor', distributor);
-    }catch(err) {
-      return null;
+
+      const { abi } = await hre.artifacts.readArtifact('MerkleDistributor')
+      return new ethers.Contract(distributor, abi, signers[0])
+    } catch (err) {
+      return null
     }
   }
 
@@ -86,7 +99,7 @@ describe('GovernTokenFactory', function () {
       let token, minter, merkleDistributor, tx
       let mintedAmount = 100
       let distributorMintedAmount = 10000
-      let tree 
+      let tree
 
       before(async () => {
         tree = new BalanceTree([
@@ -97,29 +110,30 @@ describe('GovernTokenFactory', function () {
         tx = await governTokenFactory.newToken(
           governExecutor,
           [
-            '0x'+'0'.repeat(40),
-            18, 
-            "TokenName",
-            "TokenSymbol",
+            '0x' + '0'.repeat(40),
+            18,
+            'TokenName',
+            'TokenSymbol',
             mintAddr,
             mintedAmount,
             zero32Bytes,
             0,
             '0x',
-            '0x'
+            '0x',
           ],
           item.useProxies
         )
         const data = await getTokenAndMinter(tx)
         token = data.token
         minter = data.minter
+
         merkleDistributor = await getMerkleDistributor(tx)
       })
 
       it('should not create merkle distributor when zero merkle root is passed', async () => {
         expect(merkleDistributor).to.equal(null)
       })
-      
+
       it('checks if amount is minted and minter is the correct minter', async () => {
         expect(await token.balanceOf(mintAddr)).to.equal(mintedAmount)
         expect(await token.minter()).to.equal(minter.address)
@@ -162,12 +176,11 @@ describe('GovernTokenFactory', function () {
     })
   })
 
-
   describe('deploys with merkle distributor', async () => {
     let token, minter, merkleDistributor, tx
     let mintedAmount = 100
     let distributorMintedAmount = 200
-    let tree 
+    let tree
 
     before(async () => {
       tree = new BalanceTree([
@@ -178,16 +191,16 @@ describe('GovernTokenFactory', function () {
       tx = await governTokenFactory.newToken(
         governExecutor,
         [
-          '0x'+'0'.repeat(40),
-          18, 
-          "TokenName",
-          "TokenSymbol",
+          '0x' + '0'.repeat(40),
+          18,
+          'TokenName',
+          'TokenSymbol',
           mintAddr,
           mintedAmount,
           tree.getHexRoot(),
           distributorMintedAmount,
           '0x00',
-          '0x11'
+          '0x11',
         ],
         true
       )
@@ -204,19 +217,23 @@ describe('GovernTokenFactory', function () {
           merkleDistributor.address,
           tree.getHexRoot(),
           distributorMintedAmount,
-          "0x00",
-          "0x11"
+          '0x00',
+          '0x11'
         )
-      expect(await token.balanceOf(merkleDistributor.address)).to.equal(distributorMintedAmount)
-      
-      const proof0 = tree.getProof(0, wallet0, BigNumber.from(100));
+      expect(await token.balanceOf(merkleDistributor.address)).to.equal(
+        distributorMintedAmount
+      )
+
+      const proof0 = tree.getProof(0, wallet0, BigNumber.from(100))
 
       await expect(await merkleDistributor.claim(0, wallet0, 100, proof0))
         .to.emit(merkleDistributor, 'Claimed')
         .withArgs(0, wallet0, 100)
 
-      await expect(merkleDistributor.claim(2, wallet0, 100, proof0)).to.be.revertedWith(ERRORS.PROOF_FAILED)
-      
+      await expect(
+        merkleDistributor.claim(2, wallet0, 100, proof0)
+      ).to.be.revertedWith(ERRORS.PROOF_FAILED)
+
       expect(await merkleDistributor.merkleRoot()).to.equal(tree.getHexRoot())
     })
   })
