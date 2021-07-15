@@ -4,6 +4,8 @@ import { isTokenERC20 } from 'utils/token';
 import { utils, Contract, BigNumber, providers } from 'ethers';
 import { erc20TokenABI } from 'abis/erc20';
 import { Asset } from 'utils/Asset';
+import { networkEnvironment } from 'environment';
+const { subgraphUrl } = networkEnvironment;
 
 /**
  * Validate file size
@@ -27,6 +29,37 @@ export const validateFileSize = async (files: FileList, size: number): Promise<V
 export const validateToken = async (address: string, provider: any): Promise<ValidateResult> => {
   const isERC20 = await isTokenERC20(address, provider);
   return isERC20 || 'Token adress is not ERC20 compliant';
+};
+
+/**
+ * Checks if dao exists
+ *
+ * @param name dao name
+ * @returns  <ValidateResult> true if valid, or error message if invalid
+ */
+export const daoExists = async (name: string): Promise<ValidateResult> => {
+  const query = `
+    query Daos($name: String) {
+      daos(where: {name: $name}){ 
+        id
+      }
+    }
+  `;
+
+  const data = await fetch(subgraphUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({
+      query,
+      variables: { name: name },
+    }),
+  });
+
+  const daos = await data.json();
+  return daos?.data?.daos?.length > 0 || 'Dao with this name already exists';
 };
 
 /**
