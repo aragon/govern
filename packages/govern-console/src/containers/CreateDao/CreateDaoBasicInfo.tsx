@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { CreateDaoSteps } from './utils/Shared';
 import { useCreateDaoContext, ICreateDaoBasicInfo } from './utils/CreateDaoContextProvider';
 import { useForm, Controller } from 'react-hook-form';
 import { validateToken, validateAmountForDecimals, daoExists } from 'utils/validations';
 import { useWallet } from 'AugmentedWallet';
 import { PROXY_CONTRACT_URL } from '../../utils/constants';
-import { useDaoQuery } from 'hooks/query-hooks';
 import {
   useLayout,
   Grid,
@@ -58,14 +57,6 @@ const CreateDaoBasicInfo: React.FC<{
     setBasicInfo(basicInfoUpdated);
     setActiveStep(CreateDaoSteps.Config);
   };
-
-  const [daoName, setDaoName] = useState<string>('');
-
-  useEffect(() => {
-    if (daoName != '') {
-      // const { data: dao, loading, error } = useDaoQuery(daoName);
-    }
-  }, [daoName]);
 
   return (
     <Box>

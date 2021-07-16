@@ -33,7 +33,8 @@ export const validateToken = async (address: string, provider: any): Promise<Val
 
 /**
  * Checks if dao exists
- *
+ * // TODO: Giorgi add refetch for useDaoQuery and
+ *         use the same hook instead of the below separate function
  * @param name dao name
  * @returns  <ValidateResult> true if valid, or error message if invalid
  */

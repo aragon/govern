@@ -15,7 +15,9 @@ const CreateDao: React.FC = () => {
   const [activeStep, setActiveStep] = useState<CreateDaoSteps>(CreateDaoSteps.BasicInfo);
 
   useEffect(() => {
-    console.log('modis aaaq ? ');
+    // TODO: Sarkawt
+    // When you move from previous step to second one, and if on the previos step, you had it scrolled, on the next step, it should scroll up
+    // automatically. This should be working but it doesn't.
     window.scrollTo(0, 0);
   }, []);
 
