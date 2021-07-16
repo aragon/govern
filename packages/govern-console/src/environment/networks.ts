@@ -79,14 +79,14 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
       defaultDaoConfig: {
         executionDelay: 180,
         scheduleDeposit: {
-          token: '0xc7AD46e0b8a400Bb3C915120d284AafbA8fc4735',
+          token: '0x8F2Ac3fD1a9Ce7208eFff7C31aC0e2A98b0778f3',
           amount: '10000000000000000000',
         },
         challengeDeposit: {
-          token: '0xc7AD46e0b8a400Bb3C915120d284AafbA8fc4735',
+          token: '0x8F2Ac3fD1a9Ce7208eFff7C31aC0e2A98b0778f3',
           amount: '10000000000000000000',
         },
-        resolver: '0xD2c15eCd1751C2cE8b02ab2D95db32E662517D61',
+        resolver: '0x9c003eC97676c30a041f128D671b3Db2f790c3E7',
         rules: 'No main agreement has been defined',
         maxCalldataSize: 100000,
       },
