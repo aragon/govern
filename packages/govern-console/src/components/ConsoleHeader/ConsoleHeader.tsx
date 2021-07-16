@@ -4,7 +4,7 @@ import MUICard from '@material-ui/core/Card';
 import MUITypography from '@material-ui/core/Typography';
 import { useHistory } from 'react-router-dom';
 import consoleHeaderGraphic from 'images/console-header.svg';
-import { Button, TextInput, Split, useLayout, useToast, SPACING } from '@aragon/ui';
+import { Button, TextInput, Split, useLayout, useToast, SPACING, Link } from '@aragon/ui';
 
 const ConsoleHeaderCard = styled(MUICard)(({ theme }) => ({
   background: theme.custom.daoHeader.background,
@@ -71,18 +71,19 @@ export const ConsoleHeader: React.FC = () => {
     <ConsoleHeaderCard>
       <div style={{ padding: SPACING[layoutName] * 2 }}>
         <div style={{ display: 'grid', gridGap: '24px' }}>
-          <Title> Welcome to Aragon Console</Title>
+          <Title>Govern</Title>
 
           <Subtitle>
-            Lorem ipsum dolor amet ipsu amet dolores ipsum amet dolor ipsum amet ipsum amet dolors
-            ipsum{' '}
+            Full-stack, frictionless DAOs: signal on{' '}
+            <Link href="https://voice.aragon.org/">Voice</Link>, schedule on Govern, dispute in{' '}
+            <Link href="https://court.aragon.org/">Court</Link>.
           </Subtitle>
 
           <Split
             primary={
               <TextInput
                 wide
-                placeholder="DAO Name"
+                placeholder="Search DAOs"
                 onChange={onInputChange}
                 onKeyDown={onEnterKey}
               />
@@ -91,7 +92,7 @@ export const ConsoleHeader: React.FC = () => {
               <Button
                 wide={layoutName !== 'large'}
                 type="primary"
-                label="Go to DAO"
+                label="Search"
                 size="large"
                 onClick={onGotoDao}
               />
