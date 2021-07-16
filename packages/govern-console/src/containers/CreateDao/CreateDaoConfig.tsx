@@ -49,6 +49,11 @@ const CreateDaoConfig: React.FC<{
     setValue('customResolver', customResolver);
   }, [ruleText, isRuleFile, ruleFile, resolver, customResolver, setValue]);
 
+  useEffect(() => {
+    console.log('modis aaaq ? ');
+    window.scrollTo(0, 0);
+  }, []);
+
   const moveToNextStep = async () => {
     const validate = await trigger();
 

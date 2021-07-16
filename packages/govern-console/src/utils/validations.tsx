@@ -59,7 +59,7 @@ export const daoExists = async (name: string): Promise<ValidateResult> => {
   });
 
   const daos = await data.json();
-  return daos?.data?.daos?.length > 0 || 'Dao with this name already exists';
+  return daos?.data?.daos?.length == 0 || 'Dao with this name already exists';
 };
 
 /**

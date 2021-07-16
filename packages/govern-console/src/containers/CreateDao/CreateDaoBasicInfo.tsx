@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CreateDaoSteps } from './utils/Shared';
 import { useCreateDaoContext, ICreateDaoBasicInfo } from './utils/CreateDaoContextProvider';
 import { useForm, Controller } from 'react-hook-form';
 import { validateToken, validateAmountForDecimals, daoExists } from 'utils/validations';
 import { useWallet } from 'AugmentedWallet';
 import { PROXY_CONTRACT_URL } from '../../utils/constants';
-
+import { useDaoQuery } from 'hooks/query-hooks';
 import {
   useLayout,
   Grid,
@@ -59,6 +59,14 @@ const CreateDaoBasicInfo: React.FC<{
     setActiveStep(CreateDaoSteps.Config);
   };
 
+  const [daoName, setDaoName] = useState<string>('');
+
+  useEffect(() => {
+    if (daoName != '') {
+      // const { data: dao, loading, error } = useDaoQuery(daoName);
+    }
+  }, [daoName]);
+
   return (
     <Box>
       <div style={{ display: 'grid', gridGap: spacing }}>
@@ -70,7 +78,12 @@ const CreateDaoBasicInfo: React.FC<{
           defaultValue={daoIdentifier}
           rules={{
             required: 'This is required.',
-            validate: (value) => daoExists(value),
+            validate: async (value) => {
+              if (/\s/.test(value)) {
+                return "Dao identifier can't contain spaces";
+              }
+              return await daoExists(value);
+            },
           }}
           render={({ field: { onChange, value }, fieldState: { error } }) => (
             <TextInput

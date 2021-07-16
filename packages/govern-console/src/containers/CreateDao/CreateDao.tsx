@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 
 import CreateDaoBasicInfo from './CreateDaoBasicInfo';
 import CreateDaoConfig from './CreateDaoConfig';
@@ -13,6 +13,11 @@ import ReviewCard from './components/ReviewCard';
 
 const CreateDao: React.FC = () => {
   const [activeStep, setActiveStep] = useState<CreateDaoSteps>(CreateDaoSteps.BasicInfo);
+
+  useEffect(() => {
+    console.log('modis aaaq ? ');
+    window.scrollTo(0, 0);
+  }, []);
 
   const activeView = useMemo(() => {
     switch (activeStep) {
