@@ -8,7 +8,7 @@ const ReviewCard: React.FC = () => {
     <div>
       <StyledText name={'title1'}>Please, take your time and review all the info!</StyledText>
       <StyledText name={'body2'} style={{ color: theme.disabledContent }}>
-        This is an important step for your DAO, we need to take care every information is perfect
+        Carefully review all of your settings.
       </StyledText>
     </div>
   );

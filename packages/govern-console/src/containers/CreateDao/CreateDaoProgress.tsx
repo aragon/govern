@@ -248,7 +248,7 @@ const CreateDaoProgress: React.FC<{
     <ProgressComponent
       image={progressImage}
       title={'Creating your DAO'}
-      subTitle={'Hold tight your transaction is under process'}
+      subTitle={'Your transaction is in progress.'}
       progressList={progressList}
       info={'Please be patient and do not close this window until it finishes.'}
       action={action}

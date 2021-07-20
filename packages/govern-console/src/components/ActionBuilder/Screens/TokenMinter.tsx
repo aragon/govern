@@ -18,6 +18,7 @@ import { useWallet } from 'AugmentedWallet';
 import { ActionBuilderCloseHandler } from 'utils/types';
 import { useActionBuilderState } from '../ActionBuilderStateProvider';
 import { Asset } from 'utils/Asset';
+import { constants } from 'ethers';
 
 const functionSignature = 'function mint(address to, uint256 amount, bytes calldata context)';
 
@@ -74,7 +75,7 @@ export const TokenMinter: React.FC<TokenMinterProps> = ({ onClick }) => {
     <Grid>
       <GridItem>
         <StyledText name="title1">Mint Tokens</StyledText>
-        <Hint>Helptext TBD</Hint>
+        <Hint>Mint more DAO tokens</Hint>
       </GridItem>
       <GridItem>
         <StyledText name="title2">Who should receive minted tokens?</StyledText>
@@ -119,7 +120,7 @@ export const TokenMinter: React.FC<TokenMinterProps> = ({ onClick }) => {
                 title="Recipient address"
                 subtitle="The assets will be transfered to this address."
                 value={value}
-                placeholder="Type recipent address"
+                placeholder={constants.AddressZero}
                 onChange={onChange}
                 status={error ? 'error' : 'normal'}
                 error={error ? error.message : null}
@@ -142,7 +143,7 @@ export const TokenMinter: React.FC<TokenMinterProps> = ({ onClick }) => {
             <TextInput
               wide
               title="Amount"
-              subtitle="Define how many tokens you want to mint."
+              subtitle="Number of tokens to mint."
               value={value}
               placeholder="0"
               onChange={onChange}
@@ -155,7 +156,8 @@ export const TokenMinter: React.FC<TokenMinterProps> = ({ onClick }) => {
       <GridItem>
         <Button
           mode={'primary'}
-          label="Save action now"
+          size="large"
+          label="Add transaction"
           onClick={handleSubmit(submitActionData)}
         ></Button>
       </GridItem>

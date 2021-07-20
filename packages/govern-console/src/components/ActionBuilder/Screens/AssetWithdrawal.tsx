@@ -21,8 +21,9 @@ import AbiHandler from 'utils/AbiHandler';
 import { Asset, AssetLabel, ETH, OTHER_TOKEN_SYMBOL } from 'utils/Asset';
 import { useActionBuilderState } from '../ActionBuilderStateProvider';
 import { getErrorFromException } from 'utils/HelperFunctions';
-
 import { networkEnvironment } from 'environment';
+import { constants } from 'ethers';
+
 const { curatedTokens } = networkEnvironment;
 const withdrawalAssets = Object.keys(curatedTokens).concat([
   ETH.symbol,
@@ -111,8 +112,8 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
   return (
     <Grid>
       <GridItem>
-        <StyledText name="title1">Withdraw assets</StyledText>
-        <Hint>Helptext TBD</Hint>
+        <StyledText name="title1">Send funds</StyledText>
+        <Hint>Transfer DAO funds to any address.</Hint>
       </GridItem>
       <GridItem>
         <Controller
@@ -128,7 +129,7 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
               title="Recipient address"
               subtitle="The assets will be transfered to this address."
               value={value}
-              placeholder="Type recipent address"
+              placeholder={constants.AddressZero}
               onChange={onChange}
               status={error ? 'error' : 'normal'}
               error={error ? error.message : null}
@@ -192,7 +193,7 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
               wide
               type="number"
               title="Amount"
-              subtitle="Define how many tokens you want to withdraw."
+              subtitle="Number of tokens to transfer."
               value={value}
               placeholder={0}
               onChange={onChange}
@@ -233,7 +234,7 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
         <Button
           size="large"
           mode="primary"
-          label="Save action now"
+          label="Add transaction"
           onClick={handleSubmit(buildActions)}
         ></Button>
       </GridItem>

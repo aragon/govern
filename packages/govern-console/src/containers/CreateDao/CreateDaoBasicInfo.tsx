@@ -17,6 +17,7 @@ import {
   Info,
   SPACING,
   Link,
+  StyledText,
 } from '@aragon/ui';
 import StepsHeader from './components/StepsHeader';
 
@@ -58,6 +59,14 @@ const CreateDaoBasicInfo: React.FC<{
     setActiveStep(CreateDaoSteps.Config);
   };
 
+  const tokenNumberSubtitile = (
+    <p>
+      Enter number of tokens to be minted (<span style={{ fontWeight: 600 }}>IMPORTANT</span>: they
+      will be sent to the current <span style={{ fontWeight: 600 }}>connected wallet address</span>
+      ).
+    </p>
+  );
+
   return (
     <Box>
       <div style={{ display: 'grid', gridGap: spacing }}>
@@ -71,10 +80,10 @@ const CreateDaoBasicInfo: React.FC<{
           render={({ field: { onChange, value }, fieldState: { error } }) => (
             <TextInput
               title="DAO identifier"
-              subtitle="Enter the indentifier of your DAO (Use only lower capital characters, without space)"
+              subtitle="Enter DAO name (lower-case, no spaces)."
               wide
               value={value}
-              placeholder={'Enter DAO identifier'}
+              placeholder={'my_new_dao'}
               onChange={onChange}
               status={!!error ? 'error' : 'normal'}
               error={error ? error.message : null}
@@ -87,7 +96,7 @@ const CreateDaoBasicInfo: React.FC<{
           defaultValue={isExistingToken}
           render={({ field: { onChange, value } }) => (
             <ContentSwitcher
-              title="Create token"
+              title="DAO token"
               subtitle="Create a new ERC-20 token for your DAO, or use an existing one"
               onChange={onChange}
               selected={value}
@@ -116,7 +125,7 @@ const CreateDaoBasicInfo: React.FC<{
                       subtitle="Enter your token name"
                       wide
                       value={value}
-                      placeholder={'Enter your token name...'}
+                      placeholder={'My New Token'}
                       onChange={onChange}
                       status={!!error ? 'error' : 'normal'}
                       error={error ? error.message : null}
@@ -137,7 +146,7 @@ const CreateDaoBasicInfo: React.FC<{
                       subtitle="Enter your token symbol"
                       wide
                       value={value}
-                      placeholder={'Enter your token symbol...'}
+                      placeholder={'MNT'}
                       onChange={onChange}
                       status={!!error ? 'error' : 'normal'}
                       error={error ? error.message : null}
@@ -147,7 +156,7 @@ const CreateDaoBasicInfo: React.FC<{
               </GridItem>
             </Grid>
             <Info mode={'warning'} title={''}>
-              The created token will use {tokenDecimals} decimals. For the amount, Don't append 0's.
+              Please, follow the format - 10.0 → Include decimals, e.g. 10.0
             </Info>
             <Controller
               name="tokenMintAmount"
@@ -160,13 +169,12 @@ const CreateDaoBasicInfo: React.FC<{
               }}
               render={({ field: { onChange, value }, fieldState: { error } }) => (
                 <TextInput
-                  title="Amount of tokens"
-                  subtitle="Enter amount of tokens to be minted (they will be sent to your wallet address)..."
+                  title="Number of tokens"
+                  subtitle={tokenNumberSubtitile}
                   wide
-                  type={'number'}
                   value={value}
                   onChange={onChange}
-                  placeholder={'Enter amount'}
+                  placeholder="500.50"
                   status={!!error ? 'error' : 'normal'}
                   error={error ? error.message : null}
                 />
@@ -198,7 +206,10 @@ const CreateDaoBasicInfo: React.FC<{
           />
         )}
 
-        <Box shadow>
+        <StyledText name="title3" style={{ marginBottom: -8 }}>
+          Proxies
+        </StyledText>
+        <div>
           <label
             style={{
               display: 'flex',
@@ -216,11 +227,11 @@ const CreateDaoBasicInfo: React.FC<{
             <span style={{ marginLeft: '4px' }}>Use Aragon Proxies</span>
           </label>
           <div style={{ marginLeft: 32 }}>
-            Use <Link href={PROXY_CONTRACT_URL}>Proxies</Link> for the deployment - This will enable
-            your DAO to use the already deployed code of the Govern Executer and Queue, and heavily
-            decrease gas costs for your DAO deployment.
+            Use <Link href={PROXY_CONTRACT_URL}>Proxies</Link> - Employ Govern Executor and Queue to
+            heavily reduce gas costs for your DAO deployment, while maintaining full security and
+            autonomy.
           </div>
-        </Box>
+        </div>
         <Button wide size={'large'} mode={'secondary'} onClick={moveToNextStep}>
           Next Step
         </Button>

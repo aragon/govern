@@ -15,11 +15,9 @@ const SuccessAction: React.FC<{
   return (
     <div>
       <StyledText name={'body2'}>
-        Your DAO is ready. Do you wanna register your token in Aragon Voice?
+        Your DAO is ready. Next, register your token on Aragon Voice.
       </StyledText>
-      <StyledText name={'body2'} style={{ color: theme.disabled }}>
-        This allows you create governance proposals easy with 0 gas price
-      </StyledText>
+
       {isNewDaoTokenRegistered ? (
         <div>
           <Button
@@ -27,7 +25,6 @@ const SuccessAction: React.FC<{
             mode={'primary'}
             style={{
               marginTop: 20,
-              marginLeft: layoutName !== 'small' ? SPACING[layoutName] : '0px',
             }}
             onClick={goToDaoPage}
           >
@@ -36,19 +33,29 @@ const SuccessAction: React.FC<{
         </div>
       ) : (
         <div>
-          <Button size={'large'} mode={'secondary'} style={{ marginTop: 20 }} onClick={goToDaoPage}>
-            Don't register token
-          </Button>
+          <StyledText name={'body2'} style={{ color: theme.disabled }}>
+            Voice enables gasless (non-binding) governance proposals and votes.
+          </StyledText>
           <Button
             size={'large'}
             mode={'primary'}
             style={{
               marginTop: 20,
-              marginLeft: layoutName !== 'small' ? SPACING[layoutName] : '0px',
             }}
             onClick={() => tokenRegister()}
           >
-            Yes, register token
+            Registering token on Aragon Voice
+          </Button>
+          <Button
+            size={'large'}
+            mode={'secondary'}
+            style={{
+              marginTop: 20,
+              marginLeft: layoutName === 'large' ? SPACING[layoutName] : '0px',
+            }}
+            onClick={goToDaoPage}
+          >
+            Don't register token
           </Button>
         </div>
       )}

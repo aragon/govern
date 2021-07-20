@@ -30,7 +30,7 @@ const CreateDaoReview: React.FC<{
     const datas = collateralArray(collaterals);
     if (collaterals.executionAddressList.length > 0) {
       const dataModified = datas.map((data) => {
-        if (data.name === 'Excutors Addresses') {
+        if (typeof data.value !== 'string') {
           return {
             name: data.name,
             value: (
@@ -51,7 +51,7 @@ const CreateDaoReview: React.FC<{
   return (
     <>
       <Modal visible={opened} onClose={() => setOpened(false)}>
-        <StyledText name="title2">Schedule execution permission addresses</StyledText>
+        <StyledText name="title2">Schedule transaction whitelist addresses</StyledText>
         {collaterals.executionAddressList.map((addr, i) => (
           <div key={`address-${i}`} style={{ marginTop: 10 }}>
             <AddressField
@@ -72,8 +72,8 @@ const CreateDaoReview: React.FC<{
             marginTop: '20px',
           }}
         >
-          Check again all the information is correct. You can’t modify some of this information once
-          the DAO is created
+          Check that your settings are correct. Some of these settings cannot be modified once the
+          DAO has been created.
         </Info>
 
         <Grid columns={'2'} columnWidth={'1fr'} style={{ marginTop: 20 }}>

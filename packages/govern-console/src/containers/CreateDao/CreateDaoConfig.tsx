@@ -76,8 +76,7 @@ const CreateDaoConfig: React.FC<{
           render={({ field: { onChange, value }, fieldState: { error } }) => (
             <TextInput
               title="Execution delay"
-              subtitle="Amount of time any action in your DAO will be available to be challenged before being
-              executed"
+              subtitle="Number of seconds during which a DAO transaction may be challenged before being executed."
               wide
               value={value}
               placeholder={'Amount'}
@@ -103,7 +102,7 @@ const CreateDaoConfig: React.FC<{
         </FormProvider>
 
         <div>
-          <StyledText name={'title3'}>Resolver</StyledText>
+          <StyledText name={'title3'}>Dispute resolution client</StyledText>
           <StyledText name={'title4'} style={{ color: theme.disabledContent }}>
             The resolver is a smart contract that can handle disputes in your DAO and follows the
             ERC3k interface. By default your DAO will use Aragon Court as a resolver.{' '}
@@ -157,7 +156,7 @@ const CreateDaoConfig: React.FC<{
                       marginLeft: '4px',
                     }}
                   >
-                    Override default resolver
+                    Override default
                   </span>
                 </label>
               </GridItem>
@@ -165,9 +164,12 @@ const CreateDaoConfig: React.FC<{
           </Box>
         </div>
 
-        <Info mode={'warning'} title={''}>
-          Hey, this is an important step, please check that all the information entered is correct.
-        </Info>
+        {watch('customResolver') && (
+          <Info mode={'error'} title={''}>
+            Carefully review the client address and ensure your chosen client is compatible with
+            Govern. An incorrect address or incompatible client may lock your DAO.
+          </Info>
+        )}
 
         <Split
           width={'100%'}
@@ -179,7 +181,7 @@ const CreateDaoConfig: React.FC<{
                 setActiveStep(CreateDaoSteps.BasicInfo);
               }}
               icon={<IconArrowLeft />}
-              label={'back'}
+              label={'Back'}
               display={'all'}
             />
           }

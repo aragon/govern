@@ -506,7 +506,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
               /> */}
             <IPFSInput
               title="Justification"
-              subtitle="Please provide the reasons for this DAO settings change as this will trigger an action on the executor queue"
+              subtitle="Provide reasons for this DAO settings change as this will trigger a transaction on the executor queue that may be challenged in Court."
               placeholder="Please insert the reason why you want to execute this"
               textInputName="proof"
               fileInputName="proofFile"

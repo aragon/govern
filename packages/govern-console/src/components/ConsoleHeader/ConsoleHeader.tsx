@@ -57,7 +57,7 @@ export const ConsoleHeader: React.FC = () => {
     if (searchString.length > 0) {
       history.push(`daos/${searchString}`);
     } else {
-      toast('Invalid Dao Name. At least one letter should be entered.');
+      toast('Invalid DAO Name. At least one letter should be entered.');
     }
   };
 
