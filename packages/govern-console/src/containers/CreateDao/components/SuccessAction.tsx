@@ -15,7 +15,8 @@ const SuccessAction: React.FC<{
   return (
     <div>
       <StyledText name={'body2'}>
-        Your DAO is ready. Next, register your token on Aragon Voice.
+        Your DAO is ready.{' '}
+        {!isNewDaoTokenRegistered && 'Next, register your token on Aragon Voice.'}
       </StyledText>
 
       {isNewDaoTokenRegistered ? (
@@ -26,14 +27,13 @@ const SuccessAction: React.FC<{
             style={{
               marginTop: 20,
             }}
+            label="DAO is ready, go to DAO page"
             onClick={goToDaoPage}
-          >
-            Token already Registered, go to DAO page
-          </Button>
+          />
         </div>
       ) : (
         <div>
-          <StyledText name={'body2'} style={{ color: theme.disabled }}>
+          <StyledText name={'body2'} style={{ color: theme.disabledContent }}>
             Voice enables gasless (non-binding) governance proposals and votes.
           </StyledText>
           <Button
@@ -44,19 +44,18 @@ const SuccessAction: React.FC<{
             }}
             onClick={() => tokenRegister()}
           >
-            Registering token on Aragon Voice
+            Register token
           </Button>
           <Button
             size={'large'}
             mode={'secondary'}
             style={{
               marginTop: 20,
-              marginLeft: layoutName === 'large' ? SPACING[layoutName] : '0px',
+              marginLeft: SPACING[layoutName],
             }}
+            label="Skip"
             onClick={goToDaoPage}
-          >
-            Don't register token
-          </Button>
+          />
         </div>
       )}
     </div>

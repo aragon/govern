@@ -49,7 +49,7 @@ export const validateAmountForDecimals = (amount: string, decimals: number) => {
     return true;
   }
   if (!amount.includes('.')) {
-    return 'Please, follow the format - 10.0';
+    return 'Include decimals, e.g. 10.0';
   }
 
   if (amount.split('.')[1].length > decimals) {

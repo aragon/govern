@@ -133,7 +133,7 @@ const CreateDaoProgress: React.FC<{
     const registerProgressPosition = progressList.length;
     newList.push({
       status: CircularProgressStatus.InProgress,
-      text: 'Register token in Aragon Voice',
+      text: 'Registering token on Aragon Voice',
     });
     setProgressList(newList);
     setShowAction('none');
@@ -211,6 +211,7 @@ const CreateDaoProgress: React.FC<{
   /* eslint-disable */
 
   useEffect(() => {
+    console.log('showAction', showAction);
     switch (showAction) {
       case 'fail':
         setAction(<FailAction setActiveStep={setActiveStep} />);
@@ -250,7 +251,11 @@ const CreateDaoProgress: React.FC<{
       title={'Creating your DAO'}
       subTitle={'Your transaction is in progress.'}
       progressList={progressList}
-      info={'Please be patient and do not close this window until it finishes.'}
+      info={
+        showAction === 'none'
+          ? 'Please be patient and do not close this window until it finishes.'
+          : ''
+      }
       action={action}
     />
   );

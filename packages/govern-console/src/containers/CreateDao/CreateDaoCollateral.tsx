@@ -283,7 +283,13 @@ const CreateDaoCollateral: React.FC<{
             render={({ field: { onChange, value } }) => (
               <ContentSwitcher
                 title="Whitelist of addresses that may schedule transactions."
-                subtitle="Limit the addresses that may schedule transactions. Caution: if these addresses are incorrect or unavailable, your DAO will be locked."
+                subtitle={
+                  <p>
+                    Limit the addresses that may schedule transactions.{' '}
+                    <span style={{ fontWeight: 600 }}>Caution</span>: if these addresses are
+                    incorrect or unavailable, your DAO will be locked.
+                  </p>
+                }
                 onChange={onChange}
                 selected={value}
                 items={['Address List', 'Any Address']}
