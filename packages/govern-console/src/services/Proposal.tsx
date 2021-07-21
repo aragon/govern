@@ -75,7 +75,7 @@ export default class FacadeProposal {
       tx: () => {
         return this.proposal.resolve(container, disputeId);
       },
-      message: 'Resolves a proposal',
+      message: 'Resolve disputed transaction',
       status: CustomTransactionStatus.Pending,
     };
 

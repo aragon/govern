@@ -8,8 +8,7 @@ const SettingsCard: React.FC = () => {
     <div>
       <StyledText name={'title1'}>Your DAO settings</StyledText>
       <StyledText name={'body2'} style={{ color: theme.disabledContent }}>
-        Message about the importancy of permissions on your DAO, bla bla, explaining the settings
-        etc.
+        Carefully review your changes as some settings may break or lock your DAO.
       </StyledText>
     </div>
   );

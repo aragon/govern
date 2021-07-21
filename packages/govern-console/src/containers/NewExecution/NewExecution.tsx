@@ -179,8 +179,9 @@ const NewExecution: React.FC = () => {
                   <TextInput
                     wide
                     title="Title"
+                    subtitle="Add a title to identify this transaction."
                     value={value}
-                    placeholder="Type execution title"
+                    placeholder="Sending funds to SuperDAO as per Voice vote 0x486...9b3b."
                     onChange={onChange}
                     status={error ? 'error' : 'normal'}
                     error={error ? error.message : null}
@@ -191,7 +192,7 @@ const NewExecution: React.FC = () => {
             <GridItem>
               <IPFSInput
                 title="Justification"
-                subtitle="Insert the reason for scheduling this execution so DAO members can understand it."
+                subtitle="Tell DAO members why you are scheduling this transaction."
                 label=""
                 placeholder="Please insert the reason why you want to execute this"
                 textInputName="proof"
@@ -199,16 +200,16 @@ const NewExecution: React.FC = () => {
               />
             </GridItem>
             <GridItem>
-              <StyledText name={'title3'}>Actions</StyledText>
+              <StyledText name={'title3'}>Transactions</StyledText>
               <StyledText name={'title4'}>
-                Add as many actions (smart contract interactions) you want for this execution.
+                Batch as many transactions as you like into a single execution.
               </StyledText>
               <ActionList actions={fields} swap={swap} remove={remove} />
               <br />
               <Button
                 mode="secondary"
                 icon={<IconAdd />}
-                label="Add new action"
+                label="Add new transaction"
                 onClick={openActionModal}
               ></Button>
             </GridItem>

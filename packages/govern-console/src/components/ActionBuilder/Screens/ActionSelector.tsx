@@ -13,14 +13,14 @@ type ActionOption = {
 
 const actions: ActionOption[] = [
   {
-    title: 'Withdraw assets',
-    subTitle: 'helptext',
+    title: 'Send DAO funds',
+    subTitle: 'Transfer DAO funds to any address.',
     state: 'withdrawAssets',
   },
-  { title: 'Mint tokens', subTitle: 'helptext', state: 'mintTokens' },
+  { title: 'Mint tokens', subTitle: 'Mint more DAO tokens.', state: 'mintTokens' },
   {
     title: 'External contract',
-    subTitle: 'Interact with any contract on the blockchain and access any functionality',
+    subTitle: 'Interact with any contract on the blockchain and access any functionality.',
     state: 'abiForm',
   },
 ];

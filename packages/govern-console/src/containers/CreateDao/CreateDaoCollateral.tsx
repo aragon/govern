@@ -7,7 +7,7 @@ import { useWallet } from 'AugmentedWallet';
 import { getTokenInfo } from 'utils/token';
 import { formatUnits } from 'utils/lib';
 import { MAX_SCHEDULE_ACCESS_LIST_ALLOWED } from 'utils/constants';
-
+import { constants } from 'ethers';
 import {
   useLayout,
   TextInput,
@@ -101,15 +101,14 @@ const CreateDaoCollateral: React.FC<{
         <div>
           <StyledText name={'title3'}>Collaterals</StyledText>
           <StyledText name={'title4'} style={{ color: theme.disabledContent }}>
-            In order to schedule or challenge executions, any member must provide this amount of
-            collateral, so they have stake in the game and act with the best interest of your DAO.
-            By default Aragon Console uses DAI as a collateral token. If you want to change this,
-            provide another contract address in or use your newly created DAO Token.
+            Collateral is required to schedule or challenge any transaction. The default currency
+            for collateral is DAI. To override the default, provide another contract address or use
+            your newly created DAO token.
           </StyledText>
         </div>
 
         <Info mode={'warning'} title={''}>
-          Hey, this is an important step, please check that all the information entered is correct.
+          Carefully review your collateral contract address. An incorrect address may lock your DAO.
         </Info>
         <div>
           {!isExistingToken && (
@@ -120,10 +119,10 @@ const CreateDaoCollateral: React.FC<{
               render={({ field: { onChange, value } }) => (
                 <ContentSwitcher
                   title="Schedule execution collateral token"
-                  subtitle="Which token do you want to use for schedule execution?"
+                  subtitle="Choose which token may be used to schedule a transaction."
                   onChange={onChange}
                   selected={value}
-                  items={['Custom Token', 'New Token']}
+                  items={['Custom Token', 'New DAO token']}
                   paddingSettings={{
                     horizontal: spacing * 2,
                     vertical: spacing / 4,
@@ -160,7 +159,7 @@ const CreateDaoCollateral: React.FC<{
                 disabled={watch('isScheduleNewDaoToken')}
                 placeholder={
                   watch('isScheduleNewDaoToken')
-                    ? 'The contract address will be avaible after the creation process'
+                    ? 'The contract address will be available after the creation process'
                     : 'Contract address...'
                 }
                 value={!watch('isScheduleNewDaoToken') ? value : ''}
@@ -204,7 +203,7 @@ const CreateDaoCollateral: React.FC<{
               render={({ field: { onChange, value } }) => (
                 <ContentSwitcher
                   title="Challenge collateral token"
-                  subtitle="Which token do you want to use for challange collateral?"
+                  subtitle="Choose which token may be used to challenge a transaction."
                   onChange={onChange}
                   selected={value}
                   items={['Custom Token', 'New Token']}
@@ -243,7 +242,7 @@ const CreateDaoCollateral: React.FC<{
                 disabled={watch('isChallengeNewDaoToken')}
                 placeholder={
                   watch('isChallengeNewDaoToken')
-                    ? 'The contract address will be avaible after the creation process'
+                    ? 'The contract address will be available after the creation process'
                     : 'Contract address...'
                 }
                 value={!watch('isChallengeNewDaoToken') ? value : ''}
@@ -283,9 +282,14 @@ const CreateDaoCollateral: React.FC<{
             defaultValue={isAnyAddress}
             render={({ field: { onChange, value } }) => (
               <ContentSwitcher
-                title="Schedule execution permissions"
-                subtitle="If you want you can define the list of addresses that have permission to schedule
-                  executions in your DAO, so it is not open for anyone"
+                title="Whitelist of addresses that may schedule transactions."
+                subtitle={
+                  <p>
+                    Limit the addresses that may schedule transactions.{' '}
+                    <span style={{ fontWeight: 600 }}>Caution</span>: if these addresses are
+                    incorrect or unavailable, your DAO will be locked.
+                  </p>
+                }
                 onChange={onChange}
                 selected={value}
                 items={['Address List', 'Any Address']}
@@ -333,6 +337,7 @@ const CreateDaoCollateral: React.FC<{
                           onChange={onChange}
                           status={!!error ? 'error' : 'normal'}
                           error={error ? error.message : null}
+                          placeholder={constants.AddressZero}
                         />
                       )}
                     />
@@ -375,7 +380,7 @@ const CreateDaoCollateral: React.FC<{
                 setActiveStep(CreateDaoSteps.Config);
               }}
               icon={<IconArrowLeft />}
-              label={'back'}
+              label={'Back'}
               display={'all'}
             />
           }

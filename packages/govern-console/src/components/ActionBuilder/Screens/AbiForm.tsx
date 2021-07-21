@@ -17,6 +17,7 @@ import { validateContract, validateAbi } from 'utils/validations';
 import { useWallet } from 'AugmentedWallet';
 import { useActionBuilderState } from '../ActionBuilderStateProvider';
 import AbiHandler from 'utils/AbiHandler';
+import { constants } from 'ethers';
 
 type FormInput = {
   contractAddress: string;
@@ -63,7 +64,7 @@ export const AbiForm: React.FC = () => {
   return (
     <Grid>
       <GridItem>
-        <StyledText name="title1">Choose contract</StyledText>
+        <StyledText name="title1">Contract address</StyledText>
       </GridItem>
       <GridItem>
         <StyledText name="title2">Input contract address</StyledText>
@@ -92,7 +93,7 @@ export const AbiForm: React.FC = () => {
                 <TextInput
                   wide
                   value={value}
-                  placeholder="Type contract address"
+                  placeholder={constants.AddressZero}
                   onChange={onChange}
                   status={error ? 'error' : 'normal'}
                   error={error ? error.message : null}
@@ -156,7 +157,7 @@ export const AbiForm: React.FC = () => {
             <Button
               mode={'primary'}
               wide
-              label="Choose"
+              label="Select"
               onClick={handleSubmit(gotoNextScreen)}
             ></Button>
           </GridItem>
