@@ -63,8 +63,8 @@
   },
   "dependencies": {
     "@urql/core": "^1.13.1",
-    "dvote-js": "^1.3.1",
-    "ethers": "^5.1.4",
+    "dvote-js": "^1.9.14",
+    "ethers": "^5.4.1",
     "graphql": "^15.4.0",
     "graphql-tag": "^2.11.0",
     "isomorphic-unfetch": "^3.1.0"
