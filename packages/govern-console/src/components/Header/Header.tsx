@@ -44,7 +44,7 @@ const Header = () => {
   };
 
   return (
-    <NavBar>
+    <NavBar id="header">
       <Title id="navbar_title" onClick={redirectToHomePage}>
         <img src={governIcon} width={layoutName !== 'small' ? '182px' : '162px'} />
         <Tag mode="activity" size="normal" uppercase={false} label="Beta" />

@@ -2,6 +2,8 @@ import React, { useMemo, useState } from 'react';
 import addressIcon from '../../images/connected-user-icon.svg';
 import { CreateDaoSteps, configArray, basicInfoArray, collateralArray } from './utils/Shared';
 import { useCreateDaoContext } from './utils/CreateDaoContextProvider';
+import { useWallet } from 'AugmentedWallet';
+
 import {
   useLayout,
   Grid,
@@ -20,6 +22,9 @@ import StepsHeader from './components/StepsHeader';
 const CreateDaoReview: React.FC<{
   setActiveStep: React.Dispatch<React.SetStateAction<CreateDaoSteps>>;
 }> = ({ setActiveStep }) => {
+  const context: any = useWallet();
+  const { isConnected } = context;
+
   const { layoutName } = useLayout();
   const { basicInfo, config, collaterals } = useCreateDaoContext();
   const [opened, setOpened] = useState(false);
@@ -165,9 +170,19 @@ const CreateDaoReview: React.FC<{
             ];
           }}
         />
+        {/* <br /> */}
+        {!isConnected && (
+          <React.Fragment>
+            <br />
+            <Info mode={'warning'} title={''}>
+              Connect your wallet to be able to create a dao.
+            </Info>
+          </React.Fragment>
+        )}
 
         <Button
           wide
+          disabled={!isConnected}
           size={'large'}
           mode={'primary'}
           style={{ marginTop: 20 }}
