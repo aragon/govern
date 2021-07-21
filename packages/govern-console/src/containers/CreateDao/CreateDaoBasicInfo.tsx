@@ -164,7 +164,7 @@ const CreateDaoBasicInfo: React.FC<{
               </GridItem>
             </Grid>
             <Info mode={'warning'} title={''}>
-              Include decimals, e.g. 10.0
+              The created token will use {tokenDecimals} decimals. For the amount, Don't append 0's.
             </Info>
             <Controller
               name="tokenMintAmount"
