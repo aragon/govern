@@ -10,7 +10,7 @@ import { CreateDaoProvider } from './utils/CreateDaoContextProvider';
 import PageContent from 'components/PageContent/PageContent';
 import { PageName } from 'utils/HelpText';
 import ReviewCard from './components/ReviewCard';
-import scrollToTop from '../../utils/scrollToId';
+import scrollToTop from 'utils/scrollToId';
 
 const CreateDao: React.FC = () => {
   const [activeStep, setActiveStep] = useState<CreateDaoSteps>(CreateDaoSteps.BasicInfo);

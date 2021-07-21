@@ -13,7 +13,7 @@ import CreateDao from 'containers/CreateDao/CreateDao';
 import { trackPage } from 'services/analytics';
 import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
-import scrollToTop from '../../utils/scrollToId';
+import scrollToTop from 'utils/scrollToId';
 
 const HomePage = () => {
   const history = useHistory();
