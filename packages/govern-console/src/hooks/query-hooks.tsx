@@ -14,7 +14,7 @@ import {
 const POLL_INTERVAL = 5000;
 
 export function useDaoQuery(daoName: string) {
-  const { data, loading, error } = useQuery(DAO_BY_NAME, {
+  const { data, loading, error, refetch } = useQuery(DAO_BY_NAME, {
     variables: { name: daoName },
   });
 
@@ -29,6 +29,7 @@ export function useDaoQuery(daoName: string) {
     data: daoData,
     loading: loading,
     error,
+    refetch,
   };
 }
 
