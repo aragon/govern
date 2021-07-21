@@ -2,7 +2,6 @@ import React, { useState, useEffect, memo } from 'react';
 import { styled } from '@material-ui/core/styles';
 import { DaoHeader } from 'components/DaoHeader/DaoHeader';
 import { ProposalCard } from 'components/ProposalCards/ProposalCard';
-import { ANButton } from 'components/Button/ANButton';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
@@ -12,6 +11,7 @@ import { formatDate } from 'utils/date';
 import { getState, getStateColor } from 'utils/states';
 import { useDaoQuery, useLazyProposalListQuery } from 'hooks/query-hooks';
 import { proposalDetailsUrl } from 'utils/urls';
+import { Button } from '@aragon/ui';
 
 //* Styled Components List
 const DaoPageMainDiv = styled(Paper)(({ theme }) => ({
@@ -153,7 +153,7 @@ const DaoMainPage: React.FC = () => {
                 }}
               >
                 {isProposalPage ? (
-                  <PageLabelSelected>Executions</PageLabelSelected>
+                  <PageLabelSelected>Transactions</PageLabelSelected>
                 ) : (
                   <PageLabel onClick={() => onPageChange('proposal')}>Proposal</PageLabel>
                 )}
@@ -176,14 +176,13 @@ const DaoMainPage: React.FC = () => {
                       marginTop: '28px',
                     }}
                   >
-                    <ANButton
-                      label="New Execution"
-                      buttonType="primary"
-                      height="46px"
-                      width="142px"
+                    <Button
+                      label="New Transaction"
+                      mode="primary"
+                      size="large"
                       onClick={goToNewExecution}
                       style={{ marginRight: '12px' }}
-                    ></ANButton>
+                    />
                   </div>
                   <WrapperGrid container spacing={3} direction="row" justify="flex-start">
                     {visibleProposalList.map((proposal: any) => (
@@ -214,14 +213,13 @@ const DaoMainPage: React.FC = () => {
                     }}
                   >
                     {queueNonce !== visibleProposalList.length ? (
-                      <ANButton
+                      <Button
                         label="Load More Executions"
-                        buttonType="secondary"
-                        height="46px"
-                        width="196px"
+                        mode="secondary"
+                        hsoze="large"
                         labelColor="#00C2FF"
                         onClick={fetchMoreData}
-                      ></ANButton>
+                      />
                     ) : null}
                   </div>
                 </div>

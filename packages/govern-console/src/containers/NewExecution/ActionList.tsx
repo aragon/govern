@@ -97,7 +97,7 @@ const ActionList: React.FC<ActionListProps> = ({ actions, swap, remove }) => {
   if (actions && actions.length === 0) {
     return (
       <Card width="auto" height={`${15 * GU}px`}>
-        No action yet.
+        No transaction yet.
       </Card>
     );
   }

@@ -61,7 +61,7 @@ const NoDaoFound: React.FC = () => {
     if (daoSearchText.length > 0) {
       history.push(`${daoSearchText}`);
     } else {
-      toast('Invalid Dao Name. At least one letter should be entered.');
+      toast('Invalid DAO Name. At least one letter should be entered.');
     }
   };
 

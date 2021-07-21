@@ -81,7 +81,7 @@ export const DaoHeader: React.FC<DaoHeaderProps> = ({ daoName }) => {
         }}
       >
         <div>
-          <HeaderLabel>DAO Name</HeaderLabel>
+          <HeaderLabel>DAO identifier</HeaderLabel>
           <HeaderValue>{daoName}</HeaderValue>
         </div>
         <Grid

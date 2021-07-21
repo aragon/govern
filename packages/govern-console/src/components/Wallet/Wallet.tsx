@@ -9,6 +9,7 @@ import { getTruncatedAccountAddress } from 'utils/account';
 declare let window: any;
 
 const Wallet = ({}) => {
+  const connetButtonLabel = 'Connect wallet';
   const context: any = useWallet();
   const { layoutName } = useLayout();
   const toast = useToast();
@@ -94,7 +95,7 @@ const Wallet = ({}) => {
         onClick={() => {
           connectWalletAndSetStatus('injected');
         }}
-        label={'Connect Account'}
+        label={connetButtonLabel}
         icon={<IconConnect />}
         display={layoutName === 'small' ? 'icon' : 'all'}
         disabled={status === 'connecting'}
@@ -108,7 +109,7 @@ const Wallet = ({}) => {
         onClick={() => {
           connectWalletAndSetStatus('injected');
         }}
-        label={'Connect Account'}
+        label={connetButtonLabel}
         icon={<IconConnect />}
         display={layoutName === 'small' ? 'icon' : 'all'}
         disabled={status === 'connecting'}
@@ -122,7 +123,7 @@ const Wallet = ({}) => {
         onClick={() => {
           connectWalletAndSetStatus('injected');
         }}
-        label={'Connect Account'}
+        label={connetButtonLabel}
         icon={<IconConnect />}
         display={layoutName === 'small' ? 'icon' : 'all'}
         disabled={status === 'connecting'}

@@ -142,7 +142,7 @@ export const Deposit: React.FC = () => {
         </div>
       </GridItem>
       <GridItem>
-        <StyledText name="title2">Token</StyledText>
+        <StyledText name="title2">Asset</StyledText>
         <Hint>Choose which asset you would like to deposit.</Hint>
         <Controller
           name="token"

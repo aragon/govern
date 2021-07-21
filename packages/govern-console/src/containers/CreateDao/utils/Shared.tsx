@@ -13,10 +13,10 @@ enum CreateDaoSteps {
   Progress,
 }
 
-const stepsNames = ['Basic info', 'Config', 'Collateral', 'Review'];
+const stepsNames = ['Basic info', 'Config', 'Collaterals', 'Review'];
 
 const formatParamNames: { [key: string]: string } = {
-  daoIdentifier: 'Dao Identifier',
+  daoIdentifier: 'DAO Identifier',
   isExistingToken: 'Use Existing Token',
   tokenName: 'Token Name',
   tokenSymbol: 'Token Symbol',
@@ -26,19 +26,19 @@ const formatParamNames: { [key: string]: string } = {
 
   executionDelay: 'Execution Delay',
   isRuleFile: 'Use Rule File',
-  ruleFile: 'Rule File',
-  ruleText: 'Rule Text',
-  resolver: 'Resolver',
+  ruleFile: 'DAO Agreement',
+  ruleText: 'DAO Agreement',
+  resolver: 'Dispute resolution client',
   maxCalldataSize: 'Max Call Data Size',
 
-  scheduleAddress: 'Schedule Address',
-  scheduleAmount: 'Schedule Amount',
+  scheduleAddress: 'Schedule Token Address',
+  scheduleAmount: 'Schedule Token Amount',
   isScheduleNewDaoToken: 'Use Schedule New Dao Token',
-  challengeAddress: 'Challenge Address',
-  challengeAmount: 'Challenge Amount',
+  challengeAddress: 'Challenge Token Address',
+  challengeAmount: 'Challenge Token Amount',
   isChallengeNewDaoToken: 'Use Challenge New Dao Token',
-  isAnyAddress: 'Use Any Address',
-  executionAddressList: 'Excutors Addresses',
+  isAnyAddress: 'Scheduling transaction whitelist',
+  executionAddressList: 'Scheduling transaction whitelist',
 };
 
 export type BasicInfoArg =
@@ -68,11 +68,21 @@ const basicInfoArray = (basicInfo: ICreateDaoBasicInfo) => {
     ? ['tokenDecimals', 'isExistingToken', 'tokenName', 'tokenSymbol', 'tokenMintAmount']
     : ['tokenDecimals', 'isExistingToken', 'tokenAddress'];
 
+  const formatValue = (name: string, value: any) => {
+    switch (name) {
+      case 'isProxy':
+        return value ? 'Yes' : 'No';
+
+      default:
+        return value.toString();
+    }
+  };
+
   return Object.entries(basicInfo)
     .filter((entry) => !filters.includes(entry[0] as any))
     .map((entry) => ({
       name: formatParamNames[entry[0]?.toString()],
-      value: entry[1]?.toString(),
+      value: formatValue(entry[0], entry[1]),
     }));
 };
 
@@ -84,6 +94,9 @@ const configArray = (config: ICreateDaoConfig) => {
 
       case 'ruleText':
         return value && typeof value !== 'string' ? toUtf8String(value) : value;
+
+      case 'executionDelay':
+        return `${value} seconds`;
 
       default:
         return value.toString();
@@ -108,21 +121,33 @@ const collateralArray = (collaterals: ICreateDaoCollaterals) => {
       (name === 'scheduleAddress' && collaterals.isScheduleNewDaoToken) ||
       (name === 'challengeAddress' && collaterals.isChallengeNewDaoToken)
     )
-      return 'The contract address will be available after the creation process';
+      return 'New DAO token';
 
-    if (
-      name === 'isScheduleNewDaoToken' ||
-      name === 'isChallengeNewDaoToken' ||
-      name === 'isAnyAddress'
-    )
-      return Boolean(value).toString();
+    if (name === 'isScheduleNewDaoToken' || name === 'isChallengeNewDaoToken')
+      return Boolean(value) ? 'Yes' : 'No';
+
+    if (name === 'isAnyAddress') {
+      return 'Any Address';
+    }
 
     return value;
   };
 
   const filters: (keyof ICreateDaoCollaterals)[] = collaterals.isAnyAddress
-    ? ['scheduleDecimals', 'challengeDecimals', 'executionAddressList']
-    : ['scheduleDecimals', 'challengeDecimals', 'isAnyAddress'];
+    ? [
+        'scheduleDecimals',
+        'challengeDecimals',
+        'executionAddressList',
+        'isChallengeNewDaoToken',
+        'isScheduleNewDaoToken',
+      ]
+    : [
+        'scheduleDecimals',
+        'challengeDecimals',
+        'isAnyAddress',
+        'isChallengeNewDaoToken',
+        'isScheduleNewDaoToken',
+      ];
 
   return Object.entries(collaterals)
     .filter((entry) => !filters.includes(entry[0] as any))

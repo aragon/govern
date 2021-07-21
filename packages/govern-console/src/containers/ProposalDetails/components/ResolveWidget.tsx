@@ -1,12 +1,12 @@
 import React, { memo } from 'react';
-import { ANButton } from 'components/Button/ANButton';
 import { PROPOSAL_STATES } from 'utils/states';
 import { InfoKeyDiv, InfoValueDivInline } from '../ProposalDetails';
 import { Widget, WidgetRow, InfoWrapper, TitleText } from './SharedStyles';
 import { formatDate } from 'utils/date';
 import { useDisputeHook } from 'hooks/court-hooks';
-
+import { Button } from '@aragon/ui';
 import { networkEnvironment } from 'environment';
+
 const { courtUrl } = networkEnvironment;
 
 const ResolveWidget: React.FC<any> = ({
@@ -23,7 +23,7 @@ const ResolveWidget: React.FC<any> = ({
     return (
       <Widget>
         <WidgetRow>
-          <TitleText>Resolve Details</TitleText>
+          <TitleText>Dispute resolution details</TitleText>
         </WidgetRow>
         <InfoWrapper>
           <InfoKeyDiv>Resolved At</InfoKeyDiv>
@@ -76,14 +76,14 @@ const ResolveWidget: React.FC<any> = ({
           color: '#7483B3',
         }}
       >
-        <ANButton
-          label="Resolve"
+        <Button
+          wide
+          label="Resolve dispute"
           disabled={disabled}
-          height="45px"
-          width="372px"
+          mode="primary"
+          size="large"
           style={{ margin: 'auto' }}
           onClick={() => onResolveProposal(disputeId)}
-          buttonType="primary"
         />
       </div>
     </Widget>
