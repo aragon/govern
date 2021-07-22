@@ -92,7 +92,7 @@ const CreateDaoBasicInfo: React.FC<{
               wide
               value={value}
               placeholder={'my_new_dao'}
-              onChange={onChange}
+              onChange={(e: any) => onChange(e.target.value.toLowerCase())}
               status={!!error ? 'error' : 'normal'}
               error={error ? error.message : null}
             />
