@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { CreateDaoSteps } from './utils/Shared';
 import { useCreateDaoContext, ICreateDaoBasicInfo } from './utils/CreateDaoContextProvider';
 import { useForm, Controller } from 'react-hook-form';
@@ -20,6 +20,7 @@ import {
   StyledText,
 } from '@aragon/ui';
 import StepsHeader from './components/StepsHeader';
+import { constants } from 'ethers';
 
 const CreateDaoBasicInfo: React.FC<{
   setActiveStep: React.Dispatch<React.SetStateAction<CreateDaoSteps>>;
@@ -30,9 +31,6 @@ const CreateDaoBasicInfo: React.FC<{
 
   const context: any = useWallet();
   const { provider } = context;
-
-  const methods = useForm<ICreateDaoBasicInfo>();
-  const { control, setValue, watch, getValues, trigger } = methods;
 
   const {
     daoIdentifier,
@@ -45,9 +43,12 @@ const CreateDaoBasicInfo: React.FC<{
     isProxy,
   } = basicInfo;
 
-  useEffect(() => {
-    setValue('isExistingToken', isExistingToken);
-  }, [isExistingToken, setValue]);
+  const methods = useForm<ICreateDaoBasicInfo>({ defaultValues: { ...basicInfo } });
+  const { control, watch, getValues, trigger } = methods;
+
+  // useEffect(() => {
+  //   setValue('isExistingToken', isExistingToken);
+  // }, [isExistingToken, setValue]);
 
   const moveToNextStep = async () => {
     const validate = await trigger();
@@ -205,7 +206,7 @@ const CreateDaoBasicInfo: React.FC<{
                 subtitle="Enter your token address"
                 wide
                 value={value}
-                placeholder={'Enter token address'}
+                placeholder={constants.AddressZero}
                 onChange={onChange}
                 status={!!error ? 'error' : 'normal'}
                 error={error ? error.message : null}

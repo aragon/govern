@@ -52,6 +52,8 @@ const CreateDaoCollateral: React.FC<{
 
   const methods = useForm<any>({
     defaultValues: {
+      isScheduleNewDaoToken,
+      isChallengeNewDaoToken,
       executionAddressList: executionAddressList.map((address) => {
         return { value: address };
       }),
@@ -66,6 +68,13 @@ const CreateDaoCollateral: React.FC<{
     trigger,
     formState: { errors },
   } = methods;
+
+  useEffect(() => {
+    if (isExistingToken) {
+      setValue('isScheduleNewDaoToken', 0);
+      setValue('isChallengeNewDaoToken', 0);
+    }
+  }, [isExistingToken, setValue]);
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -206,7 +215,7 @@ const CreateDaoCollateral: React.FC<{
                   subtitle="Choose which token may be used to challenge a transaction."
                   onChange={onChange}
                   selected={value}
-                  items={['Custom Token', 'New Token']}
+                  items={['Custom Token', 'New DAO Token']}
                   paddingSettings={{
                     horizontal: spacing * 2,
                     vertical: spacing / 4,
@@ -308,7 +317,7 @@ const CreateDaoCollateral: React.FC<{
           </Info>
         ) : (
           <div>
-            {fields.map((item: any, index: any) => {
+            {fields.map((item: any, index: number) => {
               return (
                 <div
                   key={item.id}
@@ -345,11 +354,12 @@ const CreateDaoCollateral: React.FC<{
                       mode={'secondary'}
                       size={'large'}
                       disabled={fields.length === 1}
-                      icon={<IconMinus />}
                       onClick={() => {
                         remove(index);
                       }}
-                    />
+                    >
+                      <IconMinus />
+                    </Button>
                   </div>
                 </div>
               );
@@ -385,9 +395,13 @@ const CreateDaoCollateral: React.FC<{
             />
           }
           secondary={
-            <Button wide size={'large'} mode={'secondary'} onClick={moveToNextStep}>
-              Next Step
-            </Button>
+            <Button
+              wide
+              size={'large'}
+              mode={'secondary'}
+              onClick={moveToNextStep}
+              label="Next Step"
+            />
           }
         />
       </div>

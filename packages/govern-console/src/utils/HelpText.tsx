@@ -15,10 +15,10 @@ export const HelpText: Record<string, Array<ReactNode>> = {
       </div>,
     ],
     [
-      'Why do I need to write the reasons for changing the DAO settings?',
+      'Why do I need to write the reasons for scheduling a transaction?',
       <div key={'acordion-item-1'} style={{ padding: 16 }}>
-        DAO members may challenge any transaction contrary to the DAO Agreement in Aragon Court.
-        Therefore, you must explain how the change is compatible with the Agreement.
+        DAO members may challenge any transaction contrary to the DAO Agreement. Therefore, you must
+        explain how this transaction is compatible with the Agreement.
       </div>,
     ],
   ],

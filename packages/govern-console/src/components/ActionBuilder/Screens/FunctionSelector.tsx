@@ -157,7 +157,7 @@ export const FunctionSelector: React.FC<FunctionSelectorProps> = ({ onClick }) =
         </Box>
       </GridItem>
       <GridItem>
-        <Button wide mode={'primary'} label="Choose" onClick={submitActions}></Button>
+        <Button wide mode={'primary'} label="Select" onClick={submitActions}></Button>
       </GridItem>
     </Grid>
   );
