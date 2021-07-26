@@ -7,6 +7,7 @@ import { CircularProgressStatus } from 'utils/types';
 import { parseUnits } from 'utils/lib';
 import { constants } from 'ethers';
 import { networkEnvironment } from 'environment';
+import { trackEvent, EventType } from 'services/analytics';
 
 const { daoFactoryAddress, governRegistryAddress } = networkEnvironment;
 
@@ -30,6 +31,7 @@ declare let window: any;
 const CreateDaoProgress: React.FC<{
   setActiveStep: React.Dispatch<React.SetStateAction<CreateDaoSteps>>;
 }> = ({ setActiveStep }) => {
+  const { networkName } = networkEnvironment;
   const walletContext: any = useWallet();
   const { provider, account } = walletContext;
   const { basicInfo, config, collaterals } = useCreateDaoContext();
@@ -197,9 +199,19 @@ const CreateDaoProgress: React.FC<{
           );
           await result.wait();
 
+          // analytics
+          trackEvent(EventType.DAO_CREATED, {
+            network: networkName,
+            daoAddress: basicInfo.daoIdentifier,
+          });
+
           if (basicInfo.isExistingToken) updateNewDaoTokenAddress(basicInfo.tokenAddress);
         } catch (error) {
           console.log('error', error);
+
+          // analytics
+          trackEvent(EventType.DAO_CREATIONFAILED, { network: networkName, error: error });
+
           newList[1].status = CircularProgressStatus.Failed;
           setProgressList(newList);
           setShowAction('fail');

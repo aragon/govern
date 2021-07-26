@@ -7,6 +7,9 @@ enum MethodType {
 // TODO: define tracked Events
 export enum EventType {
   DEPOSIT_ASSETS_ClICKED = 'deposit_assets_clicked',
+  DAO_CREATEBTN_CLICKED = 'dao_createBtn_clicked',
+  DAO_CREATED = 'dao_created',
+  DAO_CREATIONFAILED = 'dao_creationFailed',
 }
 
 /**
