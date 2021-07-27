@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { networkEnvironment } from 'environment';
 import { Button, EthIdenticon, useLayout, IconConnect, useToast } from '@aragon/ui';
 import { getTruncatedAccountAddress } from 'utils/account';
+import { trackEvent, EventType } from 'services/analytics';
 
 //TODO add the icon for logged in users
 declare let window: any;
@@ -13,9 +14,10 @@ const Wallet = ({}) => {
   const context: any = useWallet();
   const { layoutName } = useLayout();
   const toast = useToast();
-  const { account, chainId, connect, error, reset, status } = context;
+  const { account, chainId, connect, error, reset, status, networkName } = context;
   const [networkStatus, setNetworkStatus] = useState<string>(status);
   const [userAccount, setUserAccount] = useState<string>(status);
+  console.log('contect', context);
 
   useEffect(() => {
     if (chainId !== networkEnvironment.chainId) {
@@ -83,6 +85,12 @@ const Wallet = ({}) => {
         icon={<EthIdenticon address={userAccount} scale={1.5} radius={50} />}
         display={layoutName === 'small' ? 'icon' : 'all'}
         onClick={() => {
+          // analytics
+          trackEvent(EventType.WALLET_DISCONNECTED, {
+            wallet_address: account,
+            // wallet_provider: providerInfo.name,
+            network: networkName,
+          });
           reset();
         }}
       />
