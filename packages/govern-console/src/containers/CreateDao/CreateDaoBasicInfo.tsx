@@ -46,10 +46,6 @@ const CreateDaoBasicInfo: React.FC<{
   const methods = useForm<ICreateDaoBasicInfo>({ defaultValues: { ...basicInfo } });
   const { control, watch, getValues, trigger } = methods;
 
-  // useEffect(() => {
-  //   setValue('isExistingToken', isExistingToken);
-  // }, [isExistingToken, setValue]);
-
   const moveToNextStep = async () => {
     const validate = await trigger();
 
