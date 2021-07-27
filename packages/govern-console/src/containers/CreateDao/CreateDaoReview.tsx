@@ -3,6 +3,7 @@ import addressIcon from '../../images/connected-user-icon.svg';
 import { CreateDaoSteps, configArray, basicInfoArray, collateralArray } from './utils/Shared';
 import { useCreateDaoContext } from './utils/CreateDaoContextProvider';
 import { useWallet } from 'AugmentedWallet';
+import { trackEvent, EventType } from 'services/analytics';
 
 import {
   useLayout,
@@ -18,10 +19,12 @@ import {
   AddressField,
 } from '@aragon/ui';
 import StepsHeader from './components/StepsHeader';
+import { networkEnvironment } from 'environment';
 
 const CreateDaoReview: React.FC<{
   setActiveStep: React.Dispatch<React.SetStateAction<CreateDaoSteps>>;
 }> = ({ setActiveStep }) => {
+  const { networkName } = networkEnvironment;
   const context: any = useWallet();
   const { isConnected } = context;
 
@@ -187,6 +190,9 @@ const CreateDaoReview: React.FC<{
           mode={'primary'}
           style={{ marginTop: 20 }}
           onClick={() => {
+            // analytics
+            trackEvent(EventType.DAO_CREATEBTN_CLICKED, { network: networkName });
+
             setActiveStep(CreateDaoSteps.Progress);
           }}
         >

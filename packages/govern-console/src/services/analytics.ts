@@ -10,6 +10,7 @@ export enum EventType {
   DAO_CREATEBTN_CLICKED = 'dao_createBtn_clicked',
   DAO_CREATED = 'dao_created',
   DAO_CREATIONFAILED = 'dao_creationFailed',
+  NAVBAR_CREATEDAO_CLICKED = 'navbar_createDAO_clicked',
 }
 
 /**

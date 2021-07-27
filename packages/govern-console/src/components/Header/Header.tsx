@@ -42,7 +42,7 @@ const Header = () => {
 
   const goToCreateDaoPage = () => {
     // analytics
-    trackEvent(EventType.DAO_CREATEBTN_CLICKED, { network: networkName });
+    trackEvent(EventType.NAVBAR_CREATEDAO_CLICKED, { network: networkName });
 
     history.push('/create-dao');
   };
