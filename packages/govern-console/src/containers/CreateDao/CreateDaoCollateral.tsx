@@ -22,6 +22,7 @@ import {
   IconArrowLeft,
   SPACING,
   useTheme,
+  GU,
 } from '@aragon/ui';
 import StepsHeader from './components/StepsHeader';
 
@@ -120,7 +121,7 @@ const CreateDaoCollateral: React.FC<{
           Carefully review your collateral contract address. An incorrect address may lock your DAO.
         </Info>
         <div>
-          {!isExistingToken && (
+          {!isExistingToken ? (
             <Controller
               name="isScheduleNewDaoToken"
               control={control}
@@ -139,6 +140,16 @@ const CreateDaoCollateral: React.FC<{
                 />
               )}
             />
+          ) : (
+            <div>
+              <StyledText name={'title3'}>Schedule execution collateral token</StyledText>
+              <StyledText
+                name={'title4'}
+                style={{ color: theme.disabledContent, marginBottom: GU }}
+              >
+                Choose which token may be used to schedule a transaction.
+              </StyledText>
+            </div>
           )}
 
           <Controller
@@ -204,7 +215,7 @@ const CreateDaoCollateral: React.FC<{
         </div>
 
         <div>
-          {!isExistingToken && (
+          {!isExistingToken ? (
             <Controller
               name="isChallengeNewDaoToken"
               control={control}
@@ -223,6 +234,16 @@ const CreateDaoCollateral: React.FC<{
                 />
               )}
             />
+          ) : (
+            <div>
+              <StyledText name={'title3'}>Challenge collateral token</StyledText>
+              <StyledText
+                name={'title4'}
+                style={{ color: theme.disabledContent, marginBottom: GU }}
+              >
+                Choose which token may be used to challenge a transaction.
+              </StyledText>
+            </div>
           )}
           <Controller
             name="challengeAddress"
