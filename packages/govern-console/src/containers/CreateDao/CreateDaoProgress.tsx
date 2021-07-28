@@ -51,8 +51,8 @@ const CreateDaoProgress: React.FC<{
     // analytics
     trackEvent(EventType.DAO_CREATED, {
       network: networkName,
-      daoIdentifier: basicInfo.daoIdentifier,
-      daoAddress: executor,
+      dao_identifier: basicInfo.daoIdentifier,
+      dao_address: executor,
     });
   };
 
