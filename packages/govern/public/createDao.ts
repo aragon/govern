@@ -30,7 +30,7 @@ const token = `
     bytes merkleTree,
     bytes merkleContext
   )`
- 
+
 const factoryAbi = [
   `function newGovern(
     ${token} _token, 
@@ -39,10 +39,10 @@ const factoryAbi = [
     ${ContainerConfig} _config, 
     string _name
   ) external`,
-];
+]
 
 const registryAbi = [
-  'event Registered(address indexed executor, address queue, address indexed token, address minter, address indexed registrant, string name)'
+  'event Registered(address indexed executor, address queue, address indexed token, address minter, address indexed registrant, string name)',
 ]
 
 const tokenAbi = ['function balanceOf(address who) view returns (uint256)']
@@ -58,8 +58,8 @@ export type Token = {
   mintAmount: BigNumberish | string
   merkleRoot: utils.BytesLike
   merkleMintAmount: BigNumberish | string
-  merkleTree: utils.BytesLike;
-  merkleContext: utils.BytesLike;
+  merkleTree: utils.BytesLike
+  merkleContext: utils.BytesLike
 }
 
 export type TokenDeposit = {
@@ -104,23 +104,25 @@ export type CreateDaoOptions = {
 export async function createDao(
   args: CreateDaoParams,
   options: CreateDaoOptions = {},
-  registeredDaoTokenCallback?: (tokenAddress: string) => void
+  registeredDaoCallback?: (tokenAddress: string, executor: string) => void
 ): Promise<providers.TransactionResponse> {
-  let token: Partial<Token>;
+  let token: Partial<Token>
 
   const keys: (keyof Partial<Token>)[] = [
-    'tokenName', 
-    'tokenSymbol', 
-    'tokenDecimals', 
-    'mintAddress', 
+    'tokenName',
+    'tokenSymbol',
+    'tokenDecimals',
+    'mintAddress',
     'merkleRoot',
     'merkleMintAmount',
     'merkleTree',
-    'merkleContext'
-  ];
+    'merkleContext',
+  ]
 
   if (!args.token.tokenAddress) {
-    const tokenIsMissingInfo = keys.every(item => args.token.hasOwnProperty(item));
+    const tokenIsMissingInfo = keys.every((item) =>
+      args.token.hasOwnProperty(item)
+    )
     if (!tokenIsMissingInfo) {
       throw new Error(`Missing ${keys.join(' or ')}`)
     }
@@ -139,7 +141,7 @@ export async function createDao(
       merkleRoot: '0x' + '00'.repeat(32),
       merkleMintAmount: 0,
       merkleTree: '0x',
-      merkleContext: '0x'
+      merkleContext: '0x',
     }
   }
 
@@ -155,24 +157,24 @@ export async function createDao(
     registryAbi,
     signer
   )
-  if (typeof registeredDaoTokenCallback === 'function') {
+  if (typeof registeredDaoCallback === 'function') {
     GovernRegistry.on(
       'Registered',
-      async (govern, queue, token, minter, registrant, name) => {
+      async (excecutor, queue, token, minter, registrant, name) => {
         // not our DAO, wait for next one
         if (name !== args.name) return
         // send back token address
-        registeredDaoTokenCallback(token)
+        registeredDaoCallback(token, excecutor)
       }
     )
   }
-  
+
   const result = contract.newGovern(
     token,
     args.scheduleAccessList,
     args.useProxies,
     args.config,
-    args.name,
+    args.name
   )
 
   return result
