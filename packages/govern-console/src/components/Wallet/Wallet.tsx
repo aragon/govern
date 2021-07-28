@@ -86,7 +86,7 @@ const Wallet = ({}) => {
         onClick={() => {
           // analytics
           trackEvent(EventType.WALLET_DISCONNECTED, {
-            wallet_address: account,
+            wallet_address: userAccount,
             wallet_provider: connector, // provider name would make more sense
             network: networkName,
           });
