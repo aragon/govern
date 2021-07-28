@@ -223,7 +223,6 @@ const CreateDaoProgress: React.FC<{
   /* eslint-disable */
 
   useEffect(() => {
-    console.log('showAction', showAction);
     switch (showAction) {
       case 'fail':
         setAction(<FailAction setActiveStep={setActiveStep} />);
