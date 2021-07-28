@@ -14,10 +14,9 @@ const Wallet = ({}) => {
   const context: any = useWallet();
   const { layoutName } = useLayout();
   const toast = useToast();
-  const { account, chainId, connect, error, reset, status, networkName } = context;
+  const { account, chainId, connect, error, reset, status, networkName, connector } = context;
   const [networkStatus, setNetworkStatus] = useState<string>(status);
   const [userAccount, setUserAccount] = useState<string>(status);
-  console.log('contect', context);
 
   useEffect(() => {
     if (chainId !== networkEnvironment.chainId) {
@@ -88,9 +87,10 @@ const Wallet = ({}) => {
           // analytics
           trackEvent(EventType.WALLET_DISCONNECTED, {
             wallet_address: account,
-            // wallet_provider: providerInfo.name,
+            wallet_provider: connector, // provider name would make more sense
             network: networkName,
           });
+
           reset();
         }}
       />
