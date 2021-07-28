@@ -209,7 +209,10 @@ const CreateDaoProgress: React.FC<{
           console.log('error', error);
 
           // analytics
-          trackEvent(EventType.DAO_CREATIONFAILED, { network: networkName, error: error });
+          trackEvent(EventType.DAO_CREATIONFAILED, {
+            network: networkName,
+            error: error.message ? error.message : error.reason,
+          });
 
           newList[1].status = CircularProgressStatus.Failed;
           setProgressList(newList);
