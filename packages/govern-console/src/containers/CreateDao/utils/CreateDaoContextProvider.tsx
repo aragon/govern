@@ -93,7 +93,7 @@ const CreateDaoProvider: React.FC = ({ children }) => {
   const handleIsExistingToken = useCallback(
     (e: any, onChange: (e: any) => void) => {
       // this will reset isScheduleNewDaoToken & isChallengeNewDaoToken
-      // if isExistingToken is set to true
+      // if isExistingToken is set
       if (e === 1) {
         setCollaterals({
           ...collaterals,
