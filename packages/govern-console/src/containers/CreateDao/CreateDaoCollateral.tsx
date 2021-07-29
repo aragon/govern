@@ -46,13 +46,18 @@ const CreateDaoCollateral: React.FC<{
     executionAddressList,
   } = collaterals;
 
-  const isExistingToken = basicInfo.isExistingToken;
-
   const context: any = useWallet();
   const { provider } = context;
 
   const methods = useForm<any>({
     defaultValues: {
+      scheduleAddress,
+      scheduleDecimals,
+      scheduleAmount: formatUnits(scheduleAmount, scheduleDecimals),
+      challengeAddress,
+      challengeDecimals,
+      challengeAmount: formatUnits(challengeAmount, challengeDecimals),
+      isAnyAddress,
       isScheduleNewDaoToken,
       isChallengeNewDaoToken,
       executionAddressList: executionAddressList.map((address) => {
@@ -70,6 +75,11 @@ const CreateDaoCollateral: React.FC<{
     formState: { errors },
   } = methods;
 
+  const isExistingToken = basicInfo.isExistingToken;
+
+  // in case at BasicInfo isExistingToken is set,
+  // then we reset isScheduleNewDaoToken and isChallengeNewDaoToken to default, to prevent locking inputs
+  // this action also can be handled in basicInfo view, but we choose to do it in this view for consistency
   useEffect(() => {
     if (isExistingToken) {
       setValue('isScheduleNewDaoToken', 0);
@@ -81,15 +91,6 @@ const CreateDaoCollateral: React.FC<{
     control,
     name: 'executionAddressList',
   });
-
-  useEffect(() => {
-    setValue('scheduleAmount', formatUnits(scheduleAmount, scheduleDecimals));
-    setValue('challengeAmount', formatUnits(challengeAmount, challengeDecimals));
-  }, [scheduleAmount, scheduleDecimals, challengeAmount, challengeDecimals, setValue]);
-
-  useEffect(() => {
-    setValue('isAnyAddress', isAnyAddress);
-  }, [isAnyAddress, setValue]);
 
   const moveToNextStep = async () => {
     await trigger();
