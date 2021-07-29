@@ -1,7 +1,6 @@
-import React, { useMemo, useState, useContext } from 'react';
+import React, { useMemo, useState, useContext, useCallback } from 'react';
 import { BigNumber, BytesLike } from 'ethers';
 import { networkEnvironment } from 'environment';
-import { useCallback } from 'react';
 
 export interface ICreateDaoBasicInfo {
   daoIdentifier: string;
