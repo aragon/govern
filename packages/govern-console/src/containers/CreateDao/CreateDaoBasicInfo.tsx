@@ -27,7 +27,7 @@ const CreateDaoBasicInfo: React.FC<{
 }> = ({ setActiveStep }) => {
   const { layoutName } = useLayout();
   const spacing = SPACING[layoutName];
-  const { basicInfo, setBasicInfo } = useCreateDaoContext();
+  const { basicInfo, setBasicInfo, handleIsExistingToken } = useCreateDaoContext();
 
   const context: any = useWallet();
   const { provider } = context;
@@ -103,7 +103,9 @@ const CreateDaoBasicInfo: React.FC<{
             <ContentSwitcher
               title="DAO token"
               subtitle="Create a new ERC-20 token for your DAO, or use an existing one"
-              onChange={onChange}
+              onChange={(e: any) => {
+                handleIsExistingToken(e, onChange);
+              }}
               selected={value}
               items={['New Token', 'Existing Token']}
               paddingSettings={{

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { CreateDaoSteps } from './utils/Shared';
 import { useCreateDaoContext } from './utils/CreateDaoContextProvider';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
@@ -76,16 +76,6 @@ const CreateDaoCollateral: React.FC<{
   } = methods;
 
   const isExistingToken = basicInfo.isExistingToken;
-
-  // in case at BasicInfo isExistingToken is set,
-  // then we reset isScheduleNewDaoToken and isChallengeNewDaoToken to default, to prevent locking inputs
-  // this action also can be handled in basicInfo view, but we choose to do it in this view for consistency
-  useEffect(() => {
-    if (isExistingToken) {
-      setValue('isScheduleNewDaoToken', 0);
-      setValue('isChallengeNewDaoToken', 0);
-    }
-  }, [isExistingToken, setValue]);
 
   const { fields, append, remove } = useFieldArray({
     control,
