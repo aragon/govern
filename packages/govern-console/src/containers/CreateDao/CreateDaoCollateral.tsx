@@ -82,16 +82,20 @@ const CreateDaoCollateral: React.FC<{
     name: 'executionAddressList',
   });
 
-  const moveToNextStep = async () => {
+  const moveToNextStep = async (isBack: boolean) => {
     await trigger();
 
-    if (Object.keys(errors).length > 0) return;
+    if (Object.keys(errors).length > 0 && !isBack) return;
 
     const data = { ...getValues() };
     data.executionAddressList = data.executionAddressList.map((item: any) => item.value);
 
     setCollaterals(data);
-    setActiveStep(CreateDaoSteps.Review);
+    if (isBack) {
+      setActiveStep(CreateDaoSteps.Config);
+    } else {
+      setActiveStep(CreateDaoSteps.Review);
+    }
   };
 
   return (
@@ -398,9 +402,7 @@ const CreateDaoCollateral: React.FC<{
             <Button
               size={'large'}
               mode={'secondary'}
-              onClick={() => {
-                setActiveStep(CreateDaoSteps.Config);
-              }}
+              onClick={() => moveToNextStep(true)}
               icon={<IconArrowLeft />}
               label={'Back'}
               display={'all'}
@@ -411,7 +413,7 @@ const CreateDaoCollateral: React.FC<{
               wide
               size={'large'}
               mode={'secondary'}
-              onClick={moveToNextStep}
+              onClick={() => moveToNextStep(false)}
               label="Next Step"
             />
           }
