@@ -54,7 +54,7 @@ const CreateDaoConfig: React.FC<{
     const validate = await trigger();
     if (!validate && !isBack) return;
 
-    const newConfig = { ...getValues() };
+    const newConfig = { ...config, ...getValues() };
     setConfig(newConfig);
 
     if (isBack) {
