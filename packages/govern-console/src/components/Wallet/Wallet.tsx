@@ -4,6 +4,8 @@ import { useEffect } from 'react';
 import { networkEnvironment } from 'environment';
 import { Button, EthIdenticon, useLayout, IconConnect, useToast } from '@aragon/ui';
 import { getTruncatedAccountAddress } from 'utils/account';
+import { trackEvent, EventType } from 'services/analytics';
+import { useCallback } from 'react';
 
 //TODO add the icon for logged in users
 declare let window: any;
@@ -13,7 +15,7 @@ const Wallet = ({}) => {
   const context: any = useWallet();
   const { layoutName } = useLayout();
   const toast = useToast();
-  const { account, chainId, connect, error, reset, status } = context;
+  const { account, chainId, connect, error, reset, status, networkName, connector } = context;
   const [networkStatus, setNetworkStatus] = useState<string>(status);
   const [userAccount, setUserAccount] = useState<string>(status);
 
@@ -59,6 +61,17 @@ const Wallet = ({}) => {
     }
   };
 
+  const disconnect = useCallback(() => {
+    // analytics
+    trackEvent(EventType.WALLET_DISCONNECTED, {
+      wallet_address: userAccount,
+      wallet_provider: connector, // provider name would make more sense
+      network: networkName,
+    });
+
+    reset();
+  }, [userAccount, connector, networkName, reset]);
+
   //TODO: not suitable connectWalletAndSetStatus has to re-thought
   /* eslint-disable */
   useEffect(() => {
@@ -82,9 +95,7 @@ const Wallet = ({}) => {
         label={getTruncatedAccountAddress(userAccount)}
         icon={<EthIdenticon address={userAccount} scale={1.5} radius={50} />}
         display={layoutName === 'small' ? 'icon' : 'all'}
-        onClick={() => {
-          reset();
-        }}
+        onClick={disconnect}
       />
     );
   } else if (networkStatus === 'unsupported') {

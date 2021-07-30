@@ -4,6 +4,7 @@ import { useHistory } from 'react-router-dom';
 import { Button, StyledText, IconCirclePlus, useLayout, GU, Tag } from '@aragon/ui';
 import styled from 'styled-components';
 import { networkEnvironment } from 'environment';
+import { trackEvent, EventType } from 'services/analytics';
 
 const NavBar = styled.nav`
   display: flex;
@@ -40,6 +41,9 @@ const Header = () => {
   };
 
   const goToCreateDaoPage = () => {
+    // analytics
+    trackEvent(EventType.NAVBAR_CREATEDAO_CLICKED, { network: networkName });
+
     history.push('/create-dao');
   };
 

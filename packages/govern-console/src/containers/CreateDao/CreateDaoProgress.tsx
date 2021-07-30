@@ -7,6 +7,7 @@ import { CircularProgressStatus } from 'utils/types';
 import { parseUnits } from 'utils/lib';
 import { constants } from 'ethers';
 import { networkEnvironment } from 'environment';
+import { trackEvent, EventType } from 'services/analytics';
 
 const { daoFactoryAddress, governRegistryAddress } = networkEnvironment;
 
@@ -30,6 +31,7 @@ declare let window: any;
 const CreateDaoProgress: React.FC<{
   setActiveStep: React.Dispatch<React.SetStateAction<CreateDaoSteps>>;
 }> = ({ setActiveStep }) => {
+  const { networkName } = networkEnvironment;
   const walletContext: any = useWallet();
   const { provider, account } = walletContext;
   const { basicInfo, config, collaterals } = useCreateDaoContext();
@@ -43,8 +45,15 @@ const CreateDaoProgress: React.FC<{
   const [isNewDaoTokenRegistered, setIsNewDaoTokenRegistered] = useState(false);
   const [daoTokenAddress, setDaoTokenAddress] = useState('0x');
 
-  const updateNewDaoTokenAddress = (value: string) => {
-    setDaoTokenAddress(value);
+  const updateNewCreatedDaoInfo = (token: string, executor: string) => {
+    setDaoTokenAddress(token);
+
+    // analytics
+    trackEvent(EventType.DAO_CREATED, {
+      network: networkName,
+      dao_identifier: basicInfo.daoIdentifier,
+      dao_address: executor,
+    });
   };
 
   useEffect(() => {
@@ -193,13 +202,18 @@ const CreateDaoProgress: React.FC<{
               daoFactoryAddress: daoFactoryAddress,
               governRegistry: governRegistryAddress,
             },
-            updateNewDaoTokenAddress,
+            updateNewCreatedDaoInfo,
           );
           await result.wait();
-
-          if (basicInfo.isExistingToken) updateNewDaoTokenAddress(basicInfo.tokenAddress);
         } catch (error) {
           console.log('error', error);
+
+          // analytics
+          trackEvent(EventType.DAO_CREATIONFAILED, {
+            network: networkName,
+            error: error.message || error.reason,
+          });
+
           newList[1].status = CircularProgressStatus.Failed;
           setProgressList(newList);
           setShowAction('fail');
@@ -211,7 +225,6 @@ const CreateDaoProgress: React.FC<{
   /* eslint-disable */
 
   useEffect(() => {
-    console.log('showAction', showAction);
     switch (showAction) {
       case 'fail':
         setAction(<FailAction setActiveStep={setActiveStep} />);
