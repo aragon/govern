@@ -71,7 +71,7 @@ export const ConsoleHeader: React.FC = () => {
     <ConsoleHeaderCard>
       <div style={{ padding: SPACING[layoutName] * 2 }}>
         <div style={{ display: 'grid', gridGap: '24px' }}>
-          <Title>Govern</Title>
+          <Title>Welcome to Aragon Govern</Title>
 
           <Subtitle>
             Full-stack, frictionless DAOs: signal on{' '}

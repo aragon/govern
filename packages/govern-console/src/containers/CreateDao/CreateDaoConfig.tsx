@@ -6,6 +6,7 @@ import { validateContract } from 'utils/validations';
 import { useWallet } from 'AugmentedWallet';
 import { IPFSInput } from 'components/Field/IPFSInput';
 import { positiveNumber } from 'utils/validations';
+import { networkEnvironment } from 'environment';
 
 import {
   useLayout,
@@ -32,9 +33,9 @@ const CreateDaoConfig: React.FC<{
   const theme = useTheme();
   const { layoutName } = useLayout();
   const spacing = SPACING[layoutName];
-  // const [resolverLock, setResolverLock] = useState(false);
+  const { defaultDaoConfig: defaultConfig } = networkEnvironment;
   const { config, setConfig } = useCreateDaoContext();
-  const { executionDelay, isRuleFile, ruleFile, ruleText, resolver, customResolver } = config;
+  const { executionDelay, resolver, customResolver, isRuleFile, ruleFile, ruleText } = config;
 
   const context: any = useWallet();
   const { provider } = context;
@@ -49,15 +50,18 @@ const CreateDaoConfig: React.FC<{
     setValue('customResolver', customResolver);
   }, [ruleText, isRuleFile, ruleFile, resolver, customResolver, setValue]);
 
-  const moveToNextStep = async () => {
+  const moveToNextStep = async (isBack: boolean) => {
     const validate = await trigger();
-
-    if (!validate) return;
+    if (!validate && !isBack) return;
 
     const newConfig = { ...config, ...getValues() };
-
     setConfig(newConfig);
-    setActiveStep(CreateDaoSteps.Collateral);
+
+    if (isBack) {
+      setActiveStep(CreateDaoSteps.BasicInfo);
+    } else {
+      setActiveStep(CreateDaoSteps.Collateral);
+    }
   };
 
   return (
@@ -147,9 +151,22 @@ const CreateDaoConfig: React.FC<{
                     justifyContent: 'center',
                   }}
                 >
-                  <Checkbox
-                    checked={watch('customResolver')}
-                    onChange={() => setValue('customResolver', !getValues('customResolver'))}
+                  <Controller
+                    name="customResolver"
+                    control={control}
+                    defaultValue={customResolver}
+                    render={({ field: { onChange, value } }) => (
+                      <Checkbox
+                        checked={value}
+                        onChange={(e: any) => {
+                          if (getValues('customResolver')) {
+                            // reset resolver
+                            setValue('resolver', defaultConfig.resolver);
+                          }
+                          onChange(e);
+                        }}
+                      />
+                    )}
                   />
                   <span
                     style={{
@@ -177,16 +194,14 @@ const CreateDaoConfig: React.FC<{
             <Button
               size={'large'}
               mode={'secondary'}
-              onClick={() => {
-                setActiveStep(CreateDaoSteps.BasicInfo);
-              }}
+              onClick={() => moveToNextStep(true)}
               icon={<IconArrowLeft />}
               label={'Back'}
               display={'all'}
             />
           }
           secondary={
-            <Button wide size={'large'} mode={'secondary'} onClick={moveToNextStep}>
+            <Button wide size={'large'} mode={'secondary'} onClick={() => moveToNextStep(false)}>
               Next Step
             </Button>
           }

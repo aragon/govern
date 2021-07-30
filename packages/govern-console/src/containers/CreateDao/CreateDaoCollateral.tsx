@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { CreateDaoSteps } from './utils/Shared';
 import { useCreateDaoContext } from './utils/CreateDaoContextProvider';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
@@ -22,6 +22,7 @@ import {
   IconArrowLeft,
   SPACING,
   useTheme,
+  GU,
 } from '@aragon/ui';
 import StepsHeader from './components/StepsHeader';
 
@@ -45,13 +46,20 @@ const CreateDaoCollateral: React.FC<{
     executionAddressList,
   } = collaterals;
 
-  const isExistingToken = basicInfo.isExistingToken;
-
   const context: any = useWallet();
   const { provider } = context;
 
   const methods = useForm<any>({
     defaultValues: {
+      scheduleAddress,
+      scheduleDecimals,
+      scheduleAmount: formatUnits(scheduleAmount, scheduleDecimals),
+      challengeAddress,
+      challengeDecimals,
+      challengeAmount: formatUnits(challengeAmount, challengeDecimals),
+      isAnyAddress,
+      isScheduleNewDaoToken,
+      isChallengeNewDaoToken,
       executionAddressList: executionAddressList.map((address) => {
         return { value: address };
       }),
@@ -67,30 +75,27 @@ const CreateDaoCollateral: React.FC<{
     formState: { errors },
   } = methods;
 
+  const isExistingToken = basicInfo.isExistingToken;
+
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'executionAddressList',
   });
 
-  useEffect(() => {
-    setValue('scheduleAmount', formatUnits(scheduleAmount, scheduleDecimals));
-    setValue('challengeAmount', formatUnits(challengeAmount, challengeDecimals));
-  }, [scheduleAmount, scheduleDecimals, challengeAmount, challengeDecimals, setValue]);
-
-  useEffect(() => {
-    setValue('isAnyAddress', isAnyAddress);
-  }, [isAnyAddress, setValue]);
-
-  const moveToNextStep = async () => {
+  const moveToNextStep = async (isBack: boolean) => {
     await trigger();
 
-    if (Object.keys(errors).length > 0) return;
+    if (Object.keys(errors).length > 0 && !isBack) return;
 
     const data = { ...getValues() };
     data.executionAddressList = data.executionAddressList.map((item: any) => item.value);
 
     setCollaterals(data);
-    setActiveStep(CreateDaoSteps.Review);
+    if (isBack) {
+      setActiveStep(CreateDaoSteps.Config);
+    } else {
+      setActiveStep(CreateDaoSteps.Review);
+    }
   };
 
   return (
@@ -111,7 +116,7 @@ const CreateDaoCollateral: React.FC<{
           Carefully review your collateral contract address. An incorrect address may lock your DAO.
         </Info>
         <div>
-          {!isExistingToken && (
+          {!isExistingToken ? (
             <Controller
               name="isScheduleNewDaoToken"
               control={control}
@@ -130,6 +135,16 @@ const CreateDaoCollateral: React.FC<{
                 />
               )}
             />
+          ) : (
+            <div>
+              <StyledText name={'title3'}>Schedule execution collateral token</StyledText>
+              <StyledText
+                name={'title4'}
+                style={{ color: theme.disabledContent, marginBottom: GU }}
+              >
+                Choose which token may be used to schedule a transaction.
+              </StyledText>
+            </div>
           )}
 
           <Controller
@@ -195,7 +210,7 @@ const CreateDaoCollateral: React.FC<{
         </div>
 
         <div>
-          {!isExistingToken && (
+          {!isExistingToken ? (
             <Controller
               name="isChallengeNewDaoToken"
               control={control}
@@ -206,7 +221,7 @@ const CreateDaoCollateral: React.FC<{
                   subtitle="Choose which token may be used to challenge a transaction."
                   onChange={onChange}
                   selected={value}
-                  items={['Custom Token', 'New Token']}
+                  items={['Custom Token', 'New DAO Token']}
                   paddingSettings={{
                     horizontal: spacing * 2,
                     vertical: spacing / 4,
@@ -214,6 +229,16 @@ const CreateDaoCollateral: React.FC<{
                 />
               )}
             />
+          ) : (
+            <div>
+              <StyledText name={'title3'}>Challenge collateral token</StyledText>
+              <StyledText
+                name={'title4'}
+                style={{ color: theme.disabledContent, marginBottom: GU }}
+              >
+                Choose which token may be used to challenge a transaction.
+              </StyledText>
+            </div>
           )}
           <Controller
             name="challengeAddress"
@@ -308,7 +333,7 @@ const CreateDaoCollateral: React.FC<{
           </Info>
         ) : (
           <div>
-            {fields.map((item: any, index: any) => {
+            {fields.map((item: any, index: number) => {
               return (
                 <div
                   key={item.id}
@@ -345,11 +370,12 @@ const CreateDaoCollateral: React.FC<{
                       mode={'secondary'}
                       size={'large'}
                       disabled={fields.length === 1}
-                      icon={<IconMinus />}
                       onClick={() => {
                         remove(index);
                       }}
-                    />
+                    >
+                      <IconMinus />
+                    </Button>
                   </div>
                 </div>
               );
@@ -376,18 +402,20 @@ const CreateDaoCollateral: React.FC<{
             <Button
               size={'large'}
               mode={'secondary'}
-              onClick={() => {
-                setActiveStep(CreateDaoSteps.Config);
-              }}
+              onClick={() => moveToNextStep(true)}
               icon={<IconArrowLeft />}
               label={'Back'}
               display={'all'}
             />
           }
           secondary={
-            <Button wide size={'large'} mode={'secondary'} onClick={moveToNextStep}>
-              Next Step
-            </Button>
+            <Button
+              wide
+              size={'large'}
+              mode={'secondary'}
+              onClick={() => moveToNextStep(false)}
+              label="Next Step"
+            />
           }
         />
       </div>

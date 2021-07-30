@@ -160,7 +160,7 @@ const NewExecution: React.FC = () => {
       <Box>
         <Grid>
           <GridItem>
-            <StyledText name={'title1'}>New execution</StyledText>
+            <StyledText name={'title1'}>New transaction</StyledText>
             <StyledText name={'title4'}>
               This execution will use the current{' '}
               <Link onClick={() => history.push(settingsUrl(daoName))}>DAO Settings</Link>

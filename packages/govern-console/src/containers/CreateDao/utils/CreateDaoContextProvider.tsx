@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useContext } from 'react';
+import React, { useMemo, useState, useContext, useCallback } from 'react';
 import { BigNumber, BytesLike } from 'ethers';
 import { networkEnvironment } from 'environment';
 
@@ -24,11 +24,11 @@ export interface ICreateDaoConfig {
 }
 
 export interface ICreateDaoCollaterals {
-  isScheduleNewDaoToken: boolean;
+  isScheduleNewDaoToken: number;
   scheduleAddress: string;
   scheduleAmount: BigNumber | string;
   scheduleDecimals: number;
-  isChallengeNewDaoToken: boolean;
+  isChallengeNewDaoToken: number;
   challengeAddress: string;
   challengeAmount: BigNumber | string;
   challengeDecimals: number;
@@ -46,6 +46,8 @@ export interface CreateDaoContext {
   // collaterals
   collaterals: ICreateDaoCollaterals;
   setCollaterals: (collaterals: ICreateDaoCollaterals) => void;
+
+  handleIsExistingToken: (e: any, onChange: (e: any) => void) => void;
 }
 
 const UseCreateDao = React.createContext<CreateDaoContext | null>(null);
@@ -75,17 +77,33 @@ const CreateDaoProvider: React.FC = ({ children }) => {
   });
 
   const [collaterals, setCollaterals] = useState<ICreateDaoCollaterals>({
-    isScheduleNewDaoToken: false,
+    isScheduleNewDaoToken: 0,
     scheduleAddress: defaultConfig.scheduleDeposit.token,
     scheduleAmount: BigNumber.from(defaultConfig.scheduleDeposit.amount),
     scheduleDecimals: 18, // TODO: this should be coming from the config
-    isChallengeNewDaoToken: false,
+    isChallengeNewDaoToken: 0,
     challengeAddress: defaultConfig.challengeDeposit.token,
     challengeAmount: BigNumber.from(defaultConfig.challengeDeposit.amount),
     challengeDecimals: 18, // TODO: this should be coming from the config
     isAnyAddress: false,
     executionAddressList: [''],
   });
+
+  const handleIsExistingToken = useCallback(
+    (e: any, onChange: (e: any) => void) => {
+      // this will reset isScheduleNewDaoToken & isChallengeNewDaoToken
+      // if isExistingToken is set
+      if (e === 1) {
+        setCollaterals({
+          ...collaterals,
+          isScheduleNewDaoToken: 0,
+          isChallengeNewDaoToken: 0,
+        });
+      }
+      onChange(e);
+    },
+    [collaterals],
+  );
 
   const contextValue = useMemo(
     (): CreateDaoContext => ({
@@ -97,9 +115,12 @@ const CreateDaoProvider: React.FC = ({ children }) => {
 
       collaterals,
       setCollaterals,
+
+      handleIsExistingToken,
     }),
-    [basicInfo, config, collaterals],
+    [basicInfo, config, collaterals, handleIsExistingToken],
   );
+
   return <UseCreateDao.Provider value={contextValue}>{children}</UseCreateDao.Provider>;
 };
 
