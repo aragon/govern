@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { CreateDaoSteps } from './utils/Shared';
 import { useCreateDaoContext, ICreateDaoConfig } from './utils/CreateDaoContextProvider';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
@@ -35,19 +35,26 @@ const CreateDaoConfig: React.FC<{
   const spacing = SPACING[layoutName];
   const { defaultDaoConfig: defaultConfig } = networkEnvironment;
   const { config, setConfig } = useCreateDaoContext();
-  const { executionDelay, resolver, customResolver } = config;
+  const { executionDelay, resolver, customResolver, isRuleFile, ruleFile, ruleText } = config;
 
   const context: any = useWallet();
   const { provider } = context;
 
-  const methods = useForm<ICreateDaoConfig>({ defaultValues: { ...config } });
+  const methods = useForm<ICreateDaoConfig>();
   const { control, setValue, getValues, trigger, watch } = methods;
+
+  useEffect(() => {
+    setValue('ruleText', ruleText);
+    setValue('isRuleFile', isRuleFile);
+    setValue('ruleFile', ruleFile);
+    setValue('customResolver', customResolver);
+  }, [ruleText, isRuleFile, ruleFile, resolver, customResolver, setValue]);
 
   const moveToNextStep = async (isBack: boolean) => {
     const validate = await trigger();
     if (!validate && !isBack) return;
 
-    const newConfig = { ...config, ...getValues() };
+    const newConfig = { ...getValues() };
     setConfig(newConfig);
 
     if (isBack) {
