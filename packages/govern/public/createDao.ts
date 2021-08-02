@@ -157,25 +157,31 @@ export async function createDao(
     registryAbi,
     signer
   )
-  if (typeof registeredDaoCallback === 'function') {
-    GovernRegistry.on(
-      'Registered',
-      async (excecutor, queue, token, minter, registrant, name) => {
-        // not our DAO, wait for next one
-        if (name !== args.name) return
-        // send back token address
-        registeredDaoCallback(token, excecutor)
-      }
+
+  try {
+    const result = await contract.newGovern(
+      token,
+      args.scheduleAccessList,
+      args.useProxies,
+      args.config,
+      args.name
     )
+
+    // only subscribe if contract call is successful
+    if (typeof registeredDaoCallback === 'function') {
+      GovernRegistry.on(
+        'Registered',
+        async (excecutor, queue, token, minter, registrant, name) => {
+          // not our DAO, wait for next one
+          if (name !== args.name) return
+          // send back token address & excecutor
+          registeredDaoCallback(token, excecutor)
+        }
+      )
+    }
+
+    return result
+  } catch (error) {
+    return error
   }
-
-  const result = contract.newGovern(
-    token,
-    args.scheduleAccessList,
-    args.useProxies,
-    args.config,
-    args.name
-  )
-
-  return result
 }
