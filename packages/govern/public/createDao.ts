@@ -1,5 +1,6 @@
-import { Contract, utils, providers, BigNumberish, constants } from 'ethers'
+import { Contract, utils, providers, Signer, BigNumberish, constants } from 'ethers'
 import Configuration from '../internal/configuration/Configuration'
+import { setUpRegisteredEvent } from '../utils/events'
 
 export const ContainerConfig = `
   tuple(
@@ -39,10 +40,6 @@ const factoryAbi = [
     ${ContainerConfig} _config, 
     string _name
   ) external`,
-]
-
-const registryAbi = [
-  'event Registered(address indexed executor, address queue, address indexed token, address minter, address indexed registrant, string name)',
 ]
 
 const tokenAbi = ['function balanceOf(address who) view returns (uint256)']
@@ -107,6 +104,8 @@ export async function createDao(
   registeredDaoCallback?: (tokenAddress: string, executor: string) => void
 ): Promise<providers.TransactionResponse> {
   let token: Partial<Token>
+  
+  let isTrue = true
 
   const keys: (keyof Partial<Token>)[] = [
     'tokenName',
@@ -152,23 +151,14 @@ export async function createDao(
   ).getSigner()
 
   const contract = new Contract(factoryAddress, factoryAbi, signer)
-  const GovernRegistry = new Contract(
+  
+  setUpRegisteredEvent(
     options.governRegistry || config.governRegistry,
-    registryAbi,
-    signer
-  )
-  if (typeof registeredDaoCallback === 'function') {
-    GovernRegistry.on(
-      'Registered',
-      async (excecutor, queue, token, minter, registrant, name) => {
-        // not our DAO, wait for next one
-        if (name !== args.name) return
-        // send back token address
-        registeredDaoCallback(token, excecutor)
-      }
-    )
-  }
-
+    signer, 
+    registeredDaoCallback, 
+    args.name
+  );
+ 
   const result = contract.newGovern(
     token,
     args.scheduleAccessList,
