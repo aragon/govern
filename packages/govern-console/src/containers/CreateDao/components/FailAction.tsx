@@ -7,7 +7,7 @@ const FailAction: React.FC<{
   const theme = useTheme();
   return (
     <div>
-      <StyledText name={'body2'}>Somthing went wrong</StyledText>
+      <StyledText name={'body2'}>Something went wrong</StyledText>
       <StyledText name={'body2'} style={{ color: theme.disabled }}>
         Please review your DAO inputs and try again.
       </StyledText>

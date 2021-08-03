@@ -45,14 +45,14 @@ const CreateDaoProgress: React.FC<{
   const [isNewDaoTokenRegistered, setIsNewDaoTokenRegistered] = useState(false);
   const [daoTokenAddress, setDaoTokenAddress] = useState('0x');
 
-  const updateNewCreatedDaoInfo = (token: string, executor: string) => {
+  const updateNewCreatedDaoInfo = (token: string, excecutor: string) => {
     setDaoTokenAddress(token);
 
     // analytics
     trackEvent(EventType.DAO_CREATED, {
       network: networkName,
       dao_identifier: basicInfo.daoIdentifier,
-      dao_address: executor,
+      dao_address: excecutor,
     });
   };
 
