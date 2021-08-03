@@ -31,10 +31,10 @@ export function setUpRegisteredEvent(
     governRegistryInstance.on(
         'Registered',
         async (excecutor, queue, token, minter, registrant, name) => {
-        // not our DAO, wait for next one
-        if (name !== daoName) return
-        // send back token address and excecutor
-        fn(token, excecutor)
+            // not our DAO, wait for next one
+            if (name !== daoName) return
+            // send back token address and excecutor
+            fn(token, excecutor)
         }
     )
 }
