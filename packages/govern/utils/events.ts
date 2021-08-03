@@ -11,49 +11,30 @@ const registryAbi = [
     )`,
 ]
 
-let currentRegistryAddress = null
-let currentGovernRegistry = null
+let governRegistryInstance = null
 
 export function setUpRegisteredEvent(
-  registryAddress: string,
-  signer: providers.Provider | Signer,
-  fn: Function,
-  daoName: string
+    registryAddress: string, 
+    signer: providers.Provider | Signer, 
+    fn: Function, 
+    daoName: string
 ) {
-  // if the registry hasn't changed, no need to register it again..
-  //   if (currentRegistryAddress && currentRegistryAddress == registryAddress) {
-  //     return
-  //   }
-
-  if (currentGovernRegistry) {
-    // clean up previouse subscriptions
-    const listeners = currentGovernRegistry.listeners('Registered')
-    if (listeners.length) {
-      listeners.forEach((listener) =>
-        currentGovernRegistry.off('Registered', listener)
-      )
+    if (governRegistryInstance) {
+        governRegistryInstance.removeAllListeners('Registered');
     }
-  }
 
-  let GovernRegistry = null
-  if (currentRegistryAddress !== registryAddress) {
-    // start a new instance
-    GovernRegistry = new Contract(registryAddress, registryAbi, signer)
-    // set global variables
-    currentGovernRegistry = GovernRegistry
-    currentRegistryAddress = registryAddress
-  } else {
-    GovernRegistry = currentGovernRegistry
-  }
-
-  // start a new subscription
-  GovernRegistry.on(
-    'Registered',
-    async (excecutor, queue, token, minter, registrant, name) => {
-      // not our DAO, wait for next one
-      if (name !== daoName) return
-      // send back token address and excecutor
-      fn(token, excecutor)
+    if (governRegistryInstance?.address !== registryAddress || governRegistryInstance == null) {
+        governRegistryInstance = new Contract(registryAddress, registryAbi, signer)
     }
-  )
+
+    // start a new subscription
+    governRegistryInstance.on(
+        'Registered',
+        async (excecutor, queue, token, minter, registrant, name) => {
+        // not our DAO, wait for next one
+        if (name !== daoName) return
+        // send back token address and excecutor
+        fn(token, excecutor)
+        }
+    )
 }
