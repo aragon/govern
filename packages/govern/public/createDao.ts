@@ -1,4 +1,11 @@
-import { Contract, utils, providers, Signer, BigNumberish, constants } from 'ethers'
+import {
+  Contract,
+  utils,
+  providers,
+  Signer,
+  BigNumberish,
+  constants,
+} from 'ethers'
 import Configuration from '../internal/configuration/Configuration'
 import { setUpRegisteredEvent } from '../utils/events'
 
@@ -104,8 +111,6 @@ export async function createDao(
   registeredDaoCallback?: (tokenAddress: string, executor: string) => void
 ): Promise<providers.TransactionResponse> {
   let token: Partial<Token>
-  
-  let isTrue = true
 
   const keys: (keyof Partial<Token>)[] = [
     'tokenName',
@@ -151,14 +156,14 @@ export async function createDao(
   ).getSigner()
 
   const contract = new Contract(factoryAddress, factoryAbi, signer)
-  
+
   setUpRegisteredEvent(
     options.governRegistry || config.governRegistry,
-    signer, 
-    registeredDaoCallback, 
+    signer,
+    registeredDaoCallback,
     args.name
-  );
- 
+  )
+
   const result = contract.newGovern(
     token,
     args.scheduleAccessList,
