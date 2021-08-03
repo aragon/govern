@@ -11,7 +11,7 @@ const registryAbi = [
     )`,
 ]
 
-// let currentRegistryAddress = null
+let currentRegistryAddress = null
 let currentGovernRegistry = null
 
 export function setUpRegisteredEvent(
@@ -29,22 +29,24 @@ export function setUpRegisteredEvent(
     // clean up previouse subscriptions
     const listeners = currentGovernRegistry.listeners('Registered')
     if (listeners.length) {
-      // clean previouse listeners
       listeners.forEach((listener) =>
         currentGovernRegistry.off('Registered', listener)
       )
     }
-    // reset currentGovernRegistry
-    currentGovernRegistry = null
   }
 
-  // start a new instance
-  let GovernRegistry = new Contract(registryAddress, registryAbi, signer)
+  let GovernRegistry = null
+  if (currentRegistryAddress !== registryAddress) {
+    // start a new instance
+    GovernRegistry = new Contract(registryAddress, registryAbi, signer)
+    // set global variables
+    currentGovernRegistry = GovernRegistry
+    currentRegistryAddress = registryAddress
+  } else {
+    GovernRegistry = currentGovernRegistry
+  }
 
-  currentGovernRegistry = GovernRegistry
-
-  //   currentRegistryAddress = registryAddress
-
+  // start a new subscription
   GovernRegistry.on(
     'Registered',
     async (excecutor, queue, token, minter, registrant, name) => {
