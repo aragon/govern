@@ -40,7 +40,9 @@ contract Govern is IERC3000Executor, AdaptiveERC165, ERC1271, ACL {
 
     ERC1271 signatureValidator;
 
-    event Deposited(address indexed sender, address indexed token, uint256 amount, string indexed _reference);
+    // Deposited event can't have indexed keyword due to consuming more than 2300 for send/transfer.
+    event Deposited(address sender, address token, uint256 amount, string _reference);
+    
     event Withdrawn(address indexed token, address indexed to, address from, uint256 amount, string indexed _reference);
 
     constructor(address _initialExecutor) ACL(address(this)) public {
