@@ -25,7 +25,7 @@ export function handleExecuted(event: ExecutedEvent): void {
 export function handleDeposited(event: DepositedEvent): void {
   let deposit = new Deposit(buildId(event));
   let govern = loadOrCreateGovern(event.address)
-  deposit.reference = event.params._reference.toHexString();
+  deposit.reference = event.params._reference
   deposit.sender = event.params.sender;
   deposit.amount = event.params.amount;
   deposit.token = event.params.token;
