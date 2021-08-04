@@ -36,7 +36,7 @@ export function handleDeposited(event: DepositedEvent): void {
 export function handleWithdrawn(event: WithdrawnEvent): void {
   let withdraw = new Withdraw(buildId(event));
   let govern = loadOrCreateGovern(event.address)
-  withdraw.reference = event.params._reference.toHexString();
+  withdraw.reference = event.params._reference
   withdraw.from = event.params.from;
   withdraw.to = event.params.to;
   withdraw.amount = event.params.amount;
