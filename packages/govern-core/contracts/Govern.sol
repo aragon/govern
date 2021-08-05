@@ -40,9 +40,13 @@ contract Govern is IERC3000Executor, AdaptiveERC165, ERC1271, ACL {
 
     ERC1271 signatureValidator;
 
-    // Deposited event can't have indexed keyword due to consuming more than 2300 for send/transfer.
-    event Deposited(address sender, address token, uint256 amount, string _reference);
-    
+    // ETHDeposited and Deposited are both needed. ETHDeposited makes sure that whoever sends funds
+    // with `send/transfer`, receive function can still be executed without reverting due to gas cost
+    // increases in EIP-2929. To still use `send/transfer`, access list is needed that has the address
+    // of the contract(base contract) that is behind the proxy.
+    event ETHDeposited(address sender, uint256 amount);
+
+    event Deposited(address indexed sender, address indexed token, uint256 amount, string _reference);
     event Withdrawn(address indexed token, address indexed to, address from, uint256 amount, string _reference);
 
     constructor(address _initialExecutor) ACL(address(this)) public {
@@ -64,7 +68,7 @@ contract Govern is IERC3000Executor, AdaptiveERC165, ERC1271, ACL {
     }
 
     receive () external payable {
-        emit Deposited(msg.sender, address(0), msg.value, "");
+        emit ETHDeposited(msg.sender, msg.value);
     }
 
     fallback () external {

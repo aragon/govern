@@ -6,12 +6,14 @@ import {
   Revoked as RevokedEvent,
   Deposited as DepositedEvent,
   Withdrawn as WithdrawnEvent,
+  ETHDeposited as ETHDepositedEvent
 } from '../generated/templates/Govern/Govern'
 import { Govern, Deposit, Withdraw } from '../generated/schema'
 import { frozenRoles, roleGranted, roleRevoked } from './lib/MiniACL'
 import { loadOrCreateContainer } from './GovernQueue'
 import { handleContainerEventExecute } from './utils/events'
 import { buildId, buildIndexedId } from './utils/ids'
+import { ZERO_ADDRESS } from './utils/constants'
 
 export function handleExecuted(event: ExecutedEvent): void {
   let govern = loadOrCreateGovern(event.address)
@@ -20,6 +22,20 @@ export function handleExecuted(event: ExecutedEvent): void {
   handleContainerEventExecute(container, event)
 
   govern.save()
+}
+
+// handleETHDeposited is very similar to handleDeposited.
+// The difference is handleETHDeposited gets called with 
+// plain eth transfer + send/transfer.
+export function handleETHDeposited(event: ETHDepositedEvent): void {
+  let deposit = new Deposit(buildId(event));
+  let govern = loadOrCreateGovern(event.address)
+  deposit.reference = ""
+  deposit.sender = event.params.sender;
+  deposit.amount = event.params.amount;
+  deposit.token = ZERO_ADDRESS
+  deposit.govern = govern.id;
+  deposit.save();
 }
 
 export function handleDeposited(event: DepositedEvent): void {

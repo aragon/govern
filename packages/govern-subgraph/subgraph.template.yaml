@@ -70,7 +70,9 @@ templates:
       eventHandlers:
         - event: Executed(indexed address,(address,uint256,bytes)[],bytes32,bytes32,bytes[])
           handler: handleExecuted
-        - event: Deposited(address,address,uint256,string)
+        - event: ETHDeposited(address,uint256)
+          handler: handleETHDeposited
+        - event: Deposited(indexed address,indexed address,uint256,string)
           handler: handleDeposited
         - event: Withdrawn(indexed address,indexed address,address,uint256,string)
           handler: handleWithdrawn
