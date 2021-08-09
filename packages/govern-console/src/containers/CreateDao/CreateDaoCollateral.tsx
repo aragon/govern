@@ -309,11 +309,11 @@ const CreateDaoCollateral: React.FC<{
               <ContentSwitcher
                 title="Whitelist of addresses that may schedule transactions."
                 subtitle={
-                  <p>
+                  <StyledText name={'title4'} style={{ color: theme.disabledContent }}>
                     Limit the addresses that may schedule transactions.{' '}
                     <span style={{ fontWeight: 600 }}>Caution</span>: if these addresses are
                     incorrect or unavailable, your DAO will be locked.
-                  </p>
+                  </StyledText>
                 }
                 onChange={onChange}
                 selected={value}
