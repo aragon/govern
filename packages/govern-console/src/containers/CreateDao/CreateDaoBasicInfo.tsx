@@ -18,6 +18,7 @@ import {
   SPACING,
   Link,
   StyledText,
+  useTheme,
 } from '@aragon/ui';
 import StepsHeader from './components/StepsHeader';
 import { constants } from 'ethers';
@@ -26,6 +27,7 @@ const CreateDaoBasicInfo: React.FC<{
   setActiveStep: React.Dispatch<React.SetStateAction<CreateDaoSteps>>;
 }> = ({ setActiveStep }) => {
   const { layoutName } = useLayout();
+  const theme = useTheme();
   const spacing = SPACING[layoutName];
   const { basicInfo, setBasicInfo, handleIsExistingToken } = useCreateDaoContext();
 
@@ -57,11 +59,11 @@ const CreateDaoBasicInfo: React.FC<{
   };
 
   const tokenNumberSubtitile = (
-    <p>
+    <StyledText name={'title4'} style={{ color: theme.disabledContent }}>
       Enter number of tokens to be minted (<span style={{ fontWeight: 600 }}>IMPORTANT</span>: they
       will be sent to the current <span style={{ fontWeight: 600 }}>connected wallet address</span>
       ).
-    </p>
+    </StyledText>
   );
 
   return (
