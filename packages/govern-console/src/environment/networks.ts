@@ -23,7 +23,8 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
           amount: '10000000000000000000',
         },
         resolver: '0xC464EB732A1D2f5BbD705727576065C91B2E9f18',
-        rules: 'No main agreement has been defined', // we use Bytes (ArrayLike<number>) instead of string hex
+        rules:
+          'Any transaction created in this DAO must have first been proposed in an Aragon Voice vote on https://voice.aragon.org/ and with the following approval criteria:\n\n67% support of the participating tokens in the vote proposal duration of at least 3 days.\n\nTransactions created that do not meet the above criteria should not be permitted.', // we use Bytes (ArrayLike<number>) instead of string hex
         maxCalldataSize: 100000, // initial maxCalldatasize
       },
       curatedTokens: {
@@ -55,7 +56,8 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
           amount: '10000000000000000000',
         },
         resolver: '0xC464EB732A1D2f5BbD705727576065C91B2E9f18',
-        rules: 'No main agreement has been defined',
+        rules:
+          'Any transaction created in this DAO must have first been proposed in an Aragon Voice vote on https://voice.aragon.org/ and with the following approval criteria:\n\n67% support of the participating tokens in the vote proposal duration of at least 3 days.\n\nTransactions created that do not meet the above criteria should not be permitted.', // we use Bytes (ArrayLike<number>) instead of string hex
         maxCalldataSize: 100000,
       },
       curatedTokens: {
@@ -87,7 +89,8 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
           amount: '10000000000000000000',
         },
         resolver: '0x9c003eC97676c30a041f128D671b3Db2f790c3E7',
-        rules: 'No main agreement has been defined',
+        rules:
+          'Any transaction created in this DAO must have first been proposed in an Aragon Voice vote on https://voice.aragon.org/ and with the following approval criteria:\n\n67% support of the participating tokens in the vote proposal duration of at least 3 days.\n\nTransactions created that do not meet the above criteria should not be permitted.', // we use Bytes (ArrayLike<number>) instead of string hex
         maxCalldataSize: 100000,
       },
       curatedTokens: {
