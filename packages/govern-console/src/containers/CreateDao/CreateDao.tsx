@@ -20,6 +20,18 @@ const CreateDao: React.FC = () => {
     scrollToTop();
   }, [activeStep]);
 
+  const getPageName = () => {
+    switch (activeStep) {
+      case CreateDaoSteps.Config:
+        return PageName.CREATE_DAO_CONFIG;
+
+      case CreateDaoSteps.Collateral:
+        return PageName.CREATE_DAO_COLLATERAL;
+
+      default:
+        return PageName.CREATE_DAO;
+    }
+  };
   const activeView = useMemo(() => {
     switch (activeStep) {
       case CreateDaoSteps.BasicInfo:
@@ -46,7 +58,7 @@ const CreateDao: React.FC = () => {
     if (active !== CreateDaoSteps.Progress) {
       return (
         <PageContent
-          pageName={PageName.CREATE_DAO}
+          pageName={getPageName()}
           card={activeStep === CreateDaoSteps.Review && <ReviewCard />}
         >
           {activeView}
