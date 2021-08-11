@@ -19,6 +19,7 @@ export interface EnvironmentConfig {
   voiceUrl: string;
   daoFactoryAddress: string;
   governRegistryAddress: string;
+  datafeedAPI: string;
   defaultDaoConfig: {
     executionDelay: number;
     scheduleDeposit: Collateral;

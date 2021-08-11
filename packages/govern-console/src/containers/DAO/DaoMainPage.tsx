@@ -12,6 +12,7 @@ import { getState, getStateColor } from 'utils/states';
 import { useDaoQuery, useLazyProposalListQuery } from 'hooks/query-hooks';
 import { proposalDetailsUrl } from 'utils/urls';
 import { Button } from '@aragon/ui';
+import DataFeedService from '../../services/datafeed';
 
 //* Styled Components List
 const DaoPageMainDiv = styled(Paper)(({ theme }) => ({
@@ -65,6 +66,7 @@ const DaoMainPage: React.FC = () => {
   const [queueNonce, updateQueueNonce] = useState<number>();
   const [daoDetails, updateDaoDetails] = useState<any>();
   const [isAnExistingDao, updateIsAnExistingDao] = useState<boolean>(true);
+  const [tokenBalances, setTokenBalances] = useState<any>([]);
 
   const onPageChange = (page: string) => {
     if (page === 'profile') {
@@ -89,11 +91,29 @@ const DaoMainPage: React.FC = () => {
   };
 
   useEffect(() => {
+    async function fetchOrganization() {
+      const organization: any = await DataFeedService.fetchOrganization(
+        dao.executor.address, // dao.executor.address
+      );
+
+      if (!organization) return;
+
+      const balances = DataFeedService.calculateTokens(
+        organization?.balances,
+        dao.executor.deposits,
+        dao.executor.withdraws,
+      );
+      // console.log(balances, ' balances');
+      setTokenBalances(balances);
+    }
     if (data) {
       updateVisibleProposalList(data.governQueue.containers);
       updateQueueNonce(parseInt(data.governQueue.nonce));
     }
-  }, [data]);
+    if (dao) {
+      fetchOrganization();
+    }
+  }, [data, dao]);
 
   useEffect(() => {
     if (loadingDao) return;

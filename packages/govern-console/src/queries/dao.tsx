@@ -33,6 +33,20 @@ export const DAO_BY_NAME = gql`
       executor {
         id
         address
+        deposits {
+          sender
+          amount
+          token
+          reference
+        }
+        withdraws {
+          id
+          from
+          to
+          amount
+          token
+          reference
+        }
       }
       token
       registrant

@@ -3,6 +3,8 @@ import { utils, BigNumberish, ethers } from 'ethers';
 
 const { toUtf8String, toUtf8Bytes } = utils;
 
+export const ZERO_ADDRESS = ethers.constants.AddressZero;
+
 export function toUTF8String(data: utils.BytesLike): string | null {
   try {
     return toUtf8String(data);

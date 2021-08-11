@@ -12,6 +12,7 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
       voiceUrl: 'https://voice.aragon.org/',
       daoFactoryAddress: '0x897b8DeeA74AD703B6d3DA25ed9A3a23fC5629EF', // TODO: GIORGI update this
       governRegistryAddress: '0x4fe12c45ea84b1ae828615ccbc958c8e8f38edd8', // TODO: GIORGI update this,
+      datafeedAPI: 'https://datafeed.aragon.org',
       defaultDaoConfig: {
         executionDelay: 86400, // defaults to one day - how many seconds to wait before being able to call execute.
         scheduleDeposit: {
@@ -44,6 +45,7 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
       voiceUrl: 'http://voice-rinkeby.aragon.org/',
       daoFactoryAddress: '0x46013753f3a02ab4239cA936632E6C6B39235CCE',
       governRegistryAddress: '0xf46253ef29FaedAbf63AA8cA6c0A41CbbdC93948',
+      datafeedAPI: 'https://datafeed-rinkeby.aragon.org',
       defaultDaoConfig: {
         executionDelay: 180,
         scheduleDeposit: {
@@ -76,6 +78,7 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
       voiceUrl: 'http://voice-rinkeby.aragon.org/',
       daoFactoryAddress: '0x0f75Dd5E00f0A153fCee92A1C242Dbdf32D87196',
       governRegistryAddress: '0xcc3F32957d316a12AFCFed04c0716af4814eCB2B',
+      datafeedAPI: 'datafeed-staging.aragon.org',
       defaultDaoConfig: {
         executionDelay: 180,
         scheduleDeposit: {
