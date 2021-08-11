@@ -1,7 +1,7 @@
 import React, { useState, memo, useEffect } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import backButtonIcon from '../../images/back-btn.svg';
-import { styled } from '@material-ui/core/styles';
+import { BackButton } from 'styles';
 import { buildConfig } from 'utils/ERC3000';
 import { useWallet } from 'AugmentedWallet';
 import { DaoConfig } from '@aragon/govern';
@@ -64,14 +64,6 @@ interface FormInputs {
   rulesFile: any;
   proofFile: any;
 }
-
-const BackButton = styled('div')({
-  height: 25,
-  width: 62,
-  cursor: 'pointer',
-  position: 'relative',
-  left: 0,
-});
 
 const DaoSettings: React.FC<DaoSettingFormProps> = () => {
   const theme = useTheme();
