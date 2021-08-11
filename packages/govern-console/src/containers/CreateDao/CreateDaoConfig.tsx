@@ -94,14 +94,24 @@ const CreateDaoConfig: React.FC<{
         <FormProvider {...methods}>
           <IPFSInput
             title="Rules / Agreement"
-            subtitle="Your DAO have optimistic capabilities, meaning that actions can happen without voting,
-              but should follow pre defined rules. Please provide the main agreement for your DAO (In
-              text, or upload a file)."
+            subtitle={
+              <StyledText name={'title4'} style={{ color: theme.disabledContent }}>
+                Your DAO has optimistic capabilities, meaning that transactions can happen without
+                voting, but should follow pre defined rules. Please provide the main agreement for
+                your DAO (In text, or upload a file). You can use and edit the following text as
+                required, or use{' '}
+                <Link href="https://docs.google.com/document/d/1HkSiJtjqiTCMbCagn2ev5iv_fG_PpfJcI-NqebmQzng/">
+                  this template
+                </Link>{' '}
+                for a more complete agreement.
+              </StyledText>
+            }
             shouldUnregister={false}
-            placeholder="Please insert the reason why you want to execute this"
+            placeholder="Please insert your DAO agreement"
             isFile="isRuleFile"
             textInputName="ruleText"
             fileInputName="ruleFile"
+            rows={6}
           />
         </FormProvider>
 

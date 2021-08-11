@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
 import { useLayout, TextInput, SPACING, ContentSwitcher, FileInput } from '@aragon/ui';
 import { toUtf8String } from 'ethers/lib/utils';
@@ -18,7 +18,7 @@ export interface IPFSInputProps {
   /**
    * Sub Title of the field
    */
-  subtitle?: string;
+  subtitle?: ReactNode | string;
   /**
    * Placeholder
    */
@@ -53,6 +53,10 @@ export interface IPFSInputProps {
    * IPFS gateway url of the file.
    */
   ipfsMetadata?: ipfsMetadata;
+  /**
+   * Optional number of rows/lines for textarea if free text is chosen for component
+   */
+  rows?: number;
 }
 
 export const IPFSInput: React.FC<IPFSInputProps> = ({
@@ -64,6 +68,7 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
   shouldUnregister = true,
   ipfsMetadata,
   placeholder,
+  rows,
 }) => {
   const { control, watch, setValue } = useFormContext();
   const { layoutName } = useLayout();
@@ -138,6 +143,7 @@ export const IPFSInput: React.FC<IPFSInputProps> = ({
             <TextInput.Multiline
               wide
               placeholder={placeholder}
+              rows={rows ? rows : 2}
               value={
                 typeof value !== 'string' && !(value instanceof FileList)
                   ? toUtf8String(value)
