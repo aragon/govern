@@ -11,6 +11,9 @@ import {
   useToast,
 } from '@aragon/ui';
 import { PageName } from 'utils/HelpText';
+import backButtonIcon from '../../images/back-btn.svg';
+import { BackButton } from 'styles';
+
 import PageContent from 'components/PageContent/PageContent';
 import ActionList from 'containers/NewExecution/ActionList';
 import { ActionBuilder } from 'components/ActionBuilder/ActionBuilder';
@@ -158,6 +161,9 @@ const NewExecution: React.FC = () => {
   return (
     <PageContent pageName={PageName.NEW_EXECUTION}>
       <Box>
+        <BackButton onClick={() => history.goBack()}>
+          <img src={backButtonIcon} />
+        </BackButton>
         <Grid>
           <GridItem>
             <StyledText name={'title1'}>New transaction</StyledText>
