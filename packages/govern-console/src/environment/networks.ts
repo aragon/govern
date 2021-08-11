@@ -22,7 +22,7 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
           token: '0x6b175474e89094c44da98b954eedeac495271d0f',
           amount: '10000000000000000000',
         },
-        resolver: '0xC464EB732A1D2f5BbD705727576065C91B2E9f18',
+        resolver: '0xFb072baA713B01cE944A0515c3e1e98170977dAF',
         rules:
           'Any transaction created in this DAO must have first been proposed in an Aragon Voice vote on https://voice.aragon.org/ and with the following approval criteria:\n\n67% support of the participating tokens in the vote proposal duration of at least 3 days.\n\nTransactions created that do not meet the above criteria should not be permitted.', // we use Bytes (ArrayLike<number>) instead of string hex
         maxCalldataSize: 100000, // initial maxCalldatasize
