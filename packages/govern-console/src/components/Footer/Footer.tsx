@@ -6,7 +6,7 @@ import messageIcon from 'images/svgs/message.svg';
 import twitterIcon from 'images/svgs/twitter.svg';
 import telegramIcon from 'images/svgs/telegrama.svg';
 import { useHistory } from 'react-router-dom';
-import { Grid, GridItem, useLayout } from '@aragon/ui';
+import { Grid, GridItem, useLayout, Link, StyledText } from '@aragon/ui';
 
 const Logo = styled('div')({
   display: 'flex',
@@ -32,7 +32,7 @@ const Footer = ({}) => {
     <Grid style={{ marginTop: 24 }}>
       <GridItem
         gridRow={'1'}
-        gridColumn={'1/2'}
+        gridColumn={'1/span 1'}
         alignHorizontal={layoutName === 'small' ? 'center' : 'flex-start'}
       >
         <Logo onClick={redirectToHomePage}>
@@ -42,7 +42,21 @@ const Footer = ({}) => {
       </GridItem>
       <GridItem
         gridRow={'1'}
-        gridColumn={'2/3'}
+        gridColumn={'2/span 1'}
+        alignHorizontal={'center'}
+        alignVertical={'center'}
+      >
+        <StyledText name={'body4'} style={{ textAlign: 'center' }}>
+          Need more information about Aragon? Visit{' '}
+          <Link external href="https://aragon.org">
+            our homepage
+          </Link>
+          .{' '}
+        </StyledText>
+      </GridItem>
+      <GridItem
+        gridRow={'1'}
+        gridColumn={'3/span 1'}
         alignHorizontal={layoutName === 'small' ? 'center' : 'flex-end'}
       >
         <Social>
