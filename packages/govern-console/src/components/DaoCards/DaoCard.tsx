@@ -44,8 +44,11 @@ const CardLabel = styled(MUITypography)(({ theme }) => ({
   background: theme.custom.daoCard.labelColor,
   WebkitBackgroundClip: 'text',
   WebkitTextFillColor: 'transparent',
-  padding: '0px 18px',
-  marginBottom: '35px',
+  paddingBottom: '35px',
+  overflow: 'hidden',
+  width: '100%',
+  textOverflow: 'ellipsis',
+  textAlign: 'center',
 }));
 
 export const DaoCard: React.FC<DaoCardProps> = ({ label, numberOfProposals }) => {
