@@ -7,3 +7,8 @@ export const ETHERSCAN_API_KEY = 'HS2AR94Q6G6RYIYHR7VRCZGP6E382K4BDC ';
 export const IPFS_GATEWAY = 'https://ipfs.io/ipfs/';
 export const ARAGON_HELP_URL = 'https://help.aragon.org/';
 export const MAX_SCHEDULE_ACCESS_LIST_ALLOWED = 10;
+
+export const TIME_INTERVALS = {
+  names: ['Seconds', 'Minutes', 'Hours', 'Days'],
+  values: [1, 60, 3600, 86400],
+};

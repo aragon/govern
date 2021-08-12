@@ -14,6 +14,8 @@ export interface ICreateDaoBasicInfo {
 }
 
 export interface ICreateDaoConfig {
+  delaySelectedIndex: number;
+  delayInputValue: number;
   executionDelay: number;
   isRuleFile: boolean;
   ruleFile: any;
@@ -67,6 +69,8 @@ const CreateDaoProvider: React.FC = ({ children }) => {
   });
 
   const [config, setConfig] = useState<ICreateDaoConfig>({
+    delaySelectedIndex: 3,
+    delayInputValue: 7,
     executionDelay: parseInt(defaultConfig.executionDelay.toString()),
     isRuleFile: false,
     ruleFile: '',

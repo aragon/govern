@@ -7,6 +7,7 @@ import { useWallet } from 'AugmentedWallet';
 import { IPFSInput } from 'components/Field/IPFSInput';
 import { positiveNumber } from 'utils/validations';
 import { networkEnvironment } from 'environment';
+import { TIME_INTERVALS } from 'utils/constants';
 
 import {
   useLayout,
@@ -24,6 +25,7 @@ import {
   IconArrowLeft,
   Split,
   useTheme,
+  DropDown,
 } from '@aragon/ui';
 import StepsHeader from './components/StepsHeader';
 
@@ -35,20 +37,31 @@ const CreateDaoConfig: React.FC<{
   const spacing = SPACING[layoutName];
   const { defaultDaoConfig: defaultConfig } = networkEnvironment;
   const { config, setConfig } = useCreateDaoContext();
-  const { executionDelay, resolver, customResolver, isRuleFile, ruleFile, ruleText } = config;
+  const {
+    delaySelectedIndex,
+    delayInputValue,
+    resolver,
+    customResolver,
+    isRuleFile,
+    ruleFile,
+    ruleText,
+  } = config;
 
   const context: any = useWallet();
   const { provider } = context;
 
   const methods = useForm<ICreateDaoConfig>();
   const { control, setValue, getValues, trigger, watch } = methods;
-
   useEffect(() => {
     setValue('ruleText', ruleText);
     setValue('isRuleFile', isRuleFile);
     setValue('ruleFile', ruleFile);
     setValue('customResolver', customResolver);
   }, [ruleText, isRuleFile, ruleFile, resolver, customResolver, setValue]);
+
+  const updateExecutionDelay = (amount: number, interval: number) => {
+    setValue('executionDelay', amount * interval);
+  };
 
   const moveToNextStep = async (isBack: boolean) => {
     const validate = await trigger();
@@ -69,27 +82,69 @@ const CreateDaoConfig: React.FC<{
       <div style={{ display: 'grid', gridGap: spacing }}>
         <StepsHeader index={1} />
 
-        <Controller
-          name="executionDelay"
-          control={control}
-          defaultValue={executionDelay}
-          rules={{
-            required: 'This is required.',
-            validate: (value) => positiveNumber(value),
-          }}
-          render={({ field: { onChange, value }, fieldState: { error } }) => (
-            <TextInput
-              title="Execution delay"
-              subtitle="Number of seconds during which a DAO transaction may be challenged before being executed."
-              wide
-              value={value}
-              placeholder={'Amount'}
-              onChange={onChange}
-              status={!!error ? 'error' : 'normal'}
-              error={error ? error.message : null}
+        <div>
+          <StyledText name={'title3'}>Execution delay</StyledText>
+          <StyledText name={'title4'} style={{ color: theme.disabledContent }}>
+            Amount of time any transaction in your DAO will be available to be disputed by your
+            members before being executed.
+          </StyledText>
+          <div
+            css={`
+              display: inline-flex;
+              flex-wrap: wrap;
+              gap: ${spacing}px;
+            `}
+          >
+            <Controller
+              name="delayInputValue"
+              control={control}
+              defaultValue={delayInputValue}
+              rules={{
+                required: 'This is required.',
+                validate: (value) => positiveNumber(value),
+              }}
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
+                <TextInput
+                  value={value}
+                  placeholder={'Amount'}
+                  onChange={(event: any) => {
+                    updateExecutionDelay(
+                      event.target.value,
+                      TIME_INTERVALS.values[delaySelectedIndex],
+                    );
+                    onChange(event);
+                  }}
+                  status={!!error ? 'error' : 'normal'}
+                  error={error ? error.message : null}
+                />
+              )}
             />
-          )}
-        />
+            <Controller
+              name="delaySelectedIndex"
+              control={control}
+              defaultValue={delaySelectedIndex}
+              rules={{
+                required: 'This is required.',
+              }}
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
+                <DropDown
+                  items={TIME_INTERVALS.names}
+                  placeholder="Select time"
+                  selected={value}
+                  onChange={(index: number) => {
+                    updateExecutionDelay(
+                      getValues('delayInputValue'),
+                      TIME_INTERVALS.values[index],
+                    );
+                    onChange(index);
+                  }}
+                  status={!!error ? 'error' : 'normal'}
+                  error={error ? error.message : null}
+                />
+              )}
+            />
+          </div>
+        </div>
 
         <FormProvider {...methods}>
           <IPFSInput
