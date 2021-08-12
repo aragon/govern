@@ -27,8 +27,10 @@ templates:
       abis:
         - name: GovernQueue
           file: $GOVERN_CORE_MODULE/abi/contracts/pipelines/GovernQueue.sol/GovernQueue.json
+        - name: ERC20
+          file: $GOVERN_CONTRACT_UTILS_MODULE/abi/contracts/erc20/ERC20.sol/ERC20.json
       eventHandlers:
-        - event: Configured(indexed bytes32,indexed address,(uint256,(address,uint256),(address,uint256),address,bytes))
+        - event: Configured(indexed bytes32,indexed address,(uint256,(address,uint256),(address,uint256),address,bytes,uint256))
           handler: handleConfigured
         - event: Frozen(indexed bytes4,indexed address)
           handler: handleFrozen
@@ -63,9 +65,17 @@ templates:
       abis:
         - name: Govern
           file: $GOVERN_CORE_MODULE/abi/contracts/Govern.sol/Govern.json
+        - name: GovernQueue
+          file: $GOVERN_CORE_MODULE/abi/contracts/pipelines/GovernQueue.sol/GovernQueue.json
       eventHandlers:
         - event: Executed(indexed address,(address,uint256,bytes)[],bytes32,bytes32,bytes[])
           handler: handleExecuted
+        - event: ETHDeposited(address,uint256)
+          handler: handleETHDeposited
+        - event: Deposited(indexed address,indexed address,uint256,string)
+          handler: handleDeposited
+        - event: Withdrawn(indexed address,indexed address,address,uint256,string)
+          handler: handleWithdrawn
         - event: Frozen(indexed bytes4,indexed address)
           handler: handleFrozen
         - event: Granted(indexed bytes4,indexed address,indexed address,address)

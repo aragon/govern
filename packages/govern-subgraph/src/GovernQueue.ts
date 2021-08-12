@@ -1,4 +1,4 @@
-import { Address, Bytes, BigInt } from '@graphprotocol/graph-ts'
+import { Address, Bytes, BigInt, ipfs, json, log } from '@graphprotocol/graph-ts'
 import {
   Challenged as ChallengedEvent,
   Configured as ConfiguredEvent,
@@ -8,38 +8,40 @@ import {
   Resolved as ResolvedEvent,
   Revoked as RevokedEvent,
   Scheduled as ScheduledEvent,
-  Vetoed as VetoedEvent,
-  Ruled as RuledEvent,
-  GovernQueue as GovernQueueContract
+  Vetoed as VetoedEvent
 } from '../generated/templates/GovernQueue/GovernQueue'
+
+import { GovernQueue as GovernQueueContract } from '../generated/templates/GovernQueue/GovernQueue'
+import { ERC20 } from '../generated/templates/GovernQueue/ERC20'
+import { getERC20Info } from './utils/tokens';
+
 import {
-  Action as ActionEntity,
-  Collateral as CollateralEntity,
-  Config as ConfigEntity,
-  Container as ContainerEntity,
-  ContainerPayload as PayloadEntity,
-  GovernQueue as GovernQueueEntity
+  Action,
+  Collateral,
+  Config,
+  Container,
+  Payload,
+  GovernQueue
 } from '../generated/schema'
 import { frozenRoles, roleGranted, roleRevoked } from './lib/MiniACL'
 import { buildId, buildIndexedId } from './utils/ids'
 import {
   ZERO_ADDRESS,
   APPROVED_STATUS,
-  CANCELLED_STATUS,
+  VETOED_STATUS,
   CHALLENGED_STATUS,
   EXECUTED_STATUS,
   NONE_STATUS,
   REJECTED_STATUS,
-  SCHEDULED_STATUS,
-  ALLOW_RULING
+  SCHEDULED_STATUS
 } from './utils/constants'
 import {
   handleContainerEventChallenge,
   handleContainerEventResolve,
-  handleContainerEventRule,
   handleContainerEventSchedule,
   handleContainerEventVeto
 } from './utils/events'
+
 import { loadOrCreateGovern } from './Govern'
 
 export function handleScheduled(event: ScheduledEvent): void {
@@ -47,9 +49,11 @@ export function handleScheduled(event: ScheduledEvent): void {
   let payload = loadOrCreatePayload(event.params.containerHash)
   let container = loadOrCreateContainer(event.params.containerHash)
   let executor = loadOrCreateGovern(event.params.payload.executor)
+
   // Builds each of the actions bundled in the payload,
   // and saves them to the DB.
   buildActions(event)
+
   payload.nonce = event.params.payload.nonce
   payload.executionTime = event.params.payload.executionTime
   payload.submitter = event.params.payload.submitter
@@ -57,8 +61,30 @@ export function handleScheduled(event: ScheduledEvent): void {
   payload.allowFailuresMap = event.params.payload.allowFailuresMap
   payload.proof = event.params.payload.proof
 
+  let proofIpfsHex = event.params.payload.proof.toHexString().substring(2)
+  
+  // if cidString is ipfs v1 version hex from the cid's raw bytes and
+  // we add `f` as a multibase prefix and remove `0x`
+  let result = ipfs.cat('f' + proofIpfsHex + "/metadata.json")
+  if (result) {
+    let data = json.fromBytes(result as Bytes)
+    payload.title = data.toObject().get('title').toString()
+  } else {
+    // if cidString is ipfs v0 version hex from the cid's raw bytes,
+    // we add:
+    // 1. 112 (0x70 in hex) which is dag-pb format.
+    // 2. 01 because we want to use v1 version
+    // 3. f since cidString is already hex, we only add `f` without converting anything.
+    result = ipfs.cat('f0170' + proofIpfsHex + '/metadata.json')
+    if(result) {
+      let data = json.fromBytes(result as Bytes)
+      payload.title = data.toObject().get('title').toString()
+    }
+  }
+
   container.payload = payload.id
   container.state = SCHEDULED_STATUS
+  container.createdAt = event.block.timestamp
   // This should always be possible, as a queue without a config
   // should be impossible to get at this stage
   container.config = queue.config
@@ -66,7 +92,7 @@ export function handleScheduled(event: ScheduledEvent): void {
   let config = loadConfig(queue.config)
   let scheduleDeposit = loadCollateral(config.scheduleDeposit)
 
-  handleContainerEventSchedule(container, event, scheduleDeposit as CollateralEntity)
+  handleContainerEventSchedule(container, event, scheduleDeposit as Collateral)
 
   executor.save()
   payload.save()
@@ -86,7 +112,7 @@ export function handleChallenged(event: ChallengedEvent): void {
 
   container.state = CHALLENGED_STATUS
 
-  let resolver = ConfigEntity.load(queue.config).resolver
+  let resolver = Config.load(queue.config).resolver
   let containerEvent = handleContainerEventChallenge(container, event, resolver)
 
   containerEvent.save()
@@ -108,7 +134,7 @@ export function handleVetoed(event: VetoedEvent): void {
   let queue = loadOrCreateQueue(event.address)
   let container = loadOrCreateContainer(event.params.containerHash)
 
-  container.state = CANCELLED_STATUS
+  container.state = VETOED_STATUS
 
   handleContainerEventVeto(container, event)
 
@@ -120,26 +146,38 @@ export function handleConfigured(event: ConfiguredEvent): void {
   let queue = loadOrCreateQueue(event.address)
 
   let configId = buildId(event)
-  let config = new ConfigEntity(configId)
+  let config = new Config(configId)
 
-  let scheduleDeposit = new CollateralEntity(
+  let scheduleDeposit = new Collateral(
     buildIndexedId(event.transaction.hash.toHex(), 1)
   )
   scheduleDeposit.token = event.params.config.scheduleDeposit.token
   scheduleDeposit.amount = event.params.config.scheduleDeposit.amount
 
-  let challengeDeposit = new CollateralEntity(
+  let challengeDeposit = new Collateral(
     buildIndexedId(event.transaction.hash.toHex(), 2)
   )
   challengeDeposit.token = event.params.config.challengeDeposit.token
   challengeDeposit.amount = event.params.config.challengeDeposit.amount
 
-  config.queue = queue.id
+  // Grab Schedule Token info
+  let data = getERC20Info(event.params.config.scheduleDeposit.token)
+  scheduleDeposit.decimals = data.decimals;
+  scheduleDeposit.name = data.name;
+  scheduleDeposit.symbol = data.symbol;
+
+  // Grab challenge Token info
+  data = getERC20Info(event.params.config.challengeDeposit.token)
+  challengeDeposit.decimals = data.decimals;
+  challengeDeposit.name = data.name;
+  challengeDeposit.symbol = data.symbol;
+
   config.executionDelay = event.params.config.executionDelay
   config.scheduleDeposit = scheduleDeposit.id
   config.challengeDeposit = challengeDeposit.id
   config.resolver = event.params.config.resolver
   config.rules = event.params.config.rules
+  config.maxCalldataSize = event.params.config.maxCalldataSize
 
   queue.config = config.id
 
@@ -185,36 +223,27 @@ export function handleRevoked(event: RevokedEvent): void {
   queue.save()
 }
 
-// Helpers
 // create a dummy config when creating queue to avoid not-null error
 export function createDummyConfig(queueId: string): string {
   let ZERO = BigInt.fromI32(0)
 
-  // use queueId as the configId for this dummy config
-  // subsequent config configure call will use transaction
-  // id and log id as the id
   let configId = queueId
-  let config = new ConfigEntity(configId)
+  let config = new Config(configId)
 
-  let scheduleDeposit = new CollateralEntity(
-    buildIndexedId(configId, 1)
-  )
+  let scheduleDeposit = new Collateral(buildIndexedId(configId, 1))
   scheduleDeposit.token = ZERO_ADDRESS
   scheduleDeposit.amount = ZERO
 
-  let challengeDeposit = new CollateralEntity(
-    buildIndexedId(configId, 2)
-  )
+  let challengeDeposit = new Collateral(buildIndexedId(configId, 2))
   challengeDeposit.token = ZERO_ADDRESS
   challengeDeposit.amount = ZERO
 
-  config.queue = queueId
   config.executionDelay = ZERO
   config.scheduleDeposit = scheduleDeposit.id
   config.challengeDeposit = challengeDeposit.id
   config.resolver = ZERO_ADDRESS
   config.rules = Bytes.fromI32(0) as Bytes
-
+  config.maxCalldataSize = BigInt.fromI32(0)
   scheduleDeposit.save()
   challengeDeposit.save()
   config.save()
@@ -222,50 +251,53 @@ export function createDummyConfig(queueId: string): string {
   return config.id!
 }
 
-export function loadOrCreateQueue(entity: Address): GovernQueueEntity {
-  let queueId = entity.toHex()
+export function loadOrCreateQueue(queueAddress: Address): GovernQueue {
+  let queueId = queueAddress.toHex()
   // Create queue
-  let queue = GovernQueueEntity.load(queueId)
+  let queue = GovernQueue.load(queueId)
   if (queue === null) {
-    queue = new GovernQueueEntity(queueId)
-    queue.address = entity
+    queue = new GovernQueue(queueId)
+    queue.address = queueAddress
     queue.config = createDummyConfig(queueId)
     queue.roles = []
   }
+
+  queue.nonce = GovernQueueContract.bind(queueAddress).nonce()
+
   return queue!
 }
 
-export function loadOrCreateContainer(containerHash: Bytes): ContainerEntity {
+export function loadOrCreateContainer(containerHash: Bytes): Container {
   let ContainerId = containerHash.toHex()
   // Create container
-  let container = ContainerEntity.load(ContainerId)
+  let container = Container.load(ContainerId)
   if (container === null) {
-    container = new ContainerEntity(ContainerId)
+    container = new Container(ContainerId)
     container.state = NONE_STATUS
   }
   return container!
 }
 
-function loadOrCreatePayload(containerHash: Bytes): PayloadEntity {
+function loadOrCreatePayload(containerHash: Bytes): Payload {
   let PayloadId = containerHash.toHex()
   // Create payload
-  let payload = PayloadEntity.load(PayloadId)
+  let payload = Payload.load(PayloadId)
   if (payload === null) {
-    payload = new PayloadEntity(PayloadId)
+    payload = new Payload(PayloadId)
   }
   return payload!
 }
 
-function loadConfig(configAddress: string): ConfigEntity {
-  let config = ConfigEntity.load(configAddress)
+function loadConfig(configAddress: string): Config {
+  let config = Config.load(configAddress)
   if (config === null) {
     throw new Error('Config not found.')
   }
   return config!
 }
 
-function loadCollateral(collateralAddress: string): CollateralEntity {
-  let collateral = CollateralEntity.load(collateralAddress)
+function loadCollateral(collateralAddress: string): Collateral {
+  let collateral = Collateral.load(collateralAddress)
   if (collateral === null) {
     throw new Error('Collateral not found.')
   }
@@ -276,7 +308,7 @@ function buildActions(event: ScheduledEvent): void {
   let actions = event.params.payload.actions
   for (let index = 0; index < actions.length; index++) {
     let actionId = buildIndexedId(event.params.containerHash.toHex(), index)
-    let action = new ActionEntity(actionId)
+    let action = new Action(actionId)
 
     action.to = actions[index].to
     action.value = actions[index].value
@@ -286,4 +318,3 @@ function buildActions(event: ScheduledEvent): void {
     action.save()
   }
 }
-

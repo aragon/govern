@@ -30,7 +30,6 @@ describe('AbstractActionTest', () => {
       return Promise.resolve(true)
     })
 
-
     await expect(abstractAction.execute()).resolves.toEqual(true)
 
     expect(clientInstance.request).toHaveBeenCalledTimes(1)

@@ -19,11 +19,11 @@ export default class GraphQLClient implements ClientInterface {
   private client: Client
 
   /**
-   * @param {string} governUrl
+   * @param {string} subgraphUrl
    *
    * @constructor
    */
-  constructor(private governUrl: string) {
+  constructor(private subgraphUrl: string) {
     this.connect()
   }
 
@@ -37,8 +37,8 @@ export default class GraphQLClient implements ClientInterface {
   private connect(): void {
     this.client = new Client({
       maskTypename: true,
-      url: this.governUrl,
-      fetch
+      url: this.subgraphUrl,
+      fetch,
     })
   }
 
@@ -57,10 +57,9 @@ export default class GraphQLClient implements ClientInterface {
   public async request(query: string, args: any = {}): Promise<any> {
     const result = await this.client.query(gql(query), args).toPromise()
 
-    if (result.error) { // TODO: Use errors from core
-      throw new Error(
-        this.mapResponse(result) + this.mapError(result.error)
-      )
+    if (result.error) {
+      // TODO: Use errors from core
+      throw new Error(this.mapResponse(result) + this.mapError(result.error))
     }
 
     return result.data
@@ -79,7 +78,7 @@ export default class GraphQLClient implements ClientInterface {
    */
   private mapResponse(result: any): string {
     return (
-      `Govern: ${result.operation.context.url}\n\n` +
+      `Subgraph: ${result.operation.context.url}\n\n` +
       `Arguments: ${JSON.stringify(result.operation.variables, null, 2)}\n\n` +
       `Query: ${result.operation.query.loc?.source.body}\n\n` +
       `Returned data: ${JSON.stringify(result.data, null, 2)}\n\n`

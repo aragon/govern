@@ -26,7 +26,8 @@
   "dependencies": {
     "@aragon/govern-core": "^1.0.0-beta.12",
     "babel-polyfill": "^6.26.0",
-    "babel-register": "^6.26.0"
+    "babel-register": "^6.26.0",
+    "file-type": "^16.5.0"
   },
   "gitHead": "aabbf6bd2dac11872ba9bb1f1dc8fffb6044aa7c"
 }

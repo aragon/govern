@@ -8,8 +8,8 @@ module.exports = {
     global: {
       functions: 80,
       lines: 80,
-      statements: 80
-    }
+      statements: 80,
+    },
   },
   notify: true,
   clearMocks: true,
@@ -19,6 +19,12 @@ module.exports = {
   bail: true,
   coveragePathIgnorePatterns: [
     'node_modules',
-    'dist'
-  ]
+    'dist',
+    'createDao.ts',
+    'proposal.ts',
+    'Gateway.ts',
+    'token.ts',
+    'RegisterToken.ts',
+    'public/index.ts',
+  ],
 }

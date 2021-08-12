@@ -1,57 +1,82 @@
+# Types
+
 type GovernRegistry @entity {
   id: ID!
   address: Bytes!
   count: Int!
-  entries: [RegistryEntry!]!
+  daos: [Dao!]!
 }
 
-type RegistryEntry @entity {
+type Dao @entity {
   id: ID!
   name: String!
   queue: GovernQueue!
   executor: Govern!
+  token: String!
+  minter: String
+  registrant: String!
+  createdAt: BigInt!
+}
+
+type Deposit @entity {
+  id: ID!
+  sender: Bytes!
+  amount: BigInt!
+  token: Bytes!
+  reference: String!
+  govern: Govern!
+}
+
+type Withdraw @entity {
+  id: ID!
+  from: Bytes!
+  to: Bytes!
+  amount: BigInt!
+  token: Bytes!
+  reference: String!
+  govern: Govern!
 }
 
 type Govern @entity {
   id: ID!
+  deposits: [Deposit!]! @derivedFrom(field: "govern")
+  withdraws: [Withdraw!]! @derivedFrom(field: "govern")
   address: Bytes!
   metadata: Bytes
-  registryEntries: [RegistryEntry!]! @derivedFrom(field: "executor")
-  containers: [Container]!
   roles: [Role!]!
 }
 
 type GovernQueue @entity {
   id: ID!
   address: Bytes!
+  nonce: BigInt!
   config: Config!
-  registryEntries: [RegistryEntry!]! @derivedFrom(field: "queue")
-  queued: [Container!]! @derivedFrom(field: "queue")
+  containers: [Container!]! @derivedFrom(field: "queue")
   roles: [Role!]!
+}
+
+type Container @entity {
+  id: ID!
+  state: ContainerState!
+  queue: GovernQueue!
+  config: Config!
+  payload: Payload!
+  createdAt: BigInt!
+  history: [ContainerEvent!]! @derivedFrom(field: "container")
 }
 
 type Config @entity {
   id: ID!
-  queue: GovernQueue!
   executionDelay: BigInt!
   scheduleDeposit: Collateral!
   challengeDeposit: Collateral!
   resolver: Bytes!
   rules: Bytes!
+  maxCalldataSize: BigInt!
 }
 
-type Container @entity {
+type Payload @entity {
   id: ID!
-  queue: GovernQueue!
-  state: ContainerState!
-  config: Config!
-  payload: ContainerPayload!
-  history: [ContainerEvent!]! @derivedFrom(field: "container")
-}
-
-type ContainerPayload @entity {
-  id: ID!
-  container: Container! @derivedFrom(field: "payload")
   nonce: BigInt!
   executionTime: BigInt!
   submitter: Bytes!
@@ -59,20 +84,24 @@ type ContainerPayload @entity {
   actions: [Action!]! @derivedFrom(field: "payload")
   allowFailuresMap: Bytes!
   proof: Bytes!
+  title: String
 }
 
 type Collateral @entity {
   id: ID!
   token: Bytes!
   amount: BigInt!
+  decimals: Int
+  name: String
+  symbol: String
 }
 
 type Action @entity {
   id: ID!
-  payload: ContainerPayload!
   to: Bytes!
   value: BigInt!
   data: Bytes!
+  payload: Payload!
 }
 
 type Role @entity {
@@ -84,13 +113,15 @@ type Role @entity {
   frozen: Boolean!
 }
 
+# Enums
+
 enum ContainerState {
   None
   Scheduled
   Approved
   Challenged
   Rejected
-  Cancelled
+  Vetoed
   Executed
 }
 
@@ -106,7 +137,7 @@ type ContainerEventChallenge implements ContainerEvent @entity {
   id: ID!
   container: Container!
   createdAt: BigInt!
-  actor: Bytes!
+  challenger: Bytes!
   collateral: Collateral!
   disputeId: BigInt!
   reason: Bytes!
@@ -139,15 +170,6 @@ type ContainerEventSchedule implements ContainerEvent @entity {
   container: Container!
   createdAt: BigInt!
   collateral: Collateral!
-}
-
-type ContainerEventSubmitEvidence implements ContainerEvent @entity {
-  id: ID!
-  container: Container!
-  createdAt: BigInt!
-  evidence: Bytes!
-  submitter: Bytes!
-  finished: Boolean!
 }
 
 type ContainerEventVeto implements ContainerEvent @entity {

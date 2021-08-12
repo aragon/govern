@@ -6,7 +6,7 @@ import {
   AdaptiveERC165Mock,
   AdaptiveERC165MockHelper,
   AdaptiveERC165Mock__factory,
-  AdaptiveERC165MockHelper__factory
+  AdaptiveERC165MockHelper__factory,
 } from '../typechain'
 
 const ERRORS = {
@@ -22,7 +22,7 @@ const EVENTS = {
 const beefInterfaceId = '0xbeefbeef'
 const callbackSig = hexDataSlice(id('callbackFunc()'), 0, 4) // 0x1eb2075a
 const magicNumber = '0x10000000'
-const magicNumberReturn = magicNumber + "0".repeat(56)
+const magicNumberReturn = magicNumber + '0'.repeat(56)
 
 describe('AdaptiveErc165', function () {
   let adaptive: AdaptiveERC165Mock, signers: Signer[]
@@ -57,9 +57,9 @@ describe('AdaptiveErc165', function () {
     })
 
     it('ensures support the right interfaceID', async () => {
-      await expect(
-        await adaptive.supportsInterface(beefInterfaceId)
-      ).to.equal(true)
+      await expect(await adaptive.supportsInterface(beefInterfaceId)).to.equal(
+        true
+      )
     })
 
     it('ensures the right callback was call with the right memory value', async () => {
@@ -83,9 +83,7 @@ describe('AdaptiveErc165', function () {
     })
 
     it('returns the correct value from handleCallback assembly', async () => {
-      await expect(
-        adaptiveHelper.handleCallback(callbackSig)
-      )
+      await expect(adaptiveHelper.handleCallback(callbackSig))
         .to.emit(adaptiveHelper, EVENTS.RECEIVED_CALLBACK)
         .withArgs(magicNumberReturn)
     })

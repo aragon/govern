@@ -4,85 +4,39 @@ jobs:
   coverage:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+      - uses: actions/checkout@v1
 
-    - name: Install node
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12
+      - name: Install node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.15.5
 
-    - name: Cache yarn modules
-      uses: actions/cache@v2
-      with:
-        path: '**/node_modules'
-        key: yarn-${{ hashFiles('yarn.lock') }}
+      - name: Cache yarn modules
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: yarn-${{ hashFiles('yarn.lock') }}
 
-    - name: Cache contracts
-      uses: actions/cache@v2
-      with:
-        path: |
-          packages/*/cache
-          packages/*/artifacts
-          ~/.cache/buidler-nodejs/
-          ~/.cache/hardhat-nodejs/
-        key: contracts-${{ hashFiles('packages/*/contracts/**/*.sol') }}
+      - name: Cache contracts
+        uses: actions/cache@v2
+        with:
+          path: |
+            packages/*/cache
+            packages/*/artifacts
+            ~/.cache/buidler-nodejs/
+            ~/.cache/hardhat-nodejs/
+          key: contracts-${{ hashFiles('packages/*/contracts/**/*.sol') }}
 
-    - name: Install dependencies
-      run: yarn install --frozen-lockfile
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
 
-    - name: Build contracts
-      run: yarn compile:cached
+      - name: Build contracts
+        run: yarn compile:cached
 
-    - name: Run coverage
-      run: yarn coverage
+      - name: Run coverage
+        run: yarn coverage
 
-    - name: Upload report
-      run: bash <(curl -s https://codecov.io/bash)
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-
-  deploy-rinkeby:
-    if: github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
-    needs: coverage
-    env:
-      CD: true
-      ETH_KEY: ${{ secrets.ETH_KEY }}
-      ETHERSCAN_KEY: ${{ secrets.ETHERSCAN_KEY }}
-      REGISTRY_RINKEBY: "0x87eE5EA31dCf1f526f21Bb576131C37890AE65E0"
-    steps:
-    - uses: actions/checkout@v1
-
-    - name: Install node
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12
-
-    - name: Cache yarn modules
-      uses: actions/cache@v2
-      with:
-        path: '**/node_modules'
-        key: yarn-${{ hashFiles('yarn.lock') }}
-
-    - name: Cache contracts
-      uses: actions/cache@v2
-      with:
-        path: |
-          packages/*/cache
-          packages/*/artifacts
-          ~/.cache/buidler-nodejs/
-          ~/.cache/hardhat-nodejs/
-        key: contracts-${{ hashFiles('packages/*/contracts/**/*.sol') }}
-
-    - name: Install dependencies
-      run: yarn install --frozen-lockfile
-
-    - name: Deploy Factory
-      run: cd packages/govern-create && yarn deploy --network rinkeby
-
-    - name: Deploy Govern
-      run: cd packages/govern-create && yarn deploy-govern --network rinkeby > github-message
-
-    - name: Log
-      run: cat packages/govern-create/github-message
+      - name: Upload report
+        run: bash <(curl -s https://codecov.io/bash)
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

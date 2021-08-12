@@ -17,6 +17,7 @@ contract GovernRegistry is IERC3000Registry {
         IERC3000Executor _executor,
         IERC3000 _queue,
         IERC20 _token,
+        address minter,
         string calldata _name,
         bytes calldata _initialMetadata
     ) override external
@@ -25,7 +26,7 @@ contract GovernRegistry is IERC3000Registry {
 
         nameUsed[_name] = true;
 
-        emit Registered(_executor, _queue, _token, msg.sender, _name);
+        emit Registered(_executor, _queue, _token, minter, msg.sender, _name);
         _setMetadata(_executor, _initialMetadata);
     }
 

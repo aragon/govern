@@ -1,12 +1,17 @@
 import ClientInterface from '../clients/lib/ClientInterface'
 import GraphQLClient from '../clients/graphql/GraphQLClient'
+import { DAO_FACTORY_ADDRESS, GOVERN_REGISTRY_ADDRESS } from './ConfigDefaults'
 
 export interface ConfigurationObject {
-  governURL?: string
+  subgraphURL?: string
+  daoFactoryAddress?: string
+  tokenStorageProof?: string
+  governRegistry?: string
 }
 
 let defaultConfig: Configuration
-const governURL = 'https://govern.backend.aragon.org'
+const subgraphURL =
+  'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-mainnet'
 
 /**
  * @class Configuration
@@ -20,8 +25,10 @@ export default class Configuration {
    * @private
    */
   private config: {
-    governURL: string;
+    subgraphURL: string
     client: ClientInterface
+    daoFactoryAddress: string
+    governRegistry: string
   }
 
   /**
@@ -45,27 +52,33 @@ export default class Configuration {
    * @private
    */
   private setConfig(config: any): void {
-    if (!config.governURL) {
-      throw new Error('Missing Govern server URL!')
+    if (!config.subgraphURL) {
+      throw new Error('Missing Govern subgraph URL!')
+    }
+
+    if (!config.daoFactoryAddress) {
+      throw new Error('Missing Dao factory address!')
     }
 
     this.config = {
-      governURL: config.governURL,
-      client: new GraphQLClient(config.governURL)
+      subgraphURL: config.subgraphURL,
+      client: new GraphQLClient(config.subgraphURL),
+      daoFactoryAddress: config.daoFactoryAddress,
+      governRegistry: config.governRegistry,
     }
   }
 
   /**
-   * Getter for governURL
+   * Getter for subgraphURL
    *
-   * @var governURL
+   * @var subgraphURL
    *
    * @returns {string}
    *
    * @public
    */
-  get governURL(): string {
-    return this.config.governURL
+  get subgraphURL(): string {
+    return this.config.subgraphURL
   }
 
   /**
@@ -79,6 +92,32 @@ export default class Configuration {
    */
   get client(): ClientInterface {
     return this.config.client
+  }
+
+  /**
+   * Getter for daoFactoryAddress property
+   *
+   * @var daoFactoryAddress
+   *
+   * @returns {string}
+   *
+   * @public
+   */
+  get daoFactoryAddress(): string {
+    return this.config.daoFactoryAddress
+  }
+
+  /**
+   * Getter for governRegistry property
+   *
+   * @var governRegistry
+   *
+   * @returns {string}
+   *
+   * @public
+   */
+  get governRegistry(): string {
+    return this.config.governRegistry
   }
 
   /**
@@ -97,8 +136,16 @@ export default class Configuration {
       config = {}
     }
 
-    if (!config.governURL) {
-      config.governURL = governURL
+    if (!config.subgraphURL) {
+      config.subgraphURL = subgraphURL
+    }
+
+    if (!config.daoFactoryAddress) {
+      config.daoFactoryAddress = DAO_FACTORY_ADDRESS
+    }
+
+    if (!config.governRegistry) {
+      config.governRegistry = GOVERN_REGISTRY_ADDRESS
     }
 
     defaultConfig = new Configuration(config)

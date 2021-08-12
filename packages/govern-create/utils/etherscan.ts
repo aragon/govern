@@ -2,7 +2,7 @@ import HRE from 'hardhat'
 import fs from 'fs'
 import { file } from 'tmp-promise'
 
-export const SUPPORTED_ETHERSCAN_NETWORKS = ['mainnet', 'rinkeby']
+export const SUPPORTED_ETHERSCAN_NETWORKS = ['mainnet', 'rinkeby', 'rinkeby_staging']
 
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -13,7 +13,6 @@ export const verifyContract = async (
   constructorArguments: any[]
 ) => {
   const currentNetwork = HRE.network.name
-
   if (!process.env.ETHERSCAN_KEY) {
     throw Error('Missing process.env.ETHERSCAN_KEY.')
   }
@@ -70,7 +69,7 @@ export const runTaskWithRetry = async (
   } catch (error) {
     counter--
     // This is not the ideal check, but it's all that's possible for now https://github.com/nomiclabs/hardhat/issues/1301
-    if(!/already verified/i.test(error.message)){
+    if (!/already verified/i.test(error.message)) {
       console.log(`Retrying attemps: ${counter}.`)
       console.error(error.message)
       await runTaskWithRetry(task, params, counter, msDelay, cleanup)

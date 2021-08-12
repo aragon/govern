@@ -7,6 +7,8 @@ import {
   animals,
 } from 'unique-names-generator'
 
+import { ERC3000DefaultConfig } from 'erc3k/utils/ERC3000'
+
 function buildName(name: string | null): string {
   const uniqueName =
     name ??
@@ -46,11 +48,11 @@ task('deploy-govern', 'Deploys a Govern instance')
       const { ethers, deployments, network } = HRE
 
       const registryContract = registry
-      ? await ethers.getContractAt('GovernRegistry', registry)
-      : await ethers.getContractAt(
-          'GovernRegistry',
-          (await deployments.get('GovernRegistry')).address
-        )
+        ? await ethers.getContractAt('GovernRegistry', registry)
+        : await ethers.getContractAt(
+            'GovernRegistry',
+            (await deployments.get('GovernRegistry')).address
+          )
 
       const baseFactoryContract = factory
         ? await ethers.getContractAt('GovernBaseFactory', factory)
@@ -58,13 +60,18 @@ task('deploy-govern', 'Deploys a Govern instance')
             'GovernBaseFactory',
             (await deployments.get('GovernBaseFactory')).address
           )
-
-      const tx = await baseFactoryContract.newGovernWithoutConfig(
-        name,
-        token,
-        tokenName || name,
-        tokenSymbol,
+      
+      // TODO: newGovern has been changed, this needs to reflect.
+      const tx = await baseFactoryContract.newGovern(
+        {
+          tokenAddress: token,
+          tokenName: tokenName || name,
+          tokenSymbol: tokenSymbol,
+          tokenDecimals: 18,
+        },
         useProxies,
+        ERC3000DefaultConfig,
+        name,
         {
           gasLimit: useProxies ? 2e6 : 9e6,
           gasPrice: 2e9,

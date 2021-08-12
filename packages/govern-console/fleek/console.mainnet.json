@@ -1,0 +1,14 @@
+{
+  "site": {
+    "id": "f927d81c-d942-4630-8858-550542a401d5",
+    "team": "aragonone-team",
+    "platform": "ipfs",
+    "source": "ipfs",
+    "name": "muddy-pond-3573"
+  },
+  "build": {
+    "baseDir": "",
+    "publicDir": "build",
+    "rootDir": ""
+  }
+}

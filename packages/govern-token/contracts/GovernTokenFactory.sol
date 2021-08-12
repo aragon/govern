@@ -6,6 +6,8 @@ pragma solidity 0.6.8;
 pragma experimental ABIEncoderV2;
 
 import "@aragon/govern-contract-utils/contracts/minimal-proxies/ERC1167ProxyFactory.sol";
+import "./libraries/TokenLib.sol";
+
 import "erc3k/contracts/IERC3000Executor.sol";
 
 import "./GovernToken.sol";
@@ -27,25 +29,21 @@ contract GovernTokenFactory {
 
     function newToken(
         IERC3000Executor _governExecutor,
-        string calldata _tokenName,
-        string calldata _tokenSymbol,
-        uint8 _tokenDecimals,
-        address _mintAddr,
-        uint256 _mintAmount,
+        TokenLib.TokenConfig calldata _token,
         bool _useProxies
     ) external returns (
         GovernToken token,
         GovernMinter minter
     ) {
         if (!_useProxies) {
-            (token, minter) = _deployContracts(_tokenName, _tokenSymbol, _tokenDecimals);
+            (token, minter) = _deployContracts(_token.tokenName, _token.tokenSymbol, _token.tokenDecimals);
         } else {
             token = GovernToken(tokenBase.clone(abi.encodeWithSelector(
                 token.initialize.selector,
                 address(this),
-                _tokenName,
-                _tokenSymbol,
-                _tokenDecimals
+                _token.tokenName,
+                _token.tokenSymbol,
+                _token.tokenDecimals
             ))); 
             minter = GovernMinter(minterBase.clone(abi.encodeWithSelector(
                 minter.initialize.selector,
@@ -56,7 +54,14 @@ contract GovernTokenFactory {
         }
 
         token.changeMinter(address(minter));
-        if (_mintAmount > 0) minter.mint(_mintAddr, _mintAmount, "initial mint");
+        
+        if (_token.mintAmount > 0) {
+            minter.mint(_token.mintAddress, _token.mintAmount, "initial mint");
+        }
+
+        if (_token.merkleRoot != bytes32(0)) {
+            minter.merkleMint(_token.merkleRoot, _token.merkleMintAmount, _token.merkleTree, _token.merkleContext);
+        }
 
         bytes4 mintRole = minter.mint.selector ^ minter.merkleMint.selector;
         bytes4 rootRole = minter.ROOT_ROLE();

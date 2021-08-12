@@ -10,8 +10,13 @@ import 'hardhat-deploy'
 import 'hardhat-typechain'
 import 'solidity-coverage'
 import './tasks/govern'
+import './tasks/ens'
 
-import { node_url, accounts } from './utils/network'
+import { node_url, accounts, RINKEBY_URL } from './utils/network'
+
+const PRIV_KEYS = process.env.PRIVATE_KEY
+  ? [`0x${process.env.PRIVATE_KEY}`]
+  : []
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -28,6 +33,7 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_KEY,
+    // WQ7EFJVI6QCN9XKY3ET6IS4S7IX8CJ8QCW TODO:GIORGI remove later
   },
   networks: {
     hardhat: {
@@ -35,7 +41,7 @@ const config: HardhatUserConfig = {
       throwOnCallFailures: true,
       allowUnlimitedContractSize: true,
       blockGasLimit: 0x1fffffffffffff,
-      // tests that deploy new tokens with proxies set to false, require more than 8,000,000 GAS. 
+      // tests that deploy new tokens with proxies set to false, require more than 8,000,000 GAS.
       // Without setting this,tests do fail due to out of gas error
       gas: 10000000,
       accounts: accounts(),
@@ -49,12 +55,16 @@ const config: HardhatUserConfig = {
       allowUnlimitedContractSize: true,
     },
     mainnet: {
-      url: node_url('mainnet'),
-      accounts: accounts('mainnet'),
+      url: 'https://mainnet.infura.io/v3/7a03fcb37be7479da06f92c5117afd47',
+      accounts: PRIV_KEYS,
     },
     rinkeby: {
-      url: 'https://rinkeby.eth.aragon.network',
-      accounts: accounts('rinkeby'),
+      url: 'https://rinkeby.infura.io/v3/7a03fcb37be7479da06f92c5117afd47',
+      accounts: PRIV_KEYS,
+    },
+    rinkeby_staging: {
+      url: 'https://rinkeby.infura.io/v3/7a03fcb37be7479da06f92c5117afd47',
+      accounts: PRIV_KEYS,
     },
   },
 }

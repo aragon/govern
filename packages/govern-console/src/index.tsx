@@ -1,56 +1,71 @@
-import React from 'react'
-import { render } from 'react-dom'
-import { HashRouter } from 'react-router-dom'
-import { QueryCache, ReactQueryCacheProvider } from 'react-query'
-import { createGlobalStyle } from 'styled-components'
-import 'styled-components/macro'
-import App from './App'
-import GeneralProvider from './Providers/GeneralProvider'
+import React from 'react';
+import ReactDOM from 'react-dom';
+import MomentUtils from '@date-io/moment';
+import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import { ThemeProvider } from '@material-ui/core/styles';
+import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
+// import { offsetLimitPagination } from '@apollo/client/utilities';
 
-const queryCache = new QueryCache()
+import App from './App';
+import reportWebVitals from './reportWebVitals';
+import { lightTheme } from './AragonTheme';
+import './index.css';
 
-const GlobalStyle = createGlobalStyle`
-  *, *:before, *:after {
-    box-sizing: border-box;
-  }
-  html {
-    -webkit-overflow-scrolling: touch;
-  }
-  body {
-    height: 0;
-    min-height: 100vh;
-    background: black;
-    color: white;
-    font-family: 'Roboto Mono', Helvetica, sans-serif;
-  }
-  body, ul, p, h1, h2, h3, h4, h5, h6 {
-    margin: 0;
-    padding: 0;
-  }
-  button, select, input, textarea, h1, h2, h3, h4, h5, h6 {
-    font-size: inherit;
-    font-family: inherit;
-    font-weight: inherit;
-    line-height: inherit;
-  }
-  a, button, select, input, textarea {
-    color: inherit;
-  }
-  strong, b {
-    font-weight: 600;
-  }
-`
+import { networkEnvironment } from './environment';
 
-render(
-  <ReactQueryCacheProvider queryCache={queryCache}>
-    <HashRouter>
-      <GeneralProvider>
-        <React.StrictMode>
-          <GlobalStyle />
+const { subgraphUrl, courtSubgraphUrl } = networkEnvironment;
+
+function mergeFunction(existing: [], incoming: []) {
+  if (!incoming) return existing;
+  if (!existing) return incoming;
+  return [...existing, ...incoming];
+}
+
+export const courtClient = new ApolloClient({
+  uri: courtSubgraphUrl,
+  cache: new InMemoryCache({}),
+});
+
+const client = new ApolloClient({
+  uri: subgraphUrl,
+  cache: new InMemoryCache({
+    typePolicies: {
+      GovernQueue: {
+        fields: {
+          containers: {
+            keyArgs: false,
+            merge: mergeFunction,
+          },
+        },
+      },
+      Query: {
+        fields: {
+          daos: {
+            keyArgs: ['where', ['name']],
+            merge: mergeFunction,
+          },
+        },
+      },
+    },
+  }),
+  connectToDevTools: true,
+});
+
+ReactDOM.render(
+  <React.StrictMode>
+    <ThemeProvider theme={lightTheme}>
+      {/* for date picker https://material-ui-pickers.dev/getting-started/installation */}
+      <MuiPickersUtilsProvider utils={MomentUtils}>
+        <ApolloProvider client={client}>
           <App />
-        </React.StrictMode>
-      </GeneralProvider>
-    </HashRouter>
-  </ReactQueryCacheProvider>,
+        </ApolloProvider>
+      </MuiPickersUtilsProvider>
+    </ThemeProvider>
+  </React.StrictMode>,
   document.getElementById('root'),
-)
+);
+
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals();

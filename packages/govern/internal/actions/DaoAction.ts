@@ -1,5 +1,6 @@
 import AbstractAction from './lib/AbstractAction'
-import dao, { Dao } from '../clients/graphql/queries/dao'
+import dao from '../clients/graphql/queries/dao'
+import { Dao } from '../clients/graphql/fragments/dao-entry'
 
 /**
  * @class DaoAction
@@ -28,13 +29,13 @@ export default class DaoAction extends AbstractAction {
    *
    * @method execute
    *
-   * @returns {Promise<Dao>}
+   * @returns {Promise<Dao|null>}
    *
    * @public
    */
-  public async execute(): Promise<Dao> {
+  public async execute(): Promise<Dao | null> {
     const response = await super.execute()
 
-    return response.dao;
+    return response.dao
   }
 }

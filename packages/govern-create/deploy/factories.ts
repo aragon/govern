@@ -12,19 +12,19 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const governFactory = await deploy('GovernFactory', {
     from: deployer,
     log: true,
-    deterministicDeployment: true,
+    // deterministicDeployment: true,
   })
 
   const queueFactory = await deploy('GovernQueueFactory', {
     from: deployer,
     log: true,
-    deterministicDeployment: true,
+    // deterministicDeployment: true,
   })
 
   const tokenFactory = await deploy('GovernTokenFactory', {
     from: deployer,
     log: true,
-    deterministicDeployment: true,
+    // deterministicDeployment: true,
   })
 
   await deploy('GovernBaseFactory', {
@@ -36,9 +36,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       tokenFactory.address,
     ],
     log: true,
-    deterministicDeployment:true
+    // deterministicDeployment: true,
   })
-
 }
 export default func
 func.tags = [

@@ -2,23 +2,87 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.png" />
+    <link rel="icon" href="%PUBLIC_URL%/media/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
     <meta
       name="description"
-      content="Web site created using create-react-app"
+      content="An experimental framework to simplify and speed up DAO governance"
     />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
+    <title>Aragon Govern - Optimistic Governance for DAOs</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/media/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/media/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/media/favicon-16x16.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <title>Aragon Console</title>
+    <link rel="mask-icon" href="%PUBLIC_URL%/media/safari-pinned-tab.svg" color="#a9b9ff" />
+    <meta name="msapplication-config" content="%PUBLIC_URL%/media/browserconfig.xml" />
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
   </body>
+  <script>
+    !(function () {
+      const analyticsKey = '%REACT_APP_ANALYTICS_KEY%';
+      var analytics = (window.analytics = window.analytics || []);
+      if (!analytics.initialize && !analyticsKey.includes('REACT_APP_ANALYTICS_KEY'))
+        if (analytics.invoked)
+          window.console && console.error && console.error('Segment snippet included twice.');
+        else {
+          analytics.invoked = !0;
+          analytics.methods = [
+            'trackSubmit',
+            'trackClick',
+            'trackLink',
+            'trackForm',
+            'pageview',
+            'identify',
+            'reset',
+            'group',
+            'track',
+            'ready',
+            'alias',
+            'debug',
+            'page',
+            'once',
+            'off',
+            'on',
+            'addSourceMiddleware',
+            'addIntegrationMiddleware',
+            'setAnonymousId',
+            'addDestinationMiddleware',
+          ];
+          analytics.factory = function (e) {
+            return function () {
+              var t = Array.prototype.slice.call(arguments);
+              t.unshift(e);
+              analytics.push(t);
+              return analytics;
+            };
+          };
+          for (var e = 0; e < analytics.methods.length; e++) {
+            var key = analytics.methods[e];
+            analytics[key] = analytics.factory(key);
+          }
+          analytics.load = function (key, e) {
+            var t = document.createElement('script');
+            t.type = 'text/javascript';
+            t.async = !0;
+            t.src = 'https://cdn.segment.com/analytics.js/v1/' + key + '/analytics.min.js';
+            var n = document.getElementsByTagName('script')[0];
+            n.parentNode.insertBefore(t, n);
+            analytics._loadOptions = e;
+          };
+          analytics._writeKey = analyticsKey;
+          analytics.SNIPPET_VERSION = '4.13.2';
+          analytics.load(analyticsKey);
+          analytics.page();
+        }
+    })();
+  </script>
 </html>

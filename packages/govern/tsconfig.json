@@ -5,16 +5,10 @@
     "strictPropertyInitialization": false,
     "outDir": "./dist",
     "inlineSources": true,
-    "types": [
-      "jest"
-    ],
-    "lib": [
-      "dom",
-      "es2018"
-    ]
+    "strict": false,
+    "resolveJsonModule": true,
+    "types": ["jest"],
+    "lib": ["dom", "es2018"]
   },
-  "include": [
-    "./internal/**/*",
-    "./public/**/*"
-  ]
+  "include": ["./internal/**/*", "./public/**/*"]
 }

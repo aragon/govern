@@ -103,7 +103,13 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
         require(_container.payload.executionTime >= _container.config.executionDelay.add(block.timestamp), "queue: bad delay");
         // ensure that the submitter of the payload is also the sender of this call
         require(_container.payload.submitter == msg.sender, "queue: bad submitter");
-
+        // Restrict the size of calldata to _container.config.maxCalldataSize to make sure challenge function stays callable
+        uint calldataSize;
+        assembly {
+            calldataSize := calldatasize()
+        }
+        require(calldataSize <= _container.config.maxCalldataSize, "calldatasize: limit exceeded");
+        // store and set container's hash
         containerHash = ERC3000Data.containerHash(_container.payload.hash(), _configHash);
         queue[containerHash].checkAndSetState(
             GovernQueueStateLib.State.None, // ensure that the state for this container is None
@@ -308,6 +314,21 @@ contract GovernQueue is IERC3000, IArbitrable, AdaptiveERC165, ACL {
         internal
         returns (bytes32)
     {
+        // validate collaterals by calling balanceOf on their interface
+        if(_config.challengeDeposit.amount != 0 && _config.challengeDeposit.token != address(0)) {
+            (bool ok, bytes memory value) = _config.challengeDeposit.token.call(
+                abi.encodeWithSelector(ERC20.balanceOf.selector, address(this))
+            );
+            require(ok && value.length > 0, "queue: bad config");
+        }
+
+        if(_config.scheduleDeposit.amount != 0 && _config.scheduleDeposit.token != address(0)) {
+            (bool ok, bytes memory value) = _config.scheduleDeposit.token.call(
+                abi.encodeWithSelector(ERC20.balanceOf.selector, address(this))
+            );
+            require(ok && value.length > 0, "queue: bad config");
+        }
+        
         configHash = _config.hash();
 
         emit Configured(configHash, msg.sender, _config);

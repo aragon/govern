@@ -1,43 +1,42 @@
 import { Address } from '@graphprotocol/graph-ts'
 import {
   Registered as RegisteredEvent,
-  SetMetadata as SetMetadataEvent
+  SetMetadata as SetMetadataEvent,
 } from '../generated/GovernRegistry/GovernRegistry'
 import {
   Govern as GovernTemplate,
-  GovernQueue as GovernQueueTemplate
+  GovernQueue as GovernQueueTemplate,
 } from '../generated/templates'
-import {
-  GovernRegistry as GovernRegistryEntity,
-  RegistryEntry as RegistryEntryEntity
-} from '../generated/schema'
+import { GovernRegistry, Dao } from '../generated/schema'
 import { loadOrCreateGovern } from './Govern'
 import { loadOrCreateQueue } from './GovernQueue'
 
 export function handleRegistered(event: RegisteredEvent): void {
   let registry = loadOrCreateRegistry(event.address)
 
-  // create and save these to avoid null error from
-  // registryEntries queries due to missing data
   let queue = loadOrCreateQueue(event.params.queue)
   let govern = loadOrCreateGovern(event.params.executor)
+
   queue.save()
   govern.save()
+  let dao = new Dao(event.params.name)
 
-  let registryEntry = new RegistryEntryEntity(event.params.name)
+  dao.name = event.params.name
+  dao.executor = event.params.executor.toHex()
+  dao.queue = event.params.queue.toHex()
+  dao.token = event.params.token.toHex()
+  dao.minter = event.params.minter.toHex()
+  dao.registrant = event.params.registrant.toHex()
+  dao.createdAt = event.block.timestamp
 
-  registryEntry.name = event.params.name
-  registryEntry.executor = event.params.executor.toHex()
-  registryEntry.queue = event.params.queue.toHex()
-
-  // add game to the registry
-  let currentEntries = registry.entries
-  currentEntries.push(registryEntry.id)
-  registry.entries = currentEntries
+  // add dao to the registry
+  let currentDAOs = registry.daos
+  currentDAOs.push(dao.id)
+  registry.daos = currentDAOs
 
   registry.count += 1
 
-  registryEntry.save()
+  dao.save()
   registry.save()
 
   // Create datasource templates
@@ -52,17 +51,15 @@ export function handleSetMetadata(event: SetMetadataEvent): void {
   govern.save()
 }
 
-export function loadOrCreateRegistry(
-  registryAddress: Address
-): GovernRegistryEntity {
+export function loadOrCreateRegistry(registryAddress: Address): GovernRegistry {
   let registryId = registryAddress.toHex()
-  let registry = GovernRegistryEntity.load(registryId)
+  let registry = GovernRegistry.load(registryId)
 
   if (registry === null) {
-    registry = new GovernRegistryEntity(registryId)
+    registry = new GovernRegistry(registryId)
     registry.address = registryAddress
     registry.count = 0
-    registry.entries = []
+    registry.daos = []
   }
   return registry!
 }
