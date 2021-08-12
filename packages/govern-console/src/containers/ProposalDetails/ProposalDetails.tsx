@@ -54,7 +54,6 @@ const ProposalStatus = styled('div')({
   boxSizing: 'border-box',
 });
 const ProposalId = styled('div')(({ theme }) => ({
-  height: '44px',
   width: '100%',
   color: theme.custom.black,
   fontWeight: 600,
