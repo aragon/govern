@@ -10,8 +10,8 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
       courtSubgraphUrl: 'https://api.thegraph.com/subgraphs/name/aragon/aragon-court-v2-mainnet',
       courtUrl: 'https://court.aragon.org/#',
       voiceUrl: 'https://voice.aragon.org/',
-      daoFactoryAddress: '0x897b8DeeA74AD703B6d3DA25ed9A3a23fC5629EF', // TODO: GIORGI update this
-      governRegistryAddress: '0x4fe12c45ea84b1ae828615ccbc958c8e8f38edd8', // TODO: GIORGI update this,
+      daoFactoryAddress: '0x8bF05ce17B30f8C73B06e49f67076f944687c967',
+      governRegistryAddress: '0xf2b7D096cd34F228A6413e276132C21D98b19882',
       defaultDaoConfig: {
         executionDelay: 86400, // defaults to one day - how many seconds to wait before being able to call execute.
         scheduleDeposit: {
@@ -22,7 +22,7 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
           token: '0x6b175474e89094c44da98b954eedeac495271d0f',
           amount: '10000000000000000000',
         },
-        resolver: '0xC464EB732A1D2f5BbD705727576065C91B2E9f18',
+        resolver: '0xFb072baA713B01cE944A0515c3e1e98170977dAF',
         rules:
           'Any transaction created in this DAO must have first been proposed in an Aragon Voice vote on https://voice.aragon.org/ and with the following approval criteria:\n\n67% support of the participating tokens in the vote proposal duration of at least 3 days.\n\nTransactions created that do not meet the above criteria should not be permitted.', // we use Bytes (ArrayLike<number>) instead of string hex
         maxCalldataSize: 100000, // initial maxCalldatasize

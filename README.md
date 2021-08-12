@@ -63,13 +63,13 @@ To use Govern, feel free to deploy your own registries and factories, but using 
 
 #### Mainnet
 
-- 📜 GovernRegistry: [`0x9dDC0BAB6aCCa5F374E2C21708b3107e5E973601`](https://etherscan.io/address/0x9dDC0BAB6aCCa5F374E2C21708b3107e5E973601)
-- 🏭 GovernBaseFactory: [`0x3B02e7C7Af1be87BBEc071f5DFfcdD8613154bA9`](https://etherscan.io/address/0x3B02e7C7Af1be87BBEc071f5DFfcdD8613154bA9)
+- 📜 GovernRegistry: [`0xf2b7D096cd34F228A6413e276132C21D98b19882`](https://etherscan.io/address/0xf2b7D096cd34F228A6413e276132C21D98b19882)
+- 🏭 GovernBaseFactory: [`0x8bF05ce17B30f8C73B06e49f67076f944687c967`](https://etherscan.io/address/0x8bF05ce17B30f8C73B06e49f67076f944687c967)
 
 #### Rinkeby
 
-- 📜 GovernRegistry: [`0x7714e0a2A2DA090C2bbba9199A54B903bB83A73d`](https://rinkeby.etherscan.io/address/0x7714e0a2A2DA090C2bbba9199A54B903bB83A73d)
-- 🏭 GovernBaseFactory: [`0xc03710063b0e4435f997A0B1bbdf2680A2f07E13`](https://rinkeby.etherscan.io/address/0xc03710063b0e4435f997A0B1bbdf2680A2f07E13)
+- 📜 GovernRegistry: [`0xf46253ef29FaedAbf63AA8cA6c0A41CbbdC93948`](https://rinkeby.etherscan.io/address/0xf46253ef29FaedAbf63AA8cA6c0A41CbbdC93948)
+- 🏭 GovernBaseFactory: [`0x46013753f3a02ab4239cA936632E6C6B39235CCE`](https://rinkeby.etherscan.io/address/0x46013753f3a02ab4239cA936632E6C6B39235CCE)
 
 ## Help shape Aragon Govern
 

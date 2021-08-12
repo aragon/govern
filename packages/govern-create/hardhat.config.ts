@@ -55,7 +55,7 @@ const config: HardhatUserConfig = {
       allowUnlimitedContractSize: true,
     },
     mainnet: {
-      url: node_url('mainnet'),
+      url: 'https://mainnet.infura.io/v3/7a03fcb37be7479da06f92c5117afd47',
       accounts: PRIV_KEYS,
     },
     rinkeby: {
