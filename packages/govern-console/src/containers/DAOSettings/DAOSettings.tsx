@@ -328,7 +328,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
             ) : (
               <TimeInterval
                 title="Execution delay"
-                subtitle="Amount of time any action in your DAO will be available to be challenged before bein executed."
+                subtitle="Amount of time any transaction in your DAO will be available to be disputed by your members before being executed."
                 placeholder={'Amount'}
                 inputName="delayInputValue"
                 dropdownName="delaySelectedIndex"
