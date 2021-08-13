@@ -87,3 +87,9 @@ export type ActionBuilderState =
   | 'chooseAction'
   | 'abiForm'
   | 'chooseFunctions';
+
+export interface Interval {
+  name: string;
+  value: number;
+  index: number;
+}
