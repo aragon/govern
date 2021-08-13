@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useContext, useCallback } from 'react';
 import { BigNumber, BytesLike } from 'ethers';
 import { networkEnvironment } from 'environment';
+import getInterval from 'utils/TimeInterval';
 
 export interface ICreateDaoBasicInfo {
   daoIdentifier: string;
@@ -56,6 +57,7 @@ const UseCreateDao = React.createContext<CreateDaoContext | null>(null);
 
 const CreateDaoProvider: React.FC = ({ children }) => {
   const { defaultDaoConfig: defaultConfig } = networkEnvironment;
+  const executionDelayIntervals = getInterval(defaultConfig.executionDelay);
 
   const [basicInfo, setBasicInfo] = useState<ICreateDaoBasicInfo>({
     daoIdentifier: '',
@@ -69,9 +71,9 @@ const CreateDaoProvider: React.FC = ({ children }) => {
   });
 
   const [config, setConfig] = useState<ICreateDaoConfig>({
-    delaySelectedIndex: 3,
-    delayInputValue: 7,
-    executionDelay: parseInt(defaultConfig.executionDelay.toString()),
+    delaySelectedIndex: executionDelayIntervals?.index || 3, // default to Days's index
+    delayInputValue: executionDelayIntervals?.value || 7, // default to 7
+    executionDelay: defaultConfig.executionDelay,
     isRuleFile: false,
     ruleFile: '',
     ruleText: defaultConfig.rules,

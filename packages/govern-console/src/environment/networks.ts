@@ -13,7 +13,7 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
       daoFactoryAddress: '0x897b8DeeA74AD703B6d3DA25ed9A3a23fC5629EF', // TODO: GIORGI update this
       governRegistryAddress: '0x4fe12c45ea84b1ae828615ccbc958c8e8f38edd8', // TODO: GIORGI update this,
       defaultDaoConfig: {
-        executionDelay: 86400, // defaults to one day - how many seconds to wait before being able to call execute.
+        executionDelay: 604800, // defaults to 7 day - how many seconds to wait before being able to call execute.
         scheduleDeposit: {
           token: '0x6b175474e89094c44da98b954eedeac495271d0f',
           amount: '10000000000000000000',
@@ -46,7 +46,7 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
       daoFactoryAddress: '0x46013753f3a02ab4239cA936632E6C6B39235CCE',
       governRegistryAddress: '0xf46253ef29FaedAbf63AA8cA6c0A41CbbdC93948',
       defaultDaoConfig: {
-        executionDelay: 180,
+        executionDelay: 3600, // 1 Hour
         scheduleDeposit: {
           token: '0xc7AD46e0b8a400Bb3C915120d284AafbA8fc4735',
           amount: '10000000000000000000',
@@ -79,7 +79,7 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
       daoFactoryAddress: '0x0f75Dd5E00f0A153fCee92A1C242Dbdf32D87196',
       governRegistryAddress: '0xcc3F32957d316a12AFCFed04c0716af4814eCB2B',
       defaultDaoConfig: {
-        executionDelay: 180,
+        executionDelay: 180, // 3 minutes
         scheduleDeposit: {
           token: '0x8F2Ac3fD1a9Ce7208eFff7C31aC0e2A98b0778f3',
           amount: '10000000000000000000',

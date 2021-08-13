@@ -5,9 +5,7 @@ import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { validateContract } from 'utils/validations';
 import { useWallet } from 'AugmentedWallet';
 import { IPFSInput } from 'components/Field/IPFSInput';
-import { positiveNumber } from 'utils/validations';
 import { networkEnvironment } from 'environment';
-import { TIME_INTERVALS } from 'utils/constants';
 
 import {
   useLayout,
@@ -25,9 +23,9 @@ import {
   IconArrowLeft,
   Split,
   useTheme,
-  DropDown,
 } from '@aragon/ui';
 import StepsHeader from './components/StepsHeader';
+import { TimeInterval } from 'components/TimeInterval/TimeInterval';
 
 const CreateDaoConfig: React.FC<{
   setActiveStep: React.Dispatch<React.SetStateAction<CreateDaoSteps>>;
@@ -57,11 +55,18 @@ const CreateDaoConfig: React.FC<{
     setValue('isRuleFile', isRuleFile);
     setValue('ruleFile', ruleFile);
     setValue('customResolver', customResolver);
-  }, [ruleText, isRuleFile, ruleFile, resolver, customResolver, setValue]);
-
-  const updateExecutionDelay = (amount: number, interval: number) => {
-    setValue('executionDelay', amount * interval);
-  };
+    setValue('delaySelectedIndex', delaySelectedIndex);
+    setValue('delayInputValue', delayInputValue);
+  }, [
+    ruleText,
+    isRuleFile,
+    ruleFile,
+    resolver,
+    customResolver,
+    delaySelectedIndex,
+    delayInputValue,
+    setValue,
+  ]);
 
   const moveToNextStep = async (isBack: boolean) => {
     const validate = await trigger();
@@ -81,72 +86,18 @@ const CreateDaoConfig: React.FC<{
     <Box>
       <div style={{ display: 'grid', gridGap: spacing }}>
         <StepsHeader index={1} />
-
-        <div>
-          <StyledText name={'title3'}>Execution delay</StyledText>
-          <StyledText name={'title4'} style={{ color: theme.disabledContent }}>
-            Amount of time any transaction in your DAO will be available to be disputed by your
-            members before being executed.
-          </StyledText>
-          <div
-            css={`
-              display: inline-flex;
-              flex-wrap: wrap;
-              gap: ${spacing}px;
-            `}
-          >
-            <Controller
-              name="delayInputValue"
-              control={control}
-              defaultValue={delayInputValue}
-              rules={{
-                required: 'This is required.',
-                validate: (value) => positiveNumber(value),
-              }}
-              render={({ field: { onChange, value }, fieldState: { error } }) => (
-                <TextInput
-                  value={value}
-                  placeholder={'Amount'}
-                  onChange={(event: any) => {
-                    updateExecutionDelay(
-                      event.target.value,
-                      TIME_INTERVALS.values[delaySelectedIndex],
-                    );
-                    onChange(event);
-                  }}
-                  status={!!error ? 'error' : 'normal'}
-                  error={error ? error.message : null}
-                />
-              )}
-            />
-            <Controller
-              name="delaySelectedIndex"
-              control={control}
-              defaultValue={delaySelectedIndex}
-              rules={{
-                required: 'This is required.',
-              }}
-              render={({ field: { onChange, value }, fieldState: { error } }) => (
-                <DropDown
-                  items={TIME_INTERVALS.names}
-                  placeholder="Select time"
-                  selected={value}
-                  onChange={(index: number) => {
-                    updateExecutionDelay(
-                      getValues('delayInputValue'),
-                      TIME_INTERVALS.values[index],
-                    );
-                    onChange(index);
-                  }}
-                  status={!!error ? 'error' : 'normal'}
-                  error={error ? error.message : null}
-                />
-              )}
-            />
-          </div>
-        </div>
-
         <FormProvider {...methods}>
+          <TimeInterval
+            title="Execution delay"
+            subtitle="Amount of time any transaction in your DAO will be available to be disputed by your
+          members before being executed."
+            placeholder={'Amount'}
+            inputName="delayInputValue"
+            dropdownName="delaySelectedIndex"
+            resultName="executionDelay"
+            shouldUnregister={false}
+          />
+
           <IPFSInput
             title="Rules / Agreement"
             subtitle={
