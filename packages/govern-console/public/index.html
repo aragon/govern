@@ -29,34 +29,35 @@
   <script>
     !(function () {
       const analyticsKey = '%REACT_APP_ANALYTICS_KEY%';
-      if (!analyticsKey.includes('REACT_APP_ANALYTICS_KEY'))
+      if (!analyticsKey.includes('REACT_APP_ANALYTICS_KEY')) {
         analytics = window.rudderanalytics = [];
-      for (
-        var methods = [
-            'load',
-            'page',
-            'track',
-            'identify',
-            'alias',
-            'group',
-            'ready',
-            'reset',
-            'getAnonymousId',
-            'setAnonymousId',
-          ],
-          i = 0;
-        i < methods.length;
-        i++
-      ) {
-        var method = methods[i];
-        rudderanalytics[method] = (function (a) {
-          return function () {
-            rudderanalytics.push([a].concat(Array.prototype.slice.call(arguments)));
-          };
-        })(method);
+        for (
+          var methods = [
+              'load',
+              'page',
+              'track',
+              'identify',
+              'alias',
+              'group',
+              'ready',
+              'reset',
+              'getAnonymousId',
+              'setAnonymousId',
+            ],
+            i = 0;
+          i < methods.length;
+          i++
+        ) {
+          var method = methods[i];
+          rudderanalytics[method] = (function (a) {
+            return function () {
+              rudderanalytics.push([a].concat(Array.prototype.slice.call(arguments)));
+            };
+          })(method);
+        }
+        rudderanalytics.load(analyticsKey, 'https://rudderstack.aragon.org');
+        rudderanalytics.page();
       }
-      rudderanalytics.load(analyticsKey, 'https://rudderstack.aragon.org');
-      rudderanalytics.page();
     })();
   </script>
   <script type="text/javascript">
