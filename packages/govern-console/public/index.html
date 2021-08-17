@@ -30,7 +30,7 @@
     !(function () {
       const analyticsKey = '%REACT_APP_ANALYTICS_KEY%';
       if (!analyticsKey.includes('REACT_APP_ANALYTICS_KEY')) {
-        analytics = window.rudderanalytics = [];
+        rudderanalytics = window.rudderanalytics = [];
         for (
           var methods = [
               'load',
@@ -90,5 +90,5 @@
       '6112b302b55c2b04bf6dd098',
     ]);
   </script>
-  <script src="https://cdn.rudderlabs.com/v1/rudder-analytics.min.js"></script>
+  <script async src="https://cdn.rudderlabs.com/v1/rudder-analytics.min.js"></script>
 </html>
