@@ -21,7 +21,7 @@ export enum EventType {
  * @returns the corresponding analytics method
  */
 function getAnalyticsMethod(methodType: MethodType) {
-  const windowAnalytics = (window as any).analytics;
+  const windowAnalytics = (window as any).rudderanalytics;
   if (!windowAnalytics) {
     return;
   }
