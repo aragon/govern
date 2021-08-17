@@ -29,62 +29,66 @@
   <script>
     !(function () {
       const analyticsKey = '%REACT_APP_ANALYTICS_KEY%';
-      var analytics = (window.analytics = window.analytics || []);
-      if (!analytics.initialize && !analyticsKey.includes('REACT_APP_ANALYTICS_KEY'))
-        if (analytics.invoked)
-          window.console && console.error && console.error('Segment snippet included twice.');
-        else {
-          analytics.invoked = !0;
-          analytics.methods = [
-            'trackSubmit',
-            'trackClick',
-            'trackLink',
-            'trackForm',
-            'pageview',
-            'identify',
-            'reset',
-            'group',
-            'track',
-            'ready',
-            'alias',
-            'debug',
-            'page',
-            'once',
-            'off',
-            'on',
-            'addSourceMiddleware',
-            'addIntegrationMiddleware',
-            'setAnonymousId',
-            'addDestinationMiddleware',
-          ];
-          analytics.factory = function (e) {
+      if (!analyticsKey.includes('REACT_APP_ANALYTICS_KEY')) {
+        rudderanalytics = window.rudderanalytics = [];
+        for (
+          var methods = [
+              'load',
+              'page',
+              'track',
+              'identify',
+              'alias',
+              'group',
+              'ready',
+              'reset',
+              'getAnonymousId',
+              'setAnonymousId',
+            ],
+            i = 0;
+          i < methods.length;
+          i++
+        ) {
+          var method = methods[i];
+          rudderanalytics[method] = (function (a) {
             return function () {
-              var t = Array.prototype.slice.call(arguments);
-              t.unshift(e);
-              analytics.push(t);
-              return analytics;
+              rudderanalytics.push([a].concat(Array.prototype.slice.call(arguments)));
             };
-          };
-          for (var e = 0; e < analytics.methods.length; e++) {
-            var key = analytics.methods[e];
-            analytics[key] = analytics.factory(key);
-          }
-          analytics.load = function (key, e) {
-            var t = document.createElement('script');
-            t.type = 'text/javascript';
-            t.async = !0;
-            t.src = 'https://cdn.segment.com/analytics.js/v1/' + key + '/analytics.min.js';
-            var n = document.getElementsByTagName('script')[0];
-            n.parentNode.insertBefore(t, n);
-            analytics._loadOptions = e;
-          };
-          analytics._writeKey = analyticsKey;
-          analytics.SNIPPET_VERSION = '4.13.2';
-          analytics.load(analyticsKey);
-          analytics.page();
+          })(method);
         }
+        rudderanalytics.load(analyticsKey, 'https://rudderstack.aragon.org');
+        rudderanalytics.page();
+      }
     })();
   </script>
-  <script type="text/javascript">!function(e,t,n){function a(){var e=t.getElementsByTagName("script")[0],n=t.createElement("script");n.type="text/javascript",n.async=!0,n.src="https://beacon-v2.helpscout.net",e.parentNode.insertBefore(n,e)}if(e.Beacon=n=function(t,n,a){e.Beacon.readyQueue.push({method:t,options:n,data:a})},n.readyQueue=[],"complete"===t.readyState)return a();e.attachEvent?e.attachEvent("onload",a):e.addEventListener("load",a,!1)}(window,document,window.Beacon||function(){});</script>
-  <script type="text/javascript">window.Beacon('init', '163e0284-762b-4e2d-b3b3-70a73a7e6c9f');window.Beacon('suggest',["60a3961d1df47a61c5ad26e8", "6112b2c264a230081ba1ddad", "6112b332766e8844fc34f26c", "6112b302b55c2b04bf6dd098"])</script>  
+  <script type="text/javascript">
+    !(function (e, t, n) {
+      function a() {
+        var e = t.getElementsByTagName('script')[0],
+          n = t.createElement('script');
+        (n.type = 'text/javascript'),
+          (n.async = !0),
+          (n.src = 'https://beacon-v2.helpscout.net'),
+          e.parentNode.insertBefore(n, e);
+      }
+      if (
+        ((e.Beacon = n = function (t, n, a) {
+          e.Beacon.readyQueue.push({ method: t, options: n, data: a });
+        }),
+        (n.readyQueue = []),
+        'complete' === t.readyState)
+      )
+        return a();
+      e.attachEvent ? e.attachEvent('onload', a) : e.addEventListener('load', a, !1);
+    })(window, document, window.Beacon || function () {});
+  </script>
+  <script type="text/javascript">
+    window.Beacon('init', '163e0284-762b-4e2d-b3b3-70a73a7e6c9f');
+    window.Beacon('suggest', [
+      '60a3961d1df47a61c5ad26e8',
+      '6112b2c264a230081ba1ddad',
+      '6112b332766e8844fc34f26c',
+      '6112b302b55c2b04bf6dd098',
+    ]);
+  </script>
+  <script async src="https://cdn.rudderlabs.com/v1/rudder-analytics.min.js"></script>
 </html>
