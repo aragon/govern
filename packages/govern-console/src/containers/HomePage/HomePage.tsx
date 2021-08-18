@@ -14,6 +14,7 @@ import { trackPage } from 'services/analytics';
 import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import scrollToTop from 'utils/scrollToId';
+import styled from 'styled-components';
 
 const HomePage = () => {
   const history = useHistory();
@@ -29,31 +30,54 @@ const HomePage = () => {
   return (
     <ModalsProvider>
       <Main theme="light" toastProps={{ top: true, position: 'center' }}>
-        <Header />
-        <Switch>
-          <Route exact path="/">
-            <ConsoleMainPage />
-          </Route>
-          <Route exact path="/daos/:daoName">
-            <DaoMainPage />
-          </Route>
-          <Route exact path="/daos/:daoName/executions/:id">
-            <ProposalDetails onClickBack={() => history.goBack()} />
-          </Route>
-          <Route exact path="/daos/:daoName/new-execution">
-            <NewExecution />
-          </Route>
-          <Route exact path="/daos/:daoName/dao-settings">
-            <DaoSettings onClickBack={() => history.goBack()} />
-          </Route>
-          <Route exact path="/create-dao">
-            <CreateDao />
-          </Route>
-        </Switch>
-        <Footer />
+        <Container>
+          <BodyArea>
+            <Header />
+            <Switch>
+              <Route exact path="/">
+                <ConsoleMainPage />
+              </Route>
+              <Route exact path="/daos/:daoName">
+                <DaoMainPage />
+              </Route>
+              <Route exact path="/daos/:daoName/executions/:id">
+                <ProposalDetails onClickBack={() => history.goBack()} />
+              </Route>
+              <Route exact path="/daos/:daoName/new-execution">
+                <NewExecution />
+              </Route>
+              <Route exact path="/daos/:daoName/dao-settings">
+                <DaoSettings onClickBack={() => history.goBack()} />
+              </Route>
+              <Route exact path="/create-dao">
+                <CreateDao />
+              </Route>
+            </Switch>
+          </BodyArea>
+          <FooterArea>
+            <Footer />
+          </FooterArea>
+        </Container>
       </Main>
     </ModalsProvider>
   );
 };
+
+const Container = styled.div`
+  display: grid;
+  grid-gap: 16px;
+  grid-template-areas:
+    'body'
+    'footer';
+`;
+
+const BodyArea = styled.div`
+  grid-area: body;
+  min-height: 82vh;
+`;
+
+const FooterArea = styled.div`
+  grid-area: footer;
+`;
 
 export default HomePage;
