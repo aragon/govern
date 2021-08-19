@@ -80,7 +80,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
   const { control, setValue, getValues, handleSubmit, trigger } = methods;
   const { daoName } = useParams<ParamTypes>();
   //TODO daoname empty handling
-  const { data: dao } = useDaoQuery(daoName);
+  const { data: dao, loading: loadingDaoData } = useDaoQuery(daoName);
   const [daoDetails, updateDaoDetails] = useState<any>();
   const [config, setConfig] = useState<any>(undefined);
   const [daoAddresses, setDaoAddresses] = useState<{ executorAddress: string; token: string }>({
@@ -320,9 +320,9 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
               </Box>
             </div>
 
-            {ipfsRulesLoading ? (
+            {loadingDaoData ? (
               <ANCircularProgressWithCaption
-                caption="Fetching Execution delay from IPFS"
+                caption="Fetching Execution delay"
                 state={CircularProgressStatus.InProgress}
               />
             ) : (
