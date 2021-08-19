@@ -34,20 +34,22 @@ const RigtSideContainer = styled.div`
 `;
 
 // TODO: Temporary and to be removed.
-const chainInfo = { names: ['Mainnet', 'Rinkeby'], values: ['govern', 'govern-rinkeby'] };
+const chainInfo = {
+  names: ['Mainnet', 'Rinkeby'],
+  networkIds: [1, 4],
+  values: ['govern', 'govern-rinkeby'],
+};
 
 const Header = () => {
   const { layoutName } = useLayout();
   const history = useHistory();
-  const { networkName } = networkEnvironment;
+  const { networkName, chainId } = networkEnvironment;
   const [selectedNetwork, setSelectedNetwork] = useState(-1);
 
   useEffect(() => {
-    const index = chainInfo.names.indexOf(
-      networkName[0].toUpperCase() + networkName.slice(1).toLowerCase(),
-    );
+    const index = chainInfo.networkIds.indexOf(chainId);
     setSelectedNetwork(index);
-  }, [networkName]);
+  }, [chainId]);
 
   const redirectToHomePage = () => {
     history.push('/');
