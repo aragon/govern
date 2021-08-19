@@ -10,7 +10,7 @@ import { trackEvent, EventType } from 'services/analytics';
 const NavBar = styled.nav`
   display: flex;
   flex-direction: row:
-  gap: 16px;
+  gap: ${2 * GU}px;
   padding: 8px;
   align-items: center;
 `;
@@ -29,7 +29,7 @@ const RigtSideContainer = styled.div`
   flex-wrap: nowrap;
   flex-direction: row;
   align-items: center;
-  gap: 8px;
+  gap: ${GU}px;
   justify-content: flex-end;
 `;
 
