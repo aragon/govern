@@ -16,6 +16,23 @@ import { useEffect } from 'react';
 import scrollToTop from 'utils/scrollToId';
 import styled from 'styled-components';
 
+const Container = styled.div`
+  display: grid;
+  grid-gap: 16px;
+  grid-template-areas:
+    'body'
+    'footer';
+`;
+
+const BodyArea = styled.div`
+  grid-area: body;
+  min-height: 90vh;
+`;
+
+const FooterArea = styled.div`
+  grid-area: footer;
+`;
+
 const HomePage = () => {
   const history = useHistory();
   const { pathname } = useLocation();
@@ -62,22 +79,5 @@ const HomePage = () => {
     </ModalsProvider>
   );
 };
-
-const Container = styled.div`
-  display: grid;
-  grid-gap: 16px;
-  grid-template-areas:
-    'body'
-    'footer';
-`;
-
-const BodyArea = styled.div`
-  grid-area: body;
-  min-height: 82vh;
-`;
-
-const FooterArea = styled.div`
-  grid-area: footer;
-`;
 
 export default HomePage;
