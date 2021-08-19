@@ -74,7 +74,9 @@ const Header = () => {
         )} */}
 
         {/* // TODO: Temporary and to be removed. */}
+
         <DropDown
+          header={'Network'}
           items={chainInfo.names}
           placeholder="Select Network"
           selected={selectedNetwork}
