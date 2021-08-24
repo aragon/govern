@@ -21,7 +21,6 @@ import { useDaoQuery } from 'hooks/query-hooks';
 import { ipfsMetadata } from 'utils/types';
 import { formatUnits, parseUnits } from 'utils/lib';
 import { getTokenInfo } from 'utils/token';
-import { positiveNumber } from 'utils/validations';
 import { ANCircularProgressWithCaption } from 'components/CircularProgress/ANCircularProgressWithCaption';
 import { CircularProgressStatus } from 'utils/types';
 
@@ -42,6 +41,7 @@ import {
 } from '@aragon/ui';
 import PageContent from 'components/PageContent/PageContent';
 import SettingsCard from './components/SettingsCard';
+import { TimeInterval } from 'components/TimeInterval/TimeInterval';
 
 export interface DaoSettingFormProps {
   /**
@@ -63,6 +63,8 @@ interface FormInputs {
   isRuleFile: boolean;
   rulesFile: any;
   proofFile: any;
+  delaySelectedIndex: number;
+  delayInputValue: number;
 }
 
 const DaoSettings: React.FC<DaoSettingFormProps> = () => {
@@ -78,7 +80,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
   const { control, setValue, getValues, handleSubmit, trigger } = methods;
   const { daoName } = useParams<ParamTypes>();
   //TODO daoname empty handling
-  const { data: dao } = useDaoQuery(daoName);
+  const { data: dao, loading: loadingDaoData } = useDaoQuery(daoName);
   const [daoDetails, updateDaoDetails] = useState<any>();
   const [config, setConfig] = useState<any>(undefined);
   const [daoAddresses, setDaoAddresses] = useState<{ executorAddress: string; token: string }>({
@@ -101,6 +103,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
 
   useEffect(() => {
     if (dao) {
+      // console.log('getInterval', getInterval(dao.queue?.config?.executionDelay));
       updateDaoDetails(dao);
     }
   }, [dao]);
@@ -316,30 +319,24 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
                 </Grid>
               </Box>
             </div>
-            <Controller
-              name="daoConfig.executionDelay"
-              control={control}
-              defaultValue={''}
-              rules={{
-                required: 'This is required.',
-                validate: (value) => positiveNumber(value),
-              }}
-              render={({ field: { onChange, value }, fieldState: { error } }) => (
-                <TextInput
-                  title={'Execution Delay'}
-                  subtitle={
-                    'Amount of time any action in your DAO will be available to be challenged before bein executed'
-                  }
-                  type="number"
-                  onChange={onChange}
-                  value={value.toString()}
-                  wide
-                  placeholder={'350s'}
-                  status={!!error ? 'error' : 'normal'}
-                  error={error ? error.message : null}
-                />
-              )}
-            />
+
+            {loadingDaoData ? (
+              <ANCircularProgressWithCaption
+                caption="Fetching Execution delay"
+                state={CircularProgressStatus.InProgress}
+              />
+            ) : (
+              <TimeInterval
+                title="Execution delay"
+                subtitle="Amount of time any transaction in your DAO will be available to be disputed by your members before being executed."
+                placeholder={'Amount'}
+                inputName="delayInputValue"
+                dropdownName="delaySelectedIndex"
+                resultName="daoConfig.executionDelay"
+                shouldUnregister={false}
+                timeInSeconds={daoDetails?.queue?.config?.executionDelay}
+              />
+            )}
 
             {ipfsRulesLoading ? (
               <ANCircularProgressWithCaption

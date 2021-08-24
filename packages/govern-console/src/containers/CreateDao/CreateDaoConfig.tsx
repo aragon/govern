@@ -5,7 +5,6 @@ import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { validateContract } from 'utils/validations';
 import { useWallet } from 'AugmentedWallet';
 import { IPFSInput } from 'components/Field/IPFSInput';
-import { positiveNumber } from 'utils/validations';
 import { networkEnvironment } from 'environment';
 
 import {
@@ -26,6 +25,7 @@ import {
   useTheme,
 } from '@aragon/ui';
 import StepsHeader from './components/StepsHeader';
+import { TimeInterval } from 'components/TimeInterval/TimeInterval';
 
 const CreateDaoConfig: React.FC<{
   setActiveStep: React.Dispatch<React.SetStateAction<CreateDaoSteps>>;
@@ -35,20 +35,38 @@ const CreateDaoConfig: React.FC<{
   const spacing = SPACING[layoutName];
   const { defaultDaoConfig: defaultConfig } = networkEnvironment;
   const { config, setConfig } = useCreateDaoContext();
-  const { executionDelay, resolver, customResolver, isRuleFile, ruleFile, ruleText } = config;
+  const {
+    delaySelectedIndex,
+    delayInputValue,
+    resolver,
+    customResolver,
+    isRuleFile,
+    ruleFile,
+    ruleText,
+  } = config;
 
   const context: any = useWallet();
   const { provider } = context;
 
   const methods = useForm<ICreateDaoConfig>();
   const { control, setValue, getValues, trigger, watch } = methods;
-
   useEffect(() => {
     setValue('ruleText', ruleText);
     setValue('isRuleFile', isRuleFile);
     setValue('ruleFile', ruleFile);
     setValue('customResolver', customResolver);
-  }, [ruleText, isRuleFile, ruleFile, resolver, customResolver, setValue]);
+    setValue('delaySelectedIndex', delaySelectedIndex);
+    setValue('delayInputValue', delayInputValue);
+  }, [
+    ruleText,
+    isRuleFile,
+    ruleFile,
+    resolver,
+    customResolver,
+    delaySelectedIndex,
+    delayInputValue,
+    setValue,
+  ]);
 
   const moveToNextStep = async (isBack: boolean) => {
     const validate = await trigger();
@@ -68,30 +86,18 @@ const CreateDaoConfig: React.FC<{
     <Box>
       <div style={{ display: 'grid', gridGap: spacing }}>
         <StepsHeader index={1} />
-
-        <Controller
-          name="executionDelay"
-          control={control}
-          defaultValue={executionDelay}
-          rules={{
-            required: 'This is required.',
-            validate: (value) => positiveNumber(value),
-          }}
-          render={({ field: { onChange, value }, fieldState: { error } }) => (
-            <TextInput
-              title="Execution delay"
-              subtitle="Number of seconds during which a DAO transaction may be challenged before being executed."
-              wide
-              value={value}
-              placeholder={'Amount'}
-              onChange={onChange}
-              status={!!error ? 'error' : 'normal'}
-              error={error ? error.message : null}
-            />
-          )}
-        />
-
         <FormProvider {...methods}>
+          <TimeInterval
+            title="Execution delay"
+            subtitle="Amount of time any transaction in your DAO will be available to be disputed by your
+          members before being executed."
+            placeholder={'Amount'}
+            inputName="delayInputValue"
+            dropdownName="delaySelectedIndex"
+            resultName="executionDelay"
+            shouldUnregister={false}
+          />
+
           <IPFSInput
             title="Rules / Agreement"
             subtitle={

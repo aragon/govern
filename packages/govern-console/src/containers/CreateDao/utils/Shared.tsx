@@ -4,6 +4,7 @@ import {
   ICreateDaoConfig,
   ICreateDaoCollaterals,
 } from './CreateDaoContextProvider';
+import { TIME_INTERVALS } from 'utils/constants';
 
 enum CreateDaoSteps {
   BasicInfo,
@@ -96,19 +97,21 @@ const configArray = (config: ICreateDaoConfig) => {
         return value && typeof value !== 'string' ? toUtf8String(value) : value;
 
       case 'executionDelay':
-        return `${value} seconds`;
+        return `${config.delayInputValue} ${TIME_INTERVALS.names[config.delaySelectedIndex]}`;
 
       default:
         return value.toString();
     }
   };
 
-  const filters: (keyof ICreateDaoConfig)[] = !config.isRuleFile
-    ? ['maxCalldataSize', 'customResolver', 'isRuleFile', 'ruleFile']
-    : ['maxCalldataSize', 'customResolver', 'isRuleFile', 'ruleText'];
+  const filters: (keyof ICreateDaoConfig)[] = [
+    'executionDelay',
+    'resolver',
+    config.isRuleFile ? 'ruleFile' : 'ruleText',
+  ];
 
   return Object.entries(config)
-    .filter((entry) => !filters.includes(entry[0] as any))
+    .filter((entry) => filters.includes(entry[0] as any))
     .map((entry) => ({
       name: formatParamNames[entry[0]?.toString()],
       value: formatValue(entry[0], entry[1]),

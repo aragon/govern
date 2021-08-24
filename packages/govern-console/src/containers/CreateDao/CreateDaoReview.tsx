@@ -196,7 +196,7 @@ const CreateDaoReview: React.FC<{
             setActiveStep(CreateDaoSteps.Progress);
           }}
         >
-          Confirm and create a DAO
+          Confirm and create your DAO
         </Button>
       </Box>
     </>

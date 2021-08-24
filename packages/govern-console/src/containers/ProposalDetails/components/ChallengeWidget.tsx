@@ -117,19 +117,10 @@ const ChallengeWidget: React.FC<any> = ({
 
   return (
     <Box shadow>
-      {/* <InputSubTitle>
-        Challenge Reason{' '}
-        <HelpButton
-          helpText={
-            'Provide your reasons for challenging this transaction. Be as detailed as possible so Court guardians can make an informed decision.'
-          }
-        />
-      </InputSubTitle> */}
-
       <FormProvider {...methods}>
         <IPFSInput
           title="Challenge Reason"
-          subtitle="Provide your reasons for challenging this transaction. Be as detailed as possible so Court guardians can make an informed decision."
+          subtitle="Provide your reasons for challenging this transaction. Be as detailed as possible so Aragon Court guardians can make an informed decision."
           label="Provide Reason"
           placeholder="Reasons for challenging the transaction..."
           textInputName="reason"
