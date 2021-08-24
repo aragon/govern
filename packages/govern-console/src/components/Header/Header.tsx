@@ -1,7 +1,8 @@
+import React, { useState, useEffect } from 'react';
 import governIcon from 'images/svgs/aragon-icon.svg';
 import Wallet from 'components/Wallet/Wallet';
 import { useHistory } from 'react-router-dom';
-import { Button, StyledText, IconCirclePlus, useLayout, GU, Tag } from '@aragon/ui';
+import { Button, IconCirclePlus, useLayout, GU, Tag, DropDown } from '@aragon/ui';
 import styled from 'styled-components';
 import { networkEnvironment } from 'environment';
 import { trackEvent, EventType } from 'services/analytics';
@@ -9,8 +10,9 @@ import { trackEvent, EventType } from 'services/analytics';
 const NavBar = styled.nav`
   display: flex;
   flex-direction: row:
-  gap: 16px;
+  gap: ${2 * GU}px;
   padding: 8px;
+  align-items: center;
 `;
 
 const Title = styled.div`
@@ -26,15 +28,28 @@ const RigtSideContainer = styled.div`
   width: 100%;
   flex-wrap: nowrap;
   flex-direction: row;
-  justify-content: flex-end;
   align-items: center;
-  gap: 10px;
+  gap: ${GU}px;
+  justify-content: flex-end;
 `;
+
+// TODO: Temporary and to be removed.
+const chainInfo = {
+  names: ['Mainnet', 'Rinkeby'],
+  networkIds: [1, 4],
+  values: ['govern', 'govern-rinkeby'],
+};
 
 const Header = () => {
   const { layoutName } = useLayout();
   const history = useHistory();
-  const { networkName } = networkEnvironment;
+  const { networkName, chainId } = networkEnvironment;
+  const [selectedNetwork, setSelectedNetwork] = useState(-1);
+
+  useEffect(() => {
+    const index = chainInfo.networkIds.indexOf(chainId);
+    setSelectedNetwork(index);
+  }, [chainId]);
 
   const redirectToHomePage = () => {
     history.push('/');
@@ -53,10 +68,36 @@ const Header = () => {
         <img src={governIcon} width={layoutName !== 'small' ? '182px' : '162px'} />
         <Tag mode="activity" size="normal" uppercase={false} label="Beta" />
       </Title>
+
       <RigtSideContainer id="account">
-        {layoutName !== 'small' && (
-          <StyledText name="body2">Network:{networkName.toUpperCase()}</StyledText>
-        )}
+        {/* {layoutName !== 'small' && (
+          // TODO: Temporary and to be returned.
+          // <StyledText name="body2">Network:{networkName.toUpperCase()}</StyledText>          
+        )} */}
+
+        {/* // TODO: Temporary and to be removed. */}
+
+        <DropDown
+          header={'Network'}
+          items={chainInfo.names}
+          placeholder="Select Network"
+          selected={selectedNetwork}
+          onChange={(index: number) => {
+            if (index !== selectedNetwork) {
+              const open = window.open(undefined, '_self');
+              if (open) {
+                open.opener = null;
+                open.location.href = `https://${chainInfo.values[index]}.aragon.org`;
+              }
+            }
+          }}
+          shadow
+          iconOnly={layoutName === 'small'}
+          css={`
+            height: 40px;
+          `}
+        />
+
         <Wallet />
         <Button
           size={'large'}
