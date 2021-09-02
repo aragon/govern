@@ -14,7 +14,7 @@ import { Hint } from 'components/Hint/Hint';
 import { useForm, Controller } from 'react-hook-form';
 import { validateAmountForDecimals, validateAddress } from 'utils/validations';
 import AbiHandler from 'utils/AbiHandler';
-import { useWallet } from 'AugmentedWallet';
+import { useWallet } from 'providers/AugmentedWallet';
 import { ActionBuilderCloseHandler } from 'utils/types';
 import { useActionBuilderState } from '../ActionBuilderStateProvider';
 import { Asset } from 'utils/Asset';

@@ -3,7 +3,7 @@ import { useHistory, useParams } from 'react-router-dom';
 import backButtonIcon from '../../images/back-btn.svg';
 import { BackButton } from 'styles';
 import { buildConfig } from 'utils/ERC3000';
-import { useWallet } from 'AugmentedWallet';
+import { useWallet } from 'providers/AugmentedWallet';
 import { DaoConfig } from '@aragon/govern';
 import { CustomTransaction } from 'utils/types';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';

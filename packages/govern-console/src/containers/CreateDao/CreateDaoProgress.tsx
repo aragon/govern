@@ -21,7 +21,7 @@ import {
 } from '@aragon/govern';
 import { addToIpfs } from 'utils/ipfs';
 import { BytesLike } from '@ethersproject/bytes';
-import { useWallet } from 'AugmentedWallet';
+import { useWallet } from 'providers/AugmentedWallet';
 import FailAction from './components/FailAction';
 import SuccessAction from './components/SuccessAction';
 import RegisterSuccessAction from './components/RegisterSuccessAction';

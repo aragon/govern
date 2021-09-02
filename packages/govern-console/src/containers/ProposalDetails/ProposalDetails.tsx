@@ -6,7 +6,7 @@ import Typography from '@material-ui/core/Typography';
 import backButtonIcon from 'images/back-btn.svg';
 import { Label } from 'components/Labels/Label';
 import { useParams } from 'react-router-dom';
-import { useWallet } from '../../AugmentedWallet';
+import { useWallet } from '../../providers/AugmentedWallet';
 import { CustomTransaction } from 'utils/types';
 import { getProposalParams } from 'utils/ERC3000';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';

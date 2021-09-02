@@ -1,6 +1,6 @@
 import Home from 'containers/HomePage/HomePage';
 import { HashRouter as Router } from 'react-router-dom';
-import { WalletProvider } from './AugmentedWallet';
+import { WalletProvider } from './providers/AugmentedWallet';
 
 const App = () => {
   return (
