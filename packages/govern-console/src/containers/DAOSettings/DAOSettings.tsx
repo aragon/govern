@@ -83,9 +83,14 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
   const { data: dao, loading: loadingDaoData } = useDaoQuery(daoName);
   const [daoDetails, updateDaoDetails] = useState<any>();
   const [config, setConfig] = useState<any>(undefined);
-  const [daoAddresses, setDaoAddresses] = useState<{ executorAddress: string; token: string }>({
+  const [daoAddresses, setDaoAddresses] = useState<{
+    executorAddress: string;
+    token: string;
+    queue: string;
+  }>({
     executorAddress: '',
     token: '',
+    queue: '',
   });
   const [ipfsMetadata, setIpfsMetadata] = useState<ipfsMetadata>();
   const [ipfsRulesLoading, setIpfsRulesLoading] = useState<boolean>(true);
@@ -142,6 +147,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
         const _daoAddresses = {
           executorAddress: daoDetails.executor.address,
           token: daoDetails.token,
+          queue: daoDetails.queue.address,
         };
         setConfig(_config);
         setDaoAddresses(_daoAddresses);
@@ -254,6 +260,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
           <StyledText name={'title1'}>DAO Settings</StyledText>
           <TextCopy title={'DAO Govern Executor Address'} value={daoAddresses.executorAddress} />
           <TextCopy title={'DAO Token address'} value={daoAddresses.token} />
+          <TextCopy title={'DAO Queue address'} value={daoAddresses.queue} />
           <FormProvider {...methods}>
             <div>
               <StyledText name={'title3'}>Resolver</StyledText>
