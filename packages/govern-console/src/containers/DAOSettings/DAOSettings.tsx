@@ -43,13 +43,6 @@ import PageContent from 'components/PageContent/PageContent';
 import SettingsCard from './components/SettingsCard';
 import { TimeInterval } from 'components/TimeInterval/TimeInterval';
 
-export interface DaoSettingFormProps {
-  /**
-   * on click back
-   */
-  onClickBack: () => void;
-}
-
 interface ParamTypes {
   /**
    * type of path (url) params
@@ -67,7 +60,7 @@ interface FormInputs {
   delayInputValue: number;
 }
 
-const DaoSettings: React.FC<DaoSettingFormProps> = () => {
+const DaoSettings: React.FC = () => {
   const theme = useTheme();
   const { layoutName } = useLayout();
   const spacing = SPACING[layoutName];
@@ -219,7 +212,7 @@ const DaoSettings: React.FC<DaoSettingFormProps> = () => {
     if (proposalInstance) {
       try {
         transactionsQueue.current = await proposalInstance.schedule(payload, buildConfig(config));
-      } catch (error) {
+      } catch (error: any) {
         toast(error.message);
         return;
       }

@@ -5,7 +5,7 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import backButtonIcon from 'images/back-btn.svg';
 import { Label } from 'components/Labels/Label';
-import { useParams } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import { useWallet } from 'providers/AugmentedWallet';
 import { CustomTransaction } from 'utils/types';
 import { getProposalParams } from 'utils/ERC3000';
@@ -21,14 +21,10 @@ import { useLazyProposalQuery, useDaoQuery } from 'hooks/query-hooks';
 import { ipfsMetadata } from 'utils/types';
 import { formatUnits } from 'utils/lib';
 import { DecodedActionData } from './components/DecodedActionData';
-
 // widget components
 import ChallengeWidget from './components/ChallengeWidget';
 import ExecuteWidget from './components/ExecuteWidget';
 import ResolveWidget from './components/ResolveWidget';
-interface ProposalDetailsProps {
-  onClickBack?: any;
-}
 
 //* styled Components
 
@@ -280,8 +276,9 @@ const ExpandedDiv = styled('div')({
 
 //* End of styled Components
 
-const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
+const ProposalDetails: React.FC = () => {
   const { daoName, id: proposalId } = useParams<any>();
+  const history = useHistory();
 
   const { data: dao } = useDaoQuery(daoName);
   const context: any = useWallet();
@@ -389,7 +386,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       if (proposalInstance) {
         try {
           transactionsQueue.current = await proposalInstance.challenge(proposalParams, reasonCid);
-        } catch (error) {
+        } catch (error: any) {
           console.log('Failed challenging', error);
           toast(error.message);
           return;
@@ -453,7 +450,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
 
   return (
     <StyledPaper elevation={0}>
-      <BackButton onClick={onClickBack}>
+      <BackButton onClick={() => history.goBack()}>
         <img src={backButtonIcon} />
       </BackButton>
       <ProposalStatus>
