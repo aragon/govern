@@ -48,8 +48,7 @@ export const TimeInterval: React.FC<TimeIntervalInputs> = ({
 
   // prevent sending initial undefined value to inputs
   const handleGetValues = (value: string) => {
-    const result = getValues(value);
-    return result ? result : 0;
+    return getValues(value) || 0;
   };
 
   return (
