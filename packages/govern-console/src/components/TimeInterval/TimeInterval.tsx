@@ -46,6 +46,11 @@ export const TimeInterval: React.FC<TimeIntervalInputs> = ({
     }
   }, [timeInSeconds, dropdownName, inputName, setValue]);
 
+  // prevent sending initial undefined value to inputs
+  const handleGetValues = (value: string) => {
+    return getValues(value) || 0;
+  };
+
   return (
     <div>
       {typeof title === 'string' ? <StyledText name={'title3'}>{title}</StyledText> : title}
@@ -68,7 +73,7 @@ export const TimeInterval: React.FC<TimeIntervalInputs> = ({
           key={`key-${inputName}`}
           name={inputName}
           control={control}
-          defaultValue={getValues(inputName)}
+          defaultValue={handleGetValues(inputName)}
           shouldUnregister={shouldUnregister}
           rules={{
             required: 'This is required.',
@@ -96,7 +101,7 @@ export const TimeInterval: React.FC<TimeIntervalInputs> = ({
           key={`key-${dropdownName}`}
           name={dropdownName}
           control={control}
-          defaultValue={getValues(dropdownName)}
+          defaultValue={handleGetValues(dropdownName)}
           shouldUnregister={shouldUnregister}
           rules={{
             required: 'This is required.',
