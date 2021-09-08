@@ -54,8 +54,8 @@ const client = new ApolloClient({
 
 ReactDOM.render(
   <React.StrictMode>
-    <WalletProvider>
-      <APMProvider>
+    <APMProvider>
+      <WalletProvider>
         <ThemeProvider theme={lightTheme}>
           {/* for date picker https://material-ui-pickers.dev/getting-started/installation */}
           <MuiPickersUtilsProvider utils={MomentUtils}>
@@ -64,8 +64,8 @@ ReactDOM.render(
             </ApolloProvider>
           </MuiPickersUtilsProvider>
         </ThemeProvider>
-      </APMProvider>
-    </WalletProvider>
+      </WalletProvider>
+    </APMProvider>
   </React.StrictMode>,
   document.getElementById('root'),
 );

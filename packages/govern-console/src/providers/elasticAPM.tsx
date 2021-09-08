@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useMemo, useContext } from 'react';
+import React, { useState, useMemo, useContext } from 'react';
 import { init as initApm, ApmBase } from '@elastic/apm-rum';
-import { useWallet } from 'providers/AugmentedWallet';
 
-const UseAPMContext = React.createContext({});
+interface IAPMContext {
+  apm: ApmBase | null;
+  setApm: React.Dispatch<React.SetStateAction<ApmBase | null>> | null;
+}
+const UseAPMContext = React.createContext<IAPMContext>({ apm: null, setApm: null });
 
 const APMProvider: React.FC = ({ children }) => {
-  const context: any = useWallet();
-  const { networkName } = context;
-
   const [apm, setApm] = useState<ApmBase | null>(() => {
     if (process.env.REACT_APP_DEPLOY_VERSION && process.env.REACT_APP_DEPLOY_ENVIRONMENT) {
       return initApm({
@@ -22,14 +22,6 @@ const APMProvider: React.FC = ({ children }) => {
     }
   });
 
-  useEffect(() => {
-    if (apm && networkName) {
-      const context = { networkType: networkName };
-      apm.addLabels({ ...context });
-      apm.setCustomContext(context);
-    }
-  }, [apm, networkName]);
-
   const contextValue = useMemo(() => {
     return { apm, setApm };
   }, [apm, setApm]);
@@ -37,8 +29,16 @@ const APMProvider: React.FC = ({ children }) => {
   return <UseAPMContext.Provider value={contextValue}>{children}</UseAPMContext.Provider>;
 };
 
-function useAPM(): ApmBase {
-  return useContext(UseAPMContext) as ApmBase;
+function useAPM() {
+  return useContext(UseAPMContext);
 }
 
-export { APMProvider, useAPM };
+function updateAPMContext(apm: ApmBase | null, networkType: string) {
+  if (apm && networkType) {
+    const context = { networkType: networkType };
+    apm.addLabels(context);
+    apm.setCustomContext(context);
+  }
+}
+
+export { APMProvider, useAPM, updateAPMContext };

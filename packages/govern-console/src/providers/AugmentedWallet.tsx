@@ -5,6 +5,7 @@ import { Account } from 'utils/types';
 import { INFURA_PROJECT_ID } from 'utils/constants';
 import { networkEnvironment } from 'environment';
 import { identifyUser } from 'services/analytics';
+import { useAPM, updateAPMContext } from './elasticAPM';
 const { chainId } = networkEnvironment;
 
 const WalletAugmentedContext = React.createContext({});
@@ -56,6 +57,11 @@ const WalletAugmented: React.FC<unknown> = ({ children }) => {
       account,
     };
   }, [wallet, provider, injectedProvider]);
+
+  const { apm } = useAPM();
+  useEffect(() => {
+    updateAPMContext(apm, contextValue.networkName);
+  }, [apm, contextValue]);
 
   return (
     <WalletAugmentedContext.Provider value={contextValue}>
