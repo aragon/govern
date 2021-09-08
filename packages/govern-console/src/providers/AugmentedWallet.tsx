@@ -61,7 +61,7 @@ const WalletAugmented: React.FC<unknown> = ({ children }) => {
   const { apm } = useAPM();
   useEffect(() => {
     updateAPMContext(apm, contextValue.networkName);
-  }, [apm, contextValue]);
+  }, [apm, contextValue.networkName]);
 
   return (
     <WalletAugmentedContext.Provider value={contextValue}>
