@@ -1,5 +1,4 @@
-import { Switch, Route } from 'react-router-dom';
-import { useHistory } from 'react-router-dom';
+import { Switch } from 'react-router-dom';
 import Header from 'components/Header/Header';
 import Footer from 'components/Footer/Footer';
 import ConsoleMainPage from 'containers/Console/ConsoleMainPage';
@@ -15,6 +14,7 @@ import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import scrollToTop from 'utils/scrollToId';
 import styled from 'styled-components';
+import { ApmRoute } from '@elastic/apm-rum-react';
 
 const Container = styled.div`
   display: grid;
@@ -34,7 +34,6 @@ const FooterArea = styled.div`
 `;
 
 const HomePage = () => {
-  const history = useHistory();
   const { pathname } = useLocation();
 
   useEffect(() => {
@@ -51,24 +50,12 @@ const HomePage = () => {
           <BodyArea>
             <Header />
             <Switch>
-              <Route exact path="/">
-                <ConsoleMainPage />
-              </Route>
-              <Route exact path="/daos/:daoName">
-                <DaoMainPage />
-              </Route>
-              <Route exact path="/daos/:daoName/executions/:id">
-                <ProposalDetails onClickBack={() => history.goBack()} />
-              </Route>
-              <Route exact path="/daos/:daoName/new-execution">
-                <NewExecution />
-              </Route>
-              <Route exact path="/daos/:daoName/dao-settings">
-                <DaoSettings onClickBack={() => history.goBack()} />
-              </Route>
-              <Route exact path="/create-dao">
-                <CreateDao />
-              </Route>
+              <ApmRoute exact path="/" component={ConsoleMainPage} />
+              <ApmRoute exact path="/daos/:daoName" component={DaoMainPage} />
+              <ApmRoute exact path="/daos/:daoName/executions/:id" component={ProposalDetails} />
+              <ApmRoute exact path="/daos/:daoName/new-execution" component={NewExecution} />
+              <ApmRoute exact path="/daos/:daoName/dao-settings" component={DaoSettings} />
+              <ApmRoute exact path="/create-dao" component={CreateDao} />
             </Switch>
           </BodyArea>
           <FooterArea>

@@ -16,7 +16,7 @@ import { ActionBuilderCloseHandler } from 'utils/types';
 import { Hint } from 'components/Hint/Hint';
 import { useForm, Controller } from 'react-hook-form';
 import { validateAmountForDecimals, validateToken } from 'utils/validations';
-import { useWallet } from 'AugmentedWallet';
+import { useWallet } from 'providers/AugmentedWallet';
 import AbiHandler from 'utils/AbiHandler';
 import { Asset, AssetLabel, ETH, OTHER_TOKEN_SYMBOL } from 'utils/Asset';
 import { useActionBuilderState } from '../ActionBuilderStateProvider';

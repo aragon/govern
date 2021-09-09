@@ -15,14 +15,14 @@ jobs:
     if: github.ref == 'refs/heads/develop'
     strategy:
       matrix:
-        environment: ["Rinkeby", "Rinkeby_Staging"]
+        environment: ['Rinkeby', 'Rinkeby_Staging']
         include:
-          - environment: "Rinkeby"
-            fleekfile: "console.rinkeby.json"
-            environment_name: "rinkeby"
-          - environment: "Rinkeby_Staging"
-            fleekfile: "console.rinkeby.staging.json"
-            environment_name: "staging"
+          - environment: 'Rinkeby'
+            fleekfile: 'console.rinkeby.json'
+            environment_name: 'rinkeby'
+          - environment: 'Rinkeby_Staging'
+            fleekfile: 'console.rinkeby.staging.json'
+            environment_name: 'staging'
     runs-on: ubuntu-latest
     container: fleek/create-react-app:node-15
     environment: ${{ matrix.environment }}
@@ -40,11 +40,11 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: Build the app
-        run: CI='' yarn build:rinkeby
+        run: CI='' yarn build
         env:
           REACT_APP_ANALYTICS_KEY: ${{ secrets.REACT_APP_ANALYTICS_KEY }}
-          REACT_APP_DEPLOYVERSION: ${{ github.sha }}
-          REACT_APP_ENVIRONMENT: ${{ matrix.environment_name }}
+          REACT_APP_DEPLOY_VERSION: ${{ github.sha }}
+          REACT_APP_DEPLOY_ENVIRONMENT: ${{ matrix.environment_name }}
       - name: Activate rinkeby's fleek
         env:
           FLEEK_FILE: ${{ matrix.fleekfile }}
@@ -64,7 +64,6 @@ jobs:
           for f in ./build/static/**/*.js.map ; do 
             curl -X POST https://apm-monitoring.aragon.org/assets/v1/sourcemaps -F service_name="govern" -F service_version="$COMMIT_SHA" -F bundle_filepath="http://localhost/static/js/bundle.js" -F sourcemap=@$f
           done
-
 
   build-and-deploy-mainnet:
     runs-on: ubuntu-latest
@@ -93,8 +92,8 @@ jobs:
         run: CI='' yarn build:mainnet
         env:
           REACT_APP_ANALYTICS_KEY: ${{ secrets.REACT_APP_ANALYTICS_KEY }}
-          REACT_APP_DEPLOYVERSION: ${{ github.sha }}
-          REACT_APP_ENVIRONMENT: production
+          REACT_APP_DEPLOY_VERSION: ${{ github.sha }}
+          REACT_APP_DEPLOY_ENVIRONMENT: production
 
       - name: Activate mainnet's fleek
         run: mv fleek/console.mainnet.json .fleek.json

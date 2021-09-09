@@ -6,7 +6,7 @@ import MUITypography from '@material-ui/core/Typography';
 import { settingsUrl } from 'utils/urls';
 import { Button, IconSettings, Grid, useToast } from '@aragon/ui';
 import { ActionBuilder } from 'components/ActionBuilder/ActionBuilder';
-import { useWallet } from 'AugmentedWallet';
+import { useWallet } from 'providers/AugmentedWallet';
 import { Error } from 'utils/Error';
 import { trackEvent, EventType } from 'services/analytics';
 

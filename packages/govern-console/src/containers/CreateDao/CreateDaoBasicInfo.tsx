@@ -3,7 +3,7 @@ import { CreateDaoSteps } from './utils/Shared';
 import { useCreateDaoContext, ICreateDaoBasicInfo } from './utils/CreateDaoContextProvider';
 import { useForm, Controller } from 'react-hook-form';
 import { validateToken, validateAmountForDecimals, daoExists } from 'utils/validations';
-import { useWallet } from 'AugmentedWallet';
+import { useWallet } from 'providers/AugmentedWallet';
 import { PROXY_CONTRACT_URL } from '../../utils/constants';
 import {
   useLayout,

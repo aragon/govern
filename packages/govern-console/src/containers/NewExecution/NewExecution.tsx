@@ -19,7 +19,7 @@ import ActionList from 'containers/NewExecution/ActionList';
 import { ActionBuilder } from 'components/ActionBuilder/ActionBuilder';
 import { useParams, useHistory } from 'react-router-dom';
 import { ContractReceipt } from 'ethers';
-import { useWallet } from 'AugmentedWallet';
+import { useWallet } from 'providers/AugmentedWallet';
 import { buildConfig } from 'utils/ERC3000';
 import { CustomTransaction, ActionItem } from 'utils/types';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
