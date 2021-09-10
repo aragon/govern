@@ -2,7 +2,9 @@ import { Switch } from 'react-router-dom';
 import Header from 'components/Header/Header';
 import Footer from 'components/Footer/Footer';
 import ConsoleMainPage from 'containers/Console/ConsoleMainPage';
-import DaoMainPage from 'containers/DAO/DaoMainPage';
+// import DaoMainPage from 'containers/DAO/DaoMainPage';
+import DaoHomePage from 'containers/DAO/DaoHomePage';
+
 import ProposalDetails from 'containers/ProposalDetails/ProposalDetails';
 import NewExecution from 'containers/NewExecution/NewExecution';
 import DaoSettings from 'containers/DAOSettings/DAOSettings';
@@ -51,7 +53,14 @@ const HomePage = () => {
             <Header />
             <Switch>
               <ApmRoute exact path="/" component={ConsoleMainPage} />
-              <ApmRoute exact path="/daos/:daoName" component={DaoMainPage} />
+              {/* <ApmRoute exact path="/daos/:daoName" component={DaoMainPage} /> */}
+
+              {/* New DaoHomePage leading to actions. TODO: Goal is to move the relevant
+                functions and data fetching into this new homepage
+              */}
+              <ApmRoute path="/daos/:daoName/" component={DaoHomePage} />
+
+              {/* These guys need to be moved down the nesting chain*/}
               <ApmRoute exact path="/daos/:daoName/executions/:id" component={ProposalDetails} />
               <ApmRoute exact path="/daos/:daoName/new-execution" component={NewExecution} />
               <ApmRoute exact path="/daos/:daoName/dao-settings" component={DaoSettings} />
