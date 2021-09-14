@@ -1,87 +1,7 @@
 import styled from 'styled-components';
-import { NavLink } from 'react-router-dom';
-import { IconWallet, IconSettings } from '@aragon/ui';
+import { Box, IconWallet, IconSettings, useLayout } from '@aragon/ui';
 
-const Container = styled.div`
-  width: 298px;
-  height: 342px;
-  display: flex;
-  position: relative;
-`;
-
-const StyledCard = styled.div`
-  width: 298px;
-  height: 314px;
-  align-self: flex-end;
-  background-color: white;
-
-  border-radius: 16px;
-  box-shadow: 0px 3px 3px rgba(180, 193, 228, 0.35);
-`;
-
-const AvatarContainer = styled.div`
-  position: absolute;
-  top: 0px;
-  left: 24px;
-`;
-
-const Avatar = styled.div`
-  border-radius: 50%;
-  padding: 8px;
-  width: 40px;
-  height: 40px;
-background-color: red;
-  drop-shadow(0px 3px 3px rgba(180, 193, 228, 0.35));
-`;
-
-const Details = styled.div`
-  margin: 40px 24px 0px 24px;
-`;
-
-const Title = styled.p`
-  margin: 0;
-  color: #20232c;
-  font-size: 24px;
-  font-weight: 600;
-  line-height: 30px;
-  /* border: 1px dotted green; */
-`;
-
-const ActionsCount = styled.p`
-  margin: 0;
-  color: #7483ab;
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 24px;
-  /* border: 1px dotted green; */
-`;
-
-const LinkGroup = styled.div`
-  height: 168px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  margin: 24px;
-  /* border: 1px dotted blue; */
-`;
-
-const ActionLink = styled(NavLink)`
-  height: 48px;
-  display: flex;
-  align-items: center;
-  border-radius: 12px;
-  size: 16px;
-  color: #7483ab;
-  line-height: 20px;
-  font-weight: 600;
-  text-decoration: none;
-
-  /* Active */
-  &.active {
-    color: #00c2ff;
-    background-color: #f0fbff;
-  }
-`;
+import ActionLink from '../ActionLink/ActionLink';
 
 type Props = {
   baseUrl: string;
@@ -89,33 +9,114 @@ type Props = {
   openActions: string;
 };
 
+type MenuOptions = {
+  path: string;
+  label: string;
+  icon: React.ReactElement;
+};
+
+/**
+ * TODO: Get actions svg from aragon/ui
+ */
+const links: MenuOptions[] = [
+  { path: '/actions', label: 'Actions', icon: <IconWallet /> },
+  { path: '/finance', label: 'Finance', icon: <IconWallet /> },
+  { path: '/settings', label: 'Settings', icon: <IconSettings /> },
+];
+
+/**
+ * Interestingly enough the avatar will collapse into it if the border isn't set
+ */
+const Container = styled.div`
+  border: 1px solid transparent;
+  position: relative;
+`;
+
+const AvatarContainer = styled.div`
+  position: absolute;
+  width: 100%;
+  display: flex;
+  padding: 0px 24px;
+  z-index: 1;
+`;
+
+const AvatarWrapper = styled.div`
+  display: flex;
+  align-content: center;
+  justify-items: center;
+  border-radius: 100px;
+  background-color: #f6f9fc;
+  padding: 8px;
+`;
+
+/** Placeholder for actual avatar */
+const Avatar = styled.div`
+  width: 40px;
+  height: 40px;
+  border-radius: 100px;
+  background-color: red;
+`;
+
+const Content = styled(Box)`
+  margin-top: 24px;
+  border-radius: 16px;
+  background-color: #ffffff;
+  box-shadow: 0px 3px 3px rgba(180, 193, 228, 0.35);
+`;
+
+const Details = styled.div`
+  gap: 4px;
+  display: flex;
+  flex-direction: column;
+  margin-top: 16px;
+`;
+
+/**
+ * Should probably be replaced with StyledText from aragon/ui
+ */
+const Title = styled.p`
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 30px;
+  color: #20232c;
+`;
+const Subtitle = styled.p`
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  color: #7483ab;
+`;
+
+const LinkGroup = styled.div`
+  height: 168px;
+  margin-top: 24px;
+  gap: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+`;
+
 const DaoSideCard: React.FC<Props> = ({ baseUrl, identifier, openActions }) => {
-  console.log(baseUrl);
+  const { layoutName } = useLayout();
+
   return (
     <Container>
-      <StyledCard>
-        <AvatarContainer>
+      <AvatarContainer css={layoutName === 'small' ? 'justify-content: center' : undefined}>
+        <AvatarWrapper>
           <Avatar />
-        </AvatarContainer>
-        <Details>
+        </AvatarWrapper>
+      </AvatarContainer>
+      <Content>
+        <Details css={layoutName === 'small' ? 'align-items: center' : undefined}>
           <Title>{identifier}</Title>
-          <ActionsCount>{openActions} open actions</ActionsCount>
+          <Subtitle>{openActions} open actions</Subtitle>
         </Details>
-        <LinkGroup>
-          <ActionLink to={`${baseUrl}/actions`}>
-            <IconWallet css={{ margin: '12px' }} />
-            Actions
-          </ActionLink>
-          <ActionLink to={`${baseUrl}/finance`}>
-            <IconWallet css={{ margin: '12px' }} />
-            Finance
-          </ActionLink>
-          <ActionLink to={`${baseUrl}/settings`}>
-            <IconSettings css={{ margin: '12px' }} />
-            Settings
-          </ActionLink>
+        <LinkGroup css={layoutName === 'small' ? 'flex-direction: row' : undefined}>
+          {links.map(({ path, icon, label }, index) => (
+            <ActionLink key={index} url={baseUrl + path} label={label} icon={icon} />
+          ))}
         </LinkGroup>
-      </StyledCard>
+      </Content>
     </Container>
   );
 };

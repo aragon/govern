@@ -60,10 +60,12 @@ const HomePage = () => {
               */}
               <ApmRoute path="/daos/:daoName/" component={DaoHomePage} />
 
-              {/* These guys need to be moved down the nesting chain*/}
+              {/* These guys need to be moved down the nested routes inside of DaoHomePage */}
               <ApmRoute exact path="/daos/:daoName/executions/:id" component={ProposalDetails} />
               <ApmRoute exact path="/daos/:daoName/new-execution" component={NewExecution} />
               <ApmRoute exact path="/daos/:daoName/dao-settings" component={DaoSettings} />
+              {/* --------------------------------------------------------------------------- */}
+
               <ApmRoute exact path="/create-dao" component={CreateDao} />
             </Switch>
           </BodyArea>
