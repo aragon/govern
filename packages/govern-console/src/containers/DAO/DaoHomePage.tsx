@@ -3,6 +3,7 @@ import { Grid, GridItem, useLayout } from '@aragon/ui';
 import { Redirect, Switch, useParams, useRouteMatch } from 'react-router';
 
 import DaoSideCard from './components/DaoSideCard/DaoSideCard';
+import DaoActionsPage from './DaoActionPage';
 
 /**
  * TODO: implement codesplitting, especially if api calls
@@ -38,7 +39,7 @@ const DaoHomePage: React.FC = () => {
           <ApmRoute
             exact
             path={`${path}actions`}
-            render={() => <div>Actions Component goes here...</div>}
+            render={<DaoActionsPage/>}
           />
           <ApmRoute
             exact
