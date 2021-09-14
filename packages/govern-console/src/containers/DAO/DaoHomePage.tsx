@@ -36,11 +36,7 @@ const DaoHomePage: React.FC = () => {
         <Switch>
           {/* Note that this 'home' route is not being tracked (ApmRoute not used)*/}
           <Redirect exact from={path} to={`${path}actions`} />
-          <ApmRoute
-            exact
-            path={`${path}actions`}
-            render={<DaoActionsPage/>}
-          />
+          <ApmRoute exact path={`${path}actions`} render={() => <DaoActionsPage />} />
           <ApmRoute
             exact
             path={`${path}finance`}
