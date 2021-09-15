@@ -1,8 +1,11 @@
+import { useEffect, useState } from 'react';
 import { ApmRoute } from '@elastic/apm-rum-react';
 import { Grid, GridItem, useLayout } from '@aragon/ui';
 import { Redirect, Switch, useParams, useRouteMatch } from 'react-router';
 
+import NoDaoFound from './NoDaoFound';
 import DaoSideCard from './components/DaoSideCard/DaoSideCard';
+import { useDaoQuery, useLazyProposalListQuery } from 'hooks/query-hooks';
 
 /**
  * TODO: implement codesplitting, especially if api calls
@@ -20,20 +23,103 @@ const DaoHomePage: React.FC = () => {
   const { layoutName } = useLayout();
 
   /**
-   * TODO: Check if dao is found, setup sub routing with actions;
-   * Return daoNotFound.
+   * State
+   */
+  const [daoExists, setDaoExists] = useState<boolean>(true);
+  const [daoDetails, setDaoDetails] = useState<any>();
+  const [queueNonce, setQueueNonce] = useState<number>();
+  const [visibleActions, setVisibleActions] = useState<any>([]);
+
+  /**
+   * Effects
+   */
+  const { data: dao, loading: daoIsLoading } = useDaoQuery(daoName);
+  const { getQueueData, data: queueData, fetchMore } = useLazyProposalListQuery();
+
+  console.log(queueData);
+
+  /**
+   * Update state and get queue data
+   */
+  useEffect(() => {
+    if (daoIsLoading) return;
+
+    if (dao && getQueueData) {
+      setDaoExists(true);
+      setDaoDetails(dao);
+
+      if (dao.queue) {
+        getQueueData({
+          variables: {
+            offset: 0,
+            limit: 16,
+            id: dao.queue.id,
+          },
+        });
+      }
+    } else {
+      setDaoExists(false);
+    }
+  }, [daoIsLoading, dao, getQueueData]);
+
+  /**
+   * Update visible proposals
+   */
+  useEffect(() => {
+    if (queueData) {
+      setQueueNonce(parseInt(queueData.governQueue.nonce));
+      setVisibleActions(queueData.governQueue.containers);
+    }
+  }, [queueData]);
+
+  /**
+   * Functions
+   */
+  const fetchMoreData = async () => {
+    if (fetchMore) {
+      fetchMore({
+        variables: {
+          offset: visibleActions.length,
+        },
+      });
+    }
+  };
+
+  /**
+   * Render
+   */
+  if (daoIsLoading) {
+    return <div>Loading...</div>;
+  }
+
+  /**
+   * No Dao found based on the dao name
+   * TODO: remove comment!
+   */
+  if (!daoExists) {
+    return <NoDaoFound />;
+  }
+
+  /**
+   * Dao IS found!
    */
   return (
     <Grid layout={true}>
       <GridItem gridColumn={layoutName === 'small' ? '1/-1' : '1/5'}>
-        <DaoSideCard baseUrl={url} identifier={daoName} openActions="2" />
+        <DaoSideCard
+          address={dao?.queue?.address}
+          baseUrl={url}
+          identifier={daoName}
+          openActions="2"
+        />
       </GridItem>
       <GridItem
         gridRow={layoutName === 'small' ? '2/4' : '1'}
         gridColumn={layoutName === 'small' ? '1/-1' : '5/17'}
       >
         <Switch>
-          {/* Note that this 'home' route is not being tracked (ApmRoute not used)*/}
+          {/* TODO: Note that this 'home' route is not being tracked (ApmRoute not used)
+           Should be removed*/}
           <Redirect exact from={path} to={`${path}actions`} />
           <ApmRoute
             exact
@@ -51,8 +137,8 @@ const DaoHomePage: React.FC = () => {
             render={() => <div>Settings Component goes here...</div>}
           />
 
-          {/* Need to vault upwards into parent 404 */}
-          <ApmRoute render={() => <div>TEMP not found component</div>} />
+          {/* Operation not found on DAO */}
+          <ApmRoute render={() => <div>Operation not found on dao. Go home?</div>} />
         </Switch>
       </GridItem>
     </Grid>
