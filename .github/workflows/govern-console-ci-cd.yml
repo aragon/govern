@@ -62,7 +62,7 @@ jobs:
           COMMIT_SHA: ${{ github.sha }}
         run: |
           for f in ./build/static/**/*.js.map ; do 
-            curl -X POST https://apm-monitoring.aragon.org/assets/v1/sourcemaps -F service_name="govern" -F service_version="$COMMIT_SHA" -F bundle_filepath="http://localhost/static/js/$f" -F sourcemap=@$f
+            curl -X POST https://apm-monitoring.aragon.org/assets/v1/sourcemaps -F service_name="govern" -F service_version="$COMMIT_SHA" -F bundle_filepath="http://localhost/static/js/$(basename $f)" -F sourcemap=@$f
           done
 
   build-and-deploy-mainnet:
@@ -110,5 +110,5 @@ jobs:
           COMMIT_SHA: ${{ github.sha }}
         run: |
           for f in ./build/static/**/*.js.map ; do 
-            curl -X POST https://apm-monitoring.aragon.org/assets/v1/sourcemaps -F service_name="govern" -F service_version="$COMMIT_SHA" -F bundle_filepath="http://localhost/static/js/$f" -F sourcemap=@$f
+            curl -X POST https://apm-monitoring.aragon.org/assets/v1/sourcemaps -F service_name="govern" -F service_version="$COMMIT_SHA" -F bundle_filepath="http://localhost/static/js/$(basename $f)" -F sourcemap=@$f
           done
