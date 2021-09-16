@@ -67,6 +67,7 @@ const HomePage = () => {
               {/* --------------------------------------------------------------------------- */}
 
               <ApmRoute exact path="/create-dao" component={CreateDao} />
+              {/* TODO: add missing catch all not found page */}
             </Switch>
           </BodyArea>
           <FooterArea>

@@ -1,9 +1,10 @@
 import styled from 'styled-components';
-import { Box, IconWallet, IconSettings, useLayout } from '@aragon/ui';
+import { Box, EthIdenticon, IconWallet, IconSettings, useLayout } from '@aragon/ui';
 
 import ActionLink from '../ActionLink/ActionLink';
 
 type Props = {
+  address: string;
   baseUrl: string;
   identifier: string;
   openActions: string;
@@ -49,14 +50,6 @@ const AvatarWrapper = styled.div`
   padding: 8px;
 `;
 
-/** Placeholder for actual avatar */
-const Avatar = styled.div`
-  width: 40px;
-  height: 40px;
-  border-radius: 100px;
-  background-color: red;
-`;
-
 const Content = styled(Box)`
   margin-top: 24px;
   border-radius: 16px;
@@ -79,6 +72,10 @@ const Title = styled.p`
   font-weight: 600;
   line-height: 30px;
   color: #20232c;
+
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 `;
 const Subtitle = styled.p`
   font-size: 16px;
@@ -96,14 +93,14 @@ const LinkGroup = styled.div`
   justify-content: space-between;
 `;
 
-const DaoSideCard: React.FC<Props> = ({ baseUrl, identifier, openActions }) => {
+const DaoSideCard: React.FC<Props> = ({ address, baseUrl, identifier, openActions }) => {
   const { layoutName } = useLayout();
 
   return (
     <Container>
       <AvatarContainer css={layoutName === 'small' ? 'justify-content: center' : undefined}>
         <AvatarWrapper>
-          <Avatar />
+          <EthIdenticon address={address} scale={2} />
         </AvatarWrapper>
       </AvatarContainer>
       <Content>
@@ -111,7 +108,7 @@ const DaoSideCard: React.FC<Props> = ({ baseUrl, identifier, openActions }) => {
           <Title>{identifier}</Title>
           <Subtitle>{openActions} open actions</Subtitle>
         </Details>
-        <LinkGroup css={layoutName === 'small' ? 'flex-direction: row' : undefined}>
+        <LinkGroup css={layoutName === 'small' ? 'flex-direction: row; height: auto' : undefined}>
           {links.map(({ path, icon, label }, index) => (
             <ActionLink key={index} url={baseUrl + path} label={label} icon={icon} />
           ))}
