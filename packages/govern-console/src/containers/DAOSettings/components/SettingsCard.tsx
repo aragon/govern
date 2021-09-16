@@ -1,3 +1,7 @@
+/**
+ * TODO: TUnused component. Please remove.
+ */
+
 import React from 'react';
 import cardMainImage from 'images/pngs/dao_setting_@2x.png';
 import { EmptyStateCard, StyledText, useTheme } from '@aragon/ui';
@@ -7,7 +11,7 @@ const SettingsCard: React.FC = () => {
   const cardText = (
     <div>
       <StyledText name={'title1'}>Your DAO settings</StyledText>
-      <StyledText name={'body2'} style={{ color: theme.disabledContent }}>
+      <StyledText name={'body4'} style={{ color: theme.disabledContent }}>
         Carefully review your changes as some settings may break or lock your DAO.
       </StyledText>
     </div>
