@@ -18,6 +18,7 @@ const ActionCard = styled(Box).attrs(() => ({
   border-radius: 16px;
   width: 100%;
   border: none;
+  cursor: pointer;
   & > div {
     width: 100%;
   }
@@ -71,15 +72,15 @@ const LableContainer = styled.div`
   display: flex;
 `;
 
-const DaoActionCard: React.FC = () => {
+const DaoActionCard: React.FC<Props> = ({ text, time, lable }) => {
   return (
     <ActionCard>
       <TextContainer>
-        <Text>0x7ad0...f5dd</Text>
-        <Time>Yesterday</Time>
+        <Text>{text}</Text>
+        <Time>{time}</Time>
       </TextContainer>
       <LableContainer>
-        <Lable className="challenged">Challenged</Lable>
+        <Lable className="challenged">{lable}</Lable>
         <IconRight
           css={`
             margin-left: ${3 * GU}px;

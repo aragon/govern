@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { DropDown, Button, GU, SearchInput } from '@aragon/ui';
+import { DropDown, Button, GU, SearchInput, IconDown } from '@aragon/ui';
 import styled from 'styled-components';
 
 import ActionsList from './components/ActionsList/ActionsList';
@@ -29,7 +29,7 @@ const SearchContainer = styled.div`
   margin-bottom: ${3 * GU}px;
 `;
 
-const CustomButton = styled(Button)`
+const CustomActionButton = styled(Button)`
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -39,6 +39,24 @@ const CustomButton = styled(Button)`
   height: 44px;
   border-radius: 12px;
   box-shadow: none;
+`;
+
+const LoadMoreButton = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 24px;
+  width: 154px;
+  height: 44px;
+  border-radius: 12px;
+  color: #7483ab;
+  background: #ffffff;
+  box-shadow: none;
+  cursor: pointer;
+  & > svg {
+    padding-left: 2px;
+  }
 `;
 
 const ActionListContainer = styled.div`
@@ -53,11 +71,18 @@ const DaoActionsPage: React.FC = () => {
     <Container>
       <HeaderContainer>
         <Title>Actions</Title>
-        <CustomButton label="New action" />
+        <CustomActionButton label="New action" />
       </HeaderContainer>
       <SearchContainer>
         <DropDown
-          items={['All Actions', 'Black Wildflower', 'Ancient Paper']}
+          items={[
+            'All Actions',
+            'Executable',
+            'Scheduled',
+            'challenged',
+            'Executed',
+            'Ruled Negatively',
+          ]}
           css={`
             border: none;
           `}
@@ -77,6 +102,10 @@ const DaoActionsPage: React.FC = () => {
       <ActionListContainer>
         <ActionsList />
       </ActionListContainer>
+      <LoadMoreButton>
+        <span>Load more</span>
+        <IconDown />
+      </LoadMoreButton>
     </Container>
   );
 };
