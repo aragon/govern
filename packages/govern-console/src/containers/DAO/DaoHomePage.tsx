@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react';
 import { ApmRoute } from '@elastic/apm-rum-react';
+import { useEffect, useState } from 'react';
 import { Grid, GridItem, useLayout } from '@aragon/ui';
-import { Redirect, Switch, useParams, useRouteMatch } from 'react-router';
+import { Redirect, Switch, useLocation, useParams, useRouteMatch } from 'react-router';
 
 import NoDaoFound from './NoDaoFound';
 import DaoSideCard from './components/DaoSideCard/DaoSideCard';
 import { useDaoQuery, useLazyProposalListQuery } from 'hooks/query-hooks';
+import HelpComponent from 'components/HelpComponent/HelpComponent';
 
 /**
  * TODO: implement codesplitting, especially if api calls
@@ -19,6 +20,7 @@ import { useDaoQuery, useLazyProposalListQuery } from 'hooks/query-hooks';
  */
 const DaoHomePage: React.FC = () => {
   const { daoName } = useParams<any>();
+  const { pathname } = useLocation();
   const { path, url } = useRouteMatch();
   const { layoutName } = useLayout();
 
@@ -35,8 +37,6 @@ const DaoHomePage: React.FC = () => {
    */
   const { data: dao, loading: daoIsLoading } = useDaoQuery(daoName);
   const { getQueueData, data: queueData, fetchMore } = useLazyProposalListQuery();
-
-  console.log(queueData);
 
   /**
    * Update state and get queue data
@@ -140,6 +140,9 @@ const DaoHomePage: React.FC = () => {
           {/* Operation not found on DAO */}
           <ApmRoute render={() => <div>Operation not found on dao. Go home?</div>} />
         </Switch>
+      </GridItem>
+      <GridItem gridColumn={layoutName === 'small' ? '1/-1' : '1/5'}>
+        {pathname === `${url}/settings` && <HelpComponent />}
       </GridItem>
     </Grid>
   );
