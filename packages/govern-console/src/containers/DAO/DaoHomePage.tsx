@@ -5,14 +5,9 @@ import { Redirect, Switch, useLocation, useParams, useRouteMatch } from 'react-r
 
 import NoDaoFound from './NoDaoFound';
 import DaoSideCard from './components/DaoSideCard/DaoSideCard';
-import { useDaoQuery, useLazyProposalListQuery } from 'hooks/query-hooks';
+import DAOSettings from 'containers/DAOSettings/DAOSettings';
 import HelpComponent from 'components/HelpComponent/HelpComponent';
-
-/**
- * TODO: implement codesplitting, especially if api calls
- * are being made by specific pages
- */
-// import DAOSettings from 'containers/DAOSettings/DAOSettings';
+import { useDaoQuery, useLazyProposalListQuery } from 'hooks/query-hooks';
 
 /**
  * Mainpage taking care of the routing to various dao functions;
@@ -92,10 +87,6 @@ const DaoHomePage: React.FC = () => {
     return <div>Loading...</div>;
   }
 
-  /**
-   * No Dao found based on the dao name
-   * TODO: remove comment!
-   */
   if (!daoExists) {
     return <NoDaoFound />;
   }
@@ -131,11 +122,7 @@ const DaoHomePage: React.FC = () => {
             path={`${path}finance`}
             render={() => <div>Finance Component goes here...</div>}
           />
-          <ApmRoute
-            exact
-            path={`${path}settings`}
-            render={() => <div>Settings Component goes here...</div>}
-          />
+          <ApmRoute exact path={`${path}settings`} component={DAOSettings} />
 
           {/* Operation not found on DAO */}
           <ApmRoute render={() => <div>Operation not found on dao. Go home?</div>} />
