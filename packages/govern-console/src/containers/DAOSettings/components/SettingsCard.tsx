@@ -1,5 +1,5 @@
 /**
- * TODO: TUnused component. Please remove.
+ * TODO: Unused component. To be removed.
  */
 
 import React from 'react';
