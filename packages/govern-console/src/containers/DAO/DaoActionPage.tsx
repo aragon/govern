@@ -66,17 +66,17 @@ const ActionListContainer = styled.div`
 
 type actionsData = {
   governQueue: {
-    __typename: string;
+    __typename?: string;
     id: string;
     address: string;
     nonce: string;
     containers: {
-      __typename: string;
+      __typename?: string;
       id: string;
       state: string;
       createdAt: string;
       payload: {
-        __typename: string;
+        __typename?: string;
         id: string;
         executionTime: string;
         title: string;
@@ -87,6 +87,7 @@ type actionsData = {
 
 const DaoActionsPage: React.FC = (queueData) => {
   const [selected, setSelected] = useState<number>(0);
+  const [value, setValue] = useState<string>('');
 
   const FilterState = (data: actionsData['governQueue']['containers'][0]) => {
     switch (selected) {
@@ -107,12 +108,21 @@ const DaoActionsPage: React.FC = (queueData) => {
     }
   };
 
+  const SearchAction = (data: actionsData['governQueue']['containers'][0]) => {
+    // need improvment
+    const re = new RegExp(value, 'i');
+    if (value === '') return data;
+    else if (data.payload.title) if (data.payload.title.match(re)) return data;
+  };
+
   const RenderActions: any = (queueData: actionsData) => {
+    // need improvment
     const { layoutName } = useLayout();
     const temp: React.FC[] | any = [];
     if (queueData.governQueue) {
       queueData.governQueue.containers
         .filter((data) => FilterState(data))
+        .filter((data) => SearchAction(data))
         .map((data, index: number) => {
           temp.push(
             <GridItem gridColumn={layoutName === 'medium' ? '1/-1' : '1/3'}>
@@ -157,6 +167,7 @@ const DaoActionsPage: React.FC = (queueData) => {
             margin-left: ${3 * GU}px;
             border-radius: 12px;
           `}
+          onChange={(text: string) => setValue(text)}
           placeholder="Type to search..."
           wide={true}
         />
@@ -164,10 +175,10 @@ const DaoActionsPage: React.FC = (queueData) => {
       <ActionListContainer>
         <Grid columns={'4'}>{RenderActions(queueData)}</Grid>
       </ActionListContainer>
-      <LoadMoreButton>
+      {/* <LoadMoreButton>
         <span>Load more</span>
         <IconDown />
-      </LoadMoreButton>
+      </LoadMoreButton> */}
     </Container>
   );
 };
