@@ -38,7 +38,6 @@ const DaoHomePage: React.FC = () => {
    */
   const { data: dao, loading: daoIsLoading } = useDaoQuery(daoName);
   const { getQueueData, data: queueData, fetchMore } = useLazyProposalListQuery();
-
   /**
    * Update state and get queue data
    */
@@ -122,7 +121,11 @@ const DaoHomePage: React.FC = () => {
           {/* TODO: Note that this 'home' route is not being tracked (ApmRoute not used)
            Should be removed*/}
           <Redirect exact from={path} to={`${path}actions`} />
-          <ApmRoute exact path={`${path}actions`} render={() => <DaoActionsPage />} />
+          <ApmRoute
+            exact
+            path={`${path}actions`}
+            render={() => <DaoActionsPage {...queueData} />}
+          />
           <ApmRoute
             exact
             path={`${path}finance`}

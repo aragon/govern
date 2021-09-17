@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { DropDown, Button, GU, SearchInput, IconDown } from '@aragon/ui';
+import React, { useState } from 'react';
+import { DropDown, Button, GU, SearchInput, IconDown, Grid, GridItem, useLayout } from '@aragon/ui';
 import styled from 'styled-components';
 
-import ActionsList from './components/ActionsList/ActionsList';
+import DaoActionCard from './components/DaoActionCard/DaoActionCard';
 
 const Container = styled.div`
   margin-top: ${3 * GU}px;
@@ -64,8 +64,70 @@ const ActionListContainer = styled.div`
   margin-bottom: ${3 * GU}px;
 `;
 
-const DaoActionsPage: React.FC = () => {
+type actionsData = {
+  governQueue: {
+    __typename: string;
+    id: string;
+    address: string;
+    nonce: string;
+    containers: {
+      __typename: string;
+      id: string;
+      state: string;
+      createdAt: string;
+      payload: {
+        __typename: string;
+        id: string;
+        executionTime: string;
+        title: string;
+      };
+    }[];
+  };
+};
+
+const DaoActionsPage: React.FC = (queueData) => {
   const [selected, setSelected] = useState<number>(0);
+
+  const FilterState = (data: actionsData['governQueue']['containers'][0]) => {
+    switch (selected) {
+      case 0:
+        return data;
+      case 1:
+        return data.state === 'Executable';
+      case 2:
+        return data.state === 'Scheduled';
+      case 3:
+        return data.state === 'Challenged';
+      case 4:
+        return data.state === 'Executed';
+      case 5:
+        return data.state === 'Ruled Negatively';
+      default:
+        return;
+    }
+  };
+
+  const RenderActions: any = (queueData: actionsData) => {
+    const { layoutName } = useLayout();
+    const temp: React.FC[] | any = [];
+    if (queueData.governQueue) {
+      queueData.governQueue.containers
+        .filter((data) => FilterState(data))
+        .map((data, index: number) => {
+          temp.push(
+            <GridItem gridColumn={layoutName === 'medium' ? '1/-1' : '1/3'}>
+              <DaoActionCard
+                key={index}
+                date={data.createdAt}
+                state={data.state}
+                title={data.payload.title}
+              />
+            </GridItem>,
+          );
+        });
+      return temp;
+    } else return <div>Loading...</div>;
+  };
 
   return (
     <Container>
@@ -79,7 +141,7 @@ const DaoActionsPage: React.FC = () => {
             'All Actions',
             'Executable',
             'Scheduled',
-            'challenged',
+            'Challenged',
             'Executed',
             'Ruled Negatively',
           ]}
@@ -100,7 +162,7 @@ const DaoActionsPage: React.FC = () => {
         />
       </SearchContainer>
       <ActionListContainer>
-        <ActionsList />
+        <Grid columns={'4'}>{RenderActions(queueData)}</Grid>
       </ActionListContainer>
       <LoadMoreButton>
         <span>Load more</span>

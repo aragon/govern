@@ -1,11 +1,11 @@
 import styled from 'styled-components';
 import { Box, Tag, IconRight, GU } from '@aragon/ui';
 
-export interface Props {
-  text: string;
-  time: string;
-  lable: string;
-}
+type Props = {
+  date: string;
+  state: string;
+  title: string | null;
+};
 
 const ActionCard = styled(Box).attrs(() => ({
   padding: 16,
@@ -72,15 +72,15 @@ const LableContainer = styled.div`
   display: flex;
 `;
 
-const DaoActionCard: React.FC<Props> = ({ text, time, lable }) => {
+const DaoActionCard: React.FC<Props> = ({ date, state, title }) => {
   return (
     <ActionCard>
       <TextContainer>
-        <Text>{text}</Text>
-        <Time>{time}</Time>
+        <Text>{title}</Text>
+        <Time>{date}</Time>
       </TextContainer>
       <LableContainer>
-        <Lable className="challenged">{lable}</Lable>
+        <Lable className={state.toLowerCase().replace(' ', '_')}>{state}</Lable>
         <IconRight
           css={`
             margin-left: ${3 * GU}px;
