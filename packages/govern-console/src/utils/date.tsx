@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { format, formatRelative } from 'date-fns';
 
 export const toMs = (seconds: number) => seconds * 1000;
 
@@ -16,8 +16,12 @@ export function formatDate(date: number | string, formatType?: string) {
       date = parseInt(date, 10);
     }
     date = date * 1000;
-    formatType = formatType || KNOWN_FORMATS.standard;
-    return format(date, formatType, {});
+    if (formatType !== 'relative') {
+      formatType = formatType || KNOWN_FORMATS.standard;
+      return format(date, formatType, {});
+    } else {
+      return formatRelative(date, new Date()); // Relative Format for Human Readable Date format
+    }
   } catch (e) {
     return date;
   }

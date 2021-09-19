@@ -64,32 +64,30 @@ const ActionListContainer = styled.div`
   margin-bottom: ${3 * GU}px;
 `;
 
-type actionsData = {
-  governQueue: {
+type actionsType = {
+  __typename?: string;
+  id: string;
+  state: string;
+  createdAt: string;
+  payload: {
     __typename?: string;
     id: string;
-    address: string;
-    nonce: string;
-    containers: {
-      __typename?: string;
-      id: string;
-      state: string;
-      createdAt: string;
-      payload: {
-        __typename?: string;
-        id: string;
-        executionTime: string;
-        title: string;
-      };
-    }[];
+    executionTime: string;
+    title: string;
   };
+}[];
+
+type props = {
+  fetchMore: () => Promise<void>;
+  actions: actionsType;
+  isMore: boolean;
 };
 
-const DaoActionsPage: React.FC = (queueData) => {
+const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore }) => {
   const [selected, setSelected] = useState<number>(0);
   const [value, setValue] = useState<string>('');
 
-  const FilterState = (data: actionsData['governQueue']['containers'][0]) => {
+  const FilterState = (data: actionsType[0]) => {
     switch (selected) {
       case 0:
         return data;
@@ -108,24 +106,24 @@ const DaoActionsPage: React.FC = (queueData) => {
     }
   };
 
-  const SearchAction = (data: actionsData['governQueue']['containers'][0]) => {
-    // need improvment
+  const SearchAction = (data: actionsType[0]) => {
     const re = new RegExp(value, 'i');
     if (value === '') return data;
     else if (data.payload.title) if (data.payload.title.match(re)) return data;
   };
 
-  const RenderActions: any = (queueData: actionsData) => {
-    // need improvment
+  const RenderActions = (actions: actionsType) => {
     const { layoutName } = useLayout();
     const temp: React.FC[] | any = [];
-    if (queueData.governQueue) {
-      queueData.governQueue.containers
+    if (actions) {
+      actions
         .filter((data) => FilterState(data))
         .filter((data) => SearchAction(data))
         .map((data, index: number) => {
           temp.push(
-            <GridItem gridColumn={layoutName === 'medium' ? '1/-1' : '1/3'}>
+            <GridItem
+              gridColumn={layoutName === 'medium' ? '1/-1' : index % 2 === 0 ? '1/3' : '3/5'}
+            >
               <DaoActionCard
                 key={index}
                 date={data.createdAt}
@@ -173,12 +171,14 @@ const DaoActionsPage: React.FC = (queueData) => {
         />
       </SearchContainer>
       <ActionListContainer>
-        <Grid columns={'4'}>{RenderActions(queueData)}</Grid>
+        <Grid columns={'4'}>{RenderActions(actions)}</Grid>
       </ActionListContainer>
-      {/* <LoadMoreButton>
-        <span>Load more</span>
-        <IconDown />
-      </LoadMoreButton> */}
+      {isMore && (
+        <LoadMoreButton onClick={fetchMore}>
+          <span>Load more</span>
+          <IconDown />
+        </LoadMoreButton>
+      )}
     </Container>
   );
 };

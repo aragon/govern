@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { Box, Tag, IconRight, GU } from '@aragon/ui';
+import { formatDate } from 'utils/date';
 
 type Props = {
   date: string;
@@ -76,8 +77,8 @@ const DaoActionCard: React.FC<Props> = ({ date, state, title }) => {
   return (
     <ActionCard>
       <TextContainer>
-        <Text>{title}</Text>
-        <Time>{date}</Time>
+        <Text>{title || '-'}</Text>
+        <Time>{formatDate(date, 'relative')}</Time>
       </TextContainer>
       <LableContainer>
         <Lable className={state.toLowerCase().replace(' ', '_')}>{state}</Lable>

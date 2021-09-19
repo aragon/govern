@@ -29,6 +29,7 @@ const DaoHomePage: React.FC = () => {
    * State
    */
   const [daoExists, setDaoExists] = useState<boolean>(true);
+  const [IsMoreActions, setIsMoreActions] = useState<boolean>(false);
   const [daoDetails, setDaoDetails] = useState<any>();
   const [queueNonce, setQueueNonce] = useState<number>();
   const [visibleActions, setVisibleActions] = useState<any>([]);
@@ -63,7 +64,7 @@ const DaoHomePage: React.FC = () => {
   }, [daoIsLoading, dao, getQueueData]);
 
   /**
-   * Update visible proposals
+   * Update visible proposals & Check Is more visible actions available
    */
   useEffect(() => {
     if (queueData) {
@@ -71,6 +72,12 @@ const DaoHomePage: React.FC = () => {
       setVisibleActions(queueData.governQueue.containers);
     }
   }, [queueData]);
+
+  useEffect(() => {
+    if (queueNonce && visibleActions.length) {
+      setIsMoreActions(queueNonce !== visibleActions.length);
+    } else setIsMoreActions(false);
+  }, [queueNonce, visibleActions]);
 
   /**
    * Functions
@@ -124,7 +131,13 @@ const DaoHomePage: React.FC = () => {
           <ApmRoute
             exact
             path={`${path}actions`}
-            render={() => <DaoActionsPage {...queueData} />}
+            render={() => (
+              <DaoActionsPage
+                fetchMore={fetchMoreData}
+                actions={visibleActions}
+                isMore={IsMoreActions}
+              />
+            )}
           />
           <ApmRoute
             exact
