@@ -101,7 +101,7 @@ const DaoHomePage: React.FC = () => {
    * Dao IS found!
    */
   return (
-    <Grid layout={true} gap={24} columns={'16'}>
+    <Grid layout={true} gap={24}>
       <GridItem gridColumn={layoutName === 'small' ? '1/-1' : '1/5'}>
         <DaoSideCard
           address={dao?.queue?.address}
