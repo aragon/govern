@@ -1,8 +1,29 @@
 import React, { useState } from 'react';
 import { DropDown, Button, GU, SearchInput, IconDown, Grid, GridItem, useLayout } from '@aragon/ui';
 import styled from 'styled-components';
+import { useHistory } from 'react-router-dom';
 
 import DaoActionCard from './components/DaoActionCard/DaoActionCard';
+
+type actionsType = {
+  __typename?: string;
+  id: string;
+  state: string;
+  createdAt: string;
+  payload: {
+    __typename?: string;
+    id: string;
+    executionTime: string;
+    title: string;
+  };
+}[];
+
+type props = {
+  fetchMore: () => Promise<void>;
+  actions: actionsType;
+  isMore: boolean;
+  identifier: string;
+};
 
 const Container = styled.div`
   margin-top: ${3 * GU}px;
@@ -64,26 +85,8 @@ const ActionListContainer = styled.div`
   margin-bottom: ${3 * GU}px;
 `;
 
-type actionsType = {
-  __typename?: string;
-  id: string;
-  state: string;
-  createdAt: string;
-  payload: {
-    __typename?: string;
-    id: string;
-    executionTime: string;
-    title: string;
-  };
-}[];
-
-type props = {
-  fetchMore: () => Promise<void>;
-  actions: actionsType;
-  isMore: boolean;
-};
-
-const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore }) => {
+const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, identifier }) => {
+  const history = useHistory();
   const [selected, setSelected] = useState<number>(0);
   const [value, setValue] = useState<string>('');
 
@@ -137,11 +140,15 @@ const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore }) => {
     } else return <div>Loading...</div>;
   };
 
+  const goToNewExecution = () => {
+    history.push(`/daos/${identifier}/actions/new-execution`);
+  };
+
   return (
     <Container>
       <HeaderContainer>
         <Title>Actions</Title>
-        <CustomActionButton label="New action" />
+        <CustomActionButton label="New action" onClick={goToNewExecution} />
       </HeaderContainer>
       <SearchContainer>
         <DropDown
@@ -171,7 +178,7 @@ const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore }) => {
         />
       </SearchContainer>
       <ActionListContainer>
-        <Grid columns={'4'}>{RenderActions(actions)}</Grid>
+        <Grid column={'4'}>{RenderActions(actions)}</Grid>
       </ActionListContainer>
       {isMore && (
         <LoadMoreButton onClick={fetchMore}>

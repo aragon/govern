@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Box, Tag, IconRight, GU } from '@aragon/ui';
+import { Box, Tag, IconRight, GU, useLayout } from '@aragon/ui';
 import { formatDate } from 'utils/date';
 
 type Props = {
@@ -59,6 +59,10 @@ const Text = styled.p`
   font-weight: 600;
   font-size: 16px;
   line-height: 125%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
 `;
 
 const Time = styled.p`
@@ -74,10 +78,18 @@ const LableContainer = styled.div`
 `;
 
 const DaoActionCard: React.FC<Props> = ({ date, state, title }) => {
+  const { layoutName } = useLayout();
+
   return (
     <ActionCard>
       <TextContainer>
-        <Text>{title || '-'}</Text>
+        <Text
+          css={`
+            width: ${layoutName === 'small' ? '100px' : '250px'};
+          `}
+        >
+          {title || '-'}
+        </Text>
         <Time>{formatDate(date, 'relative')}</Time>
       </TextContainer>
       <LableContainer>

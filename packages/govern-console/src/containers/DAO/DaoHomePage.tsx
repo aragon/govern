@@ -8,6 +8,7 @@ import DaoSideCard from './components/DaoSideCard/DaoSideCard';
 import DaoActionsPage from './DaoActionPage';
 import { useDaoQuery, useLazyProposalListQuery } from 'hooks/query-hooks';
 import HelpComponent from 'components/HelpComponent/HelpComponent';
+import NewExecution from 'containers/NewExecution/NewExecution';
 
 /**
  * TODO: implement codesplitting, especially if api calls
@@ -136,6 +137,7 @@ const DaoHomePage: React.FC = () => {
                 fetchMore={fetchMoreData}
                 actions={visibleActions}
                 isMore={IsMoreActions}
+                identifier={daoName}
               />
             )}
           />
@@ -149,6 +151,7 @@ const DaoHomePage: React.FC = () => {
             path={`${path}settings`}
             render={() => <div>Settings Component goes here...</div>}
           />
+          <ApmRoute exact path={`${path}actions/new-execution`} render={() => <NewExecution />} />
 
           {/* Operation not found on DAO */}
           <ApmRoute render={() => <div>Operation not found on dao. Go home?</div>} />
