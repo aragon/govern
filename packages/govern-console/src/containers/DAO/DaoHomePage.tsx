@@ -1,13 +1,19 @@
+import styled from 'styled-components';
 import { ApmRoute } from '@elastic/apm-rum-react';
-import { useEffect, useState } from 'react';
-import { Grid, GridItem, useLayout } from '@aragon/ui';
+import { Grid, GridItem, GU, useLayout } from '@aragon/ui';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Redirect, Switch, useLocation, useParams, useRouteMatch } from 'react-router';
 
 import NoDaoFound from './NoDaoFound';
 import DaoSideCard from './components/DaoSideCard/DaoSideCard';
-import DAOSettings from 'containers/DAOSettings/DAOSettings';
 import HelpComponent from 'components/HelpComponent/HelpComponent';
 import { useDaoQuery, useLazyProposalListQuery } from 'hooks/query-hooks';
+
+const DaoSettings = lazy(() => import('containers/DAOSettings/DAOSettings'));
+
+const StyledGridItem = styled(GridItem)`
+  padding-top: ${3 * GU}px;
+`;
 
 /**
  * Mainpage taking care of the routing to various dao functions;
@@ -95,7 +101,7 @@ const DaoHomePage: React.FC = () => {
    * Dao IS found!
    */
   return (
-    <Grid layout={true}>
+    <Grid layout={true} gap={24} columns={'16'}>
       <GridItem gridColumn={layoutName === 'small' ? '1/-1' : '1/5'}>
         <DaoSideCard
           address={dao?.queue?.address}
@@ -104,33 +110,36 @@ const DaoHomePage: React.FC = () => {
           openActions="2"
         />
       </GridItem>
-      <GridItem
-        gridRow={layoutName === 'small' ? '2/4' : '1'}
+      <StyledGridItem
+        gridRow={layoutName === 'small' ? '2/4' : '1/4'}
         gridColumn={layoutName === 'small' ? '1/-1' : '5/17'}
       >
-        <Switch>
-          {/* TODO: Note that this 'home' route is not being tracked (ApmRoute not used)
-           Should be removed*/}
-          <Redirect exact from={path} to={`${path}actions`} />
-          <ApmRoute
-            exact
-            path={`${path}actions`}
-            render={() => <div>Actions Component goes here...</div>}
-          />
-          <ApmRoute
-            exact
-            path={`${path}finance`}
-            render={() => <div>Finance Component goes here...</div>}
-          />
-          <ApmRoute exact path={`${path}settings`} component={DAOSettings} />
-
-          {/* Operation not found on DAO */}
-          <ApmRoute render={() => <div>Operation not found on dao. Go home?</div>} />
-        </Switch>
-      </GridItem>
-      <GridItem gridColumn={layoutName === 'small' ? '1/-1' : '1/5'}>
-        {pathname === `${url}/settings` && <HelpComponent />}
-      </GridItem>
+        <Suspense fallback={<div>Loading...</div>}>
+          <Switch>
+            <Redirect exact from={path} to={`${path}actions`} />
+            <ApmRoute
+              exact
+              path={`${path}actions`}
+              render={() => <div>Actions Component goes here...</div>}
+            />
+            <ApmRoute
+              exact
+              path={`${path}finance`}
+              render={() => <div>Finance Component goes here...</div>}
+            />
+            <ApmRoute exact path={`${path}settings`} component={DaoSettings} />
+            <ApmRoute render={() => <div>Operation not found on dao. Go home?</div>} />
+          </Switch>
+        </Suspense>
+      </StyledGridItem>
+      {pathname === `${url}/settings` && (
+        <GridItem
+          gridRow={layoutName === 'small' ? '4/5' : '2/3'}
+          gridColumn={layoutName === 'small' ? '1/-1' : '1/5'}
+        >
+          <HelpComponent />
+        </GridItem>
+      )}
     </Grid>
   );
 };
