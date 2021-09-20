@@ -1,9 +1,17 @@
+import styled from 'styled-components';
 import { Controller } from 'react-hook-form';
 import { TextInput, StyledText, useTheme } from '@aragon/ui';
 
 import { getTokenInfo } from 'utils/token';
-import { validateAmountForDecimals, validateToken } from 'utils/validations';
 import { SetStateAction } from 'react';
+import { validateAmountForDecimals, validateToken } from 'utils/validations';
+
+const StyledDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: space-between;
+`;
 
 type Props = {
   control: any;
@@ -27,7 +35,7 @@ const Collaterals: React.FC<Props> = ({
   const { disabledContent } = useTheme();
 
   return (
-    <>
+    <StyledDiv>
       <div>
         <StyledText name={'title3'}>Collaterals</StyledText>
         <StyledText name={'title4'} style={{ color: disabledContent }}>
@@ -37,6 +45,7 @@ const Collaterals: React.FC<Props> = ({
       </div>
 
       {/* Schedule Execution Collateral */}
+
       <Controller
         name="daoConfig.scheduleDeposit.token"
         control={control}
@@ -148,7 +157,7 @@ const Collaterals: React.FC<Props> = ({
           />
         )}
       />
-    </>
+    </StyledDiv>
   );
 };
 
