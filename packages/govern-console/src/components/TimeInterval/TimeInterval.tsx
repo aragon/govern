@@ -14,12 +14,14 @@ interface TimeIntervalInputs {
   shouldUnregister?: boolean;
   timeInSeconds?: number;
   placeholder?: string;
+  inputContainerStyles?: any;
 }
 
 export const TimeInterval: React.FC<TimeIntervalInputs> = ({
   title,
   subtitle,
   inputName,
+  inputContainerStyles,
   dropdownName,
   resultName,
   shouldUnregister = false,
@@ -68,6 +70,7 @@ export const TimeInterval: React.FC<TimeIntervalInputs> = ({
           flex-wrap: wrap;
           gap: ${spacing}px;
         `}
+        style={{ ...inputContainerStyles }}
       >
         <Controller
           key={`key-${inputName}`}
@@ -90,7 +93,9 @@ export const TimeInterval: React.FC<TimeIntervalInputs> = ({
                 updateResult(event.target.value, TIME_INTERVALS.values[getValues(dropdownName)]);
                 onChange(event);
               }}
-              width={layoutName === 'large' ? '270px' : ''}
+              css={`
+                min-width: 270px;
+              `}
               wide={layoutName === 'large' ? false : true}
               status={!!error ? 'error' : 'normal'}
               error={error ? error.message : null}
