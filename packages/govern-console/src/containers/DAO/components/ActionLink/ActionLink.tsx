@@ -2,11 +2,6 @@ import styled from 'styled-components';
 import { NavLink } from 'react-router-dom';
 import { useLayout } from '@aragon/ui';
 
-/**
- * TODO: min-width for small screen
- * Also, on small screen the square tapped area despite
- * border-radius
- */
 const StyledDiv = styled(NavLink)`
   display: flex;
   align-items: center;

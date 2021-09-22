@@ -41,6 +41,7 @@ const DaoHomePage: React.FC = () => {
   const { data: dao, loading: daoIsLoading } = useDaoQuery(daoName);
   const { getQueueData, data: queueData, fetchMore } = useLazyProposalListQuery();
 
+  console.log(queueData);
   /**
    * Update state and get queue data
    */
@@ -99,6 +100,7 @@ const DaoHomePage: React.FC = () => {
     history.replace('/daos/not-found');
   }
 
+  // TODO: Set API call to get open action(scheduled + executable)
   return (
     <Grid layout={true} gap={24}>
       <GridItem gridColumn={layoutName === 'small' ? '1/-1' : '1/5'}>
