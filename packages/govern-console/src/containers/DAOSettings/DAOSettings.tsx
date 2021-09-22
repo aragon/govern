@@ -1,14 +1,15 @@
 import {
+  GU,
   Box,
   Grid,
   Button,
-  SPACING,
-  TextCopy,
   useTheme,
+  GridItem,
   useToast,
   useLayout,
   StyledText,
 } from '@aragon/ui';
+import styled from 'styled-components';
 import { DaoConfig } from '@aragon/govern';
 import { buildConfig } from 'utils/ERC3000';
 import { ContractReceipt } from 'ethers';
@@ -31,6 +32,22 @@ import { addToIpfs, fetchIPFS } from 'utils/ipfs';
 import { formatUnits, parseUnits } from 'utils/lib';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import { CustomTransaction, ipfsMetadata as IPFSMetadataType } from 'utils/types';
+
+const StyledDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${2 * GU}px;
+  align-items: space-between;
+`;
+
+const Container = styled(Box)`
+  border-radius: 16px;
+`;
+
+const SubmitButton = styled(Button)`
+  padding: 8px 12px;
+  margin-bottom: ${GU}px;
+`;
 
 interface ParamTypes {
   /**
@@ -72,8 +89,7 @@ const DaoSettings: React.FC = () => {
   const methods = useForm<FormInputs>();
   const { control, setValue, getValues, handleSubmit, trigger } = methods;
 
-  const context: any = useWallet();
-  const { account, isConnected, provider } = context;
+  const { account, isConnected, provider } = useWallet();
   const { dispatch } = useContext(ModalsContext);
 
   /**
@@ -208,7 +224,7 @@ const DaoSettings: React.FC = () => {
 
     // payload for the final container
     const payload = {
-      submitter: account.address,
+      submitter: account.address + '',
       executor: daoDetails.executor.address,
       actions: [proposalInstance?.buildAction('configure', [newConfig], 0)],
       proof: proofCid,
@@ -246,61 +262,71 @@ const DaoSettings: React.FC = () => {
    * Render
    */
   return (
-    <Box>
-      <Grid gap={SPACING[layoutName]}>
-        <div>
+    <Container>
+      <Grid gap={3 * GU}>
+        <GridItem>
           <StyledText name={'title1'}>Settings</StyledText>
           {/* TODO: Proper copy needs to be added to the subtitle */}
           <StyledText name={'title4'} style={{ color: disabledContent }}>
-            Message about the importance of permissions on your DAO, bla bla, explaining the
+            [TBD]Message about the importance of permissions on your DAO, bla bla, explaining the
             settings etc.
           </StyledText>
-        </div>
-        <TextCopy title={'DAO Govern Executor Address'} value={daoAddresses.executorAddress} />
-        <TextCopy title={'DAO Token address'} value={daoAddresses.token} />
-        <TextCopy title={'DAO Queue address'} value={daoAddresses.queue} />
+        </GridItem>
 
         <FormProvider {...methods}>
-          <Resolver
-            control={control}
-            provider={provider}
-            resolverLock={resolverLock}
-            onResolverLockChange={updateResolverLock}
-          />
-          <ExecutionDelay
-            isLoading={daoIsLoading}
-            delayInSeconds={daoDetails?.queue?.config?.executionDelay}
-          />
-          <RulesAndAgreement isLoading={ipfsRulesLoading} ipfsMetadata={ipfsMetadata} />
-          <Collaterals
-            control={control}
-            provider={provider}
-            onTrigger={trigger}
-            scheduleDecimals={scheduleDecimals}
-            challengeDecimals={challengeDecimals}
-            onScheduleDepositChange={setScheduleDecimals}
-            onChallengeDecimalsChange={setChallengeDecimals}
-          />
-          <IPFSInput
-            rows={4}
-            title="Justification for change of settings"
-            subtitle="Insert the reason for scheduling this change of settings, so DAO members can understand it."
-            placeholder="Please insert the reason why you want to execute this"
-            textInputName="proof"
-            fileInputName="proofFile"
-          />
-          <div>
-            <Button
+          <GridItem>
+            <Resolver
+              control={control}
+              provider={provider}
+              resolverLock={resolverLock}
+              tokenAddress={daoAddresses.token}
+              queueAddress={daoAddresses.queue}
+              executorAddress={daoAddresses.executorAddress}
+              onResolverLockChange={updateResolverLock}
+            />
+          </GridItem>
+          <GridItem>
+            <StyledDiv>
+              <ExecutionDelay
+                isLoading={daoIsLoading}
+                delayInSeconds={daoDetails?.queue?.config?.executionDelay}
+              />
+              <RulesAndAgreement isLoading={ipfsRulesLoading} ipfsMetadata={ipfsMetadata} />
+            </StyledDiv>
+          </GridItem>
+          <GridItem>
+            <Collaterals
+              control={control}
+              provider={provider}
+              onTrigger={trigger}
+              scheduleDecimals={scheduleDecimals}
+              challengeDecimals={challengeDecimals}
+              onScheduleDepositChange={setScheduleDecimals}
+              onChallengeDecimalsChange={setChallengeDecimals}
+            />
+          </GridItem>
+          <GridItem>
+            <IPFSInput
+              rows={4}
+              title="Justification for change of settings"
+              subtitle="Insert the reason for scheduling this change of settings, so DAO members can understand it."
+              placeholder="Please insert the reason why you want to execute this"
+              textInputName="proof"
+              fileInputName="proofFile"
+            />
+          </GridItem>
+          <GridItem>
+            <SubmitButton
               size={layoutName}
               label={'Schedule configuration changes'}
               onClick={handleSubmit(callSaveSetting)}
               disabled={!isConnected}
               buttonType={'primary'}
             />
-          </div>
+          </GridItem>
         </FormProvider>
       </Grid>
-    </Box>
+    </Container>
   );
 };
 
