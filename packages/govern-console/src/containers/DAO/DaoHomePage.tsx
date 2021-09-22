@@ -2,11 +2,12 @@ import styled from 'styled-components';
 import { ApmRoute } from '@elastic/apm-rum-react';
 import { Grid, GridItem, GU, useLayout } from '@aragon/ui';
 import { lazy, Suspense, useEffect, useState } from 'react';
-import { Redirect, Switch, useLocation, useParams, useRouteMatch } from 'react-router';
+import { Redirect, Switch, useHistory, useLocation, useParams, useRouteMatch } from 'react-router';
 
-import NoDaoFound from './NoDaoFound';
 import DaoSideCard from './components/DaoSideCard/DaoSideCard';
+import NewExecution from 'containers/NewExecution/NewExecution';
 import HelpComponent from 'components/HelpComponent/HelpComponent';
+import ProposalDetails from 'containers/ProposalDetails/ProposalDetails';
 import { useDaoQuery, useLazyProposalListQuery } from 'hooks/query-hooks';
 
 const DaoSettings = lazy(() => import('containers/DAOSettings/DAOSettings'));
@@ -16,10 +17,11 @@ const StyledGridItem = styled(GridItem)`
 `;
 
 /**
- * Mainpage taking care of the routing to various dao functions;
+ * Main page taking care of the routing to various dao functions;
  * pulls all the data (for now at least)
  */
 const DaoHomePage: React.FC = () => {
+  const history = useHistory();
   const { daoName } = useParams<any>();
   const { pathname } = useLocation();
   const { path, url } = useRouteMatch();
@@ -94,12 +96,9 @@ const DaoHomePage: React.FC = () => {
   }
 
   if (!daoExists) {
-    return <NoDaoFound />;
+    history.replace('/daos/not-found');
   }
 
-  /**
-   * Dao IS found!
-   */
   return (
     <Grid layout={true} gap={24}>
       <GridItem gridColumn={layoutName === 'small' ? '1/-1' : '1/5'}>
@@ -128,6 +127,10 @@ const DaoHomePage: React.FC = () => {
               render={() => <div>Finance Component goes here...</div>}
             />
             <ApmRoute exact path={`${path}settings`} component={DaoSettings} />
+            <ApmRoute exact path={`${path}new-execution`} component={NewExecution} />
+            <ApmRoute exact path={`${path}executions/:id`} component={ProposalDetails} />
+
+            {/* TODO: Operation not found page */}
             <ApmRoute render={() => <div>Operation not found on dao. Go home?</div>} />
           </Switch>
         </Suspense>

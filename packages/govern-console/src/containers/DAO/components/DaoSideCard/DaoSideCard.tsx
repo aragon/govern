@@ -1,5 +1,12 @@
+import {
+  Box,
+  EthIdenticon,
+  IconActionsFilled,
+  IconSettingsFilled,
+  IconFinanceFilled,
+  useLayout,
+} from '@aragon/ui';
 import styled from 'styled-components';
-import { Box, EthIdenticon, IconWallet, IconSettings, useLayout } from '@aragon/ui';
 
 import ActionLink from '../ActionLink/ActionLink';
 
@@ -16,18 +23,12 @@ type MenuOptions = {
   icon: React.ReactElement;
 };
 
-/**
- * TODO: Get actions svg from aragon/ui
- */
 const links: MenuOptions[] = [
-  { path: '/actions', label: 'Actions', icon: <IconWallet /> },
-  { path: '/finance', label: 'Finance', icon: <IconWallet /> },
-  { path: '/settings', label: 'Settings', icon: <IconSettings /> },
+  { path: '/actions', label: 'Actions', icon: <IconActionsFilled size="small" /> },
+  { path: '/finance', label: 'Finance', icon: <IconFinanceFilled size="small" /> },
+  { path: '/settings', label: 'Settings', icon: <IconSettingsFilled size="small" /> },
 ];
 
-/**
- * Interestingly enough the avatar will collapse into it if the border isn't set
- */
 const Container = styled.div`
   border: 1px solid transparent;
   position: relative;
@@ -64,9 +65,6 @@ const Details = styled.div`
   margin-top: 16px;
 `;
 
-/**
- * Should probably be replaced with StyledText from aragon/ui
- */
 const Title = styled.p`
   font-size: 24px;
   font-weight: 600;

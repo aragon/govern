@@ -10,23 +10,16 @@ import { useLayout } from '@aragon/ui';
 const StyledDiv = styled(NavLink)`
   display: flex;
   align-items: center;
+  gap: 12px;
   height: 48px;
-  padding: 8px 8px 8px 8px;
+  padding: 8px 12px;
   border-radius: 12px;
 
-  /* These guys are used all over the place
-   * and need to be moved to a 'global' space
-   * such as a theme or something
-  */
   font-size: 16px;
   color: #7483ab;
   line-height: 20px;
   font-weight: 600;
   text-decoration: none;
-
-  & > svg {
-    margin-right: 4px;
-  }
 
   /* Active */
   &.active {
