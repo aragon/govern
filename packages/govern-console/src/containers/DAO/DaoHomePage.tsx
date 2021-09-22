@@ -12,8 +12,8 @@ import { useDaoQuery, useLazyProposalListQuery } from 'hooks/query-hooks';
 
 const DaoSettings = lazy(() => import('containers/DAOSettings/DAOSettings'));
 
-const StyledGridItem = styled(GridItem)`
-  padding-top: ${3 * GU}px;
+const StyledGridItem = styled(GridItem)<{ layoutName: string }>`
+  padding-top: ${(props) => (props.layoutName === 'small' ? undefined : 3 * GU)}px;
 `;
 
 /**
@@ -41,7 +41,6 @@ const DaoHomePage: React.FC = () => {
   const { data: dao, loading: daoIsLoading } = useDaoQuery(daoName);
   const { getQueueData, data: queueData, fetchMore } = useLazyProposalListQuery();
 
-  console.log(queueData);
   /**
    * Update state and get queue data
    */
@@ -112,6 +111,7 @@ const DaoHomePage: React.FC = () => {
         />
       </GridItem>
       <StyledGridItem
+        layoutName={layoutName}
         gridRow={layoutName === 'small' ? '2/4' : '1/4'}
         gridColumn={layoutName === 'small' ? '1/-1' : '5/17'}
       >
@@ -129,8 +129,8 @@ const DaoHomePage: React.FC = () => {
               render={() => <div>Finance Component goes here...</div>}
             />
             <ApmRoute exact path={`${path}settings`} component={DaoSettings} />
-            <ApmRoute exact path={`${path}new-execution`} component={NewExecution} />
             <ApmRoute exact path={`${path}executions/:id`} component={ProposalDetails} />
+            <ApmRoute exact path={`${path}actions/new-execution`} component={NewExecution} />
 
             {/* TODO: Operation not found page */}
             <ApmRoute render={() => <div>Operation not found on dao. Go home?</div>} />

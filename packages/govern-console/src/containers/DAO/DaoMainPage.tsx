@@ -1,3 +1,4 @@
+// TODO: This component is deprecated. Remove.
 import React, { useState, useEffect, memo } from 'react';
 import { styled } from '@material-ui/core/styles';
 import { DaoHeader } from 'components/DaoHeader/DaoHeader';
