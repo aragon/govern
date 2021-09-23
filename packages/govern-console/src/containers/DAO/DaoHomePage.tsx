@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { ApmRoute } from '@elastic/apm-rum-react';
 import { Grid, GridItem, GU, useLayout } from '@aragon/ui';
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { Redirect, Switch, useHistory, useLocation, useParams, useRouteMatch } from 'react-router';
 
 import DaoSideCard from './components/DaoSideCard/DaoSideCard';
@@ -12,8 +12,8 @@ import { useDaoQuery, useLazyProposalListQuery } from 'hooks/query-hooks';
 
 const DaoSettings = lazy(() => import('containers/DAOSettings/DAOSettings'));
 
-const StyledGridItem = styled(GridItem)<{ layoutName: string }>`
-  padding-top: ${(props) => (props.layoutName === 'small' ? undefined : 3 * GU)}px;
+const StyledGridItem = styled(GridItem)<{ paddingTop: string }>`
+  padding-top: ${({ paddingTop }) => paddingTop};
 `;
 
 /**
@@ -26,13 +26,12 @@ const DaoHomePage: React.FC = () => {
   const { pathname } = useLocation();
   const { path, url } = useRouteMatch();
   const { layoutName } = useLayout();
+  const layoutIsSmall = useMemo(() => layoutName === 'small', [layoutName]);
 
   /**
    * State
    */
   const [daoExists, setDaoExists] = useState<boolean>(true);
-  const [daoDetails, setDaoDetails] = useState<any>();
-  const [queueNonce, setQueueNonce] = useState<number>();
   const [visibleActions, setVisibleActions] = useState<any>([]);
 
   /**
@@ -49,7 +48,6 @@ const DaoHomePage: React.FC = () => {
 
     if (dao && getQueueData) {
       setDaoExists(true);
-      setDaoDetails(dao);
 
       if (dao.queue) {
         getQueueData({
@@ -70,7 +68,6 @@ const DaoHomePage: React.FC = () => {
    */
   useEffect(() => {
     if (queueData) {
-      setQueueNonce(parseInt(queueData.governQueue.nonce));
       setVisibleActions(queueData.governQueue.containers);
     }
   }, [queueData]);
@@ -102,7 +99,7 @@ const DaoHomePage: React.FC = () => {
   // TODO: Set API call to get open action(scheduled + executable)
   return (
     <Grid layout={true} gap={24}>
-      <GridItem gridColumn={layoutName === 'small' ? '1/-1' : '1/5'}>
+      <GridItem gridColumn={layoutIsSmall ? '1/-1' : '1/5'}>
         <DaoSideCard
           address={dao?.queue?.address}
           baseUrl={url}
@@ -111,9 +108,9 @@ const DaoHomePage: React.FC = () => {
         />
       </GridItem>
       <StyledGridItem
-        layoutName={layoutName}
-        gridRow={layoutName === 'small' ? '2/4' : '1/4'}
-        gridColumn={layoutName === 'small' ? '1/-1' : '5/17'}
+        gridRow={layoutIsSmall ? '2/4' : '1/4'}
+        gridColumn={layoutIsSmall ? '1/-1' : '5/17'}
+        paddingTop={layoutIsSmall ? '0px' : `${3 * GU}px`}
       >
         <Suspense fallback={<div>Loading...</div>}>
           <Switch>
@@ -139,8 +136,8 @@ const DaoHomePage: React.FC = () => {
       </StyledGridItem>
       {pathname === `${url}/settings` && (
         <GridItem
-          gridRow={layoutName === 'small' ? '4/5' : '2/3'}
-          gridColumn={layoutName === 'small' ? '1/-1' : '1/5'}
+          gridRow={layoutIsSmall ? '4/5' : '2/3'}
+          gridColumn={layoutIsSmall ? '1/-1' : '1/5'}
         >
           <HelpComponent />
         </GridItem>
