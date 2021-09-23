@@ -3,6 +3,7 @@ import { Redirect, Switch, useRouteMatch } from 'react-router';
 
 import DaoSideCard from './components/DaoSideCard/DaoSideCard';
 import DaoSettings from 'containers/DAOSettings/DAOSettings';
+import FinancePage from './DaoFinancePage';
 
 const DaoHomePage: React.FC = () => {
   const { path, url } = useRouteMatch();
@@ -18,8 +19,8 @@ const DaoHomePage: React.FC = () => {
       <Switch>
         <Redirect exact from={path} to={`${path}actions`} />
         <ApmRoute path={`${path}actions`} render={() => <div>Actions</div>} />
-        <ApmRoute path={`${path}finance`} render={() => <div>Finance</div>} />
-        <ApmRoute path={`${path}settings`} render={() => <DaoSettings />} />
+        <ApmRoute path={`${path}finance`} component={FinancePage} />
+        <ApmRoute path={`${path}settings`} component={DaoSettings} />
         {/* TODO: Action not found, send user to dao maybe? */}
       </Switch>
     </>
