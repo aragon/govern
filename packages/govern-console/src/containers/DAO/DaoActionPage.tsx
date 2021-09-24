@@ -85,43 +85,51 @@ const ActionListContainer = styled.div`
   margin-bottom: ${3 * GU}px;
 `;
 
+const NoAvailableActionContainer = styled.strong`
+  text-align: center;
+`;
+
 const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, identifier }) => {
   const history = useHistory();
   const [selected, setSelected] = useState<number>(0);
   const [value, setValue] = useState<string>('');
 
   const FilterState = (data: actionsType[0]) => {
+    enum Filters { // Convern DropDown Number to Status
+      Executable = 1,
+      Scheduled = 2,
+      Challenged = 3,
+      Executed = 4,
+      Ruled_Negatively = 5,
+    }
     switch (selected) {
-      case 0:
-        return data;
-      case 1:
+      case Filters.Executable:
         return data.state === 'Executable';
-      case 2:
+      case Filters.Scheduled:
         return data.state === 'Scheduled';
-      case 3:
+      case Filters.Challenged:
         return data.state === 'Challenged';
-      case 4:
+      case Filters.Executed:
         return data.state === 'Executed';
-      case 5:
+      case Filters.Ruled_Negatively:
         return data.state === 'Ruled Negatively';
       default:
-        return;
+        return data;
     }
   };
 
   const SearchAction = (data: actionsType[0]) => {
     const re = new RegExp(value, 'i');
-    if (value === '') return data;
-    else if (data.payload.title) if (data.payload.title.match(re)) return data;
+    if (data.payload.title?.match(re) || value === '') return data;
   };
 
   const RenderActions = (actions: actionsType) => {
     const { layoutName } = useLayout();
-    const temp: React.FC[] | any = [];
+    const temp: React.ReactElement[] = [];
     if (actions) {
       actions
-        .filter((data) => FilterState(data))
-        .filter((data) => SearchAction(data))
+        .filter((data) => FilterState(data)) // Filter Based on status
+        .filter((data) => SearchAction(data)) // search among vidible Actions
         .map((data, index: number) => {
           temp.push(
             <GridItem
@@ -136,6 +144,8 @@ const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, identifie
             </GridItem>,
           );
         });
+      if (temp.length === 0)
+        return <NoAvailableActionContainer>No action available!</NoAvailableActionContainer>;
       return temp;
     } else return <div>Loading...</div>;
   };

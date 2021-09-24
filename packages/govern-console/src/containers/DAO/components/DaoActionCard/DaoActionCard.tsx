@@ -20,6 +20,7 @@ const ActionCard = styled(Box).attrs(() => ({
   width: 100%;
   border: none;
   cursor: pointer;
+  max-width: 500px;
   & > div {
     width: 100%;
   }
@@ -30,7 +31,7 @@ const ActionCard = styled(Box).attrs(() => ({
   }
 `;
 
-const Lable = styled(Tag)`
+const Label = styled(Tag)`
   border-radius: 4px;
   color: white;
   &.executable {
@@ -73,7 +74,7 @@ const Time = styled.p`
   margin-top: 4px;
 `;
 
-const LableContainer = styled.div`
+const LabelContainer = styled.div`
   display: flex;
 `;
 
@@ -92,15 +93,15 @@ const DaoActionCard: React.FC<Props> = ({ date, state, title }) => {
         </Text>
         <Time>{formatDate(date, 'relative')}</Time>
       </TextContainer>
-      <LableContainer>
-        <Lable className={state.toLowerCase().replace(' ', '_')}>{state}</Lable>
+      <LabelContainer>
+        <Label className={state.toLowerCase().replace(' ', '_')}>{state}</Label>
         <IconRight
           css={`
             margin-left: ${3 * GU}px;
             color: #7483ab;
           `}
         />
-      </LableContainer>
+      </LabelContainer>
     </ActionCard>
   );
 };
