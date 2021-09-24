@@ -15,7 +15,6 @@ type Props = {
   address: string;
   baseUrl: string;
   identifier: string;
-  openActions: string;
 };
 
 type MenuOptions = {
@@ -79,13 +78,6 @@ const Title = styled.p`
   text-overflow: ellipsis;
 `;
 
-const Subtitle = styled.p`
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 24px;
-  color: #7483ab;
-`;
-
 const LinkGroup = styled.div<{ layoutIsSmall: boolean }>`
   margin-top: 24px;
   gap: 12px;
@@ -96,7 +88,7 @@ const LinkGroup = styled.div<{ layoutIsSmall: boolean }>`
     layoutIsSmall ? 'flex-direction: row; height: auto' : 'flex-direction: column; height: 168px;'};
 `;
 
-const DaoSideCard: React.FC<Props> = ({ address, baseUrl, identifier, openActions }) => {
+const DaoSideCard: React.FC<Props> = ({ address, baseUrl, identifier }) => {
   const { layoutName } = useLayout();
   const layoutIsSmall = useMemo(() => layoutName === 'small', [layoutName]);
 
@@ -110,7 +102,6 @@ const DaoSideCard: React.FC<Props> = ({ address, baseUrl, identifier, openAction
       <Content>
         <Details align={layoutIsSmall ? 'center' : 'flex-start'}>
           <Title>{identifier}</Title>
-          <Subtitle>{openActions} open actions</Subtitle>
         </Details>
         <LinkGroup layoutIsSmall={layoutIsSmall}>
           {links.map(({ path, icon, label }, index) => (

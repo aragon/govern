@@ -38,7 +38,7 @@ const DaoHomePage: React.FC = () => {
    * Effects
    */
   const { data: dao, loading: daoIsLoading } = useDaoQuery(daoName);
-  const { getQueueData, data: queueData, fetchMore } = useLazyProposalListQuery();
+  const { getQueueData, data: queueData } = useLazyProposalListQuery();
 
   /**
    * Update state and get queue data
@@ -53,7 +53,7 @@ const DaoHomePage: React.FC = () => {
         getQueueData({
           variables: {
             offset: 0,
-            limit: 16,
+            limit: 100,
             id: dao.queue.id,
           },
         });
@@ -73,19 +73,6 @@ const DaoHomePage: React.FC = () => {
   }, [queueData]);
 
   /**
-   * Functions
-   */
-  const fetchMoreData = async () => {
-    if (fetchMore) {
-      fetchMore({
-        variables: {
-          offset: visibleActions.length,
-        },
-      });
-    }
-  };
-
-  /**
    * Render
    */
   if (daoIsLoading) {
@@ -100,12 +87,7 @@ const DaoHomePage: React.FC = () => {
   return (
     <Grid layout={true} gap={24}>
       <GridItem gridColumn={layoutIsSmall ? '1/-1' : '1/5'}>
-        <DaoSideCard
-          address={dao?.queue?.address}
-          baseUrl={url}
-          identifier={daoName}
-          openActions="2"
-        />
+        <DaoSideCard address={dao?.queue?.address} baseUrl={url} identifier={daoName} />
       </GridItem>
       <StyledGridItem
         gridRow={layoutIsSmall ? '2/4' : '1/4'}
