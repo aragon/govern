@@ -9,6 +9,7 @@ import DaoActionsPage from './DaoActionPage';
 import { useDaoQuery, useLazyProposalListQuery } from 'hooks/query-hooks';
 import HelpComponent from 'components/HelpComponent/HelpComponent';
 import NewExecution from 'containers/NewExecution/NewExecution';
+import DaoSettings from 'containers/DAOSettings/DAOSettings';
 
 /**
  * TODO: implement codesplitting, especially if api calls
@@ -149,7 +150,7 @@ const DaoHomePage: React.FC = () => {
           <ApmRoute
             exact
             path={`${path}settings`}
-            render={() => <div>Settings Component goes here...</div>}
+            render={() => <DaoSettings />}
           />
           <ApmRoute exact path={`${path}actions/new-execution`} render={() => <NewExecution />} />
 

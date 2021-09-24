@@ -1,16 +1,25 @@
-import React, { useEffect, useContext, useMemo } from 'react';
-import { providers as EthersProviders } from 'ethers';
-import { UseWalletProvider, useWallet } from 'use-wallet';
 import { Account } from 'utils/types';
+import { providers as EthersProviders } from 'ethers';
+import { UseWalletProvider, useWallet, Wallet } from 'use-wallet';
+import React, { useEffect, useContext, useMemo } from 'react';
+
+import { identifyUser } from 'services/analytics';
 import { INFURA_PROJECT_ID } from 'utils/constants';
 import { networkEnvironment } from 'environment';
-import { identifyUser } from 'services/analytics';
 import { useAPM, updateAPMContext } from './elasticAPM';
+
 const { chainId } = networkEnvironment;
 
-const WalletAugmentedContext = React.createContext({});
+type WalletAugmented = Wallet<unknown> & {
+  isConnected: boolean;
+  provider: EthersProviders.Provider;
+  account: Account | undefined;
+};
 
-function useWalletAugmented() {
+// Any is a workaround so TS doesn't ask for a filled out default
+const WalletAugmentedContext = React.createContext<WalletAugmented | any>({});
+
+function useWalletAugmented(): WalletAugmented {
   return useContext(WalletAugmentedContext);
 }
 
