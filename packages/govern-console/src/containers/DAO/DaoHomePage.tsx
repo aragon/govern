@@ -147,11 +147,7 @@ const DaoHomePage: React.FC = () => {
             path={`${path}finance`}
             render={() => <div>Finance Component goes here...</div>}
           />
-          <ApmRoute
-            exact
-            path={`${path}settings`}
-            render={() => <DaoSettings />}
-          />
+          <ApmRoute exact path={`${path}settings`} render={() => <DaoSettings />} />
           <ApmRoute exact path={`${path}actions/new-execution`} render={() => <NewExecution />} />
 
           {/* Operation not found on DAO */}
