@@ -55,7 +55,7 @@ const DaoHomePage: React.FC = () => {
         getQueueData({
           variables: {
             offset: 0,
-            limit: 16,
+            limit: 100,
             id: dao.queue.id,
           },
         });

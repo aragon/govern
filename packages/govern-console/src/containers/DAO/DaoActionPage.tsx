@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
 
 import DaoActionCard from './components/DaoActionCard/DaoActionCard';
+import NoActionAvailable from './components/NoActionAvailable/NoActionAvailable';
 
 type actionsType = {
   __typename?: string;
@@ -85,37 +86,21 @@ const ActionListContainer = styled.div`
   margin-bottom: ${3 * GU}px;
 `;
 
-const NoAvailableActionContainer = styled.strong`
-  text-align: center;
-`;
-
 const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, identifier }) => {
   const history = useHistory();
   const [selected, setSelected] = useState<number>(0);
   const [value, setValue] = useState<string>('');
 
   const FilterState = (data: actionsType[0]) => {
-    enum Filters { // Convern DropDown Number to Status
-      Executable = 1,
-      Scheduled = 2,
-      Challenged = 3,
-      Executed = 4,
-      Ruled_Negatively = 5,
-    }
-    switch (selected) {
-      case Filters.Executable:
-        return data.state === 'Executable';
-      case Filters.Scheduled:
-        return data.state === 'Scheduled';
-      case Filters.Challenged:
-        return data.state === 'Challenged';
-      case Filters.Executed:
-        return data.state === 'Executed';
-      case Filters.Ruled_Negatively:
-        return data.state === 'Ruled Negatively';
-      default:
-        return data;
-    }
+    const actionStates = [
+      'All Actions',
+      'Executable',
+      'Scheduled',
+      'Challenged',
+      'Executed',
+      'Ruled Negatively',
+    ];
+    return selected > 0 ? actionStates[selected] === data.state : true;
   };
 
   const SearchAction = (data: actionsType[0]) => {
@@ -144,8 +129,7 @@ const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, identifie
             </GridItem>,
           );
         });
-      if (temp.length === 0)
-        return <NoAvailableActionContainer>No action available!</NoAvailableActionContainer>;
+      if (temp.length === 0) return <NoActionAvailable />;
       return temp;
     } else return <div>Loading...</div>;
   };
