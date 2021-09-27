@@ -1,22 +1,19 @@
+import styled from 'styled-components';
+import { Main } from '@aragon/ui';
 import { Switch } from 'react-router-dom';
+import { ApmRoute } from '@elastic/apm-rum-react';
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+
 import Header from 'components/Header/Header';
 import Footer from 'components/Footer/Footer';
-import ConsoleMainPage from 'containers/Console/ConsoleMainPage';
-// import DaoMainPage from 'containers/DAO/DaoMainPage';
-import DaoHomePage from 'containers/DAO/DaoHomePage';
-
-import ProposalDetails from 'containers/ProposalDetails/ProposalDetails';
-import NewExecution from 'containers/NewExecution/NewExecution';
-import DaoSettings from 'containers/DAOSettings/DAOSettings';
-import { ModalsProvider } from 'containers/HomePage/ModalsContext';
-import { Main } from '@aragon/ui';
 import CreateDao from 'containers/CreateDao/CreateDao';
-import { trackPage } from 'services/analytics';
-import { useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
+import NoDaoFound from '../DAO/NoDaoFound';
 import scrollToTop from 'utils/scrollToId';
-import styled from 'styled-components';
-import { ApmRoute } from '@elastic/apm-rum-react';
+import DaoHomePage from 'containers/DAO/DaoHomePage';
+import { trackPage } from 'services/analytics';
+import ConsoleMainPage from 'containers/Console/ConsoleMainPage';
+import { ModalsProvider } from 'containers/HomePage/ModalsContext';
 
 const Container = styled.div`
   display: grid;
@@ -53,18 +50,11 @@ const HomePage = () => {
             <Header />
             <Switch>
               <ApmRoute exact path="/" component={ConsoleMainPage} />
-              {/* <ApmRoute exact path="/daos/:daoName" component={DaoMainPage} /> */}
-
-              {/* New DaoHomePage leading to actions. TODO: Goal is to move the relevant
-                functions and data fetching into this new homepage
-              */}
+              <ApmRoute exact path="/create-dao" component={CreateDao} />
+              <ApmRoute exact path="/daos/not-found" component={NoDaoFound} />
               <ApmRoute path="/daos/:daoName/" component={DaoHomePage} />
 
-              {/* These guys need to be moved down the nesting chain*/}
-              <ApmRoute exact path="/daos/:daoName/executions/:id" component={ProposalDetails} />
-              <ApmRoute exact path="/daos/:daoName/new-execution" component={NewExecution} />
-              <ApmRoute exact path="/daos/:daoName/dao-settings" component={DaoSettings} />
-              <ApmRoute exact path="/create-dao" component={CreateDao} />
+              {/* TODO: add missing catch all not found page */}
             </Switch>
           </BodyArea>
           <FooterArea>

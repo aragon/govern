@@ -66,7 +66,7 @@ const ConsoleMainPage: React.FC = () => {
   };
 
   const goToDao = (dao: any) => {
-    history.push(`/daos/${dao.name}`);
+    history.push(`/daos/${dao.name}/actions`);
   };
 
   return (
