@@ -90,16 +90,17 @@ const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, identifie
   const history = useHistory();
   const [selected, setSelected] = useState<number>(0);
   const [value, setValue] = useState<string>('');
+  const actionStates = [
+    'All Actions',
+    'Executable',
+    'Scheduled',
+    'Challenged',
+    'Executed',
+    'Rejected',
+    'Ruled Negatively',
+  ];
 
   const FilterState = (data: actionsType[0]) => {
-    const actionStates = [
-      'All Actions',
-      'Executable',
-      'Scheduled',
-      'Challenged',
-      'Executed',
-      'Ruled Negatively',
-    ];
     return selected > 0 ? actionStates[selected] === data.state : true;
   };
 
@@ -146,14 +147,7 @@ const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, identifie
       </HeaderContainer>
       <SearchContainer>
         <DropDown
-          items={[
-            'All Actions',
-            'Executable',
-            'Scheduled',
-            'Challenged',
-            'Executed',
-            'Ruled Negatively',
-          ]}
+          items={actionStates}
           css={`
             border: none;
           `}
