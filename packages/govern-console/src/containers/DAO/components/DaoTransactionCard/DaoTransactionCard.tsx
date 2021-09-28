@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Box, Tag, IconRight, GU, useLayout } from '@aragon/ui';
+import { Box, IconDownload, useLayout } from '@aragon/ui';
 import { formatDate } from 'utils/date';
 
 type Props = {
@@ -20,34 +20,13 @@ const ActionCard = styled(Box).attrs(() => ({
   width: 100%;
   border: none;
   cursor: pointer;
-  max-width: 500px;
   & > div {
     width: 100%;
   }
   & > div > div {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-  }
-`;
-
-const Label = styled(Tag)`
-  border-radius: 4px;
-  color: white;
-  &.executable {
-    background: #00c2ff;
-  }
-  &.scheduled {
-    background: #ffbc5b;
-  }
-  &.challenged {
-    background: linear-gradient(107.79deg, #ff7984 1.46%, #ffeb94 100%);
-  }
-  &.executed {
-    background: #46c469;
-  }
-  &.ruled_negatively {
-    background: #ff6a60;
+    align-items: start;
   }
 `;
 
@@ -66,6 +45,32 @@ const Text = styled.p`
   max-width: 150px;
 `;
 
+const IconContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  margin-right: 16px;
+  &.deposit {
+    background: #e7f9ed;
+    color: #218242;
+  }
+  &.withdraw {
+    background: #fff9f0;
+    color: #ffb53a;
+  }
+  &.failed_withdraw {
+    background: #fff0f0;
+    color: #ff575c;
+  }
+  &.pending {
+    background: #f0fbff;
+    color: #00c2ff;
+  }
+`;
+
 const Time = styled.p`
   font-weight: 500;
   font-size: 14px;
@@ -74,7 +79,25 @@ const Time = styled.p`
   margin-top: 4px;
 `;
 
-const LabelContainer = styled.div`
+const PriceContainer = styled.div`
+  display: flex;
+  font-weight: 600;
+  font-size: 16px;
+  &.deposit {
+    color: #218242;
+  }
+  &.withdraw {
+    color: #ffb53a;
+  }
+  &.failed_withdraw {
+    color: #20232c;
+  }
+  &.pending {
+    color: #20232c;
+  }
+`;
+
+const InfoContainer = styled.div`
   display: flex;
 `;
 
@@ -83,16 +106,22 @@ const DaoTransactionCard: React.FC = () => {
 
   return (
     <ActionCard>
-      <TextContainer>
-        <Text
-          css={`
-            width: ${layoutName === 'small' ? '100px' : '250px'};
-          `}
-        >
-          -
-        </Text>
-      </TextContainer>
-      <LabelContainer></LabelContainer>
+      <InfoContainer>
+        <IconContainer className="deposit">
+          <IconDownload />
+        </IconContainer>
+        <TextContainer>
+          <Text
+            css={`
+              width: ${layoutName === 'small' ? '100px' : '250px'};
+            `}
+          >
+            Deposit
+          </Text>
+          <Time>Yesterday</Time>
+        </TextContainer>
+      </InfoContainer>
+      <PriceContainer className="deposit">+5,000 USDT</PriceContainer>
     </ActionCard>
   );
 };

@@ -31,8 +31,7 @@ const CustomActionButton = styled(Button)`
 
 const TransactionListContainer = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
   width: 100%;
   margin-bottom: ${3 * GU}px;
 `;
