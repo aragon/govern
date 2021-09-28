@@ -1,8 +1,12 @@
+import { BigNumber } from 'ethers';
 import styled, { css } from 'styled-components';
 import { useEffect, useMemo, useState } from 'react';
 import { useLayout, Button, ButtonText, IconUp, IconDown } from '@aragon/ui';
 
 import BalanceCard from '../BalanceCard/BalanceCard';
+import { toBigNum } from 'utils/lib';
+import { useFinanceQuery } from 'hooks/query-hooks';
+import { useParams } from 'react-router';
 
 const Container = styled.div<{ layoutIsSmall: boolean }>`
   gap: 16px;
@@ -76,11 +80,56 @@ const Assets = styled.div`
   width: 100%;
 `;
 
+type Deposit = {
+  _typename: string;
+  amount: string;
+  id: string;
+  sender: string;
+  token: string;
+};
+
+type Withdraw = {
+  id: string;
+  to: string;
+  from: string;
+  token: string;
+  amount: string;
+  _typename: string;
+};
+
+type Balance = {
+  [key: string]: bigint;
+};
+
 const FinanceSideCard: React.FC = () => {
+  const { daoName } = useParams<any>();
+  const { data, loading } = useFinanceQuery(daoName);
   const [displayAssets, setDisplayAssets] = useState<boolean>(false);
 
   const { layoutName } = useLayout();
   const layoutIsSmall = useMemo(() => layoutName === 'small', [layoutName]);
+
+  function mapToBalance(data: any) {
+    const balance: Balance = {};
+    console.log(data);
+
+    data.deposits.forEach((deposit: Deposit) => {
+      if (balance[deposit.token]) {
+        balance[deposit.token] += BigInt(deposit.amount);
+      } else {
+        balance[deposit.token] = BigInt(deposit.amount);
+      }
+    });
+
+    data.withdraws.forEach((withdraw: Withdraw) => {
+      if (balance[withdraw.token]) {
+        balance[withdraw.token] -= BigInt(withdraw.amount);
+      } else {
+        // Should never fall into here
+        console.log('Error. What??', withdraw.token);
+      }
+    });
+  }
 
   useEffect(() => {
     // Assets shown on medium to large screens
@@ -101,6 +150,7 @@ const FinanceSideCard: React.FC = () => {
 
   return (
     <Container layoutIsSmall={layoutIsSmall}>
+      {!loading && mapToBalance(data)}
       <Balance>
         <Crypto>10.1001323 ETH</Crypto>
         <USDValue>~$25,012.57 USD</USDValue>

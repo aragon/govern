@@ -16,3 +16,7 @@ export function transformDaoDetails(data: any) {
 
   return data;
 }
+
+export function transformFinance(data: any) {
+  return data?.daos[0].executor;
+}
