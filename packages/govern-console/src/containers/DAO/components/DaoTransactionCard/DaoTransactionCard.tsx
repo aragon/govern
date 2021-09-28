@@ -12,14 +12,12 @@ const ActionCard = styled(Box).attrs(() => ({
   padding: 16,
 }))`
   display: flex;
-  flex-direction: row;
   justify-content: space-between;
   align-items: center;
   background-color: #ffffff;
   border-radius: 16px;
   width: 100%;
   border: none;
-  cursor: pointer;
   & > div {
     width: 100%;
   }

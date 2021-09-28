@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Button, GU, useLayout, IconDown, Grid, GridItem } from '@aragon/ui';
+import { Button, GU, useLayout, IconDown } from '@aragon/ui';
 import styled from 'styled-components';
 import DaoTransactionCard from './components/DaoTransactionCard/DaoTransactionCard';
+import DaoTransferModal from './DaoTransferModal';
 
 const HeaderContainer = styled.div`
   display: flex;
@@ -63,11 +64,16 @@ const LoadMoreButton = styled.div`
 
 const DaoFinancePage: React.FC = () => {
   const { layoutName } = useLayout();
+  const [opened, setOpened] = useState<boolean>(false);
+
+  const open = () => setOpened(true);
+  const close = () => setOpened(false);
+
   return (
     <div>
       <HeaderContainer>
         <Title>Finance</Title>
-        <CustomActionButton label="New Transfer" />
+        <CustomActionButton label="New Transfer" onClick={open} />
       </HeaderContainer>
       <TransactionListContainer>
         <ListTitle>Transactions</ListTitle>
@@ -77,6 +83,7 @@ const DaoFinancePage: React.FC = () => {
         <span>Load more</span>
         <IconDown />
       </LoadMoreButton>
+      <DaoTransferModal opened={opened} close={close} />
     </div>
   );
 };
