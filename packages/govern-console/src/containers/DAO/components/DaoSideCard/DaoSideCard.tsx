@@ -1,5 +1,13 @@
+import {
+  Box,
+  EthIdenticon,
+  IconActionsFilled,
+  IconSettingsFilled,
+  IconFinanceFilled,
+  useLayout,
+} from '@aragon/ui';
 import styled from 'styled-components';
-import { Box, EthIdenticon, IconWallet, IconSettings, useLayout } from '@aragon/ui';
+import { useMemo } from 'react';
 
 import ActionLink from '../ActionLink/ActionLink';
 
@@ -7,7 +15,6 @@ type Props = {
   address: string;
   baseUrl: string;
   identifier: string;
-  openActions: string;
 };
 
 type MenuOptions = {
@@ -16,29 +23,24 @@ type MenuOptions = {
   icon: React.ReactElement;
 };
 
-/**
- * TODO: Get actions svg from aragon/ui
- */
 const links: MenuOptions[] = [
-  { path: '/actions', label: 'Actions', icon: <IconWallet /> },
-  { path: '/finance', label: 'Finance', icon: <IconWallet /> },
-  { path: '/settings', label: 'Settings', icon: <IconSettings /> },
+  { path: '/actions', label: 'Actions', icon: <IconActionsFilled size="small" /> },
+  { path: '/finance', label: 'Finance', icon: <IconFinanceFilled size="small" /> },
+  { path: '/settings', label: 'Settings', icon: <IconSettingsFilled size="small" /> },
 ];
 
-/**
- * Interestingly enough the avatar will collapse into it if the border isn't set
- */
 const Container = styled.div`
   border: 1px solid transparent;
   position: relative;
 `;
 
-const AvatarContainer = styled.div`
+const AvatarContainer = styled.div<{ justify: string }>`
   position: absolute;
   width: 100%;
   display: flex;
   padding: 0px 24px;
   z-index: 1;
+  justify-content: ${({ justify }) => justify};
 `;
 
 const AvatarWrapper = styled.div`
@@ -57,58 +59,49 @@ const Content = styled(Box)`
   box-shadow: 0px 3px 3px rgba(180, 193, 228, 0.35);
 `;
 
-const Details = styled.div`
+const Details = styled.div<{ align: string }>`
   gap: 4px;
   display: flex;
   flex-direction: column;
+  align-items: ${({ align }) => align};
   margin-top: 16px;
 `;
 
-/**
- * Should probably be replaced with StyledText from aragon/ui
- */
 const Title = styled.p`
   font-size: 24px;
   font-weight: 600;
   line-height: 30px;
   color: #20232c;
-
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 `;
-const Subtitle = styled.p`
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 24px;
-  color: #7483ab;
-`;
 
-const LinkGroup = styled.div`
-  height: 168px;
+const LinkGroup = styled.div<{ layoutIsSmall: boolean }>`
   margin-top: 24px;
   gap: 12px;
   display: flex;
-  flex-direction: column;
   justify-content: space-between;
+  ${({ layoutIsSmall }) =>
+    layoutIsSmall ? 'flex-direction: row; height: auto' : 'flex-direction: column; height: 168px;'};
 `;
 
-const DaoSideCard: React.FC<Props> = ({ address, baseUrl, identifier, openActions }) => {
+const DaoSideCard: React.FC<Props> = ({ address, baseUrl, identifier }) => {
   const { layoutName } = useLayout();
+  const layoutIsSmall = useMemo(() => layoutName === 'small', [layoutName]);
 
   return (
     <Container>
-      <AvatarContainer css={layoutName === 'small' ? 'justify-content: center' : undefined}>
+      <AvatarContainer justify={layoutIsSmall ? 'center' : 'flex-start'}>
         <AvatarWrapper>
           <EthIdenticon address={address} scale={2} />
         </AvatarWrapper>
       </AvatarContainer>
       <Content>
-        <Details css={layoutName === 'small' ? 'align-items: center' : undefined}>
+        <Details align={layoutIsSmall ? 'center' : 'flex-start'}>
           <Title>{identifier}</Title>
-          <Subtitle>{openActions} open actions</Subtitle>
         </Details>
-        <LinkGroup css={layoutName === 'small' ? 'flex-direction: row; height: auto' : undefined}>
+        <LinkGroup layoutIsSmall={layoutIsSmall}>
           {links.map(({ path, icon, label }, index) => (
             <ActionLink key={index} url={baseUrl + path} label={label} icon={icon} />
           ))}
