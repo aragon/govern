@@ -4,7 +4,9 @@ export const TRANSFERS = gql`
   query DAO($name: String) {
     daos(where: { name: $name }) {
       id
+      token
       executor {
+        id
         deposits {
           id
           amount

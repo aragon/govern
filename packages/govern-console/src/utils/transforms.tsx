@@ -18,5 +18,8 @@ export function transformDaoDetails(data: any) {
 }
 
 export function transformFinance(data: any) {
-  return data?.daos[0].executor;
+  if (data) {
+    return { ...data.daos[0].executor, token: data.daos[0].token };
+  }
+  return [];
 }

@@ -1,12 +1,34 @@
-import { BigNumber } from 'ethers';
 import styled, { css } from 'styled-components';
 import { useEffect, useMemo, useState } from 'react';
 import { useLayout, Button, ButtonText, IconUp, IconDown } from '@aragon/ui';
+import { constants } from 'ethers';
 
 import BalanceCard from '../BalanceCard/BalanceCard';
-import { toBigNum } from 'utils/lib';
-import { useFinanceQuery } from 'hooks/query-hooks';
-import { useParams } from 'react-router';
+import { useWallet } from 'providers/AugmentedWallet';
+import { getTokenInfo } from 'utils/token';
+import { Deposit, Withdraw } from 'utils/types';
+
+type Transfers = {
+  deposits: Deposit[];
+  withdraws: Withdraw[];
+  token: string;
+};
+
+type Props = {
+  transfers: Transfers;
+};
+
+type Balance = {
+  [key: string]: bigint;
+};
+
+type PreparedBalance = {
+  [key: string]: {
+    decimals: number;
+    symbol: string;
+    amount: bigint;
+  };
+};
 
 const Container = styled.div<{ layoutIsSmall: boolean }>`
   gap: 16px;
@@ -22,7 +44,7 @@ const Container = styled.div<{ layoutIsSmall: boolean }>`
   ${({ layoutIsSmall }) => layoutIsSmall && 'width: 343px'}
 `;
 
-const Balance = styled.div`
+const MainTokenBalance = styled.div`
   gap: 4px;
   display: flex;
   flex-direction: column;
@@ -80,56 +102,62 @@ const Assets = styled.div`
   width: 100%;
 `;
 
-type Deposit = {
-  _typename: string;
-  amount: string;
-  id: string;
-  sender: string;
-  token: string;
-};
-
-type Withdraw = {
-  id: string;
-  to: string;
-  from: string;
-  token: string;
-  amount: string;
-  _typename: string;
-};
-
-type Balance = {
-  [key: string]: bigint;
-};
-
-const FinanceSideCard: React.FC = () => {
-  const { daoName } = useParams<any>();
-  const { data, loading } = useFinanceQuery(daoName);
+const FinanceSideCard: React.FC<Props> = ({ transfers }) => {
+  const { provider } = useWallet();
+  const [balances, setBalances] = useState<PreparedBalance>({});
   const [displayAssets, setDisplayAssets] = useState<boolean>(false);
 
   const { layoutName } = useLayout();
   const layoutIsSmall = useMemo(() => layoutName === 'small', [layoutName]);
 
-  function mapToBalance(data: any) {
-    const balance: Balance = {};
-    console.log(data);
+  useEffect(() => {
+    function mapTransfersToBalance(data: Transfers) {
+      const balance: Balance = {};
 
-    data.deposits.forEach((deposit: Deposit) => {
-      if (balance[deposit.token]) {
-        balance[deposit.token] += BigInt(deposit.amount);
-      } else {
-        balance[deposit.token] = BigInt(deposit.amount);
-      }
-    });
+      // TODO: get migration transfers from v2
 
-    data.withdraws.forEach((withdraw: Withdraw) => {
-      if (balance[withdraw.token]) {
-        balance[withdraw.token] -= BigInt(withdraw.amount);
-      } else {
-        // Should never fall into here
-        console.log('Error. What??', withdraw.token);
-      }
-    });
-  }
+      // Add all deposits from subgraph
+      data.deposits?.forEach((deposit: Deposit) => {
+        if (balance[deposit.token]) {
+          balance[deposit.token] += BigInt(deposit.amount);
+        } else {
+          balance[deposit.token] = BigInt(deposit.amount);
+        }
+      });
+
+      // Remove all withdraws from subgraph
+      data.withdraws?.forEach((withdraw: Withdraw) => {
+        if (balance[withdraw.token]) {
+          balance[withdraw.token] -= BigInt(withdraw.amount);
+        } else {
+          // Should never fall into here
+          console.log('Error. What??', withdraw.token);
+        }
+      });
+
+      // Switch zero address to actual token
+      // TODO: check if zero address is on there
+      delete Object.assign(balance, { [data.token]: balance[constants.AddressZero] })[
+        constants.AddressZero
+      ];
+
+      return balance;
+    }
+
+    async function prepareTokens(balance: Balance) {
+      const preparedTokens: PreparedBalance = {};
+
+      // get and map token info as well as price
+      Object.keys(balance).map(async (address: string) => {
+        const { decimals, symbol } = await getTokenInfo(address, provider);
+        preparedTokens[address] = { decimals, symbol, amount: balance[address] };
+      });
+
+      setBalances(preparedTokens);
+    }
+
+    prepareTokens(mapTransfersToBalance(transfers));
+  }, [transfers, provider]);
 
   useEffect(() => {
     // Assets shown on medium to large screens
@@ -150,11 +178,10 @@ const FinanceSideCard: React.FC = () => {
 
   return (
     <Container layoutIsSmall={layoutIsSmall}>
-      {!loading && mapToBalance(data)}
-      <Balance>
+      <MainTokenBalance>
         <Crypto>10.1001323 ETH</Crypto>
         <USDValue>~$25,012.57 USD</USDValue>
-      </Balance>
+      </MainTokenBalance>
 
       {displayAssets && (
         <Assets>

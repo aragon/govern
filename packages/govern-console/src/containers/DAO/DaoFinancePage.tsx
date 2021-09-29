@@ -1,8 +1,12 @@
+import styled from 'styled-components';
+import { useParams } from 'react-router';
 import React, { useState } from 'react';
 import { Button, GU, useLayout, IconDown } from '@aragon/ui';
-import styled from 'styled-components';
-import DaoTransactionCard from './components/DaoTransactionCard/DaoTransactionCard';
+
+import FinanceSideCard from './components/FinanceSideCard/FinanceSideCard';
 import DaoTransferModal from './DaoTransferModal';
+import DaoTransactionCard from './components/DaoTransactionCard/DaoTransactionCard';
+import { useFinanceQuery } from 'hooks/query-hooks';
 
 const HeaderContainer = styled.div`
   display: flex;
@@ -63,6 +67,9 @@ const LoadMoreButton = styled.div`
 `;
 
 const DaoFinancePage: React.FC = () => {
+  const { daoName } = useParams<any>();
+  const { data, loading } = useFinanceQuery(daoName);
+
   const { layoutName } = useLayout();
   const [opened, setOpened] = useState<boolean>(false);
 
@@ -84,6 +91,7 @@ const DaoFinancePage: React.FC = () => {
         <IconDown />
       </LoadMoreButton>
       <DaoTransferModal opened={opened} close={close} />
+      <FinanceSideCard transfers={data} />
     </div>
   );
 };

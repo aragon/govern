@@ -88,6 +88,23 @@ export type ActionBuilderState =
   | 'abiForm'
   | 'chooseFunctions';
 
+export type Deposit = {
+  id: string;
+  type: 'Deposit' | 'Withdraw';
+  token: string;
+  amount: string;
+  sender: string;
+};
+
+export type Withdraw = {
+  id: string;
+  to: string;
+  from: string;
+  type: 'Deposit' | 'Withdraw';
+  token: string;
+  amount: string;
+};
+
 export interface Interval {
   name: string;
   value: number;
