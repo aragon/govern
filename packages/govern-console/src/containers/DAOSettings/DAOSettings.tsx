@@ -90,7 +90,6 @@ const DaoSettings: React.FC = () => {
   const { control, setValue, getValues, handleSubmit, trigger } = methods;
 
   const { account, isConnected, provider } = useWallet();
-  // const { account, isConnected, provider } = context;
   const { dispatch } = useContext(ModalsContext);
 
   /**
