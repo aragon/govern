@@ -9,13 +9,11 @@ const StyledDiv = styled(NavLink)`
   height: 48px;
   padding: 8px 12px;
   border-radius: 12px;
-
   font-size: 16px;
   color: #7483ab;
   line-height: 20px;
   font-weight: 600;
   text-decoration: none;
-
   /* Active */
   &.active {
     color: #00c2ff;

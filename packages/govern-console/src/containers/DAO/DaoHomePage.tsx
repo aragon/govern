@@ -4,12 +4,13 @@ import { Grid, GridItem, GU, useLayout } from '@aragon/ui';
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { Redirect, Switch, useHistory, useLocation, useParams, useRouteMatch } from 'react-router';
 
+import NoDaoFound from './NoDaoFound';
 import DaoSideCard from './components/DaoSideCard/DaoSideCard';
 import NewExecution from 'containers/NewExecution/NewExecution';
 import HelpComponent from 'components/HelpComponent/HelpComponent';
 import ProposalDetails from 'containers/ProposalDetails/ProposalDetails';
 import { useDaoQuery, useLazyProposalListQuery } from 'hooks/query-hooks';
-
+import DaoActionsPage from './DaoActionPage';
 const DaoSettings = lazy(() => import('containers/DAOSettings/DAOSettings'));
 
 const StyledGridItem = styled(GridItem)<{ paddingTop: string }>`
@@ -32,13 +33,16 @@ const DaoHomePage: React.FC = () => {
    * State
    */
   const [daoExists, setDaoExists] = useState<boolean>(true);
+  const [IsMoreActions, setIsMoreActions] = useState<boolean>(false);
+  const [daoDetails, setDaoDetails] = useState<any>();
+  const [queueNonce, setQueueNonce] = useState<number>();
   const [visibleActions, setVisibleActions] = useState<any>([]);
 
   /**
    * Effects
    */
   const { data: dao, loading: daoIsLoading } = useDaoQuery(daoName);
-  const { getQueueData, data: queueData } = useLazyProposalListQuery();
+  const { getQueueData, data: queueData, fetchMore } = useLazyProposalListQuery();
 
   /**
    * Update state and get queue data
@@ -64,6 +68,19 @@ const DaoHomePage: React.FC = () => {
   }, [daoIsLoading, dao, getQueueData]);
 
   /**
+   * Functions
+   */
+  const fetchMoreData = async () => {
+    if (fetchMore) {
+      fetchMore({
+        variables: {
+          offset: visibleActions.length,
+        },
+      });
+    }
+  };
+
+  /**
    * Update visible proposals
    */
   useEffect(() => {
@@ -71,6 +88,12 @@ const DaoHomePage: React.FC = () => {
       setVisibleActions(queueData.governQueue.containers);
     }
   }, [queueData]);
+
+  useEffect(() => {
+    if (queueNonce && visibleActions.length) {
+      setIsMoreActions(queueNonce !== visibleActions.length);
+    } else setIsMoreActions(false);
+  }, [queueNonce, visibleActions]);
 
   /**
    * Render
@@ -100,7 +123,14 @@ const DaoHomePage: React.FC = () => {
             <ApmRoute
               exact
               path={`${path}actions`}
-              render={() => <div>Actions Component goes here...</div>}
+              render={() => (
+                <DaoActionsPage
+                  fetchMore={fetchMoreData}
+                  actions={visibleActions}
+                  isMore={IsMoreActions}
+                  identifier={daoName}
+                />
+              )}
             />
             <ApmRoute
               exact

@@ -72,7 +72,6 @@ const Title = styled.p`
   font-weight: 600;
   line-height: 30px;
   color: #20232c;
-
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -83,7 +82,6 @@ const LinkGroup = styled.div<{ layoutIsSmall: boolean }>`
   gap: 12px;
   display: flex;
   justify-content: space-between;
-
   ${({ layoutIsSmall }) =>
     layoutIsSmall ? 'flex-direction: row; height: auto' : 'flex-direction: column; height: 168px;'};
 `;
