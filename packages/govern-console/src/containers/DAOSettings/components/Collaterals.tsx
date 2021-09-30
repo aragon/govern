@@ -45,7 +45,6 @@ const Collaterals: React.FC<Props> = ({
       </div>
 
       {/* Schedule Execution Collateral */}
-
       <Controller
         name="daoConfig.scheduleDeposit.token"
         control={control}
