@@ -148,6 +148,7 @@ const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, identifie
           items={actionStates}
           css={`
             border: none;
+            margin-right: ${3 * GU}px;
           `}
           selected={selected}
           onChange={setSelected}
@@ -155,12 +156,14 @@ const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, identifie
         <SearchInput
           css={`
             width: 100%;
-            margin-left: ${3 * GU}px;
             border-radius: 12px;
           `}
+          adornmentSettings={{
+            width: 25,
+          }}
           onChange={(text: string) => setValue(text)}
           placeholder="Type to search..."
-          wide={true}
+          wide
         />
       </SearchContainer>
       <ActionListContainer>

@@ -20,7 +20,7 @@ const ActionCard = styled(Box).attrs(() => ({
   width: 100%;
   border: none;
   cursor: pointer;
-  max-width: 500px;
+  max-width: 455px;
   & > div {
     width: 100%;
   }
