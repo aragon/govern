@@ -3,15 +3,13 @@ import { constants } from 'ethers';
 import React, { useEffect, useState } from 'react';
 import { Button, GU, useLayout, IconDown } from '@aragon/ui';
 
-import FinanceSideCard from './components/FinanceSideCard/FinanceSideCard';
-import DaoTransferModal from './DaoTransferModal';
-import DaoTransactionCard from './components/DaoTransactionCard/DaoTransactionCard';
-import { useFinanceQuery } from 'hooks/query-hooks';
-
 import { useWallet } from 'providers/AugmentedWallet';
 import { formatUnits } from 'utils/lib';
+import FinanceSideCard from './components/FinanceSideCard/FinanceSideCard';
+import DaoTransferModal from './DaoTransferModal';
 import { getTokenInfo } from 'utils/token';
-
+import DaoTransactionCard from './components/DaoTransactionCard/DaoTransactionCard';
+import { useFinanceQuery } from 'hooks/query-hooks';
 import { Deposit, FinanceToken, Withdraw } from 'utils/types';
 
 type Props = {
@@ -82,15 +80,14 @@ const LoadMoreButton = styled.div`
 `;
 
 const DaoFinancePage: React.FC = () => {
-  const { data, loading: isLoading } = useFinanceQuery('');
   const { provider } = useWallet();
   const [tokens, setTokens] = useState<FinanceToken>({});
+  const { data, loading: isLoading } = useFinanceQuery('');
 
   const { layoutName } = useLayout();
   const [opened, setOpened] = useState<boolean>(false);
 
   useEffect(() => {
-    // TODO: move into effect hook
     const sumBalances = () => {
       const balances: Balance = {};
       // Add all deposits from subgraph
@@ -111,9 +108,11 @@ const DaoFinancePage: React.FC = () => {
 
       // Switch zero address to actual token
       if (balances[constants.AddressZero]) {
-        delete Object.assign(balances, {
-          ['0xa21803551c5f27f0be18a85a9d628f4643fd945e']: balances[constants.AddressZero],
-        })[constants.AddressZero];
+        Object.assign(balances, {
+          ['']: balances[constants.AddressZero],
+        });
+
+        delete balances[constants.AddressZero];
       }
       return balances;
     };
@@ -121,6 +120,8 @@ const DaoFinancePage: React.FC = () => {
     const prepareTokens = async (balances: Balance) => {
       Object.keys(balances).forEach(async (tokenAddress: string) => {
         const { decimals, symbol } = await getTokenInfo(tokenAddress, provider);
+
+        // TODO: get icons
 
         // Forced to set state like a savage so that rerenders are forced
         // and proper props are passed to the children
