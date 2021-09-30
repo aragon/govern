@@ -2,8 +2,9 @@ import styled from 'styled-components';
 
 // TODO: Finalize. Tentative props
 type Props = {
-  cryptoValue: string;
-  USDValue: string;
+  token: string;
+  usd: string;
+  symbol: string;
 };
 
 const Container = styled.div`
@@ -48,15 +49,15 @@ const USDEquivalent = styled.p`
   line-height: 21px;
 `;
 
-const BalanceCard: React.FC<Props> = ({ cryptoValue, USDValue }) => {
+const BalanceCard: React.FC<Props> = ({ token, usd, symbol }) => {
   return (
     <Container>
       <IconContainer>
         <TempIcon />
       </IconContainer>
       <Balance>
-        <Crypto>{`${cryptoValue} USDT`}</Crypto>
-        <USDEquivalent>{`~${USDValue} USD`}</USDEquivalent>
+        <Crypto>{`${token} ${symbol}`}</Crypto>
+        {usd && <USDEquivalent>{`~${usd} USD`}</USDEquivalent>}
       </Balance>
     </Container>
   );

@@ -4,13 +4,13 @@ import { Grid, GridItem, GU, useLayout } from '@aragon/ui';
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { Redirect, Switch, useHistory, useLocation, useParams, useRouteMatch } from 'react-router';
 
-import NoDaoFound from './NoDaoFound';
 import DaoSideCard from './components/DaoSideCard/DaoSideCard';
 import NewExecution from 'containers/NewExecution/NewExecution';
 import HelpComponent from 'components/HelpComponent/HelpComponent';
+import DaoActionsPage from './DaoActionPage';
+import DaoFinancePage from './DaoFinancePage';
 import ProposalDetails from 'containers/ProposalDetails/ProposalDetails';
 import { useDaoQuery, useLazyProposalListQuery } from 'hooks/query-hooks';
-import DaoActionsPage from './DaoActionPage';
 const DaoSettings = lazy(() => import('containers/DAOSettings/DAOSettings'));
 
 const StyledGridItem = styled(GridItem)<{ paddingTop: string }>`
@@ -52,6 +52,9 @@ const DaoHomePage: React.FC = () => {
 
     if (dao && getQueueData) {
       setDaoExists(true);
+      setDaoDetails((prevState: any) => {
+        return { ...prevState, ...dao };
+      });
 
       if (dao.queue) {
         getQueueData({
@@ -135,7 +138,9 @@ const DaoHomePage: React.FC = () => {
             <ApmRoute
               exact
               path={`${path}finance`}
-              render={() => <div>Finance Component goes here...</div>}
+              render={() => (
+                <DaoFinancePage executorId={daoDetails?.executor.id} token={daoDetails?.token} />
+              )}
             />
             <ApmRoute exact path={`${path}settings`} component={DaoSettings} />
             <ApmRoute exact path={`${path}executions/:id`} component={ProposalDetails} />

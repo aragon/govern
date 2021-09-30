@@ -79,19 +79,34 @@ const LoadMoreButton = styled.div`
   }
 `;
 
-const DaoFinancePage: React.FC = () => {
+const DaoFinancePage: React.FC<Props> = ({ executorId, token }) => {
   const { provider } = useWallet();
   const [tokens, setTokens] = useState<FinanceToken>({});
-  const { data, loading: isLoading } = useFinanceQuery('');
+  const { data: finances, loading: isLoading } = useFinanceQuery(executorId);
 
   const { layoutName } = useLayout();
   const [opened, setOpened] = useState<boolean>(false);
 
   useEffect(() => {
-    const sumBalances = () => {
+    if (!isLoading && finances) {
+      prepareTokens(sumBalances());
+    }
+
+    function sumBalances() {
       const balances: Balance = {};
+
+      // No deposits still show main balance as 0
+      if (finances.deposits.length == 0) {
+        Object.assign(balances, {
+          [token]: BigInt(0),
+        });
+        return balances;
+      }
+
+      // TODO: Get migration data
+
       // Add all deposits from subgraph
-      data.deposits.forEach((deposit: Deposit) => {
+      finances.deposits.forEach((deposit: Deposit) => {
         if (balances[deposit.token]) {
           balances[deposit.token] += BigInt(deposit.amount);
         } else {
@@ -100,7 +115,7 @@ const DaoFinancePage: React.FC = () => {
       });
 
       // Remove all withdraws from subgraph
-      data.withdraws.forEach((withdraw: Withdraw) => {
+      finances.withdraws.forEach((withdraw: Withdraw) => {
         if (balances[withdraw.token]) {
           balances[withdraw.token] -= BigInt(withdraw.amount);
         }
@@ -109,15 +124,16 @@ const DaoFinancePage: React.FC = () => {
       // Switch zero address to actual token
       if (balances[constants.AddressZero]) {
         Object.assign(balances, {
-          ['']: balances[constants.AddressZero],
+          [token]: balances[constants.AddressZero],
         });
 
         delete balances[constants.AddressZero];
       }
-      return balances;
-    };
 
-    const prepareTokens = async (balances: Balance) => {
+      return balances;
+    }
+
+    async function prepareTokens(balances: Balance) {
       Object.keys(balances).forEach(async (tokenAddress: string) => {
         const { decimals, symbol } = await getTokenInfo(tokenAddress, provider);
 
@@ -136,12 +152,8 @@ const DaoFinancePage: React.FC = () => {
           };
         });
       });
-    };
-
-    if (!isLoading && data) {
-      prepareTokens(sumBalances());
     }
-  }, [data, isLoading, provider]);
+  }, [finances, isLoading, provider, token]);
 
   const open = () => setOpened(true);
   const close = () => setOpened(false);
@@ -165,7 +177,7 @@ const DaoFinancePage: React.FC = () => {
         <IconDown />
       </LoadMoreButton>
       <DaoTransferModal opened={opened} close={close} />
-      <FinanceSideCard tokens={tokens} mainToken="" />
+      <FinanceSideCard tokens={tokens} mainToken={token} />
     </div>
   );
 };

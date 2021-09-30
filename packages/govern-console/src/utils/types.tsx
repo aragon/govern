@@ -110,6 +110,7 @@ export type FinanceToken = {
     decimals: number;
     symbol: string;
     amount: bigint | string;
+    usd?: string;
   };
 };
 

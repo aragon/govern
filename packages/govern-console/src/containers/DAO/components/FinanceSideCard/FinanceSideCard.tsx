@@ -88,6 +88,7 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken }) => {
 
   const { layoutName } = useLayout();
   const layoutIsSmall = useMemo(() => layoutName === 'small', [layoutName]);
+  const daoToken = useMemo(() => tokens[mainToken], [tokens, mainToken]);
 
   useEffect(() => {
     // Assets shown on medium to large screens
@@ -100,15 +101,16 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken }) => {
     }
   }, [layoutIsSmall]);
 
+  // TODO: Change to default values; loading is jarring
   if (objectIsEmptyOrUndefined(tokens)) {
-    return <div>Loading</div>;
+    return <div>Loading...</div>;
   }
 
   return (
     <Container layoutIsSmall={layoutIsSmall}>
       <MainTokenBalance>
-        <Token>{`${tokens[mainToken].amount} ${tokens[mainToken].symbol}`}</Token>
-        <USDValue>~$25,012.57 USD</USDValue>
+        <Token>{`${daoToken.amount} ${daoToken.symbol}`}</Token>
+        {daoToken.usd && <USDValue>~$25,012.57 USD</USDValue>}
       </MainTokenBalance>
 
       {displayAssets && (
@@ -116,8 +118,9 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken }) => {
           {Object.values(tokens).map((token: any) => (
             <BalanceCard
               key={token.symbol}
-              USDValue={'8,000,000'}
-              cryptoValue={token.amount.toString()}
+              usd={token.usd}
+              token={token.amount}
+              symbol={token.symbol}
             />
           ))}
         </Assets>
@@ -133,8 +136,6 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken }) => {
               }}
             >
               {`${displayAssets ? 'Close' : 'Show'} ${Object.keys(tokens).length} asset(s)`}
-
-              {/* TODO: This needs to change if transformation is used */}
               {displayAssets ? <IconUp size="small" /> : <IconDown size="small" />}
             </ButtonTextContainer>
           </ShowAssetsButton>

@@ -26,9 +26,7 @@ type props = {
   identifier: string;
 };
 
-const Container = styled.div`
-  margin-top: ${3 * GU}px;
-`;
+const Container = styled.div``;
 
 const HeaderContainer = styled.div`
   display: flex;
@@ -122,7 +120,7 @@ const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, identifie
               gridColumn={layoutName === 'medium' ? '1/-1' : index % 2 === 0 ? '1/3' : '3/5'}
             >
               <DaoActionCard
-                key={index}
+                key={data.id}
                 date={data.createdAt}
                 state={data.state}
                 title={data.payload.title}
