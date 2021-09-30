@@ -47,12 +47,17 @@ export function useDaosQuery() {
   return { data, loading, error, fetchMore };
 }
 
-export function useFinanceQuery(name: string) {
+export function useFinanceQuery(executorId: string) {
   const { data, loading, error } = useQuery(TRANSFERS, {
-    variables: { name },
+    variables: { id: executorId },
   });
 
-  return { data: transformFinance(data), loading, error };
+  const transfers = useMemo(() => {
+    if (data) {
+      return transformFinance(data);
+    }
+  }, [data]);
+  return { data: transfers, loading, error };
 }
 
 export function useGovernRegistryQuery() {

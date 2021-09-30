@@ -1,26 +1,22 @@
 import { gql } from '@apollo/client';
 
 export const TRANSFERS = gql`
-  query DAO($name: String) {
-    daos(where: { name: $name }) {
+  query finances($id: ID!) {
+    govern(id: $id) {
       id
-      token
-      executor {
+      deposits {
         id
-        deposits {
-          id
-          amount
-          sender
-          token
-          reference
-        }
-        withdraws {
-          id
-          amount
-          to
-          from
-          token
-        }
+        amount
+        sender
+        token
+        reference
+      }
+      withdraws {
+        id
+        amount
+        to
+        from
+        token
       }
     }
   }

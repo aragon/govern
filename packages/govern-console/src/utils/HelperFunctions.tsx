@@ -16,6 +16,10 @@ export function isIPFShash(/*_value: string*/): boolean {
   return false;
 }
 
+export function objectIsEmptyOrUndefined(obj: any) {
+  return Object.keys(obj).length === 0 || obj === undefined;
+}
+
 // export function getFormattedValue(value: string) {
 //   try {
 //     if (isIPFShash(value)) {

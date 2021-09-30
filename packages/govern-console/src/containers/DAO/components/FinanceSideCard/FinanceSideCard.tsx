@@ -1,33 +1,14 @@
 import styled, { css } from 'styled-components';
 import { useEffect, useMemo, useState } from 'react';
 import { useLayout, Button, ButtonText, IconUp, IconDown } from '@aragon/ui';
-import { constants } from 'ethers';
 
 import BalanceCard from '../BalanceCard/BalanceCard';
-import { useWallet } from 'providers/AugmentedWallet';
-import { getTokenInfo } from 'utils/token';
-import { Deposit, Withdraw } from 'utils/types';
-
-type Transfers = {
-  deposits: Deposit[];
-  withdraws: Withdraw[];
-  token: string;
-};
+import { FinanceToken } from 'utils/types';
+import { objectIsEmptyOrUndefined } from 'utils/HelperFunctions';
 
 type Props = {
-  transfers: Transfers;
-};
-
-type Balance = {
-  [key: string]: bigint;
-};
-
-type PreparedBalance = {
-  [key: string]: {
-    decimals: number;
-    symbol: string;
-    amount: bigint;
-  };
+  tokens: FinanceToken;
+  mainToken: string;
 };
 
 const Container = styled.div<{ layoutIsSmall: boolean }>`
@@ -50,7 +31,7 @@ const MainTokenBalance = styled.div`
   flex-direction: column;
 `;
 
-const Crypto = styled.p`
+const Token = styled.p`
   font-size: 24px;
   font-weight: 600;
   line-height: 30px;
@@ -102,62 +83,11 @@ const Assets = styled.div`
   width: 100%;
 `;
 
-const FinanceSideCard: React.FC<Props> = ({ transfers }) => {
-  const { provider } = useWallet();
-  const [balances, setBalances] = useState<PreparedBalance>({});
+const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken }) => {
   const [displayAssets, setDisplayAssets] = useState<boolean>(false);
 
   const { layoutName } = useLayout();
   const layoutIsSmall = useMemo(() => layoutName === 'small', [layoutName]);
-
-  useEffect(() => {
-    function mapTransfersToBalance(data: Transfers) {
-      const balance: Balance = {};
-
-      // TODO: get migration transfers from v2
-
-      // Add all deposits from subgraph
-      data.deposits?.forEach((deposit: Deposit) => {
-        if (balance[deposit.token]) {
-          balance[deposit.token] += BigInt(deposit.amount);
-        } else {
-          balance[deposit.token] = BigInt(deposit.amount);
-        }
-      });
-
-      // Remove all withdraws from subgraph
-      data.withdraws?.forEach((withdraw: Withdraw) => {
-        if (balance[withdraw.token]) {
-          balance[withdraw.token] -= BigInt(withdraw.amount);
-        } else {
-          // Should never fall into here
-          console.log('Error. What??', withdraw.token);
-        }
-      });
-
-      // Switch zero address to actual token
-      // TODO: check if zero address is on there
-      delete Object.assign(balance, { [data.token]: balance[constants.AddressZero] })[
-        constants.AddressZero
-      ];
-
-      return balance;
-    }
-
-    async function prepareTokens(balance: Balance) {
-      const preparedTokens: PreparedBalance = {};
-
-      // get and map token info as well as price
-      Object.keys(balance).map(async (address: string) => {
-        const { decimals, symbol } = await getTokenInfo(address, provider);
-        preparedTokens[address] = { decimals, symbol, amount: balance[address] };
-      });
-
-      setBalances(preparedTokens);
-    }
-
-    prepareTokens(mapTransfersToBalance(transfers));
-  }, [transfers, provider]);
 
   useEffect(() => {
     // Assets shown on medium to large screens
@@ -165,28 +95,30 @@ const FinanceSideCard: React.FC<Props> = ({ transfers }) => {
       setDisplayAssets(true);
     }
 
-    /**
-     * Coming from larger screens, hide assets (back to default
-     * for small screens)
-     * NOTE: Branch taken only when using console or perhaps a
-     * switch from portrait to landscape
-     */
     if (layoutIsSmall) {
       setDisplayAssets(false);
     }
   }, [layoutIsSmall]);
 
+  if (objectIsEmptyOrUndefined(tokens)) {
+    return <div>Loading</div>;
+  }
+
   return (
     <Container layoutIsSmall={layoutIsSmall}>
       <MainTokenBalance>
-        <Crypto>10.1001323 ETH</Crypto>
+        <Token>{`${tokens[mainToken].amount} ${tokens[mainToken].symbol}`}</Token>
         <USDValue>~$25,012.57 USD</USDValue>
       </MainTokenBalance>
 
       {displayAssets && (
         <Assets>
-          {new Array(4).fill(0).map((_, index) => (
-            <BalanceCard key={index} USDValue={'8,000,000'} cryptoValue={'8,000,232'} />
+          {Object.values(tokens).map((token: any) => (
+            <BalanceCard
+              key={token.symbol}
+              USDValue={'8,000,000'}
+              cryptoValue={token.amount.toString()}
+            />
           ))}
         </Assets>
       )}
@@ -200,7 +132,8 @@ const FinanceSideCard: React.FC<Props> = ({ transfers }) => {
                 setDisplayAssets(!displayAssets);
               }}
             >
-              {`${displayAssets ? 'Close' : 'Show'} 4 assets`}
+              {`${displayAssets ? 'Close' : 'Show'} ${Object.keys(tokens).length} asset(s)`}
+
               {/* TODO: This needs to change if transformation is used */}
               {displayAssets ? <IconUp size="small" /> : <IconDown size="small" />}
             </ButtonTextContainer>

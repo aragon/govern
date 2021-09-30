@@ -105,6 +105,14 @@ export type Withdraw = {
   amount: string;
 };
 
+export type FinanceToken = {
+  [key: string]: {
+    decimals: number;
+    symbol: string;
+    amount: bigint | string;
+  };
+};
+
 export interface Interval {
   name: string;
   value: number;
