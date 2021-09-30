@@ -1,11 +1,14 @@
 import styled from 'styled-components';
 import { Box, Tag, IconRight, GU, useLayout } from '@aragon/ui';
 import { formatDate } from 'utils/date';
+import { useHistory } from 'react-router-dom';
 
 type Props = {
   date: string;
   state: string;
   title: string | null;
+  dao_identifier: string;
+  id: string;
 };
 
 const ActionCard = styled(Box).attrs(() => ({
@@ -78,11 +81,16 @@ const LabelContainer = styled.div`
   display: flex;
 `;
 
-const DaoActionCard: React.FC<Props> = ({ date, state, title }) => {
+const DaoActionCard: React.FC<Props> = ({ id, date, state, title, dao_identifier }) => {
   const { layoutName } = useLayout();
+  const history = useHistory();
+
+  const goToActionDetails = () => {
+    history.push(`/daos/${dao_identifier}/actions/executions/${id}`);
+  };
 
   return (
-    <ActionCard>
+    <ActionCard onClick={goToActionDetails}>
       <TextContainer>
         <Text
           css={`

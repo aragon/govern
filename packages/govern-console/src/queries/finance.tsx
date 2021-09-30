@@ -10,6 +10,7 @@ export const TRANSFERS = gql`
         sender
         token
         reference
+        createdAt
       }
       withdraws {
         id
@@ -17,6 +18,7 @@ export const TRANSFERS = gql`
         to
         from
         token
+        createdAt
       }
     }
   }

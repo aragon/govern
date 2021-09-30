@@ -156,6 +156,8 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, token }) => {
     }
   }, [finances, isLoading, provider, token]);
 
+  console.log('finances', finances);
+
   const open = () => setOpened(true);
   const close = () => setOpened(false);
 

@@ -141,15 +141,15 @@ const DaoHomePage: React.FC = () => {
               )}
             />
             <ApmRoute exact path={`${path}settings`} component={DaoSettings} />
-            <ApmRoute exact path={`${path}executions/:id`} component={ProposalDetails} />
-            <ApmRoute exact path={`${path}actions/new-execution`} component={NewExecution} />
+            <ApmRoute exact path={`${path}actions/executions/:id`} component={ProposalDetails} />
+            <ApmRoute exact path={`${path}actions/new`} component={NewExecution} />
 
             {/* TODO: Operation not found page */}
             <ApmRoute render={() => <div>Operation not found on dao. Go home?</div>} />
           </Switch>
         </Suspense>
       </StyledGridItem>
-      {pathname === `${url}/settings` && (
+      {(pathname === `${url}/settings` || pathname === `${url}/actions/new`) && (
         <GridItem
           gridRow={layoutIsSmall ? '4/5' : '2/3'}
           gridColumn={layoutIsSmall ? '1/-1' : '1/5'}

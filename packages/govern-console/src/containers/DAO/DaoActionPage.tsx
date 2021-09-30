@@ -117,13 +117,15 @@ const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, identifie
         .map((data, index: number) => {
           temp.push(
             <GridItem
+              key={index}
               gridColumn={layoutName === 'medium' ? '1/-1' : index % 2 === 0 ? '1/3' : '3/5'}
             >
               <DaoActionCard
-                key={data.id}
+                id={data.id}
                 date={data.createdAt}
                 state={data.state}
                 title={data.payload.title}
+                dao_identifier={identifier}
               />
             </GridItem>,
           );
@@ -134,7 +136,7 @@ const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, identifie
   };
 
   const goToNewExecution = () => {
-    history.push(`/daos/${identifier}/actions/new-execution`);
+    history.push(`/daos/${identifier}/actions/new`);
   };
 
   return (
