@@ -52,9 +52,7 @@ const DaoHomePage: React.FC = () => {
 
     if (dao && getQueueData) {
       setDaoExists(true);
-      setDaoDetails((prevState: any) => {
-        return { ...prevState, ...dao };
-      });
+      setDaoDetails(dao);
 
       if (dao.queue) {
         getQueueData({

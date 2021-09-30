@@ -136,6 +136,7 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, token }) => {
     async function prepareTokens(balances: Balance) {
       Object.keys(balances).forEach(async (tokenAddress: string) => {
         const { decimals, symbol } = await getTokenInfo(tokenAddress, provider);
+        console.log(decimals, symbol, balances[tokenAddress]);
 
         // TODO: get icons
 

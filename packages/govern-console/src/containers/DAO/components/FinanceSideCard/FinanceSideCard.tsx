@@ -4,7 +4,6 @@ import { useLayout, Button, ButtonText, IconUp, IconDown } from '@aragon/ui';
 
 import BalanceCard from '../BalanceCard/BalanceCard';
 import { FinanceToken } from 'utils/types';
-import { objectIsEmptyOrUndefined } from 'utils/HelperFunctions';
 
 type Props = {
   tokens: FinanceToken;
@@ -88,7 +87,13 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken }) => {
 
   const { layoutName } = useLayout();
   const layoutIsSmall = useMemo(() => layoutName === 'small', [layoutName]);
-  const daoToken = useMemo(() => tokens[mainToken], [tokens, mainToken]);
+  const { symbol, amount, usd } = useMemo(() => {
+    return {
+      amount: tokens[mainToken]?.amount || '0',
+      symbol: tokens[mainToken]?.symbol || 'Tokens',
+      usd: tokens[mainToken]?.usd,
+    };
+  }, [tokens, mainToken]);
 
   useEffect(() => {
     // Assets shown on medium to large screens
@@ -101,16 +106,11 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken }) => {
     }
   }, [layoutIsSmall]);
 
-  // TODO: Change to default values; loading is jarring
-  if (objectIsEmptyOrUndefined(tokens)) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <Container layoutIsSmall={layoutIsSmall}>
       <MainTokenBalance>
-        <Token>{`${daoToken.amount} ${daoToken.symbol}`}</Token>
-        {daoToken.usd && <USDValue>~$25,012.57 USD</USDValue>}
+        <Token>{`${amount} ${symbol}`}</Token>
+        {usd && <USDValue>~$25,012.57 USD</USDValue>}
       </MainTokenBalance>
 
       {displayAssets && (
