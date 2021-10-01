@@ -1,11 +1,15 @@
 import styled from 'styled-components';
-import { Box, IconDownload, useLayout } from '@aragon/ui';
+import { Box, IconDownload, IconUpload, useLayout } from '@aragon/ui';
 import { formatDate } from 'utils/date';
+import { transctions } from 'utils/types';
 
 type Props = {
-  date: string;
-  state: string;
-  title: string | null;
+  info: transctions[0];
+};
+
+const icon = {
+  deposit: <IconDownload />,
+  withdraw: <IconUpload />,
 };
 
 const ActionCard = styled(Box).attrs(() => ({
@@ -99,13 +103,13 @@ const InfoContainer = styled.div`
   display: flex;
 `;
 
-const DaoTransactionCard: React.FC = () => {
+const DaoTransactionCard: React.FC<Props> = ({ info }) => {
   const { layoutName } = useLayout();
 
   return (
     <ActionCard>
       <InfoContainer>
-        <IconContainer className="deposit">
+        <IconContainer className={info.__typename.toLowerCase()}>
           <IconDownload />
         </IconContainer>
         <TextContainer>
@@ -114,12 +118,14 @@ const DaoTransactionCard: React.FC = () => {
               width: ${layoutName === 'small' ? '100px' : '250px'};
             `}
           >
-            Deposit
+            {info.__typename}
           </Text>
-          <Time>Yesterday</Time>
+          <Time>{formatDate(info.createdAt, 'relative')}</Time>
         </TextContainer>
       </InfoContainer>
-      <PriceContainer className="deposit">+5,000 USDT</PriceContainer>
+      <PriceContainer className={info.__typename.toLowerCase()}>
+        {info.amount} {info.symbol}
+      </PriceContainer>
     </ActionCard>
   );
 };

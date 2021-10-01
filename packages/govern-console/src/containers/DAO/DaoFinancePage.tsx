@@ -10,7 +10,7 @@ import DaoTransferModal from './DaoTransferModal';
 import { getTokenInfo } from 'utils/token';
 import DaoTransactionCard from './components/DaoTransactionCard/DaoTransactionCard';
 import { useFinanceQuery } from 'hooks/query-hooks';
-import { Deposit, FinanceToken, Withdraw } from 'utils/types';
+import { Deposit, FinanceToken, Withdraw, Finance, transctions } from 'utils/types';
 
 type Props = {
   executorId: string;
@@ -82,6 +82,7 @@ const LoadMoreButton = styled.div`
 const DaoFinancePage: React.FC<Props> = ({ executorId, token }) => {
   const { provider } = useWallet();
   const [tokens, setTokens] = useState<FinanceToken>({});
+  const [transactions, setTransactions] = useState<transctions>([]);
   const { data: finances, loading: isLoading } = useFinanceQuery(executorId);
 
   const { layoutName } = useLayout();
@@ -90,6 +91,7 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, token }) => {
   useEffect(() => {
     if (!isLoading && finances) {
       prepareTokens(sumBalances());
+      prepareTransactions();
     }
 
     function sumBalances() {
@@ -154,9 +156,42 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, token }) => {
         });
       });
     }
+
+    function sortTransaction(a: transctions[0], b: transctions[0]) {
+      return parseInt(b.createdAt) - parseInt(a.createdAt);
+    }
+
+    async function prepareTransactions() {
+      [...finances.withdraws, ...finances.deposits].map(
+        async ({ createdAt, __typename, amount, token: currentToken }) => {
+          const { decimals, symbol } =
+            currentToken === constants.AddressZero
+              ? await getTokenInfo(token, provider)
+              : await getTokenInfo(currentToken, provider);
+          setTransactions((prevState: any) => {
+            return [
+              ...prevState,
+              {
+                createdAt,
+                __typename,
+                token: currentToken,
+                symbol,
+                amount: formatUnits(amount, decimals),
+              },
+            ].sort(sortTransaction);
+          });
+        },
+      );
+    }
   }, [finances, isLoading, provider, token]);
 
-  console.log('finances', finances);
+  const RenderTransactionCard = () => {
+    const temp: React.ReactElement[] = [];
+    transactions.map((data, index) => {
+      temp.push(<DaoTransactionCard info={data} key={index} />);
+    });
+    return temp;
+  };
 
   const open = () => setOpened(true);
   const close = () => setOpened(false);
@@ -173,7 +208,7 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, token }) => {
       </HeaderContainer>
       <TransactionListContainer>
         <ListTitle>Transactions</ListTitle>
-        <DaoTransactionCard />
+        {RenderTransactionCard()}
       </TransactionListContainer>
       <LoadMoreButton>
         <span>Load more</span>

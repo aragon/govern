@@ -94,6 +94,7 @@ export type Deposit = {
   token: string;
   amount: string;
   sender: string;
+  createdAt: string;
 };
 
 export type Withdraw = {
@@ -103,7 +104,23 @@ export type Withdraw = {
   type: 'Deposit' | 'Withdraw';
   token: string;
   amount: string;
+  createdAt: string;
 };
+
+export type Finance = {
+  id: string;
+  deposits: Deposit[];
+  withdraws: Withdraw[];
+  __typename: string;
+};
+
+export type transctions = {
+  createdAt: string;
+  __typename: string;
+  amount: string;
+  token: string;
+  symbol: string;
+}[];
 
 export type FinanceToken = {
   [key: string]: {
