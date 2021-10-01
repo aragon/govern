@@ -90,7 +90,7 @@ export type ActionBuilderState =
 
 export type Deposit = {
   id: string;
-  type: 'Deposit' | 'Withdraw';
+  type: 'Deposit';
   token: string;
   amount: string;
   sender: string;
@@ -100,16 +100,18 @@ export type Withdraw = {
   id: string;
   to: string;
   from: string;
-  type: 'Deposit' | 'Withdraw';
+  type: 'Withdraw';
   token: string;
   amount: string;
 };
 
 export type FinanceToken = {
   [key: string]: {
-    decimals: number;
     symbol: string;
-    amount: bigint | string;
+    amount: bigint;
+    amountForHuman: string;
+    decimals: number | string;
+    price?: number | string;
     usd?: string;
   };
 };

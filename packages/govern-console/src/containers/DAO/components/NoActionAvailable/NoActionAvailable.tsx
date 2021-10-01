@@ -5,7 +5,7 @@ const Container = styled.strong`
 `;
 
 const NoActionAvailable: React.FC = () => {
-  return <Container>No action available!</Container>;
+  return <Container>No actions available!</Container>;
 };
 
 export default NoActionAvailable;

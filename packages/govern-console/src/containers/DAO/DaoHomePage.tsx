@@ -34,6 +34,8 @@ const DaoHomePage: React.FC = () => {
    */
   const [daoExists, setDaoExists] = useState<boolean>(true);
   const [IsMoreActions, setIsMoreActions] = useState<boolean>(false);
+
+  // TODO: check if used
   const [daoDetails, setDaoDetails] = useState<any>();
   const [queueNonce, setQueueNonce] = useState<number>();
   const [visibleActions, setVisibleActions] = useState<any>([]);
@@ -52,7 +54,6 @@ const DaoHomePage: React.FC = () => {
 
     if (dao && getQueueData) {
       setDaoExists(true);
-      setDaoDetails(dao);
 
       if (dao.queue) {
         getQueueData({
@@ -136,9 +137,7 @@ const DaoHomePage: React.FC = () => {
             <ApmRoute
               exact
               path={`${path}finance`}
-              render={() => (
-                <DaoFinancePage executorId={daoDetails?.executor.id} token={daoDetails?.token} />
-              )}
+              render={() => <DaoFinancePage executorId={dao?.executor.id} token={dao?.token} />}
             />
             <ApmRoute exact path={`${path}settings`} component={DaoSettings} />
             <ApmRoute exact path={`${path}executions/:id`} component={ProposalDetails} />

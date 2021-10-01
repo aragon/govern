@@ -8,20 +8,18 @@ import { FinanceToken } from 'utils/types';
 type Props = {
   tokens: FinanceToken;
   mainToken: string;
+  onNewTransfer: () => void;
 };
 
-const Container = styled.div<{ layoutIsSmall: boolean }>`
+const Container = styled.div`
   gap: 16px;
   display: flex;
   align-items: flex-start;
   flex-direction: column;
   justify-content: flex-start;
-
   border-radius: 12px;
   padding: 24px 16px 16px;
   background-color: #ffffff;
-
-  ${({ layoutIsSmall }) => layoutIsSmall && 'width: 343px'}
 `;
 
 const MainTokenBalance = styled.div`
@@ -82,16 +80,23 @@ const Assets = styled.div`
   width: 100%;
 `;
 
-const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken }) => {
+const formatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  maximumFractionDigits: 0,
+});
+
+// TODO: set default props to remove memo
+const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken, onNewTransfer }) => {
   const [displayAssets, setDisplayAssets] = useState<boolean>(false);
 
   const { layoutName } = useLayout();
   const layoutIsSmall = useMemo(() => layoutName === 'small', [layoutName]);
-  const { symbol, amount, usd } = useMemo(() => {
+  const { symbol, amount, price } = useMemo(() => {
     return {
-      amount: tokens[mainToken]?.amount || '0',
+      amount: tokens[mainToken]?.amountForHuman || 0.0,
       symbol: tokens[mainToken]?.symbol || 'Tokens',
-      usd: tokens[mainToken]?.usd,
+      price: tokens[mainToken]?.usd,
     };
   }, [tokens, mainToken]);
 
@@ -107,10 +112,10 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken }) => {
   }, [layoutIsSmall]);
 
   return (
-    <Container layoutIsSmall={layoutIsSmall}>
+    <Container>
       <MainTokenBalance>
         <Token>{`${amount} ${symbol}`}</Token>
-        {usd && <USDValue>~$25,012.57 USD</USDValue>}
+        {price && <USDValue>{`~${formatter.format(Number(price) * Number(amount))} USD`}</USDValue>}
       </MainTokenBalance>
 
       {displayAssets && (
@@ -118,8 +123,10 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken }) => {
           {Object.values(tokens).map((token: any) => (
             <BalanceCard
               key={token.symbol}
-              usd={token.usd}
-              token={token.amount}
+              usd={
+                token.price && formatter.format(Number(token.price) * Number(token.amountForHuman))
+              }
+              token={token.amountForHuman}
               symbol={token.symbol}
             />
           ))}
@@ -128,7 +135,7 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken }) => {
 
       {layoutIsSmall && (
         <ButtonGroup>
-          <NewTransferButton label="New transfer" />
+          <NewTransferButton label="New transfer" onClick={onNewTransfer} />
           <ShowAssetsButton>
             <ButtonTextContainer
               onClick={() => {

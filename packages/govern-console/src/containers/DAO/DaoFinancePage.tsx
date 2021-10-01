@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { constants } from 'ethers';
-import React, { useEffect, useState } from 'react';
-import { Button, GU, useLayout, IconDown } from '@aragon/ui';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Button, GU, Grid, GridItem, useLayout, IconDown } from '@aragon/ui';
 
 import { useWallet } from 'providers/AugmentedWallet';
 import { formatUnits } from 'utils/lib';
@@ -10,6 +10,7 @@ import DaoTransferModal from './DaoTransferModal';
 import { getTokenInfo } from 'utils/token';
 import DaoTransactionCard from './components/DaoTransactionCard/DaoTransactionCard';
 import { useFinanceQuery } from 'hooks/query-hooks';
+import { getMigrationBalances } from 'services/finances';
 import { Deposit, FinanceToken, Withdraw } from 'utils/types';
 
 type Props = {
@@ -17,8 +18,14 @@ type Props = {
   token: string;
 };
 
-type Balance = {
-  [key: string]: bigint;
+type MigrationResponse = {
+  amount: string;
+  price: string;
+  asset: {
+    address: string;
+    symbol: string;
+    decimals: string;
+  };
 };
 
 const HeaderContainer = styled.div`
@@ -79,82 +86,90 @@ const LoadMoreButton = styled.div`
   }
 `;
 
-const DaoFinancePage: React.FC<Props> = ({ executorId, token }) => {
+const DaoFinancePage: React.FC<Props> = ({ executorId, token: mainToken }) => {
   const { provider } = useWallet();
   const [tokens, setTokens] = useState<FinanceToken>({});
+  const [opened, setOpened] = useState<boolean>(false);
   const { data: finances, loading: isLoading } = useFinanceQuery(executorId);
 
   const { layoutName } = useLayout();
-  const [opened, setOpened] = useState<boolean>(false);
+  const layoutIsSmall = useMemo(() => layoutName === 'small', [layoutName]);
 
   useEffect(() => {
     if (!isLoading && finances) {
-      prepareTokens(sumBalances());
+      prepareTokens();
     }
 
-    function sumBalances() {
-      const balances: Balance = {};
-
+    async function getCurrentBalances(balances: FinanceToken) {
       // No deposits still show main balance as 0
-      if (finances.deposits.length == 0) {
-        Object.assign(balances, {
-          [token]: BigInt(0),
-        });
-        return balances;
+      if (finances.deposits.length === 0) {
+        const { decimals, symbol } = await getTokenInfo(mainToken, provider);
+        balances[mainToken] = {
+          amount: BigInt(0),
+          amountForHuman: formatUnits(0, decimals),
+          symbol,
+          decimals,
+        };
       }
 
-      // TODO: Get migration data
+      // Add all deposits
+      let currentToken: string;
+      finances.deposits.forEach(async ({ token: depositToken, amount }: Deposit) => {
+        currentToken = depositToken === constants.AddressZero ? mainToken : depositToken;
 
-      // Add all deposits from subgraph
-      finances.deposits.forEach((deposit: Deposit) => {
-        if (balances[deposit.token]) {
-          balances[deposit.token] += BigInt(deposit.amount);
+        if (balances[currentToken]) {
+          balances[currentToken].amount += BigInt(amount);
+          balances[currentToken].amountForHuman = formatUnits(
+            balances[currentToken].amount,
+            +balances[currentToken].decimals,
+          );
         } else {
-          balances[deposit.token] = BigInt(deposit.amount);
-        }
-      });
-
-      // Remove all withdraws from subgraph
-      finances.withdraws.forEach((withdraw: Withdraw) => {
-        if (balances[withdraw.token]) {
-          balances[withdraw.token] -= BigInt(withdraw.amount);
-        }
-      });
-
-      // Switch zero address to actual token
-      if (balances[constants.AddressZero]) {
-        Object.assign(balances, {
-          [token]: balances[constants.AddressZero],
-        });
-
-        delete balances[constants.AddressZero];
-      }
-
-      return balances;
-    }
-
-    async function prepareTokens(balances: Balance) {
-      Object.keys(balances).forEach(async (tokenAddress: string) => {
-        const { decimals, symbol } = await getTokenInfo(tokenAddress, provider);
-        console.log(decimals, symbol, balances[tokenAddress]);
-
-        // TODO: get icons
-
-        // Forced to set state like a savage so that rerenders are forced
-        // and proper props are passed to the children
-        setTokens((prevState) => {
-          return {
-            ...prevState,
-            [tokenAddress]: {
-              decimals,
-              symbol,
-              amount: formatUnits(balances[tokenAddress], decimals),
-            },
+          const { decimals, symbol } = await getTokenInfo(currentToken, provider);
+          balances[currentToken] = {
+            amount: BigInt(amount),
+            amountForHuman: formatUnits(amount, decimals),
+            symbol,
+            decimals,
+            // TODO: get Price
           };
-        });
+        }
       });
+
+      // Subtract all withdraws
+      finances.withdraws.forEach(({ token: depositToken, amount }: Withdraw) => {
+        currentToken = depositToken === constants.AddressZero ? mainToken : depositToken;
+
+        if (balances[currentToken]) {
+          balances[currentToken].amount -= BigInt(amount);
+          balances[currentToken].amountForHuman = formatUnits(
+            balances[currentToken].amount,
+            +balances[currentToken].decimals,
+          );
+        }
+      });
+      setTokens(balances);
     }
-  }, [finances, isLoading, provider, token]);
+
+    async function prepareTokens() {
+      // Get migrated assets if any
+      const balances: FinanceToken = {};
+      const data = await getMigrationBalances(executorId);
+      data?.forEach(
+        ({ amount, price, asset: { address, symbol, decimals } }: MigrationResponse) => {
+          balances[address] = {
+            amount: BigInt(amount),
+            amountForHuman: formatUnits(amount, +decimals),
+            symbol,
+            decimals: Number(decimals),
+            price,
+          };
+        },
+      );
+
+      // Get subgraph balances
+      await getCurrentBalances(balances);
+    }
+  }, [finances, isLoading, provider, mainToken, executorId]);
 
   const open = () => setOpened(true);
   const close = () => setOpened(false);
@@ -164,22 +179,33 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, token }) => {
   }
 
   return (
-    <div>
-      <HeaderContainer>
-        <Title>Finance</Title>
-        <CustomActionButton label="New Transfer" onClick={open} />
-      </HeaderContainer>
-      <TransactionListContainer>
-        <ListTitle>Transactions</ListTitle>
-        <DaoTransactionCard />
-      </TransactionListContainer>
-      <LoadMoreButton>
-        <span>Load more</span>
-        <IconDown />
-      </LoadMoreButton>
-      <DaoTransferModal opened={opened} close={close} />
-      <FinanceSideCard tokens={tokens} mainToken={token} />
-    </div>
+    <Grid gap={24} columns="9">
+      <GridItem gridColumn={layoutIsSmall ? '1/-1' : '7/10'}>
+        <FinanceSideCard tokens={tokens} mainToken={mainToken} onNewTransfer={open} />
+      </GridItem>
+      <GridItem
+        gridRow={layoutIsSmall ? '2/-1' : '1/2'}
+        gridColumn={layoutIsSmall ? '1/-1' : '1/7'}
+      >
+        <div>
+          {!layoutIsSmall && (
+            <HeaderContainer>
+              <Title>Finance</Title>
+              <CustomActionButton label="New Transfer" onClick={open} />
+            </HeaderContainer>
+          )}
+          <TransactionListContainer>
+            <ListTitle>Transactions</ListTitle>
+            <DaoTransactionCard />
+          </TransactionListContainer>
+          <LoadMoreButton>
+            <span>Load more</span>
+            <IconDown />
+          </LoadMoreButton>
+          <DaoTransferModal opened={opened} close={close} />
+        </div>
+      </GridItem>
+    </Grid>
   );
 };
 

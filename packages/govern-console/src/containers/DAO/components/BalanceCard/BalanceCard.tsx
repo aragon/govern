@@ -12,7 +12,7 @@ const Container = styled.div`
   display: flex;
   align-items: center;
   padding: 12px 0px;
-  border-top: 1px solid lightgray; // TODO: to be changed
+  border-top: 1px solid #eff1f7;
 `;
 
 const IconContainer = styled.div`
