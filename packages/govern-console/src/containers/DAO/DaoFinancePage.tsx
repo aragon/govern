@@ -210,10 +210,10 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, token }) => {
         <ListTitle>Transactions</ListTitle>
         {RenderTransactionCard()}
       </TransactionListContainer>
-      <LoadMoreButton>
+      {/* <LoadMoreButton>
         <span>Load more</span>
         <IconDown />
-      </LoadMoreButton>
+      </LoadMoreButton> */}
       <DaoTransferModal opened={opened} close={close} />
       <FinanceSideCard tokens={tokens} mainToken={token} />
     </div>

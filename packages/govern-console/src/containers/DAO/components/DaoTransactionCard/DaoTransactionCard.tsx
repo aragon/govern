@@ -7,9 +7,14 @@ type Props = {
   info: transctions[0];
 };
 
-const icon = {
-  deposit: <IconDownload />,
-  withdraw: <IconUpload />,
+type Signs = {
+  deposit: string;
+  withdraw: string;
+};
+
+const Sign: Signs = {
+  deposit: '+',
+  withdraw: '-',
 };
 
 const ActionCard = styled(Box).attrs(() => ({
@@ -110,7 +115,7 @@ const DaoTransactionCard: React.FC<Props> = ({ info }) => {
     <ActionCard>
       <InfoContainer>
         <IconContainer className={info.__typename.toLowerCase()}>
-          <IconDownload />
+          {info.__typename.toLowerCase() === 'deposit' ? <IconDownload /> : <IconUpload />}
         </IconContainer>
         <TextContainer>
           <Text
@@ -124,7 +129,7 @@ const DaoTransactionCard: React.FC<Props> = ({ info }) => {
         </TextContainer>
       </InfoContainer>
       <PriceContainer className={info.__typename.toLowerCase()}>
-        {info.amount} {info.symbol}
+        {info.__typename.toLowerCase() === 'deposit' ? '+' : '-'} {info.amount} {info.symbol}
       </PriceContainer>
     </ActionCard>
   );

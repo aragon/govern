@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Modal } from '@aragon/ui';
 import styled from 'styled-components';
 import SelectToken from './components/ModalContents/SelectToken';
@@ -14,11 +15,34 @@ const TransferModal = styled(Modal)`
   }
 `;
 
+function selectStep(step: number) {
+  switch (step) {
+    case 1:
+      return <SelectToken />;
+    case 2:
+      return <SignDeposit />;
+    default:
+      return <NewTransfer />;
+  }
+}
+
 const DaoTransferModal: React.FC<{ opened: boolean; close: () => void }> = ({ opened, close }) => {
+  const [step, setStep] = useState<number>(0);
+
+  //TODO change logic
+
+  useEffect(() => {
+    if (!opened) setStep(0);
+  }, [opened]);
+
   return (
     <>
-      <TransferModal visible={opened} onClose={close}>
-        <SignDeposit />
+      <TransferModal
+        visible={opened}
+        onClose={close}
+        onClick={() => setStep((prestep) => prestep + 1)}
+      >
+        {selectStep(step)}
       </TransferModal>
     </>
   );
