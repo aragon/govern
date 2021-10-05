@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import SelectToken from './components/ModalContents/SelectToken';
 import NewTransfer from './components/ModalContents/NewTransfer';
 import SignDeposit from './components/ModalContents/SignDeposit';
+import ReviewDeposit from './components/ModalContents/ReviewDeposit';
 
 const TransferModal = styled(Modal)`
   & > div > div > div {
@@ -42,7 +43,7 @@ const DaoTransferModal: React.FC<{ opened: boolean; close: () => void }> = ({ op
         onClose={close}
         onClick={() => setStep((prestep) => prestep + 1)}
       >
-        {selectStep(step)}
+        <ReviewDeposit />
       </TransferModal>
     </>
   );
