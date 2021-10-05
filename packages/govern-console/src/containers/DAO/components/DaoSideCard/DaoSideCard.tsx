@@ -72,6 +72,8 @@ const Title = styled.p`
   font-weight: 600;
   line-height: 30px;
   color: #20232c;
+
+  width: 100%;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

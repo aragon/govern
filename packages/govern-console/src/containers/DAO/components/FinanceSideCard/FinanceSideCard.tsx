@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import styled, { css } from 'styled-components';
 import { useEffect, useMemo, useState } from 'react';
 import { useLayout, Button, ButtonText, IconUp, IconDown } from '@aragon/ui';
@@ -86,17 +87,17 @@ const formatter = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 0,
 });
 
-// TODO: set default props to remove memo
 const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken, onNewTransfer }) => {
   const [displayAssets, setDisplayAssets] = useState<boolean>(false);
 
   const { layoutName } = useLayout();
   const layoutIsSmall = useMemo(() => layoutName === 'small', [layoutName]);
-  const { symbol, amount, price } = useMemo(() => {
+  const { symbol, amount, price, numberOfAssets } = useMemo(() => {
     return {
       amount: tokens[mainToken]?.amountForHuman || 0.0,
       symbol: tokens[mainToken]?.symbol || 'Tokens',
-      price: tokens[mainToken]?.usd,
+      price: tokens[mainToken]?.price,
+      numberOfAssets: Object.keys(tokens).length || 1,
     };
   }, [tokens, mainToken]);
 
@@ -120,14 +121,15 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken, onNewTransfer }) 
 
       {displayAssets && (
         <Assets>
-          {Object.values(tokens).map((token: any) => (
+          {Object.values(tokens).map((token: any, index: number) => (
             <BalanceCard
-              key={token.symbol}
+              key={token.symbol + index}
               usd={
                 token.price && formatter.format(Number(token.price) * Number(token.amountForHuman))
               }
               token={token.amountForHuman}
               symbol={token.symbol}
+              icon={token.icon}
             />
           ))}
         </Assets>
@@ -142,7 +144,9 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken, onNewTransfer }) 
                 setDisplayAssets(!displayAssets);
               }}
             >
-              {`${displayAssets ? 'Close' : 'Show'} ${Object.keys(tokens).length} asset(s)`}
+              {`${displayAssets ? 'Close' : 'Show'} ${
+                numberOfAssets !== 1 ? `${numberOfAssets} assets` : `asset`
+              }`}
               {displayAssets ? <IconUp size="small" /> : <IconDown size="small" />}
             </ButtonTextContainer>
           </ShowAssetsButton>
@@ -152,4 +156,5 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken, onNewTransfer }) 
   );
 };
 
-export default FinanceSideCard;
+const MemoizedFinanceCard = memo(FinanceSideCard);
+export default MemoizedFinanceCard;

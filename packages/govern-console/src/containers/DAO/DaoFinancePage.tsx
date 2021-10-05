@@ -10,22 +10,13 @@ import DaoTransferModal from './DaoTransferModal';
 import { getTokenInfo } from 'utils/token';
 import DaoTransactionCard from './components/DaoTransactionCard/DaoTransactionCard';
 import { useFinanceQuery } from 'hooks/query-hooks';
-import { getMigrationBalances } from 'services/finances';
-import { Deposit, FinanceToken, Withdraw } from 'utils/types';
+import { ASSET_ICON_BASE_URL } from 'utils/constants';
+import { getMigrationBalances, getTokenPrice } from 'services/finances';
+import { Balance, Deposit, FinanceToken, Withdraw } from 'utils/types';
 
 type Props = {
   executorId: string;
   token: string;
-};
-
-type MigrationResponse = {
-  amount: string;
-  price: string;
-  asset: {
-    address: string;
-    symbol: string;
-    decimals: string;
-  };
 };
 
 const HeaderContainer = styled.div`
@@ -97,77 +88,70 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, token: mainToken }) => {
 
   useEffect(() => {
     if (!isLoading && finances) {
-      prepareTokens();
+      getCurrentBalances();
     }
 
-    async function getCurrentBalances(balances: FinanceToken) {
-      // No deposits still show main balance as 0
-      if (finances.deposits.length === 0) {
-        const { decimals, symbol } = await getTokenInfo(mainToken, provider);
+    // TODO: Potentially refactor to avoid setting state often
+    async function getCurrentBalances() {
+      const balances: Balance = getMigrationBalances(executorId);
+      let deposit: Deposit;
+      let address: string;
+      for (deposit of finances.deposits) {
+        address = deposit.token;
+        // if new asset
+        if (address in balances === false) {
+          const { symbol, decimals } = await getTokenInfo(address, provider);
+
+          balances[address] = {
+            amount: BigInt(deposit.amount),
+            symbol,
+            decimals,
+          };
+          continue;
+        }
+
+        // add to previous amount
+        balances[address].amount += BigInt(deposit.amount);
+      }
+
+      // No transactions yet using main dao token
+      if (mainToken in balances == false) {
+        const { symbol, decimals } = await getTokenInfo(mainToken, provider);
         balances[mainToken] = {
           amount: BigInt(0),
-          amountForHuman: formatUnits(0, decimals),
           symbol,
           decimals,
         };
       }
 
-      // Add all deposits
-      let currentToken: string;
-      finances.deposits.forEach(async ({ token: depositToken, amount }: Deposit) => {
-        currentToken = depositToken === constants.AddressZero ? mainToken : depositToken;
+      // Ignore eth TODO: more info needed
+      if (constants.AddressZero in balances) {
+        delete balances[constants.AddressZero];
+      }
 
-        if (balances[currentToken]) {
-          balances[currentToken].amount += BigInt(amount);
-          balances[currentToken].amountForHuman = formatUnits(
-            balances[currentToken].amount,
-            +balances[currentToken].decimals,
-          );
-        } else {
-          const { decimals, symbol } = await getTokenInfo(currentToken, provider);
-          balances[currentToken] = {
-            amount: BigInt(amount),
-            amountForHuman: formatUnits(amount, decimals),
-            symbol,
-            decimals,
-            // TODO: get Price
-          };
+      let withdraw: Withdraw;
+      for (withdraw of finances.withdraws) {
+        address = withdraw.token;
+        if (address in balances) {
+          balances[address].amount -= BigInt(withdraw.amount);
         }
-      });
+      }
 
-      // Subtract all withdraws
-      finances.withdraws.forEach(({ token: depositToken, amount }: Withdraw) => {
-        currentToken = depositToken === constants.AddressZero ? mainToken : depositToken;
-
-        if (balances[currentToken]) {
-          balances[currentToken].amount -= BigInt(amount);
-          balances[currentToken].amountForHuman = formatUnits(
-            balances[currentToken].amount,
-            +balances[currentToken].decimals,
-          );
-        }
-      });
-      setTokens(balances);
-    }
-
-    async function prepareTokens() {
-      // Get migrated assets if any
-      const balances: FinanceToken = {};
-      const data = await getMigrationBalances(executorId);
-      data?.forEach(
-        ({ amount, price, asset: { address, symbol, decimals } }: MigrationResponse) => {
-          balances[address] = {
-            amount: BigInt(amount),
-            amountForHuman: formatUnits(amount, +decimals),
-            symbol,
-            decimals: Number(decimals),
-            price,
+      // Populate with price, human friendly amount and image
+      for (address in balances) {
+        const response = await getTokenPrice(address);
+        setTokens((prevState) => {
+          return {
+            ...prevState,
+            [address]: {
+              ...balances[address],
+              amountForHuman: formatUnits(balances[address].amount, balances[address].decimals),
+              price: response?.price,
+              icon: `${ASSET_ICON_BASE_URL}/${address}/logo.png`,
+            },
           };
-        },
-      );
-
-      // Get subgraph balances
-      await getCurrentBalances(balances);
+        });
+      }
     }
   }, [finances, isLoading, provider, mainToken, executorId]);
 

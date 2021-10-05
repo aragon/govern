@@ -110,9 +110,16 @@ export type FinanceToken = {
     symbol: string;
     amount: bigint;
     amountForHuman: string;
-    decimals: number | string;
     price?: number | string;
-    usd?: string;
+    decimals: number;
+  };
+};
+
+export type Balance = {
+  [key: string]: {
+    amount: bigint;
+    symbol: string;
+    decimals: number;
   };
 };
 

@@ -113,14 +113,14 @@ const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, identifie
     if (actions) {
       actions
         .filter((data) => FilterState(data)) // Filter Based on status
-        .filter((data) => SearchAction(data)) // search among vidible Actions
+        .filter((data) => SearchAction(data)) // search among visible Actions
         .map((data, index: number) => {
           temp.push(
             <GridItem
               gridColumn={layoutName === 'medium' ? '1/-1' : index % 2 === 0 ? '1/3' : '3/5'}
             >
               <DaoActionCard
-                key={data.id}
+                key={index}
                 date={data.createdAt}
                 state={data.state}
                 title={data.payload.title}
