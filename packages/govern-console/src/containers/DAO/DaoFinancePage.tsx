@@ -13,6 +13,7 @@ import { useFinanceQuery } from 'hooks/query-hooks';
 import { ASSET_ICON_BASE_URL } from 'utils/constants';
 import { getMigrationBalances, getTokenPrice } from 'services/finances';
 import { Balance, Deposit, FinanceToken, Withdraw, transctions } from 'utils/types';
+import NoResultFound from './components/NoResultFound/NoResultFound';
 
 type Props = {
   executorId: string;
@@ -165,7 +166,7 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, token: mainToken }) => {
         async ({ createdAt, __typename, amount, token: currentToken }) => {
           const { decimals, symbol } =
             currentToken === constants.AddressZero
-              ? await getTokenInfo(mainToken, provider)
+              ? { symbol: 'ETH', decimals: 18 }
               : await getTokenInfo(currentToken, provider);
           setTransactions((prevState: any) => {
             return [
@@ -189,6 +190,7 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, token: mainToken }) => {
     transactions.map((data, index) => {
       temp.push(<DaoTransactionCard info={data} key={index} />);
     });
+    if (temp.length === 0) return <NoResultFound type="transaction" />;
     return temp;
   };
 
@@ -219,10 +221,6 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, token: mainToken }) => {
             <ListTitle>Transactions</ListTitle>
             {RenderTransactionCard()}
           </TransactionListContainer>
-          <LoadMoreButton>
-            <span>Load more</span>
-            <IconDown />
-          </LoadMoreButton>
           <DaoTransferModal opened={opened} close={close} />
         </div>
       </GridItem>

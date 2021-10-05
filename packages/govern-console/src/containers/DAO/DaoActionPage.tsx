@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
 
 import DaoActionCard from './components/DaoActionCard/DaoActionCard';
-import NoActionAvailable from './components/NoActionAvailable/NoActionAvailable';
+import NoResultFound from './components/NoResultFound/NoResultFound';
 
 type actionsType = {
   __typename?: string;
@@ -130,7 +130,7 @@ const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, identifie
             </GridItem>,
           );
         });
-      if (temp.length === 0) return <NoActionAvailable />;
+      if (temp.length === 0) return <NoResultFound type="action" />;
       return temp;
     } else return <div>Loading...</div>;
   };
