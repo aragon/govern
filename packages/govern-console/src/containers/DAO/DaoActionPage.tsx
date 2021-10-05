@@ -23,7 +23,7 @@ type props = {
   fetchMore: () => Promise<void>;
   actions: actionsType;
   isMore: boolean;
-  identifier: string;
+  daoName: string;
 };
 
 const Container = styled.div``;
@@ -84,7 +84,7 @@ const ActionListContainer = styled.div`
   margin-bottom: ${3 * GU}px;
 `;
 
-const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, identifier }) => {
+const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, daoName }) => {
   const history = useHistory();
   const [selected, setSelected] = useState<number>(0);
   const [value, setValue] = useState<string>('');
@@ -125,7 +125,7 @@ const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, identifie
                 date={data.createdAt}
                 state={data.state}
                 title={data.payload.title}
-                dao_identifier={identifier}
+                dao_identifier={daoName}
               />
             </GridItem>,
           );
@@ -136,7 +136,7 @@ const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, identifie
   };
 
   const goToNewExecution = () => {
-    history.push(`/daos/${identifier}/actions/new`);
+    history.push(`/daos/${daoName}/actions/new`);
   };
 
   return (

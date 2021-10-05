@@ -43,7 +43,7 @@ const DaoTransferModal: React.FC<{ opened: boolean; close: () => void }> = ({ op
         onClose={close}
         onClick={() => setStep((prestep) => prestep + 1)}
       >
-        <ReviewDeposit />
+        <NewTransfer />
       </TransferModal>
     </>
   );

@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { constants } from 'ethers';
-import React, { useEffect, useMemo, useState } from 'react';
-import { Button, GU, Grid, GridItem, useLayout, IconDown } from '@aragon/ui';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import { Button, GU, Grid, GridItem, useLayout, useToast } from '@aragon/ui';
 
 import { useWallet } from 'providers/AugmentedWallet';
 import { formatUnits } from 'utils/lib';
@@ -14,10 +14,13 @@ import { useFinanceQuery } from 'hooks/query-hooks';
 import { ASSET_ICON_BASE_URL } from 'utils/constants';
 import { getMigrationBalances, getTokenPrice } from 'services/finances';
 import { Balance, Deposit, FinanceToken, Withdraw, Transaction } from 'utils/types';
+import { trackEvent, EventType } from 'services/analytics';
+import { Error } from 'utils/Error';
 
 type Props = {
   executorId: string;
   token: string;
+  daoName: string;
 };
 
 const HeaderContainer = styled.div`
@@ -60,33 +63,18 @@ const ListTitle = styled.p`
   margin-bottom: 16px;
 `;
 
-const LoadMoreButton = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  padding: 12px 24px;
-  width: 154px;
-  height: 44px;
-  border-radius: 12px;
-  color: #7483ab;
-  background: #ffffff;
-  box-shadow: none;
-  cursor: pointer;
-  & > svg {
-    padding-left: 2px;
-  }
-`;
-
-const DaoFinancePage: React.FC<Props> = ({ executorId, token: mainToken }) => {
+const DaoFinancePage: React.FC<Props> = ({ executorId, daoName, token: mainToken }) => {
   const { provider } = useWallet();
   const [tokens, setTokens] = useState<FinanceToken>({});
-  const [opened, setOpened] = useState<boolean>(false);
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState<boolean>(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const { data: finances, loading: isLoading } = useFinanceQuery(executorId);
 
+  const { data: finances, loading: isLoading } = useFinanceQuery(executorId);
+  const context: any = useWallet();
+  const { isConnected } = context;
   const { layoutName } = useLayout();
   const layoutIsSmall = useMemo(() => layoutName === 'small', [layoutName]);
+  const toast = useToast();
 
   useEffect(() => {
     if (!isLoading && finances) {
@@ -194,8 +182,19 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, token: mainToken }) => {
     return temp;
   };
 
-  const open = () => setOpened(true);
-  const close = () => setOpened(false);
+  const openTransferModal = useCallback(() => {
+    if (!isConnected) {
+      toast(Error.ConnectAccount);
+      return;
+    }
+    if (daoName) {
+      trackEvent(EventType.DEPOSIT_ASSETS_ClICKED, { dao_name: daoName });
+    }
+
+    setIsTransferModalOpen(true);
+  }, [setIsTransferModalOpen, toast, isConnected, daoName]);
+
+  const close = () => setIsTransferModalOpen(false);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -204,7 +203,7 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, token: mainToken }) => {
   return (
     <Grid gap={24} columns="9">
       <GridItem gridColumn={layoutIsSmall ? '1/-1' : '7/10'}>
-        <FinanceSideCard tokens={tokens} mainToken={mainToken} onNewTransfer={open} />
+        <FinanceSideCard tokens={tokens} mainToken={mainToken} onNewTransfer={openTransferModal} />
       </GridItem>
       <GridItem
         gridRow={layoutIsSmall ? '2/-1' : '1/2'}
@@ -214,14 +213,14 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, token: mainToken }) => {
           {!layoutIsSmall && (
             <HeaderContainer>
               <Title>Finance</Title>
-              <CustomActionButton label="New Transfer" onClick={open} />
+              <CustomActionButton label="New Transfer" onClick={openTransferModal} />
             </HeaderContainer>
           )}
           <TransactionListContainer>
             <ListTitle>Transactions</ListTitle>
             {RenderTransactionCard()}
           </TransactionListContainer>
-          <DaoTransferModal opened={opened} close={close} />
+          <DaoTransferModal opened={isTransferModalOpen} close={close} />
         </div>
       </GridItem>
     </Grid>

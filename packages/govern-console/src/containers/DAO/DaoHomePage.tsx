@@ -130,14 +130,20 @@ const DaoHomePage: React.FC = () => {
                   fetchMore={fetchMoreData}
                   actions={visibleActions}
                   isMore={IsMoreActions}
-                  identifier={daoName}
+                  daoName={daoName}
                 />
               )}
             />
             <ApmRoute
               exact
               path={`${path}finance`}
-              render={() => <DaoFinancePage executorId={dao?.executor.id} token={dao?.token} />}
+              render={() => (
+                <DaoFinancePage
+                  daoName={daoName}
+                  executorId={dao?.executor.id}
+                  token={dao?.token}
+                />
+              )}
             />
             <ApmRoute exact path={`${path}settings`} component={DaoSettings} />
             <ApmRoute exact path={`${path}actions/executions/:id`} component={ProposalDetails} />
