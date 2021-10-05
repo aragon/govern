@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import styled, { css } from 'styled-components';
 import { useEffect, useMemo, useState } from 'react';
 import { useLayout, Button, ButtonText, IconUp, IconDown } from '@aragon/ui';
@@ -8,20 +9,18 @@ import { FinanceToken } from 'utils/types';
 type Props = {
   tokens: FinanceToken;
   mainToken: string;
+  onNewTransfer: () => void;
 };
 
-const Container = styled.div<{ layoutIsSmall: boolean }>`
+const Container = styled.div`
   gap: 16px;
   display: flex;
   align-items: flex-start;
   flex-direction: column;
   justify-content: flex-start;
-
   border-radius: 12px;
   padding: 24px 16px 16px;
   background-color: #ffffff;
-
-  ${({ layoutIsSmall }) => layoutIsSmall && 'width: 343px'}
 `;
 
 const MainTokenBalance = styled.div`
@@ -82,16 +81,23 @@ const Assets = styled.div`
   width: 100%;
 `;
 
-const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken }) => {
+const formatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  maximumFractionDigits: 0,
+});
+
+const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken, onNewTransfer }) => {
   const [displayAssets, setDisplayAssets] = useState<boolean>(false);
 
   const { layoutName } = useLayout();
   const layoutIsSmall = useMemo(() => layoutName === 'small', [layoutName]);
-  const { symbol, amount, usd } = useMemo(() => {
+  const { symbol, amount, price, numberOfAssets } = useMemo(() => {
     return {
-      amount: tokens[mainToken]?.amount || '0',
+      amount: tokens[mainToken]?.amountForHuman || 0.0,
       symbol: tokens[mainToken]?.symbol || 'Tokens',
-      usd: tokens[mainToken]?.usd,
+      price: tokens[mainToken]?.price,
+      numberOfAssets: Object.keys(tokens).length || 1,
     };
   }, [tokens, mainToken]);
 
@@ -107,20 +113,23 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken }) => {
   }, [layoutIsSmall]);
 
   return (
-    <Container layoutIsSmall={layoutIsSmall}>
+    <Container>
       <MainTokenBalance>
         <Token>{`${amount} ${symbol}`}</Token>
-        {usd && <USDValue>~$25,012.57 USD</USDValue>}
+        {price && <USDValue>{`~${formatter.format(Number(price) * Number(amount))} USD`}</USDValue>}
       </MainTokenBalance>
 
       {displayAssets && (
         <Assets>
-          {Object.values(tokens).map((token: any) => (
+          {Object.values(tokens).map((token: any, index: number) => (
             <BalanceCard
-              key={token.symbol}
-              usd={token.usd}
-              token={token.amount}
+              key={token.symbol + index}
+              usd={
+                token.price && formatter.format(Number(token.price) * Number(token.amountForHuman))
+              }
+              token={token.amountForHuman}
               symbol={token.symbol}
+              icon={token.icon}
             />
           ))}
         </Assets>
@@ -128,14 +137,16 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken }) => {
 
       {layoutIsSmall && (
         <ButtonGroup>
-          <NewTransferButton label="New transfer" />
+          <NewTransferButton label="New transfer" onClick={onNewTransfer} />
           <ShowAssetsButton>
             <ButtonTextContainer
               onClick={() => {
                 setDisplayAssets(!displayAssets);
               }}
             >
-              {`${displayAssets ? 'Close' : 'Show'} ${Object.keys(tokens).length} asset(s)`}
+              {`${displayAssets ? 'Close' : 'Show'} ${
+                numberOfAssets !== 1 ? `${numberOfAssets} assets` : `asset`
+              }`}
               {displayAssets ? <IconUp size="small" /> : <IconDown size="small" />}
             </ButtonTextContainer>
           </ShowAssetsButton>
@@ -145,4 +156,5 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken }) => {
   );
 };
 
-export default FinanceSideCard;
+const MemoizedFinanceCard = memo(FinanceSideCard);
+export default MemoizedFinanceCard;

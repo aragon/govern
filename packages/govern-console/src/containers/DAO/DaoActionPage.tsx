@@ -113,7 +113,7 @@ const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, identifie
     if (actions) {
       actions
         .filter((data) => FilterState(data)) // Filter Based on status
-        .filter((data) => SearchAction(data)) // search among vidible Actions
+        .filter((data) => SearchAction(data)) // search among visible Actions
         .map((data, index: number) => {
           temp.push(
             <GridItem

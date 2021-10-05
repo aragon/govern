@@ -18,6 +18,7 @@ export const TRANSFERS = gql`
         to
         from
         token
+        reference
         createdAt
       }
     }

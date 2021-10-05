@@ -1,10 +1,13 @@
+import { memo } from 'react';
 import styled from 'styled-components';
 
-// TODO: Finalize. Tentative props
+import ETHIcon from 'images/pngs/eth_logo.png';
+
 type Props = {
   token: string;
   usd: string;
   symbol: string;
+  icon: string;
 };
 
 const Container = styled.div`
@@ -12,7 +15,7 @@ const Container = styled.div`
   display: flex;
   align-items: center;
   padding: 12px 0px;
-  border-top: 1px solid lightgray; // TODO: to be changed
+  border-top: 1px solid #eff1f7;
 `;
 
 const IconContainer = styled.div`
@@ -23,10 +26,9 @@ const IconContainer = styled.div`
   height: 32px;
 `;
 
-const TempIcon = styled.div`
+const Icon = styled.img`
   width: 24px;
   height: 24px;
-  background-color: yellow;
 `;
 
 const Balance = styled.div`
@@ -49,11 +51,18 @@ const USDEquivalent = styled.p`
   line-height: 21px;
 `;
 
-const BalanceCard: React.FC<Props> = ({ token, usd, symbol }) => {
+const BalanceCard: React.FC<Props> = ({ icon, token, usd, symbol }) => {
   return (
     <Container>
       <IconContainer>
-        <TempIcon />
+        <Icon
+          src={icon || ETHIcon}
+          alt="token logo"
+          onError={(e: any) => {
+            e.target.onerror = null;
+            e.target.src = ETHIcon;
+          }}
+        />
       </IconContainer>
       <Balance>
         <Crypto>{`${token} ${symbol}`}</Crypto>
@@ -63,4 +72,5 @@ const BalanceCard: React.FC<Props> = ({ token, usd, symbol }) => {
   );
 };
 
-export default BalanceCard;
+const MemoizedBalanceCard = memo(BalanceCard);
+export default MemoizedBalanceCard;
