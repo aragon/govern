@@ -80,8 +80,8 @@ const LoadMoreButton = styled.div`
 const DaoFinancePage: React.FC<Props> = ({ executorId, token: mainToken }) => {
   const { provider } = useWallet();
   const [tokens, setTokens] = useState<FinanceToken>({});
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [opened, setOpened] = useState<boolean>(false);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const { data: finances, loading: isLoading } = useFinanceQuery(executorId);
 
   const { layoutName } = useLayout();
