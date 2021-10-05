@@ -77,8 +77,9 @@ const ButtonTextContainer = styled.div`
   justify-content: center;
 `;
 
-const Assets = styled.div`
+const Assets = styled.div<{ isVisible: boolean }>`
   width: 100%;
+  ${({ isVisible }) => (isVisible ? '' : 'display: none')}
 `;
 
 const formatter = new Intl.NumberFormat('en-US', {
@@ -112,6 +113,10 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken, onNewTransfer }) 
     }
   }, [layoutIsSmall]);
 
+  function sortAssets(asset: any, nextAsset: any) {
+    return asset.symbol > nextAsset.symbol ? 1 : -1;
+  }
+
   return (
     <Container>
       <MainTokenBalance>
@@ -119,9 +124,10 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken, onNewTransfer }) 
         {price && <USDValue>{`~${formatter.format(Number(price) * Number(amount))} USD`}</USDValue>}
       </MainTokenBalance>
 
-      {displayAssets && (
-        <Assets>
-          {Object.values(tokens).map((token: any, index: number) => (
+      <Assets isVisible={displayAssets}>
+        {Object.values(tokens)
+          .sort(sortAssets)
+          .map((token: any, index: number) => (
             <BalanceCard
               key={token.symbol + index}
               usd={
@@ -132,8 +138,7 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken, onNewTransfer }) 
               icon={token.icon}
             />
           ))}
-        </Assets>
-      )}
+      </Assets>
 
       {layoutIsSmall && (
         <ButtonGroup>
