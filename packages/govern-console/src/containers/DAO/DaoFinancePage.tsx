@@ -5,6 +5,7 @@ import { Button, GU, Grid, GridItem, useLayout, IconDown } from '@aragon/ui';
 
 import { useWallet } from 'providers/AugmentedWallet';
 import { formatUnits } from 'utils/lib';
+import NoResultFound from './components/NoResultFound/NoResultFound';
 import FinanceSideCard from './components/FinanceSideCard/FinanceSideCard';
 import DaoTransferModal from './DaoTransferModal';
 import { getTokenInfo } from 'utils/token';
@@ -12,8 +13,7 @@ import DaoTransactionCard from './components/DaoTransactionCard/DaoTransactionCa
 import { useFinanceQuery } from 'hooks/query-hooks';
 import { ASSET_ICON_BASE_URL } from 'utils/constants';
 import { getMigrationBalances, getTokenPrice } from 'services/finances';
-import { Balance, Deposit, FinanceToken, Withdraw, transctions } from 'utils/types';
-import NoResultFound from './components/NoResultFound/NoResultFound';
+import { Balance, Deposit, FinanceToken, Withdraw, Transaction } from 'utils/types';
 
 type Props = {
   executorId: string;
@@ -81,8 +81,8 @@ const LoadMoreButton = styled.div`
 const DaoFinancePage: React.FC<Props> = ({ executorId, token: mainToken }) => {
   const { provider } = useWallet();
   const [tokens, setTokens] = useState<FinanceToken>({});
-  const [transactions, setTransactions] = useState<transctions>([]);
   const [opened, setOpened] = useState<boolean>(false);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const { data: finances, loading: isLoading } = useFinanceQuery(executorId);
 
   const { layoutName } = useLayout();
@@ -157,13 +157,13 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, token: mainToken }) => {
       }
     }
 
-    function sortTransaction(a: transctions[0], b: transctions[0]) {
+    function sortTransaction(a: Transaction, b: Transaction) {
       return parseInt(b.createdAt) - parseInt(a.createdAt);
     }
 
     async function prepareTransactions() {
       [...finances.withdraws, ...finances.deposits].map(
-        async ({ createdAt, __typename, amount, token: currentToken }) => {
+        async ({ createdAt, typename, amount, token: currentToken }) => {
           const { decimals, symbol } =
             currentToken === constants.AddressZero
               ? { symbol: 'ETH', decimals: 18 }
@@ -173,7 +173,7 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, token: mainToken }) => {
               ...prevState,
               {
                 createdAt,
-                __typename,
+                typename,
                 token: currentToken,
                 symbol,
                 amount: formatUnits(amount, decimals),

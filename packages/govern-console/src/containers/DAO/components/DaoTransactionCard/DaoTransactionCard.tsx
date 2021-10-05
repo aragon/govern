@@ -1,10 +1,10 @@
 import styled from 'styled-components';
 import { Box, IconDownload, IconUpload, useLayout } from '@aragon/ui';
 import { formatDate } from 'utils/date';
-import { transctions } from 'utils/types';
+import { Transaction } from 'utils/types';
 
 type Props = {
-  info: transctions[0];
+  info: Transaction;
 };
 
 type Signs = {
@@ -114,8 +114,8 @@ const DaoTransactionCard: React.FC<Props> = ({ info }) => {
   return (
     <ActionCard>
       <InfoContainer>
-        <IconContainer className={info.__typename.toLowerCase()}>
-          {info.__typename.toLowerCase() === 'deposit' ? <IconDownload /> : <IconUpload />}
+        <IconContainer className={info.typename.toLowerCase()}>
+          {info.typename.toLowerCase() === 'deposit' ? <IconDownload /> : <IconUpload />}
         </IconContainer>
         <TextContainer>
           <Text
@@ -123,13 +123,13 @@ const DaoTransactionCard: React.FC<Props> = ({ info }) => {
               width: ${layoutName === 'small' ? '100px' : '250px'};
             `}
           >
-            {info.__typename}
+            {info.typename}
           </Text>
           <Time>{formatDate(info.createdAt, 'relative')}</Time>
         </TextContainer>
       </InfoContainer>
-      <PriceContainer className={info.__typename.toLowerCase()}>
-        {info.__typename.toLowerCase() === 'deposit' ? '+' : '-'} {info.amount} {info.symbol}
+      <PriceContainer className={info.typename.toLowerCase()}>
+        {info.typename.toLowerCase() === 'deposit' ? '+' : '-'} {info.amount} {info.symbol}
       </PriceContainer>
     </ActionCard>
   );

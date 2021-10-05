@@ -11,6 +11,7 @@ export const TRANSFERS = gql`
         token
         reference
         createdAt
+        typename: __typename
       }
       withdraws {
         id
@@ -20,6 +21,7 @@ export const TRANSFERS = gql`
         token
         reference
         createdAt
+        typename: __typename
       }
     }
   }

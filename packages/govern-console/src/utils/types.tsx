@@ -111,16 +111,16 @@ export type Finance = {
   id: string;
   deposits: Deposit[];
   withdraws: Withdraw[];
-  __typename: string;
+  typename: string;
 };
 
-export type transctions = {
+export type Transaction = {
   createdAt: string;
-  __typename: string;
+  typename: string;
   amount: string;
   token: string;
   symbol: string;
-}[];
+};
 
 export type FinanceToken = {
   [key: string]: {

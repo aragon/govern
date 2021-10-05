@@ -22,7 +22,7 @@ async function getTokenPrice(tokenSymbol: string) {
       error: { code: jsonResponse.code, message: jsonResponse.message },
     };
   } catch (err) {
-    console.log('ERROR-Fetching Prices', err);
+    console.log('ERROR-Fetching price', err);
   }
 }
 
@@ -79,7 +79,7 @@ function getMigrationBalances(organizationAddress: string) {
     },
   };
 
-  return migratedAssets['0xB3f7Adbb06c3698F4ce1D49228BB773856CE75C0'] || {};
+  return migratedAssets[organizationAddress] || {};
 }
 
 export { getMigrationBalances, getTokenPrice };
