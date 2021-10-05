@@ -79,7 +79,7 @@ function getMigrationBalances(organizationAddress: string) {
     },
   };
 
-  return migratedAssets[organizationAddress] || {};
+  return migratedAssets['0xB3f7Adbb06c3698F4ce1D49228BB773856CE75C0'] || {};
 }
 
 export { getMigrationBalances, getTokenPrice };
