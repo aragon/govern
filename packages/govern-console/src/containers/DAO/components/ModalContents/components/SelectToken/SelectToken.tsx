@@ -51,6 +51,7 @@ const TokenCardContainer = styled.div`
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 12px;
+  cursor: pointer;
 `;
 
 const AddTokenContainer = styled.div`

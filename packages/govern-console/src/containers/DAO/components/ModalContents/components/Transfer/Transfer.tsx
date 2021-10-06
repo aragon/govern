@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import styled from 'styled-components';
 import {
   ContentSwitcher,
+  DropDown,
   GU,
   TextInput,
   IconDown,
@@ -120,11 +121,32 @@ const CustomeContentSwitcher = styled(ContentSwitcher)`
     width: 50%;
   }
 `;
+const SelectedToken = styled.div`
+  display: flex;
+  align-items: center;
+  height: 24px;
+  gap: 12px;
+  color: #20232c;
+
+  & > img {
+    height: 24px;
+    width: 24px;
+  }
+`;
 
 const Transfer: React.FC<props> = ({ next, methods, buildActions, setShowSelectToken }) => {
   const [selected, setSelected] = useState<number>();
-  const { control, handleSubmit } = methods;
+  const { control, handleSubmit, getValues } = methods;
 
+  function renderToken(token: any) {
+    return (
+      <SelectedToken>
+        <img src={token?.logo} />
+        <p>{token?.symbol}</p>
+      </SelectedToken>
+    );
+  }
+  const token = getValues('token');
   return (
     <>
       <HeaderContainer>
@@ -147,15 +169,19 @@ const Transfer: React.FC<props> = ({ next, methods, buildActions, setShowSelectT
         */}
         <SubTitle>Token</SubTitle>
         <InputContainer>
-          <TextInput
+          <DropDown
+            items={[renderToken(token)]}
+            placeholder="Type to search ..."
+            wide
             css={`
               border-radius: 12px;
+              color: #7483ab;
             `}
+            selected={token ? 0 : -1}
             onClick={setShowSelectToken}
-            wide
-            adornmentPosition="end"
-            placeholder="Type to search ..."
-            adornment={<IconDown />}
+            onChange={() => {
+              console.log('TODO: pull up select token');
+            }}
           />
         </InputContainer>
         <SubTitle>Amount</SubTitle>
