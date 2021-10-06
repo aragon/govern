@@ -10,13 +10,8 @@ import {
   useToast,
 } from '@aragon/ui';
 import { useForm, FormProvider, Controller } from 'react-hook-form';
-import { Asset, AssetLabel, ETH, OTHER_TOKEN_SYMBOL } from 'utils/Asset';
 import { useWallet } from 'providers/AugmentedWallet';
-import { validateAmountForDecimals, validateToken, validateBalance } from 'utils/validations';
-import { AssetWithdrawal } from 'components/ActionBuilder/Screens/AssetWithdrawal';
-import { useActionBuilderState } from 'components/ActionBuilder/ActionBuilderStateProvider';
-import { getErrorFromException } from 'utils/HelperFunctions';
-import { Executor } from 'services/Executor';
+
 import Transfer from './components/Transfer/Transfer';
 import SelectToken from './components/SelectToken/SelectToken';
 
@@ -122,7 +117,6 @@ const CustomeContentSwitcher = styled(ContentSwitcher)`
 
 const NewTransfer: React.FC<props> = ({ next, setFormInfo }) => {
   const [selected, setSelected] = useState<number>();
-  const [selectedToken, setSelectedToken] = useState<any>(null);
   const [showSelectToken, setShowSelectToken] = useState(false);
   const methods = useForm<DepositFormData>();
   const { control, handleSubmit, watch, getValues } = methods;
@@ -133,30 +127,31 @@ const NewTransfer: React.FC<props> = ({ next, setFormInfo }) => {
     setFormInfo({ token, depositAmount, reference });
   }, [getValues, setFormInfo]);
 
-  return !showSelectToken ? (
-    <Transfer
-      methods={methods}
-      next={next}
-      token={selectedToken}
-      buildActions={buildActions}
-      setShowSelectToken={() => setShowSelectToken(true)}
-    />
-  ) : (
+  return (
     <FormProvider {...methods}>
-      <Controller
-        name="token"
-        control={control}
-        defaultValue={null}
-        render={({ field: { onChange } }) => (
-          <SelectToken
-            setShowSelectToken={() => setShowSelectToken(false)}
-            onSelectToken={(value) => {
-              setShowSelectToken(false);
-              onChange(value);
-            }}
-          />
-        )}
-      />
+      {showSelectToken ? (
+        <Controller
+          name="token"
+          control={control}
+          defaultValue={null}
+          render={({ field: { onChange } }) => (
+            <SelectToken
+              setShowSelectToken={() => setShowSelectToken(false)}
+              onSelectToken={(value) => {
+                setShowSelectToken(false);
+                onChange(value);
+              }}
+            />
+          )}
+        />
+      ) : (
+        <Transfer
+          methods={methods}
+          next={next}
+          buildActions={buildActions}
+          setShowSelectToken={() => setShowSelectToken(true)}
+        />
+      )}
     </FormProvider>
   );
 };
