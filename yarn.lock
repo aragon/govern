@@ -10341,10 +10341,10 @@ duplexify@^3.4.2, duplexify@^3.6.0:
     readable-stream "^2.0.0"
     stream-shift "^1.0.0"
 
-dvote-js@^1.13.2:
-  version "1.13.2"
-  resolved "https://registry.yarnpkg.com/dvote-js/-/dvote-js-1.13.2.tgz#63d1f13b314ad7ba1dab9c2f75242cbc3eba0984"
-  integrity sha512-M2f/baJCb6MPFP8trYfX2SD5NHrSKmyAqeFKD+FbZDG8oVW/TB81ZKx/8gHdszKHp1+0JNs0D3fg0ey8ZLGvlQ==
+dvote-js@1.13.3:
+  version "1.13.3"
+  resolved "https://registry.yarnpkg.com/dvote-js/-/dvote-js-1.13.3.tgz#640283c5775b8b7bf19768d6044ccf2be7ab48aa"
+  integrity sha512-RXxh2SEuQW2hjr2P/ik+HtWMBqiGyzN42MA2+L/tUwW4B7bm4wiR7WrkZ6PXmKv3MVniT2Gb6O6hpEwG54va8Q==
   dependencies:
     "@vocdoni/storage-proofs-eth" "^0.4.1"
     axios "^0.21.1"
@@ -25383,12 +25383,17 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
+typescript@4.4.3:
+  version "4.4.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.4.3.tgz#bdc5407caa2b109efd4f82fe130656f977a29324"
+  integrity sha512-4xfscpisVgqqDfPaJo5vkd+Qd/ItkoagnHpufr+i2QCHBsNYp+G7UAoyFl8aPtx879u38wPV65rZ8qbGZijalA==
+
 typescript@^3.8.3:
   version "3.9.9"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.9.9.tgz#e69905c54bc0681d0518bd4d587cc6f2d0b1a674"
   integrity sha512-kdMjTiekY+z/ubJCATUPlRDl39vXYiMV9iyeMuEuXZh2we6zz80uovNN2WlAxmmdE/Z/YQe+EbOEXB5RHEED3w==
 
-typescript@^4.0.3, typescript@^4.0.5, typescript@^4.1.2:
+typescript@^4.0.3, typescript@^4.1.2:
   version "4.2.4"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.2.4.tgz#8610b59747de028fda898a8aef0e103f156d0961"
   integrity sha512-V+evlYHZnQkaz8TRBuxTA92yZBPotr5H+WhQ7bD3hZUndx5tGOa1fuCgeSjxAzM1RiN5IzvadIXTVefuuwZCRg==
