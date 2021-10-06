@@ -124,6 +124,7 @@ const NewTransfer: React.FC<props> = ({ next, setFormInfo }) => {
 
   const buildActions = useCallback(async () => {
     const { token, depositAmount, reference = '' } = getValues();
+    console.log('SubmitInfo', { token, depositAmount, reference });
     setFormInfo({ token, depositAmount, reference });
   }, [getValues, setFormInfo]);
 

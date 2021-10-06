@@ -24,13 +24,14 @@ const DaoTransferModal: React.FC<{ opened: boolean; close: () => void; daoName: 
   // Provider react-hook-form setup here
   const [step, setStep] = useState<string>('newTransfer');
   const [formInfo, setFormInfo] = useState({});
+  console.log('see', formInfo);
 
   function selectStep() {
     switch (step) {
       case 'newTransfer':
         return (
           <NewTransfer
-            next={() => setStep('SelectToken')}
+            next={() => setStep('ReviewDeposit')}
             setFormInfo={(value) => setFormInfo(value)}
           />
         );

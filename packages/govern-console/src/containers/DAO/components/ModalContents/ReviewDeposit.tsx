@@ -162,7 +162,7 @@ const ReviewDeposit: React.FC<{ formInfo: any; daoName: string }> = ({ formInfo,
   const { provider, account, networkName } = useWallet();
   const toast = useToast();
 
-  console.log('checkValues', daoName, account);
+  console.log('checkValues', daoName, account, formInfo);
 
   return (
     <>
@@ -197,19 +197,21 @@ const ReviewDeposit: React.FC<{ formInfo: any; daoName: string }> = ({ formInfo,
       <InfoBox>
         <InfoRow>
           <InfoRowKey>Token</InfoRowKey>
-          <InfoRowValue>GET</InfoRowValue>
+          <InfoRowValue>{formInfo.token.symbol}</InfoRowValue>
         </InfoRow>
         <InfoRow>
           <InfoRowKey>Token Contract</InfoRowKey>
-          <InfoRowValue>0x8a85....30c6a1b</InfoRowValue>
+          <InfoRowValue>{getTruncatedAccountAddress(formInfo.token.address)}</InfoRowValue>
         </InfoRow>
         <InfoRow>
           <InfoRowKey>Amount</InfoRowKey>
-          <InfoRowValue>+ 5,0002.03232 GET</InfoRowValue>
+          <InfoRowValue>
+            + {formInfo.depositAmount} {formInfo.token.symbol}
+          </InfoRowValue>
         </InfoRow>
         <InfoRow>
           <InfoRowKey>Reference</InfoRowKey>
-          <InfoRowValue>Add GET as new governance token</InfoRowValue>
+          <InfoRowValue>{formInfo.reference}</InfoRowValue>
         </InfoRow>
       </InfoBox>
       <SubmitButton>
