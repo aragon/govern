@@ -1,8 +1,18 @@
 import styled from 'styled-components';
 import { IconLeft, IconPlus, TextInput, GU } from '@aragon/ui';
+import { getEnvironmentName, networkEnvironment } from 'environment';
+import { ETH } from 'utils/Asset';
+import { getNetworkConfig } from 'environment/networks';
+import { getTruncatedAccountAddress } from 'utils/account';
+
+const depositAssets: any = {
+  ...getNetworkConfig(getEnvironmentName()).curatedTokens,
+  [ETH.symbol]: ETH.address,
+};
 
 type props = {
   setShowSelectToken: () => void;
+  onSelectToken: (value: any) => void;
 };
 
 const HeaderContainer = styled.div`
@@ -80,28 +90,36 @@ const TokenTitle = styled.p`
   margin: 4px 0px;
 `;
 
-const Tokenaddress = styled.p`
+const TokenAddress = styled.p`
   font-weight: 500;
   font-size: 16px;
   line-height: 150%;
   color: #7483ab;
 `;
 
-const TokenCard = () => {
+type TokenCardProps = {
+  symbol: string;
+  address: string;
+  key: string;
+  onClick: (value: any) => void;
+};
+
+const TokenCard: React.FC<TokenCardProps> = ({ symbol, address, onClick }) => {
+  const logo = 'https://cryptologos.cc/logos/aragon-ant-logo.png';
   return (
-    <TokenCardContainer>
+    <TokenCardContainer onClick={() => onClick({ symbol, address, logo })}>
       <InfoContainer>
-        <TokenTitle>ANJ</TokenTitle>
-        <Tokenaddress>0xcD62b1C403fa....e2B51780b184</Tokenaddress>
+        <TokenTitle>{symbol}</TokenTitle>
+        <TokenAddress>{getTruncatedAccountAddress(address)}</TokenAddress>
       </InfoContainer>
       <TokenLogoContainer>
-        <TokenLogo src="https://cryptologos.cc/logos/aragon-ant-logo.png" />
+        <TokenLogo src={logo} />
       </TokenLogoContainer>
     </TokenCardContainer>
   );
 };
 
-const SelectToken: React.FC<props> = ({ setShowSelectToken }) => {
+const SelectToken: React.FC<props> = ({ setShowSelectToken, onSelectToken }) => {
   return (
     <>
       <HeaderContainer>
@@ -119,10 +137,17 @@ const SelectToken: React.FC<props> = ({ setShowSelectToken }) => {
           placeholder="Type to search ..."
         />
       </SearchContainer>
-      <TokenCard />
-      <TokenCard />
-      <TokenCard />
-      <TokenCard />
+      {Object.keys(depositAssets).map((assetName) => {
+        return (
+          <TokenCard
+            key={assetName}
+            symbol={assetName}
+            address={depositAssets[assetName]}
+            onClick={onSelectToken}
+          />
+        );
+      })}
+
       <AddTokenContainer>
         <p
           css={`

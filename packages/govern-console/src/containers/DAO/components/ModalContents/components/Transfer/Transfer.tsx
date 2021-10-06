@@ -21,6 +21,7 @@ import { Executor } from 'services/Executor';
 type props = {
   next: () => void;
   methods: any;
+  token: any;
   buildActions: () => void;
   setShowSelectToken: () => void;
 };

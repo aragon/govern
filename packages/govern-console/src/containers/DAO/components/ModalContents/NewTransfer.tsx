@@ -22,12 +22,11 @@ import SelectToken from './components/SelectToken/SelectToken';
 
 type props = {
   next: () => void;
-  // setFormInfo: () => void;
+  setFormInfo: (value: any) => void;
 };
 
 type DepositFormData = {
-  token: number;
-  tokenContractAddress: string;
+  token: any;
   depositAmount: string;
   reference?: string;
 };
@@ -121,27 +120,44 @@ const CustomeContentSwitcher = styled(ContentSwitcher)`
   }
 `;
 
-const NewTransfer: React.FC<props> = ({ next }) => {
+const NewTransfer: React.FC<props> = ({ next, setFormInfo }) => {
   const [selected, setSelected] = useState<number>();
+  const [selectedToken, setSelectedToken] = useState<any>(null);
   const [showSelectToken, setShowSelectToken] = useState(false);
   const methods = useForm<DepositFormData>();
   const { control, handleSubmit, watch, getValues } = methods;
   const context: any = useWallet();
 
   const buildActions = useCallback(async () => {
-    const { token, tokenContractAddress, depositAmount, reference = '' } = getValues();
-    console.log('check values', { token, tokenContractAddress, depositAmount, reference });
-  }, [getValues]);
+    const { token, depositAmount, reference = '' } = getValues();
+    setFormInfo({ token, depositAmount, reference });
+  }, [getValues, setFormInfo]);
 
   return !showSelectToken ? (
     <Transfer
       methods={methods}
       next={next}
+      token={selectedToken}
       buildActions={buildActions}
       setShowSelectToken={() => setShowSelectToken(true)}
     />
   ) : (
-    <SelectToken setShowSelectToken={() => setShowSelectToken(false)} />
+    <FormProvider {...methods}>
+      <Controller
+        name="token"
+        control={control}
+        defaultValue={null}
+        render={({ field: { onChange } }) => (
+          <SelectToken
+            setShowSelectToken={() => setShowSelectToken(false)}
+            onSelectToken={(value) => {
+              setShowSelectToken(false);
+              onChange(value);
+            }}
+          />
+        )}
+      />
+    </FormProvider>
   );
 };
 
