@@ -1,5 +1,8 @@
 import styled from 'styled-components';
-import { GU, TextInput, IconDown, Button, IconDownload } from '@aragon/ui';
+import { ContentSwitcher, GU, TextInput, IconDown, Button, IconDownload } from '@aragon/ui';
+import { useForm, FormProvider } from 'react-hook-form';
+import { useState } from 'react';
+import { AssetWithdrawal } from 'components/ActionBuilder/Screens/AssetWithdrawal';
 
 const HeaderContainer = styled.div`
   display: flex;
@@ -78,25 +81,28 @@ const SubmitButton = styled(Button)`
   }
 `;
 
-const TypeSelector = () => {
-  return (
-    <SelectorContainer>
-      <Option className="active">Deposit</Option>
-      <Option>WithDraw</Option>
-    </SelectorContainer>
-  );
-};
-
 const NewTransfer: React.FC = () => {
+  const [selected, setSelected] = useState<number>();
+
   return (
     <>
       <HeaderContainer>
         <Title>New transfer</Title>
       </HeaderContainer>
       <BodyContainer>
-        <SubTitle>Type</SubTitle>
-        <Description>Select type of transfer you wish to proceed.</Description>
-        <TypeSelector />
+        {/* TODO: Connect this to react-hook-form; receive props from NewTransfer parent */}
+        <ContentSwitcher
+          title={<SubTitle>Type</SubTitle>}
+          subtitle={<Description>Select type of transfer you wish to proceed.</Description>}
+          items={['Deposit', 'Withdraw']}
+          onChange={(value: number) => setSelected(value)}
+          selected={selected}
+        />
+
+        {/* While this conditionally rendering looks like a good option,
+            it might be a headache for react-hook-form. Implement withdraw and 
+            deposit separately
+        */}
         <SubTitle>Token</SubTitle>
         <InputContainer>
           <TextInput

@@ -19,15 +19,20 @@ const TransferModal = styled(Modal)`
 function selectStep(step: number) {
   switch (step) {
     case 1:
-      return <SelectToken />;
+      return <NewTransfer />;
     case 2:
+      return <SelectToken />;
+    case 3:
+      return <ReviewDeposit />;
+    case 4:
       return <SignDeposit />;
     default:
-      return <NewTransfer />;
+      console.log('Error - Invalid step');
   }
 }
 
 const DaoTransferModal: React.FC<{ opened: boolean; close: () => void }> = ({ opened, close }) => {
+  // Provider react-hook-form setup here
   const [step, setStep] = useState<number>(0);
 
   //TODO change logic
@@ -37,15 +42,13 @@ const DaoTransferModal: React.FC<{ opened: boolean; close: () => void }> = ({ op
   }, [opened]);
 
   return (
-    <>
-      <TransferModal
-        visible={opened}
-        onClose={close}
-        onClick={() => setStep((prestep) => prestep + 1)}
-      >
-        <NewTransfer />
-      </TransferModal>
-    </>
+    <TransferModal
+      visible={opened}
+      onClose={close}
+      // onClick={() => setStep((prestep) => prestep + 1)}
+    >
+      <NewTransfer />
+    </TransferModal>
   );
 };
 
