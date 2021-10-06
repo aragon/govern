@@ -134,6 +134,12 @@ const SelectedToken = styled.div`
   }
 `;
 
+const StyledDropDown = styled(DropDown)<{ error: boolean }>`
+  border-radius: 12px;
+  color: #7483ab;
+  // ${({ error }) => error && 'border: 2px solid #ff6a60;'};
+`;
+
 const Transfer: React.FC<props> = ({ next, methods, buildActions, setShowSelectToken }) => {
   const [selected, setSelected] = useState<number>();
   const { control, handleSubmit, getValues } = methods;
@@ -167,20 +173,43 @@ const Transfer: React.FC<props> = ({ next, methods, buildActions, setShowSelectT
             it might be a headache for react-hook-form. Implement withdraw and 
             deposit separately
         */}
+
+        {/*
+       <Controller
+          name="token"
+          control={control}
+          defaultValue={null}
+          render={({ field: { onChange } }) => (
+            <SelectToken
+              setShowSelectToken={() => setShowSelectToken(false)}
+              onSelectToken={(value) => {
+                setShowSelectToken(false);
+                onChange(value);
+              }}
+            />
+          )}
+        />
+      )  */}
         <SubTitle>Token</SubTitle>
         <InputContainer>
-          <DropDown
-            items={[renderToken(token)]}
-            placeholder="Type to search ..."
-            wide
-            css={`
-              border-radius: 12px;
-              color: #7483ab;
-            `}
-            selected={token ? 0 : -1}
-            onClick={setShowSelectToken}
-            onChange={() => {
-              console.log('TODO: pull up select token');
+          <Controller
+            name="token"
+            control={control}
+            rules={{ required: 'Please select a token' }}
+            render={({ field: { value }, fieldState: { error } }) => {
+              return (
+                <StyledDropDown
+                  error={error?.message}
+                  items={[renderToken(value)]}
+                  placeholder="Type to search ..."
+                  wide
+                  selected={token ? 0 : -1}
+                  onClick={setShowSelectToken}
+                  // Workaround so component isn't both controlled
+                  // and uncontrolled
+                  onChange={setShowSelectToken}
+                />
+              );
             }}
           />
         </InputContainer>
