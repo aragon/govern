@@ -64,33 +64,33 @@ const Description = styled.p`
   line-height: 150%;
 `;
 
-// const SelectorContainer = styled.div`
-//   display: flex;
-//   width: 100%;
-//   height: 44px;
-//   background: #ffffff;
-//   margin-top: ${GU}px;
-//   margin-bottom: ${3 * GU}px;
-//   border-radius: 12px;
-//   padding: 4px;
-// `;
+const SelectorContainer = styled.div`
+  display: flex;
+  width: 100%;
+  height: 44px;
+  background: #ffffff;
+  margin-top: ${GU}px;
+  margin-bottom: ${3 * GU}px;
+  border-radius: 12px;
+  padding: 4px;
+`;
 
-// const Option = styled.div`
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   width: 50%;
-//   background: #ffffff;
-//   border-radius: 12px;
-//   font-weight: 600;
-//   color: #7483ab;
-//   cursor: pointer;
-//   &.active {
-//     background: #f0fbff;
-//     color: #00c2ff;
-//     cursor: auto;
-//   }
-// `;
+const Option = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50%;
+  background: #ffffff;
+  border-radius: 12px;
+  font-weight: 600;
+  color: #7483ab;
+  cursor: pointer;
+  &.active {
+    background: #f0fbff;
+    color: #00c2ff;
+    cursor: auto;
+  }
+`;
 
 const InputContainer = styled.div`
   margin-top: ${GU}px;
@@ -121,6 +121,15 @@ const CustomeContentSwitcher = styled(ContentSwitcher)`
   }
 `;
 
+const TypeSelector = () => {
+  return (
+    <SelectorContainer>
+      <Option className="active">Deposit</Option>
+      <Option>WithDraw</Option>
+    </SelectorContainer>
+  );
+};
+
 const Transfer: React.FC<props> = ({ next, methods, buildActions, setShowSelectToken }) => {
   const [selected, setSelected] = useState<number>();
   const { control, handleSubmit } = methods;
@@ -140,6 +149,10 @@ const Transfer: React.FC<props> = ({ next, methods, buildActions, setShowSelectT
           selected={selected}
           wide
         /> */}
+
+        <SubTitle>Type</SubTitle>
+        <Description>Select type of transfer you wish to proceed.</Description>
+        <TypeSelector />
 
         {/* While this conditionally rendering looks like a good option,
             it might be a headache for react-hook-form. Implement withdraw and 
@@ -204,7 +217,12 @@ const Transfer: React.FC<props> = ({ next, methods, buildActions, setShowSelectT
             )}
           />
         </InputContainer>
-        <SubmitButton onClick={handleSubmit(buildActions)}>
+        <SubmitButton
+          onClick={() => {
+            buildActions();
+            next();
+          }}
+        >
           <p>Review deposit</p>
           <IconDownload />
         </SubmitButton>
