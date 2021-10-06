@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Modal } from '@aragon/ui';
 import styled from 'styled-components';
-import SelectToken from './components/ModalContents/SelectToken';
 import NewTransfer from './components/ModalContents/NewTransfer';
 import SignDeposit from './components/ModalContents/SignDeposit';
 import ReviewDeposit from './components/ModalContents/ReviewDeposit';
@@ -16,7 +15,11 @@ const TransferModal = styled(Modal)`
   }
 `;
 
-const DaoTransferModal: React.FC<{ opened: boolean; close: () => void }> = ({ opened, close }) => {
+const DaoTransferModal: React.FC<{ opened: boolean; close: () => void; daoName: string }> = ({
+  opened,
+  close,
+  daoName,
+}) => {
   // Provider react-hook-form setup here
   const [step, setStep] = useState<string>('newTransfer');
   const [formInfo, setFormInfo] = useState({});
@@ -27,11 +30,11 @@ const DaoTransferModal: React.FC<{ opened: boolean; close: () => void }> = ({ op
         return (
           <NewTransfer
             next={() => setStep('SelectToken')}
-            // setFormInfo={(value) => setFormInfo(value)}
+            setFormInfo={(value) => setFormInfo(value)}
           />
         );
       case 'ReviewDeposit':
-        return <ReviewDeposit />;
+        return <ReviewDeposit formInfo={formInfo} daoName={daoName} />;
       case 'SignDeposit':
         return <SignDeposit />;
       default:

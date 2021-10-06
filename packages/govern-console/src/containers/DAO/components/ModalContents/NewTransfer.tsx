@@ -22,7 +22,7 @@ import SelectToken from './components/SelectToken/SelectToken';
 
 type props = {
   next: () => void;
-  // setFormInfo: () => void;
+  setFormInfo: (value: any) => void;
 };
 
 type DepositFormData = {
@@ -121,7 +121,7 @@ const CustomeContentSwitcher = styled(ContentSwitcher)`
   }
 `;
 
-const NewTransfer: React.FC<props> = ({ next }) => {
+const NewTransfer: React.FC<props> = ({ next, setFormInfo }) => {
   const [selected, setSelected] = useState<number>();
   const [showSelectToken, setShowSelectToken] = useState(false);
   const methods = useForm<DepositFormData>();
@@ -130,7 +130,7 @@ const NewTransfer: React.FC<props> = ({ next }) => {
 
   const buildActions = useCallback(async () => {
     const { token, tokenContractAddress, depositAmount, reference = '' } = getValues();
-    console.log('check values', { token, tokenContractAddress, depositAmount, reference });
+    setFormInfo({ token, tokenContractAddress, depositAmount, reference });
   }, [getValues]);
 
   return !showSelectToken ? (
