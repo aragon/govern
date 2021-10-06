@@ -22,6 +22,7 @@ type props = {
   next: () => void;
   methods: any;
   buildActions: () => void;
+  setShowSelectToken: () => void;
 };
 
 type DepositFormData = {
@@ -120,7 +121,7 @@ const CustomeContentSwitcher = styled(ContentSwitcher)`
   }
 `;
 
-const Transfer: React.FC<props> = ({ next, methods, buildActions }) => {
+const Transfer: React.FC<props> = ({ next, methods, buildActions, setShowSelectToken }) => {
   const [selected, setSelected] = useState<number>();
   const { control, handleSubmit } = methods;
 
@@ -150,6 +151,7 @@ const Transfer: React.FC<props> = ({ next, methods, buildActions }) => {
             css={`
               border-radius: 12px;
             `}
+            onClick={setShowSelectToken}
             wide
             adornmentPosition="end"
             placeholder="Type to search ..."

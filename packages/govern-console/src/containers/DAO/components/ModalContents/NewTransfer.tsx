@@ -18,6 +18,7 @@ import { useActionBuilderState } from 'components/ActionBuilder/ActionBuilderSta
 import { getErrorFromException } from 'utils/HelperFunctions';
 import { Executor } from 'services/Executor';
 import Transfer from './components/Transfer/Transfer';
+import SelectToken from './components/SelectToken/SelectToken';
 
 type props = {
   next: () => void;
@@ -122,6 +123,7 @@ const CustomeContentSwitcher = styled(ContentSwitcher)`
 
 const NewTransfer: React.FC<props> = ({ next }) => {
   const [selected, setSelected] = useState<number>();
+  const [showSelectToken, setShowSelectToken] = useState(false);
   const methods = useForm<DepositFormData>();
   const { control, handleSubmit, watch, getValues } = methods;
   const context: any = useWallet();
@@ -131,7 +133,16 @@ const NewTransfer: React.FC<props> = ({ next }) => {
     console.log('check values', { token, tokenContractAddress, depositAmount, reference });
   }, [getValues]);
 
-  return <Transfer methods={methods} next={next} buildActions={buildActions} />;
+  return !showSelectToken ? (
+    <Transfer
+      methods={methods}
+      next={next}
+      buildActions={buildActions}
+      setShowSelectToken={() => setShowSelectToken(true)}
+    />
+  ) : (
+    <SelectToken setShowSelectToken={() => setShowSelectToken(false)} />
+  );
 };
 
 export default NewTransfer;

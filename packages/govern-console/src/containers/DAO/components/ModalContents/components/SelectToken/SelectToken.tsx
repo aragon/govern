@@ -1,6 +1,10 @@
 import styled from 'styled-components';
 import { IconLeft, IconPlus, TextInput, GU } from '@aragon/ui';
 
+type props = {
+  setShowSelectToken: () => void;
+};
+
 const HeaderContainer = styled.div`
   display: flex;
 `;
@@ -97,11 +101,11 @@ const TokenCard = () => {
   );
 };
 
-const SelectToken: React.FC = () => {
+const SelectToken: React.FC<props> = ({ setShowSelectToken }) => {
   return (
     <>
       <HeaderContainer>
-        <BackButton>
+        <BackButton onClick={setShowSelectToken}>
           <IconLeft />
         </BackButton>
         <Title>Select Token</Title>
