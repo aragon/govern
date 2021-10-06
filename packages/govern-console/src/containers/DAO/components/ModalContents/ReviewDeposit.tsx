@@ -1,5 +1,7 @@
 import styled from 'styled-components';
-import { IconLeft, IconDownload, GU, Button, IconRight } from '@aragon/ui';
+import { IconLeft, IconDownload, GU, Button, IconRight, useToast } from '@aragon/ui';
+import { useWallet } from 'providers/AugmentedWallet';
+import { getTruncatedAccountAddress } from 'utils/account';
 
 const HeaderContainer = styled.div`
   display: flex;
@@ -156,7 +158,12 @@ const SubmitButton = styled(Button)`
   }
 `;
 
-const ReviewDeposit: React.FC = () => {
+const ReviewDeposit: React.FC<{ formInfo: any; daoName: string }> = ({ formInfo, daoName }) => {
+  const { provider, account, networkName } = useWallet();
+  const toast = useToast();
+
+  console.log('checkValues', daoName, account);
+
   return (
     <>
       <HeaderContainer>
@@ -179,12 +186,12 @@ const ReviewDeposit: React.FC = () => {
       <AddressContainer>
         <AddressBox>
           <AddressTitle>From</AddressTitle>
-          <AddressContent>0xd5d....54f53</AddressContent>
+          <AddressContent>{getTruncatedAccountAddress(account.address)}</AddressContent>
         </AddressBox>
         <CustomIconRight />
         <AddressBox>
           <AddressTitle>To</AddressTitle>
-          <AddressContent>Decentraland</AddressContent>
+          <AddressContent>{daoName}</AddressContent>
         </AddressBox>
       </AddressContainer>
       <InfoBox>

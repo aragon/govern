@@ -220,7 +220,7 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, daoName, token: mainToken
             <ListTitle>Transactions</ListTitle>
             {RenderTransactionCard()}
           </TransactionListContainer>
-          <DaoTransferModal opened={isTransferModalOpen} close={close} />
+          <DaoTransferModal opened={isTransferModalOpen} close={close} daoName={daoName} />
         </div>
       </GridItem>
     </Grid>
