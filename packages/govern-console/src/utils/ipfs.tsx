@@ -131,57 +131,62 @@ export async function fetchIPFS(uriOrCid: string) {
     error: null,
   };
 
-  for await (const file of ipfs.get(cid)) {
-    // If the file type is dir, it's a directory,
-    // so we need inside files
-    if (file.type === 'dir') {
-      continue;
-    }
-
-    if (file.type === 'file') {
-      const content: any = [];
-
-      for await (const chunk of file.content) {
-        content.push(chunk);
+  try {
+    // Add try/catch for catch fetch errors throw navigation
+    for await (const file of ipfs.get(cid)) {
+      // If the file type is dir, it's a directory,
+      // so we need inside files
+      if (file.type === 'dir') {
+        continue;
       }
 
-      const buffer = Buffer.concat(content);
+      if (file.type === 'file') {
+        const content: any = [];
 
-      if (file.path.includes('metadata')) {
-        try {
-          data.metadata = JSON.parse(new TextDecoder().decode(buffer));
-        } catch (err) {}
-      } else {
-        data.endpoint = IPFS_GATEWAY + file.path;
-
-        const extension = file.path.split('.').pop();
-        // check if the extension exists and is of type `.txt`
-        // to get the text representation by saving bandwith.
-        if (Object.values(FILE_EXTS).includes(extension)) {
-          try {
-            data.text = new TextDecoder().decode(buffer);
-          } catch (err) {}
+        for await (const chunk of file.content) {
+          content.push(chunk);
         }
-        // if the path name doesn't have .txt extension
-        // or doesn't include path at all, fetch is needed
-        // to determine the type and gets its text if it's text/plain
-        else {
-          const response = await fetch(IPFS_GATEWAY + file.path);
-          if (!response.ok) {
-            data.error = !response.ok;
-            return data;
-          }
 
-          const blob = await response.clone().blob();
+        const buffer = Buffer.concat(content);
 
-          if (MIME_TYPES.includes(blob.type)) {
+        if (file.path.includes('metadata')) {
+          try {
+            data.metadata = JSON.parse(new TextDecoder().decode(buffer));
+          } catch (err) {}
+        } else {
+          data.endpoint = IPFS_GATEWAY + file.path;
+
+          const extension = file.path.split('.').pop();
+          // check if the extension exists and is of type `.txt`
+          // to get the text representation by saving bandwith.
+          if (Object.values(FILE_EXTS).includes(extension)) {
             try {
               data.text = new TextDecoder().decode(buffer);
             } catch (err) {}
           }
+          // if the path name doesn't have .txt extension
+          // or doesn't include path at all, fetch is needed
+          // to determine the type and gets its text if it's text/plain
+          else {
+            const response = await fetch(IPFS_GATEWAY + file.path);
+            if (!response.ok) {
+              data.error = !response.ok;
+              return data;
+            }
+
+            const blob = await response.clone().blob();
+
+            if (MIME_TYPES.includes(blob.type)) {
+              try {
+                data.text = new TextDecoder().decode(buffer);
+              } catch (err) {}
+            }
+          }
         }
       }
     }
+  } catch {
+    console.log('Fetch failed');
   }
 
   return data;
