@@ -1,7 +1,7 @@
 import styled from 'styled-components';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { GU, LoadingRing } from '@aragon/ui';
+import { GU, LoadingRing, IconConnect, IconCheck, Button, IconRotateLeft } from '@aragon/ui';
 import { useTransferContext } from './TransferContext';
 import { CustomTransactionStatus } from 'utils/types';
 
@@ -50,31 +50,86 @@ const SignDeposit: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const MessageType = useMemo(() => {
+    switch (txState) {
+      case TransactionState.Processing:
+        return (
+          <SignCard className="loading">
+            <Wrapper>
+              <InfoWrapper>
+                <LoadingContainer className="loading">
+                  <LoadingRing />
+                </LoadingContainer>
+                <InfoContainer>
+                  <InfoTitle>{reference}</InfoTitle>
+                  <InfoDescription>Waiting for confirmation ...</InfoDescription>
+                </InfoContainer>
+              </InfoWrapper>
+              <Amount>
+                + {depositAmount} {symbol}
+              </Amount>
+            </Wrapper>
+          </SignCard>
+        );
+      case TransactionState.Success:
+        return (
+          <SignCard className="success">
+            <Wrapper>
+              <InfoWrapper>
+                <LoadingContainer className="success">
+                  <IconCheck />
+                </LoadingContainer>
+                <InfoContainer>
+                  <InfoTitle>{reference}</InfoTitle>
+                  <InfoDescription>Transfer successfully signed</InfoDescription>
+                </InfoContainer>
+              </InfoWrapper>
+              <Amount>
+                + {depositAmount} {symbol}
+              </Amount>
+            </Wrapper>
+            <SuccessButton label="Close deposit" wide />
+          </SignCard>
+        );
+      case TransactionState.Failure:
+        return (
+          <SignCard className="failed">
+            <Wrapper>
+              <InfoWrapper>
+                <LoadingContainer className="failed">
+                  <IconConnect />
+                </LoadingContainer>
+                <InfoContainer>
+                  <InfoTitle>{reference}</InfoTitle>
+                  <InfoDescription>Transfer rejected by wallet</InfoDescription>
+                </InfoContainer>
+              </InfoWrapper>
+              <Amount>
+                + {depositAmount} {symbol}
+              </Amount>
+            </Wrapper>
+            <FailedButton wide>
+              <p>try again</p>
+              <IconRotateLeft />
+            </FailedButton>
+          </SignCard>
+        );
+    }
+  }, [txState, reference, depositAmount, symbol]);
+
   return (
     <>
       <HeaderContainer>
         <Title>Sign deposit</Title>
         <Description>To complete your transfer, sign your deposit with your wallet.</Description>
       </HeaderContainer>
-      <SignCard>
-        <Wrapper>
-          <LoadingContainer>
-            <LoadingRing />
-          </LoadingContainer>
-          <InfoContainer>
-            <InfoTitle>{reference}</InfoTitle>
-            <InfoDescription>Waiting for confirmation ...</InfoDescription>
-          </InfoContainer>
-        </Wrapper>
-        <Amount>
-          + ${depositAmount} ${symbol}
-        </Amount>
-      </SignCard>
+      {MessageType}
     </>
   );
 };
 
 export default SignDeposit;
+
 const HeaderContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -98,11 +153,21 @@ const Description = styled.p`
 
 const SignCard = styled.div`
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   padding: 16px;
   background: #ffffff;
   border-radius: 12px;
   border: solid 2px #00c2ff;
+
+  &.loading {
+    border: solid 2px #00c2ff;
+  }
+  &.success {
+    border: solid 2px #3cce6e;
+  }
+  &.failed {
+    border: solid 2px #ff575c;
+  }
 `;
 
 const LoadingContainer = styled.div`
@@ -111,11 +176,28 @@ const LoadingContainer = styled.div`
   justify-content: center;
   height: 32px;
   width: 32px;
-  background: #f0fbff;
   border-radius: 8px;
+
+  &.loading {
+    background: #f0fbff;
+  }
+  &.success {
+    background: #effbf3;
+    color: #3cce6e;
+  }
+  &.failed {
+    background: #ffe0e1;
+    color: #ff575c;
+  }
 `;
 
 const Wrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+}
+`;
+
+const InfoWrapper = styled.div`
   display: flex;
 `;
 
@@ -143,4 +225,20 @@ const Amount = styled.p`
   font-size: 16px;
   font-weight: 600;
   color: #20232c;
+`;
+
+const SuccessButton = styled(Button)`
+  background: #effbf3;
+  color: #3cce6e;
+  box-shadow: none;
+  margin-top: 16px;
+  height: 40px;
+`;
+
+const FailedButton = styled(Button)`
+  background: #ffe0e1;
+  color: #ff575c;
+  box-shadow: none;
+  margin-top: 16px;
+  height: 40px;
 `;
