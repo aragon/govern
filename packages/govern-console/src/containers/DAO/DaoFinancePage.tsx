@@ -150,6 +150,7 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, daoName, token: mainToken
     }
 
     async function prepareTransactions() {
+      setTransactions([]);
       [...finances.withdraws, ...finances.deposits].map(
         async ({ createdAt, typename, amount, token: currentToken }) => {
           const { decimals, symbol } =
