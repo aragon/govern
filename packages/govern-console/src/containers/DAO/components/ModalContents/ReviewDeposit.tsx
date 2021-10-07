@@ -1,7 +1,105 @@
 import styled from 'styled-components';
+import { useCallback, useMemo } from 'react';
 import { IconLeft, IconDownload, GU, Button, IconRight, useToast } from '@aragon/ui';
 import { useWallet } from 'providers/AugmentedWallet';
+import { useTransferContext } from './TransferContext';
+import { useFormContext } from 'react-hook-form';
+
 import { getTruncatedAccountAddress } from 'utils/account';
+import { Executor } from 'services/Executor';
+import { Asset } from 'utils/Asset';
+import { getErrorFromException } from 'utils/HelperFunctions';
+
+const ReviewDeposit: React.FC = () => {
+  const toast = useToast();
+  const context: any = useWallet();
+  const { getValues } = useFormContext();
+  const { account, provider } = context;
+  const { daoIdentifier, executorId, gotoState, setTransactions } = useTransferContext();
+
+  // TODO: Memo useless?
+  const { token, depositAmount, reference } = useMemo(() => getValues(), [getValues]);
+
+  const executeTransfer = useCallback(async () => {
+    const {
+      token: { symbol, address },
+      depositAmount,
+      reference = '',
+    } = getValues();
+
+    try {
+      const executor = new Executor(executorId, account.signer);
+      const asset = await Asset.createFromDropdownLabel(symbol, address, depositAmount, provider);
+      const transaction = await executor.deposit(asset, reference);
+      console.log(transaction);
+      setTransactions(transaction);
+      gotoState('sign');
+    } catch (err) {
+      console.log('deposit error', err);
+      const errorMessage = getErrorFromException(err);
+      toast(errorMessage);
+    }
+  }, [getValues, executorId, account.signer, provider, setTransactions, gotoState, toast]);
+
+  return (
+    <>
+      <HeaderContainer>
+        <BackButton onClick={() => gotoState('initial')}>
+          <IconLeft />
+        </BackButton>
+        <Title>Review transfer</Title>
+      </HeaderContainer>
+      <TransactionWrapper>
+        <IconContainer>
+          <Icon>
+            <IconDownload />
+          </Icon>
+        </IconContainer>
+        <TransferContainer>
+          <TransferTitle>Deposit</TransferTitle>
+          <TransferSubtitle>Review now</TransferSubtitle>
+        </TransferContainer>
+      </TransactionWrapper>
+      <AddressContainer>
+        <AddressBox>
+          <AddressTitle>From</AddressTitle>
+          <AddressContent>{getTruncatedAccountAddress(account.address)}</AddressContent>
+        </AddressBox>
+        <CustomIconRight />
+        <AddressBox>
+          <AddressTitle>To</AddressTitle>
+          <AddressContent>{daoIdentifier}</AddressContent>
+        </AddressBox>
+      </AddressContainer>
+      <InfoBox>
+        <InfoRow>
+          <InfoRowKey>Token</InfoRowKey>
+          <InfoRowValue>{token.symbol}</InfoRowValue>
+        </InfoRow>
+        <InfoRow>
+          <InfoRowKey>Token Contract</InfoRowKey>
+          <InfoRowValue>{getTruncatedAccountAddress(token.address)}</InfoRowValue>
+        </InfoRow>
+        <InfoRow>
+          <InfoRowKey>Amount</InfoRowKey>
+          <InfoRowValue>
+            + {depositAmount} {token.symbol}
+          </InfoRowValue>
+        </InfoRow>
+        <InfoRow>
+          <InfoRowKey>Reference</InfoRowKey>
+          <InfoRowValue>{reference}</InfoRowValue>
+        </InfoRow>
+      </InfoBox>
+      <SubmitButton onClick={executeTransfer}>
+        <p>Sign deposit</p>
+        <IconDownload />
+      </SubmitButton>
+    </>
+  );
+};
+
+export default ReviewDeposit;
 
 const HeaderContainer = styled.div`
   display: flex;
@@ -37,7 +135,8 @@ const TransferContainer = styled.div`
   border-radius: 12px;
   background: #ffffff;
   box-shadow: 0px 3px 3px rgba(180, 193, 228, 0.35);
-  padding: 32px 16px 16px;
+import { useTransferContext } from '../../TransferContext';
+padding: 32px 16px 16px;
 `;
 
 const TransferTitle = styled.p`
@@ -157,69 +256,3 @@ const SubmitButton = styled(Button)`
     margin-right: 12px;
   }
 `;
-
-const ReviewDeposit: React.FC<{ formInfo: any; daoName: string }> = ({ formInfo, daoName }) => {
-  const { provider, account, networkName } = useWallet();
-  const toast = useToast();
-
-  console.log('checkValues', daoName, account, formInfo);
-
-  return (
-    <>
-      <HeaderContainer>
-        <BackButton>
-          <IconLeft />
-        </BackButton>
-        <Title>Review transfer</Title>
-      </HeaderContainer>
-      <TransactionWrapper>
-        <IconContainer>
-          <Icon>
-            <IconDownload />
-          </Icon>
-        </IconContainer>
-        <TransferContainer>
-          <TransferTitle>Deposit</TransferTitle>
-          <TransferSubtitle>Review now</TransferSubtitle>
-        </TransferContainer>
-      </TransactionWrapper>
-      <AddressContainer>
-        <AddressBox>
-          <AddressTitle>From</AddressTitle>
-          <AddressContent>{getTruncatedAccountAddress(account.address)}</AddressContent>
-        </AddressBox>
-        <CustomIconRight />
-        <AddressBox>
-          <AddressTitle>To</AddressTitle>
-          <AddressContent>{daoName}</AddressContent>
-        </AddressBox>
-      </AddressContainer>
-      <InfoBox>
-        <InfoRow>
-          <InfoRowKey>Token</InfoRowKey>
-          <InfoRowValue>{formInfo.token.symbol}</InfoRowValue>
-        </InfoRow>
-        <InfoRow>
-          <InfoRowKey>Token Contract</InfoRowKey>
-          <InfoRowValue>{getTruncatedAccountAddress(formInfo.token.address)}</InfoRowValue>
-        </InfoRow>
-        <InfoRow>
-          <InfoRowKey>Amount</InfoRowKey>
-          <InfoRowValue>
-            + {formInfo.depositAmount} {formInfo.token.symbol}
-          </InfoRowValue>
-        </InfoRow>
-        <InfoRow>
-          <InfoRowKey>Reference</InfoRowKey>
-          <InfoRowValue>{formInfo.reference}</InfoRowValue>
-        </InfoRow>
-      </InfoBox>
-      <SubmitButton>
-        <p>Sign deposit</p>
-        <IconDownload />
-      </SubmitButton>
-    </>
-  );
-};
-
-export default ReviewDeposit;

@@ -1,62 +1,39 @@
-import { useState, useCallback } from 'react';
-import styled from 'styled-components';
-import {
-  ContentSwitcher,
-  GU,
-  TextInput,
-  IconDown,
-  Button,
-  IconDownload,
-  useToast,
-} from '@aragon/ui';
-import { useForm, FormProvider, Controller } from 'react-hook-form';
-import { useWallet } from 'providers/AugmentedWallet';
+// import styled from 'styled-components';
+// import { ContentSwitcher, GU, Button } from '@aragon/ui';
 
 import Transfer from './components/Transfer/Transfer';
-import SelectToken from './components/SelectToken/SelectToken';
 
-type props = {
-  next: () => void;
-  setFormInfo: (value: any) => void;
-};
+// const HeaderContainer = styled.div`
+//   display: flex;
+//   padding-bottom: 10px;
+//   margin-bottom: ${3 * GU}px;
+// `;
 
-type DepositFormData = {
-  token: any;
-  depositAmount: string;
-  reference?: string;
-};
+// const BodyContainer = styled.div`
+//   display: flex;
+//   flex-direction: column;
+// `;
 
-const HeaderContainer = styled.div`
-  display: flex;
-  padding-bottom: 10px;
-  margin-bottom: ${3 * GU}px;
-`;
+// const Title = styled.p`
+//   display: flex;
+//   align-items: center;
+//   font-weight: 600;
+//   font-size: 16px;
+// `;
 
-const BodyContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
+// const SubTitle = styled.p`
+//   font-weight: 600;
+//   font-size: 16px;
+//   line-height: 125%;
+//   margin: 4px 0px;
+// `;
 
-const Title = styled.p`
-  display: flex;
-  align-items: center;
-  font-weight: 600;
-  font-size: 16px;
-`;
-
-const SubTitle = styled.p`
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 125%;
-  margin: 4px 0px;
-`;
-
-const Description = styled.p`
-  color: #7483ab;
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 150%;
-`;
+// const Description = styled.p`
+//   color: #7483ab;
+//   font-weight: 500;
+//   font-size: 16px;
+//   line-height: 150%;
+// `;
 
 // const SelectorContainer = styled.div`
 //   display: flex;
@@ -86,75 +63,37 @@ const Description = styled.p`
 //   }
 // `;
 
-const InputContainer = styled.div`
-  margin-top: ${GU}px;
-  margin-bottom: ${3 * GU}px;
-`;
+// const InputContainer = styled.div`
+//   margin-top: ${GU}px;
+//   margin-bottom: ${3 * GU}px;
+// `;
 
-const SubmitButton = styled(Button)`
-  height: 48px;
-  width: 100%;
-  box-shadow: none;
+// const SubmitButton = styled(Button)`
+//   height: 48px;
+//   width: 100%;
+//   box-shadow: none;
 
-  & p {
-    font-weight: 600;
-    font-size: 16px;
-    margin-right: 12px;
-  }
-`;
+//   & p {
+//     font-weight: 600;
+//     font-size: 16px;
+//     margin-right: 12px;
+//   }
+// `;
 
-const CustomeContentSwitcher = styled(ContentSwitcher)`
-  & > div > ul {
-    width: 100%;
-  }
-  & > div > ul > li {
-    width: 100%;
-  }
-  & > div > ul > li > button {
-    width: 50%;
-  }
-`;
+// const CustomeContentSwitcher = styled(ContentSwitcher)`
+//   & > div > ul {
+//     width: 100%;
+//   }
+//   & > div > ul > li {
+//     width: 100%;
+//   }
+//   & > div > ul > li > button {
+//     width: 50%;
+//   }
+// `;
 
-const NewTransfer: React.FC<props> = ({ next, setFormInfo }) => {
-  const [selected, setSelected] = useState<number>();
-  const [showSelectToken, setShowSelectToken] = useState(false);
-  const methods = useForm<DepositFormData>();
-  const { control, handleSubmit, watch, getValues } = methods;
-  const context: any = useWallet();
-
-  const buildActions = useCallback(async () => {
-    const { token, depositAmount, reference = '' } = getValues();
-    console.log('SubmitInfo', { token, depositAmount, reference });
-    setFormInfo({ token, depositAmount, reference });
-  }, [getValues, setFormInfo]);
-
-  return (
-    <FormProvider {...methods}>
-      {showSelectToken ? (
-        <Controller
-          name="token"
-          control={control}
-          defaultValue={null}
-          render={({ field: { onChange } }) => (
-            <SelectToken
-              setShowSelectToken={() => setShowSelectToken(false)}
-              onSelectToken={(value) => {
-                setShowSelectToken(false);
-                onChange(value);
-              }}
-            />
-          )}
-        />
-      ) : (
-        <Transfer
-          methods={methods}
-          next={next}
-          buildActions={buildActions}
-          setShowSelectToken={() => setShowSelectToken(true)}
-        />
-      )}
-    </FormProvider>
-  );
+const NewTransfer: React.FC = () => {
+  return <Transfer />;
 };
 
 export default NewTransfer;

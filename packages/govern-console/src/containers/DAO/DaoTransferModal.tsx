@@ -1,10 +1,18 @@
-import { useState, useEffect } from 'react';
 import { Modal } from '@aragon/ui';
 import styled from 'styled-components';
 import NewTransfer from './components/ModalContents/NewTransfer';
-import SignDeposit from './components/ModalContents/SignDeposit';
 import ReviewDeposit from './components/ModalContents/ReviewDeposit';
+import { useForm, FormProvider, Controller, useFormContext } from 'react-hook-form';
+import { useTransferContext, TransferProvider } from './components/ModalContents/TransferContext';
 import SelectToken from './components/ModalContents/components/SelectToken/SelectToken';
+import SignDeposit from './components/ModalContents/SignDeposit';
+
+type Props = { opened: boolean; close: () => void; daoName: string; executorId: string };
+type DepositFormData = {
+  token: any;
+  depositAmount: string;
+  reference?: string;
+};
 
 const TransferModal = styled(Modal)`
   & > div > div > div {
@@ -16,41 +24,65 @@ const TransferModal = styled(Modal)`
   }
 `;
 
-const DaoTransferModal: React.FC<{ opened: boolean; close: () => void; daoName: string }> = ({
-  opened,
-  close,
-  daoName,
-}) => {
-  // Provider react-hook-form setup here
-  const [step, setStep] = useState<string>('newTransfer');
-  const [formInfo, setFormInfo] = useState({});
-  console.log('see', formInfo);
-
-  function selectStep() {
-    switch (step) {
-      case 'newTransfer':
-        return (
-          <NewTransfer
-            next={() => setStep('ReviewDeposit')}
-            setFormInfo={(value) => setFormInfo(value)}
-          />
-        );
-      case 'ReviewDeposit':
-        return <ReviewDeposit formInfo={formInfo} daoName={daoName} />;
-      case 'SignDeposit':
-        return <SignDeposit />;
-      default:
-        console.log('Error - Invalid step');
-    }
-  }
-
-  useEffect(() => {
-    if (!opened) setStep('newTransfer');
-  }, [opened]);
+const DaoTransferModal: React.FC<Props> = ({ opened, close, daoName, executorId }) => {
+  const methods = useForm<DepositFormData>();
 
   return (
-    <TransferModal visible={opened} onClose={close}>
-      {selectStep()}
+    <TransferProvider daoName={daoName} executor={executorId}>
+      <FormProvider {...methods}>
+        <TransferSwitcher opened={opened} close={close} />
+      </FormProvider>
+    </TransferProvider>
+  );
+};
+
+type SwitcherProps = {
+  opened: boolean;
+  close: () => void;
+};
+
+const TransferSwitcher: React.FC<SwitcherProps> = ({ opened, close }) => {
+  const { reset, control } = useFormContext();
+  const { state, gotoState } = useTransferContext();
+
+  const handleModalClose = () => {
+    close();
+    reset();
+    gotoState('initial');
+  };
+
+  const handleBackClick = () => {
+    gotoState('initial');
+  };
+
+  const handleTokenSelected = (onChange: (value: any) => void, value: any) => {
+    onChange(value);
+    handleBackClick();
+  };
+
+  return (
+    <TransferModal visible={opened} onClose={handleModalClose}>
+      {
+        {
+          fail: <div>Fails</div>,
+          sign: <SignDeposit />,
+          review: <ReviewDeposit />,
+          initial: <NewTransfer />,
+          success: <div>Success</div>,
+          selectToken: (
+            <Controller
+              name="token"
+              control={control}
+              defaultValue={null}
+              render={({ field: { onChange } }) => (
+                <SelectToken
+                  onTokenSelected={(value: any) => handleTokenSelected(onChange, value)}
+                />
+              )}
+            />
+          ),
+        }[state]
+      }
     </TransferModal>
   );
 };

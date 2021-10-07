@@ -11,12 +11,10 @@ import {
   useToast,
   GU,
 } from '@aragon/ui';
-import { PageName } from 'utils/HelpText';
 import backButtonIcon from '../../images/back-btn.svg';
 import { BackButton } from 'styles';
 
 import styled from 'styled-components';
-import PageContent from 'components/PageContent/PageContent';
 import ActionList from 'containers/NewExecution/ActionList';
 import { ActionBuilder } from 'components/ActionBuilder/ActionBuilder';
 import { useParams, useHistory } from 'react-router-dom';

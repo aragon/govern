@@ -7,16 +7,6 @@ type Props = {
   info: Transaction;
 };
 
-type Signs = {
-  deposit: string;
-  withdraw: string;
-};
-
-const Sign: Signs = {
-  deposit: '+',
-  withdraw: '-',
-};
-
 const ActionCard = styled(Box).attrs(() => ({
   padding: 16,
 }))`

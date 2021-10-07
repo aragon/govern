@@ -1,37 +1,12 @@
-import { useState, useCallback } from 'react';
 import styled from 'styled-components';
-import {
-  ContentSwitcher,
-  DropDown,
-  GU,
-  TextInput,
-  IconDown,
-  Button,
-  IconDownload,
-  useToast,
-} from '@aragon/ui';
-import { useForm, FormProvider, Controller } from 'react-hook-form';
-import { Asset, AssetLabel, ETH, OTHER_TOKEN_SYMBOL } from 'utils/Asset';
+import { useCallback } from 'react';
+import { useFormContext, Controller } from 'react-hook-form';
+import { DropDown, GU, TextInput, Button, IconDownload } from '@aragon/ui';
+
+import { Asset } from 'utils/Asset';
 import { useWallet } from 'providers/AugmentedWallet';
-import { validateAmountForDecimals, validateToken, validateBalance } from 'utils/validations';
-import { AssetWithdrawal } from 'components/ActionBuilder/Screens/AssetWithdrawal';
-import { useActionBuilderState } from 'components/ActionBuilder/ActionBuilderStateProvider';
-import { getErrorFromException } from 'utils/HelperFunctions';
-import { Executor } from 'services/Executor';
-
-type props = {
-  next: () => void;
-  methods: any;
-  buildActions: () => void;
-  setShowSelectToken: () => void;
-};
-
-type DepositFormData = {
-  token: number;
-  tokenContractAddress: string;
-  depositAmount: string;
-  reference?: string;
-};
+import { useTransferContext } from '../../TransferContext';
+import { validateAmountForDecimals, validateBalance } from 'utils/validations';
 
 const HeaderContainer = styled.div`
   display: flex;
@@ -65,34 +40,6 @@ const Description = styled.p`
   line-height: 150%;
 `;
 
-const SelectorContainer = styled.div`
-  display: flex;
-  width: 100%;
-  height: 44px;
-  background: #ffffff;
-  margin-top: ${GU}px;
-  margin-bottom: ${3 * GU}px;
-  border-radius: 12px;
-  padding: 4px;
-`;
-
-const Option = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 50%;
-  background: #ffffff;
-  border-radius: 12px;
-  font-weight: 600;
-  color: #7483ab;
-  cursor: pointer;
-  &.active {
-    background: #f0fbff;
-    color: #00c2ff;
-    cursor: auto;
-  }
-`;
-
 const InputContainer = styled.div`
   margin-top: ${GU}px;
   margin-bottom: ${3 * GU}px;
@@ -110,17 +57,6 @@ const SubmitButton = styled(Button)`
   }
 `;
 
-const CustomeContentSwitcher = styled(ContentSwitcher)`
-  & > div > ul {
-    width: 100%;
-  }
-  & > div > ul > li {
-    width: 100%;
-  }
-  & > div > ul > li > button {
-    width: 50%;
-  }
-`;
 const SelectedToken = styled.div`
   display: flex;
   align-items: center;
@@ -140,19 +76,92 @@ const StyledDropDown = styled(DropDown)<{ error: boolean }>`
   // ${({ error }) => error && 'border: 2px solid #ff6a60;'};
 `;
 
-const Transfer: React.FC<props> = ({ next, methods, buildActions, setShowSelectToken }) => {
-  const [selected, setSelected] = useState<number>();
-  const { control, handleSubmit, getValues } = methods;
+// const SelectorContainer = styled.div`
+//   display: flex;
+//   width: 100%;
+//   height: 44px;
+//   background: #ffffff;
+//   margin-top: ${GU}px;
+//   margin-bottom: ${3 * GU}px;
+//   border-radius: 12px;
+//   padding: 4px;
+// `;
 
-  function renderToken(token: any) {
+// const Option = styled.div`
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   width: 50%;
+//   background: #ffffff;
+//   border-radius: 12px;
+//   font-weight: 600;
+//   color: #7483ab;
+//   cursor: pointer;
+//   &.active {
+//     background: #f0fbff;
+//     color: #00c2ff;
+//     cursor: auto;
+//   }
+// `;
+
+// const StyledContentSwitcher = styled(ContentSwitcher)`
+//   & > div > ul {
+//     width: 100%;
+//   }
+//   & > div > ul > li {
+//     width: 100%;
+//   }
+//   & > div > ul > li > button {
+//     width: 50%;
+//   }
+// `;
+
+const Transfer: React.FC = () => {
+  const { gotoState } = useTransferContext();
+  const { control, getValues, handleSubmit } = useFormContext();
+  const token = getValues('token');
+
+  const context: any = useWallet();
+  const { provider, account } = context;
+
+  const goBack = () => {
+    gotoState('selectToken');
+  };
+
+  const validateAmount = useCallback(
+    async (value: string) => {
+      const { token } = getValues();
+      try {
+        const asset = await Asset.createFromDropdownLabel(
+          token.symbol,
+          token.address,
+          value,
+          provider,
+        );
+
+        const result = validateAmountForDecimals(value, asset.decimals);
+        if (result !== true) {
+          return result;
+        }
+
+        const owner = await account?.signer?.getAddress();
+        return validateBalance(asset, owner, provider);
+      } catch (err) {
+        console.log('Error validating amount', err);
+        return 'Error validating amount';
+      }
+    },
+    [provider, getValues, account],
+  );
+
+  const renderToken = (token: any) => {
     return (
       <SelectedToken>
         <img src={token?.logo} />
         <p>{token?.symbol}</p>
       </SelectedToken>
     );
-  }
-  const token = getValues('token');
+  };
   return (
     <>
       <HeaderContainer>
@@ -160,40 +169,25 @@ const Transfer: React.FC<props> = ({ next, methods, buildActions, setShowSelectT
       </HeaderContainer>
       <BodyContainer>
         {/* TODO: Connect this to react-hook-form; receive props from NewTransfer parent */}
-        {/* <CustomeContentSwitcher
+
+        {/* <StyledContentSwitcher
           title={<SubTitle>Type</SubTitle>}
           subtitle={<Description>Select type of transfer you wish to proceed.</Description>}
           items={['Deposit', 'Withdraw']}
-          onChange={(value: number) => setSelected(value)}
-          selected={selected}
+          // onChange={(value: number) => setSelected(value)}
+          // selected={selected}
           wide
         /> */}
 
-        <SubTitle>Type</SubTitle>
+        {/* <SubTitle>Type</SubTitle>
         <Description>Select type of transfer you wish to proceed.</Description>
-        <TypeSelector />
+        <TypeSelector /> */}
 
         {/* While this conditionally rendering looks like a good option,
             it might be a headache for react-hook-form. Implement withdraw and 
             deposit separately
         */}
 
-        {/*
-       <Controller
-          name="token"
-          control={control}
-          defaultValue={null}
-          render={({ field: { onChange } }) => (
-            <SelectToken
-              setShowSelectToken={() => setShowSelectToken(false)}
-              onSelectToken={(value) => {
-                setShowSelectToken(false);
-                onChange(value);
-              }}
-            />
-          )}
-        />
-      )  */}
         <SubTitle>Token</SubTitle>
         <InputContainer>
           <Controller
@@ -203,15 +197,14 @@ const Transfer: React.FC<props> = ({ next, methods, buildActions, setShowSelectT
             render={({ field: { value }, fieldState: { error } }) => {
               return (
                 <StyledDropDown
-                  error={error?.message}
-                  items={[renderToken(value)]}
-                  placeholder="Type to search ..."
                   wide
+                  error={error?.message}
+                  status={error ? 'error' : 'normal'}
+                  items={[renderToken(value)]}
+                  onClick={goBack}
+                  onChange={goBack}
                   selected={token ? 0 : -1}
-                  onClick={setShowSelectToken}
-                  // Workaround so component isn't both controlled
-                  // and uncontrolled
-                  onChange={setShowSelectToken}
+                  placeholder="Type to search ..."
                 />
               );
             }}
@@ -224,7 +217,7 @@ const Transfer: React.FC<props> = ({ next, methods, buildActions, setShowSelectT
             control={control}
             rules={{
               required: 'This is required.',
-              // validate: validateAmount,
+              validate: validateAmount,
             }}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <TextInput
@@ -234,7 +227,7 @@ const Transfer: React.FC<props> = ({ next, methods, buildActions, setShowSelectT
                 value={value}
                 onChange={onChange}
                 status={error ? 'error' : 'normal'}
-                error={error ? error.message : null}
+                error={error?.message}
                 wide
               />
             )}
@@ -263,12 +256,7 @@ const Transfer: React.FC<props> = ({ next, methods, buildActions, setShowSelectT
             )}
           />
         </InputContainer>
-        <SubmitButton
-          onClick={() => {
-            buildActions();
-            next();
-          }}
-        >
+        <SubmitButton onClick={handleSubmit(() => gotoState('review'))}>
           <p>Review deposit</p>
           <IconDownload />
         </SubmitButton>

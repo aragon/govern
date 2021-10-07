@@ -1,8 +1,10 @@
 import styled from 'styled-components';
 import { IconLeft, IconPlus, TextInput, GU } from '@aragon/ui';
-import { getEnvironmentName, networkEnvironment } from 'environment';
+
 import { ETH } from 'utils/Asset';
 import { getNetworkConfig } from 'environment/networks';
+import { useTransferContext } from '../../TransferContext';
+import { getEnvironmentName } from 'environment';
 import { getTruncatedAccountAddress } from 'utils/account';
 
 const depositAssets: any = {
@@ -11,8 +13,7 @@ const depositAssets: any = {
 };
 
 type props = {
-  setShowSelectToken: () => void;
-  onSelectToken: (value: any) => void;
+  onTokenSelected: (value: any) => void;
 };
 
 const HeaderContainer = styled.div`
@@ -42,6 +43,11 @@ const SearchContainer = styled.div`
   margin-top: ${3 * GU}px;
   width: 100%;
   margin-bottom: 12px;
+`;
+
+const StyledInput = styled(TextInput)`
+  width: 100%;
+  border-radius: 12px;
 `;
 
 const TokenCardContainer = styled.div`
@@ -120,23 +126,19 @@ const TokenCard: React.FC<TokenCardProps> = ({ symbol, address, onClick }) => {
   );
 };
 
-const SelectToken: React.FC<props> = ({ setShowSelectToken, onSelectToken }) => {
+const SelectToken: React.FC<props> = ({ onTokenSelected }) => {
+  const { gotoState } = useTransferContext();
+
   return (
     <>
       <HeaderContainer>
-        <BackButton onClick={setShowSelectToken}>
+        <BackButton onClick={() => gotoState('initial')}>
           <IconLeft />
         </BackButton>
         <Title>Select Token</Title>
       </HeaderContainer>
       <SearchContainer>
-        <TextInput
-          css={`
-            width: 100%;
-            border-radius: 12px;
-          `}
-          placeholder="Type to search ..."
-        />
+        <StyledInput placeholder="Type to search ..." />
       </SearchContainer>
       {Object.keys(depositAssets).map((assetName) => {
         return (
@@ -144,7 +146,7 @@ const SelectToken: React.FC<props> = ({ setShowSelectToken, onSelectToken }) => 
             key={assetName}
             symbol={assetName}
             address={depositAssets[assetName]}
-            onClick={onSelectToken}
+            onClick={onTokenSelected}
           />
         );
       })}

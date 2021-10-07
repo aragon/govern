@@ -1,6 +1,80 @@
 import styled from 'styled-components';
+import { useEffect, useState } from 'react';
+import { useFormContext } from 'react-hook-form';
 import { GU, LoadingRing } from '@aragon/ui';
+import { useTransferContext } from './TransferContext';
+import { CustomTransactionStatus } from 'utils/types';
 
+enum TransactionState {
+  Processing,
+  Success,
+  Failure,
+}
+
+const SignDeposit: React.FC = () => {
+  // useTransferContext();
+  const { transactions } = useTransferContext();
+  const [txState, setTxState] = useState(TransactionState.Processing);
+  const [transaction, setTransaction] = useState({ ...transactions[0] });
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const { getValues } = useFormContext();
+  const {
+    reference,
+    depositAmount,
+    token: { symbol },
+  } = getValues();
+
+  const updateStatus = (status: CustomTransactionStatus) => {
+    setTransaction((transaction) => ({ ...transaction, status }));
+  };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        updateStatus(CustomTransactionStatus.InProgress);
+        const txResponse = await transaction.tx();
+        const txReceipt = await txResponse.wait();
+        updateStatus(CustomTransactionStatus.Successful);
+        setTxState(TransactionState.Success);
+        console.log(transaction, txReceipt);
+      } catch (ex: any) {
+        updateStatus(CustomTransactionStatus.Failed);
+        setTxState(TransactionState.Failure);
+        setErrorMessage(ex.message);
+        console.log(ex);
+      }
+    })();
+
+    // Purposefully want this to run only once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <>
+      <HeaderContainer>
+        <Title>Sign deposit</Title>
+        <Description>To complete your transfer, sign your deposit with your wallet.</Description>
+      </HeaderContainer>
+      <SignCard>
+        <Wrapper>
+          <LoadingContainer>
+            <LoadingRing />
+          </LoadingContainer>
+          <InfoContainer>
+            <InfoTitle>{reference}</InfoTitle>
+            <InfoDescription>Waiting for confirmation ...</InfoDescription>
+          </InfoContainer>
+        </Wrapper>
+        <Amount>
+          + ${depositAmount} ${symbol}
+        </Amount>
+      </SignCard>
+    </>
+  );
+};
+
+export default SignDeposit;
 const HeaderContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -70,28 +144,3 @@ const Amount = styled.p`
   font-weight: 600;
   color: #20232c;
 `;
-
-const SignDeposit: React.FC = () => {
-  return (
-    <>
-      <HeaderContainer>
-        <Title>Sign deposit</Title>
-        <Description>To complete your transfer, sign your deposit with your wallet.</Description>
-      </HeaderContainer>
-      <SignCard>
-        <Wrapper>
-          <LoadingContainer>
-            <LoadingRing />
-          </LoadingContainer>
-          <InfoContainer>
-            <InfoTitle>Add GET as new ...</InfoTitle>
-            <InfoDescription>Waiting for confirmation ...</InfoDescription>
-          </InfoContainer>
-        </Wrapper>
-        <Amount>+ 5k GET</Amount>
-      </SignCard>
-    </>
-  );
-};
-
-export default SignDeposit;
