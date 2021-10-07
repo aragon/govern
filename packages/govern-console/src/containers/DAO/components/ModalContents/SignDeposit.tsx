@@ -1,9 +1,18 @@
 import styled from 'styled-components';
 import { useEffect, useState, useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { GU, LoadingRing, IconConnect, IconCheck, Button, IconRotateLeft } from '@aragon/ui';
+import {
+  GU,
+  LoadingRing,
+  IconConnect,
+  IconCheck,
+  Button,
+  IconRotateLeft,
+  IconExternal,
+} from '@aragon/ui';
 import { useTransferContext } from './TransferContext';
 import { CustomTransactionStatus } from 'utils/types';
+import { useWallet } from 'providers/AugmentedWallet';
 
 enum TransactionState {
   Processing,
@@ -11,12 +20,18 @@ enum TransactionState {
   Failure,
 }
 
-const SignDeposit: React.FC = () => {
+type Props = {
+  onClose: () => void;
+};
+
+const SignDeposit: React.FC<Props> = ({ onClose }) => {
   // useTransferContext();
   const { transactions } = useTransferContext();
   const [txState, setTxState] = useState(TransactionState.Processing);
+  const [transactionHash, setTransactionHash] = useState('');
   const [transaction, setTransaction] = useState({ ...transactions[0] });
   const [errorMessage, setErrorMessage] = useState('');
+  const { networkName } = useWallet();
 
   const { getValues } = useFormContext();
   const {
@@ -29,22 +44,38 @@ const SignDeposit: React.FC = () => {
     setTransaction((transaction) => ({ ...transaction, status }));
   };
 
+  const SendToExplore = () => {
+    window.open(
+      `${
+        {
+          Rinkeby: 'https://rinkeby.etherscan.io/tx/',
+          Mainnet: 'https://etherscan.io/tx/',
+        }[networkName] + transactionHash
+      }`,
+      '_blank',
+    );
+  };
+
+  async function BuildTransaction() {
+    try {
+      setTransactionHash('');
+      updateStatus(CustomTransactionStatus.InProgress);
+      const txResponse = await transaction.tx();
+      const txReceipt = await txResponse.wait();
+      updateStatus(CustomTransactionStatus.Successful);
+      setTxState(TransactionState.Success);
+      console.log('checkit', txReceipt);
+      setTransactionHash(txReceipt.transactionHash);
+    } catch (ex: any) {
+      updateStatus(CustomTransactionStatus.Failed);
+      setTxState(TransactionState.Failure);
+      setErrorMessage(ex.message);
+      console.log(ex);
+    }
+  }
+
   useEffect(() => {
-    (async () => {
-      try {
-        updateStatus(CustomTransactionStatus.InProgress);
-        const txResponse = await transaction.tx();
-        const txReceipt = await txResponse.wait();
-        updateStatus(CustomTransactionStatus.Successful);
-        setTxState(TransactionState.Success);
-        console.log(transaction, txReceipt);
-      } catch (ex: any) {
-        updateStatus(CustomTransactionStatus.Failed);
-        setTxState(TransactionState.Failure);
-        setErrorMessage(ex.message);
-        console.log(ex);
-      }
-    })();
+    BuildTransaction();
 
     // Purposefully want this to run only once
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -88,7 +119,11 @@ const SignDeposit: React.FC = () => {
                 + {depositAmount} {symbol}
               </Amount>
             </Wrapper>
-            <SuccessButton label="Close deposit" wide />
+            <SuccessButton label="Close deposit" wide onClick={onClose} />
+            <TransparentButton onClick={SendToExplore} wide>
+              <p>View on explorer</p>
+              <IconExternal />
+            </TransparentButton>
           </SignCard>
         );
       case TransactionState.Failure:
@@ -108,14 +143,14 @@ const SignDeposit: React.FC = () => {
                 + {depositAmount} {symbol}
               </Amount>
             </Wrapper>
-            <FailedButton wide>
+            <FailedButton wide onClick={BuildTransaction}>
               <p>try again</p>
               <IconRotateLeft />
             </FailedButton>
           </SignCard>
         );
     }
-  }, [txState, reference, depositAmount, symbol]);
+  }, [txState, reference, depositAmount, symbol, BuildTransaction]);
 
   return (
     <>
@@ -233,6 +268,10 @@ const SuccessButton = styled(Button)`
   box-shadow: none;
   margin-top: 16px;
   height: 40px;
+
+  &:hover {
+    background: #effbf3;
+  }
 `;
 
 const FailedButton = styled(Button)`
@@ -241,4 +280,18 @@ const FailedButton = styled(Button)`
   box-shadow: none;
   margin-top: 16px;
   height: 40px;
+  &:hover {
+    background: #ffe0e1;
+  }
+`;
+
+const TransparentButton = styled(Button)`
+  background: transparent;
+  color: #00c2ff;
+  margin-top: 16px;
+  height: 40px;
+  box-shadow: none;
+  &:hover {
+    background: transparent;
+  }
 `;

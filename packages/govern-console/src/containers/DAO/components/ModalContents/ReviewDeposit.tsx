@@ -16,6 +16,8 @@ const ReviewDeposit: React.FC = () => {
   const { getValues } = useFormContext();
   const { account, provider } = context;
   const { daoIdentifier, executorId, gotoState, setTransactions } = useTransferContext();
+  // const withdrawSignature =
+  //   'function withdraw(address token, address from, address to, uint256 amount, string memory reference)';
 
   // TODO: Memo useless?
   const { token, depositAmount, reference } = useMemo(() => getValues(), [getValues]);
