@@ -1,14 +1,14 @@
 import styled from 'styled-components';
+import { useWallet } from 'providers/AugmentedWallet';
+import { useFormContext } from 'react-hook-form';
+import { useTransferContext } from './TransferContext';
 import { useCallback, useMemo } from 'react';
 import { IconLeft, IconDownload, GU, Button, IconRight, useToast } from '@aragon/ui';
-import { useWallet } from 'providers/AugmentedWallet';
-import { useTransferContext } from './TransferContext';
-import { useFormContext } from 'react-hook-form';
 
-import { getTruncatedAccountAddress } from 'utils/account';
-import { Executor } from 'services/Executor';
 import { Asset } from 'utils/Asset';
+import { Executor } from 'services/Executor';
 import { getErrorFromException } from 'utils/HelperFunctions';
+import { getTruncatedAccountAddress } from 'utils/account';
 
 const ReviewDeposit: React.FC = () => {
   const toast = useToast();
@@ -33,7 +33,6 @@ const ReviewDeposit: React.FC = () => {
       const executor = new Executor(executorId, account.signer);
       const asset = await Asset.createFromDropdownLabel(symbol, address, depositAmount, provider);
       const transaction = await executor.deposit(asset, reference);
-      console.log(transaction);
       setTransactions(transaction);
       gotoState('sign');
     } catch (err) {
@@ -137,8 +136,7 @@ const TransferContainer = styled.div`
   border-radius: 12px;
   background: #ffffff;
   box-shadow: 0px 3px 3px rgba(180, 193, 228, 0.35);
-import { useTransferContext } from '../../TransferContext';
-padding: 32px 16px 16px;
+  padding: 32px 16px 16px;
 `;
 
 const TransferTitle = styled.p`

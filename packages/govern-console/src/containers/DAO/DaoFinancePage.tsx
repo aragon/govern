@@ -95,8 +95,8 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, daoName, token: mainToken
 
           balances[address] = {
             amount: BigInt(deposit.amount),
-            symbol,
-            decimals,
+            symbol: symbol || 'ETH',
+            decimals: decimals || 18,
           };
           continue;
         }
@@ -116,9 +116,9 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, daoName, token: mainToken
       }
 
       // Ignore eth TODO: more info needed
-      if (constants.AddressZero in balances) {
-        delete balances[constants.AddressZero];
-      }
+      // if (constants.AddressZero in balances) {
+      //   delete balances[constants.AddressZero];
+      // }
 
       let withdraw: Withdraw;
       for (withdraw of finances.withdraws) {
@@ -145,10 +145,12 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, daoName, token: mainToken
       }
     }
 
+    // Sort based on date
     function sortTransaction(a: Transaction, b: Transaction) {
       return parseInt(b.createdAt) - parseInt(a.createdAt);
     }
 
+    // Create List for Showing List of transaction
     async function prepareTransactions() {
       setTransactions([]);
       [...finances.withdraws, ...finances.deposits].map(

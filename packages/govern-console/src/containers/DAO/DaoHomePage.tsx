@@ -36,8 +36,8 @@ const DaoHomePage: React.FC = () => {
   const [IsMoreActions, setIsMoreActions] = useState<boolean>(false);
 
   // TODO: check if used
-  const [daoDetails, setDaoDetails] = useState<any>();
-  const [queueNonce, setQueueNonce] = useState<number>();
+  // const [daoDetails, setDaoDetails] = useState<any>();
+  const [queueNonce] = useState<number>(); // TODO: add setQueueNonce for pagination
   const [visibleActions, setVisibleActions] = useState<any>([]);
 
   /**

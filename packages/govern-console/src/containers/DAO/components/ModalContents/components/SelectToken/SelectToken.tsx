@@ -1,18 +1,21 @@
 import styled from 'styled-components';
-import { IconLeft, IconPlus, TextInput, GU } from '@aragon/ui';
+import { useFormContext } from 'react-hook-form';
+import { useCallback, useMemo, useState } from 'react';
+import { ButtonText, IconLeft, IconPlus, TextInput, GU } from '@aragon/ui';
 
 import { ETH } from 'utils/Asset';
+import TokenCard from './TokenCard';
+import TokenNotFound from './TokenNotFound';
 import { getNetworkConfig } from 'environment/networks';
 import { useTransferContext } from '../../TransferContext';
 import { getEnvironmentName } from 'environment';
-import { getTruncatedAccountAddress } from 'utils/account';
 
 const depositAssets: any = {
   ...getNetworkConfig(getEnvironmentName()).curatedTokens,
   [ETH.symbol]: ETH.address,
 };
 
-type props = {
+type Props = {
   onTokenSelected: (value: any) => void;
 };
 
@@ -50,84 +53,70 @@ const StyledInput = styled(TextInput)`
   border-radius: 12px;
 `;
 
-const TokenCardContainer = styled.div`
+const TokenListContainer = styled.div`
+  gap: 12px;
   display: flex;
-  justify-content: space-between;
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 12px;
-  cursor: pointer;
+  flex-direction: column;
 `;
 
-const AddTokenContainer = styled.div`
+const AddTokenButton = styled(ButtonText)`
+  height: 44px;
   display: flex;
   background: #ffffff;
   border-radius: 12px;
   padding: 16px;
-  margin-bottom: 12px;
   align-items: center;
   justify-content: center;
   color: #00c2ff;
   font-size: 16px;
   line-height: 125%;
+
+  & > p {
+    padding-right: 12px;
+  }
 `;
 
-const InfoContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const TokenLogoContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const TokenLogo = styled.img`
-  width: 24px;
-  height: 24px;
-  border-radius: 100%;
-`;
-
-const TokenTitle = styled.p`
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 125%;
-  margin: 4px 0px;
-`;
-
-const TokenAddress = styled.p`
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 150%;
-  color: #7483ab;
-`;
-
-type TokenCardProps = {
-  symbol: string;
-  address: string;
-  key: string;
-  onClick: (value: any) => void;
-};
-
-const TokenCard: React.FC<TokenCardProps> = ({ symbol, address, onClick }) => {
-  const logo = 'https://cryptologos.cc/logos/aragon-ant-logo.png';
-  return (
-    <TokenCardContainer onClick={() => onClick({ symbol, address, logo })}>
-      <InfoContainer>
-        <TokenTitle>{symbol}</TokenTitle>
-        <TokenAddress>{getTruncatedAccountAddress(address)}</TokenAddress>
-      </InfoContainer>
-      <TokenLogoContainer>
-        <TokenLogo src={logo} />
-      </TokenLogoContainer>
-    </TokenCardContainer>
-  );
-};
-
-const SelectToken: React.FC<props> = ({ onTokenSelected }) => {
+const SelectToken: React.FC<Props> = ({ onTokenSelected }) => {
+  const { setValue } = useFormContext();
   const { gotoState } = useTransferContext();
+  const [query, setSearchQuery] = useState<string>('');
+
+  const searchDeposit = useCallback(
+    (assetName: string) => {
+      const regex = new RegExp(query, 'i');
+      if (assetName.match(regex) || query === '') return assetName;
+    },
+    [query],
+  );
+
+  const displayedAssets = useMemo(() => Object.keys(depositAssets).filter(searchDeposit), [
+    searchDeposit,
+  ]);
+
+  const handleAddToken = () => {
+    setValue('isCustomToken', true);
+    setValue('token', {
+      symbol: query,
+      address: null,
+      logo: 'https://cryptologos.cc/logos/aragon-ant-logo.png',
+    });
+    gotoState('initial');
+  };
+
+  const renderTokenList = () => {
+    return displayedAssets.length === 0 ? (
+      <TokenNotFound />
+    ) : (
+      displayedAssets.map((assetName) => (
+        <TokenCard
+          key={assetName}
+          symbol={assetName}
+          address={depositAssets[assetName]}
+          onClick={onTokenSelected}
+        />
+      ))
+    );
+  };
 
   return (
     <>
@@ -138,29 +127,19 @@ const SelectToken: React.FC<props> = ({ onTokenSelected }) => {
         <Title>Select Token</Title>
       </HeaderContainer>
       <SearchContainer>
-        <StyledInput placeholder="Type to search ..." />
+        <StyledInput
+          value={query}
+          onChange={(e: any) => setSearchQuery(e.target.value)}
+          placeholder="Type to search ..."
+        />
       </SearchContainer>
-      {Object.keys(depositAssets).map((assetName) => {
-        return (
-          <TokenCard
-            key={assetName}
-            symbol={assetName}
-            address={depositAssets[assetName]}
-            onClick={onTokenSelected}
-          />
-        );
-      })}
-
-      <AddTokenContainer>
-        <p
-          css={`
-            padding-right: 12px;
-          `}
-        >
-          Add other token
-        </p>
-        <IconPlus />
-      </AddTokenContainer>
+      <TokenListContainer>
+        {renderTokenList()}
+        <AddTokenButton onClick={handleAddToken}>
+          <p>Add {displayedAssets.length === 0 ? `${query} now` : `other token`}</p>
+          <IconPlus />
+        </AddTokenButton>
+      </TokenListContainer>
     </>
   );
 };
