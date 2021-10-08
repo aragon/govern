@@ -1,4 +1,5 @@
-import { Modal } from '@aragon/ui';
+import { useMemo } from 'react';
+import { Modal, useLayout } from '@aragon/ui';
 import styled from 'styled-components';
 import NewTransfer from './components/ModalContents/NewTransfer';
 import ReviewDeposit from './components/ModalContents/ReviewDeposit';
@@ -20,7 +21,7 @@ const TransferModal = styled(Modal)`
     background: #f6f9fc;
     max-height: 768px;
     overflow: auto;
-    max-width: 487px;
+    max-width: 486px;
   }
 `;
 
@@ -44,6 +45,8 @@ type SwitcherProps = {
 const TransferSwitcher: React.FC<SwitcherProps> = ({ opened, close }) => {
   const { reset, control } = useFormContext();
   const { state, gotoState } = useTransferContext();
+  const { layoutName } = useLayout();
+  const layoutIsSmall = useMemo(() => layoutName === 'small', [layoutName]);
 
   const handleModalClose = () => {
     close();
@@ -61,7 +64,15 @@ const TransferSwitcher: React.FC<SwitcherProps> = ({ opened, close }) => {
   };
 
   return (
-    <TransferModal visible={opened} onClose={handleModalClose}>
+    <TransferModal
+      visible={opened}
+      onClose={handleModalClose}
+      css={`
+        & > div > div > div {
+          ${layoutIsSmall && 'width:100%!important;'}
+        }
+      `}
+    >
       {
         {
           fail: <div>Fails</div>,

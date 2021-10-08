@@ -11,7 +11,7 @@ const NavBar = styled.nav`
   display: flex;
   flex-direction: row:
   gap: ${2 * GU}px;
-  padding: 8px;
+  padding: 8px 8px 18px 8px;
   align-items: center;
 `;
 
