@@ -67,7 +67,7 @@ const TransferSwitcher: React.FC<SwitcherProps> = ({ opened, close }) => {
       {
         {
           fail: <div>Fails</div>,
-          sign: <SignDeposit />,
+          sign: <SignDeposit onClose={handleModalClose} />,
           review: <ReviewDeposit />,
           initial: <NewTransfer />,
           success: <div>Success</div>,
