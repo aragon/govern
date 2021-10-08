@@ -6,7 +6,7 @@ import { DropDown, GU, TextInput, Button, IconDownload } from '@aragon/ui';
 import { Asset } from 'utils/Asset';
 import { useWallet } from 'providers/AugmentedWallet';
 import { useTransferContext } from '../../TransferContext';
-import { validateAmountForDecimals, validateBalance } from 'utils/validations';
+import { validateAmountForDecimals, validateBalance, validateToken } from 'utils/validations';
 
 const HeaderContainer = styled.div`
   display: flex;
@@ -45,6 +45,10 @@ const InputContainer = styled.div`
   margin-bottom: ${3 * GU}px;
 `;
 
+const StyledTextInput = styled(TextInput)`
+  border-radius: 12px;
+`;
+
 const SubmitButton = styled(Button)`
   height: 48px;
   width: 100%;
@@ -76,50 +80,12 @@ const StyledDropDown = styled(DropDown)<{ error: boolean }>`
   // ${({ error }) => error && 'border: 2px solid #ff6a60;'};
 `;
 
-// const SelectorContainer = styled.div`
-//   display: flex;
-//   width: 100%;
-//   height: 44px;
-//   background: #ffffff;
-//   margin-top: ${GU}px;
-//   margin-bottom: ${3 * GU}px;
-//   border-radius: 12px;
-//   padding: 4px;
-// `;
-
-// const Option = styled.div`
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   width: 50%;
-//   background: #ffffff;
-//   border-radius: 12px;
-//   font-weight: 600;
-//   color: #7483ab;
-//   cursor: pointer;
-//   &.active {
-//     background: #f0fbff;
-//     color: #00c2ff;
-//     cursor: auto;
-//   }
-// `;
-
-// const StyledContentSwitcher = styled(ContentSwitcher)`
-//   & > div > ul {
-//     width: 100%;
-//   }
-//   & > div > ul > li {
-//     width: 100%;
-//   }
-//   & > div > ul > li > button {
-//     width: 50%;
-//   }
-// `;
-
 const Transfer: React.FC = () => {
   const { gotoState } = useTransferContext();
   const { control, getValues, handleSubmit } = useFormContext();
-  const token = getValues('token');
+
+  // TODO: put get values in callback function
+  const [token, isCustomToken] = getValues(['token', 'isCustomToken']);
 
   const context: any = useWallet();
   const { provider, account } = context;
@@ -154,40 +120,19 @@ const Transfer: React.FC = () => {
     [provider, getValues, account],
   );
 
-  const renderToken = (token: any) => {
-    return (
-      <SelectedToken>
-        <img src={token?.logo} />
-        <p>{token?.symbol}</p>
-      </SelectedToken>
-    );
-  };
+  const renderToken = (token: any) => (
+    <SelectedToken>
+      <img src={token?.logo} />
+      <p>{token?.symbol}</p>
+    </SelectedToken>
+  );
+
   return (
     <>
       <HeaderContainer>
         <Title>New transfer</Title>
       </HeaderContainer>
       <BodyContainer>
-        {/* TODO: Connect this to react-hook-form; receive props from NewTransfer parent */}
-
-        {/* <StyledContentSwitcher
-          title={<SubTitle>Type</SubTitle>}
-          subtitle={<Description>Select type of transfer you wish to proceed.</Description>}
-          items={['Deposit', 'Withdraw']}
-          // onChange={(value: number) => setSelected(value)}
-          // selected={selected}
-          wide
-        /> */}
-
-        {/* <SubTitle>Type</SubTitle>
-        <Description>Select type of transfer you wish to proceed.</Description>
-        <TypeSelector /> */}
-
-        {/* While this conditionally rendering looks like a good option,
-            it might be a headache for react-hook-form. Implement withdraw and 
-            deposit separately
-        */}
-
         <SubTitle>Token</SubTitle>
         <InputContainer>
           <Controller
@@ -210,20 +155,43 @@ const Transfer: React.FC = () => {
             }}
           />
         </InputContainer>
+        {isCustomToken && (
+          <>
+            <SubTitle>Token Address</SubTitle>
+            <InputContainer>
+              <Controller
+                name="token.address"
+                shouldUnregister={true}
+                control={control}
+                rules={{
+                  required: 'Token address is required.',
+                  validate: (value) => validateToken(value, provider),
+                }}
+                render={({ field: { onChange, value }, fieldState: { error } }) => (
+                  <StyledTextInput
+                    value={value}
+                    placeholder="0x ..."
+                    onChange={onChange}
+                    status={error ? 'error' : 'normal'}
+                    error={error?.message}
+                    wide
+                  />
+                )}
+              />
+            </InputContainer>
+          </>
+        )}
         <SubTitle>Amount</SubTitle>
         <InputContainer>
           <Controller
             name="depositAmount"
             control={control}
             rules={{
-              required: 'This is required.',
+              required: 'Token amount is required.',
               validate: validateAmount,
             }}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
-              <TextInput
-                css={`
-                  border-radius: 12px;
-                `}
+              <StyledTextInput
                 value={value}
                 onChange={onChange}
                 status={error ? 'error' : 'normal'}
@@ -243,15 +211,12 @@ const Transfer: React.FC = () => {
             control={control}
             defaultValue=""
             render={({ field: { onChange, value }, fieldState: { error } }) => (
-              <TextInput
-                css={`
-                  border-radius: 12px;
-                `}
-                wide
+              <StyledTextInput
                 value={value}
                 onChange={onChange}
                 status={error ? 'error' : 'normal'}
                 error={error ? error.message : null}
+                wide
               />
             )}
           />

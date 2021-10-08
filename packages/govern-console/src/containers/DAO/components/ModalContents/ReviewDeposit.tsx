@@ -1,14 +1,14 @@
 import styled from 'styled-components';
+import { useWallet } from 'providers/AugmentedWallet';
+import { useFormContext } from 'react-hook-form';
+import { useTransferContext } from './TransferContext';
 import { useCallback, useMemo } from 'react';
 import { IconLeft, IconDownload, GU, Button, IconRight, useToast } from '@aragon/ui';
-import { useWallet } from 'providers/AugmentedWallet';
-import { useTransferContext } from './TransferContext';
-import { useFormContext } from 'react-hook-form';
 
-import { getTruncatedAccountAddress } from 'utils/account';
-import { Executor } from 'services/Executor';
 import { Asset } from 'utils/Asset';
+import { Executor } from 'services/Executor';
 import { getErrorFromException } from 'utils/HelperFunctions';
+import { getTruncatedAccountAddress } from 'utils/account';
 
 const ReviewDeposit: React.FC = () => {
   const toast = useToast();

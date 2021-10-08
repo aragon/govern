@@ -10,6 +10,7 @@ import SignDeposit from './components/ModalContents/SignDeposit';
 type Props = { opened: boolean; close: () => void; daoName: string; executorId: string };
 type DepositFormData = {
   token: any;
+  isCustomToken: boolean;
   depositAmount: string;
   reference?: string;
 };
@@ -42,8 +43,8 @@ type SwitcherProps = {
 };
 
 const TransferSwitcher: React.FC<SwitcherProps> = ({ opened, close }) => {
-  const { reset, control } = useFormContext();
   const { state, gotoState } = useTransferContext();
+  const { reset, control, setValue } = useFormContext();
 
   const handleModalClose = () => {
     close();
@@ -58,6 +59,7 @@ const TransferSwitcher: React.FC<SwitcherProps> = ({ opened, close }) => {
   const handleTokenSelected = (onChange: (value: any) => void, value: any) => {
     onChange(value);
     handleBackClick();
+    setValue('isCustomToken', false);
   };
 
   return (
