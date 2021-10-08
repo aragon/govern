@@ -18,6 +18,7 @@ import { ModalsProvider } from 'containers/HomePage/ModalsContext';
 const Container = styled.div`
   display: grid;
   grid-gap: 16px;
+  padding: 0px 8px 0px 8px;
   grid-template-areas:
     'header'
     'body'

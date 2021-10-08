@@ -68,6 +68,7 @@ const SignDeposit: React.FC<Props> = ({ onClose }) => {
   const BuildTransaction = useCallback(async () => {
     try {
       setTransactionHash('');
+      setTxState(SigningState.Processing);
       updateStatus(CustomTransactionStatus.InProgress);
       const txResponse = await transaction.tx();
       const txReceipt = await txResponse.wait();
