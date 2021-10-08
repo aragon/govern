@@ -203,7 +203,7 @@ const Transfer: React.FC = () => {
         </InputContainer>
         <SubTitle>Reference</SubTitle>
         <Description>
-          Add an optional reference copy to identify this transa- ction later on.
+          Add an optional reference copy to identify this transa&shy;ction later on.
         </Description>
         <InputContainer>
           <Controller
