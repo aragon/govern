@@ -35,12 +35,11 @@ const SignDeposit: React.FC<Props> = ({ onClose }) => {
   // const [errorMessage, setErrorMessage] = useState('');
   const [transactionHash, setTransactionHash] = useState('');
 
-  // TODO: Memoize
   const {
     reference,
     depositAmount,
     token: { symbol },
-  } = getValues();
+  } = useMemo(() => getValues(), [getValues]);
 
   useEffect(() => {
     BuildTransaction();
