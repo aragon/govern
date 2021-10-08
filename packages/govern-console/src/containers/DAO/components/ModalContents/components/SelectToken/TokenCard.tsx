@@ -1,6 +1,14 @@
 import styled from 'styled-components';
 
+import ETHIcon from 'images/pngs/eth_logo.png';
+import { ASSET_ICON_BASE_URL } from 'utils/constants';
 import { getTruncatedAccountAddress } from 'utils/account';
+
+const logoAddresses: any = {
+  DAI: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+  USDT: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+  USDC: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+};
 
 type Props = {
   key: string;
@@ -50,7 +58,9 @@ const TokenLogo = styled.img`
 `;
 
 const TokenCard: React.FC<Props> = ({ symbol, address, onClick }) => {
-  const logo = 'https://cryptologos.cc/logos/aragon-ant-logo.png';
+  const logo =
+    symbol === 'ETH' ? ETHIcon : `${ASSET_ICON_BASE_URL}/${logoAddresses[symbol]}/logo.png`;
+
   return (
     <TokenCardContainer onClick={() => onClick({ symbol, address, logo })}>
       <InfoContainer>

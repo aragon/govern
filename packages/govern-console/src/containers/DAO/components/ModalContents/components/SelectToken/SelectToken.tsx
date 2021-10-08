@@ -3,6 +3,7 @@ import { useFormContext } from 'react-hook-form';
 import { useCallback, useMemo, useState } from 'react';
 import { ButtonText, IconLeft, IconPlus, TextInput, GU } from '@aragon/ui';
 
+import ETHIcon from 'images/pngs/eth_logo.png';
 import { ETH } from 'utils/Asset';
 import TokenCard from './TokenCard';
 import TokenNotFound from './TokenNotFound';
@@ -95,10 +96,12 @@ const SelectToken: React.FC<Props> = ({ onTokenSelected }) => {
 
   const handleAddToken = () => {
     setValue('isCustomToken', true);
+
+    // TODO: find appropriate logo
     setValue('token', {
       symbol: query,
       address: null,
-      logo: 'https://cryptologos.cc/logos/aragon-ant-logo.png',
+      logo: ETHIcon,
     });
     gotoState('initial');
   };
