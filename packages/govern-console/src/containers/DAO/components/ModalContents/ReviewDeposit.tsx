@@ -33,7 +33,6 @@ const ReviewDeposit: React.FC = () => {
       const executor = new Executor(executorId, account.signer);
       const asset = await Asset.createFromDropdownLabel(symbol, address, depositAmount, provider);
       const transaction = await executor.deposit(asset, reference);
-      console.log(transaction);
       setTransactions(transaction);
       gotoState('sign');
     } catch (err) {

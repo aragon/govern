@@ -1,6 +1,3 @@
-import styled from 'styled-components';
-import { useEffect, useState, useMemo } from 'react';
-import { useFormContext } from 'react-hook-form';
 import {
   GU,
   LoadingRing,
@@ -10,11 +7,15 @@ import {
   IconRotateLeft,
   IconExternal,
 } from '@aragon/ui';
+import styled from 'styled-components';
+import { useFormContext } from 'react-hook-form';
+import { useCallback, useEffect, useState, useMemo } from 'react';
+
+import { useWallet } from 'providers/AugmentedWallet';
 import { useTransferContext } from './TransferContext';
 import { CustomTransactionStatus } from 'utils/types';
-import { useWallet } from 'providers/AugmentedWallet';
 
-enum TransactionState {
+enum SigningState {
   Processing,
   Success,
   Failure,
@@ -26,25 +27,33 @@ type Props = {
 
 const SignDeposit: React.FC<Props> = ({ onClose }) => {
   // useTransferContext();
+  const { getValues } = useFormContext();
+  const { networkName } = useWallet();
   const { transactions } = useTransferContext();
-  const [txState, setTxState] = useState(TransactionState.Processing);
-  const [transactionHash, setTransactionHash] = useState('');
+  const [txState, setTxState] = useState(SigningState.Processing);
   const [transaction, setTransaction] = useState({ ...transactions[0] });
   const [errorMessage, setErrorMessage] = useState('');
-  const { networkName } = useWallet();
+  const [transactionHash, setTransactionHash] = useState('');
 
-  const { getValues } = useFormContext();
+  // TODO: Memoize
   const {
     reference,
     depositAmount,
     token: { symbol },
   } = getValues();
 
+  useEffect(() => {
+    BuildTransaction();
+
+    // Purposefully want this to run only once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const updateStatus = (status: CustomTransactionStatus) => {
     setTransaction((transaction) => ({ ...transaction, status }));
   };
 
-  const SendToExplore = () => {
+  const SendToExplore = useCallback(() => {
     window.open(
       `${
         {
@@ -54,36 +63,28 @@ const SignDeposit: React.FC<Props> = ({ onClose }) => {
       }`,
       '_blank',
     );
-  };
+  }, [networkName, transactionHash]);
 
-  async function BuildTransaction() {
+  const BuildTransaction = useCallback(async () => {
     try {
       setTransactionHash('');
       updateStatus(CustomTransactionStatus.InProgress);
       const txResponse = await transaction.tx();
       const txReceipt = await txResponse.wait();
       updateStatus(CustomTransactionStatus.Successful);
-      setTxState(TransactionState.Success);
-      console.log('checkit', txReceipt);
+      setTxState(SigningState.Success);
+      console.log('checkit', txReceipt, txResponse);
       setTransactionHash(txReceipt.transactionHash);
     } catch (ex: any) {
       updateStatus(CustomTransactionStatus.Failed);
-      setTxState(TransactionState.Failure);
+      setTxState(SigningState.Failure);
       setErrorMessage(ex.message);
-      console.log(ex);
     }
-  }
-
-  useEffect(() => {
-    BuildTransaction();
-
-    // Purposefully want this to run only once
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [transaction]);
 
   const MessageType = useMemo(() => {
     switch (txState) {
-      case TransactionState.Processing:
+      case SigningState.Processing:
         return (
           <SignCard className="loading">
             <Wrapper>
@@ -102,7 +103,7 @@ const SignDeposit: React.FC<Props> = ({ onClose }) => {
             </Wrapper>
           </SignCard>
         );
-      case TransactionState.Success:
+      case SigningState.Success:
         return (
           <SignCard className="success">
             <Wrapper>
@@ -126,7 +127,7 @@ const SignDeposit: React.FC<Props> = ({ onClose }) => {
             </TransparentButton>
           </SignCard>
         );
-      case TransactionState.Failure:
+      case SigningState.Failure:
         return (
           <SignCard className="failed">
             <Wrapper>
@@ -150,7 +151,7 @@ const SignDeposit: React.FC<Props> = ({ onClose }) => {
           </SignCard>
         );
     }
-  }, [txState, reference, depositAmount, symbol, BuildTransaction]);
+  }, [txState, reference, depositAmount, symbol, onClose, SendToExplore, BuildTransaction]);
 
   return (
     <>

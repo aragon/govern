@@ -1,8 +1,7 @@
 import styled from 'styled-components';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback } from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
-import { DropDown, GU, TextInput, Button, IconDownload, ContentSwitcher } from '@aragon/ui';
-import { constants } from 'ethers';
+import { DropDown, GU, TextInput, Button, IconDownload } from '@aragon/ui';
 
 import { Asset } from 'utils/Asset';
 import { useWallet } from 'providers/AugmentedWallet';
@@ -74,48 +73,47 @@ const SelectedToken = styled.div`
 const StyledDropDown = styled(DropDown)<{ error: boolean }>`
   border-radius: 12px;
   color: #7483ab;
-  // ${({ error }) => error && 'border: 2px solid #ff6a60;'};
 `;
 
-const SelectorContainer = styled.div`
-  display: flex;
-  width: 100%;
-  height: 44px;
-  background: #ffffff;
-  margin-top: ${GU}px;
-  margin-bottom: ${3 * GU}px;
-  border-radius: 12px;
-  padding: 4px;
-`;
+// const SelectorContainer = styled.div`
+//   display: flex;
+//   width: 100%;
+//   height: 44px;
+//   background: #ffffff;
+//   margin-top: ${GU}px;
+//   margin-bottom: ${3 * GU}px;
+//   border-radius: 12px;
+//   padding: 4px;
+// `;
 
-const Option = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 50%;
-  background: #ffffff;
-  border-radius: 12px;
-  font-weight: 600;
-  color: #7483ab;
-  cursor: pointer;
-  &.active {
-    background: #f0fbff;
-    color: #00c2ff;
-    cursor: auto;
-  }
-`;
+// const Option = styled.div`
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   width: 50%;
+//   background: #ffffff;
+//   border-radius: 12px;
+//   font-weight: 600;
+//   color: #7483ab;
+//   cursor: pointer;
+//   &.active {
+//     background: #f0fbff;
+//     color: #00c2ff;
+//     cursor: auto;
+//   }
+// `;
 
-const StyledContentSwitcher = styled(ContentSwitcher)`
-  & > div > ul {
-    width: 100%;
-  }
-  & > div > ul > li {
-    width: 100%;
-  }
-  & > div > ul > li > button {
-    width: 50%;
-  }
-`;
+// const StyledContentSwitcher = styled(ContentSwitcher)`
+//   & > div > ul {
+//     width: 100%;
+//   }
+//   & > div > ul > li {
+//     width: 100%;
+//   }
+//   & > div > ul > li > button {
+//     width: 50%;
+//   }
+// `;
 
 const NewTransfer: React.FC = () => {
   const { gotoState } = useTransferContext();
@@ -208,31 +206,6 @@ const NewTransfer: React.FC = () => {
         <Title>New transfer</Title>
       </HeaderContainer>
       <BodyContainer>
-        {/* TODO: Connect this to react-hook-form; receive props from NewTransfer parent */}
-
-        {/* <SubTitle>Type</SubTitle>
-        <Description>Select type of transfer you wish to proceed.</Description> */}
-        {/* <Controller
-          name="type"
-          control={control}
-          defaultValue={'deposit'}
-          render={({ field: { onChange, value }, fieldState: { error } }) => (
-            <StyledContentSwitcher
-              title={<SubTitle>Type</SubTitle>}
-              subtitle={<Description>Select type of transfer you wish to proceed.</Description>}
-              items={typeList}
-              selected={typeList.indexOf(value)}
-              onChange={(index: number) => SwitchChange(index, onChange)}
-              wide
-            />
-          )}
-        /> */}
-
-        {/* While this conditionally rendering looks like a good option,
-            it might be a headache for react-hook-form. Implement withdraw and 
-            deposit separately
-        */}
-
         <SubTitle>Token</SubTitle>
         <InputContainer>
           <Controller

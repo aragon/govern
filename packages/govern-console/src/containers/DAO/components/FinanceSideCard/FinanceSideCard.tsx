@@ -21,6 +21,7 @@ const Container = styled.div`
   border-radius: 12px;
   padding: 24px 16px 16px;
   background-color: #ffffff;
+  max-width: 298px;
 `;
 
 const MainTokenBalance = styled.div`
