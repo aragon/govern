@@ -32,7 +32,6 @@ const links: MenuOptions[] = [
 const Container = styled.div`
   border: 1px solid transparent;
   position: relative;
-  max-width: 298px;
 `;
 
 const AvatarContainer = styled.div<{ justify: string }>`
