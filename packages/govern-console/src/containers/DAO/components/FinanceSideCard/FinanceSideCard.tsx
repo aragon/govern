@@ -94,6 +94,8 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken, onNewTransfer }) 
 
   const { layoutName } = useLayout();
   const layoutIsSmall = useMemo(() => layoutName === 'small', [layoutName]);
+
+  // TODO: remove when implementing skeleton loading
   const { symbol, amount, price, numberOfAssets } = useMemo(() => {
     return {
       amount: tokens[mainToken]?.amountForHuman || 0.0,
@@ -105,13 +107,8 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken, onNewTransfer }) 
 
   useEffect(() => {
     // Assets shown on medium to large screens
-    if (!layoutIsSmall) {
-      setDisplayAssets(true);
-    }
-
-    if (layoutIsSmall) {
-      setDisplayAssets(false);
-    }
+    if (!layoutIsSmall) setDisplayAssets(true);
+    else setDisplayAssets(false);
   }, [layoutIsSmall]);
 
   function sortAssets(asset: any, nextAsset: any) {
