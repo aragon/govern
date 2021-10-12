@@ -2,10 +2,10 @@ import styled from 'styled-components';
 import { memo, useState } from 'react';
 
 type Props = {
-  token: string;
   usd: string;
-  symbol: string;
   icon: string;
+  token: string;
+  symbol: string;
 };
 
 const Container = styled.div`

@@ -25,7 +25,7 @@ type Props = {
 
 const SideCard = styled(GridItem).attrs(({ layoutIsSmall, isMediumPortrait }) => {
   let row = layoutIsSmall ? '1/2' : '1/3';
-  let column = layoutIsSmall ? '1/-1' : '7/10';
+  let column = layoutIsSmall ? '1/-1' : '3/4';
 
   if (isMediumPortrait) {
     row = '2/3';
@@ -37,7 +37,7 @@ const SideCard = styled(GridItem).attrs(({ layoutIsSmall, isMediumPortrait }) =>
 
 const ListContainer = styled(GridItem).attrs(({ layoutIsSmall, isMediumPortrait }) => {
   let row = layoutIsSmall ? '2/-1' : '2/3';
-  let column = layoutIsSmall ? '1/-1' : '1/7';
+  let column = layoutIsSmall ? '1/-1' : '1/3';
 
   if (isMediumPortrait) {
     row = '3/4';
@@ -237,14 +237,14 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, daoName, token: mainToken
   }
 
   return (
-    <Grid gap={24} columns="9">
+    <Grid gap={24}>
       <SideCard layoutIsSmall={layoutIsSmall} isMediumPortrait={isMediumPortrait}>
         <FinanceSideCard tokens={tokens} mainToken={mainToken} onNewTransfer={openTransferModal} />
       </SideCard>
       {!layoutIsSmall && (
         <GridItem
           gridRow={layoutIsSmall ? '2/-1' : '1/2'}
-          gridColumn={layoutIsSmall ? '1/-1' : '1/7'}
+          gridColumn={layoutIsSmall ? '1/-1' : '1/3'}
         >
           <HeaderContainer>
             <Title>Finance</Title>

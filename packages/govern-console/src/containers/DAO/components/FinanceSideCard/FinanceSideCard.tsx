@@ -27,6 +27,7 @@ const MainTokenBalance = styled.div`
   gap: 4px;
   display: flex;
   flex-direction: column;
+  width: 173px;
 `;
 
 const Token = styled.p`
@@ -121,7 +122,9 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken, onNewTransfer }) 
     <Container>
       <MainTokenBalance>
         <Token>{`${amount} ${symbol}`}</Token>
-        {price && <USDValue>{`~${formatter.format(Number(price) * Number(amount))} USD`}</USDValue>}
+        <USDValue>
+          {price ? `~${formatter.format(Number(price) * Number(amount))} USD` : 'USD value unknown'}
+        </USDValue>
       </MainTokenBalance>
 
       <Assets isVisible={displayAssets}>
