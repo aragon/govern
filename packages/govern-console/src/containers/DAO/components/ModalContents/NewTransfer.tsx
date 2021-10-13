@@ -7,6 +7,7 @@ import { Asset } from 'utils/Asset';
 import { useWallet } from 'providers/AugmentedWallet';
 import { useTransferContext } from './TransferContext';
 import { validateAmountForDecimals, validateBalance, validateToken } from 'utils/validations';
+import { ContentSwitcher } from 'components/ContentSwitcher/ContentSwitcher';
 
 const HeaderContainer = styled.div`
   display: flex;
@@ -41,6 +42,11 @@ const Description = styled.p`
 `;
 
 const InputContainer = styled.div`
+  margin-top: ${GU}px;
+  margin-bottom: ${3 * GU}px;
+`;
+
+const TextAreaContainer = styled.div`
   margin-top: ${GU}px;
   margin-bottom: ${3 * GU}px;
 `;
@@ -83,9 +89,11 @@ const StyledDropDown = styled(DropDown)<{ error: boolean }>`
 const Transfer: React.FC = () => {
   const { gotoState } = useTransferContext();
   const { control, getValues, handleSubmit } = useFormContext();
+  const TransactionTypeList = ['Withdraw', 'Deposit'];
+  const justificationTypeList = ['Text', 'File'];
 
   // TODO: put get values in callback function
-  const [token, isCustomToken] = getValues(['token', 'isCustomToken']);
+  const [token, isCustomToken, type] = getValues(['token', 'isCustomToken', 'type']);
 
   const context: any = useWallet();
   const { provider, account } = context;
@@ -133,6 +141,16 @@ const Transfer: React.FC = () => {
         <Title>New transfer</Title>
       </HeaderContainer>
       <BodyContainer>
+        <SubTitle>Type</SubTitle>
+        <Description>Select type of transfer you wish to proceed.</Description>
+        <Controller
+          name="type"
+          control={control}
+          defaultValue={'Withdraw'}
+          render={({ field: { onChange, value } }) => (
+            <ContentSwitcher items={TransactionTypeList} selected={value} onChange={onChange} />
+          )}
+        />
         <SubTitle>Token</SubTitle>
         <InputContainer>
           <Controller
@@ -166,6 +184,32 @@ const Transfer: React.FC = () => {
                 rules={{
                   required: 'Token address is required.',
                   validate: (value) => validateToken(value, provider),
+                }}
+                render={({ field: { onChange, value }, fieldState: { error } }) => (
+                  <StyledTextInput
+                    value={value}
+                    placeholder="0x ..."
+                    onChange={onChange}
+                    status={error ? 'error' : 'normal'}
+                    error={error?.message}
+                    wide
+                  />
+                )}
+              />
+            </InputContainer>
+          </>
+        )}
+        {type === 'Withdraw' && (
+          <>
+            <SubTitle>Recipient address</SubTitle>
+            <Description>The assets will be transfered to this address.</Description>
+            <InputContainer>
+              <Controller
+                name="recipient"
+                control={control}
+                defaultValue=""
+                rules={{
+                  required: 'This is required.',
                 }}
                 render={({ field: { onChange, value }, fieldState: { error } }) => (
                   <StyledTextInput
@@ -221,6 +265,36 @@ const Transfer: React.FC = () => {
             )}
           />
         </InputContainer>
+        <SubTitle>Justification</SubTitle>
+        <Description>
+          Add a reason as a copy or file for scheduling this financial execution.
+        </Description>
+        <Controller
+          name="justificationType"
+          control={control}
+          defaultValue={'Text'}
+          render={({ field: { onChange, value } }) => (
+            <ContentSwitcher items={justificationTypeList} selected={value} onChange={onChange} />
+          )}
+        />
+        <TextAreaContainer>
+          <Controller
+            name="justificationText"
+            control={control}
+            defaultValue=""
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <StyledTextInput
+                value={value}
+                placeholder="Type your justification"
+                onChange={onChange}
+                status={error ? 'error' : 'normal'}
+                error={error ? error.message : null}
+                wide
+                multiline
+              />
+            )}
+          />
+        </TextAreaContainer>
         <SubmitButton onClick={handleSubmit(() => gotoState('review'))}>
           <p>Review deposit</p>
           <IconDownload />

@@ -2,25 +2,48 @@ import styled from 'styled-components';
 import { useWallet } from 'providers/AugmentedWallet';
 import { useFormContext } from 'react-hook-form';
 import { useTransferContext } from './TransferContext';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { IconLeft, IconDownload, GU, Button, IconRight, useToast } from '@aragon/ui';
 
 import { Asset } from 'utils/Asset';
 import { Executor } from 'services/Executor';
 import { getErrorFromException } from 'utils/HelperFunctions';
 import { getTruncatedAccountAddress } from 'utils/account';
+import AbiHandler from 'utils/AbiHandler';
+import { addToIpfs } from 'utils/ipfs';
+import { useDaoQuery } from 'hooks/query-hooks';
+import { buildConfig } from 'utils/ERC3000';
+import { useFacadeProposal } from 'hooks/proposal-hooks';
+import { CustomTransaction } from 'utils/types';
 
 const ReviewDeposit: React.FC = () => {
   const toast = useToast();
   const context: any = useWallet();
   const { getValues } = useFormContext();
-  const { account, provider } = context;
-  const { daoIdentifier, executorId, gotoState, setTransactions } = useTransferContext();
-  // const withdrawSignature =
-  //   'function withdraw(address token, address from, address to, uint256 amount, string memory reference)';
+  const { account, provider, isConnected } = context;
+  const {
+    daoIdentifier,
+    executorId,
+    gotoState,
+    setTransactions,
+    setActions,
+  } = useTransferContext();
+  const withdrawSignature =
+    'function withdraw(address token, address from, address to, uint256 amount, string memory reference)';
 
   // TODO: Memo useless?
-  const { token, depositAmount, reference } = useMemo(() => getValues(), [getValues]);
+  const { token, depositAmount, type, reference, recipient } = useMemo(() => getValues(), [
+    getValues,
+  ]);
+
+  const transactionsQueue = useRef<CustomTransaction[]>([]);
+
+  const { data: daoDetails } = useDaoQuery(daoIdentifier);
+
+  const proposalInstance = useFacadeProposal(
+    daoDetails?.queue.address,
+    daoDetails?.queue.config.resolver,
+  );
 
   const executeTransfer = useCallback(async () => {
     const {
@@ -30,17 +53,71 @@ const ReviewDeposit: React.FC = () => {
     } = getValues();
 
     try {
-      const executor = new Executor(executorId, account.signer);
       const asset = await Asset.createFromDropdownLabel(symbol, address, depositAmount, provider);
-      const transaction = await executor.deposit(asset, reference);
-      setTransactions(transaction);
+      if (type === 'Deposit') {
+        const executor = new Executor(executorId, account.signer);
+        const transaction = await executor.deposit(asset, reference);
+        setTransactions(transaction);
+      } else {
+        const values = [asset.address, executorId, recipient, asset.amount, reference];
+        const action = AbiHandler.mapToAction(withdrawSignature, executorId, values);
+        console.log('see', values);
+        try {
+          const encodedActions = AbiHandler.encodeActions([action]);
+          const proof = getValues('proofFile') ? getValues('proofFile')[0] : getValues('proof');
+          const proofCid = await addToIpfs(proof, {
+            title: getValues('title'),
+          });
+
+          let containerHash: string | undefined;
+
+          const payload = {
+            submitter: account.address,
+            executor: daoDetails.executor.address,
+            actions: encodedActions,
+            proof: proofCid,
+          };
+
+          if (proposalInstance) {
+            try {
+              transactionsQueue.current = await proposalInstance.schedule(
+                payload,
+                buildConfig(daoDetails.queue.config),
+              );
+            } catch (error) {
+              console.log('Failed scheduling', error);
+              toast(error.message);
+              return;
+            }
+          }
+
+          setTransactions(transactionsQueue.current);
+        } catch (err) {
+          console.log('Failed to encode action data', err);
+          toast('Error encoding action data, please double check your action input.');
+        }
+        // setActions(action);
+      }
       gotoState('sign');
     } catch (err) {
       console.log('deposit error', err);
       const errorMessage = getErrorFromException(err);
       toast(errorMessage);
     }
-  }, [getValues, executorId, account.signer, provider, setTransactions, gotoState, toast]);
+  }, [
+    getValues,
+    executorId,
+    provider,
+    setTransactions,
+    gotoState,
+    toast,
+    recipient,
+    proposalInstance,
+    daoDetails,
+    account,
+    // setActions,
+    type,
+  ]);
 
   return (
     <>
@@ -57,7 +134,7 @@ const ReviewDeposit: React.FC = () => {
           </Icon>
         </IconContainer>
         <TransferContainer>
-          <TransferTitle>Deposit</TransferTitle>
+          <TransferTitle>{type}</TransferTitle>
           <TransferSubtitle>Review now</TransferSubtitle>
         </TransferContainer>
       </TransactionWrapper>
@@ -66,7 +143,7 @@ const ReviewDeposit: React.FC = () => {
           <AddressTitle>From</AddressTitle>
           <AddressContent>{getTruncatedAccountAddress(account.address)}</AddressContent>
         </AddressBox>
-        <CustomIconRight />
+        <CustomIconRight size="medium" />
         <AddressBox>
           <AddressTitle>To</AddressTitle>
           <AddressContent>{daoIdentifier}</AddressContent>
@@ -154,7 +231,7 @@ const TransferSubtitle = styled.p`
 const AddressContainer = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   margin-top: 24px;
 `;
 
@@ -227,8 +304,8 @@ const IconContainer = styled.div`
 
 const CustomIconRight = styled(IconRight)`
   margin: 0px 10px 0px 10px;
-  width: 70px;
   color: #b4c1e4;
+  width: 60px;
 `;
 
 const AddressTitle = styled.p`
