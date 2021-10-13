@@ -90,24 +90,33 @@ const ListTitle = styled.p`
 const DaoFinancePage: React.FC<Props> = ({ executorId, daoName, token: mainToken }) => {
   const toast = useToast();
   const { layoutName } = useLayout();
+
   const { provider, isConnected } = useWallet();
   const { data: finances, loading: isLoading } = useFinanceQuery(executorId);
 
   const [tokens, setTokens] = useState<FinanceToken>({});
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [isMediumPortrait, setMediumPortrait] = useState<boolean>(
-    layoutName === 'medium' && /portrait/.test(window.screen.orientation.type),
-  );
   const [isTransferModalOpen, setIsTransferModalOpen] = useState<boolean>(false);
 
+  // TODO: Future refactor - extract both isSmall and isMediumPortrait into one hook
   const layoutIsSmall = useMemo(() => layoutName === 'small', [layoutName]);
+  const checkIfMediumPortrait = useCallback(
+    () => layoutName === 'medium' && /portrait/.test(window.screen.orientation.type),
+    [layoutName],
+  );
+
+  const [isMediumPortrait, updateIsMediumPortrait] = useState<boolean>(() =>
+    checkIfMediumPortrait(),
+  );
+
+  const setMediumPortrait = useCallback(() => {
+    updateIsMediumPortrait(checkIfMediumPortrait);
+  }, [checkIfMediumPortrait]);
 
   useEffect(() => {
-    window.addEventListener('resize', () =>
-      setMediumPortrait(layoutName === 'medium' && /portrait/.test(window.screen.orientation.type)),
-    );
-    return () => window.removeEventListener('resize', () => null);
-  }, [layoutName]);
+    window.addEventListener('resize', setMediumPortrait);
+    return () => window.removeEventListener('resize', setMediumPortrait);
+  }, [setMediumPortrait]);
 
   useEffect(() => {
     if (!isLoading && finances) {
@@ -115,7 +124,6 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, daoName, token: mainToken
       prepareTransactions();
     }
 
-    // TODO: Potentially refactor to avoid setting state often
     async function getCurrentBalances() {
       const balances: Balance = { ...getMigrationBalances(executorId) };
       let deposit: Deposit;
