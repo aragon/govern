@@ -1,57 +1,61 @@
 import React, { memo } from 'react';
-import { styled } from '@material-ui/core/styles';
+import styled from 'styled-components';
 import { Button } from '@aragon/ui';
 import { useHistory } from 'react-router-dom';
-import MUITypography from '@material-ui/core/Typography';
 import daoNoutFound from 'images/dao-not-found.svg';
 
-const VerticalAlignWrapper = styled('div')({
-  height: 'fit-content',
-  width: 'fit-content',
-  margin: 'auto',
-  padding: '120px 32px 0px 32px',
-});
+const VerticalAlignWrapper = styled.div`
+  height: 100%;
+  margin: auto;
+  padding: 120px 32px 0px 32px;
+`;
 
-const Subtitle = styled(MUITypography)(({ theme }) => ({
-  color: theme.custom.daoHeader.labelColor,
-  lineHeight: '27px',
-  fontSize: '18px',
-  fontWeight: 500,
-  fontFamily: theme.typography.fontFamily,
-  fontStyle: 'normal',
-}));
+const Subtitle = styled.p`
+  color: #7483ab;
+  line-height: 27px;
+  font-size: 18px;
+  font-weight: 500;
+`;
 
-const Title = styled(MUITypography)(({ theme }: any) => ({
-  color: theme.custom.daoHeader.valueColor,
-  lineHeight: '30px',
-  fontSize: '24px',
-  fontWeight: 600,
-  fontFamily: theme.typography.fontFamily,
-  fontStyle: 'normal',
-  paddingBottom: '8px',
-}));
+const Title = styled.p`
+  color: #20232c;
+  line-height: 30px;
+  font-size: 24px;
+  font-weight: 600;
+  font-style: normal;
+  padding-bottom: 8px;
+`;
 
-const DaoNotFoundWrapper = styled('div')({
-  width: '100%',
-  height: '100%',
-  textAlign: 'center',
-  background: ' linear-gradient(107.79deg, #E4F8FF 1.46%, #F1F1FF 100%)',
-  borderRadius: '16px',
-  boxSizing: 'border-box',
-  position: 'relative',
-});
+const DaoNotFoundWrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  background: linear-gradient(107.79deg, #e4f8ff 1.46%, #f1f1ff 100%);
+  border-radius: 16px;
+  box-sizing: border-box;
+  position: relative;
+`;
 
-const NavigationbuttonContainer = styled('div')({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: ' center',
-  marginTop: '24px',
-});
+const NavigationbuttonContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 24px;
+`;
 
-const NotFoundImage = styled('img')({
-  width: '236px',
-  height: '225px',
-});
+const NotFoundImage = styled.img`
+  width: 236px;
+  height: 225px;
+`;
+
+const NavigationButton = styled(Button)`
+  width: 186px;
+  height: 40px;
+  border-radius: 12px;
+  box-shadow: none;
+  font-size: 16px;
+  padding: 8px 16px;
+`;
 
 const NoPageFound: React.FC = () => {
   const history = useHistory();
@@ -70,12 +74,10 @@ const NoPageFound: React.FC = () => {
             We've explored deep and wide, but we can't find the page you were looking for.
           </Subtitle>
           <NavigationbuttonContainer>
-            <Button
+            <NavigationButton
               buttonType="primary"
               type="submit"
               label="Navigate back home"
-              height={'40px'}
-              width={'186px'}
               onClick={onGotoDao}
             />
           </NavigationbuttonContainer>
