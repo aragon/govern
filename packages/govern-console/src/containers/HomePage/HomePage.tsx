@@ -15,6 +15,10 @@ import { trackPage } from 'services/analytics';
 import ConsoleMainPage from 'containers/Console/ConsoleMainPage';
 import { ModalsProvider } from 'containers/HomePage/ModalsContext';
 
+const MainContainer = styled(Main)`
+  width: 100%;
+`;
+
 const Container = styled.div`
   display: grid;
   grid-gap: 16px;
@@ -47,7 +51,7 @@ const HomePage = () => {
 
   return (
     <ModalsProvider>
-      <Main theme="light" toastProps={{ top: true, position: 'center' }}>
+      <MainContainer theme="light" toastProps={{ top: true, position: 'center' }}>
         <Container>
           <Header />
           <BodyArea>
@@ -62,7 +66,7 @@ const HomePage = () => {
             <Footer />
           </FooterArea>
         </Container>
-      </Main>
+      </MainContainer>
     </ModalsProvider>
   );
 };

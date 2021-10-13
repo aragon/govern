@@ -18,10 +18,34 @@ import { trackEvent, EventType } from 'services/analytics';
 import { Error } from 'utils/Error';
 
 type Props = {
-  executorId: string;
   token: string;
   daoName: string;
+  executorId: string;
 };
+
+const SideCard = styled(GridItem).attrs(({ layoutIsSmall, isMediumPortrait }) => {
+  let row = layoutIsSmall ? '1/2' : '1/3';
+  let column = layoutIsSmall ? '1/-1' : '3/4';
+
+  if (isMediumPortrait) {
+    row = '2/3';
+    column = '1/7';
+  }
+
+  return { gridRow: row, gridColumn: column };
+})``;
+
+const ListContainer = styled(GridItem).attrs(({ layoutIsSmall, isMediumPortrait }) => {
+  let row = layoutIsSmall ? '2/-1' : '2/3';
+  let column = layoutIsSmall ? '1/-1' : '1/3';
+
+  if (isMediumPortrait) {
+    row = '3/4';
+    column = '1/7';
+  }
+
+  return { gridRow: row, gridColumn: column };
+})``;
 
 const HeaderContainer = styled.div`
   display: flex;
@@ -64,17 +88,35 @@ const ListTitle = styled.p`
 `;
 
 const DaoFinancePage: React.FC<Props> = ({ executorId, daoName, token: mainToken }) => {
-  const { provider } = useWallet();
-  const [tokens, setTokens] = useState<FinanceToken>({});
-  const [isTransferModalOpen, setIsTransferModalOpen] = useState<boolean>(false);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-
-  const { data: finances, loading: isLoading } = useFinanceQuery(executorId);
-  const context: any = useWallet();
-  const { isConnected } = context;
-  const { layoutName } = useLayout();
-  const layoutIsSmall = useMemo(() => layoutName === 'small', [layoutName]);
   const toast = useToast();
+  const { layoutName } = useLayout();
+
+  const { provider, isConnected } = useWallet();
+  const { data: finances, loading: isLoading } = useFinanceQuery(executorId);
+
+  const [tokens, setTokens] = useState<FinanceToken>({});
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState<boolean>(false);
+
+  // TODO: Future refactor - extract both isSmall and isMediumPortrait into one hook
+  const layoutIsSmall = useMemo(() => layoutName === 'small', [layoutName]);
+  const checkIfMediumPortrait = useCallback(
+    () => layoutName === 'medium' && /portrait/.test(window.screen.orientation.type),
+    [layoutName],
+  );
+
+  const [isMediumPortrait, updateIsMediumPortrait] = useState<boolean>(() =>
+    checkIfMediumPortrait(),
+  );
+
+  const setMediumPortrait = useCallback(() => {
+    updateIsMediumPortrait(checkIfMediumPortrait);
+  }, [checkIfMediumPortrait]);
+
+  useEffect(() => {
+    window.addEventListener('resize', setMediumPortrait);
+    return () => window.removeEventListener('resize', setMediumPortrait);
+  }, [setMediumPortrait]);
 
   useEffect(() => {
     if (!isLoading && finances) {
@@ -82,9 +124,8 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, daoName, token: mainToken
       prepareTransactions();
     }
 
-    // TODO: Potentially refactor to avoid setting state often
     async function getCurrentBalances() {
-      const balances: Balance = getMigrationBalances(executorId);
+      const balances: Balance = { ...getMigrationBalances(executorId) };
       let deposit: Deposit;
       let address: string;
       for (deposit of finances.deposits) {
@@ -116,9 +157,9 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, daoName, token: mainToken
       }
 
       // Ignore eth TODO: more info needed
-      // if (constants.AddressZero in balances) {
-      //   delete balances[constants.AddressZero];
-      // }
+      if (constants.AddressZero in balances) {
+        delete balances[constants.AddressZero];
+      }
 
       let withdraw: Withdraw;
       for (withdraw of finances.withdraws) {
@@ -204,33 +245,33 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, daoName, token: mainToken
   }
 
   return (
-    <Grid gap={24} columns="9">
-      <GridItem gridColumn={layoutIsSmall ? '1/-1' : '7/10'}>
+    <Grid gap={24}>
+      <SideCard layoutIsSmall={layoutIsSmall} isMediumPortrait={isMediumPortrait}>
         <FinanceSideCard tokens={tokens} mainToken={mainToken} onNewTransfer={openTransferModal} />
-      </GridItem>
-      <GridItem
-        gridRow={layoutIsSmall ? '2/-1' : '1/2'}
-        gridColumn={layoutIsSmall ? '1/-1' : '1/7'}
-      >
-        <div>
-          {!layoutIsSmall && (
-            <HeaderContainer>
-              <Title>Finance</Title>
-              <CustomActionButton label="New Transfer" onClick={openTransferModal} />
-            </HeaderContainer>
-          )}
-          <TransactionListContainer>
-            <ListTitle>Transactions</ListTitle>
-            {RenderTransactionCard()}
-          </TransactionListContainer>
-          <DaoTransferModal
-            opened={isTransferModalOpen}
-            close={close}
-            daoName={daoName}
-            executorId={executorId}
-          />
-        </div>
-      </GridItem>
+      </SideCard>
+      {!layoutIsSmall && (
+        <GridItem
+          gridRow={layoutIsSmall ? '2/-1' : '1/2'}
+          gridColumn={layoutIsSmall ? '1/-1' : '1/3'}
+        >
+          <HeaderContainer>
+            <Title>Finance</Title>
+            <CustomActionButton label="New Transfer" onClick={openTransferModal} />
+          </HeaderContainer>
+        </GridItem>
+      )}
+      <ListContainer layoutIsSmall={layoutIsSmall} isMediumPortrait={isMediumPortrait}>
+        <TransactionListContainer>
+          <ListTitle>Transactions</ListTitle>
+          {RenderTransactionCard()}
+        </TransactionListContainer>
+        <DaoTransferModal
+          opened={isTransferModalOpen}
+          close={close}
+          daoName={daoName}
+          executorId={executorId}
+        />
+      </ListContainer>
     </Grid>
   );
 };

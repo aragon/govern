@@ -1,13 +1,11 @@
-import { memo } from 'react';
 import styled from 'styled-components';
-
-import ETHIcon from 'images/pngs/eth_logo.png';
+import { memo, useState } from 'react';
 
 type Props = {
-  token: string;
   usd: string;
-  symbol: string;
   icon: string;
+  token: string;
+  symbol: string;
 };
 
 const Container = styled.div`
@@ -51,22 +49,29 @@ const USDEquivalent = styled.p`
   line-height: 21px;
 `;
 
+const FallbackIcon = styled.div`
+  width: 24px;
+  height: 24px;
+  border-radius: 32px;
+  background: linear-gradient(107.79deg, #00c2ff 1.46%, #01e8f7 100%);
+`;
+
 const BalanceCard: React.FC<Props> = ({ icon, token, usd, symbol }) => {
+  const [error, setError] = useState<boolean>(false);
+
   return (
     <Container>
       <IconContainer>
-        <Icon
-          src={icon || ETHIcon}
-          alt="token logo"
-          onError={(e: any) => {
-            e.target.onerror = null;
-            e.target.src = ETHIcon;
-          }}
-        />
+        {error ? (
+          <FallbackIcon />
+        ) : (
+          <Icon src={icon} alt="token logo" onError={() => setError(true)} />
+        )}
       </IconContainer>
+
       <Balance>
         <Crypto>{`${token} ${symbol}`}</Crypto>
-        {usd && <USDEquivalent>{`~${usd} USD`}</USDEquivalent>}
+        <USDEquivalent>{usd ? `~${usd} USD` : 'USD value unknown'}</USDEquivalent>
       </Balance>
     </Container>
   );
