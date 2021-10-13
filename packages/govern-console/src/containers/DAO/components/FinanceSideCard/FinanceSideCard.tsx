@@ -27,7 +27,7 @@ const MainTokenBalance = styled.div`
   gap: 4px;
   display: flex;
   flex-direction: column;
-  width: 173px;
+  min-width: 173px;
 `;
 
 const Token = styled.p`
