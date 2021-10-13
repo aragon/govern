@@ -1,7 +1,7 @@
 import React from 'react';
 import { Label } from '../Labels/Label';
 import { Box, StyledText, useTheme, GU } from '@aragon/ui';
-
+import { toUTF8String } from 'utils/lib';
 export interface ProposalCardProps {
   /**
    * TransactionHash of the proposal
@@ -47,6 +47,11 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
     return hash;
   };
 
+  const getTitleTransaction = () => {
+    const utfString = toUTF8String(proposalTitle) || '{}'; // Check for title availability
+    return JSON.parse(utfString).title;
+  };
+
   return (
     <Box shadow onClick={onClickProposalCard} style={{ cursor: 'pointer' }}>
       <Label labelColor={proposalStatusColor} labelText={proposalStatus} />
@@ -60,7 +65,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
           textOverflow: 'ellipsis',
         }}
       >
-        {proposalTitle || getSlicedTransactionHash()}{' '}
+        {getTitleTransaction() || getSlicedTransactionHash()}{' '}
       </StyledText>
       <StyledText
         name="title3"
