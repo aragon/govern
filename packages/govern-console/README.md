@@ -1,5 +1,5 @@
 # Govern Console
-This is Aragon V2 frontend, it was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is Aragon V2 frontend project, bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
 
