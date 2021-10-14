@@ -8,6 +8,7 @@ import { useWallet } from 'providers/AugmentedWallet';
 import { useTransferContext } from './TransferContext';
 import { validateAmountForDecimals, validateBalance, validateToken } from 'utils/validations';
 import { ContentSwitcher } from 'components/ContentSwitcher/ContentSwitcher';
+import { NewIPFSInput } from 'components/Field/NewIPFSInput';
 
 const HeaderContainer = styled.div`
   display: flex;
@@ -89,8 +90,6 @@ const StyledDropDown = styled(DropDown)<{ error: boolean }>`
 const Transfer: React.FC = () => {
   const { gotoState } = useTransferContext();
   const { control, getValues, handleSubmit } = useFormContext();
-  const TransactionTypeList = ['Withdraw', 'Deposit'];
-  const justificationTypeList = ['Text', 'File'];
 
   // TODO: put get values in callback function
   const [token, isCustomToken, type] = getValues(['token', 'isCustomToken', 'type']);
@@ -146,9 +145,9 @@ const Transfer: React.FC = () => {
         <Controller
           name="type"
           control={control}
-          defaultValue={'Withdraw'}
+          defaultValue={0}
           render={({ field: { onChange, value } }) => (
-            <ContentSwitcher items={TransactionTypeList} selected={value} onChange={onChange} />
+            <ContentSwitcher items={['Withdraw', 'Deposit']} selected={value} onChange={onChange} />
           )}
         />
         <SubTitle>Token</SubTitle>
@@ -269,30 +268,12 @@ const Transfer: React.FC = () => {
         <Description>
           Add a reason as a copy or file for scheduling this financial execution.
         </Description>
-        <Controller
-          name="justificationType"
-          control={control}
-          defaultValue={'Text'}
-          render={({ field: { onChange, value } }) => (
-            <ContentSwitcher items={justificationTypeList} selected={value} onChange={onChange} />
-          )}
-        />
         <TextAreaContainer>
-          <Controller
-            name="justificationText"
-            control={control}
-            defaultValue=""
-            render={({ field: { onChange, value }, fieldState: { error } }) => (
-              <StyledTextInput
-                value={value}
-                placeholder="Type your justification"
-                onChange={onChange}
-                status={error ? 'error' : 'normal'}
-                error={error ? error.message : null}
-                wide
-                multiline
-              />
-            )}
+          <NewIPFSInput
+            label=""
+            placeholder="Please insert the reason why you want to execute this"
+            textInputName="proof"
+            fileInputName="proofFile"
           />
         </TextAreaContainer>
         <SubmitButton onClick={handleSubmit(() => gotoState('review'))}>

@@ -5,11 +5,11 @@ export interface ContentSwitcherProps {
   /**
    * Optional click handler
    */
-  selected?: string;
+  selected?: number;
   /**
    * On change handler
    */
-  onChange: (value: string) => void;
+  onChange: (value: number) => void;
   /**
    * width
    */
@@ -31,12 +31,12 @@ export interface ContentSwitcherProps {
 export const ContentSwitcher: React.FC<ContentSwitcherProps> = ({ items, onChange, selected }) => {
   return (
     <SelectorContainer>
-      {items?.map((value) => {
+      {items?.map((value, index) => {
         return (
           <Option
             key={value}
-            className={value === selected ? 'active' : ''}
-            onClick={() => onChange(value)}
+            className={index === selected ? 'active' : ''}
+            onClick={() => onChange(index)}
           >
             {value}
           </Option>

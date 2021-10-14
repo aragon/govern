@@ -7,7 +7,7 @@ import { toUTF8String } from 'utils/lib';
 type Props = {
   date: string;
   state: string;
-  title: string;
+  title: string | null;
   dao_identifier: string;
   id: string;
 };
@@ -92,7 +92,7 @@ const DaoActionCard: React.FC<Props> = ({ id, date, state, title, dao_identifier
   };
 
   const getTitleTransaction = () => {
-    const utfString = toUTF8String(title) || '{}'; // Check for title availability
+    const utfString = toUTF8String(title || '') || '{}'; // Check for title availability
     return JSON.parse(utfString).title;
   };
 
