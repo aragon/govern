@@ -1,0 +1,17 @@
+name: Govern-Console CI/CD
+on:
+  push:
+    paths:
+      - 'packages/govern-console/**'
+      - 'packages/govern/**'
+    branches:
+      - 'DAO-377-govern-console-ci-trigger'
+
+env:
+  working-directory: packages/govern-console
+
+jobs:
+  build-deploy-develop:
+    steps:
+      - name: test echo
+        run: echo triggered
