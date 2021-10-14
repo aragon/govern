@@ -58,12 +58,12 @@
     "rollup-plugin-node-resolve": "^5.2.0",
     "ts-jest": "^26.4.2",
     "tslint": "^6.1.3",
-    "typescript": "4.4.3",
+    "typescript": "^4.0.5",
     "uglify-es": "^3.3.9"
   },
   "dependencies": {
     "@urql/core": "^1.13.1",
-    "dvote-js": "1.13.3",
+    "dvote-js": "^1.9.14",
     "ethers": "^5.4.1",
     "graphql": "^15.4.0",
     "graphql-tag": "^2.11.0",

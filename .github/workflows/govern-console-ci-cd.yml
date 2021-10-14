@@ -36,7 +36,7 @@ jobs:
         with:
           node-version: 14.15.5
       - name: Build the Govern
-        run: cd ../govern && yarn install --frozen-lockfile --network-concurrency 1 && yarn build
+        run: cd ../govern && yarn install --frozen-lockfile && yarn build
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: Build the app
