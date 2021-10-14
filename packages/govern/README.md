@@ -1,4 +1,4 @@
-# Govern.js
+# govern.js
 
 > The JavaScript client API for the Govern server
 
