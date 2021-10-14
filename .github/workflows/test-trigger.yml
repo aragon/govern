@@ -1,4 +1,4 @@
-name: Govern-Console CI/CD
+name: test
 on:
   push:
     paths:
@@ -12,6 +12,7 @@ env:
 
 jobs:
   build-deploy-develop:
+    runs-on: ubuntu-latest
     steps:
       - name: test echo
         run: echo triggered
