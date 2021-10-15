@@ -70,7 +70,8 @@ const SignDeposit: React.FC<Props> = ({ onClose }) => {
 
   const handleViewProposal = useCallback(() => {
     if (containerHash) history.push(proposalDetailsUrl(daoIdentifier, containerHash));
-  }, [containerHash, daoIdentifier, history]);
+    onClose();
+  }, [containerHash, daoIdentifier, history, onClose]);
 
   const SendToExplore = useCallback(() => {
     window.open(

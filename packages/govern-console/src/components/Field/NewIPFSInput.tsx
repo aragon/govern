@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
-import { useLayout, TextInput, SPACING, FileInput } from '@aragon/ui';
-import { toUtf8String } from 'ethers/lib/utils';
+import { TextInput, FileInput } from '@aragon/ui';
+// import { toUtf8String } from 'ethers/lib/utils';
 import { useEffect } from 'react';
 import { ipfsMetadata } from 'utils/types';
 import { validateFileSize } from 'utils/validations';
@@ -70,8 +70,6 @@ export const NewIPFSInput: React.FC<NewIPFSInputProps> = ({
   rows,
 }) => {
   const { control, watch, setValue } = useFormContext();
-  const { layoutName } = useLayout();
-  const spacing = SPACING[layoutName];
   const isFileChosen = isFile || `is_file_${fileInputName}`;
 
   const formatValue = (value: any) => {

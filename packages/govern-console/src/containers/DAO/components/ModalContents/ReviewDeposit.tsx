@@ -69,8 +69,6 @@ const ReviewDeposit: React.FC = () => {
     try {
       const asset = await Asset.createFromDropdownLabel(symbol, address, depositAmount, provider);
 
-      console.log(asset);
-
       if (type === 1) {
         // type === deposit
         const executor = new Executor(executorId, account.signer);
@@ -81,8 +79,8 @@ const ReviewDeposit: React.FC = () => {
         const action = AbiHandler.mapToAction(withdrawSignature, executorId, values);
         try {
           const encodedActions = AbiHandler.encodeActions([action]);
-          const proof = getValues('proofFile') ? getValues('proofFile')[0] : getValues('proof');
-          const proofCid = await addToIpfs(proof, {
+          const currentProof = proofFile ? proofFile[0] : proof;
+          const proofCid = await addToIpfs(currentProof, {
             title: getValues('title'),
           });
 
@@ -132,7 +130,8 @@ const ReviewDeposit: React.FC = () => {
     proposalInstance,
     daoDetails,
     account,
-    // setActions,
+    proof,
+    proofFile,
     type,
   ]);
 

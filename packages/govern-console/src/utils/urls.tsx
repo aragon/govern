@@ -16,5 +16,5 @@ export function settingsUrl(daoName: string): string {
  * @returns {string} the url of the proposal details page
  */
 export function proposalDetailsUrl(daoName: string, containerHash: string): string {
-  return `/daos/${daoName}/executions/${containerHash}`;
+  return `/daos/${daoName}/actions/executions/${containerHash}`;
 }
