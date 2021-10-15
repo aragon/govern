@@ -65,6 +65,8 @@ const ListTitle = styled.p`
 
 const DaoFinancePage: React.FC<Props> = ({ executorId, daoName, token: mainToken }) => {
   const { provider } = useWallet();
+
+  // TODO: compare with Assets class
   const [tokens, setTokens] = useState<FinanceToken>({});
   const [isTransferModalOpen, setIsTransferModalOpen] = useState<boolean>(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);

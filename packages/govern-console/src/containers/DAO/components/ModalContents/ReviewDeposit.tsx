@@ -193,8 +193,11 @@ const InfoRowValue = styled.p`
   font-weight: 600;
   font-size: 16px;
   color: #20232c;
-  max-width: 200px;
   text-align: right;
+  max-width: 200px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 `;
 
 const Icon = styled.div`

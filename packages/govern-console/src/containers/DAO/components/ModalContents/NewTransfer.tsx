@@ -1,12 +1,22 @@
 import styled from 'styled-components';
-import { useCallback } from 'react';
-import { useFormContext, Controller } from 'react-hook-form';
-import { DropDown, GU, TextInput, Button, IconDownload } from '@aragon/ui';
+import { Contract } from 'ethers';
+import { useCallback, useEffect, useState } from 'react';
+import { useFormContext, Controller, useWatch } from 'react-hook-form';
+import { Button, DropDown, GU, IconCopy, IconDownload, Tag, TextInput } from '@aragon/ui';
 
-import { Asset } from 'utils/Asset';
 import { useWallet } from 'providers/AugmentedWallet';
+import { formatUnits } from 'utils/lib';
+import { getTokenInfo } from 'utils/token';
+import { erc20TokenABI } from 'abis/erc20';
+import { networkEnvironment } from 'environment';
 import { useTransferContext } from './TransferContext';
+import { ASSET_ICON_BASE_URL } from 'utils/constants';
+import { Asset, OTHER_TOKEN_SYMBOL, ETH } from 'utils/Asset';
 import { validateAmountForDecimals, validateBalance, validateToken } from 'utils/validations';
+
+const { curatedTokens } = networkEnvironment;
+const currentTokens = { ...curatedTokens, [ETH.symbol]: ETH.address };
+const MAX_REFERENCE_LENGTH = 140;
 
 const HeaderContainer = styled.div`
   display: flex;
@@ -43,6 +53,18 @@ const Description = styled.p`
 const InputContainer = styled.div`
   margin-top: ${GU}px;
   margin-bottom: ${3 * GU}px;
+  display: flex;
+  flex-direction: column;
+  gap: ${GU}px;
+`;
+
+const HintIndicator = styled.span`
+  padding: 0px 16px;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 18px;
+  color: #7483ab;
+  text-align: right;
 `;
 
 const StyledTextInput = styled(TextInput)`
@@ -74,32 +96,101 @@ const SelectedToken = styled.div`
   }
 `;
 
-const StyledDropDown = styled(DropDown)<{ error: boolean }>`
+const FallbackLogo = styled.div`
+  width: 24px;
+  height: 24px;
+  border-radius: 32px;
+  background: linear-gradient(107.79deg, #00c2ff 1.46%, #01e8f7 100%);
+`;
+
+const StyledDropDown = styled(DropDown)`
   border-radius: 12px;
   color: #7483ab;
-  // ${({ error }) => error && 'border: 2px solid #ff6a60;'};
+`;
+
+const StyledTag = styled(Tag)`
+  color: #7483ab;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 15px;
+
+  height: 23px;
+  margin-left: ${GU}px;
+  background: #eff1f7;
+  border-radius: 8px;
+`;
+
+const Adornment = styled.span`
+  margin-right: 6px;
+  font-size: 16px;
+  line-height: 24px;
+  color: #00c2ff;
+  cursor: pointer;
 `;
 
 const Transfer: React.FC = () => {
+  const tokenAddress = useWatch({ name: 'token.address' });
+  const isCustomToken = useWatch({ name: 'isCustomToken' });
   const { gotoState } = useTransferContext();
-  const { control, getValues, handleSubmit } = useFormContext();
-
-  // TODO: put get values in callback function
-  const [token, isCustomToken] = getValues(['token', 'isCustomToken']);
+  const [logoError, setLogoError] = useState<boolean>(false);
+  const [tokenBalance, setBalance] = useState<string>();
+  const { control, getValues, setValue, handleSubmit, formState } = useFormContext();
 
   const context: any = useWallet();
-  const { provider, account } = context;
+  const {
+    balance,
+    provider,
+    account: { address: accountAddress },
+  } = context;
 
+  useEffect(() => {
+    const getBalance = async () => {
+      // No token or invalid token, no balance
+      if (!tokenAddress || formState.errors.token?.address) {
+        setBalance(undefined);
+        return;
+      }
+
+      if (getValues('token.symbol') === 'ETH') {
+        setBalance(formatUnits(balance, 18));
+      }
+
+      try {
+        const contract = new Contract(tokenAddress, erc20TokenABI, provider);
+        const { decimals } = await getTokenInfo(tokenAddress, provider);
+        const currentBalance = await contract.balanceOf(accountAddress);
+        setBalance(formatUnits(currentBalance, decimals));
+      } catch (err) {
+        // Passing invalid address will return error (can be safely ignored)
+        // Should not throw ideally if bad address is taken into account
+      }
+    };
+
+    getBalance();
+  }, [accountAddress, balance, formState.errors.token?.address, getValues, provider, tokenAddress]);
+
+  /**
+   * Functions
+   */
   const goBack = () => {
     gotoState('selectToken');
   };
 
   const validateAmount = useCallback(
     async (value: string) => {
-      const { token } = getValues();
+      const token = getValues('token');
+
+      if (!token?.address) return 'No token selected';
+
+      // Invalid token address
+      if (formState.errors?.token?.address)
+        return 'Cannot validate amount with given token address';
+
+      if (parseFloat(value) === 0) return 'Amount must be greater than zero';
+
       try {
         const asset = await Asset.createFromDropdownLabel(
-          token.symbol,
+          token.symbol in currentTokens ? token.symbol : OTHER_TOKEN_SYMBOL,
           token.address,
           value,
           provider,
@@ -110,21 +201,71 @@ const Transfer: React.FC = () => {
           return result;
         }
 
-        const owner = await account?.signer?.getAddress();
-        return validateBalance(asset, owner, provider);
+        return validateBalance(asset, accountAddress, provider);
       } catch (err) {
         console.log('Error validating amount', err);
         return 'Error validating amount';
       }
     },
-    [provider, getValues, account],
+    [getValues, formState.errors?.token?.address, provider, accountAddress],
   );
 
-  const renderToken = (token: any) => (
-    <SelectedToken>
-      <img src={token?.logo} />
-      <p>{token?.symbol}</p>
-    </SelectedToken>
+  const tokenValidator = useCallback(
+    async (address: string) => {
+      const result = await validateToken(address, provider);
+
+      // Valid non-curated token populates symbol
+      if (getValues('isCustomToken') && result == true) {
+        const { symbol } = await getTokenInfo(address, provider);
+        setValue('token.symbol', symbol);
+        setValue('token.logo', `${ASSET_ICON_BASE_URL}/${address}/logo.png`);
+      } else {
+        setValue('token.symbol', '');
+        setValue('token.logo', null);
+      }
+      return result;
+    },
+    [getValues, provider, setValue],
+  );
+
+  const handleClipboardAction = useCallback(
+    async (currentValue: string, onChange: (value: any) => void) => {
+      if (currentValue) {
+        await navigator.clipboard.writeText(currentValue);
+      } else {
+        const text = await navigator.clipboard.readText();
+        onChange(text);
+      }
+    },
+    [],
+  );
+
+  const renderToken = useCallback(
+    (token: any) => {
+      // Initial state
+      if (!token) return '';
+
+      if (!token.logo) {
+        return (
+          <SelectedToken>
+            {token.symbol !== '' && <FallbackLogo />}
+            <p>{token.symbol}</p>
+          </SelectedToken>
+        );
+      }
+
+      return (
+        <SelectedToken>
+          {logoError ? (
+            <FallbackLogo />
+          ) : (
+            <img src={token.logo} alt="token logo" onError={() => setLogoError(true)} />
+          )}
+          <p>{token.symbol}</p>
+        </SelectedToken>
+      );
+    },
+    [logoError],
   );
 
   return (
@@ -148,8 +289,8 @@ const Transfer: React.FC = () => {
                   items={[renderToken(value)]}
                   onClick={goBack}
                   onChange={goBack}
-                  selected={token ? 0 : -1}
-                  placeholder="Type to search ..."
+                  selected={value ? 0 : -1}
+                  placeholder="Select a token ..."
                 />
               );
             }}
@@ -161,11 +302,11 @@ const Transfer: React.FC = () => {
             <InputContainer>
               <Controller
                 name="token.address"
-                shouldUnregister={true}
+                defaultValue=""
                 control={control}
                 rules={{
                   required: 'Token address is required.',
-                  validate: (value) => validateToken(value, provider),
+                  validate: tokenValidator,
                 }}
                 render={({ field: { onChange, value }, fieldState: { error } }) => (
                   <StyledTextInput
@@ -175,6 +316,12 @@ const Transfer: React.FC = () => {
                     status={error ? 'error' : 'normal'}
                     error={error?.message}
                     wide
+                    adornment={
+                      <Adornment onClick={() => handleClipboardAction(value, onChange)}>
+                        {value ? <IconCopy /> : 'Paste'}
+                      </Adornment>
+                    }
+                    adornmentPosition="end"
                   />
                 )}
               />
@@ -185,23 +332,34 @@ const Transfer: React.FC = () => {
         <InputContainer>
           <Controller
             name="depositAmount"
+            defaultValue=""
             control={control}
             rules={{
               required: 'Token amount is required.',
               validate: validateAmount,
             }}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
-              <StyledTextInput
-                value={value}
-                onChange={onChange}
-                status={error ? 'error' : 'normal'}
-                error={error?.message}
-                wide
-              />
+              <>
+                <StyledTextInput
+                  wide
+                  value={value}
+                  onChange={onChange}
+                  status={error ? 'error' : 'normal'}
+                  error={error?.message}
+                  adornment={<Adornment onClick={() => onChange(tokenBalance)}>Max</Adornment>}
+                  adornmentPosition="end"
+                />
+                {
+                  // Valid token address & valid balance (i.e. token selected)
+                  tokenBalance && <HintIndicator>Max Balance: {tokenBalance}</HintIndicator>
+                }
+              </>
             )}
           />
         </InputContainer>
-        <SubTitle>Reference</SubTitle>
+        <SubTitle>
+          Reference<StyledTag>Optional</StyledTag>
+        </SubTitle>
         <Description>
           Add an optional reference copy to identify this transa&shy;ction later on.
         </Description>
@@ -210,14 +368,25 @@ const Transfer: React.FC = () => {
             name="reference"
             control={control}
             defaultValue=""
+            rules={{
+              maxLength: {
+                value: MAX_REFERENCE_LENGTH,
+                message: 'Please keep description short',
+              },
+            }}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
-              <StyledTextInput
-                value={value}
-                onChange={onChange}
-                status={error ? 'error' : 'normal'}
-                error={error ? error.message : null}
-                wide
-              />
+              <>
+                <StyledTextInput
+                  value={value}
+                  onChange={onChange}
+                  status={error ? 'error' : 'normal'}
+                  error={error?.message}
+                  wide
+                />
+                <HintIndicator>
+                  {value?.length}/{MAX_REFERENCE_LENGTH}
+                </HintIndicator>
+              </>
             )}
           />
         </InputContainer>

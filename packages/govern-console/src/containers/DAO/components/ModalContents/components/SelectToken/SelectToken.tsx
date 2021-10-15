@@ -3,16 +3,15 @@ import { useFormContext } from 'react-hook-form';
 import { useCallback, useMemo, useState } from 'react';
 import { ButtonText, IconLeft, IconPlus, TextInput, GU } from '@aragon/ui';
 
-import ETHIcon from 'images/pngs/eth_logo.png';
 import { ETH } from 'utils/Asset';
 import TokenCard from './TokenCard';
 import TokenNotFound from './TokenNotFound';
-import { getNetworkConfig } from 'environment/networks';
 import { useTransferContext } from '../../TransferContext';
-import { getEnvironmentName } from 'environment';
+import { networkEnvironment } from 'environment';
 
+const { curatedTokens } = networkEnvironment;
 const depositAssets: any = {
-  ...getNetworkConfig(getEnvironmentName()).curatedTokens,
+  ...curatedTokens,
   [ETH.symbol]: ETH.address,
 };
 
@@ -90,27 +89,25 @@ const SelectToken: React.FC<Props> = ({ onTokenSelected }) => {
     [query],
   );
 
-  const displayedAssets = useMemo(() => Object.keys(depositAssets).filter(searchDeposit), [
-    searchDeposit,
-  ]);
+  const { assets, noAssets } = useMemo((): { assets: string[]; noAssets: boolean } => {
+    const assets = Object.keys(depositAssets).filter(searchDeposit);
+    return {
+      assets,
+      noAssets: assets.length === 0,
+    };
+  }, [searchDeposit]);
 
   const handleAddToken = () => {
     setValue('isCustomToken', true);
-
-    // TODO: find appropriate logo
-    setValue('token', {
-      symbol: query,
-      address: null,
-      logo: ETHIcon,
-    });
+    setValue('token', { symbol: query });
     gotoState('initial');
   };
 
   const renderTokenList = () => {
-    return displayedAssets.length === 0 ? (
+    return noAssets ? (
       <TokenNotFound />
     ) : (
-      displayedAssets.map((assetName) => (
+      assets.map((assetName) => (
         <TokenCard
           key={assetName}
           symbol={assetName}
@@ -137,11 +134,11 @@ const SelectToken: React.FC<Props> = ({ onTokenSelected }) => {
         />
       </SearchContainer>
       <TokenListContainer>
-        {renderTokenList()}
         <AddTokenButton onClick={handleAddToken}>
-          <p>Add {displayedAssets.length === 0 ? `${query} now` : `other token`}</p>
+          <p>Add {noAssets ? `${query} now` : `other token`}</p>
           <IconPlus />
         </AddTokenButton>
+        {renderTokenList()}
       </TokenListContainer>
     </>
   );
