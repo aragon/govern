@@ -22,13 +22,7 @@ const ReviewDeposit: React.FC = () => {
   const { networkName } = useWallet();
   const { getValues, watch } = useFormContext();
   const { account, provider } = context;
-  const {
-    daoIdentifier,
-    executorId,
-    gotoState,
-    setTransactions,
-    setActions,
-  } = useTransferContext();
+  const { daoIdentifier, executorId, gotoState, setTransactions } = useTransferContext();
   const withdrawSignature =
     'function withdraw(address token, address from, address to, uint256 amount, string memory reference)';
 
@@ -74,6 +68,9 @@ const ReviewDeposit: React.FC = () => {
 
     try {
       const asset = await Asset.createFromDropdownLabel(symbol, address, depositAmount, provider);
+
+      console.log(asset);
+
       if (type === 1) {
         // type === deposit
         const executor = new Executor(executorId, account.signer);
@@ -89,7 +86,7 @@ const ReviewDeposit: React.FC = () => {
             title: getValues('title'),
           });
 
-          let containerHash: string | undefined;
+          // let containerHash: string | undefined;
 
           const payload = {
             submitter: account.address,
