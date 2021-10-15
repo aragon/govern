@@ -8,12 +8,15 @@ import {
   IconExternal,
 } from '@aragon/ui';
 import styled from 'styled-components';
+import { useHistory } from 'react-router';
 import { useFormContext } from 'react-hook-form';
+import { Proposal, ReceiptType } from '@aragon/govern';
 import { useCallback, useEffect, useState, useMemo } from 'react';
 
 import { useWallet } from 'providers/AugmentedWallet';
 import { useTransferContext } from './TransferContext';
-import { CustomTransactionStatus } from 'utils/types';
+import { CustomTransaction, CustomTransactionStatus } from 'utils/types';
+import { proposalDetailsUrl } from 'utils/urls';
 
 enum SigningState {
   Processing,
@@ -26,20 +29,28 @@ type Props = {
 };
 
 const SignDeposit: React.FC<Props> = ({ onClose }) => {
-  // useTransferContext();
+  const history = useHistory();
+  const { daoIdentifier } = useTransferContext();
+
   const { getValues } = useFormContext();
   const { networkName } = useWallet();
   const { transactions } = useTransferContext();
   const [txState, setTxState] = useState(SigningState.Processing);
-  const [transaction, setTransaction] = useState({ ...transactions[0] });
+  const [transactionList, setTransactionList] = useState<CustomTransaction[]>([...transactions]);
   // const [errorMessage, setErrorMessage] = useState('');
   const [transactionHash, setTransactionHash] = useState('');
 
+  // Redirect on container hash
+  const [containerHash, setContainerHash] = useState<string>();
+
   const {
     reference,
+    title,
     depositAmount,
     token: { symbol },
   } = useMemo(() => getValues(), [getValues]);
+
+  const transferSymbol = useMemo(() => (title === 'Withdraw' ? '-' : '+'), [title]);
 
   useEffect(() => {
     BuildTransaction();
@@ -48,9 +59,19 @@ const SignDeposit: React.FC<Props> = ({ onClose }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const updateStatus = (status: CustomTransactionStatus) => {
-    setTransaction((transaction) => ({ ...transaction, status }));
-  };
+  const updateStatus = useCallback(
+    (txIndex: number, newStatus: CustomTransactionStatus) => {
+      const txs = [...transactions];
+      txs[txIndex].status = newStatus;
+      setTransactionList(txs);
+    },
+    [transactions],
+  );
+
+  const handleViewProposal = useCallback(() => {
+    if (containerHash) history.push(proposalDetailsUrl(daoIdentifier, containerHash));
+    onClose();
+  }, [containerHash, daoIdentifier, history, onClose]);
 
   const SendToExplore = useCallback(() => {
     window.open(
@@ -65,21 +86,33 @@ const SignDeposit: React.FC<Props> = ({ onClose }) => {
   }, [networkName, transactionHash]);
 
   const BuildTransaction = useCallback(async () => {
-    try {
-      setTransactionHash('');
-      setTxState(SigningState.Processing);
-      updateStatus(CustomTransactionStatus.InProgress);
-      const txResponse = await transaction.tx();
-      const txReceipt = await txResponse.wait();
-      updateStatus(CustomTransactionStatus.Successful);
-      setTxState(SigningState.Success);
-      setTransactionHash(txReceipt.transactionHash);
-    } catch (ex: any) {
-      updateStatus(CustomTransactionStatus.Failed);
-      setTxState(SigningState.Failure);
-      // setErrorMessage(ex.message);
+    let isQueueAborted = false;
+    let index = 0;
+    for (const tx of transactionList) {
+      if (isQueueAborted) return;
+      try {
+        setTransactionHash('');
+        setTxState(SigningState.Processing);
+        updateStatus(index, CustomTransactionStatus.InProgress);
+        const txResponse = await tx.tx();
+        const txReceipt = await txResponse.wait();
+        updateStatus(index, CustomTransactionStatus.Successful);
+        setContainerHash(Proposal.getContainerHashFromReceipt(txReceipt, ReceiptType.Scheduled));
+        setTransactionHash(txReceipt.transactionHash);
+      } catch (ex: any) {
+        isQueueAborted = true;
+        updateStatus(index, CustomTransactionStatus.Failed);
+        setTxState(SigningState.Failure);
+        console.log(ex);
+        // setErrorMessage(ex.message);
+      }
+      index++;
     }
-  }, [transaction]);
+    // All transactions complete
+    if (!isQueueAborted) {
+      setTxState(SigningState.Success);
+    }
+  }, [transactionList, updateStatus]);
 
   const MessageType = useMemo(() => {
     switch (txState) {
@@ -97,7 +130,7 @@ const SignDeposit: React.FC<Props> = ({ onClose }) => {
                 </InfoContainer>
               </InfoWrapper>
               <Amount>
-                + {depositAmount} {symbol}
+                {transferSymbol} {depositAmount} {symbol}
               </Amount>
             </Wrapper>
           </SignCard>
@@ -116,10 +149,14 @@ const SignDeposit: React.FC<Props> = ({ onClose }) => {
                 </InfoContainer>
               </InfoWrapper>
               <Amount>
-                + {depositAmount} {symbol}
+                {transferSymbol} {depositAmount} {symbol}
               </Amount>
             </Wrapper>
-            <SuccessButton label="Close deposit" wide onClick={onClose} />
+            <SuccessButton
+              wide
+              label={title === 'Withdraw' ? 'View proposal' : 'Close deposit'}
+              onClick={handleViewProposal}
+            />
             <TransparentButton onClick={SendToExplore} wide>
               <p>View on explorer</p>
               <IconExternal />
@@ -140,7 +177,7 @@ const SignDeposit: React.FC<Props> = ({ onClose }) => {
                 </InfoContainer>
               </InfoWrapper>
               <Amount>
-                + {depositAmount} {symbol}
+                {transferSymbol} {depositAmount} {symbol}
               </Amount>
             </Wrapper>
             <FailedButton wide onClick={BuildTransaction}>
@@ -150,13 +187,23 @@ const SignDeposit: React.FC<Props> = ({ onClose }) => {
           </SignCard>
         );
     }
-  }, [txState, reference, depositAmount, symbol, onClose, SendToExplore, BuildTransaction]);
+  }, [
+    txState,
+    reference,
+    transferSymbol,
+    depositAmount,
+    symbol,
+    title,
+    handleViewProposal,
+    SendToExplore,
+    BuildTransaction,
+  ]);
 
   return (
     <>
       <HeaderContainer>
-        <Title>Sign deposit</Title>
-        <Description>To complete your transfer, sign your deposit with your wallet.</Description>
+        <Title>Sign {title}</Title>
+        <Description>To complete your transfer, sign your {title} with your wallet.</Description>
       </HeaderContainer>
       {MessageType}
     </>

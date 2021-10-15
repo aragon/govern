@@ -1,26 +1,63 @@
 import styled from 'styled-components';
-import { useWallet } from 'providers/AugmentedWallet';
 import { useFormContext } from 'react-hook-form';
-import { useTransferContext } from './TransferContext';
-import { useCallback, useMemo } from 'react';
-import { IconLeft, IconDownload, GU, Button, IconRight, useToast } from '@aragon/ui';
+import { useCallback, useMemo, useRef } from 'react';
+import { IconLeft, IconDownload, GU, Button, IconRight, useToast, IconExternal } from '@aragon/ui';
 
+import { useTransferContext } from './TransferContext';
 import { Asset } from 'utils/Asset';
 import { Executor } from 'services/Executor';
 import { getErrorFromException } from 'utils/HelperFunctions';
 import { getTruncatedAccountAddress } from 'utils/account';
+import AbiHandler from 'utils/AbiHandler';
+import { addToIpfs } from 'utils/ipfs';
+import { useDaoQuery } from 'hooks/query-hooks';
+import { buildConfig } from 'utils/ERC3000';
+import { useFacadeProposal } from 'hooks/proposal-hooks';
+import { CustomTransaction } from 'utils/types';
+import { useWallet } from 'providers/AugmentedWallet';
 
 const ReviewDeposit: React.FC = () => {
   const toast = useToast();
   const context: any = useWallet();
-  const { getValues } = useFormContext();
+  const { networkName } = useWallet();
+  const { getValues, watch } = useFormContext();
   const { account, provider } = context;
   const { daoIdentifier, executorId, gotoState, setTransactions } = useTransferContext();
-  // const withdrawSignature =
-  //   'function withdraw(address token, address from, address to, uint256 amount, string memory reference)';
+  const withdrawSignature =
+    'function withdraw(address token, address from, address to, uint256 amount, string memory reference)';
 
   // TODO: Memo useless?
-  const { token, depositAmount, reference } = useMemo(() => getValues(), [getValues]);
+  const {
+    title,
+    token,
+    depositAmount,
+    type,
+    reference,
+    proof,
+    proofFile,
+    recipient,
+  } = useMemo(() => getValues(), [getValues]);
+
+  const SendToTokenContract = useCallback(() => {
+    window.open(
+      `${
+        {
+          Rinkeby: 'https://rinkeby.etherscan.io/token/',
+          Mainnet: 'https://etherscan.io/token/',
+        }[networkName] + token.address
+      }`,
+      '_blank',
+    );
+  }, [token, networkName]);
+
+  const transactionsQueue = useRef<CustomTransaction[]>([]);
+
+  const { data: daoDetails } = useDaoQuery(daoIdentifier);
+
+  const proposalInstance = useFacadeProposal(
+    daoDetails?.queue.address,
+    daoDetails?.queue.config.resolver,
+  );
 
   const executeTransfer = useCallback(async () => {
     const {
@@ -30,17 +67,73 @@ const ReviewDeposit: React.FC = () => {
     } = getValues();
 
     try {
-      const executor = new Executor(executorId, account.signer);
       const asset = await Asset.createFromDropdownLabel(symbol, address, depositAmount, provider);
-      const transaction = await executor.deposit(asset, reference);
-      setTransactions(transaction);
+
+      if (type === 1) {
+        // type === deposit
+        const executor = new Executor(executorId, account.signer);
+        const transaction = await executor.deposit(asset, reference);
+        setTransactions(transaction);
+      } else {
+        const values = [asset.address, executorId, recipient, asset.amount, reference];
+        const action = AbiHandler.mapToAction(withdrawSignature, executorId, values);
+        try {
+          const encodedActions = AbiHandler.encodeActions([action]);
+          const currentProof = proofFile ? proofFile[0] : proof;
+          const proofCid = await addToIpfs(currentProof, {
+            title: getValues('title'),
+          });
+
+          // let containerHash: string | undefined;
+
+          const payload = {
+            submitter: account.address,
+            executor: daoDetails.executor.address,
+            actions: encodedActions,
+            proof: proofCid,
+          };
+
+          if (proposalInstance) {
+            try {
+              transactionsQueue.current = await proposalInstance.schedule(
+                payload,
+                buildConfig(daoDetails.queue.config),
+              );
+            } catch (error) {
+              console.log('Failed scheduling', error);
+              toast(error.message);
+              return;
+            }
+          }
+
+          setTransactions(transactionsQueue.current);
+        } catch (err) {
+          console.log('Failed to encode action data', err);
+          toast('Error encoding action data, please double check your action input.');
+        }
+        // setActions(action);
+      }
       gotoState('sign');
     } catch (err) {
       console.log('deposit error', err);
       const errorMessage = getErrorFromException(err);
       toast(errorMessage);
     }
-  }, [getValues, executorId, account.signer, provider, setTransactions, gotoState, toast]);
+  }, [
+    getValues,
+    executorId,
+    provider,
+    setTransactions,
+    gotoState,
+    toast,
+    recipient,
+    proposalInstance,
+    daoDetails,
+    account,
+    proof,
+    proofFile,
+    type,
+  ]);
 
   return (
     <>
@@ -50,50 +143,63 @@ const ReviewDeposit: React.FC = () => {
         </BackButton>
         <Title>Review transfer</Title>
       </HeaderContainer>
-      <TransactionWrapper>
-        <IconContainer>
-          <Icon>
-            <IconDownload />
-          </Icon>
-        </IconContainer>
-        <TransferContainer>
-          <TransferTitle>Deposit</TransferTitle>
-          <TransferSubtitle>Review now</TransferSubtitle>
-        </TransferContainer>
-      </TransactionWrapper>
-      <AddressContainer>
-        <AddressBox>
-          <AddressTitle>From</AddressTitle>
-          <AddressContent>{getTruncatedAccountAddress(account.address)}</AddressContent>
-        </AddressBox>
-        <CustomIconRight />
-        <AddressBox>
-          <AddressTitle>To</AddressTitle>
-          <AddressContent>{daoIdentifier}</AddressContent>
-        </AddressBox>
-      </AddressContainer>
-      <InfoBox>
-        <InfoRow>
-          <InfoRowKey>Token</InfoRowKey>
-          <InfoRowValue>{token.symbol}</InfoRowValue>
-        </InfoRow>
-        <InfoRow>
-          <InfoRowKey>Token Contract</InfoRowKey>
-          <InfoRowValue>{getTruncatedAccountAddress(token.address)}</InfoRowValue>
-        </InfoRow>
-        <InfoRow>
-          <InfoRowKey>Amount</InfoRowKey>
-          <InfoRowValue>
-            + {depositAmount} {token.symbol}
-          </InfoRowValue>
-        </InfoRow>
-        <InfoRow>
-          <InfoRowKey>Reference</InfoRowKey>
-          <InfoRowValue>{reference}</InfoRowValue>
-        </InfoRow>
-      </InfoBox>
+      <BodyContainer>
+        <TransactionWrapper>
+          <IconContainer>
+            <Icon>
+              <IconDownload />
+            </Icon>
+          </IconContainer>
+          <TransferContainer>
+            <TransferTitle>{title}</TransferTitle>
+            <TransferSubtitle>Review now</TransferSubtitle>
+          </TransferContainer>
+        </TransactionWrapper>
+        <AddressContainer>
+          <AddressBox>
+            <AddressTitle>From</AddressTitle>
+            <AddressContent>{getTruncatedAccountAddress(account.address)}</AddressContent>
+          </AddressBox>
+          <CustomIconRight size="medium" />
+          <AddressBox>
+            <AddressTitle>To</AddressTitle>
+            <AddressContent>{daoIdentifier}</AddressContent>
+          </AddressBox>
+        </AddressContainer>
+        <InfoBox>
+          <InfoRow>
+            <InfoKey>Token</InfoKey>
+            <InfoValue>{token.symbol}</InfoValue>
+          </InfoRow>
+          <InfoRow>
+            <InfoKey>Token Address</InfoKey>
+            <InfoValue>
+              {getTruncatedAccountAddress(token.address)}
+              <TokenLink onClick={SendToTokenContract} />
+            </InfoValue>
+          </InfoRow>
+          <InfoRow>
+            <InfoKey>Amount</InfoKey>
+            <InfoValue>
+              + {depositAmount} {token.symbol}
+            </InfoValue>
+          </InfoRow>
+          <InfoColumn>
+            <InfoKey>Reference</InfoKey>
+            <InfoValue>{reference}</InfoValue>
+          </InfoColumn>
+          {!watch('type') && (
+            <>
+              <InfoColumn>
+                <InfoKey>Justification</InfoKey>
+                <InfoValue>{proofFile ? proofFile[0].name : proof}</InfoValue>
+              </InfoColumn>
+            </>
+          )}
+        </InfoBox>
+      </BodyContainer>
       <SubmitButton onClick={executeTransfer}>
-        <p>Sign deposit</p>
+        <p>Sign {title}</p>
         <IconDownload />
       </SubmitButton>
     </>
@@ -104,8 +210,25 @@ export default ReviewDeposit;
 
 const HeaderContainer = styled.div`
   display: flex;
-  padding-bottom: 10px;
-  margin-bottom: ${3 * GU}px;
+  margin-bottom: ${2 * GU}px;
+`;
+
+const BodyContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  height: 470px;
+  padding-top: 22px;
+  ::-webkit-scrollbar-track {
+    background: #f6f9fc;
+  }
+  ::-webkit-scrollbar {
+    width: 5px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #eff1f7;
+    border-radius: 12px;
+  }
 `;
 
 const Title = styled.p`
@@ -154,7 +277,7 @@ const TransferSubtitle = styled.p`
 const AddressContainer = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   margin-top: 24px;
 `;
 
@@ -165,6 +288,12 @@ const AddressBox = styled.div`
   border-radius: 12px;
   background: #ffffff;
   width: 100%;
+`;
+
+const TokenLink = styled(IconExternal)`
+  color: #00c2ff;
+  margin-left: 12px;
+  cursor: pointer;
 `;
 
 const InfoBox = styled.div`
@@ -183,18 +312,25 @@ const InfoRow = styled.div`
   border-bottom: solid 2px #f6f9fc;
 `;
 
-const InfoRowKey = styled.p`
+const InfoColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 14px 16px 14px 16px;
+  border-bottom: solid 2px #f6f9fc;
+`;
+
+const InfoKey = styled.p`
   color: #7483ab;
   font-weight: 600;
   font-size: 16px;
 `;
 
-const InfoRowValue = styled.p`
+const InfoValue = styled.p`
+  display: flex;
+  align-items: center;
   font-weight: 600;
   font-size: 16px;
   color: #20232c;
-  max-width: 200px;
-  text-align: right;
 `;
 
 const Icon = styled.div`
@@ -227,8 +363,8 @@ const IconContainer = styled.div`
 
 const CustomIconRight = styled(IconRight)`
   margin: 0px 10px 0px 10px;
-  width: 70px;
   color: #b4c1e4;
+  width: 60px;
 `;
 
 const AddressTitle = styled.p`
