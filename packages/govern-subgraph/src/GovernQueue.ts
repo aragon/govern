@@ -12,7 +12,6 @@ import {
 } from '../generated/templates/GovernQueue/GovernQueue'
 
 import { GovernQueue as GovernQueueContract } from '../generated/templates/GovernQueue/GovernQueue'
-import { ERC20 } from '../generated/templates/GovernQueue/ERC20'
 import { getERC20Info } from './utils/tokens';
 
 import {

@@ -20,21 +20,25 @@ type Dao @entity {
 
 type Deposit @entity {
   id: ID!
+  transactionHash: Bytes!
   sender: Bytes!
   amount: BigInt!
   token: Bytes!
   reference: String!
   govern: Govern!
+  createdAt: BigInt!
 }
 
 type Withdraw @entity {
   id: ID!
+  transactionHash: Bytes!
   from: Bytes!
   to: Bytes!
   amount: BigInt!
   token: Bytes!
   reference: String!
   govern: Govern!
+  createdAt: BigInt!
 }
 
 type Govern @entity {
