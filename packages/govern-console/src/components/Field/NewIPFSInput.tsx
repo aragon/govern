@@ -108,7 +108,7 @@ export const NewIPFSInput: React.FC<NewIPFSInputProps> = ({
           display: 'flex',
           flexDirection: 'row',
           verticalAlign: 'middle',
-          margin: `${SPACING['small']}px 0 ${SPACING['medium']}px 0`,
+          margin: `0px 0 8px 0`,
         }}
       >
         <Controller
@@ -134,9 +134,10 @@ export const NewIPFSInput: React.FC<NewIPFSInputProps> = ({
               placeholder={placeholder}
               rows={rows ? rows : 2}
               value={
-                typeof value !== 'string' && !(value instanceof FileList)
-                  ? toUtf8String(value)
-                  : value
+                // typeof value !== 'string' && !(value instanceof FileList) //TODO: When does Value isn't string?
+                // ? toUtf8String(value)
+                // :
+                value
               }
               onChange={onChange}
               status={!!error ? 'error' : 'normal'}

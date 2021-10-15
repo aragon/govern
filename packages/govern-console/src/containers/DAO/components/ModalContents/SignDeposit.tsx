@@ -13,7 +13,7 @@ import { useCallback, useEffect, useState, useMemo } from 'react';
 
 import { useWallet } from 'providers/AugmentedWallet';
 import { useTransferContext } from './TransferContext';
-import { CustomTransactionStatus } from 'utils/types';
+import { CustomTransaction, CustomTransactionStatus } from 'utils/types';
 
 enum SigningState {
   Processing,
@@ -31,12 +31,13 @@ const SignDeposit: React.FC<Props> = ({ onClose }) => {
   const { networkName } = useWallet();
   const { transactions } = useTransferContext();
   const [txState, setTxState] = useState(SigningState.Processing);
-  const [transaction, setTransaction] = useState({ ...transactions[0] });
+  const [transactionList, setTransactionList] = useState<CustomTransaction[]>([...transactions]);
   // const [errorMessage, setErrorMessage] = useState('');
   const [transactionHash, setTransactionHash] = useState('');
 
   const {
     reference,
+    title,
     depositAmount,
     token: { symbol },
   } = useMemo(() => getValues(), [getValues]);
@@ -48,9 +49,14 @@ const SignDeposit: React.FC<Props> = ({ onClose }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const updateStatus = (status: CustomTransactionStatus) => {
-    setTransaction((transaction) => ({ ...transaction, status }));
-  };
+  const updateStatus = useCallback(
+    (txIndex: number, newStatus: CustomTransactionStatus) => {
+      const txs = [...transactions];
+      txs[txIndex].status = newStatus;
+      setTransactionList(txs);
+    },
+    [transactions],
+  );
 
   const SendToExplore = useCallback(() => {
     window.open(
@@ -65,21 +71,28 @@ const SignDeposit: React.FC<Props> = ({ onClose }) => {
   }, [networkName, transactionHash]);
 
   const BuildTransaction = useCallback(async () => {
-    try {
-      setTransactionHash('');
-      setTxState(SigningState.Processing);
-      updateStatus(CustomTransactionStatus.InProgress);
-      const txResponse = await transaction.tx();
-      const txReceipt = await txResponse.wait();
-      updateStatus(CustomTransactionStatus.Successful);
-      setTxState(SigningState.Success);
-      setTransactionHash(txReceipt.transactionHash);
-    } catch (ex: any) {
-      updateStatus(CustomTransactionStatus.Failed);
-      setTxState(SigningState.Failure);
-      // setErrorMessage(ex.message);
+    let isQueueAborted = false;
+    let index = 0;
+    for (const tx of transactionList) {
+      if (isQueueAborted) return;
+      try {
+        setTransactionHash('');
+        setTxState(SigningState.Processing);
+        updateStatus(index, CustomTransactionStatus.InProgress);
+        const txResponse = await tx.tx();
+        const txReceipt = await txResponse.wait();
+        updateStatus(index, CustomTransactionStatus.Successful);
+        setTxState(SigningState.Success);
+        setTransactionHash(txReceipt.transactionHash);
+      } catch (ex: any) {
+        isQueueAborted = true;
+        updateStatus(index, CustomTransactionStatus.Failed);
+        setTxState(SigningState.Failure);
+        // setErrorMessage(ex.message);
+      }
+      index++;
     }
-  }, [transaction]);
+  }, [transactionList, updateStatus]);
 
   const MessageType = useMemo(() => {
     switch (txState) {
@@ -155,8 +168,8 @@ const SignDeposit: React.FC<Props> = ({ onClose }) => {
   return (
     <>
       <HeaderContainer>
-        <Title>Sign deposit</Title>
-        <Description>To complete your transfer, sign your deposit with your wallet.</Description>
+        <Title>Sign {title}</Title>
+        <Description>To complete your transfer, sign your {title} with your wallet.</Description>
       </HeaderContainer>
       {MessageType}
     </>

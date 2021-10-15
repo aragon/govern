@@ -12,13 +12,24 @@ import { NewIPFSInput } from 'components/Field/NewIPFSInput';
 
 const HeaderContainer = styled.div`
   display: flex;
-  padding-bottom: 10px;
-  margin-bottom: ${3 * GU}px;
+  padding-bottom: 26px;
 `;
 
 const BodyContainer = styled.div`
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  height: 520px;
+  ::-webkit-scrollbar-track {
+    background: #f6f9fc;
+  }
+  ::-webkit-scrollbar {
+    width: 5px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #eff1f7;
+    border-radius: 12px;
+  }
 `;
 
 const Title = styled.p`
@@ -32,7 +43,6 @@ const SubTitle = styled.p`
   font-weight: 600;
   font-size: 16px;
   line-height: 125%;
-  margin: 4px 0px;
 `;
 
 const Description = styled.p`
@@ -40,6 +50,7 @@ const Description = styled.p`
   font-weight: 500;
   font-size: 16px;
   line-height: 150%;
+  padding-top: 4px;
 `;
 
 const InputContainer = styled.div`
@@ -57,7 +68,7 @@ const StyledTextInput = styled(TextInput)`
 `;
 
 const SubmitButton = styled(Button)`
-  height: 48px;
+  min-height: 48px;
   width: 100%;
   box-shadow: none;
 
@@ -89,16 +100,22 @@ const StyledDropDown = styled(DropDown)<{ error: boolean }>`
 
 const Transfer: React.FC = () => {
   const { gotoState } = useTransferContext();
-  const { control, getValues, handleSubmit } = useFormContext();
+  const { control, getValues, setValue, handleSubmit, watch } = useFormContext();
 
   // TODO: put get values in callback function
   const [token, isCustomToken, type] = getValues(['token', 'isCustomToken', 'type']);
+  const transactionTypes = ['Withdraw', 'Deposit'];
 
   const context: any = useWallet();
   const { provider, account } = context;
 
   const goBack = () => {
     gotoState('selectToken');
+  };
+
+  const goNext = () => {
+    setValue('title', transactionTypes[type]);
+    gotoState('review');
   };
 
   const validateAmount = useCallback(
@@ -142,14 +159,16 @@ const Transfer: React.FC = () => {
       <BodyContainer>
         <SubTitle>Type</SubTitle>
         <Description>Select type of transfer you wish to proceed.</Description>
-        <Controller
-          name="type"
-          control={control}
-          defaultValue={0}
-          render={({ field: { onChange, value } }) => (
-            <ContentSwitcher items={['Withdraw', 'Deposit']} selected={value} onChange={onChange} />
-          )}
-        />
+        <InputContainer>
+          <Controller
+            name="type"
+            control={control}
+            defaultValue={0}
+            render={({ field: { onChange, value } }) => (
+              <ContentSwitcher items={transactionTypes} selected={value} onChange={onChange} />
+            )}
+          />
+        </InputContainer>
         <SubTitle>Token</SubTitle>
         <InputContainer>
           <Controller
@@ -198,7 +217,27 @@ const Transfer: React.FC = () => {
             </InputContainer>
           </>
         )}
-        {type === 'Withdraw' && (
+        <SubTitle>Amount</SubTitle>
+        <InputContainer>
+          <Controller
+            name="depositAmount"
+            control={control}
+            rules={{
+              required: 'Token amount is required.',
+              validate: validateAmount,
+            }}
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <StyledTextInput
+                value={value}
+                onChange={onChange}
+                status={error ? 'error' : 'normal'}
+                error={error?.message}
+                wide
+              />
+            )}
+          />
+        </InputContainer>
+        {!watch('type') && (
           <>
             <SubTitle>Recipient address</SubTitle>
             <Description>The assets will be transfered to this address.</Description>
@@ -224,26 +263,6 @@ const Transfer: React.FC = () => {
             </InputContainer>
           </>
         )}
-        <SubTitle>Amount</SubTitle>
-        <InputContainer>
-          <Controller
-            name="depositAmount"
-            control={control}
-            rules={{
-              required: 'Token amount is required.',
-              validate: validateAmount,
-            }}
-            render={({ field: { onChange, value }, fieldState: { error } }) => (
-              <StyledTextInput
-                value={value}
-                onChange={onChange}
-                status={error ? 'error' : 'normal'}
-                error={error?.message}
-                wide
-              />
-            )}
-          />
-        </InputContainer>
         <SubTitle>Reference</SubTitle>
         <Description>
           Add an optional reference copy to identify this transa&shy;ction later on.
@@ -264,20 +283,24 @@ const Transfer: React.FC = () => {
             )}
           />
         </InputContainer>
-        <SubTitle>Justification</SubTitle>
-        <Description>
-          Add a reason as a copy or file for scheduling this financial execution.
-        </Description>
-        <TextAreaContainer>
-          <NewIPFSInput
-            label=""
-            placeholder="Please insert the reason why you want to execute this"
-            textInputName="proof"
-            fileInputName="proofFile"
-          />
-        </TextAreaContainer>
-        <SubmitButton onClick={handleSubmit(() => gotoState('review'))}>
-          <p>Review deposit</p>
+        {!watch('type') && (
+          <>
+            <SubTitle>Justification</SubTitle>
+            <Description>
+              Add a reason as a copy or file for scheduling this financial execution.
+            </Description>
+            <TextAreaContainer>
+              <NewIPFSInput
+                label=""
+                placeholder="Please insert the reason why you want to execute this"
+                textInputName="proof"
+                fileInputName="proofFile"
+              />
+            </TextAreaContainer>
+          </>
+        )}
+        <SubmitButton onClick={handleSubmit(goNext)}>
+          <p>Review {transactionTypes[type]}</p>
           <IconDownload />
         </SubmitButton>
       </BodyContainer>

@@ -49,7 +49,7 @@ export const ContentSwitcher: React.FC<ContentSwitcherProps> = ({ items, onChang
 const SelectorContainer = styled.div`
   display: flex;
   width: 100%;
-  height: 44px;
+  min-height: 44px;
   background: #ffffff;
   border-radius: 12px;
   padding: 4px;
