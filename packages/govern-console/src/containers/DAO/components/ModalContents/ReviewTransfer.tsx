@@ -26,17 +26,10 @@ const ReviewDeposit: React.FC = () => {
   const withdrawSignature =
     'function withdraw(address token, address from, address to, uint256 amount, string memory reference)';
 
-  // TODO: Memo useless?
-  const {
-    title,
-    token,
-    depositAmount,
-    type,
-    reference,
-    proof,
-    proofFile,
-    recipient,
-  } = useMemo(() => getValues(), [getValues]);
+  const { title, token, amount, type, reference, proof, proofFile, recipient } = useMemo(
+    () => getValues(),
+    [getValues],
+  );
 
   const SendToTokenContract = useCallback(() => {
     window.open(
@@ -62,12 +55,12 @@ const ReviewDeposit: React.FC = () => {
   const executeTransfer = useCallback(async () => {
     const {
       token: { symbol, address },
-      depositAmount,
+      amount,
       reference = '',
     } = getValues();
 
     try {
-      const asset = await Asset.createFromDropdownLabel(symbol, address, depositAmount, provider);
+      const asset = await Asset.createFromDropdownLabel(symbol, address, amount, provider);
 
       if (type === 1) {
         // type === deposit
@@ -178,7 +171,7 @@ const ReviewDeposit: React.FC = () => {
           <InfoRow>
             <InfoKey>Amount</InfoKey>
             <InfoValue>
-              + {depositAmount} {token.symbol}
+              + {amount} {token.symbol}
             </InfoValue>
           </InfoRow>
           <InfoColumn>

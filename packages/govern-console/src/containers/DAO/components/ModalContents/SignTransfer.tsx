@@ -15,8 +15,8 @@ import { useCallback, useEffect, useState, useMemo } from 'react';
 
 import { useWallet } from 'providers/AugmentedWallet';
 import { useTransferContext } from './TransferContext';
-import { CustomTransaction, CustomTransactionStatus } from 'utils/types';
 import { proposalDetailsUrl } from 'utils/urls';
+import { CustomTransaction, CustomTransactionStatus } from 'utils/types';
 
 enum SigningState {
   Processing,
@@ -46,7 +46,7 @@ const SignDeposit: React.FC<Props> = ({ onClose }) => {
   const {
     reference,
     title,
-    depositAmount,
+    amount,
     token: { symbol },
   } = useMemo(() => getValues(), [getValues]);
 
@@ -69,8 +69,13 @@ const SignDeposit: React.FC<Props> = ({ onClose }) => {
   );
 
   const handleViewProposal = useCallback(() => {
-    if (containerHash) history.push(proposalDetailsUrl(daoIdentifier, containerHash));
-    onClose();
+    if (containerHash) {
+      history.push(proposalDetailsUrl(daoIdentifier, containerHash));
+    } else {
+      // TODO: implement a solution without full page reload
+      window.location.reload();
+      onClose();
+    }
   }, [containerHash, daoIdentifier, history, onClose]);
 
   const SendToExplore = useCallback(() => {
@@ -130,7 +135,7 @@ const SignDeposit: React.FC<Props> = ({ onClose }) => {
                 </InfoContainer>
               </InfoWrapper>
               <Amount>
-                {transferSymbol} {depositAmount} {symbol}
+                {transferSymbol} {amount} {symbol}
               </Amount>
             </Wrapper>
           </SignCard>
@@ -149,7 +154,7 @@ const SignDeposit: React.FC<Props> = ({ onClose }) => {
                 </InfoContainer>
               </InfoWrapper>
               <Amount>
-                {transferSymbol} {depositAmount} {symbol}
+                {transferSymbol} {amount} {symbol}
               </Amount>
             </Wrapper>
             <SuccessButton
@@ -177,7 +182,7 @@ const SignDeposit: React.FC<Props> = ({ onClose }) => {
                 </InfoContainer>
               </InfoWrapper>
               <Amount>
-                {transferSymbol} {depositAmount} {symbol}
+                {transferSymbol} {amount} {symbol}
               </Amount>
             </Wrapper>
             <FailedButton wide onClick={BuildTransaction}>
@@ -191,7 +196,7 @@ const SignDeposit: React.FC<Props> = ({ onClose }) => {
     txState,
     reference,
     transferSymbol,
-    depositAmount,
+    amount,
     symbol,
     title,
     handleViewProposal,

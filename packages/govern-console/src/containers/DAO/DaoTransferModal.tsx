@@ -3,36 +3,45 @@ import { useMemo } from 'react';
 import { Modal, useLayout } from '@aragon/ui';
 import { useForm, FormProvider, Controller, useFormContext } from 'react-hook-form';
 
+import Sign from './components/ModalContents/SignTransfer';
+import Review from './components/ModalContents/ReviewTransfer';
 import NewTransfer from './components/ModalContents/NewTransfer';
 import SelectToken from './components/ModalContents/components/SelectToken/SelectToken';
-import SignDeposit from './components/ModalContents/SignDeposit';
-import ReviewDeposit from './components/ModalContents/ReviewDeposit';
 import { useTransferContext, TransferProvider } from './components/ModalContents/TransferContext';
 
 type Props = { opened: boolean; close: () => void; daoName: string; executorId: string };
 
 type DepositFormData = {
+  type: number;
   token: any;
-  isCustomToken: boolean;
-  depositAmount: string;
+  title: string;
+  proof: string;
+  amount: string;
+  recipient: string;
+  proofFile: string;
   reference?: string;
+  isCustomToken: boolean;
 };
 
 const defaultFormProps = {
+  type: 0,
   token: undefined,
-  isCustomToken: false,
-  depositAmount: '',
+  title: '',
+  proof: '',
+  amount: '',
+  recipient: '',
+  proofFile: '',
   reference: '',
+  isCustomToken: false,
 };
 
-const TransferModal = styled(Modal)<{ isSmall: boolean }>`
+const TransferModal = styled(Modal)`
   & > div > div > div {
     border-radius: 16px !important;
     background: #f6f9fc;
     max-height: 768px;
     overflow: auto;
     max-width: 486px;
-    ${({ isSmall }) => isSmall && 'width:100%!important;'}
   }
 `;
 
@@ -79,9 +88,9 @@ const TransferSwitcher: React.FC<SwitcherProps> = ({ opened, close }) => {
       case 'initial':
         return <NewTransfer />;
       case 'review':
-        return <ReviewDeposit />;
+        return <Review />;
       case 'sign':
-        return <SignDeposit onClose={handleModalClose} />;
+        return <Sign onClose={handleModalClose} />;
       //TODO: change token selected
       case 'selectToken':
         return (
@@ -98,7 +107,11 @@ const TransferSwitcher: React.FC<SwitcherProps> = ({ opened, close }) => {
   };
 
   return (
-    <TransferModal visible={opened} onClose={handleModalClose} isSmall={layoutIsSmall}>
+    <TransferModal
+      visible={opened}
+      onClose={handleModalClose}
+      css={layoutIsSmall ? 'width:100%!important;' : ''}
+    >
       {renderState()}
     </TransferModal>
   );

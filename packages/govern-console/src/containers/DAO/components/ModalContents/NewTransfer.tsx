@@ -1,23 +1,24 @@
 import styled from 'styled-components';
 import { Contract } from 'ethers';
-import { useCallback, useEffect, useState } from 'react';
 import { useFormContext, Controller, useWatch } from 'react-hook-form';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, DropDown, GU, IconCopy, IconDownload, Tag, TextInput } from '@aragon/ui';
 
 import { useWallet } from 'providers/AugmentedWallet';
 import { formatUnits } from 'utils/lib';
 import { getTokenInfo } from 'utils/token';
+import { NewIPFSInput } from 'components/Field/NewIPFSInput';
 import { erc20TokenABI } from 'abis/erc20';
+import { ContentSwitcher } from 'components/ContentSwitcher/ContentSwitcher';
 import { networkEnvironment } from 'environment';
 import { useTransferContext } from './TransferContext';
 import { ASSET_ICON_BASE_URL } from 'utils/constants';
 import { Asset, OTHER_TOKEN_SYMBOL, ETH } from 'utils/Asset';
 import { validateAmountForDecimals, validateBalance, validateToken } from 'utils/validations';
-import { ContentSwitcher } from 'components/ContentSwitcher/ContentSwitcher';
-import { NewIPFSInput } from 'components/Field/NewIPFSInput';
 
 const { curatedTokens } = networkEnvironment;
 const currentTokens = { ...curatedTokens, [ETH.symbol]: ETH.address };
+
 const transactionTypes = ['Withdraw', 'Deposit'];
 const MAX_REFERENCE_LENGTH = 140;
 
@@ -148,13 +149,14 @@ const Adornment = styled.span`
 `;
 
 const Transfer: React.FC = () => {
-  const type = useWatch({ name: 'type' });
+  const type: number = useWatch({ name: 'type' });
   const tokenAddress = useWatch({ name: 'token.address' });
   const isCustomToken = useWatch({ name: 'isCustomToken' });
+  const isWithdraw = useMemo(() => type === 0, [type]);
   const { gotoState } = useTransferContext();
   const [logoError, setLogoError] = useState<boolean>(false);
   const [tokenBalance, setBalance] = useState<string>();
-  const { control, getValues, setValue, handleSubmit, formState, watch } = useFormContext();
+  const { control, getValues, setValue, handleSubmit, formState } = useFormContext();
 
   const context: any = useWallet();
   const {
@@ -368,7 +370,7 @@ const Transfer: React.FC = () => {
         <SubTitle>Amount</SubTitle>
         <InputContainer>
           <Controller
-            name="depositAmount"
+            name="amount"
             defaultValue=""
             control={control}
             rules={{
@@ -386,15 +388,12 @@ const Transfer: React.FC = () => {
                   adornment={<Adornment onClick={() => onChange(tokenBalance)}>Max</Adornment>}
                   adornmentPosition="end"
                 />
-                {
-                  // Valid token address & valid balance (i.e. token selected)
-                  tokenBalance && <HintIndicator>Max Balance: {tokenBalance}</HintIndicator>
-                }
+                {tokenBalance && <HintIndicator>Max Balance: {tokenBalance}</HintIndicator>}
               </>
             )}
           />
         </InputContainer>
-        {!type && (
+        {isWithdraw && (
           <>
             <SubTitle>Recipient address</SubTitle>
             <Description>The assets will be transferred to this address.</Description>
@@ -405,6 +404,7 @@ const Transfer: React.FC = () => {
                 defaultValue=""
                 rules={{
                   required: 'This is required.',
+                  validate: (value) => validateToken(value, provider),
                 }}
                 render={({ field: { onChange, value }, fieldState: { error } }) => (
                   <StyledTextInput
@@ -453,7 +453,7 @@ const Transfer: React.FC = () => {
             )}
           />
         </InputContainer>
-        {!type && (
+        {isWithdraw && (
           <>
             <SubTitle>Justification</SubTitle>
             <Description>
