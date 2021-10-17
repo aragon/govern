@@ -1,21 +1,22 @@
 import styled from 'styled-components';
+import { SkeletonTheme } from 'react-loading-skeleton';
 import { constants } from 'ethers';
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { Button, GU, Grid, GridItem, useLayout, useToast } from '@aragon/ui';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 
+import { Error } from 'utils/Error';
 import { useWallet } from 'providers/AugmentedWallet';
-import { formatUnits } from 'utils/lib';
 import NoResultFound from './components/NoResultFound/NoResultFound';
+import { formatUnits } from 'utils/lib';
 import FinanceSideCard from './components/FinanceSideCard/FinanceSideCard';
 import DaoTransferModal from './DaoTransferModal';
 import { getTokenInfo } from 'utils/token';
 import DaoTransactionCard from './components/DaoTransactionCard/DaoTransactionCard';
 import { useFinanceQuery } from 'hooks/query-hooks';
 import { ASSET_ICON_BASE_URL } from 'utils/constants';
+import { trackEvent, EventType } from 'services/analytics';
 import { getMigrationBalances, getTokenPrice } from 'services/finances';
 import { Balance, Deposit, FinanceToken, Withdraw, Transaction } from 'utils/types';
-import { trackEvent, EventType } from 'services/analytics';
-import { Error } from 'utils/Error';
 
 type Props = {
   token: string;
@@ -217,14 +218,17 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, daoName, token: mainToken
     }
   }, [finances, isLoading, provider, mainToken, executorId]);
 
-  const RenderTransactionCard = () => {
-    const temp: React.ReactElement[] = [];
-    transactions.map((data, index) => {
-      temp.push(<DaoTransactionCard info={data} key={index} />);
-    });
-    if (temp.length === 0) return <NoResultFound type="transaction" />;
-    return temp;
-  };
+  const RenderTransactionCard = useCallback(() => {
+    if (isLoading) {
+      return Array(5)
+        .fill(0)
+        .map((_, index) => <DaoTransactionCard key={index} />);
+    }
+
+    const txs = transactions.map((data, index) => <DaoTransactionCard info={data} key={index} />);
+    if (txs.length === 0) return <NoResultFound type="transaction" />;
+    return txs;
+  }, [isLoading, transactions]);
 
   const openTransferModal = useCallback(() => {
     if (!isConnected) {
@@ -240,39 +244,41 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, daoName, token: mainToken
 
   const close = () => setIsTransferModalOpen(false);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
   return (
-    <Grid gap={24}>
-      <SideCard layoutIsSmall={layoutIsSmall} isMediumPortrait={isMediumPortrait}>
-        <FinanceSideCard tokens={tokens} mainToken={mainToken} onNewTransfer={openTransferModal} />
-      </SideCard>
-      {!layoutIsSmall && (
-        <GridItem
-          gridRow={layoutIsSmall ? '2/-1' : '1/2'}
-          gridColumn={layoutIsSmall ? '1/-1' : '1/3'}
-        >
-          <HeaderContainer>
-            <Title>Finance</Title>
-            <CustomActionButton label="New Transfer" onClick={openTransferModal} />
-          </HeaderContainer>
-        </GridItem>
-      )}
-      <ListContainer layoutIsSmall={layoutIsSmall} isMediumPortrait={isMediumPortrait}>
-        <TransactionListContainer>
-          <ListTitle>Transactions</ListTitle>
-          {RenderTransactionCard()}
-        </TransactionListContainer>
-        <DaoTransferModal
-          opened={isTransferModalOpen}
-          close={close}
-          daoName={daoName}
-          executorId={executorId}
-        />
-      </ListContainer>
-    </Grid>
+    <SkeletonTheme color="#F6F9FC">
+      <Grid gap={24}>
+        <SideCard layoutIsSmall={layoutIsSmall} isMediumPortrait={isMediumPortrait}>
+          <FinanceSideCard
+            tokens={tokens}
+            mainToken={mainToken}
+            onNewTransfer={openTransferModal}
+          />
+        </SideCard>
+        {!layoutIsSmall && (
+          <GridItem
+            gridRow={layoutIsSmall ? '2/-1' : '1/2'}
+            gridColumn={layoutIsSmall ? '1/-1' : '1/3'}
+          >
+            <HeaderContainer>
+              <Title>Finance</Title>
+              <CustomActionButton label="New Transfer" onClick={openTransferModal} />
+            </HeaderContainer>
+          </GridItem>
+        )}
+        <ListContainer layoutIsSmall={layoutIsSmall} isMediumPortrait={isMediumPortrait}>
+          <TransactionListContainer>
+            <ListTitle>Transactions</ListTitle>
+            {RenderTransactionCard()}
+          </TransactionListContainer>
+          <DaoTransferModal
+            opened={isTransferModalOpen}
+            close={close}
+            daoName={daoName}
+            executorId={executorId}
+          />
+        </ListContainer>
+      </Grid>
+    </SkeletonTheme>
   );
 };
 

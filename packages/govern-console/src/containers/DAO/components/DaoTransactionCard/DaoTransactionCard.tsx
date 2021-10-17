@@ -1,10 +1,12 @@
 import styled from 'styled-components';
+import Skeleton from 'react-loading-skeleton';
+import { useMemo } from 'react';
 import { Box, IconDownload, IconUpload, useLayout } from '@aragon/ui';
+
 import { formatDate } from 'utils/date';
 import { Transaction } from 'utils/types';
-
 type Props = {
-  info: Transaction;
+  info?: Transaction;
 };
 
 const ActionCard = styled(Box).attrs(() => ({
@@ -39,7 +41,7 @@ const Text = styled.p`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 150px;
+  // max-width: 150px;
 `;
 
 const IconContainer = styled.div`
@@ -50,6 +52,8 @@ const IconContainer = styled.div`
   width: 32px;
   height: 32px;
   margin-right: 16px;
+  color: #7483ab;
+
   &.deposit {
     background: #e7f9ed;
     color: #218242;
@@ -80,6 +84,7 @@ const PriceContainer = styled.div`
   display: flex;
   font-weight: 600;
   font-size: 16px;
+
   &.deposit {
     color: #218242;
   }
@@ -96,33 +101,63 @@ const PriceContainer = styled.div`
 
 const InfoContainer = styled.div`
   display: flex;
+  flex: 1;
 `;
+
+const StyledSkeleton = styled(Skeleton).attrs(() => ({ style: { borderRadius: '8px' } }))``;
 
 const DaoTransactionCard: React.FC<Props> = ({ info }) => {
   const { layoutName } = useLayout();
+  const isDeposit = useMemo(() => info?.typename.toLowerCase() === 'deposit', [info?.typename]);
+
+  const Icon = useMemo(() => {
+    if (!info?.typename) {
+      return <StyledSkeleton width={32} height={32} />;
+    }
+    return isDeposit ? <IconDownload /> : <IconUpload />;
+  }, [info?.typename, isDeposit]);
+
+  const Price = useMemo(() => {
+    if (!info?.amount || !info?.symbol) {
+      return <StyledSkeleton height={20} width={80} />;
+    }
+
+    return `${isDeposit ? '+' : '-'} ${info?.amount} ${info?.symbol}`;
+  }, [info?.amount, info?.symbol, isDeposit]);
 
   return (
     <ActionCard>
       <InfoContainer>
-        <IconContainer className={info.typename.toLowerCase()}>
-          {info.typename.toLowerCase() === 'deposit' ? <IconDownload /> : <IconUpload />}
-        </IconContainer>
+        <IconContainer className={info?.typename.toLowerCase()}>{Icon}</IconContainer>
         <TextContainer>
-          <Text
-            css={`
-              width: ${layoutName === 'small' ? '100px' : '250px'};
-            `}
-          >
-            {info.typename}
+          <Text>
+            {info?.typename ? (
+              info.typename
+            ) : (
+              <StyledSkeleton height={20} width={layoutName === 'small' ? 150 : 250} />
+            )}
           </Text>
-          <Time>{formatDate(info.createdAt, 'relative')}</Time>
+          <Time>
+            {info?.createdAt ? (
+              formatDate(info?.createdAt, 'relative')
+            ) : (
+              <StyledSkeleton height={20} width={96} />
+            )}
+          </Time>
         </TextContainer>
       </InfoContainer>
-      <PriceContainer className={info.typename.toLowerCase()}>
-        {info.typename.toLowerCase() === 'deposit' ? '+' : '-'} {info.amount} {info.symbol}
-      </PriceContainer>
+      <PriceContainer className={info?.typename.toLowerCase()}>{Price}</PriceContainer>
     </ActionCard>
   );
 };
 
 export default DaoTransactionCard;
+// info?.typename ? (
+//   info.typename.toLowerCase() === 'deposit' ? (
+//     <IconDownload />
+//   ) : (
+//     <IconUpload />
+//   )
+// ) : (
+//   <Skeleton />
+// )
