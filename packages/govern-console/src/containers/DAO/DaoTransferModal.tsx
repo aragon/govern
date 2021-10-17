@@ -19,11 +19,12 @@ type DepositFormData = {
   amount: string;
   recipient: string;
   proofFile: string;
+  USDValue?: string;
   reference?: string;
   isCustomToken: boolean;
 };
 
-const defaultFormProps = {
+const defaultFormValues = {
   type: 0,
   token: undefined,
   title: '',
@@ -31,6 +32,7 @@ const defaultFormProps = {
   amount: '',
   recipient: '',
   proofFile: '',
+  USDValue: undefined,
   reference: '',
   isCustomToken: false,
 };
@@ -48,7 +50,7 @@ const TransferModal = styled(Modal)`
 const DaoTransferModal: React.FC<Props> = ({ opened, close, daoName, executorId }) => {
   const methods = useForm<DepositFormData>({
     mode: 'onChange',
-    defaultValues: defaultFormProps,
+    defaultValues: defaultFormValues,
   });
 
   return (
@@ -72,7 +74,7 @@ const TransferSwitcher: React.FC<SwitcherProps> = ({ opened, close }) => {
   const { reset, control, setValue } = useFormContext();
 
   const handleModalClose = () => {
-    reset(defaultFormProps);
+    reset(defaultFormValues);
     gotoState('initial');
     close();
   };

@@ -48,6 +48,9 @@ const ReviewDeposit: React.FC = () => {
 
       if (!response?.error) {
         setValue('USDValue', formatter.format(Number(response?.price) * Number(amount)));
+      } else {
+        // Purposefully setting this so that price doesn't ever carry over
+        setValue('USDValue', undefined);
       }
     };
 

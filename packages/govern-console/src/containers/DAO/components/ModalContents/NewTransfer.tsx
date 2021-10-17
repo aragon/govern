@@ -152,7 +152,6 @@ const Transfer: React.FC = () => {
   const type: number = useWatch({ name: 'type' });
   const tokenAddress = useWatch({ name: 'token.address' });
   const isCustomToken = useWatch({ name: 'isCustomToken' });
-
   const isDeposit = useMemo(() => transactionTypes[type] === 'Deposit', [type]);
   const isWithdraw = useMemo(() => !isDeposit, [isDeposit]);
 
