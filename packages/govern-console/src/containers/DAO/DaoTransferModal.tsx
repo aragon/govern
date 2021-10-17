@@ -90,8 +90,7 @@ const TransferSwitcher: React.FC<SwitcherProps> = ({ opened, close }) => {
       case 'review':
         return <Review />;
       case 'sign':
-        return <Sign onClose={handleModalClose} />;
-      //TODO: change token selected
+        return <Sign />;
       case 'selectToken':
         return (
           <Controller

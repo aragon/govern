@@ -24,11 +24,7 @@ enum SigningState {
   Failure,
 }
 
-type Props = {
-  onClose: () => void;
-};
-
-const SignDeposit: React.FC<Props> = ({ onClose }) => {
+const SignDeposit: React.FC = () => {
   const history = useHistory();
   const { daoIdentifier } = useTransferContext();
 
@@ -74,9 +70,8 @@ const SignDeposit: React.FC<Props> = ({ onClose }) => {
     } else {
       // TODO: implement a solution without full page reload
       window.location.reload();
-      onClose();
     }
-  }, [containerHash, daoIdentifier, history, onClose]);
+  }, [containerHash, daoIdentifier, history]);
 
   const SendToExplore = useCallback(() => {
     window.open(
@@ -108,6 +103,7 @@ const SignDeposit: React.FC<Props> = ({ onClose }) => {
         isQueueAborted = true;
         updateStatus(index, CustomTransactionStatus.Failed);
         setTxState(SigningState.Failure);
+
         console.log(ex);
         // setErrorMessage(ex.message);
       }

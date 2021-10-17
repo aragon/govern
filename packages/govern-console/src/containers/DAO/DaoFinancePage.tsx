@@ -94,7 +94,6 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, daoName, token: mainToken
   const { provider, isConnected } = useWallet();
   const { data: finances, loading: isLoading } = useFinanceQuery(executorId);
 
-  // TODO: compare with Assets class
   const [tokens, setTokens] = useState<FinanceToken>({});
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isTransferModalOpen, setIsTransferModalOpen] = useState<boolean>(false);
@@ -157,7 +156,6 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, daoName, token: mainToken
         };
       }
 
-      // Ignore eth TODO: more info needed
       if (constants.AddressZero in balances) {
         delete balances[constants.AddressZero];
       }

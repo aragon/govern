@@ -35,8 +35,6 @@ const DaoHomePage: React.FC = () => {
   const [daoExists, setDaoExists] = useState<boolean>(true);
   const [IsMoreActions, setIsMoreActions] = useState<boolean>(false);
 
-  // TODO: check if used
-  // const [daoDetails, setDaoDetails] = useState<any>();
   const [queueNonce] = useState<number>(); // TODO: add setQueueNonce for pagination
   const [visibleActions, setVisibleActions] = useState<any>([]);
 
@@ -148,9 +146,7 @@ const DaoHomePage: React.FC = () => {
             <ApmRoute exact path={`${path}settings`} component={DaoSettings} />
             <ApmRoute exact path={`${path}actions/executions/:id`} component={ProposalDetails} />
             <ApmRoute exact path={`${path}actions/new`} component={NewExecution} />
-
-            {/* TODO: Operation not found page */}
-            <ApmRoute render={() => <div>Operation not found on dao. Go home?</div>} />
+            <ApmRoute render={() => history.push('/not-found')} />
           </Switch>
         </Suspense>
       </StyledGridItem>

@@ -1,3 +1,4 @@
+import React from 'react';
 import styled from 'styled-components';
 
 const TokenNotFoundTextWrapper = styled.div`
@@ -22,7 +23,6 @@ const TokenNotFoundSubtitle = styled.p`
   color: #7483ab;
 `;
 
-// TODO: memoize
 const TokenNotFound: React.FC = () => {
   return (
     <TokenNotFoundTextWrapper>
@@ -33,5 +33,4 @@ const TokenNotFound: React.FC = () => {
     </TokenNotFoundTextWrapper>
   );
 };
-
-export default TokenNotFound;
+export default React.memo(TokenNotFound);
