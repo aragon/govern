@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import Skeleton from 'react-loading-skeleton';
 import styled, { css } from 'styled-components';
 import { useEffect, useMemo, useState } from 'react';
 import { useLayout, Button, ButtonText, IconUp, IconDown } from '@aragon/ui';
@@ -27,13 +28,16 @@ const MainTokenBalance = styled.div`
   gap: 4px;
   display: flex;
   flex-direction: column;
-  min-width: 173px;
+  width: 100%;
 `;
+
+const StyledSkeleton = styled(Skeleton).attrs(() => ({ style: { borderRadius: '8px' } }))``;
 
 const Token = styled.p`
   font-size: 24px;
   font-weight: 600;
   line-height: 30px;
+  width: 240px;
 `;
 
 const USDValue = styled.p`
@@ -41,6 +45,7 @@ const USDValue = styled.p`
   font-size: 16px;
   font-weight: 500;
   line-height: 24px;
+  width: 160px;
 `;
 
 const ButtonGroup = styled.div`
@@ -95,15 +100,18 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken, onNewTransfer }) 
   const { layoutName } = useLayout();
   const layoutIsSmall = useMemo(() => layoutName === 'small', [layoutName]);
 
-  // TODO: remove when implementing skeleton loading
   const { symbol, amount, price, numberOfAssets } = useMemo(() => {
     return {
-      amount: tokens[mainToken]?.amountForHuman || 0.0,
-      symbol: tokens[mainToken]?.symbol || 'Tokens',
+      amount: tokens[mainToken]?.amountForHuman,
+      symbol: tokens[mainToken]?.symbol,
       price: tokens[mainToken]?.price,
-      numberOfAssets: Object.keys(tokens).length || 1,
+      numberOfAssets: Object.keys(tokens).length,
     };
   }, [tokens, mainToken]);
+
+  const USDPrice = useMemo(() => {
+    return price ? `~${formatter.format(Number(price) * Number(amount))} USD` : 'USD value unknown';
+  }, [amount, price]);
 
   useEffect(() => {
     // Assets shown on medium to large screens
@@ -114,14 +122,12 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken, onNewTransfer }) 
   function sortAssets(asset: any, nextAsset: any) {
     return asset.symbol > nextAsset.symbol ? 1 : -1;
   }
-
+  `${amount} ${symbol}`;
   return (
     <Container>
       <MainTokenBalance>
-        <Token>{`${amount} ${symbol}`}</Token>
-        <USDValue>
-          {price ? `~${formatter.format(Number(price) * Number(amount))} USD` : 'USD value unknown'}
-        </USDValue>
+        <Token>{amount && symbol ? `${amount} ${symbol}` : <StyledSkeleton height={30} />}</Token>
+        <USDValue>{symbol ? USDPrice : <StyledSkeleton height={24} />}</USDValue>
       </MainTokenBalance>
 
       <Assets isVisible={displayAssets}>
