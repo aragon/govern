@@ -19,8 +19,8 @@ import { validateAmountForDecimals, validateBalance, validateToken } from 'utils
 const { curatedTokens } = networkEnvironment;
 const currentTokens = { ...curatedTokens, [ETH.symbol]: ETH.address };
 
-const transactionTypes = ['Withdraw', 'Deposit'];
 const MAX_REFERENCE_LENGTH = 140;
+export const transactionTypes = ['Deposit', 'Withdraw'];
 
 const HeaderContainer = styled.div`
   display: flex;
@@ -152,7 +152,10 @@ const Transfer: React.FC = () => {
   const type: number = useWatch({ name: 'type' });
   const tokenAddress = useWatch({ name: 'token.address' });
   const isCustomToken = useWatch({ name: 'isCustomToken' });
-  const isWithdraw = useMemo(() => type === 0, [type]);
+
+  const isDeposit = useMemo(() => transactionTypes[type] === 'Deposit', [type]);
+  const isWithdraw = useMemo(() => !isDeposit, [isDeposit]);
+
   const { gotoState } = useTransferContext();
   const [logoError, setLogoError] = useState<boolean>(false);
   const [tokenBalance, setBalance] = useState<string>();
@@ -385,10 +388,14 @@ const Transfer: React.FC = () => {
                   onChange={onChange}
                   status={error ? 'error' : 'normal'}
                   error={error?.message}
-                  adornment={<Adornment onClick={() => onChange(tokenBalance)}>Max</Adornment>}
+                  adornment={
+                    isDeposit && <Adornment onClick={() => onChange(tokenBalance)}>Max</Adornment>
+                  }
                   adornmentPosition="end"
                 />
-                {tokenBalance && <HintIndicator>Max Balance: {tokenBalance}</HintIndicator>}
+                {isDeposit && tokenBalance && (
+                  <HintIndicator>Max Balance: {tokenBalance}</HintIndicator>
+                )}
               </>
             )}
           />

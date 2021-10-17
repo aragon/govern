@@ -3,24 +3,25 @@ import { useFormContext } from 'react-hook-form';
 import { useCallback, useMemo, useRef } from 'react';
 import { IconLeft, IconDownload, GU, Button, IconRight, useToast, IconExternal } from '@aragon/ui';
 
-import { useTransferContext } from './TransferContext';
 import { Asset } from 'utils/Asset';
-import { Executor } from 'services/Executor';
-import { getErrorFromException } from 'utils/HelperFunctions';
-import { getTruncatedAccountAddress } from 'utils/account';
 import AbiHandler from 'utils/AbiHandler';
+import { Executor } from 'services/Executor';
+import { useWallet } from 'providers/AugmentedWallet';
 import { addToIpfs } from 'utils/ipfs';
 import { useDaoQuery } from 'hooks/query-hooks';
 import { buildConfig } from 'utils/ERC3000';
+import { transactionTypes } from './NewTransfer';
 import { useFacadeProposal } from 'hooks/proposal-hooks';
 import { CustomTransaction } from 'utils/types';
-import { useWallet } from 'providers/AugmentedWallet';
+import { useTransferContext } from './TransferContext';
+import { getErrorFromException } from 'utils/HelperFunctions';
+import { getTruncatedAccountAddress } from 'utils/account';
 
 const ReviewDeposit: React.FC = () => {
   const toast = useToast();
   const context: any = useWallet();
+  const { getValues } = useFormContext();
   const { networkName } = useWallet();
-  const { getValues, watch } = useFormContext();
   const { account, provider } = context;
   const { daoIdentifier, executorId, gotoState, setTransactions } = useTransferContext();
   const withdrawSignature =
@@ -30,6 +31,9 @@ const ReviewDeposit: React.FC = () => {
     () => getValues(),
     [getValues],
   );
+
+  const isDeposit = useMemo(() => transactionTypes[type] === 'Deposit', [type]);
+  const isWithdraw = useMemo(() => !isDeposit, [isDeposit]);
 
   const SendToTokenContract = useCallback(() => {
     window.open(
@@ -62,8 +66,7 @@ const ReviewDeposit: React.FC = () => {
     try {
       const asset = await Asset.createFromDropdownLabel(symbol, address, amount, provider);
 
-      if (type === 1) {
-        // type === deposit
+      if (isDeposit) {
         const executor = new Executor(executorId, account.signer);
         const transaction = await executor.deposit(asset, reference);
         setTransactions(transaction);
@@ -111,18 +114,20 @@ const ReviewDeposit: React.FC = () => {
     }
   }, [
     getValues,
-    executorId,
     provider,
-    setTransactions,
+    isDeposit,
     gotoState,
-    toast,
+    executorId,
+    account.signer,
+    account.address,
+    setTransactions,
     recipient,
-    proposalInstance,
-    daoDetails,
-    account,
-    proof,
     proofFile,
-    type,
+    proof,
+    daoDetails.executor.address,
+    daoDetails.queue.config,
+    proposalInstance,
+    toast,
   ]);
 
   return (
@@ -178,7 +183,7 @@ const ReviewDeposit: React.FC = () => {
             <InfoKey>Reference</InfoKey>
             <InfoValue>{reference}</InfoValue>
           </InfoColumn>
-          {!watch('type') && (
+          {isWithdraw && (
             <>
               <InfoColumn>
                 <InfoKey>Justification</InfoKey>
