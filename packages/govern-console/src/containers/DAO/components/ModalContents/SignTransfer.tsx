@@ -89,6 +89,9 @@ const SignDeposit: React.FC = () => {
     let isQueueAborted = false;
     let index = 0;
     for (const tx of transactionList) {
+      // if a transaction was successful, don't re-run it
+      if (tx.status === CustomTransactionStatus.Successful) continue;
+
       if (isQueueAborted) return;
       try {
         setTransactionHash('');

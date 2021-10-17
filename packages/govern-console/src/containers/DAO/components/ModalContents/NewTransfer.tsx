@@ -402,10 +402,7 @@ const Transfer: React.FC = () => {
                 name="recipient"
                 control={control}
                 defaultValue=""
-                rules={{
-                  required: 'This is required.',
-                  validate: (value) => validateToken(value, provider),
-                }}
+                rules={{ required: 'This is required.' }}
                 render={({ field: { onChange, value }, fieldState: { error } }) => (
                   <StyledTextInput
                     value={value}
