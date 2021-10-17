@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { useFormContext } from 'react-hook-form';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { IconLeft, IconDownload, GU, Button, IconRight, useToast, IconExternal } from '@aragon/ui';
 
 import { Asset } from 'utils/Asset';
@@ -16,24 +16,43 @@ import { CustomTransaction } from 'utils/types';
 import { useTransferContext } from './TransferContext';
 import { getErrorFromException } from 'utils/HelperFunctions';
 import { getTruncatedAccountAddress } from 'utils/account';
+import { getTokenPrice } from 'services/finances';
+
+const formatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  maximumFractionDigits: 0,
+});
 
 const ReviewDeposit: React.FC = () => {
   const toast = useToast();
   const context: any = useWallet();
-  const { getValues } = useFormContext();
   const { networkName } = useWallet();
   const { account, provider } = context;
+  const { getValues, setValue } = useFormContext();
   const { daoIdentifier, executorId, gotoState, setTransactions } = useTransferContext();
   const withdrawSignature =
     'function withdraw(address token, address from, address to, uint256 amount, string memory reference)';
 
-  const { title, token, amount, type, reference, proof, proofFile, recipient } = useMemo(
+  const { title, token, amount, type, proof, reference, proofFile, recipient } = useMemo(
     () => getValues(),
     [getValues],
   );
 
   const isDeposit = useMemo(() => transactionTypes[type] === 'Deposit', [type]);
   const isWithdraw = useMemo(() => !isDeposit, [isDeposit]);
+
+  useEffect(() => {
+    const getPrice = async () => {
+      const response = await getTokenPrice(token.address);
+
+      if (!response?.error) {
+        setValue('USDValue', formatter.format(Number(response?.price) * Number(amount)));
+      }
+    };
+
+    getPrice();
+  }, [amount, setValue, token.address, token.symbol]);
 
   const SendToTokenContract = useCallback(() => {
     window.open(
