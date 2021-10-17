@@ -80,6 +80,7 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
 
       const executor = dao?.executor.address;
       const values = [asset.address, executor, recipient, asset.amount, reference];
+      console.log('seeValues', withdrawalAmount, withdrawalAssets[token], asset);
       const action = AbiHandler.mapToAction(withdrawSignature, executor, values);
 
       onClick(action);

@@ -13,20 +13,34 @@ import { useTransferContext } from './TransferContext';
 import { ASSET_ICON_BASE_URL } from 'utils/constants';
 import { Asset, OTHER_TOKEN_SYMBOL, ETH } from 'utils/Asset';
 import { validateAmountForDecimals, validateBalance, validateToken } from 'utils/validations';
+import { ContentSwitcher } from 'components/ContentSwitcher/ContentSwitcher';
+import { NewIPFSInput } from 'components/Field/NewIPFSInput';
 
 const { curatedTokens } = networkEnvironment;
 const currentTokens = { ...curatedTokens, [ETH.symbol]: ETH.address };
+const transactionTypes = ['Withdraw', 'Deposit'];
 const MAX_REFERENCE_LENGTH = 140;
 
 const HeaderContainer = styled.div`
   display: flex;
-  padding-bottom: 10px;
-  margin-bottom: ${3 * GU}px;
+  padding-bottom: 26px;
 `;
 
 const BodyContainer = styled.div`
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  height: 520px;
+  ::-webkit-scrollbar-track {
+    background: #f6f9fc;
+  }
+  ::-webkit-scrollbar {
+    width: 5px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #eff1f7;
+    border-radius: 12px;
+  }
 `;
 
 const Title = styled.p`
@@ -40,7 +54,6 @@ const SubTitle = styled.p`
   font-weight: 600;
   font-size: 16px;
   line-height: 125%;
-  margin: 4px 0px;
 `;
 
 const Description = styled.p`
@@ -48,6 +61,7 @@ const Description = styled.p`
   font-weight: 500;
   font-size: 16px;
   line-height: 150%;
+  padding-top: 4px;
 `;
 
 const InputContainer = styled.div`
@@ -67,12 +81,17 @@ const HintIndicator = styled.span`
   text-align: right;
 `;
 
+const TextAreaContainer = styled.div`
+  margin-top: ${GU}px;
+  margin-bottom: ${3 * GU}px;
+`;
+
 const StyledTextInput = styled(TextInput)`
   border-radius: 12px;
 `;
 
 const SubmitButton = styled(Button)`
-  height: 48px;
+  min-height: 48px;
   width: 100%;
   box-shadow: none;
 
@@ -129,12 +148,13 @@ const Adornment = styled.span`
 `;
 
 const Transfer: React.FC = () => {
+  const type = useWatch({ name: 'type' });
   const tokenAddress = useWatch({ name: 'token.address' });
   const isCustomToken = useWatch({ name: 'isCustomToken' });
   const { gotoState } = useTransferContext();
   const [logoError, setLogoError] = useState<boolean>(false);
   const [tokenBalance, setBalance] = useState<string>();
-  const { control, getValues, setValue, handleSubmit, formState } = useFormContext();
+  const { control, getValues, setValue, handleSubmit, formState, watch } = useFormContext();
 
   const context: any = useWallet();
   const {
@@ -174,6 +194,11 @@ const Transfer: React.FC = () => {
    */
   const goBack = () => {
     gotoState('selectToken');
+  };
+
+  const goNext = () => {
+    setValue('title', transactionTypes[type]);
+    gotoState('review');
   };
 
   const validateAmount = useCallback(
@@ -274,6 +299,18 @@ const Transfer: React.FC = () => {
         <Title>New transfer</Title>
       </HeaderContainer>
       <BodyContainer>
+        <SubTitle>Type</SubTitle>
+        <Description>Select type of transfer you wish to proceed.</Description>
+        <InputContainer>
+          <Controller
+            name="type"
+            control={control}
+            defaultValue={0}
+            render={({ field: { onChange, value } }) => (
+              <ContentSwitcher items={transactionTypes} selected={value} onChange={onChange} />
+            )}
+          />
+        </InputContainer>
         <SubTitle>Token</SubTitle>
         <InputContainer>
           <Controller
@@ -357,6 +394,32 @@ const Transfer: React.FC = () => {
             )}
           />
         </InputContainer>
+        {!type && (
+          <>
+            <SubTitle>Recipient address</SubTitle>
+            <Description>The assets will be transferred to this address.</Description>
+            <InputContainer>
+              <Controller
+                name="recipient"
+                control={control}
+                defaultValue=""
+                rules={{
+                  required: 'This is required.',
+                }}
+                render={({ field: { onChange, value }, fieldState: { error } }) => (
+                  <StyledTextInput
+                    value={value}
+                    placeholder="0x ..."
+                    onChange={onChange}
+                    status={error ? 'error' : 'normal'}
+                    error={error?.message}
+                    wide
+                  />
+                )}
+              />
+            </InputContainer>
+          </>
+        )}
         <SubTitle>
           Reference<StyledTag>Optional</StyledTag>
         </SubTitle>
@@ -390,8 +453,24 @@ const Transfer: React.FC = () => {
             )}
           />
         </InputContainer>
-        <SubmitButton onClick={handleSubmit(() => gotoState('review'))}>
-          <p>Review deposit</p>
+        {!type && (
+          <>
+            <SubTitle>Justification</SubTitle>
+            <Description>
+              Add a reason as a copy or file for scheduling this financial execution.
+            </Description>
+            <TextAreaContainer>
+              <NewIPFSInput
+                label=""
+                placeholder="Please insert the reason why you want to execute this"
+                textInputName="proof"
+                fileInputName="proofFile"
+              />
+            </TextAreaContainer>
+          </>
+        )}
+        <SubmitButton onClick={handleSubmit(goNext)}>
+          <p>Review {transactionTypes[type]}</p>
           <IconDownload />
         </SubmitButton>
       </BodyContainer>

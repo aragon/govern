@@ -10,7 +10,6 @@ export const TRANSFERS = gql`
         sender
         token
         reference
-        createdAt
         typename: __typename
       }
       withdraws {
@@ -20,7 +19,6 @@ export const TRANSFERS = gql`
         from
         token
         reference
-        createdAt
         typename: __typename
       }
     }

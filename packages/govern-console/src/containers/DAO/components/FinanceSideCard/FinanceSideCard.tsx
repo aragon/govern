@@ -27,6 +27,7 @@ const MainTokenBalance = styled.div`
   gap: 4px;
   display: flex;
   flex-direction: column;
+  min-width: 173px;
 `;
 
 const Token = styled.p`
@@ -93,6 +94,8 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken, onNewTransfer }) 
 
   const { layoutName } = useLayout();
   const layoutIsSmall = useMemo(() => layoutName === 'small', [layoutName]);
+
+  // TODO: remove when implementing skeleton loading
   const { symbol, amount, price, numberOfAssets } = useMemo(() => {
     return {
       amount: tokens[mainToken]?.amountForHuman || 0.0,
@@ -104,13 +107,8 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken, onNewTransfer }) 
 
   useEffect(() => {
     // Assets shown on medium to large screens
-    if (!layoutIsSmall) {
-      setDisplayAssets(true);
-    }
-
-    if (layoutIsSmall) {
-      setDisplayAssets(false);
-    }
+    if (!layoutIsSmall) setDisplayAssets(true);
+    else setDisplayAssets(false);
   }, [layoutIsSmall]);
 
   function sortAssets(asset: any, nextAsset: any) {
@@ -121,7 +119,9 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken, onNewTransfer }) 
     <Container>
       <MainTokenBalance>
         <Token>{`${amount} ${symbol}`}</Token>
-        {price && <USDValue>{`~${formatter.format(Number(price) * Number(amount))} USD`}</USDValue>}
+        <USDValue>
+          {price ? `~${formatter.format(Number(price) * Number(amount))} USD` : 'USD value unknown'}
+        </USDValue>
       </MainTokenBalance>
 
       <Assets isVisible={displayAssets}>
