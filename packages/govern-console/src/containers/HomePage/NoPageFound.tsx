@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import styled from 'styled-components';
 import { Button } from '@aragon/ui';
 import { useHistory } from 'react-router-dom';
-import daoNoutFound from 'images/dao-not-found.svg';
+import daoNotFound from 'images/dao-not-found.svg';
 
 const Subtitle = styled.p`
   color: #7483ab;
@@ -29,7 +29,7 @@ const DaoNotFoundWrapper = styled.div`
   padding: 120px 32px 0px 32px;
 `;
 
-const NavigationbuttonContainer = styled.div`
+const NavigationButtonContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -60,19 +60,19 @@ const NoPageFound: React.FC = () => {
   return (
     <>
       <DaoNotFoundWrapper>
-        <NotFoundImage src={daoNoutFound} />
+        <NotFoundImage src={daoNotFound} />
         <Title>This page is lost.</Title>
         <Subtitle>
           We've explored deep and wide, but we can't find the page you were looking for.
         </Subtitle>
-        <NavigationbuttonContainer>
+        <NavigationButtonContainer>
           <NavigationButton
             buttonType="primary"
             type="submit"
             label="Navigate back home"
             onClick={onGotoDao}
           />
-        </NavigationbuttonContainer>
+        </NavigationButtonContainer>
       </DaoNotFoundWrapper>
     </>
   );

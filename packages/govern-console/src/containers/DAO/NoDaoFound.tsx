@@ -4,7 +4,7 @@ import { ANButton } from 'components/Button/ANButton';
 import { InputField } from 'components/InputFields/InputField';
 import { useHistory } from 'react-router-dom';
 import MUITypography from '@material-ui/core/Typography';
-import daoNoutFound from 'images/dao-not-found.svg';
+import daoNotFound from 'images/dao-not-found.svg';
 import { useToast } from '@aragon/ui';
 
 const VerticalAlignWrapper = styled('div')({
@@ -80,7 +80,7 @@ const NoDaoFound: React.FC = () => {
     <>
       <DaoNotFoundWrapper>
         <VerticalAlignWrapper>
-          <NotFoundImage src={daoNoutFound} />
+          <NotFoundImage src={daoNotFound} />
           <Title>DAO not found</Title>
           <Subtitle>You can try with other DAO name</Subtitle>
           <RowFlexDiv>
