@@ -4,12 +4,6 @@ import { Button } from '@aragon/ui';
 import { useHistory } from 'react-router-dom';
 import daoNoutFound from 'images/dao-not-found.svg';
 
-const VerticalAlignWrapper = styled.div`
-  height: 100%;
-  margin: auto;
-  padding: 120px 32px 0px 32px;
-`;
-
 const Subtitle = styled.p`
   color: #7483ab;
   line-height: 27px;
@@ -27,13 +21,12 @@ const Title = styled.p`
 `;
 
 const DaoNotFoundWrapper = styled.div`
-  width: 100%;
   height: 100%;
   text-align: center;
   background: linear-gradient(107.79deg, #e4f8ff 1.46%, #f1f1ff 100%);
   border-radius: 16px;
   box-sizing: border-box;
-  position: relative;
+  padding: 120px 32px 0px 32px;
 `;
 
 const NavigationbuttonContainer = styled.div`
@@ -67,21 +60,19 @@ const NoPageFound: React.FC = () => {
   return (
     <>
       <DaoNotFoundWrapper>
-        <VerticalAlignWrapper>
-          <NotFoundImage src={daoNoutFound} />
-          <Title>This page is lost.</Title>
-          <Subtitle>
-            We've explored deep and wide, but we can't find the page you were looking for.
-          </Subtitle>
-          <NavigationbuttonContainer>
-            <NavigationButton
-              buttonType="primary"
-              type="submit"
-              label="Navigate back home"
-              onClick={onGotoDao}
-            />
-          </NavigationbuttonContainer>
-        </VerticalAlignWrapper>
+        <NotFoundImage src={daoNoutFound} />
+        <Title>This page is lost.</Title>
+        <Subtitle>
+          We've explored deep and wide, but we can't find the page you were looking for.
+        </Subtitle>
+        <NavigationbuttonContainer>
+          <NavigationButton
+            buttonType="primary"
+            type="submit"
+            label="Navigate back home"
+            onClick={onGotoDao}
+          />
+        </NavigationbuttonContainer>
       </DaoNotFoundWrapper>
     </>
   );
