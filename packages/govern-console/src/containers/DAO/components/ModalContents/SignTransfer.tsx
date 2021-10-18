@@ -33,7 +33,6 @@ const SignDeposit: React.FC = () => {
   const { transactions } = useTransferContext();
   const [txState, setTxState] = useState(SigningState.Processing);
   const [transactionList, setTransactionList] = useState<CustomTransaction[]>([...transactions]);
-  // const [errorMessage, setErrorMessage] = useState('');
   const [transactionHash, setTransactionHash] = useState('');
 
   // Redirect on container hash
@@ -106,9 +105,6 @@ const SignDeposit: React.FC = () => {
         isQueueAborted = true;
         updateStatus(index, CustomTransactionStatus.Failed);
         setTxState(SigningState.Failure);
-
-        console.log(ex);
-        // setErrorMessage(ex.message);
       }
       index++;
     }

@@ -163,7 +163,6 @@ const NewExecution: React.FC = () => {
   };
 
   return (
-    // <PageContent pageName={PageName.NEW_EXECUTION}>
     <Container>
       <BackButton onClick={() => history.goBack()}>
         <img src={backButtonIcon} />
@@ -237,7 +236,6 @@ const NewExecution: React.FC = () => {
         </FormProvider>
       </Grid>
     </Container>
-    // </PageContent>
   );
 };
 

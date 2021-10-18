@@ -186,7 +186,7 @@ export async function fetchIPFS(uriOrCid: string) {
       }
     }
   } catch {
-    console.log('Fetch failed');
+    console.error('Fetch failed');
   }
 
   return data;

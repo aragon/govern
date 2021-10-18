@@ -152,12 +152,3 @@ const DaoTransactionCard: React.FC<Props> = ({ info }) => {
 };
 
 export default DaoTransactionCard;
-// info?.typename ? (
-//   info.typename.toLowerCase() === 'deposit' ? (
-//     <IconDownload />
-//   ) : (
-//     <IconUpload />
-//   )
-// ) : (
-//   <Skeleton />
-// )
