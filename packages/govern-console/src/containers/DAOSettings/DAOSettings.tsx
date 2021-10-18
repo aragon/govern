@@ -266,10 +266,10 @@ const DaoSettings: React.FC = () => {
       <Grid gap={3 * GU}>
         <GridItem>
           <StyledText name={'title1'}>Settings</StyledText>
-          {/* TODO: Proper copy needs to be added to the subtitle */}
           <StyledText name={'title4'} style={{ color: disabledContent }}>
-            [TBD]Message about the importance of permissions on your DAO, bla bla, explaining the
-            settings etc.
+            The DAO settings will be changed by scheduling an action like any other in Govern. Make
+            sure you know the implications of changing any of the following settings, as some
+            incorrect information may lock your DAO.
           </StyledText>
         </GridItem>
 
