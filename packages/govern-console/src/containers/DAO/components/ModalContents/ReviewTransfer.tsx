@@ -17,6 +17,7 @@ import { useTransferContext } from './TransferContext';
 import { getErrorFromException } from 'utils/HelperFunctions';
 import { getTruncatedAccountAddress } from 'utils/account';
 import { getTokenPrice } from 'services/finances';
+import { MAINNET_ETHERSCAN_TOKEN, RINKEBY_ETHERSCAN_TOKEN } from 'utils/constants';
 
 const formatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -61,8 +62,8 @@ const ReviewDeposit: React.FC = () => {
     window.open(
       `${
         {
-          Rinkeby: 'https://rinkeby.etherscan.io/token/',
-          Mainnet: 'https://etherscan.io/token/',
+          Rinkeby: RINKEBY_ETHERSCAN_TOKEN,
+          Mainnet: MAINNET_ETHERSCAN_TOKEN,
         }[networkName] + token.address
       }`,
       '_blank',

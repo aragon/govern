@@ -16,6 +16,7 @@ import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useWallet } from 'providers/AugmentedWallet';
 import { useTransferContext } from './TransferContext';
 import { proposalDetailsUrl } from 'utils/urls';
+import { MAINNET_ETHERSCAN_TRANSACTION, RINKEBY_ETHERSCAN_TRANSACTION } from 'utils/constants';
 import { CustomTransaction, CustomTransactionStatus } from 'utils/types';
 
 enum SigningState {
@@ -76,8 +77,8 @@ const SignDeposit: React.FC = () => {
     window.open(
       `${
         {
-          Rinkeby: 'https://rinkeby.etherscan.io/tx/',
-          Mainnet: 'https://etherscan.io/tx/',
+          Rinkeby: RINKEBY_ETHERSCAN_TRANSACTION,
+          Mainnet: MAINNET_ETHERSCAN_TRANSACTION,
         }[networkName] + transactionHash
       }`,
       '_blank',

@@ -10,7 +10,16 @@ import HelpComponent from 'components/HelpComponent/HelpComponent';
 import DaoActionsPage from './DaoActionPage';
 import DaoFinancePage from './DaoFinancePage';
 import ProposalDetails from 'containers/ProposalDetails/ProposalDetails';
-import { proposalNewActionsUrl, proposalSettingsUrl } from 'utils/urls';
+import {
+  proposalNewActionsUrl,
+  proposalSettingsUrl,
+  DaoFinanceUrl,
+  NotFoundUrl,
+  DaoSettingsUrl,
+  ActionDetailsUrl,
+  NewActionUrl,
+  DoaNotFoundUrl,
+} from 'utils/urls';
 import { useDaoQuery, useLazyProposalListQuery } from 'hooks/query-hooks';
 const DaoSettings = lazy(() => import('containers/DAOSettings/DAOSettings'));
 
@@ -104,7 +113,7 @@ const DaoHomePage: React.FC = () => {
   }
 
   if (!daoExists) {
-    history.replace('/daos/not-found');
+    history.replace(DoaNotFoundUrl);
   }
 
   // TODO: Set API call to get open action(scheduled + executable)
@@ -135,7 +144,7 @@ const DaoHomePage: React.FC = () => {
             />
             <ApmRoute
               exact
-              path={`${path}finance`}
+              path={`${path}${DaoFinanceUrl}`}
               render={() => (
                 <DaoFinancePage
                   daoName={daoName}
@@ -144,10 +153,10 @@ const DaoHomePage: React.FC = () => {
                 />
               )}
             />
-            <ApmRoute exact path={`${path}settings`} component={DaoSettings} />
-            <ApmRoute exact path={`${path}actions/executions/:id`} component={ProposalDetails} />
-            <ApmRoute exact path={`${path}actions/new`} component={NewExecution} />
-            <ApmRoute render={() => history.push('/not-found')} />
+            <ApmRoute exact path={`${path}${DaoSettingsUrl}`} component={DaoSettings} />
+            <ApmRoute exact path={`${path}${ActionDetailsUrl}`} component={ProposalDetails} />
+            <ApmRoute exact path={`${path}${NewActionUrl}`} component={NewExecution} />
+            <ApmRoute render={() => history.push(NotFoundUrl)} />
           </Switch>
         </Suspense>
       </StyledGridItem>

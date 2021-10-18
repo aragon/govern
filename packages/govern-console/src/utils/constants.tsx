@@ -6,6 +6,10 @@ export const INFURA_PROJECT_ID = '7a03fcb37be7479da06f92c5117afd47';
 export const ETHERSCAN_API_KEY = 'HS2AR94Q6G6RYIYHR7VRCZGP6E382K4BDC ';
 export const IPFS_GATEWAY = 'https://ipfs.io/ipfs/';
 export const ARAGON_HELP_URL = 'https://help.aragon.org/';
+export const RINKEBY_ETHERSCAN_TRANSACTION = 'https://rinkeby.etherscan.io/tx/';
+export const MAINNET_ETHERSCAN_TRANSACTION = 'https://etherscan.io/tx/';
+export const RINKEBY_ETHERSCAN_TOKEN = 'https://rinkeby.etherscan.io/token/';
+export const MAINNET_ETHERSCAN_TOKEN = 'https://etherscan.io/token/';
 export const MAX_SCHEDULE_ACCESS_LIST_ALLOWED = 10;
 export const ASSET_ICON_BASE_URL =
   'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets';
