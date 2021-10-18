@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import Skeleton from 'react-loading-skeleton';
 import { useMemo } from 'react';
-import { Box, IconDownload, IconUpload, useLayout } from '@aragon/ui';
+import { Box, IconDeposit, IconWithdraw, useLayout } from '@aragon/ui';
 
 import { formatDate } from 'utils/date';
 import { Transaction } from 'utils/types';
@@ -114,7 +114,7 @@ const DaoTransactionCard: React.FC<Props> = ({ info }) => {
     if (!info?.typename) {
       return <StyledSkeleton width={32} height={32} />;
     }
-    return isDeposit ? <IconDownload /> : <IconUpload />;
+    return isDeposit ? <IconDeposit /> : <IconWithdraw />;
   }, [info?.typename, isDeposit]);
 
   const Price = useMemo(() => {

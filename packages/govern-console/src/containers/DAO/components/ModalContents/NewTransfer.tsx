@@ -1,8 +1,17 @@
+import {
+  Button,
+  DropDown,
+  GU,
+  IconCopyFilled,
+  IconDeposit,
+  IconWithdraw,
+  Tag,
+  TextInput,
+} from '@aragon/ui';
 import styled from 'styled-components';
 import { Contract } from 'ethers';
 import { useFormContext, Controller, useWatch } from 'react-hook-form';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, DropDown, GU, IconCopy, IconDownload, Tag, TextInput } from '@aragon/ui';
 
 import { useWallet } from 'providers/AugmentedWallet';
 import { formatUnits } from 'utils/lib';
@@ -359,7 +368,7 @@ const Transfer: React.FC = () => {
                     wide
                     adornment={
                       <Adornment onClick={() => handleClipboardAction(value, onChange)}>
-                        {value ? <IconCopy /> : 'Paste'}
+                        {value ? <IconCopyFilled /> : 'Paste'}
                       </Adornment>
                     }
                     adornmentPosition="end"
@@ -474,7 +483,7 @@ const Transfer: React.FC = () => {
         )}
         <SubmitButton onClick={handleSubmit(goNext)}>
           <p>Review {transactionTypes[type]}</p>
-          <IconDownload />
+          {isDeposit ? <IconDeposit /> : <IconWithdraw />}
         </SubmitButton>
       </BodyContainer>
     </>
