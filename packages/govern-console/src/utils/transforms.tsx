@@ -16,3 +16,8 @@ export function transformDaoDetails(data: any) {
 
   return data;
 }
+
+export function transformFinance(data: any) {
+  data = data.govern;
+  return data;
+}

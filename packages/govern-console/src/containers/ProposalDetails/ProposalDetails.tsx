@@ -72,12 +72,13 @@ const DateDisplay = styled('div')({
 });
 const DetailsWrapper = styled('div')({
   display: 'flex',
+  flexDirection: 'column',
   justifyContent: 'space-between',
   marginTop: '47px',
   fontFamily: 'Manrope',
 });
 const ProposalDetailsWrapper = styled('div')({
-  width: 'calc(100% - 443px)',
+  width: '100%',
   boxSizing: 'border-box',
   borderRadius: '16px',
   minHeight: '900px',
@@ -86,7 +87,8 @@ const ProposalDetailsWrapper = styled('div')({
   fontFamily: 'Manrope',
 });
 const WidgetWrapper = styled('div')({
-  width: '427px',
+  width: '100%',
+  marginTop: '24px',
 });
 const TitleText = styled(Typography)({
   fontWeight: 600,

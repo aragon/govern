@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
 
 import DaoActionCard from './components/DaoActionCard/DaoActionCard';
-import NoActionAvailable from './components/NoActionAvailable/NoActionAvailable';
+import NoResultFound from './components/NoResultFound/NoResultFound';
 
 type actionsType = {
   __typename?: string;
@@ -23,12 +23,10 @@ type props = {
   fetchMore: () => Promise<void>;
   actions: actionsType;
   isMore: boolean;
-  identifier: string;
+  daoName: string;
 };
 
-const Container = styled.div`
-  margin-top: ${3 * GU}px;
-`;
+const Container = styled.div``;
 
 const HeaderContainer = styled.div`
   display: flex;
@@ -86,7 +84,7 @@ const ActionListContainer = styled.div`
   margin-bottom: ${3 * GU}px;
 `;
 
-const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, identifier }) => {
+const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, daoName }) => {
   const history = useHistory();
   const [selected, setSelected] = useState<number>(0);
   const [value, setValue] = useState<string>('');
@@ -115,28 +113,30 @@ const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, identifie
     if (actions) {
       actions
         .filter((data) => FilterState(data)) // Filter Based on status
-        .filter((data) => SearchAction(data)) // search among vidible Actions
+        .filter((data) => SearchAction(data)) // search among visible Actions
         .map((data, index: number) => {
           temp.push(
             <GridItem
+              key={index}
               gridColumn={layoutName === 'medium' ? '1/-1' : index % 2 === 0 ? '1/3' : '3/5'}
             >
               <DaoActionCard
-                key={index}
+                id={data.id}
                 date={data.createdAt}
                 state={data.state}
                 title={data.payload.title}
+                dao_identifier={daoName}
               />
             </GridItem>,
           );
         });
-      if (temp.length === 0) return <NoActionAvailable />;
+      if (temp.length === 0) return <NoResultFound type="action" />;
       return temp;
     } else return <div>Loading...</div>;
   };
 
   const goToNewExecution = () => {
-    history.push(`/daos/${identifier}/actions/new-execution`);
+    history.push(`/daos/${daoName}/actions/new`);
   };
 
   return (
@@ -150,6 +150,7 @@ const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, identifie
           items={actionStates}
           css={`
             border: none;
+            margin-right: ${3 * GU}px;
           `}
           selected={selected}
           onChange={setSelected}
@@ -157,12 +158,14 @@ const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, identifie
         <SearchInput
           css={`
             width: 100%;
-            margin-left: ${3 * GU}px;
             border-radius: 12px;
           `}
+          adornmentSettings={{
+            width: 25,
+          }}
           onChange={(text: string) => setValue(text)}
           placeholder="Type to search..."
-          wide={true}
+          wide
         />
       </SearchContainer>
       <ActionListContainer>

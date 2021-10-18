@@ -15,15 +15,22 @@ import { trackPage } from 'services/analytics';
 import ConsoleMainPage from 'containers/Console/ConsoleMainPage';
 import { ModalsProvider } from 'containers/HomePage/ModalsContext';
 
+const MainContainer = styled(Main)`
+  width: 100%;
+`;
+
 const Container = styled.div`
   display: grid;
   grid-gap: 16px;
+  padding: 0px 8px 0px 8px;
   grid-template-areas:
+    'header'
     'body'
     'footer';
 `;
 
 const BodyArea = styled.div`
+  margin-top: 40px;
   grid-area: body;
   min-height: 90vh;
 `;
@@ -44,24 +51,22 @@ const HomePage = () => {
 
   return (
     <ModalsProvider>
-      <Main theme="light" toastProps={{ top: true, position: 'center' }}>
+      <MainContainer theme="light" toastProps={{ top: true, position: 'center' }}>
         <Container>
+          <Header />
           <BodyArea>
-            <Header />
             <Switch>
               <ApmRoute exact path="/" component={ConsoleMainPage} />
               <ApmRoute exact path="/create-dao" component={CreateDao} />
               <ApmRoute exact path="/daos/not-found" component={NoDaoFound} />
               <ApmRoute path="/daos/:daoName/" component={DaoHomePage} />
-
-              {/* TODO: add missing catch all not found page */}
             </Switch>
           </BodyArea>
           <FooterArea>
             <Footer />
           </FooterArea>
         </Container>
-      </Main>
+      </MainContainer>
     </ModalsProvider>
   );
 };

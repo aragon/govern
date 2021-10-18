@@ -11,7 +11,7 @@ const NavBar = styled.nav`
   display: flex;
   flex-direction: row:
   gap: ${2 * GU}px;
-  padding: 8px;
+  padding: 8px 8px 18px 8px;
   align-items: center;
 `;
 
@@ -66,7 +66,9 @@ const Header = () => {
     <NavBar id="header">
       <Title id="navbar_title" onClick={redirectToHomePage}>
         <img src={governIcon} width={layoutName !== 'small' ? '182px' : '162px'} />
-        <Tag mode="activity" size="normal" uppercase={false} label="Beta" />
+        {layoutName !== 'small' && (
+          <Tag mode="activity" size="normal" uppercase={false} label="Beta" />
+        )}
       </Title>
 
       <RigtSideContainer id="account">

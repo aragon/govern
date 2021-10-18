@@ -67,14 +67,17 @@ const Details = styled.div<{ align: string }>`
   margin-top: 16px;
 `;
 
-const Title = styled.p`
+const Title = styled.p<{ layoutIsSmall: boolean }>`
   font-size: 24px;
   font-weight: 600;
   line-height: 30px;
   color: #20232c;
+
+  width: 100%;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  ${({ layoutIsSmall }) => layoutIsSmall && 'text-align: center'}
 `;
 
 const LinkGroup = styled.div<{ layoutIsSmall: boolean }>`
@@ -99,7 +102,7 @@ const DaoSideCard: React.FC<Props> = ({ address, baseUrl, identifier }) => {
       </AvatarContainer>
       <Content>
         <Details align={layoutIsSmall ? 'center' : 'flex-start'}>
-          <Title>{identifier}</Title>
+          <Title layoutIsSmall={layoutIsSmall}>{identifier}</Title>
         </Details>
         <LinkGroup layoutIsSmall={layoutIsSmall}>
           {links.map(({ path, icon, label }, index) => (

@@ -4,13 +4,23 @@ import { Grid, GridItem, GU, useLayout } from '@aragon/ui';
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { Redirect, Switch, useHistory, useLocation, useParams, useRouteMatch } from 'react-router';
 
-import NoDaoFound from './NoDaoFound';
 import DaoSideCard from './components/DaoSideCard/DaoSideCard';
 import NewExecution from 'containers/NewExecution/NewExecution';
 import HelpComponent from 'components/HelpComponent/HelpComponent';
-import ProposalDetails from 'containers/ProposalDetails/ProposalDetails';
-import { useDaoQuery, useLazyProposalListQuery } from 'hooks/query-hooks';
 import DaoActionsPage from './DaoActionPage';
+import DaoFinancePage from './DaoFinancePage';
+import ProposalDetails from 'containers/ProposalDetails/ProposalDetails';
+import {
+  proposalNewActionsUrl,
+  proposalSettingsUrl,
+  DaoFinanceUrl,
+  NotFoundUrl,
+  DaoSettingsUrl,
+  ActionDetailsUrl,
+  NewActionUrl,
+  DaoNotFoundUrl,
+} from 'utils/urls';
+import { useDaoQuery, useLazyProposalListQuery } from 'hooks/query-hooks';
 const DaoSettings = lazy(() => import('containers/DAOSettings/DAOSettings'));
 
 const StyledGridItem = styled(GridItem)<{ paddingTop: string }>`
@@ -34,8 +44,8 @@ const DaoHomePage: React.FC = () => {
    */
   const [daoExists, setDaoExists] = useState<boolean>(true);
   const [IsMoreActions, setIsMoreActions] = useState<boolean>(false);
-  const [daoDetails, setDaoDetails] = useState<any>();
-  const [queueNonce, setQueueNonce] = useState<number>();
+
+  const [queueNonce] = useState<number>(); // TODO: add setQueueNonce for pagination
   const [visibleActions, setVisibleActions] = useState<any>([]);
 
   /**
@@ -103,7 +113,7 @@ const DaoHomePage: React.FC = () => {
   }
 
   if (!daoExists) {
-    history.replace('/daos/not-found');
+    history.replace(DaoNotFoundUrl);
   }
 
   // TODO: Set API call to get open action(scheduled + executable)
@@ -128,25 +138,29 @@ const DaoHomePage: React.FC = () => {
                   fetchMore={fetchMoreData}
                   actions={visibleActions}
                   isMore={IsMoreActions}
-                  identifier={daoName}
+                  daoName={daoName}
                 />
               )}
             />
             <ApmRoute
               exact
-              path={`${path}finance`}
-              render={() => <div>Finance Component goes here...</div>}
+              path={`${path}${DaoFinanceUrl}`}
+              render={() => (
+                <DaoFinancePage
+                  daoName={daoName}
+                  executorId={dao?.executor.id}
+                  token={dao?.token}
+                />
+              )}
             />
-            <ApmRoute exact path={`${path}settings`} component={DaoSettings} />
-            <ApmRoute exact path={`${path}executions/:id`} component={ProposalDetails} />
-            <ApmRoute exact path={`${path}actions/new-execution`} component={NewExecution} />
-
-            {/* TODO: Operation not found page */}
-            <ApmRoute render={() => <div>Operation not found on dao. Go home?</div>} />
+            <ApmRoute exact path={`${path}${DaoSettingsUrl}`} component={DaoSettings} />
+            <ApmRoute exact path={`${path}${ActionDetailsUrl}`} component={ProposalDetails} />
+            <ApmRoute exact path={`${path}${NewActionUrl}`} component={NewExecution} />
+            <ApmRoute render={() => history.push(NotFoundUrl)} />
           </Switch>
         </Suspense>
       </StyledGridItem>
-      {pathname === `${url}/settings` && (
+      {(pathname === proposalSettingsUrl(url) || pathname === proposalNewActionsUrl(url)) && (
         <GridItem
           gridRow={layoutIsSmall ? '4/5' : '2/3'}
           gridColumn={layoutIsSmall ? '1/-1' : '1/5'}

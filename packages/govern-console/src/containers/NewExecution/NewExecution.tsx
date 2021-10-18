@@ -9,12 +9,12 @@ import {
   TextInput,
   Box,
   useToast,
+  GU,
 } from '@aragon/ui';
-import { PageName } from 'utils/HelpText';
 import backButtonIcon from '../../images/back-btn.svg';
 import { BackButton } from 'styles';
 
-import PageContent from 'components/PageContent/PageContent';
+import styled from 'styled-components';
 import ActionList from 'containers/NewExecution/ActionList';
 import { ActionBuilder } from 'components/ActionBuilder/ActionBuilder';
 import { useParams, useHistory } from 'react-router-dom';
@@ -40,6 +40,10 @@ interface FormInputs {
   title: string;
   actions: ActionItem[];
 }
+
+const Container = styled(Box)`
+  border-radius: 16px;
+`;
 
 const NewExecution: React.FC = () => {
   const history = useHistory();
@@ -159,81 +163,79 @@ const NewExecution: React.FC = () => {
   };
 
   return (
-    <PageContent pageName={PageName.NEW_EXECUTION}>
-      <Box>
-        <BackButton onClick={() => history.goBack()}>
-          <img src={backButtonIcon} />
-        </BackButton>
-        <Grid>
+    <Container>
+      <BackButton onClick={() => history.goBack()}>
+        <img src={backButtonIcon} />
+      </BackButton>
+      <Grid gap={3 * GU}>
+        <GridItem>
+          <StyledText name={'title1'}>New transaction</StyledText>
+          <StyledText name={'title4'}>
+            This execution will use the current{' '}
+            <Link onClick={() => history.push(settingsUrl(daoName))}>DAO Settings</Link>
+          </StyledText>
+        </GridItem>
+        <FormProvider {...methods}>
           <GridItem>
-            <StyledText name={'title1'}>New transaction</StyledText>
-            <StyledText name={'title4'}>
-              This execution will use the current{' '}
-              <Link onClick={() => history.push(settingsUrl(daoName))}>DAO Settings</Link>
-            </StyledText>
+            <Controller
+              name="title"
+              control={control}
+              rules={{
+                required: 'This is required.',
+              }}
+              defaultValue=""
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
+                <TextInput
+                  wide
+                  title="Title"
+                  subtitle="Add a title to identify this transaction."
+                  value={value}
+                  placeholder="Sending funds to SuperDAO as per Voice vote 0x486...9b3b."
+                  onChange={onChange}
+                  status={error ? 'error' : 'normal'}
+                  error={error ? error.message : null}
+                />
+              )}
+            />
           </GridItem>
-          <FormProvider {...methods}>
-            <GridItem>
-              <Controller
-                name="title"
-                control={control}
-                rules={{
-                  required: 'This is required.',
-                }}
-                defaultValue=""
-                render={({ field: { onChange, value }, fieldState: { error } }) => (
-                  <TextInput
-                    wide
-                    title="Title"
-                    subtitle="Add a title to identify this transaction."
-                    value={value}
-                    placeholder="Sending funds to SuperDAO as per Voice vote 0x486...9b3b."
-                    onChange={onChange}
-                    status={error ? 'error' : 'normal'}
-                    error={error ? error.message : null}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem>
-              <IPFSInput
-                title="Justification"
-                subtitle="Tell DAO members why you are scheduling this transaction."
-                label=""
-                placeholder="Please insert the reason why you want to execute this"
-                textInputName="proof"
-                fileInputName="proofFile"
-              />
-            </GridItem>
-            <GridItem>
-              <StyledText name={'title3'}>Transactions</StyledText>
-              <StyledText name={'title4'}>
-                Batch as many transactions as you like into a single execution.
-              </StyledText>
-              <ActionList actions={fields} swap={swap} remove={remove} />
-              <br />
-              <Button
-                mode="secondary"
-                icon={<IconAdd />}
-                label="Add new transaction"
-                onClick={openActionModal}
-              ></Button>
-            </GridItem>
+          <GridItem>
+            <IPFSInput
+              title="Justification"
+              subtitle="Tell DAO members why you are scheduling this transaction."
+              label=""
+              placeholder="Please insert the reason why you want to execute this"
+              textInputName="proof"
+              fileInputName="proofFile"
+            />
+          </GridItem>
+          <GridItem>
+            <StyledText name={'title3'}>Transactions</StyledText>
+            <StyledText name={'title4'}>
+              Batch as many transactions as you like into a single execution.
+            </StyledText>
+            <ActionList actions={fields} swap={swap} remove={remove} />
+            <br />
             <Button
-              wide
-              size="large"
-              mode="primary"
-              disabled={!isConnected}
-              onClick={handleSubmit(onSchedule)}
-              label="Schedule"
+              mode="secondary"
+              icon={<IconAdd />}
+              label="Add new transaction"
+              onClick={openActionModal}
             ></Button>
-            {showActionModal && (
-              <ActionBuilder visible={showActionModal} onClose={onCloseActionModal}></ActionBuilder>
-            )}
-          </FormProvider>
-        </Grid>
-      </Box>
-    </PageContent>
+          </GridItem>
+          <Button
+            wide
+            size="large"
+            mode="primary"
+            disabled={!isConnected}
+            onClick={handleSubmit(onSchedule)}
+            label="Schedule"
+          ></Button>
+          {showActionModal && (
+            <ActionBuilder visible={showActionModal} onClose={onCloseActionModal}></ActionBuilder>
+          )}
+        </FormProvider>
+      </Grid>
+    </Container>
   );
 };
 

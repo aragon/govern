@@ -1,14 +1,17 @@
 import { useState, useMemo } from 'react';
 import { useQuery, useLazyQuery } from '@apollo/client';
-import { DAO_BY_NAME, DAO_LIST, GOVERN_REGISTRY } from 'queries/dao';
-import { PROPOSAL_DETAILS, PROPOSAL_LIST } from 'queries/proposals';
+
 import { DISPUTE } from 'queries/court';
+import { TRANSFERS } from 'queries/finance';
 import { courtClient } from 'index';
+import { PROPOSAL_DETAILS, PROPOSAL_LIST } from 'queries/proposals';
+import { DAO_BY_NAME, DAO_LIST, GOVERN_REGISTRY } from 'queries/dao';
 
 import {
   transformProposalDetails,
   transformProposals,
   transformDaoDetails,
+  transformFinance,
 } from 'utils/transforms';
 
 const POLL_INTERVAL = 5000;
@@ -42,6 +45,19 @@ export function useDaosQuery() {
   });
 
   return { data, loading, error, fetchMore };
+}
+
+export function useFinanceQuery(executorId: string) {
+  const { data, loading, error } = useQuery(TRANSFERS, {
+    variables: { id: executorId },
+  });
+
+  const transfers = useMemo(() => {
+    if (data) {
+      return transformFinance(data);
+    }
+  }, [data]);
+  return { data: transfers, loading, error };
 }
 
 export function useGovernRegistryQuery() {
