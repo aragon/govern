@@ -6,6 +6,7 @@ import DaoMainPage from 'containers/DAO/DaoMainPage';
 import ProposalDetails from 'containers/ProposalDetails/ProposalDetails';
 import NewExecution from 'containers/NewExecution/NewExecution';
 import DaoSettings from 'containers/DAOSettings/DAOSettings';
+import NoPageFound from './NoPageFound';
 import { ModalsProvider } from 'containers/HomePage/ModalsContext';
 import { Main } from '@aragon/ui';
 import CreateDao from 'containers/CreateDao/CreateDao';
@@ -56,6 +57,7 @@ const HomePage = () => {
               <ApmRoute exact path="/daos/:daoName/new-execution" component={NewExecution} />
               <ApmRoute exact path="/daos/:daoName/dao-settings" component={DaoSettings} />
               <ApmRoute exact path="/create-dao" component={CreateDao} />
+              <ApmRoute exact path="*" component={NoPageFound} />
             </Switch>
           </BodyArea>
           <FooterArea>
