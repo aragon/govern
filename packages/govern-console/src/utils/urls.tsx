@@ -27,7 +27,7 @@ export function proposalNewActionsUrl(url: string): string {
   return `${url}/actions/new`;
 }
 
-export const DoaNotFoundUrl = `/daos/not-found`;
+export const DaoNotFoundUrl = `/daos/not-found`;
 export const NewActionUrl = `actions/new`;
 export const ActionDetailsUrl = `actions/executions/:id`;
 export const DaoSettingsUrl = `settings`;

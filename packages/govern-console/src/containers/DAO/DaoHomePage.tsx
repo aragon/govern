@@ -18,7 +18,7 @@ import {
   DaoSettingsUrl,
   ActionDetailsUrl,
   NewActionUrl,
-  DoaNotFoundUrl,
+  DaoNotFoundUrl,
 } from 'utils/urls';
 import { useDaoQuery, useLazyProposalListQuery } from 'hooks/query-hooks';
 const DaoSettings = lazy(() => import('containers/DAOSettings/DAOSettings'));
@@ -113,7 +113,7 @@ const DaoHomePage: React.FC = () => {
   }
 
   if (!daoExists) {
-    history.replace(DoaNotFoundUrl);
+    history.replace(DaoNotFoundUrl);
   }
 
   // TODO: Set API call to get open action(scheduled + executable)
