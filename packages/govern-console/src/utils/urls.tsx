@@ -18,3 +18,11 @@ export function settingsUrl(daoName: string): string {
 export function proposalDetailsUrl(daoName: string, containerHash: string): string {
   return `/daos/${daoName}/actions/executions/${containerHash}`;
 }
+
+export function proposalSettingsUrl(url: string): string {
+  return `${url}/settings`;
+}
+
+export function proposalNewActionsUrl(url: string): string {
+  return `${url}/actions/new`;
+}

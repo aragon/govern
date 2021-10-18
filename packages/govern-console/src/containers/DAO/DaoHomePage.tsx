@@ -10,6 +10,7 @@ import HelpComponent from 'components/HelpComponent/HelpComponent';
 import DaoActionsPage from './DaoActionPage';
 import DaoFinancePage from './DaoFinancePage';
 import ProposalDetails from 'containers/ProposalDetails/ProposalDetails';
+import { proposalNewActionsUrl, proposalSettingsUrl } from 'utils/urls';
 import { useDaoQuery, useLazyProposalListQuery } from 'hooks/query-hooks';
 const DaoSettings = lazy(() => import('containers/DAOSettings/DAOSettings'));
 
@@ -150,7 +151,7 @@ const DaoHomePage: React.FC = () => {
           </Switch>
         </Suspense>
       </StyledGridItem>
-      {(pathname === `${url}/settings` || pathname === `${url}/actions/new`) && (
+      {(pathname === proposalSettingsUrl(url) || pathname === proposalNewActionsUrl(url)) && (
         <GridItem
           gridRow={layoutIsSmall ? '4/5' : '2/3'}
           gridColumn={layoutIsSmall ? '1/-1' : '1/5'}
