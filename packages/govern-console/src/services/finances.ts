@@ -31,6 +31,13 @@ async function getTokenPrice(tokenSymbol: string) {
  * @param organizationAddress organization executor address
  * @returns array of assets
  */
+
+/*
+ *This method is related to KPI options migration. See the link for more info.
+ * https://blog.aragon.org/uma-kpi-options-airdrop-now-live-for-aragon-govern-daos/
+ * Note: Only two Daos migrated
+ */
+
 function getMigrationBalances(organizationAddress: string) {
   const migratedAssets: any = {
     '0x7767a2e18f0C477b20E85Bd5252b3643D273cD25': {
