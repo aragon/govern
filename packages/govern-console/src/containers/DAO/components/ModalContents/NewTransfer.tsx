@@ -13,20 +13,16 @@ import { Contract } from 'ethers';
 import { useFormContext, Controller, useWatch } from 'react-hook-form';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { Asset } from 'utils/Asset';
 import { useWallet } from 'providers/AugmentedWallet';
 import { formatUnits } from 'utils/lib';
 import { getTokenInfo } from 'utils/token';
 import { NewIPFSInput } from 'components/Field/NewIPFSInput';
 import { erc20TokenABI } from 'abis/erc20';
 import { ContentSwitcher } from 'components/ContentSwitcher/ContentSwitcher';
-import { networkEnvironment } from 'environment';
 import { useTransferContext } from './TransferContext';
 import { ASSET_ICON_BASE_URL } from 'utils/constants';
-import { Asset, OTHER_TOKEN_SYMBOL, ETH } from 'utils/Asset';
 import { validateAmountForDecimals, validateBalance, validateToken } from 'utils/validations';
-
-const { curatedTokens } = networkEnvironment;
-const currentTokens = { ...curatedTokens, [ETH.symbol]: ETH.address };
 
 const MAX_REFERENCE_LENGTH = 140;
 export const transactionTypes = ['Deposit', 'Withdraw'];
@@ -228,7 +224,7 @@ const Transfer: React.FC = () => {
 
       try {
         const asset = await Asset.createFromDropdownLabel(
-          token.symbol in currentTokens ? token.symbol : OTHER_TOKEN_SYMBOL,
+          token.symbol,
           token.address,
           value,
           provider,

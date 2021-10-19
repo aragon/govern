@@ -153,7 +153,7 @@ export const AssetWithdrawal: React.FC<AssetWithdrawalProps> = ({ onClick }) => 
           )}
         />
       </GridItem>
-      {Asset.isOtherToken(withdrawalAssets[selectedToken]) && (
+      {Asset.isCustomToken(withdrawalAssets[selectedToken]) && (
         <GridItem>
           <Controller
             name="tokenContractAddress"

@@ -37,7 +37,7 @@ export class Asset {
    * create an instance of asset from the given token contract address
    * @param address token contract address
    * @param displayAmount display amount (not the amount to be sent to the contract)
-   * @param provider for accesing token information
+   * @param provider for accessing token information
    * @param assetType type of the asset, i.e. ETH, curated, or others..
    * @returns an instance of asset
    */
@@ -56,12 +56,12 @@ export class Asset {
    * @param label asset label in the dropdown list
    * @param address token contract address
    * @param displayAmount display amount (not the amount to be sent to the contract)
-   * @param provider for accesing token information
+   * @param provider for accessing token information
    * @returns an instance of asset
    */
   static async createFromDropdownLabel(
     label: AssetLabel,
-    otherTokenAddress: string,
+    tokenAddress: string,
     displayAmount: string,
     provider: providers.Web3Provider,
   ) {
@@ -69,12 +69,23 @@ export class Asset {
       return new Asset(ETH.symbol, ETH.decimals, ETH.address, displayAmount, 'eth');
     }
 
-    const assetType: AssetType = Asset.isOtherToken(label) ? 'other' : 'curated';
-    const assetAddress = Asset.isOtherToken(label)
-      ? otherTokenAddress
+    const assetType: AssetType = Asset.getAssetType(label, tokenAddress);
+    const assetAddress = Asset.isCustomToken(label)
+      ? tokenAddress
       : curatedTokens[label as TokenSymbol];
 
     return Asset.createFromAddress(assetAddress, displayAmount, provider, assetType);
+  }
+
+  /**
+   * Get the token type (curated or custom)
+   * @param label - asset label
+   * @param tokenAddress - token address
+   * @returns whether token is curated
+   */
+  static getAssetType(label: AssetLabel, tokenAddress: string): AssetType {
+    // if addresses are not the same as curated: still other token (i.e. custom token)
+    return curatedTokens[label as TokenSymbol] === tokenAddress ? 'curated' : 'other';
   }
 
   /**
@@ -86,11 +97,11 @@ export class Asset {
   }
 
   /**
-   * Is this 'Other...' token from the drop down list
-   * @param label drop down list item label
-   * @returns true for Other token, false otherwise
+   * Is this custom token
+   * @param label token symbol
+   * @returns true for custom token, false otherwise
    */
-  static isOtherToken(label: AssetLabel) {
-    return label === OTHER_TOKEN_SYMBOL;
+  static isCustomToken(label: AssetLabel) {
+    return !curatedTokens.hasOwnProperty(label);
   }
 }
