@@ -1,7 +1,7 @@
 import {
   GU,
   LoadingRing,
-  IconConnect,
+  IconError,
   IconCheck,
   Button,
   IconRotateLeft,
@@ -173,7 +173,7 @@ const SignDeposit: React.FC = () => {
             <Wrapper>
               <InfoWrapper>
                 <LoadingContainer className="failed">
-                  <IconConnect />
+                  <IconError />
                 </LoadingContainer>
                 <InfoContainer>
                   <InfoTitle>{reference}</InfoTitle>
