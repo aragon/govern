@@ -217,7 +217,7 @@ const ReviewDeposit: React.FC = () => {
         </InfoBox>
       </BodyContainer>
       <SubmitButton onClick={executeTransfer}>
-        <p>Sign {title}</p>
+        <p>Confirm {title}</p>
         <IconDownload />
       </SubmitButton>
     </>

@@ -1,7 +1,7 @@
 import {
   GU,
   LoadingRing,
-  IconConnect,
+  IconError,
   IconCheck,
   Button,
   IconRotateLeft,
@@ -170,7 +170,7 @@ const SignDeposit: React.FC = () => {
             <Wrapper>
               <InfoWrapper>
                 <LoadingContainer className="failed">
-                  <IconConnect />
+                  <IconError />
                 </LoadingContainer>
                 <InfoContainer>
                   <InfoTitle>{reference}</InfoTitle>
@@ -203,8 +203,8 @@ const SignDeposit: React.FC = () => {
   return (
     <>
       <HeaderContainer>
-        <Title>Sign {title}</Title>
-        <Description>To complete your transfer, sign your {title} with your wallet.</Description>
+        <Title>Confirm {title}</Title>
+        <Description>To complete your transfer, confirm your {title} with your wallet.</Description>
       </HeaderContainer>
       {MessageType}
     </>

@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { useFormContext } from 'react-hook-form';
 import { useCallback, useMemo, useState } from 'react';
-import { ButtonText, IconLeft, IconPlus, TextInput, GU } from '@aragon/ui';
+import { ButtonText, IconLeft, IconAdd, TextInput, GU } from '@aragon/ui';
 
 import { ETH } from 'utils/Asset';
 import TokenCard from './TokenCard';
@@ -136,7 +136,7 @@ const SelectToken: React.FC<Props> = ({ onTokenSelected }) => {
       <TokenListContainer>
         <AddTokenButton onClick={handleAddToken}>
           <p>Add {noAssets ? `${query} now` : `other token`}</p>
-          <IconPlus />
+          <IconAdd />
         </AddTokenButton>
         {renderTokenList()}
       </TokenListContainer>

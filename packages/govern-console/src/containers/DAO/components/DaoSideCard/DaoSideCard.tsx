@@ -1,11 +1,4 @@
-import {
-  Box,
-  EthIdenticon,
-  IconActionsFilled,
-  IconSettingsFilled,
-  IconFinanceFilled,
-  useLayout,
-} from '@aragon/ui';
+import { Box, EthIdenticon, IconActions, IconSettings, IconFinance, useLayout } from '@aragon/ui';
 import styled from 'styled-components';
 import { useMemo } from 'react';
 
@@ -24,9 +17,9 @@ type MenuOptions = {
 };
 
 const links: MenuOptions[] = [
-  { path: '/actions', label: 'Actions', icon: <IconActionsFilled size="small" /> },
-  { path: '/finance', label: 'Finance', icon: <IconFinanceFilled size="small" /> },
-  { path: '/settings', label: 'Settings', icon: <IconSettingsFilled size="small" /> },
+  { path: '/actions', label: 'Actions', icon: <IconActions /> },
+  { path: '/finance', label: 'Finance', icon: <IconFinance /> },
+  { path: '/settings', label: 'Settings', icon: <IconSettings /> },
 ];
 
 const Container = styled.div`
