@@ -51,6 +51,7 @@ const DaoTransferModal: React.FC<Props> = ({ opened, close, daoName, executorId 
   const methods = useForm<DepositFormData>({
     mode: 'onChange',
     defaultValues: defaultFormValues,
+    shouldUnregister: false,
   });
 
   return (

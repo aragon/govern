@@ -174,6 +174,8 @@ const Transfer: React.FC = () => {
     account: { address: accountAddress },
   } = context;
 
+  const values = getValues();
+
   useEffect(() => {
     const getBalance = async () => {
       // No token or invalid token, no balance
@@ -259,6 +261,8 @@ const Transfer: React.FC = () => {
         setValue('token.symbol', '');
         setValue('token.logo', null);
       }
+      setLogoError(false);
+
       return result;
     },
     [getValues, provider, setValue],
@@ -351,8 +355,7 @@ const Transfer: React.FC = () => {
             <InputContainer>
               <Controller
                 name="token.address"
-                defaultValue=""
-                shouldUnregister={false}
+                defaultValue={values.token.address || ''}
                 control={control}
                 rules={{
                   required: 'Token address is required.',
