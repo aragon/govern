@@ -191,10 +191,10 @@ const ReviewDeposit: React.FC = () => {
           </InfoRow>
           <InfoRow>
             <InfoKey>Token Address</InfoKey>
-            <InfoValue>
+            <InfoValueIcon>
               {getTruncatedAccountAddress(token.address)}
               <TokenLink onClick={SendToTokenContract} />
-            </InfoValue>
+            </InfoValueIcon>
           </InfoRow>
           <InfoRow>
             <InfoKey>Amount</InfoKey>
@@ -204,13 +204,13 @@ const ReviewDeposit: React.FC = () => {
           </InfoRow>
           <InfoColumn>
             <InfoKey>Reference</InfoKey>
-            <InfoValue>{reference}</InfoValue>
+            <InfoValue className="column">{reference}</InfoValue>
           </InfoColumn>
           {isWithdraw && (
             <>
               <InfoColumn>
                 <InfoKey>Justification</InfoKey>
-                <InfoValue>{proofFile ? proofFile[0].name : proof}</InfoValue>
+                <InfoValue className="column">{proofFile ? proofFile[0].name : proof}</InfoValue>
               </InfoColumn>
             </>
           )}
@@ -344,16 +344,26 @@ const InfoKey = styled.p`
 `;
 
 const InfoValue = styled.p`
+  font-weight: 600;
+  font-size: 16px;
+  color: #20232c;
+  text-align: right;
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  &.column {
+    padding-top: 4px;
+  }
+`;
+
+const InfoValueIcon = styled.p`
   display: flex;
   align-items: center;
   font-weight: 600;
   font-size: 16px;
   color: #20232c;
   text-align: right;
-  max-width: 200px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
 `;
 
 const Icon = styled.div`

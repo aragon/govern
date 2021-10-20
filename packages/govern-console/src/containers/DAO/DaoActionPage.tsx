@@ -62,6 +62,11 @@ const CustomActionButton = styled(Button)`
   box-shadow: none;
 `;
 
+const CustomDropDown = styled(DropDown)`
+  border: none;
+  margin-right: ${3 * GU}px;
+`;
+
 const LoadMoreButton = styled.div`
   display: flex;
   flex-direction: row;
@@ -148,15 +153,7 @@ const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, daoName }
         <CustomActionButton label="New action" onClick={goToNewExecution} />
       </HeaderContainer>
       <SearchContainer>
-        <DropDown
-          items={actionStates}
-          css={`
-            border: none;
-            margin-right: ${3 * GU}px;
-          `}
-          selected={selected}
-          onChange={setSelected}
-        />
+        <CustomDropDown items={actionStates} selected={selected} onChange={setSelected} />
         <SearchInput
           css={`
             width: 100%;

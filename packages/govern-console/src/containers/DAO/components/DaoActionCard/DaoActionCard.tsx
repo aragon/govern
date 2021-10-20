@@ -53,6 +53,9 @@ const Label = styled(Tag)`
   &.ruled_negatively {
     background: #ff6a60;
   }
+  &.rejected {
+    background: #ff6a60;
+  }
 `;
 
 const TextContainer = styled.div`

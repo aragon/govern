@@ -294,6 +294,9 @@ const InfoTitle = styled.div`
   font-style: normal;
   font-weight: 600;
   font-size: 16px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
 `;
 
 const InfoDescription = styled.div`
