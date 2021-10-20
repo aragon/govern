@@ -1,3 +1,5 @@
+// TODO: deprecate
+
 import React, { useCallback } from 'react';
 import {
   EthIdenticon,
@@ -156,7 +158,7 @@ export const Deposit: React.FC = () => {
           )}
         />
       </GridItem>
-      {Asset.isOtherToken(depositAssets[selectedToken]) && (
+      {Asset.isCustomToken(depositAssets[selectedToken]) && (
         <GridItem>
           <Controller
             name="tokenContractAddress"

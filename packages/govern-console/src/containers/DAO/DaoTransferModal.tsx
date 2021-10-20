@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { useMemo } from 'react';
 import { Modal, useLayout } from '@aragon/ui';
-import { useForm, FormProvider, Controller, useFormContext } from 'react-hook-form';
+import { useForm, FormProvider, useFormContext } from 'react-hook-form';
 
 import Sign from './components/ModalContents/SignTransfer';
 import Review from './components/ModalContents/ReviewTransfer';
@@ -51,6 +51,7 @@ const DaoTransferModal: React.FC<Props> = ({ opened, close, daoName, executorId 
   const methods = useForm<DepositFormData>({
     mode: 'onChange',
     defaultValues: defaultFormValues,
+    shouldUnregister: false,
   });
 
   return (
@@ -68,21 +69,18 @@ type SwitcherProps = {
 };
 
 const TransferSwitcher: React.FC<SwitcherProps> = ({ opened, close }) => {
+  const { reset } = useFormContext();
   const { layoutName } = useLayout();
+  const { state, gotoState, isCancellable } = useTransferContext();
+
   const layoutIsSmall = useMemo(() => layoutName === 'small', [layoutName]);
-  const { state, gotoState } = useTransferContext();
-  const { reset, control, setValue } = useFormContext();
 
   const handleModalClose = () => {
-    reset(defaultFormValues);
-    gotoState('initial');
-    close();
-  };
-
-  const handleTokenSelected = (onChange: (value: any) => void, value: any) => {
-    setValue('isCustomToken', false);
-    onChange(value);
-    gotoState('initial');
+    if (isCancellable) {
+      reset(defaultFormValues);
+      gotoState('initial');
+      close();
+    }
   };
 
   const renderState = () => {
@@ -94,16 +92,7 @@ const TransferSwitcher: React.FC<SwitcherProps> = ({ opened, close }) => {
       case 'sign':
         return <Sign />;
       case 'selectToken':
-        return (
-          <Controller
-            name="token"
-            control={control}
-            defaultValue={null}
-            render={({ field: { onChange } }) => (
-              <SelectToken onTokenSelected={(value: any) => handleTokenSelected(onChange, value)} />
-            )}
-          />
-        );
+        return <SelectToken />;
     }
   };
 
@@ -111,6 +100,7 @@ const TransferSwitcher: React.FC<SwitcherProps> = ({ opened, close }) => {
     <TransferModal
       visible={opened}
       onClose={handleModalClose}
+      closeButton={isCancellable}
       css={layoutIsSmall ? 'width:100%!important;' : ''}
     >
       {renderState()}

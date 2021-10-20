@@ -7,26 +7,23 @@ import {
   IconWithdraw,
   Tag,
   TextInput,
+  useToast,
 } from '@aragon/ui';
 import styled from 'styled-components';
 import { Contract } from 'ethers';
 import { useFormContext, Controller, useWatch } from 'react-hook-form';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { Asset } from 'utils/Asset';
 import { useWallet } from 'providers/AugmentedWallet';
 import { formatUnits } from 'utils/lib';
 import { getTokenInfo } from 'utils/token';
 import { NewIPFSInput } from 'components/Field/NewIPFSInput';
 import { erc20TokenABI } from 'abis/erc20';
 import { ContentSwitcher } from 'components/ContentSwitcher/ContentSwitcher';
-import { networkEnvironment } from 'environment';
 import { useTransferContext } from './TransferContext';
 import { ASSET_ICON_BASE_URL } from 'utils/constants';
-import { Asset, OTHER_TOKEN_SYMBOL, ETH } from 'utils/Asset';
 import { validateAmountForDecimals, validateBalance, validateToken } from 'utils/validations';
-
-const { curatedTokens } = networkEnvironment;
-const currentTokens = { ...curatedTokens, [ETH.symbol]: ETH.address };
 
 const MAX_REFERENCE_LENGTH = 140;
 export const transactionTypes = ['Deposit', 'Withdraw'];
@@ -158,6 +155,7 @@ const Adornment = styled.span`
 `;
 
 const Transfer: React.FC = () => {
+  const toast = useToast();
   const type: number = useWatch({ name: 'type' });
   const tokenAddress = useWatch({ name: 'token.address' });
   const isCustomToken = useWatch({ name: 'isCustomToken' });
@@ -175,6 +173,8 @@ const Transfer: React.FC = () => {
     provider,
     account: { address: accountAddress },
   } = context;
+
+  const values = getValues();
 
   useEffect(() => {
     const getBalance = async () => {
@@ -228,7 +228,7 @@ const Transfer: React.FC = () => {
 
       try {
         const asset = await Asset.createFromDropdownLabel(
-          token.symbol in currentTokens ? token.symbol : OTHER_TOKEN_SYMBOL,
+          token.symbol,
           token.address,
           value,
           provider,
@@ -261,6 +261,8 @@ const Transfer: React.FC = () => {
         setValue('token.symbol', '');
         setValue('token.logo', null);
       }
+      setLogoError(false);
+
       return result;
     },
     [getValues, provider, setValue],
@@ -270,12 +272,13 @@ const Transfer: React.FC = () => {
     async (currentValue: string, onChange: (value: any) => void) => {
       if (currentValue) {
         await navigator.clipboard.writeText(currentValue);
+        toast('Copied!');
       } else {
         const text = await navigator.clipboard.readText();
         onChange(text);
       }
     },
-    [],
+    [toast],
   );
 
   const renderToken = useCallback(
@@ -352,7 +355,7 @@ const Transfer: React.FC = () => {
             <InputContainer>
               <Controller
                 name="token.address"
-                defaultValue=""
+                defaultValue={values.token.address || ''}
                 control={control}
                 rules={{
                   required: 'Token address is required.',
@@ -366,6 +369,7 @@ const Transfer: React.FC = () => {
                     status={error ? 'error' : 'normal'}
                     error={error?.message}
                     wide
+                    autoFocus
                     adornment={
                       <Adornment onClick={() => handleClipboardAction(value, onChange)}>
                         {value ? <IconCopyFilled /> : 'Paste'}
