@@ -4,6 +4,7 @@ import styled, { css } from 'styled-components';
 import { useEffect, useMemo, useState } from 'react';
 import { useLayout, Button, ButtonText, IconUp, IconDown } from '@aragon/ui';
 
+import { ETH } from 'utils/Asset';
 import BalanceCard from '../BalanceCard/BalanceCard';
 import { FinanceToken } from 'utils/types';
 
@@ -91,7 +92,7 @@ const Assets = styled.div<{ isVisible: boolean }>`
 const formatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',
-  maximumFractionDigits: 0,
+  maximumFractionDigits: 2,
 });
 
 const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken, onNewTransfer }) => {
@@ -100,17 +101,18 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken, onNewTransfer }) 
   const { layoutName } = useLayout();
   const layoutIsSmall = useMemo(() => layoutName === 'small', [layoutName]);
 
+  // Ethereum balance
   const { symbol, amount, price, numberOfAssets } = useMemo(() => {
     return {
-      amount: tokens[mainToken]?.amountForHuman,
-      symbol: tokens[mainToken]?.symbol,
-      price: tokens[mainToken]?.price,
+      amount: tokens[ETH.address]?.amountForHuman,
+      symbol: ETH.symbol,
+      price: tokens[ETH.address]?.price,
       numberOfAssets: Object.keys(tokens).length,
     };
-  }, [tokens, mainToken]);
+  }, [tokens]);
 
   const USDPrice = useMemo(() => {
-    return price ? `~${formatter.format(Number(price) * Number(amount))} USD` : 'USD value unknown';
+    return price ? `${formatter.format(Number(price) * Number(amount))} USD` : 'USD value unknown';
   }, [amount, price]);
 
   useEffect(() => {
@@ -120,22 +122,30 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken, onNewTransfer }) 
   }, [layoutIsSmall]);
 
   function sortAssets(asset: any, nextAsset: any) {
-    return asset.symbol > nextAsset.symbol ? 1 : -1;
+    // Keep mainToken (dao token) on top
+    if (asset[0] === mainToken) return -1;
+    return asset[1].symbol > nextAsset[1].symbol ? 1 : -1;
   }
+
+  function filterAssets(entry: any) {
+    return entry[0] !== ETH.address;
+  }
+
   `${amount} ${symbol}`;
   return (
     <Container>
       <MainTokenBalance>
-        <Token>{amount && symbol ? `${amount} ${symbol}` : <StyledSkeleton height={30} />}</Token>
-        <USDValue>{symbol ? USDPrice : <StyledSkeleton height={24} />}</USDValue>
+        <Token>{amount ? `${amount} ETH` : <StyledSkeleton height={30} />}</Token>
+        <USDValue>{price ? USDPrice : <StyledSkeleton height={24} />}</USDValue>
       </MainTokenBalance>
 
       <Assets isVisible={displayAssets}>
-        {Object.values(tokens)
+        {Object.entries(tokens)
+          .filter(filterAssets)
           .sort(sortAssets)
-          .map((token: any, index: number) => (
+          .map(([address, token]: any, index: number) => (
             <BalanceCard
-              key={token.symbol + index}
+              key={address + index}
               usd={
                 token.price && formatter.format(Number(token.price) * Number(token.amountForHuman))
               }
