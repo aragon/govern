@@ -146,7 +146,7 @@ const SignDeposit: React.FC = () => {
                 </LoadingContainer>
                 <InfoContainer>
                   <InfoTitle>{reference}</InfoTitle>
-                  <InfoDescription>Transfer successfully signed</InfoDescription>
+                  <InfoDescription>Transfer successfully confirmed</InfoDescription>
                 </InfoContainer>
               </InfoWrapper>
               <Amount>
@@ -155,7 +155,7 @@ const SignDeposit: React.FC = () => {
             </Wrapper>
             <SuccessButton
               wide
-              label={title === 'Withdraw' ? 'View proposal' : 'Close deposit'}
+              label={title === 'Withdraw' ? 'view scheduled action' : 'Close deposit'}
               onClick={handleViewProposal}
             />
             <TransparentButton onClick={SendToExplore} wide>
