@@ -10,8 +10,13 @@ import { useCallback } from 'react';
 //TODO add the icon for logged in users
 declare let window: any;
 
-const Wallet = ({}) => {
-  const connetButtonLabel = 'Connect wallet';
+type WalletProps = {
+  buttonCSS?: string;
+  buttonDisplay?: string;
+};
+
+const Wallet: React.FC<WalletProps> = ({ buttonCSS, buttonDisplay }) => {
+  const connectButtonLabel = 'Connect wallet';
   const context: any = useWallet();
   const { layoutName } = useLayout();
   const toast = useToast();
@@ -94,8 +99,9 @@ const Wallet = ({}) => {
         mode="secondary"
         label={getTruncatedAccountAddress(userAccount)}
         icon={<EthIdenticon address={userAccount} scale={1.5} radius={50} />}
-        display={layoutName === 'small' ? 'icon' : 'all'}
+        display={buttonDisplay || layoutName === 'small' ? 'icon' : 'all'}
         onClick={disconnect}
+        css={buttonCSS}
       />
     );
   } else if (networkStatus === 'unsupported') {
@@ -106,10 +112,11 @@ const Wallet = ({}) => {
         onClick={() => {
           connectWalletAndSetStatus('injected');
         }}
-        label={connetButtonLabel}
+        label={connectButtonLabel}
         icon={<IconConnect />}
-        display={layoutName === 'small' ? 'icon' : 'all'}
+        display={buttonDisplay || layoutName === 'small' ? 'icon' : 'all'}
         disabled={status === 'connecting'}
+        css={buttonCSS}
       />
     );
   } else if (networkStatus === 'connection-error') {
@@ -120,10 +127,11 @@ const Wallet = ({}) => {
         onClick={() => {
           connectWalletAndSetStatus('injected');
         }}
-        label={connetButtonLabel}
+        label={connectButtonLabel}
         icon={<IconConnect />}
-        display={layoutName === 'small' ? 'icon' : 'all'}
+        display={buttonDisplay || layoutName === 'small' ? 'icon' : 'all'}
         disabled={status === 'connecting'}
+        css={buttonCSS}
       />
     );
   } else {
@@ -134,10 +142,11 @@ const Wallet = ({}) => {
         onClick={() => {
           connectWalletAndSetStatus('injected');
         }}
-        label={connetButtonLabel}
+        label={connectButtonLabel}
         icon={<IconConnect />}
-        display={layoutName === 'small' ? 'icon' : 'all'}
+        display={buttonDisplay || layoutName === 'small' ? 'icon' : 'all'}
         disabled={status === 'connecting'}
+        css={buttonCSS}
       />
     );
   }
