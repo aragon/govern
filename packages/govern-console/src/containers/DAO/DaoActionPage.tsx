@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DropDown, Button, GU, SearchInput, IconDown, Grid, GridItem, useLayout } from '@aragon/ui';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
@@ -6,7 +6,8 @@ import { useHistory } from 'react-router-dom';
 import DaoActionCard from './components/DaoActionCard/DaoActionCard';
 import NoResultFound from './components/NoResultFound/NoResultFound';
 import { getTitleTransaction } from 'utils/HelperFunctions';
-
+import { useProposalListQuery } from 'hooks/query-hooks';
+import { PROPOSAL_STATES_LIST } from 'utils/states';
 type actionsType = {
   __typename?: string;
   id: string;
@@ -21,10 +22,9 @@ type actionsType = {
 }[];
 
 type props = {
-  fetchMore: () => Promise<void>;
-  actions: actionsType;
-  isMore: boolean;
   daoName: string;
+  daoID: string;
+  queue: any;
 };
 
 const Container = styled.div``;
@@ -91,21 +91,18 @@ const ActionListContainer = styled.div`
   margin-bottom: ${3 * GU}px;
 `;
 
-const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, daoName }) => {
+const DaoActionsPage: React.FC<props> = ({ daoName, daoID }) => {
   const history = useHistory();
   const [selected, setSelected] = useState<number>(0);
   const [value, setValue] = useState<string>('');
-  const actionStates = [
-    'All Actions',
-    'Executable',
-    'Scheduled',
-    'Challenged',
-    'Executed',
-    'Rejected',
-  ];
+  const { refetch, data: queueData } = useProposalListQuery(daoID);
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   const FilterState = (data: actionsType[0]) => {
-    return selected > 0 ? actionStates[selected] === data.state : true;
+    return selected > 0 ? PROPOSAL_STATES_LIST[selected] === data.state : true;
   };
 
   const SearchAction = (data: actionsType[0]) => {
@@ -153,7 +150,7 @@ const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, daoName }
         <CustomActionButton label="New action" onClick={goToNewExecution} />
       </HeaderContainer>
       <SearchContainer>
-        <CustomDropDown items={actionStates} selected={selected} onChange={setSelected} />
+        <CustomDropDown items={PROPOSAL_STATES_LIST} selected={selected} onChange={setSelected} />
         <SearchInput
           css={`
             width: 100%;
@@ -168,10 +165,10 @@ const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, daoName }
         />
       </SearchContainer>
       <ActionListContainer>
-        <Grid column={'4'}>{RenderActions(actions)}</Grid>
+        <Grid column={'4'}>{RenderActions(queueData?.governQueue?.containers)}</Grid>
       </ActionListContainer>
-      {isMore && (
-        <LoadMoreButton onClick={fetchMore}>
+      {false && (
+        <LoadMoreButton>
           <span>Load more</span>
           <IconDown />
         </LoadMoreButton>

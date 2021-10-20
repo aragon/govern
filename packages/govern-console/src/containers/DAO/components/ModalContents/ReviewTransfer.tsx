@@ -354,6 +354,7 @@ const InfoValue = styled.p`
   text-overflow: ellipsis;
   &.column {
     padding-top: 4px;
+    text-align: left;
   }
 `;
 
