@@ -158,7 +158,7 @@ const SignDeposit: React.FC = () => {
             </Wrapper>
             <SuccessButton
               wide
-              label={title === 'Withdraw' ? 'view scheduled action' : 'Close deposit'}
+              label={title === 'Withdraw' ? 'View scheduled action' : 'Close deposit'}
               onClick={handleViewProposal}
             />
             <TransparentButton onClick={SendToExplore} wide>

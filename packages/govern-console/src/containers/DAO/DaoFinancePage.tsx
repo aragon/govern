@@ -157,9 +157,9 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, daoName, token: mainToken
         };
       }
 
-      if (constants.AddressZero in balances) {
-        delete balances[constants.AddressZero];
-      }
+      // if (mainToken in balances) {
+      //   delete balances[mainToken];
+      // }
 
       let withdraw: Withdraw;
       for (withdraw of finances.withdraws) {

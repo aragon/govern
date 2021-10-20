@@ -1,5 +1,10 @@
-async function getTokenPrice(tokenSymbol: string) {
-  const apiUrl = `https://api.0x.org/swap/v1/price?sellToken=${tokenSymbol}&buyToken=USDC&sellAmount=1000000000000000000`;
+import { constants } from 'ethers';
+
+async function getTokenPrice(tokenAddress: string) {
+  // Wrap Eth to WETH
+  const token = tokenAddress === constants.AddressZero ? 'WETH' : tokenAddress;
+
+  const apiUrl = `https://api.0x.org/swap/v1/price?sellToken=${token}&buyToken=USDC&sellAmount=1000000000000000000`;
   try {
     const rawResponse = await fetch(apiUrl, {
       method: 'GET',
