@@ -1,4 +1,5 @@
 import { format } from 'date-fns';
+import { toUTF8String } from 'utils/lib';
 
 export function getFormattedDate(date?: number | string) {
   try {
@@ -44,4 +45,9 @@ export function getErrorFromException(ex: any): string {
     }
   }
   return errorMessage;
+}
+
+export function getTitleTransaction(title: string | null) {
+  const utfString = toUTF8String(title || '') || '{}'; // Check for title availability
+  return JSON.parse(utfString).title;
 }

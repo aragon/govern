@@ -5,6 +5,7 @@ import { useHistory } from 'react-router-dom';
 
 import DaoActionCard from './components/DaoActionCard/DaoActionCard';
 import NoResultFound from './components/NoResultFound/NoResultFound';
+import { getTitleTransaction } from 'utils/HelperFunctions';
 
 type actionsType = {
   __typename?: string;
@@ -103,8 +104,9 @@ const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, daoName }
   };
 
   const SearchAction = (data: actionsType[0]) => {
+    const formatedTitle = getTitleTransaction(data.payload.title);
     const re = new RegExp(value, 'i');
-    if (data.payload.title?.match(re) || value === '') return data;
+    if (formatedTitle?.match(re) || value === '') return data;
   };
 
   const RenderActions = (actions: actionsType) => {

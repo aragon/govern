@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { Box, Tag, IconRight, GU, useLayout } from '@aragon/ui';
 import { formatDate } from 'utils/date';
 import { useHistory } from 'react-router-dom';
-import { toUTF8String } from 'utils/lib';
+import { getTitleTransaction } from 'utils/HelperFunctions';
 
 type Props = {
   date: string;
@@ -91,11 +91,6 @@ const DaoActionCard: React.FC<Props> = ({ id, date, state, title, dao_identifier
     return hash;
   };
 
-  const getTitleTransaction = () => {
-    const utfString = toUTF8String(title || '') || '{}'; // Check for title availability
-    return JSON.parse(utfString).title;
-  };
-
   const goToActionDetails = () => {
     history.push(`/daos/${dao_identifier}/actions/executions/${id}`);
   };
@@ -108,7 +103,7 @@ const DaoActionCard: React.FC<Props> = ({ id, date, state, title, dao_identifier
             width: ${layoutName === 'small' ? '100px' : '250px'};
           `}
         >
-          {getTitleTransaction() || getSlicedTransactionHash()}
+          {getTitleTransaction(title) || getSlicedTransactionHash()}
         </Text>
         <Time>{formatDate(date, 'relative')}</Time>
       </TextContainer>
