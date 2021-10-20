@@ -4,6 +4,7 @@ import { constants } from 'ethers';
 import { Button, GU, Grid, GridItem, useLayout, useToast } from '@aragon/ui';
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 
+import { ETH } from 'utils/Asset';
 import { Error } from 'utils/Error';
 import { useWallet } from 'providers/AugmentedWallet';
 import NoResultFound from './components/NoResultFound/NoResultFound';
@@ -137,8 +138,8 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, daoName, token: mainToken
 
           balances[address] = {
             amount: BigInt(deposit.amount),
-            symbol: symbol || 'ETH',
-            decimals: decimals || 18,
+            symbol: symbol,
+            decimals: decimals,
           };
           continue;
         }
@@ -157,9 +158,13 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, daoName, token: mainToken
         };
       }
 
-      // if (mainToken in balances) {
-      //   delete balances[mainToken];
-      // }
+      if (ETH.address in balances == false) {
+        balances[ETH.address] = {
+          amount: BigInt(0),
+          symbol: ETH.symbol,
+          decimals: ETH.decimals,
+        };
+      }
 
       let withdraw: Withdraw;
       for (withdraw of finances.withdraws) {
