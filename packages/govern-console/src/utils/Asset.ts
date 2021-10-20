@@ -69,23 +69,12 @@ export class Asset {
       return new Asset(ETH.symbol, ETH.decimals, ETH.address, displayAmount, 'eth');
     }
 
-    const assetType: AssetType = Asset.getAssetType(label, tokenAddress);
-    const assetAddress = Asset.isCustomToken(label)
-      ? tokenAddress
-      : curatedTokens[label as TokenSymbol];
+    // Compare address because custom token can have same name as curated
+    const assetType: AssetType =
+      curatedTokens[label as TokenSymbol] === tokenAddress ? 'curated' : 'other';
 
+    const assetAddress = assetType === 'other' ? tokenAddress : curatedTokens[label as TokenSymbol];
     return Asset.createFromAddress(assetAddress, displayAmount, provider, assetType);
-  }
-
-  /**
-   * Get the token type (curated or custom)
-   * @param label - asset label
-   * @param tokenAddress - token address
-   * @returns whether token is curated
-   */
-  static getAssetType(label: AssetLabel, tokenAddress: string): AssetType {
-    // if addresses are not the same as curated: still other token (i.e. custom token)
-    return curatedTokens[label as TokenSymbol] === tokenAddress ? 'curated' : 'other';
   }
 
   /**

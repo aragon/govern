@@ -8,7 +8,6 @@ import { ActionBuilderModal } from './ActionBuilderModal';
 import { ActionBuilderStateProvider, useActionBuilderState } from './ActionBuilderStateProvider';
 import { useParams } from 'react-router-dom';
 import { useDaoQuery } from 'hooks/query-hooks';
-import { Deposit } from 'components/ActionBuilder/Screens/Deposit';
 import TransactionKeeper from 'components/TransactionKeeper/TransactionKeeper';
 
 type ActionBuilderProps = {

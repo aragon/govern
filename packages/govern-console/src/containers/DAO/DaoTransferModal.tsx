@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { useMemo } from 'react';
 import { Modal, useLayout } from '@aragon/ui';
-import { useForm, FormProvider, Controller, useFormContext } from 'react-hook-form';
+import { useForm, FormProvider, useFormContext } from 'react-hook-form';
 
 import Sign from './components/ModalContents/SignTransfer';
 import Review from './components/ModalContents/ReviewTransfer';
@@ -68,21 +68,16 @@ type SwitcherProps = {
 };
 
 const TransferSwitcher: React.FC<SwitcherProps> = ({ opened, close }) => {
+  const { reset } = useFormContext();
   const { layoutName } = useLayout();
-  const layoutIsSmall = useMemo(() => layoutName === 'small', [layoutName]);
   const { state, gotoState } = useTransferContext();
-  const { reset, control, setValue } = useFormContext();
+
+  const layoutIsSmall = useMemo(() => layoutName === 'small', [layoutName]);
 
   const handleModalClose = () => {
     reset(defaultFormValues);
     gotoState('initial');
     close();
-  };
-
-  const handleTokenSelected = (onChange: (value: any) => void, value: any) => {
-    setValue('isCustomToken', false);
-    onChange(value);
-    gotoState('initial');
   };
 
   const renderState = () => {
@@ -94,16 +89,7 @@ const TransferSwitcher: React.FC<SwitcherProps> = ({ opened, close }) => {
       case 'sign':
         return <Sign />;
       case 'selectToken':
-        return (
-          <Controller
-            name="token"
-            control={control}
-            defaultValue={null}
-            render={({ field: { onChange } }) => (
-              <SelectToken onTokenSelected={(value: any) => handleTokenSelected(onChange, value)} />
-            )}
-          />
-        );
+        return <SelectToken />;
     }
   };
 

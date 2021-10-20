@@ -7,6 +7,7 @@ import {
   IconWithdraw,
   Tag,
   TextInput,
+  useToast,
 } from '@aragon/ui';
 import styled from 'styled-components';
 import { Contract } from 'ethers';
@@ -154,6 +155,7 @@ const Adornment = styled.span`
 `;
 
 const Transfer: React.FC = () => {
+  const toast = useToast();
   const type: number = useWatch({ name: 'type' });
   const tokenAddress = useWatch({ name: 'token.address' });
   const isCustomToken = useWatch({ name: 'isCustomToken' });
@@ -266,12 +268,13 @@ const Transfer: React.FC = () => {
     async (currentValue: string, onChange: (value: any) => void) => {
       if (currentValue) {
         await navigator.clipboard.writeText(currentValue);
+        toast('Copied!');
       } else {
         const text = await navigator.clipboard.readText();
         onChange(text);
       }
     },
-    [],
+    [toast],
   );
 
   const renderToken = useCallback(
@@ -349,6 +352,7 @@ const Transfer: React.FC = () => {
               <Controller
                 name="token.address"
                 defaultValue=""
+                shouldUnregister={false}
                 control={control}
                 rules={{
                   required: 'Token address is required.',
@@ -362,6 +366,7 @@ const Transfer: React.FC = () => {
                     status={error ? 'error' : 'normal'}
                     error={error?.message}
                     wide
+                    autoFocus
                     adornment={
                       <Adornment onClick={() => handleClipboardAction(value, onChange)}>
                         {value ? <IconCopyFilled /> : 'Paste'}
