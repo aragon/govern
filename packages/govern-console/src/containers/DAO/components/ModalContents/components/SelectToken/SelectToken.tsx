@@ -15,10 +15,6 @@ const depositAssets: any = {
   [ETH.symbol]: ETH.address,
 };
 
-type Props = {
-  onTokenSelected: (value: any) => void;
-};
-
 const HeaderContainer = styled.div`
   display: flex;
 `;
@@ -76,7 +72,7 @@ const AddTokenButton = styled(ButtonText)`
   }
 `;
 
-const SelectToken: React.FC<Props> = ({ onTokenSelected }) => {
+const SelectToken: React.FC = () => {
   const { setValue } = useFormContext();
   const { gotoState } = useTransferContext();
   const [query, setSearchQuery] = useState<string>('');
@@ -103,6 +99,12 @@ const SelectToken: React.FC<Props> = ({ onTokenSelected }) => {
     gotoState('initial');
   };
 
+  const handleTokenSelected = (token: any) => {
+    setValue('isCustomToken', false);
+    setValue('token', token);
+    gotoState('initial');
+  };
+
   const renderTokenList = () => {
     return noAssets ? (
       <TokenNotFound />
@@ -112,7 +114,7 @@ const SelectToken: React.FC<Props> = ({ onTokenSelected }) => {
           key={assetName}
           symbol={assetName}
           address={depositAssets[assetName]}
-          onClick={onTokenSelected}
+          onClick={handleTokenSelected}
         />
       ))
     );

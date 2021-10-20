@@ -31,8 +31,8 @@ const SignDeposit: React.FC = () => {
 
   const { getValues } = useFormContext();
   const { networkName } = useWallet();
-  const { transactions } = useTransferContext();
   const [txState, setTxState] = useState(SigningState.Processing);
+  const { transactions, setCancellable } = useTransferContext();
   const [transactionList, setTransactionList] = useState<CustomTransaction[]>([...transactions]);
   const [transactionHash, setTransactionHash] = useState('');
 
@@ -94,6 +94,7 @@ const SignDeposit: React.FC = () => {
 
       if (isQueueAborted) return;
       try {
+        setCancellable(false);
         setTransactionHash('');
         setTxState(SigningState.Processing);
         updateStatus(index, CustomTransactionStatus.InProgress);
@@ -106,14 +107,16 @@ const SignDeposit: React.FC = () => {
         isQueueAborted = true;
         updateStatus(index, CustomTransactionStatus.Failed);
         setTxState(SigningState.Failure);
+        setCancellable(true);
       }
       index++;
     }
     // All transactions complete
     if (!isQueueAborted) {
       setTxState(SigningState.Success);
+      setCancellable(true);
     }
-  }, [transactionList, updateStatus]);
+  }, [setCancellable, transactionList, updateStatus]);
 
   const MessageType = useMemo(() => {
     switch (txState) {
