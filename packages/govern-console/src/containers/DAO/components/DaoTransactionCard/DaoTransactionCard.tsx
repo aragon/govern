@@ -130,9 +130,13 @@ const DaoTransactionCard: React.FC<Props> = ({ info }) => {
       <InfoContainer>
         <IconContainer className={info?.typename.toLowerCase()}>{Icon}</IconContainer>
         <TextContainer>
-          <Text>
+          <Text
+            css={`
+              width: ${layoutName === 'small' ? '100px' : '250px'};
+            `}
+          >
             {info?.typename ? (
-              info.typename
+              info?.reference || info.typename
             ) : (
               <StyledSkeleton height={20} width={layoutName === 'small' ? 150 : 250} />
             )}

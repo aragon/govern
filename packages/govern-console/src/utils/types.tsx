@@ -117,6 +117,7 @@ export type Finance = {
 export type Transaction = {
   createdAt: string;
   typename: string;
+  reference: string;
   amount: string;
   token: string;
   symbol: string;

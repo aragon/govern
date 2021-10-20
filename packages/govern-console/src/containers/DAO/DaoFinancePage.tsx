@@ -195,7 +195,7 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, daoName, token: mainToken
     async function prepareTransactions() {
       setTransactions([]);
       [...finances.withdraws, ...finances.deposits].map(
-        async ({ createdAt, typename, amount, token: currentToken }) => {
+        async ({ createdAt, typename, amount, reference, token: currentToken }) => {
           const { decimals, symbol } =
             currentToken === constants.AddressZero
               ? { symbol: 'ETH', decimals: 18 }
@@ -207,6 +207,7 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, daoName, token: mainToken
                 createdAt,
                 typename,
                 token: currentToken,
+                reference,
                 symbol,
                 amount: formatUnits(amount, decimals),
               },
