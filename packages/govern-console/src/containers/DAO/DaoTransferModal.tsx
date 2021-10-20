@@ -70,14 +70,16 @@ type SwitcherProps = {
 const TransferSwitcher: React.FC<SwitcherProps> = ({ opened, close }) => {
   const { reset } = useFormContext();
   const { layoutName } = useLayout();
-  const { state, gotoState } = useTransferContext();
+  const { state, gotoState, isCancellable } = useTransferContext();
 
   const layoutIsSmall = useMemo(() => layoutName === 'small', [layoutName]);
 
   const handleModalClose = () => {
-    reset(defaultFormValues);
-    gotoState('initial');
-    close();
+    if (isCancellable) {
+      reset(defaultFormValues);
+      gotoState('initial');
+      close();
+    }
   };
 
   const renderState = () => {
@@ -97,6 +99,7 @@ const TransferSwitcher: React.FC<SwitcherProps> = ({ opened, close }) => {
     <TransferModal
       visible={opened}
       onClose={handleModalClose}
+      closeButton={isCancellable}
       css={layoutIsSmall ? 'width:100%!important;' : ''}
     >
       {renderState()}
