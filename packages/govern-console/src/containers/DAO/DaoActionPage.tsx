@@ -65,6 +65,7 @@ const CustomActionButton = styled(Button)`
 const CustomDropDown = styled(DropDown)`
   border: none;
   margin-right: ${3 * GU}px;
+  width: 180px;
 `;
 
 const LoadMoreButton = styled.div`
@@ -101,7 +102,6 @@ const DaoActionsPage: React.FC<props> = ({ fetchMore, actions, isMore, daoName }
     'Challenged',
     'Executed',
     'Rejected',
-    'Ruled Negatively',
   ];
 
   const FilterState = (data: actionsType[0]) => {
