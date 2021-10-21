@@ -118,7 +118,13 @@ const DaoHomePage: React.FC = () => {
 
   // TODO: Set API call to get open action(scheduled + executable)
   return (
-    <Grid layout={true} gap={24}>
+    <Grid
+      layout={true}
+      gap={24}
+      css={`
+        margin-top: ${layoutIsSmall ? '16' : '40'}px;
+      `}
+    >
       <GridItem gridColumn={layoutIsSmall ? '1/-1' : '1/5'}>
         <DaoSideCard address={dao?.queue?.address} baseUrl={url} identifier={daoName} />
       </GridItem>

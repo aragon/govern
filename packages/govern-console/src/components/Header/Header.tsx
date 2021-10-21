@@ -1,6 +1,15 @@
+import {
+  Button,
+  ButtonText,
+  DropDown,
+  GU,
+  IconCirclePlus,
+  IconClose,
+  IconDotMenu,
+  useLayout,
+} from '@aragon/ui';
 import { useHistory } from 'react-router-dom';
 import { useCallback, useMemo, useState, useEffect } from 'react';
-import { Button, ButtonText, IconCirclePlus, IconClose, useLayout, GU, DropDown } from '@aragon/ui';
 
 import Wallet from 'components/Wallet/Wallet';
 import styled from 'styled-components';
@@ -12,7 +21,7 @@ const NavBar = styled.nav<{ flexDirection: string }>`
   padding: 16px;
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.88);
+  // background: rgba(255, 255, 255, 0.88);
   flex-direction: ${({ flexDirection }) => flexDirection};
 `;
 
@@ -33,7 +42,7 @@ const Container = styled.div`
 
 const MenuButton = styled(ButtonText)<{ isOpen: boolean }>`
   height: 40px;
-  padding: 8px 14px;
+  padding: 8px 12px 8px 14px;
   border-radius: 8px;
   ${({ isOpen }) => isOpen && 'background: #f0fbff;'}
 
@@ -71,15 +80,17 @@ const MenuItems = styled.div<{ isSmall: boolean }>`
 
   display: flex;
   flex-direction: column;
+  // Uncomment when links are available
   // justify-content: space-between;
   justify-content: flex-end;
+  z-index: 1000;
 `;
 
 const LinkGroup = styled.div<{ gap: number }>`
   display: flex;
   flex-direction: column;
   gap: ${({ gap }) => gap}px;
-  z-index: 1001;
+  z-index: 1000;
 `;
 
 // TODO: Links are temporarily unavailable
@@ -166,8 +177,7 @@ const Header = () => {
           <MenuButton isOpen={showMenu} onClick={handleMenuClick}>
             <div>
               Menu
-              {/* TODO: Update menu icon in aragon ui */}
-              {showMenu && <IconClose />}
+              {showMenu ? <IconClose /> : <IconDotMenu />}
             </div>
           </MenuButton>
         )}
@@ -183,8 +193,8 @@ const Header = () => {
             <Button
               size={'large'}
               label={'Create DAO'}
-              icon={<IconCirclePlus />}
               onClick={goToCreateDaoPage}
+              icon={!layoutIsSmall && <IconCirclePlus />}
               css={layoutIsSmall ? 'height: 46px;' : ''}
             />
             <WalletContainer>
@@ -199,9 +209,7 @@ const Header = () => {
                   height: ${layoutIsSmall ? '48' : '40'}px;
                 `}
               />
-              <Wallet
-                {...(layoutIsSmall ? { buttonCSS: 'height: 48px;', buttonDisplay: 'all' } : {})}
-              />
+              <Wallet buttonCSS={`height:  ${layoutIsSmall ? '48' : '40'}px; flex: 1;`} />
             </WalletContainer>
           </ActionLinkGroup>
         </MenuItems>

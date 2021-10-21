@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useWallet } from 'use-wallet';
 import { useEffect } from 'react';
 import { networkEnvironment } from 'environment';
-import { Button, EthIdenticon, useLayout, IconConnect, useToast } from '@aragon/ui';
+import { Button, EthIdenticon, IconConnect, useToast } from '@aragon/ui';
 import { getTruncatedAccountAddress } from 'utils/account';
 import { trackEvent, EventType } from 'services/analytics';
 import { useCallback } from 'react';
@@ -12,13 +12,11 @@ declare let window: any;
 
 type WalletProps = {
   buttonCSS?: string;
-  buttonDisplay?: string;
 };
 
-const Wallet: React.FC<WalletProps> = ({ buttonCSS, buttonDisplay }) => {
+const Wallet: React.FC<WalletProps> = ({ buttonCSS }) => {
   const connectButtonLabel = 'Connect wallet';
   const context: any = useWallet();
-  const { layoutName } = useLayout();
   const toast = useToast();
   const { account, chainId, connect, error, reset, status, networkName, connector } = context;
   const [networkStatus, setNetworkStatus] = useState<string>(status);
@@ -75,7 +73,7 @@ const Wallet: React.FC<WalletProps> = ({ buttonCSS, buttonDisplay }) => {
     });
 
     reset();
-  }, [userAccount, connector, networkName, reset]);
+  }, [connector, networkName, reset, userAccount]);
 
   //TODO: not suitable connectWalletAndSetStatus has to re-thought
   /* eslint-disable */
@@ -99,7 +97,7 @@ const Wallet: React.FC<WalletProps> = ({ buttonCSS, buttonDisplay }) => {
         mode="secondary"
         label={getTruncatedAccountAddress(userAccount)}
         icon={<EthIdenticon address={userAccount} scale={1.5} radius={50} />}
-        display={buttonDisplay || layoutName === 'small' ? 'icon' : 'all'}
+        display={'all'}
         onClick={disconnect}
         css={buttonCSS}
       />
@@ -114,7 +112,7 @@ const Wallet: React.FC<WalletProps> = ({ buttonCSS, buttonDisplay }) => {
         }}
         label={connectButtonLabel}
         icon={<IconConnect />}
-        display={buttonDisplay || layoutName === 'small' ? 'icon' : 'all'}
+        display={'all'}
         disabled={status === 'connecting'}
         css={buttonCSS}
       />
@@ -129,7 +127,7 @@ const Wallet: React.FC<WalletProps> = ({ buttonCSS, buttonDisplay }) => {
         }}
         label={connectButtonLabel}
         icon={<IconConnect />}
-        display={buttonDisplay || layoutName === 'small' ? 'icon' : 'all'}
+        display={'all'}
         disabled={status === 'connecting'}
         css={buttonCSS}
       />
@@ -144,7 +142,7 @@ const Wallet: React.FC<WalletProps> = ({ buttonCSS, buttonDisplay }) => {
         }}
         label={connectButtonLabel}
         icon={<IconConnect />}
-        display={buttonDisplay || layoutName === 'small' ? 'icon' : 'all'}
+        display={'all'}
         disabled={status === 'connecting'}
         css={buttonCSS}
       />
