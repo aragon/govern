@@ -20,7 +20,7 @@ import {
   NewActionUrl,
   DaoNotFoundUrl,
 } from 'utils/urls';
-import { useDaoQuery, useLazyProposalListQuery } from 'hooks/query-hooks';
+import { useDaoQuery } from 'hooks/query-hooks';
 const DaoSettings = lazy(() => import('containers/DAOSettings/DAOSettings'));
 
 const StyledGridItem = styled(GridItem)<{ paddingTop: string }>`
@@ -43,16 +43,11 @@ const DaoHomePage: React.FC = () => {
    * State
    */
   const [daoExists, setDaoExists] = useState<boolean>(true);
-  const [IsMoreActions, setIsMoreActions] = useState<boolean>(false);
-
-  const [queueNonce] = useState<number>(); // TODO: add setQueueNonce for pagination
-  const [visibleActions, setVisibleActions] = useState<any>([]);
 
   /**
    * Effects
    */
   const { data: dao, loading: daoIsLoading } = useDaoQuery(daoName);
-  const { getQueueData, data: queueData, fetchMore } = useLazyProposalListQuery();
 
   /**
    * Update state and get queue data
@@ -60,50 +55,12 @@ const DaoHomePage: React.FC = () => {
   useEffect(() => {
     if (daoIsLoading) return;
 
-    if (dao && getQueueData) {
+    if (dao) {
       setDaoExists(true);
-
-      if (dao.queue) {
-        getQueueData({
-          variables: {
-            offset: 0,
-            limit: 100,
-            id: dao.queue.id,
-          },
-        });
-      }
     } else {
       setDaoExists(false);
     }
-  }, [daoIsLoading, dao, getQueueData]);
-
-  /**
-   * Functions
-   */
-  const fetchMoreData = async () => {
-    if (fetchMore) {
-      fetchMore({
-        variables: {
-          offset: visibleActions.length,
-        },
-      });
-    }
-  };
-
-  /**
-   * Update visible proposals
-   */
-  useEffect(() => {
-    if (queueData) {
-      setVisibleActions(queueData.governQueue.containers);
-    }
-  }, [queueData]);
-
-  useEffect(() => {
-    if (queueNonce && visibleActions.length) {
-      setIsMoreActions(queueNonce !== visibleActions.length);
-    } else setIsMoreActions(false);
-  }, [queueNonce, visibleActions]);
+  }, [daoIsLoading, dao]);
 
   /**
    * Render
@@ -140,12 +97,7 @@ const DaoHomePage: React.FC = () => {
               exact
               path={`${path}actions`}
               render={() => (
-                <DaoActionsPage
-                  fetchMore={fetchMoreData}
-                  actions={visibleActions}
-                  isMore={IsMoreActions}
-                  daoName={daoName}
-                />
+                <DaoActionsPage daoName={daoName} daoID={dao?.queue?.id} queue={dao?.queue} />
               )}
             />
             <ApmRoute

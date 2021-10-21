@@ -107,6 +107,29 @@ export function useLazyProposalListQuery() {
   };
 }
 
+export function useProposalListQuery(queueId: string) {
+  // const [proposalList, setProposalList] = useState<any>(null);
+  const { loading, data, error, refetch } = useQuery(PROPOSAL_LIST, {
+    variables: { id: queueId },
+  });
+
+  // onCompleted doesn't work with lazyQuery when clicked on `fetchMore`.
+  // https://github.com/apollographql/apollo-client/issues/6636
+  const proposalList = useMemo(() => {
+    console.log(data);
+    if (data) {
+      return transformProposals(data);
+    }
+  }, [data]);
+
+  return {
+    refetch,
+    loading,
+    data: proposalList,
+    error,
+  };
+}
+
 export function useLazyDisputeQuery(disputId: number) {
   const [getDispute, { loading, error, data }] = useLazyQuery(DISPUTE, {
     notifyOnNetworkStatusChange: true,

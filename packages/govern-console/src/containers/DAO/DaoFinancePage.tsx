@@ -4,6 +4,7 @@ import { constants } from 'ethers';
 import { Button, GU, Grid, GridItem, useLayout, useToast } from '@aragon/ui';
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 
+import { ETH } from 'utils/Asset';
 import { Error } from 'utils/Error';
 import { useWallet } from 'providers/AugmentedWallet';
 import NoResultFound from './components/NoResultFound/NoResultFound';
@@ -129,10 +130,11 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, daoName, token: mainToken
       const balances: Balance = { ...getMigrationBalances(executorId) };
       let deposit: Deposit;
       let address: string;
+
       for (deposit of finances.deposits) {
         address = deposit.token;
         // if new asset
-        if (address in balances === false) {
+        if (!balances.hasOwnProperty(address)) {
           const { symbol, decimals } = await getTokenInfo(address, provider);
 
           balances[address] = {
@@ -147,8 +149,16 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, daoName, token: mainToken
         balances[address].amount += BigInt(deposit.amount);
       }
 
+      if (!balances.hasOwnProperty(ETH.address)) {
+        balances[ETH.address] = {
+          amount: BigInt(0),
+          symbol: ETH.symbol,
+          decimals: ETH.decimals,
+        };
+      }
+
       // No transactions yet using main dao token
-      if (mainToken in balances == false) {
+      if (!balances.hasOwnProperty(mainToken)) {
         const { symbol, decimals } = await getTokenInfo(mainToken, provider);
         balances[mainToken] = {
           amount: BigInt(0),
@@ -157,14 +167,10 @@ const DaoFinancePage: React.FC<Props> = ({ executorId, daoName, token: mainToken
         };
       }
 
-      // if (mainToken in balances) {
-      //   delete balances[mainToken];
-      // }
-
       let withdraw: Withdraw;
       for (withdraw of finances.withdraws) {
         address = withdraw.token;
-        if (address in balances) {
+        if (balances.hasOwnProperty(address)) {
           balances[address].amount -= BigInt(withdraw.amount);
         }
       }

@@ -10,6 +10,15 @@ export const PROPOSAL_STATES = {
   EXECUTABLE: 'Executable',
 };
 
+export const PROPOSAL_STATES_LIST = [
+  'All Actions',
+  'Executable',
+  'Scheduled',
+  'Challenged',
+  'Executed',
+  'Rejected',
+];
+
 export const PROPOSAL_STATES_COLORS = {
   [PROPOSAL_STATES.SCHEDULED]: 'grey',
   [PROPOSAL_STATES.CHALLENGED]: 'orange',

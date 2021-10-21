@@ -4,7 +4,6 @@ import { styled } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import backButtonIcon from 'images/back-btn.svg';
-import { Label } from 'components/Labels/Label';
 import { useParams, useHistory } from 'react-router-dom';
 import { useWallet } from 'providers/AugmentedWallet';
 import { CustomTransaction } from 'utils/types';
@@ -13,7 +12,7 @@ import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import AbiHandler from 'utils/AbiHandler';
 import { formatDate } from 'utils/date';
 import { getState, getStateColor } from 'utils/states';
-import { useToast } from '@aragon/ui';
+import { useToast, Tag } from '@aragon/ui';
 import { IPFSField } from 'components/Field/IPFSField';
 import { addToIpfs, fetchIPFS } from 'utils/ipfs';
 import { useFacadeProposal } from 'hooks/proposal-hooks';
@@ -275,7 +274,6 @@ const ExpandedDiv = styled('div')({
     maxWidth: 'calc(100% - 48px)',
   },
 });
-
 //* End of styled Components
 
 const ProposalDetails: React.FC = () => {
@@ -456,10 +454,30 @@ const ProposalDetails: React.FC = () => {
         <img src={backButtonIcon} />
       </BackButton>
       <ProposalStatus>
-        <Label
-          labelColor={getStateColor(proposalInfo.state, proposalInfo.payload.executionTime)}
-          labelText={getState(proposalInfo.state, proposalInfo.payload.executionTime)}
-        />
+      <Tag
+        css={`
+          border-radius: 4px;
+          color: white;
+          &.executable {
+            background: #00c2ff;
+          }
+          &.scheduled {
+            background: #ffbc5b;
+          }
+          &.challenged {
+            background: linear-gradient(107.79deg, #ff7984 1.46%, #ffeb94 100%);
+          }
+          &.executed {
+            background: #46c469;
+          }
+          &.ruled_negatively {
+            background: #ff6a60;
+          }
+          &.rejected {
+            background: #ff6a60;
+          }
+        `}
+       className={proposalInfo?.state.toLowerCase().replace(' ', '_')}>{proposalInfo?.state}</Tag>
       </ProposalStatus>
       {/* <ProposalId>{proposalInfo.id}</ProposalId> */}
       <ProposalId>{proof?.metadata && proof.metadata.title}</ProposalId>
