@@ -89,9 +89,7 @@ const DaoSideCard: React.FC<Props> = ({ address, baseUrl, identifier }) => {
   return (
     <Container>
       <AvatarContainer justify={layoutIsSmall ? 'center' : 'flex-start'}>
-        <AvatarWrapper>
-          <EthIdenticon address={address} scale={2} />
-        </AvatarWrapper>
+        <AvatarWrapper>{address && <EthIdenticon address={address} scale={2} />}</AvatarWrapper>
       </AvatarContainer>
       <Content>
         <Details align={layoutIsSmall ? 'center' : 'flex-start'}>

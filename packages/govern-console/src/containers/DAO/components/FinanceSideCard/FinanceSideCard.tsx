@@ -14,6 +14,8 @@ type Props = {
   onNewTransfer: () => void;
 };
 
+const DEFAULT_MAX_SHOWN_ASSETS = 7;
+
 const Container = styled.div`
   gap: 16px;
   display: flex;
@@ -107,7 +109,9 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken, onNewTransfer }) 
       amount: tokens[ETH.address]?.amountForHuman,
       symbol: ETH.symbol,
       price: tokens[ETH.address]?.price,
-      numberOfAssets: Object.keys(tokens).length,
+
+      // Length - 1 because ETH won't be included in the list
+      numberOfAssets: Object.keys(tokens).length - 1,
     };
   }, [tokens]);
 
@@ -116,10 +120,12 @@ const FinanceSideCard: React.FC<Props> = ({ tokens, mainToken, onNewTransfer }) 
   }, [amount, price]);
 
   useEffect(() => {
-    // Assets shown on medium to large screens
-    if (!layoutIsSmall) setDisplayAssets(true);
-    else setDisplayAssets(false);
-  }, [layoutIsSmall]);
+    if (layoutIsSmall || numberOfAssets > DEFAULT_MAX_SHOWN_ASSETS) {
+      setDisplayAssets(false);
+    } else {
+      setDisplayAssets(true);
+    }
+  }, [layoutIsSmall, numberOfAssets]);
 
   function sortAssets(asset: any, nextAsset: any) {
     // Keep mainToken (dao token) on top
