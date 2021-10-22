@@ -21,7 +21,6 @@ const NavBar = styled.nav<{ flexDirection: string }>`
   padding: 16px;
   display: flex;
   align-items: center;
-  // background: rgba(255, 255, 255, 0.88);
   flex-direction: ${({ flexDirection }) => flexDirection};
 `;
 
@@ -80,8 +79,6 @@ const MenuItems = styled.div<{ isSmall: boolean }>`
 
   display: flex;
   flex-direction: column;
-  // Uncomment when links are available
-  // justify-content: space-between;
   justify-content: flex-end;
   z-index: 1000;
 `;
@@ -92,17 +89,6 @@ const LinkGroup = styled.div<{ gap: number }>`
   gap: ${({ gap }) => gap}px;
   z-index: 1000;
 `;
-
-// TODO: Links are temporarily unavailable
-// const NavLinkGroup = styled(LinkGroup)<{ isSmall: boolean }>`
-//   ${({ isSmall }) => !isSmall && 'display: none'}
-// `;
-
-// const MenuLink = styled(Link)`
-//   color: #7483ab;
-//   padding: 12px 16px;
-//   text-decoration: none;
-// `;
 
 const ActionLinkGroup = styled(LinkGroup)<{ isSmall: boolean }>`
   ${({ isSmall }) => !isSmall && ' flex-direction: row-reverse;'}
@@ -184,11 +170,6 @@ const Header = () => {
       </Container>
       <Menu show={showMenu} isSmall={layoutIsSmall}>
         <MenuItems isSmall={layoutIsSmall}>
-          {/* Currently unavailable
-          <NavLinkGroup gap={GU} isSmall={layoutIsSmall}>
-            <MenuLink to="/">Explore DAOs</MenuLink>
-            <MenuLink to="/">Documentation</MenuLink>
-          </NavLinkGroup> */}
           <ActionLinkGroup gap={3 * GU} isSmall={layoutIsSmall}>
             <Button
               size={'large'}
@@ -209,7 +190,7 @@ const Header = () => {
                   height: ${layoutIsSmall ? '48' : '40'}px;
                 `}
               />
-              <Wallet buttonCSS={`height:  ${layoutIsSmall ? '48' : '40'}px; flex: 1;`} />
+              <Wallet />
             </WalletContainer>
           </ActionLinkGroup>
         </MenuItems>
