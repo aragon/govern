@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import { Main } from '@aragon/ui';
 import { Switch } from 'react-router-dom';
 import { ApmRoute } from '@elastic/apm-rum-react';
 import { useEffect } from 'react';
@@ -7,13 +6,6 @@ import { useLocation } from 'react-router-dom';
 
 import Header from 'components/Header/Header';
 import Footer from 'components/Footer/Footer';
-import ConsoleMainPage from 'containers/Console/ConsoleMainPage';
-import DaoMainPage from 'containers/DAO/DaoMainPage';
-import ProposalDetails from 'containers/ProposalDetails/ProposalDetails';
-import NewExecution from 'containers/NewExecution/NewExecution';
-import DaoSettings from 'containers/DAOSettings/DAOSettings';
-import NoPageFound from './NoPageFound';
-import { ModalsProvider } from 'containers/HomePage/ModalsContext';
 import { Main } from '@aragon/ui';
 import CreateDao from 'containers/CreateDao/CreateDao';
 import NoDaoFound from '../DAO/NoDaoFound';

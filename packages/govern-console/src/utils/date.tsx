@@ -1,4 +1,4 @@
-import { format, formatRelative } from 'date-fns';
+import { format, formatRelative, formatDistance } from 'date-fns';
 
 export const toMs = (seconds: number) => seconds * 1000;
 
