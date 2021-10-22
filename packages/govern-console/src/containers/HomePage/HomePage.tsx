@@ -15,10 +15,6 @@ import { trackPage } from 'services/analytics';
 import ConsoleMainPage from 'containers/Console/ConsoleMainPage';
 import { ModalsProvider } from 'containers/HomePage/ModalsContext';
 
-const MainContainer = styled(Main)`
-  width: 100%;
-`;
-
 const Container = styled.div`
   display: grid;
   grid-gap: 16px;
@@ -30,7 +26,6 @@ const Container = styled.div`
 `;
 
 const BodyArea = styled.div`
-  margin-top: 40px;
   grid-area: body;
   min-height: 90vh;
 `;
@@ -41,7 +36,6 @@ const FooterArea = styled.div`
 
 const HomePage = () => {
   const { pathname } = useLocation();
-
   useEffect(() => {
     trackPage(pathname);
 
@@ -51,7 +45,7 @@ const HomePage = () => {
 
   return (
     <ModalsProvider>
-      <MainContainer theme="light" toastProps={{ top: true, position: 'center' }}>
+      <Main theme="light" toastProps={{ top: true, position: 'center' }}>
         <Container>
           <Header />
           <BodyArea>
@@ -66,7 +60,7 @@ const HomePage = () => {
             <Footer />
           </FooterArea>
         </Container>
-      </MainContainer>
+      </Main>
     </ModalsProvider>
   );
 };

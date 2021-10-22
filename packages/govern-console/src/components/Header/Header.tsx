@@ -1,18 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import governIcon from 'images/svgs/aragon-icon.svg';
-import Wallet from 'components/Wallet/Wallet';
+import {
+  Button,
+  ButtonText,
+  DropDown,
+  GU,
+  IconCirclePlus,
+  IconClose,
+  IconDotMenu,
+  useLayout,
+} from '@aragon/ui';
 import { useHistory } from 'react-router-dom';
-import { Button, IconCirclePlus, useLayout, GU, Tag, DropDown } from '@aragon/ui';
+import { useCallback, useMemo, useState, useEffect } from 'react';
+
+import Wallet from 'components/Wallet/Wallet';
 import styled from 'styled-components';
+import GovernIcon from 'images/svgs/aragon-icon.svg';
 import { networkEnvironment } from 'environment';
 import { trackEvent, EventType } from 'services/analytics';
 
-const NavBar = styled.nav`
+const NavBar = styled.nav<{ flexDirection: string }>`
+  padding: 16px;
   display: flex;
-  flex-direction: row:
-  gap: ${2 * GU}px;
-  padding: 8px 8px 18px 8px;
   align-items: center;
+  flex-direction: ${({ flexDirection }) => flexDirection};
 `;
 
 const Title = styled.div`
@@ -23,14 +32,72 @@ const Title = styled.div`
   column-gap: ${GU}px;
 `;
 
-const RigtSideContainer = styled.div`
-  display: flex;
+const Container = styled.div`
   width: 100%;
-  flex-wrap: nowrap;
-  flex-direction: row;
+  display: flex;
   align-items: center;
-  gap: ${GU}px;
+  justify-content: space-between;
+`;
+
+const MenuButton = styled(ButtonText)<{ isOpen: boolean }>`
+  height: 40px;
+  padding: 8px 12px 8px 14px;
+  border-radius: 8px;
+  ${({ isOpen }) => isOpen && 'background: #f0fbff;'}
+
+  color: #00c2ff;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+
+  & > div {
+    gap: ${GU}px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+`;
+
+const Menu = styled.div<{ show: boolean; isSmall: boolean }>`
+  ${({ show }) => !show && 'display: none;'}
+  ${({ isSmall }) =>
+    isSmall &&
+    `width: 100%;
+  position: fixed;
+  top: 80px;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  z-index: 1001;`}
+`;
+
+const MenuItems = styled.div<{ isSmall: boolean }>`
+  ${({ isSmall }) =>
+    isSmall &&
+    `height: 100%;
+  padding: 24px 16px 120px 16px;`}
+
+  display: flex;
+  flex-direction: column;
   justify-content: flex-end;
+  z-index: 1000;
+`;
+
+const LinkGroup = styled.div<{ gap: number }>`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ gap }) => gap}px;
+  z-index: 1000;
+`;
+
+const ActionLinkGroup = styled(LinkGroup)<{ isSmall: boolean }>`
+  ${({ isSmall }) => !isSmall && ' flex-direction: row-reverse;'}
+`;
+
+const WalletContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  gap: ${3 * GU}px;
 `;
 
 // TODO: Temporary and to be removed.
@@ -41,10 +108,18 @@ const chainInfo = {
 };
 
 const Header = () => {
-  const { layoutName } = useLayout();
   const history = useHistory();
+  const { layoutName } = useLayout();
   const { networkName, chainId } = networkEnvironment;
   const [selectedNetwork, setSelectedNetwork] = useState(-1);
+
+  const layoutIsSmall = useMemo(() => layoutName === 'small', [layoutName]);
+  const [showMenu, setShowMenu] = useState<boolean>(() => !layoutIsSmall);
+
+  useEffect(() => {
+    if (layoutIsSmall) setShowMenu(false);
+    else setShowMenu(true);
+  }, [layoutIsSmall]);
 
   useEffect(() => {
     const index = chainInfo.networkIds.indexOf(chainId);
@@ -55,61 +130,71 @@ const Header = () => {
     history.push('/');
   };
 
-  const goToCreateDaoPage = () => {
+  const goToCreateDaoPage = useCallback(() => {
     // analytics
     trackEvent(EventType.NAVBAR_CREATEDAO_CLICKED, { network: networkName });
-
     history.push('/create-dao');
+  }, [history, networkName]);
+
+  const handleDropDownChange = useCallback(
+    (index: number) => {
+      if (index !== selectedNetwork) {
+        const open = window.open(undefined, '_self');
+        if (open) {
+          open.opener = null;
+          open.location.href = `https://${chainInfo.values[index]}.aragon.org`;
+        }
+      }
+    },
+    [selectedNetwork],
+  );
+
+  const handleMenuClick = () => {
+    setShowMenu(!showMenu);
   };
 
   return (
-    <NavBar id="header">
-      <Title id="navbar_title" onClick={redirectToHomePage}>
-        <img src={governIcon} width={layoutName !== 'small' ? '182px' : '162px'} />
-        {layoutName !== 'small' && (
-          <Tag mode="activity" size="normal" uppercase={false} label="Beta" />
+    <NavBar id="header" flexDirection={layoutIsSmall ? 'column' : 'row'}>
+      <Container>
+        <Title id="navbar_title" onClick={redirectToHomePage}>
+          <img src={GovernIcon} width={layoutIsSmall ? '162px' : '182px'} />
+        </Title>
+        {layoutIsSmall && (
+          <MenuButton isOpen={showMenu} onClick={handleMenuClick}>
+            <div>
+              Menu
+              {showMenu ? <IconClose /> : <IconDotMenu />}
+            </div>
+          </MenuButton>
         )}
-      </Title>
-
-      <RigtSideContainer id="account">
-        {/* {layoutName !== 'small' && (
-          // TODO: Temporary and to be returned.
-          // <StyledText name="body2">Network:{networkName.toUpperCase()}</StyledText>          
-        )} */}
-
-        {/* // TODO: Temporary and to be removed. */}
-
-        <DropDown
-          header={'Network'}
-          items={chainInfo.names}
-          placeholder="Select Network"
-          selected={selectedNetwork}
-          onChange={(index: number) => {
-            if (index !== selectedNetwork) {
-              const open = window.open(undefined, '_self');
-              if (open) {
-                open.opener = null;
-                open.location.href = `https://${chainInfo.values[index]}.aragon.org`;
-              }
-            }
-          }}
-          shadow
-          iconOnly={layoutName === 'small'}
-          css={`
-            height: 40px;
-          `}
-        />
-
-        <Wallet />
-        <Button
-          size={'large'}
-          onClick={goToCreateDaoPage}
-          label={'Create DAO'}
-          icon={<IconCirclePlus />}
-          display={layoutName === 'small' ? 'icon' : 'label'}
-          disabled={status === 'connecting'}
-        />
-      </RigtSideContainer>
+      </Container>
+      <Menu show={showMenu} isSmall={layoutIsSmall}>
+        <MenuItems isSmall={layoutIsSmall}>
+          <ActionLinkGroup gap={3 * GU} isSmall={layoutIsSmall}>
+            <Button
+              size={'large'}
+              label={'Create DAO'}
+              onClick={goToCreateDaoPage}
+              icon={!layoutIsSmall && <IconCirclePlus />}
+              css={layoutIsSmall ? 'height: 46px;' : ''}
+            />
+            <WalletContainer>
+              <DropDown
+                shadow
+                items={chainInfo.names}
+                header={'Network'}
+                selected={selectedNetwork}
+                onChange={handleDropDownChange}
+                placeholder="Select Network"
+                css={`
+                  height: ${layoutIsSmall ? '48' : '40'}px;
+                `}
+              />
+              <Wallet />
+            </WalletContainer>
+          </ActionLinkGroup>
+        </MenuItems>
+      </Menu>
     </NavBar>
   );
 };
