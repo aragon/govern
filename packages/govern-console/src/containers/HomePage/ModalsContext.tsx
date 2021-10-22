@@ -1,5 +1,5 @@
 import React, { createContext, Dispatch, useReducer } from 'react';
-import TransctionsModal from 'components/Modal/TransactionsModal';
+import TransactionsModal from 'components/Modal/TransactionsModal';
 import { CustomTransaction } from 'utils/types';
 export enum ActionTypes {
   OPEN_TRANSACTIONS_MODAL = 'OPEN_TRANSACTIONS_MODAL',
@@ -87,7 +87,7 @@ export const ModalsProvider: React.FC = ({ children }) => {
   return (
     <ModalsContext.Provider value={{ state, dispatch }}>
       {children}
-      <TransctionsModal />
+      <TransactionsModal />
     </ModalsContext.Provider>
   );
 };

@@ -42,6 +42,7 @@ function HelpComponent() {
         type="primary"
         size={layoutName}
         style={{
+          color: '#635BFF',
           background: theme.purple,
           marginTop: 2 * GU,
           borderRadius: RADII['small'],
@@ -51,7 +52,7 @@ function HelpComponent() {
         rel="noopener noreferrer"
         target="_blank"
       >
-        Visit our help center
+        Chat with the Aragon Experts
       </Button>
     </Box>
   );

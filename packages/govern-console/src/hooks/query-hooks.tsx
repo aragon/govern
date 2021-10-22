@@ -1,14 +1,17 @@
 import { useState, useMemo } from 'react';
 import { useQuery, useLazyQuery } from '@apollo/client';
-import { DAO_BY_NAME, DAO_LIST, GOVERN_REGISTRY } from 'queries/dao';
-import { PROPOSAL_DETAILS, PROPOSAL_LIST } from 'queries/proposals';
+
 import { DISPUTE } from 'queries/court';
+import { TRANSFERS } from 'queries/finance';
 import { courtClient } from 'index';
+import { PROPOSAL_DETAILS, PROPOSAL_LIST } from 'queries/proposals';
+import { DAO_BY_NAME, DAO_LIST, GOVERN_REGISTRY } from 'queries/dao';
 
 import {
   transformProposalDetails,
   transformProposals,
   transformDaoDetails,
+  transformFinance,
 } from 'utils/transforms';
 
 const POLL_INTERVAL = 5000;
@@ -42,6 +45,19 @@ export function useDaosQuery() {
   });
 
   return { data, loading, error, fetchMore };
+}
+
+export function useFinanceQuery(executorId: string) {
+  const { data, loading, error } = useQuery(TRANSFERS, {
+    variables: { id: executorId },
+  });
+
+  const transfers = useMemo(() => {
+    if (data) {
+      return transformFinance(data);
+    }
+  }, [data]);
+  return { data: transfers, loading, error };
 }
 
 export function useGovernRegistryQuery() {
@@ -91,10 +107,32 @@ export function useLazyProposalListQuery() {
   };
 }
 
-export function useLazyDisputeQuery(disputId: number) {
+export function useProposalListQuery(queueId: string) {
+  // const [proposalList, setProposalList] = useState<any>(null);
+  const { loading, data, error, refetch } = useQuery(PROPOSAL_LIST, {
+    variables: { id: queueId },
+  });
+
+  // onCompleted doesn't work with lazyQuery when clicked on `fetchMore`.
+  // https://github.com/apollographql/apollo-client/issues/6636
+  const proposalList = useMemo(() => {
+    if (data) {
+      return transformProposals(data);
+    }
+  }, [data]);
+
+  return {
+    refetch,
+    loading,
+    data: proposalList,
+    error,
+  };
+}
+
+export function useLazyDisputeQuery(disputeId: number) {
   const [getDispute, { loading, error, data }] = useLazyQuery(DISPUTE, {
     notifyOnNetworkStatusChange: true,
-    variables: { id: disputId },
+    variables: { id: disputeId },
     client: courtClient,
   });
 
