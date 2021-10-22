@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - 'packages/govern-console/**'
+      - 'packages/govern/**'
     branches:
       - 'develop'
       - 'master'
@@ -62,7 +63,7 @@ jobs:
           COMMIT_SHA: ${{ github.sha }}
         run: |
           for f in ./build/static/**/*.js.map ; do 
-            curl -X POST https://apm-monitoring.aragon.org/assets/v1/sourcemaps -F service_name="govern" -F service_version="$COMMIT_SHA" -F bundle_filepath="http://localhost/static/js/bundle.js" -F sourcemap=@$f
+            curl -X POST https://apm-monitoring.aragon.org/assets/v1/sourcemaps -F service_name="govern" -F service_version="$COMMIT_SHA" -F bundle_filepath="http://localhost/static/js/$(basename $f)" -F sourcemap=@$f
           done
 
   build-and-deploy-mainnet:
@@ -109,6 +110,7 @@ jobs:
         env:
           COMMIT_SHA: ${{ github.sha }}
         run: |
-          for f in ./build/static/**/*.js.map ; do 
-            curl -X POST https://apm-monitoring.aragon.org/assets/v1/sourcemaps -F service_name="govern" -F service_version="$COMMIT_SHA" -F bundle_filepath="http://localhost/static/js/bundle.js" -F sourcemap=@$f
+          for f in $(find ./build/ -name "*.js.map") ; do 
+            export filename=${f%.*}
+            curl -X POST https://apm-monitoring.aragon.org/assets/v1/sourcemaps -F service_name="govern" -F service_version="$COMMIT_SHA" -F bundle_filepath="http://localhost/${filename#./build/}" -F sourcemap=@$f
           done

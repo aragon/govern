@@ -12,7 +12,6 @@ import {
 } from '../generated/templates/GovernQueue/GovernQueue'
 
 import { GovernQueue as GovernQueueContract } from '../generated/templates/GovernQueue/GovernQueue'
-import { ERC20 } from '../generated/templates/GovernQueue/ERC20'
 import { getERC20Info } from './utils/tokens';
 
 import {
@@ -66,20 +65,20 @@ export function handleScheduled(event: ScheduledEvent): void {
   // if cidString is ipfs v1 version hex from the cid's raw bytes and
   // we add `f` as a multibase prefix and remove `0x`
   let result = ipfs.cat('f' + proofIpfsHex + "/metadata.json")
-  if (result) {
-    let data = json.fromBytes(result as Bytes)
-    payload.title = data.toObject().get('title').toString()
-  } else {
+  if (!result) {
     // if cidString is ipfs v0 version hex from the cid's raw bytes,
     // we add:
     // 1. 112 (0x70 in hex) which is dag-pb format.
     // 2. 01 because we want to use v1 version
     // 3. f since cidString is already hex, we only add `f` without converting anything.
     result = ipfs.cat('f0170' + proofIpfsHex + '/metadata.json')
-    if(result) {
-      let data = json.fromBytes(result as Bytes)
-      payload.title = data.toObject().get('title').toString()
-    }
+  }
+
+  if (result) {
+    // log.debug('title {}', [result.toHex()])
+    // let data = json.fromBytes(result as Bytes)
+    // payload.title = data.toObject().get('title').toString()
+    payload.title = result.toHex()
   }
 
   container.payload = payload.id

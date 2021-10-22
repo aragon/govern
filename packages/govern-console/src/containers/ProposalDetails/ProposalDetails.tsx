@@ -10,7 +10,7 @@ import { CustomTransaction } from 'utils/types';
 import { getProposalParams } from 'utils/ERC3000';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import AbiHandler from 'utils/AbiHandler';
-import { formatDate } from 'utils/date';
+import { formatDate, formatTime } from 'utils/date';
 import { getState, getStateColor } from 'utils/states';
 import { useToast, Tag } from '@aragon/ui';
 import { IPFSField } from 'components/Field/IPFSField';
@@ -487,7 +487,7 @@ const ProposalDetails: React.FC = () => {
           <TitleText>Config</TitleText>
           <InfoWrapper>
             <InfoKeyDiv>Execution Delay:</InfoKeyDiv>
-            <InfoValueDivInline>{proposalInfo.config.executionDelay} seconds</InfoValueDivInline>
+            <InfoValueDivInline>{formatTime(proposalInfo.config.executionDelay)}</InfoValueDivInline>
           </InfoWrapper>
           <InfoWrapper>
             <InfoKeyDiv>Schedule Deposit:</InfoKeyDiv>
