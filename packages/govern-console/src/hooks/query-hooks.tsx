@@ -116,7 +116,6 @@ export function useProposalListQuery(queueId: string) {
   // onCompleted doesn't work with lazyQuery when clicked on `fetchMore`.
   // https://github.com/apollographql/apollo-client/issues/6636
   const proposalList = useMemo(() => {
-    console.log(data);
     if (data) {
       return transformProposals(data);
     }
@@ -130,10 +129,10 @@ export function useProposalListQuery(queueId: string) {
   };
 }
 
-export function useLazyDisputeQuery(disputId: number) {
+export function useLazyDisputeQuery(disputeId: number) {
   const [getDispute, { loading, error, data }] = useLazyQuery(DISPUTE, {
     notifyOnNetworkStatusChange: true,
-    variables: { id: disputId },
+    variables: { id: disputeId },
     client: courtClient,
   });
 
