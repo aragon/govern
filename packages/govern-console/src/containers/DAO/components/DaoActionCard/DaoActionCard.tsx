@@ -3,7 +3,6 @@ import { Box, IconRight, GU, useLayout } from '@aragon/ui';
 import { formatDate } from 'utils/date';
 import { useHistory } from 'react-router-dom';
 import { getTitleTransaction } from 'utils/HelperFunctions';
-import { getStateName } from 'utils/states';
 import { StateLabel } from 'components/Labels/StateLabel';
 
 type Props = {
