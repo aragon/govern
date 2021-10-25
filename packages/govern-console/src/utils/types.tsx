@@ -88,6 +88,59 @@ export type ActionBuilderState =
   | 'abiForm'
   | 'chooseFunctions';
 
+export type Deposit = {
+  id: string;
+  type: 'Deposit';
+  token: string;
+  amount: string;
+  sender: string;
+  createdAt: string;
+};
+
+export type Withdraw = {
+  id: string;
+  to: string;
+  from: string;
+  type: 'Withdraw';
+  token: string;
+  amount: string;
+  createdAt: string;
+};
+
+export type Finance = {
+  id: string;
+  deposits: Deposit[];
+  withdraws: Withdraw[];
+  typename: string;
+};
+
+export type Transaction = {
+  createdAt: string;
+  typename: string;
+  reference: string;
+  amount: string;
+  token: string;
+  symbol: string;
+};
+
+export type FinanceToken = {
+  [key: string]: {
+    symbol: string;
+    amount: bigint;
+    amountForHuman: string;
+    price?: number | string;
+    decimals: number;
+  };
+};
+
+export type Balance = {
+  [key: string]: {
+    amount: bigint;
+    symbol: string;
+    decimals: number;
+  };
+};
+
 export interface Interval {
   name: string;
   value: number;

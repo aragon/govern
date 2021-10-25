@@ -14,7 +14,7 @@ import {
 } from '@aragon/ui';
 import { Controller, useForm } from 'react-hook-form';
 import { validateContract, validateAbi } from 'utils/validations';
-import { useWallet } from 'AugmentedWallet';
+import { useWallet } from 'providers/AugmentedWallet';
 import { useActionBuilderState } from '../ActionBuilderStateProvider';
 import AbiHandler from 'utils/AbiHandler';
 import { constants } from 'ethers';

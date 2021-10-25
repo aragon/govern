@@ -5,10 +5,11 @@ import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
 // import { offsetLimitPagination } from '@apollo/client/utilities';
-
+import { APMProvider } from 'providers/elasticAPM';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { lightTheme } from './AragonTheme';
+import { WalletProvider } from './providers/AugmentedWallet';
 import './index.css';
 
 import { networkEnvironment } from './environment';
@@ -53,14 +54,18 @@ const client = new ApolloClient({
 
 ReactDOM.render(
   <React.StrictMode>
-    <ThemeProvider theme={lightTheme}>
-      {/* for date picker https://material-ui-pickers.dev/getting-started/installation */}
-      <MuiPickersUtilsProvider utils={MomentUtils}>
-        <ApolloProvider client={client}>
-          <App />
-        </ApolloProvider>
-      </MuiPickersUtilsProvider>
-    </ThemeProvider>
+    <APMProvider>
+      <WalletProvider>
+        <ThemeProvider theme={lightTheme}>
+          {/* for date picker https://material-ui-pickers.dev/getting-started/installation */}
+          <MuiPickersUtilsProvider utils={MomentUtils}>
+            <ApolloProvider client={client}>
+              <App />
+            </ApolloProvider>
+          </MuiPickersUtilsProvider>
+        </ThemeProvider>
+      </WalletProvider>
+    </APMProvider>
   </React.StrictMode>,
   document.getElementById('root'),
 );

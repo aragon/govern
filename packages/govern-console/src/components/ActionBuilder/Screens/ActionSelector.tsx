@@ -12,11 +12,6 @@ type ActionOption = {
 };
 
 const actions: ActionOption[] = [
-  {
-    title: 'Send DAO funds',
-    subTitle: 'Transfer DAO funds to any address.',
-    state: 'withdrawAssets',
-  },
   { title: 'Mint tokens', subTitle: 'Mint more DAO tokens.', state: 'mintTokens' },
   {
     title: 'External contract',
