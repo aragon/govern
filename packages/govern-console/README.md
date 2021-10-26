@@ -1,6 +1,6 @@
 # Govern Console
 
-This is Aragon V2 frontend project.
+This is Aragon Govern frontend project.
 
 ## Available Scripts
 

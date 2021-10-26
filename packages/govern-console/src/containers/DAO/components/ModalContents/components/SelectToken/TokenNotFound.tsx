@@ -1,5 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useFormContext } from 'react-hook-form';
+
+import { transactionTypes } from '../../NewTransfer';
 
 const TokenNotFoundTextWrapper = styled.div`
   height: 80px;
@@ -24,11 +27,14 @@ const TokenNotFoundSubtitle = styled.p`
 `;
 
 const TokenNotFound: React.FC = () => {
+  const { getValues } = useFormContext();
   return (
     <TokenNotFoundTextWrapper>
       <TokenNotFoundTextContent>
         <TokenNotFoundTitle>Token not found</TokenNotFoundTitle>
-        <TokenNotFoundSubtitle>Add your custom Token to deposit</TokenNotFoundSubtitle>
+        <TokenNotFoundSubtitle>
+          Add your custom token to {transactionTypes[getValues('type')].toLowerCase()}
+        </TokenNotFoundSubtitle>
       </TokenNotFoundTextContent>
     </TokenNotFoundTextWrapper>
   );
