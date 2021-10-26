@@ -111,6 +111,7 @@ export function useProposalListQuery(queueId: string) {
   // const [proposalList, setProposalList] = useState<any>(null);
   const { loading, data, error, refetch } = useQuery(PROPOSAL_LIST, {
     variables: { id: queueId },
+    fetchPolicy: 'no-cache',
   });
 
   // onCompleted doesn't work with lazyQuery when clicked on `fetchMore`.

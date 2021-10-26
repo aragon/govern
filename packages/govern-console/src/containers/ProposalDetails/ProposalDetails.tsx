@@ -448,8 +448,6 @@ const ProposalDetails: React.FC = () => {
     return <div> Loading...</div>;
   }
 
-  console.log(proposalInfo?.payload);
-
   return (
     <StyledPaper elevation={0}>
       <BackButton onClick={() => history.goBack()}>
