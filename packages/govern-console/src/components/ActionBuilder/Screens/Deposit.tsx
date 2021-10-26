@@ -1,3 +1,5 @@
+// TODO: deprecate
+
 import React, { useCallback } from 'react';
 import {
   EthIdenticon,
@@ -17,7 +19,7 @@ import {
 import { Hint } from 'components/Hint/Hint';
 import { useForm, Controller } from 'react-hook-form';
 import { validateAmountForDecimals, validateToken, validateBalance } from 'utils/validations';
-import { useWallet } from 'AugmentedWallet';
+import { useWallet } from 'providers/AugmentedWallet';
 import { useActionBuilderState } from '../ActionBuilderStateProvider';
 import { getTruncatedAccountAddress } from 'utils/account';
 import { getErrorFromException } from 'utils/HelperFunctions';
@@ -156,7 +158,7 @@ export const Deposit: React.FC = () => {
           )}
         />
       </GridItem>
-      {Asset.isOtherToken(depositAssets[selectedToken]) && (
+      {Asset.isCustomToken(depositAssets[selectedToken]) && (
         <GridItem>
           <Controller
             name="tokenContractAddress"

@@ -10,6 +10,15 @@ export const PROPOSAL_STATES = {
   EXECUTABLE: 'Executable',
 };
 
+export const PROPOSAL_STATES_LIST = [
+  'All Actions',
+  'Executable',
+  'Scheduled',
+  'Challenged',
+  'Executed',
+  'Rejected',
+];
+
 export const PROPOSAL_STATES_COLORS = {
   [PROPOSAL_STATES.SCHEDULED]: 'grey',
   [PROPOSAL_STATES.CHALLENGED]: 'orange',
@@ -21,12 +30,12 @@ export const PROPOSAL_STATES_COLORS = {
 };
 
 // NOTE: time is in seconds since epoch
-export const eligibleExecution = (time: number | string) => {
+export const eligibleExecution = (time: number) => {
   // add 15 seconds latency due to ethereum's block.timestamp variance by 15 seconds.
   // needed so that user doesn't click the button immediatelly once it's eligible which
   // will cause the tx error due to  `wait more` from the contract.
-  time = parseInt(time.toString(), 10);
   time = time + 15;
+
   return {
     isEligible: Date.now() >= time * 1000,
     eligibleDate: formatDate(time),
@@ -41,7 +50,7 @@ export const getStateColor = (state: string, executionTime: number) => {
   return PROPOSAL_STATES_COLORS[state];
 };
 
-export const getState = (state: string, executionTime: number) => {
+export const getStateName = (state: string, executionTime: number) => {
   if (state == PROPOSAL_STATES.SCHEDULED && eligibleExecution(executionTime).isEligible) {
     return 'Executable';
   }

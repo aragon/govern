@@ -28,7 +28,7 @@ export const validateFileSize = async (files: FileList, size: number): Promise<V
  */
 export const validateToken = async (address: string, provider: any): Promise<ValidateResult> => {
   const isERC20 = await isTokenERC20(address, provider);
-  return isERC20 || 'Token adress is not ERC20 compliant';
+  return isERC20 || 'Token address is not ERC20 compliant';
 };
 
 /**
@@ -64,7 +64,7 @@ export const daoExists = async (name: string): Promise<ValidateResult> => {
 };
 
 /**
- * Validates amount dependin on decimal.
+ * Validates amount depending on decimal.
  * @dev if the decimals is 0, and amount contains fractions or
  * if the decimals is more than 0 and it doesn't contain fractions, it returns an error
  *

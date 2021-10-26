@@ -3,7 +3,7 @@ import { CreateDaoSteps } from './utils/Shared';
 import { useCreateDaoContext } from './utils/CreateDaoContextProvider';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { validateToken, validateAmountForDecimals } from 'utils/validations';
-import { useWallet } from 'AugmentedWallet';
+import { useWallet } from 'providers/AugmentedWallet';
 import { getTokenInfo } from 'utils/token';
 import { formatUnits } from 'utils/lib';
 import { MAX_SCHEDULE_ACCESS_LIST_ALLOWED } from 'utils/constants';

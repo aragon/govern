@@ -31,10 +31,12 @@ export function handleETHDeposited(event: ETHDepositedEvent): void {
   let deposit = new Deposit(buildId(event));
   let govern = loadOrCreateGovern(event.address)
   deposit.reference = ""
+  deposit.transactionHash = event.transaction.hash
   deposit.sender = event.params.sender;
   deposit.amount = event.params.amount;
   deposit.token = ZERO_ADDRESS
   deposit.govern = govern.id;
+  deposit.createdAt = event.block.timestamp
   deposit.save();
 }
 
@@ -42,10 +44,12 @@ export function handleDeposited(event: DepositedEvent): void {
   let deposit = new Deposit(buildId(event));
   let govern = loadOrCreateGovern(event.address)
   deposit.reference = event.params._reference
+  deposit.transactionHash = event.transaction.hash
   deposit.sender = event.params.sender;
   deposit.amount = event.params.amount;
   deposit.token = event.params.token;
   deposit.govern = govern.id;
+  deposit.createdAt = event.block.timestamp
   deposit.save();
 }
 
@@ -53,11 +57,13 @@ export function handleWithdrawn(event: WithdrawnEvent): void {
   let withdraw = new Withdraw(buildId(event));
   let govern = loadOrCreateGovern(event.address)
   withdraw.reference = event.params._reference
+  withdraw.transactionHash = event.transaction.hash
   withdraw.from = event.params.from;
   withdraw.to = event.params.to;
   withdraw.amount = event.params.amount;
   withdraw.token = event.params.token;
   withdraw.govern = govern.id;
+  withdraw.createdAt = event.block.timestamp
   withdraw.save();
 }
 

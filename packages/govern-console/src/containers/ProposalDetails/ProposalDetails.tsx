@@ -4,16 +4,14 @@ import { styled } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import backButtonIcon from 'images/back-btn.svg';
-import { Label } from 'components/Labels/Label';
-import { useParams } from 'react-router-dom';
-import { useWallet } from '../../AugmentedWallet';
+import { useParams, useHistory } from 'react-router-dom';
+import { useWallet } from 'providers/AugmentedWallet';
 import { CustomTransaction } from 'utils/types';
 import { getProposalParams } from 'utils/ERC3000';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import AbiHandler from 'utils/AbiHandler';
-import { formatDate } from 'utils/date';
-import { getState, getStateColor } from 'utils/states';
-import { useToast } from '@aragon/ui';
+import { formatDate, formatTime } from 'utils/date';
+import { useToast, Tag } from '@aragon/ui';
 import { IPFSField } from 'components/Field/IPFSField';
 import { addToIpfs, fetchIPFS } from 'utils/ipfs';
 import { useFacadeProposal } from 'hooks/proposal-hooks';
@@ -21,14 +19,11 @@ import { useLazyProposalQuery, useDaoQuery } from 'hooks/query-hooks';
 import { ipfsMetadata } from 'utils/types';
 import { formatUnits } from 'utils/lib';
 import { DecodedActionData } from './components/DecodedActionData';
-
 // widget components
 import ChallengeWidget from './components/ChallengeWidget';
 import ExecuteWidget from './components/ExecuteWidget';
 import ResolveWidget from './components/ResolveWidget';
-interface ProposalDetailsProps {
-  onClickBack?: any;
-}
+import { StateLabel } from 'components/Labels/StateLabel';
 
 //* styled Components
 
@@ -76,12 +71,13 @@ const DateDisplay = styled('div')({
 });
 const DetailsWrapper = styled('div')({
   display: 'flex',
+  flexDirection: 'column',
   justifyContent: 'space-between',
   marginTop: '47px',
   fontFamily: 'Manrope',
 });
 const ProposalDetailsWrapper = styled('div')({
-  width: 'calc(100% - 443px)',
+  width: '100%',
   boxSizing: 'border-box',
   borderRadius: '16px',
   minHeight: '900px',
@@ -90,7 +86,8 @@ const ProposalDetailsWrapper = styled('div')({
   fontFamily: 'Manrope',
 });
 const WidgetWrapper = styled('div')({
-  width: '427px',
+  width: '100%',
+  marginTop: '24px',
 });
 const TitleText = styled(Typography)({
   fontWeight: 600,
@@ -277,11 +274,11 @@ const ExpandedDiv = styled('div')({
     maxWidth: 'calc(100% - 48px)',
   },
 });
-
 //* End of styled Components
 
-const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
+const ProposalDetails: React.FC = () => {
   const { daoName, id: proposalId } = useParams<any>();
+  const history = useHistory();
 
   const { data: dao } = useDaoQuery(daoName);
   const context: any = useWallet();
@@ -389,7 +386,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
       if (proposalInstance) {
         try {
           transactionsQueue.current = await proposalInstance.challenge(proposalParams, reasonCid);
-        } catch (error) {
+        } catch (error: any) {
           console.log('Failed challenging', error);
           toast(error.message);
           return;
@@ -451,16 +448,15 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
     return <div> Loading...</div>;
   }
 
+  console.log(proposalInfo?.payload);
+
   return (
     <StyledPaper elevation={0}>
-      <BackButton onClick={onClickBack}>
+      <BackButton onClick={() => history.goBack()}>
         <img src={backButtonIcon} />
       </BackButton>
       <ProposalStatus>
-        <Label
-          labelColor={getStateColor(proposalInfo.state, proposalInfo.payload.executionTime)}
-          labelText={getState(proposalInfo.state, proposalInfo.payload.executionTime)}
-        />
+        {proposalInfo && <StateLabel state={proposalInfo.state} executionTime={parseInt(proposalInfo.payload.executionTime,10)} />}
       </ProposalStatus>
       {/* <ProposalId>{proposalInfo.id}</ProposalId> */}
       <ProposalId>{proof?.metadata && proof.metadata.title}</ProposalId>
@@ -470,7 +466,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ onClickBack }) => {
           <TitleText>Config</TitleText>
           <InfoWrapper>
             <InfoKeyDiv>Execution Delay:</InfoKeyDiv>
-            <InfoValueDivInline>{proposalInfo.config.executionDelay} seconds</InfoValueDivInline>
+            <InfoValueDivInline>{formatTime(proposalInfo.config.executionDelay)}</InfoValueDivInline>
           </InfoWrapper>
           <InfoWrapper>
             <InfoKeyDiv>Schedule Deposit:</InfoKeyDiv>

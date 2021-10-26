@@ -1,23 +1,34 @@
-import { useState } from 'react';
+import styled from 'styled-components';
 import { useWallet } from 'use-wallet';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Button, EthIdenticon, IconConnect, useLayout, useToast } from '@aragon/ui';
+
 import { networkEnvironment } from 'environment';
-import { Button, EthIdenticon, useLayout, IconConnect, useToast } from '@aragon/ui';
-import { getTruncatedAccountAddress } from 'utils/account';
 import { trackEvent, EventType } from 'services/analytics';
-import { useCallback } from 'react';
+import { getTruncatedAccountAddress } from 'utils/account';
+
+const StyledButton = styled(Button).attrs((props) => ({
+  size: 'large',
+  mode: 'secondary',
+  display: 'all',
+  style: props.layoutIsSmall ? { height: '48px' } : {},
+}))`
+  flex: 1;
+`;
 
 //TODO add the icon for logged in users
 declare let window: any;
+const connectButtonLabel = 'Connect wallet';
 
-const Wallet = ({}) => {
-  const connetButtonLabel = 'Connect wallet';
+const Wallet: React.FC = () => {
+  const toast = useToast();
   const context: any = useWallet();
   const { layoutName } = useLayout();
-  const toast = useToast();
   const { account, chainId, connect, error, reset, status, networkName, connector } = context;
   const [networkStatus, setNetworkStatus] = useState<string>(status);
   const [userAccount, setUserAccount] = useState<string>(status);
+
+  const layoutIsSmall = useMemo(() => layoutName === 'small', [layoutName]);
 
   useEffect(() => {
     if (chainId !== networkEnvironment.chainId) {
@@ -70,7 +81,7 @@ const Wallet = ({}) => {
     });
 
     reset();
-  }, [userAccount, connector, networkName, reset]);
+  }, [connector, networkName, reset, userAccount]);
 
   //TODO: not suitable connectWalletAndSetStatus has to re-thought
   /* eslint-disable */
@@ -89,55 +100,47 @@ const Wallet = ({}) => {
 
   if (networkStatus === 'connected') {
     return (
-      <Button
-        size="large"
-        mode="secondary"
+      <StyledButton
         label={getTruncatedAccountAddress(userAccount)}
         icon={<EthIdenticon address={userAccount} scale={1.5} radius={50} />}
-        display={layoutName === 'small' ? 'icon' : 'all'}
         onClick={disconnect}
+        layoutIsSmall={layoutIsSmall}
       />
     );
   } else if (networkStatus === 'unsupported') {
     return (
-      <Button
-        size="large"
-        mode="secondary"
+      <StyledButton
         onClick={() => {
           connectWalletAndSetStatus('injected');
         }}
-        label={connetButtonLabel}
+        label={connectButtonLabel}
         icon={<IconConnect />}
-        display={layoutName === 'small' ? 'icon' : 'all'}
         disabled={status === 'connecting'}
+        layoutIsSmall={layoutIsSmall}
       />
     );
   } else if (networkStatus === 'connection-error') {
     return (
-      <Button
-        size="large"
-        mode="secondary"
+      <StyledButton
         onClick={() => {
           connectWalletAndSetStatus('injected');
         }}
-        label={connetButtonLabel}
+        label={connectButtonLabel}
         icon={<IconConnect />}
-        display={layoutName === 'small' ? 'icon' : 'all'}
         disabled={status === 'connecting'}
+        layoutIsSmall={layoutIsSmall}
       />
     );
   } else {
     return (
-      <Button
-        size="large"
-        mode="secondary"
+      <StyledButton
         onClick={() => {
           connectWalletAndSetStatus('injected');
         }}
-        label={connetButtonLabel}
+        label={connectButtonLabel}
         icon={<IconConnect />}
-        display={layoutName === 'small' ? 'icon' : 'all'}
         disabled={status === 'connecting'}
+        layoutIsSmall={layoutIsSmall}
       />
     );
   }

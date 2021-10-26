@@ -3,7 +3,7 @@ import { CreateDaoSteps } from './utils/Shared';
 import { useCreateDaoContext, ICreateDaoConfig } from './utils/CreateDaoContextProvider';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { validateContract } from 'utils/validations';
-import { useWallet } from 'AugmentedWallet';
+import { useWallet } from 'providers/AugmentedWallet';
 import { IPFSInput } from 'components/Field/IPFSInput';
 import { networkEnvironment } from 'environment';
 

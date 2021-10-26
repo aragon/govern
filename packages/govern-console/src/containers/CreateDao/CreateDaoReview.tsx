@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import addressIcon from '../../images/connected-user-icon.svg';
 import { CreateDaoSteps, configArray, basicInfoArray, collateralArray } from './utils/Shared';
 import { useCreateDaoContext } from './utils/CreateDaoContextProvider';
-import { useWallet } from 'AugmentedWallet';
+import { useWallet } from 'providers/AugmentedWallet';
 import { trackEvent, EventType } from 'services/analytics';
 
 import {
