@@ -14,6 +14,7 @@ import DaoHomePage from 'containers/DAO/DaoHomePage';
 import { trackPage } from 'services/analytics';
 import ConsoleMainPage from 'containers/Console/ConsoleMainPage';
 import { ModalsProvider } from 'containers/HomePage/ModalsContext';
+import NoPageFound from './NoPageFound';
 
 const Container = styled.div`
   display: grid;
@@ -54,6 +55,7 @@ const HomePage = () => {
               <ApmRoute exact path="/create-dao" component={CreateDao} />
               <ApmRoute exact path="/daos/not-found" component={NoDaoFound} />
               <ApmRoute path="/daos/:daoName/" component={DaoHomePage} />
+              <ApmRoute exact path="*" component={NoPageFound} />
             </Switch>
           </BodyArea>
           <FooterArea>
