@@ -11,7 +11,6 @@ import { getProposalParams } from 'utils/ERC3000';
 import { ActionTypes, ModalsContext } from 'containers/HomePage/ModalsContext';
 import AbiHandler from 'utils/AbiHandler';
 import { formatDate, formatTime } from 'utils/date';
-import { getState, getStateColor } from 'utils/states';
 import { useToast, Tag } from '@aragon/ui';
 import { IPFSField } from 'components/Field/IPFSField';
 import { addToIpfs, fetchIPFS } from 'utils/ipfs';
@@ -24,6 +23,7 @@ import { DecodedActionData } from './components/DecodedActionData';
 import ChallengeWidget from './components/ChallengeWidget';
 import ExecuteWidget from './components/ExecuteWidget';
 import ResolveWidget from './components/ResolveWidget';
+import { StateLabel } from 'components/Labels/StateLabel';
 
 //* styled Components
 
@@ -454,30 +454,7 @@ const ProposalDetails: React.FC = () => {
         <img src={backButtonIcon} />
       </BackButton>
       <ProposalStatus>
-      <Tag
-        css={`
-          border-radius: 4px;
-          color: white;
-          &.executable {
-            background: #00c2ff;
-          }
-          &.scheduled {
-            background: #ffbc5b;
-          }
-          &.challenged {
-            background: linear-gradient(107.79deg, #ff7984 1.46%, #ffeb94 100%);
-          }
-          &.executed {
-            background: #46c469;
-          }
-          &.ruled_negatively {
-            background: #ff6a60;
-          }
-          &.rejected {
-            background: #ff6a60;
-          }
-        `}
-       className={proposalInfo?.state.toLowerCase().replace(' ', '_')}>{proposalInfo?.state}</Tag>
+        {proposalInfo && <StateLabel state={proposalInfo.state} executionTime={parseInt(proposalInfo.payload.executionTime,10)} />}
       </ProposalStatus>
       {/* <ProposalId>{proposalInfo.id}</ProposalId> */}
       <ProposalId>{proof?.metadata && proof.metadata.title}</ProposalId>

@@ -1,8 +1,9 @@
 import styled from 'styled-components';
-import { Box, Tag, IconRight, GU, useLayout } from '@aragon/ui';
+import { Box, IconRight, GU, useLayout } from '@aragon/ui';
 import { formatDate } from 'utils/date';
 import { useHistory } from 'react-router-dom';
 import { getTitleTransaction } from 'utils/HelperFunctions';
+import { StateLabel } from 'components/Labels/StateLabel';
 
 type Props = {
   date: string;
@@ -32,29 +33,6 @@ const ActionCard = styled(Box).attrs(() => ({
     display: flex;
     justify-content: space-between;
     align-items: center;
-  }
-`;
-
-const Label = styled(Tag)`
-  border-radius: 4px;
-  color: white;
-  &.executable {
-    background: #00c2ff;
-  }
-  &.scheduled {
-    background: #ffbc5b;
-  }
-  &.challenged {
-    background: linear-gradient(107.79deg, #ff7984 1.46%, #ffeb94 100%);
-  }
-  &.executed {
-    background: #46c469;
-  }
-  &.ruled_negatively {
-    background: #ff6a60;
-  }
-  &.rejected {
-    background: #ff6a60;
   }
 `;
 
@@ -111,7 +89,7 @@ const DaoActionCard: React.FC<Props> = ({ id, date, state, title, dao_identifier
         <Time>{formatDate(date, 'relative')}</Time>
       </TextContainer>
       <LabelContainer>
-        <Label className={state.toLowerCase().replace(' ', '_')}>{state}</Label>
+        <StateLabel state={state} executionTime={parseInt(date, 10)} />
         <IconRight
           css={`
             margin-left: ${3 * GU}px;
