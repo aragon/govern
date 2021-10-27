@@ -1,11 +1,4 @@
-import {
-  Address,
-  Bytes,
-  BigInt,
-  ipfs,
-  json,
-  log
-} from '@graphprotocol/graph-ts'
+import { Address, Bytes, BigInt, ipfs, json, log } from '@graphprotocol/graph-ts'
 import {
   Challenged as ChallengedEvent,
   Configured as ConfiguredEvent,
@@ -19,7 +12,7 @@ import {
 } from '../generated/templates/GovernQueue/GovernQueue'
 
 import { GovernQueue as GovernQueueContract } from '../generated/templates/GovernQueue/GovernQueue'
-import { getERC20Info } from './utils/tokens'
+import { getERC20Info } from './utils/tokens';
 
 import {
   Action,
@@ -68,10 +61,10 @@ export function handleScheduled(event: ScheduledEvent): void {
   payload.proof = event.params.payload.proof
 
   let proofIpfsHex = event.params.payload.proof.toHexString().substring(2)
-
+  
   // if cidString is ipfs v1 version hex from the cid's raw bytes and
   // we add `f` as a multibase prefix and remove `0x`
-  let result = ipfs.cat('f' + proofIpfsHex + '/metadata.json')
+  let result = ipfs.cat('f' + proofIpfsHex + "/metadata.json")
   if (!result) {
     // if cidString is ipfs v0 version hex from the cid's raw bytes,
     // we add:
@@ -107,7 +100,6 @@ export function handleScheduled(event: ScheduledEvent): void {
 }
 
 export function handleExecuted(event: ExecutedEvent): void {
-  log.debug('executed event params {}', [event.params.containerHash.toString()])
   let container = loadOrCreateContainer(event.params.containerHash)
   container.state = EXECUTED_STATUS
   container.save()
@@ -169,15 +161,15 @@ export function handleConfigured(event: ConfiguredEvent): void {
 
   // Grab Schedule Token info
   let data = getERC20Info(event.params.config.scheduleDeposit.token)
-  scheduleDeposit.decimals = data.decimals
-  scheduleDeposit.name = data.name
-  scheduleDeposit.symbol = data.symbol
+  scheduleDeposit.decimals = data.decimals;
+  scheduleDeposit.name = data.name;
+  scheduleDeposit.symbol = data.symbol;
 
   // Grab challenge Token info
   data = getERC20Info(event.params.config.challengeDeposit.token)
-  challengeDeposit.decimals = data.decimals
-  challengeDeposit.name = data.name
-  challengeDeposit.symbol = data.symbol
+  challengeDeposit.decimals = data.decimals;
+  challengeDeposit.name = data.name;
+  challengeDeposit.symbol = data.symbol;
 
   config.executionDelay = event.params.config.executionDelay
   config.scheduleDeposit = scheduleDeposit.id
@@ -278,19 +270,9 @@ export function loadOrCreateContainer(containerHash: Bytes): Container {
   let ContainerId = containerHash.toHex()
   // Create container
   let container = Container.load(ContainerId)
-
   if (container === null) {
-    log.debug('container is null, createing new container with id ', [
-      ContainerId
-    ])
     container = new Container(ContainerId)
     container.state = NONE_STATUS
-  } else {
-    log.debug('container is NOT null for id {}', [ContainerId])
-    if (container.queue === null) {
-      log.debug('container queue is null, setting a zero address', [])
-      container.queue = '0x0000000000000000000000000000000000000000'
-    }
   }
   return container!
 }
