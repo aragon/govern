@@ -6,7 +6,7 @@ import {
   ContainerEventResolve,
   ContainerEventRule,
   ContainerEventSchedule,
-  ContainerEventVeto,
+  ContainerEventVeto
 } from '../../generated/schema'
 import { Executed as ExecutedEvent } from '../../generated/templates/Govern/Govern'
 import {
@@ -14,7 +14,7 @@ import {
   Resolved as ResolvedEvent,
   Ruled as RuledEvent,
   Scheduled as ScheduledEvent,
-  Vetoed as VetoedEvent,
+  Vetoed as VetoedEvent
 } from '../../generated/templates/GovernQueue/GovernQueue'
 import { buildId, buildEventHandlerId } from './ids'
 import { Bytes } from '@graphprotocol/graph-ts'
@@ -27,7 +27,6 @@ function finalizeContainerEvent<T, U>(
   containerEvent.createdAt = ethereumEvent.block.timestamp
   containerEvent.container = container.id
 
-  container.save()
   containerEvent.save()
 
   return containerEvent
