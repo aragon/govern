@@ -14,7 +14,7 @@ import {
   Resolved as ResolvedEvent,
   Ruled as RuledEvent,
   Scheduled as ScheduledEvent,
-  Vetoed as VetoedEvent
+  Vetoed as VetoedEvent,
 } from '../../generated/templates/GovernQueue/GovernQueue'
 import { buildId, buildEventHandlerId } from './ids'
 import { Bytes } from '@graphprotocol/graph-ts'
