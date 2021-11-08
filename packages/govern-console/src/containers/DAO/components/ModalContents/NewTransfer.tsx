@@ -239,7 +239,7 @@ const Transfer: React.FC = () => {
           return result;
         }
 
-        if (isDeposit) return await validateBalance(asset, accountAddress, provider);
+        return isDeposit ? await validateBalance(asset, accountAddress, provider) : true;
       } catch (err) {
         console.log('Error validating amount', err);
         return 'Error validating amount';
