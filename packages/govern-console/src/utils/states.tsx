@@ -32,13 +32,13 @@ export const PROPOSAL_STATES_COLORS = {
 // NOTE: time is in seconds since epoch
 export const eligibleExecution = (time: number) => {
   // add 15 seconds latency due to ethereum's block.timestamp variance by 15 seconds.
-  // needed so that user doesn't click the button immediatelly once it's eligible which
+  // needed so that user doesn't click the button immediately once it's eligible which
   // will cause the tx error due to  `wait more` from the contract.
-  time = time + 15;
+  const timeWithDelay: number = Number(time) + 15;
 
   return {
-    isEligible: Date.now() >= time * 1000,
-    eligibleDate: formatDate(time),
+    isEligible: Date.now() >= timeWithDelay * 1000,
+    eligibleDate: formatDate(timeWithDelay),
   };
 };
 
