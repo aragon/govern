@@ -239,7 +239,7 @@ const Transfer: React.FC = () => {
           return result;
         }
 
-        return await validateBalance(asset, accountAddress, provider);
+        if (isDeposit) return await validateBalance(asset, accountAddress, provider);
       } catch (err) {
         console.log('Error validating amount', err);
         return 'Error validating amount';
@@ -390,7 +390,7 @@ const Transfer: React.FC = () => {
             control={control}
             rules={{
               required: 'Token amount is required.',
-              ...(isDeposit && { validate: validateAmount }),
+              validate: validateAmount,
             }}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <>
