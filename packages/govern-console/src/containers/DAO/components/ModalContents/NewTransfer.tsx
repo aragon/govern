@@ -390,7 +390,7 @@ const Transfer: React.FC = () => {
             control={control}
             rules={{
               required: 'Token amount is required.',
-              validate: validateAmount,
+              ...(isDeposit && { validate: validateAmount }),
             }}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <>
