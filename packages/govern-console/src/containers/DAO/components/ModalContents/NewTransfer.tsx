@@ -245,7 +245,7 @@ const Transfer: React.FC = () => {
         return 'Error validating amount';
       }
     },
-    [getValues, formState.errors?.token?.address, provider, accountAddress],
+    [getValues, formState.errors?.token?.address, provider, isDeposit, accountAddress],
   );
 
   const tokenValidator = useCallback(
