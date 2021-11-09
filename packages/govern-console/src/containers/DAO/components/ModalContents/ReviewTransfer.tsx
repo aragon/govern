@@ -79,6 +79,12 @@ const ReviewDeposit: React.FC = () => {
     daoDetails?.queue.config.resolver,
   );
 
+  const getTransactionDirection = (status: 'To' | 'From') => {
+    if (status === 'From')
+      return isDeposit ? getTruncatedAccountAddress(account.address) : daoIdentifier;
+    else return isDeposit ? daoIdentifier : getTruncatedAccountAddress(account.address);
+  };
+
   const executeTransfer = useCallback(async () => {
     const {
       token: { symbol, address },
@@ -176,12 +182,12 @@ const ReviewDeposit: React.FC = () => {
         <AddressContainer>
           <AddressBox>
             <AddressTitle>From</AddressTitle>
-            <AddressContent>{getTruncatedAccountAddress(account.address)}</AddressContent>
+            <AddressContent>{getTransactionDirection('From')}</AddressContent>
           </AddressBox>
           <CustomIconRight size="medium" />
           <AddressBox>
             <AddressTitle>To</AddressTitle>
-            <AddressContent>{daoIdentifier}</AddressContent>
+            <AddressContent>{getTransactionDirection('To')}</AddressContent>
           </AddressBox>
         </AddressContainer>
         <InfoBox>
