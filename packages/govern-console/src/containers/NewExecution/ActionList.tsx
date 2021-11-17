@@ -18,6 +18,8 @@ import {
 import { ActionItem } from 'utils/types';
 import { Controller, useFormContext } from 'react-hook-form';
 import { getTruncatedAccountAddress } from 'utils/account';
+import ActionInputText from '../../components/ActionBuilder/ActionInputText';
+import ActionInputContainer from 'components/ActionBuilder/ActionInputContainer';
 
 type ActionListProps = {
   actions: Array<ActionItem & { id: string }>;
@@ -125,29 +127,27 @@ const ActionList: React.FC<ActionListProps> = ({ actions, swap, remove }) => {
           <Box heading={action.name}>
             <Grid>
               {action.inputs.map((input: any, num: number) => {
-                const element = (
-                  <Controller
-                    key={`actions.${index}.inputs.${num}.value`}
-                    name={`actions.${index}.inputs.${num}.value` as const}
-                    control={control}
-                    defaultValue={input.value}
-                    rules={{
-                      required: 'This is required.',
-                    }}
-                    render={({ field: { onChange, value }, fieldState: { error } }) => (
-                      <TextInput
-                        wide
-                        value={value}
-                        onChange={onChange}
-                        subtitle={input.name}
-                        placeholder={input.type}
-                        status={error ? 'error' : 'normal'}
-                        error={error ? error.message : null}
-                      />
-                    )}
+                if (action.name === 'veto' && input.name === '_container') {
+                  return (
+                    <ActionInputContainer
+                      key={`actions.${index}.inputs.${num}`}
+                      input={input}
+                      inputNum={num}
+                      actionIndex={index}
+                      formControl={control}
+                      queueId={action.contractAddress}
+                    />
+                  );
+                }
+                return (
+                  <ActionInputText
+                    key={`actions.${index}.inputs.${num}`}
+                    input={input}
+                    inputNum={num}
+                    actionIndex={index}
+                    formControl={control}
                   />
                 );
-                return element;
               })}
               {action.payable && (
                 <div>
