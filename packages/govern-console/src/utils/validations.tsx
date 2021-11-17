@@ -72,6 +72,11 @@ export const daoExists = async (name: string): Promise<ValidateResult> => {
  * @param decimals decimals
  */
 export const validateAmountForDecimals = (amount: string, decimals: number) => {
+  // TODO: implement valid regex
+  if (amount.includes(',')) {
+    return 'The amount must not be separated by commas';
+  }
+
   if (parseInt(amount) < 0) {
     return 'The amount must be positive';
   }
