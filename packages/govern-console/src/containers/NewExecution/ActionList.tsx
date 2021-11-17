@@ -127,7 +127,7 @@ const ActionList: React.FC<ActionListProps> = ({ actions, swap, remove }) => {
           <Box heading={action.name}>
             <Grid>
               {action.inputs.map((input: any, num: number) => {
-                if (input.name === '_container') {
+                if (action.name === 'veto' && input.name === '_container') {
                   return (
                     <ActionInputContainer
                       key={`actions.${index}.inputs.${num}`}
