@@ -40,7 +40,8 @@
     "compile:cached": "hardhat compile",
     "test": "hardhat test",
     "coverage": "hardhat coverage --temp artifacts",
-    "prepublishOnly": "yarn clean && yarn compile && yarn test"
+    "prepublishOnly": "yarn clean && yarn compile && yarn test",
+    "getSig": "node getVetoSig.js"
   },
   "gitHead": "aabbf6bd2dac11872ba9bb1f1dc8fffb6044aa7c"
 }
