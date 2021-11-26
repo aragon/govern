@@ -126,7 +126,7 @@ const DaoActionsPage: React.FC<props> = ({ daoName, daoID }) => {
             >
               <DaoActionCard
                 id={data.id}
-                date={data.createdAt}
+                date={data.payload.executionTime}
                 state={data.state}
                 title={data.payload.title}
                 dao_identifier={daoName}
