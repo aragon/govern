@@ -1,6 +1,6 @@
 import { toUtf8Bytes } from '@ethersproject/strings';
 import { ethers } from 'ethers';
-import { DaoConfig, ProposalParams, PayloadType } from '@aragon/govern';
+import { DaoConfig, ProposalParams, PayloadType, ActionType } from '@aragon/govern';
 
 // below types ensure that some of the properties on payload
 // ('executionTime' | 'allowFailuresMap' | "proof") are optional
@@ -43,7 +43,11 @@ export const getProposalParams = (proposalInfo: any) => {
   const config = buildConfig(proposalInfo.config);
 
   const payload: PayloadType = {
-    actions: proposalInfo.payload.actions,
+    actions: proposalInfo.payload.actions.map((action: ActionType) => ({
+      to: action.to,
+      value: action.value,
+      data: action.data,
+    })),
     executor: proposalInfo.payload.executor.address,
     proof: proposalInfo.payload.proof,
     submitter: proposalInfo.payload.submitter,
