@@ -70,13 +70,13 @@ export function useGovernRegistryQuery() {
   };
 }
 
-export function useLazyProposalQuery() {
+export function useLazyProposalQuery(pull = true) {
   const [proposalData, setProposalData] = useState<any>(null);
 
   const [getProposalData, { loading }] = useLazyQuery(PROPOSAL_DETAILS, {
     fetchPolicy: 'cache-and-network',
     notifyOnNetworkStatusChange: true,
-    pollInterval: POLL_INTERVAL,
+    pollInterval: pull ? POLL_INTERVAL : undefined,
     onCompleted: (newData) => {
       const transformedData = transformProposalDetails(newData);
       setProposalData(transformedData);
