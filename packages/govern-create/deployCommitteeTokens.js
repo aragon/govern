@@ -29,6 +29,7 @@ async function deployToken(name, symbol) {
 async function deployTokens() {
   await deployToken("ExecutiveCommitteeToken", "EXE");
   await deployToken("ComplianceCommitteeToken", "CMPL");
+  await deployToken("TechCommitteeToken", "TECH");
 }
 
 async function deployANDAOFactory() {   

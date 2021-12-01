@@ -21,7 +21,11 @@ contract ANDAOFactory {
     GovernRegistry public registry;
     Govern public mainDAOExecutor;
 
-    event SubDAOsDeployed(Govern compGovern, GovernQueue indexed compQueue, Govern execGovern, GovernQueue indexed execQueue);
+    event SubDAOsDeployed(
+        Govern compGovern, GovernQueue indexed compQueue,
+        Govern execGovern, GovernQueue indexed execQueue,
+        Govern techGovern, GovernQueue indexed techQueue
+    );
     
     constructor(
         GovernRegistry _registry,
@@ -113,6 +117,28 @@ contract ANDAOFactory {
         );
     }
 
+    function deployTechCommittee(Govern compGovern) internal returns (Govern govern, GovernQueue queue) {
+        return _createGovern(
+            IERC20(0x731B540B83292734F866fF1850532DF1D7A1F80e), // TECH COMMITTEE TOKEN
+            "an_tech_dao",
+            ERC3000Data.Config({
+                executionDelay: 259200, // 3 days
+                scheduleDeposit: ERC3000Data.Collateral({
+                token: address(0xa117000000f279D81A1D3cc75430fAA017FA5A2e),
+                amount: 50
+            }),
+            challengeDeposit: ERC3000Data.Collateral({
+                token: address(0xa117000000f279D81A1D3cc75430fAA017FA5A2e),
+                amount: 50
+            }),
+            resolver: address(0xFb072baA713B01cE944A0515c3e1e98170977dAF),
+            rules: "QmV3pQWAqq8Un71SU1RRDVqwAGy7bBQUPaqLkqHwb9H3w7",
+            maxCalldataSize: 100000
+            }),
+            compGovern
+        );
+    }
+
     function deployComplianceCommittee() internal returns (Govern govern, GovernQueue queue) {
         return _createGovern(
             IERC20(0x8aA971084Ed42fc3452D34c5AeC4878c28DD7cD0), // CMPL COMMITTEE TOKEN
@@ -135,10 +161,19 @@ contract ANDAOFactory {
         );
     }
 
-    function deployANSubDAOs() external returns (Govern compGovern, GovernQueue compQueue, Govern execGovern, GovernQueue execQueue) {
+    function deployANSubDAOs() external returns (
+        Govern compGovern, GovernQueue compQueue,
+        Govern execGovern, GovernQueue execQueue,
+        Govern techGovern, GovernQueue techQueue) {
+
         (compGovern, compQueue) = deployComplianceCommittee();
         (execGovern, execQueue) = deployExecutiveCommittee(compGovern);
+        (techGovern, techQueue) = deployExecutiveCommittee(compGovern);
 
-        emit SubDAOsDeployed(compGovern, compQueue, execGovern, execQueue);
+        emit SubDAOsDeployed(
+            compGovern, compQueue,
+            execGovern, execQueue,
+            techGovern, techQueue
+        );
     }
 }
