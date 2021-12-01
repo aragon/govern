@@ -26,7 +26,7 @@ const ActionInputText: React.FC<ActionInputTextProps> = ({
 
   useEffect(() => {
     if (value) {
-      controllerField.onChange(`0x${Buffer.from(value).toString('hex')}`);
+      controllerField.onChange(value);
     }
   }, [value, controllerField]);
 
