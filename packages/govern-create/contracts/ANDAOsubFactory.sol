@@ -93,10 +93,10 @@ contract ANDAOFactory {
 
     function deployExecutiveCommittee(Govern compGovern) internal returns (Govern govern, GovernQueue queue) {
         return _createGovern(
-            IERC20(0x613a126c20632c99afD01B044fe13e97b76eeb5A),// DEFINE COMMITTEE TOKEN
+            IERC20(0x613a126c20632c99afD01B044fe13e97b76eeb5A), // EXE COMMITTEE TOKEN
             "an_exec_dao",
             ERC3000Data.Config({
-                executionDelay: 604800,
+                executionDelay: 604800, // 7 days
                 scheduleDeposit: ERC3000Data.Collateral({
                     token: address(0xa117000000f279D81A1D3cc75430fAA017FA5A2e),
                     amount: 50
@@ -115,10 +115,10 @@ contract ANDAOFactory {
 
     function deployComplianceCommittee() internal returns (Govern govern, GovernQueue queue) {
         return _createGovern(
-            IERC20(0x8aA971084Ed42fc3452D34c5AeC4878c28DD7cD0),// DEFINE COMMITTEE TOKEN
+            IERC20(0x8aA971084Ed42fc3452D34c5AeC4878c28DD7cD0), // CMPL COMMITTEE TOKEN
             "an_compliance_dao",
             ERC3000Data.Config({
-                executionDelay: 10800,
+                executionDelay: 10800, // 3 hours
                 scheduleDeposit: ERC3000Data.Collateral({
                     token: address(0xa117000000f279D81A1D3cc75430fAA017FA5A2e),
                     amount: 50
