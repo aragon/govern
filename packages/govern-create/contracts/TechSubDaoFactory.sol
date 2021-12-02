@@ -40,9 +40,6 @@ contract TechSubDaoFactory {
     function _grantPermissions(Govern govern, GovernQueue queue, Govern vetoExecutor) internal {
         // Queue permissions
         uint256 bulkSize = 9;
-        if (address(vetoExecutor) != address(0)) {
-            bulkSize = 10;
-        }
 
         ACLData.BulkItem[] memory queueItems = new ACLData.BulkItem[](bulkSize);
         queueItems[0] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.execute.selector, ANY_ADDR);
@@ -54,10 +51,6 @@ contract TechSubDaoFactory {
         queueItems[6] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.schedule.selector, address(0x806A940E1C431aa36077c4f6fB3e7d36CEF2a9A7)); // Member 1
         queueItems[7] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.schedule.selector, address(0x05cE4A75dB7dE6B5db8367680f1179f4e208906D)); // Member 2
         queueItems[8] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.schedule.selector, address(0xCE3d8791c1bdaCc6b8e1a52B4E6aC140F8a2C8c3)); // Member 3
-
-        if (address(vetoExecutor) != address(0)) {
-            queueItems[9] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.veto.selector, address(vetoExecutor));
-        }
 
         queue.bulk(queueItems);
 
