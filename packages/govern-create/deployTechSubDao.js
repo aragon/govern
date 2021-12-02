@@ -43,21 +43,22 @@ async function deployTechSubDaoFactoryAndTechSubDao() {
     await deployTechSubDao(techSubDaoFactory);
 }
 
-async function printInfos(){
+async function printInfos() {
   blockNumber = await provider.getBlockNumber()
-  gasPrice = await provider.getGasPrice()
+  feeData = await provider.getFeeData()
   address = await signer.getAddress()
   balance = await signer.getBalance()
 
-
   console.log(
-    blockNumber,
-    address,
-    ethers.utils.formatEther(balance),
-    ethers.utils.formatUnits(gasPrice,"gwei")
+    '\nBlock Number         : ' + blockNumber,
+    '\nAddress              : ' + address,
+    '\nBalance              : ' +ethers.utils.formatEther(balance) + ' ETH',
+    '\nmaxFeePerGas         : ' + ethers.utils.formatUnits(feeData.maxFeePerGas, 'gwei') + ' gwei',
+    '\nmaxPriorityFeePerGas : ' + ethers.utils.formatUnits(feeData.maxPriorityFeePerGas, 'gwei') + ' gwei',
+    '\ngasPrice             : ' + ethers.utils.formatUnits(feeData.gasPrice, 'gwei') + ' gwei'
   )
 }
 
 printInfos()
 
-//deployTechSubDaoFactoryAndTechSubDao().catch(console.log);
+deployTechSubDaoFactoryAndTechSubDao().catch(console.log);
