@@ -103,11 +103,11 @@ contract ANDAOFactory {
                 executionDelay: 604800, // 7 days
                 scheduleDeposit: ERC3000Data.Collateral({
                     token: address(0xa117000000f279D81A1D3cc75430fAA017FA5A2e),
-                    amount: 50
+                    amount: 50*10**18
                 }),
                 challengeDeposit: ERC3000Data.Collateral({
                     token: address(0xa117000000f279D81A1D3cc75430fAA017FA5A2e),
-                    amount: 50
+                    amount: 50*10**18
                 }),
                 resolver: address(0xFb072baA713B01cE944A0515c3e1e98170977dAF),
                 rules: "QmV3pQWAqq8Un71SU1RRDVqwAGy7bBQUPaqLkqHwb9H3w7",
@@ -125,11 +125,11 @@ contract ANDAOFactory {
                 executionDelay: 259200, // 3 days
                 scheduleDeposit: ERC3000Data.Collateral({
                 token: address(0xa117000000f279D81A1D3cc75430fAA017FA5A2e),
-                amount: 50
+                amount: 50*10**18
             }),
             challengeDeposit: ERC3000Data.Collateral({
                 token: address(0xa117000000f279D81A1D3cc75430fAA017FA5A2e),
-                amount: 50
+                amount: 50*10**18
             }),
             resolver: address(0xFb072baA713B01cE944A0515c3e1e98170977dAF),
             rules: "QmV3pQWAqq8Un71SU1RRDVqwAGy7bBQUPaqLkqHwb9H3w7",
@@ -147,11 +147,11 @@ contract ANDAOFactory {
                 executionDelay: 10800, // 3 hours
                 scheduleDeposit: ERC3000Data.Collateral({
                     token: address(0xa117000000f279D81A1D3cc75430fAA017FA5A2e),
-                    amount: 50
+                    amount: 50*10**18
                 }),
                 challengeDeposit: ERC3000Data.Collateral({
                     token: address(0xa117000000f279D81A1D3cc75430fAA017FA5A2e),
-                    amount: 50
+                    amount: 50*10**18
                 }),
                 resolver: address(0xFb072baA713B01cE944A0515c3e1e98170977dAF),
                 rules: "QmV3pQWAqq8Un71SU1RRDVqwAGy7bBQUPaqLkqHwb9H3w7",
