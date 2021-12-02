@@ -95,7 +95,7 @@ contract TechSubDaoFactory {
         registry.register(govern, queue, token, address(-1), name, "");
     }
 
-    function deployTechCommittee(Govern compGovern) internal returns (Govern govern, GovernQueue queue) {
+    function deployTechCommittee() internal returns (Govern govern, GovernQueue queue) {
         return _createGovern(
             IERC20(0x731B540B83292734F866fF1850532DF1D7A1F80e), // TECH COMMITTEE TOKEN
             "an_tech_dao",
@@ -113,14 +113,12 @@ contract TechSubDaoFactory {
                 rules: "QmV3pQWAqq8Un71SU1RRDVqwAGy7bBQUPaqLkqHwb9H3w7",
                 maxCalldataSize: 100000
             }),
-            compGovern
+            Govern(payable(address(0xBe39E9CB1dAA8EE8838d6a93d360f7EA7b8373c2))) // Comp Govern Executor
         );
     }
 
     function deployTechSubDao() external returns (Govern techGovern, GovernQueue techQueue) {
-        Govern compGovern = Govern(payable(address(0xBe39E9CB1dAA8EE8838d6a93d360f7EA7b8373c2)));
-
-        (techGovern, techQueue) = deployTechCommittee(compGovern);
+        (techGovern, techQueue) = deployTechCommittee();
 
         emit TechSubDAODeployed(techGovern, techQueue);
     }
