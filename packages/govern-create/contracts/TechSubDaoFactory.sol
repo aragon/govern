@@ -106,7 +106,7 @@ contract TechSubDaoFactory {
                 rules: "The rules of this Sub-DAO are specified in the 'an_main_dao' rules (0x9c1d24318966793a68e6005eb6b27edace3f28b8, https://govern.aragon.org/#/daos/an_main_dao/settings).",
                 maxCalldataSize: 100000
             }),
-            Govern(payable(address(0xBe39E9CB1dAA8EE8838d6a93d360f7EA7b8373c2))) // Comp Govern Executor
+            Govern(0xBe39E9CB1dAA8EE8838d6a93d360f7EA7b8373c2) // Comp Govern Executor
         );
     }
 
