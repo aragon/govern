@@ -19,9 +19,10 @@ async function deployTechSubDAOFactory() {
     "0xf2b7d096cd34f228a6413e276132c21d98b19882", // GovernRegistry
     "0x6090afbdcf13b3a53323509955279ce0de4003a2", // GovernFactory
     "0x5d2d6a91c8b5fb62f2a6725eb791f412a5d39c4d", // GovernQueueFactory
-    ANMainDAOAddress
-    ,{
-      gasPrice: 100,
+    ANMainDAOAddress,
+    {
+      maxFeePerGas: ethers.utils.parseUnits('120.0', 'gwei'),
+      maxPriorityFeePerGas: ethers.utils.parseUnits('1.5', 'gwei'),
       gasLimit: 10000000
     }
   )
