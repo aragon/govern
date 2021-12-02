@@ -47,10 +47,10 @@ contract TechSubDaoFactory {
         queueItems[2] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.configure.selector, address(govern));
         queueItems[3] = ACLData.BulkItem(ACLData.BulkOp.Revoke, queue.ROOT_ROLE(), address(this));
         queueItems[4] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.ROOT_ROLE(), address(govern));
-        queueItems[5] = ACLData.BulkItem(ACLData.BulkOp.Freeze, queue.ROOT_ROLE(), address(0));
-        queueItems[6] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.schedule.selector, address(0x806A940E1C431aa36077c4f6fB3e7d36CEF2a9A7)); // Member 1
-        queueItems[7] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.schedule.selector, address(0x05cE4A75dB7dE6B5db8367680f1179f4e208906D)); // Member 2
-        queueItems[8] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.schedule.selector, address(0xCE3d8791c1bdaCc6b8e1a52B4E6aC140F8a2C8c3)); // Member 3
+        queueItems[5] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.schedule.selector, address(0x806A940E1C431aa36077c4f6fB3e7d36CEF2a9A7)); // Member 1
+        queueItems[6] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.schedule.selector, address(0x05cE4A75dB7dE6B5db8367680f1179f4e208906D)); // Member 2
+        queueItems[7] = ACLData.BulkItem(ACLData.BulkOp.Grant, queue.schedule.selector, address(0xCE3d8791c1bdaCc6b8e1a52B4E6aC140F8a2C8c3)); // Member 3
+        queueItems[8] = ACLData.BulkItem(ACLData.BulkOp.Freeze, queue.ROOT_ROLE(), address(0));
 
         queue.bulk(queueItems);
 
