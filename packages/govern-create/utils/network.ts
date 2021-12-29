@@ -1,6 +1,7 @@
 import 'dotenv/config'
 
 export const RINKEBY_URL = 'https://rinkeby.eth.aragon.network'
+export const FUJI_URL = 'https://api.avax-test.network/ext/bc/C/rpc'
 
 export function node_url(networkName: string): string {
   if (networkName) {

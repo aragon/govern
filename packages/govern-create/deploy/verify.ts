@@ -4,6 +4,7 @@ import { TASK_ETHERSCAN_VERIFY } from 'hardhat-deploy'
 
 import { verifyContract } from '../utils/etherscan'
 import { ERC3000DefaultConfig } from 'erc3k/utils/ERC3000'
+import { network } from 'hardhat'
 
 const TWO_ADDRR = `0x${'00'.repeat(19)}02`
 
@@ -19,9 +20,14 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   console.log(
     'Waiting for 2 minutes so Etherscan is aware of contracts before verifying'
   )
-  await delay(120000) // Etherscan needs some time to process before trying to verify.
-  console.log('Starting to verify now')
 
+  if (network.name == 'fuji' || 'avalanche') {
+    console.log('Starting to verify now, Some network are fast some arent')
+  } else {
+    // Etherscan needs some time to process before trying to verify.
+    console.log('Starting to verify now')
+    await delay(120000) 
+  }
   await run(TASK_ETHERSCAN_VERIFY, {
     apiKey: process.env.ETHERSCAN_KEY,
     license: 'GPL-3.0',

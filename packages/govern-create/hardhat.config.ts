@@ -66,6 +66,15 @@ const config: HardhatUserConfig = {
       url: 'https://rinkeby.infura.io/v3/7a03fcb37be7479da06f92c5117afd47',
       accounts: PRIV_KEYS,
     },
+    avalanche: {
+      url: 'https://api.avax.network/ext/bc/C/rpc',
+      accounts: PRIV_KEYS,
+    },
+    fuji: {
+      url: 'https://api.avax-test.network/ext/bc/C/rpc',
+      accounts: PRIV_KEYS,
+      blockGasLimit: 8000000
+    }
   },
 }
 

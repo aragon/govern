@@ -25,13 +25,13 @@ contract GovernMinter is ACL {
     event MintedSingle(address indexed to, uint256 amount, bytes context);
     event MintedMerkle(address indexed distributor, bytes32 indexed merkleRoot, uint256 totalAmount, bytes tree, bytes context);
 
-    constructor(GovernToken _token, address _initialMinter, MerkleDistributor _distributorBase) ACL(_initialMinter) public {
+    constructor(address _token, address _initialMinter, address _distributorBase) ACL(_initialMinter) public {
         initialize(_token, _initialMinter, _distributorBase);
     }
 
-    function initialize(GovernToken _token, address _initialMinter, MerkleDistributor _distributorBase) public initACL(_initialMinter) onlyInit("minter") {
-        token = _token;
-        distributorBase = address(_distributorBase);
+    function initialize(address _token, address _initialMinter, address _distributorBase) public initACL(_initialMinter) onlyInit("minter") {
+        token = GovernToken(_token);
+        distributorBase = _distributorBase;
         _grant(MINT_ROLE, _initialMinter);
     }
 
