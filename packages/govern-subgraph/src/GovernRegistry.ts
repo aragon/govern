@@ -30,9 +30,7 @@ export function handleRegistered(event: RegisteredEvent): void {
   dao.createdAt = event.block.timestamp
 
   // add dao to the registry
-  let currentDAOs = registry.daos
-  currentDAOs.push(dao.id)
-  registry.daos = currentDAOs
+  registry.daos.push(dao.id)
 
   registry.count += 1
 
