@@ -190,7 +190,7 @@ const NewExecution: React.FC = () => {
                   title="Title"
                   subtitle="Add a title to identify this transaction."
                   value={value}
-                  placeholder="Sending funds to SuperDAO as per Voice vote 0x486...9b3b."
+                  placeholder="Sending funds to MyDAO as per Voice vote 0x486...9b3b."
                   onChange={onChange}
                   status={error ? 'error' : 'normal'}
                   error={error ? error.message : null}
