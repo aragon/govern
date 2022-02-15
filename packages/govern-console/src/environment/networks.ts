@@ -48,11 +48,11 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
       defaultDaoConfig: {
         executionDelay: 3600, // 1 Hour
         scheduleDeposit: {
-          token: '0xc7AD46e0b8a400Bb3C915120d284AafbA8fc4735',
+          token: '0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa',
           amount: '10000000000000000000',
         },
         challengeDeposit: {
-          token: '0xc7AD46e0b8a400Bb3C915120d284AafbA8fc4735',
+          token: '0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa',
           amount: '10000000000000000000',
         },
         resolver: '0xC464EB732A1D2f5BbD705727576065C91B2E9f18',
@@ -61,7 +61,7 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
         maxCalldataSize: 100000,
       },
       curatedTokens: {
-        DAI: '0xc7AD46e0b8a400Bb3C915120d284AafbA8fc4735',
+        DAI: '0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa',
         USDT: '0x3B00Ef435fA4FcFF5C209a37d1f3dcff37c705aD',
         USDC: '0xeb8f08a975Ab53E34D8a0330E0D34de942C95926',
       },
@@ -94,7 +94,7 @@ const networks = new Map<EnvironmentName, EnvironmentConfig>([
         maxCalldataSize: 100000,
       },
       curatedTokens: {
-        DAI: '0xc7AD46e0b8a400Bb3C915120d284AafbA8fc4735',
+        DAI: '0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa',
         USDT: '0x3B00Ef435fA4FcFF5C209a37d1f3dcff37c705aD',
         USDC: '0xeb8f08a975Ab53E34D8a0330E0D34de942C95926',
       },
