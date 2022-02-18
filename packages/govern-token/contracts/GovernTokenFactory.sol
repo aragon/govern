@@ -24,7 +24,8 @@ contract GovernTokenFactory {
     event CreatedToken(GovernToken token, GovernMinter minter);
 
     constructor() public {
-        setupBases();
+        // setupBases();
+        // This we disable since it fails for the contract code out of storage
     }
 
     function newToken(
@@ -36,7 +37,8 @@ contract GovernTokenFactory {
         GovernMinter minter
     ) {
         if (!_useProxies) {
-            (token, minter) = _deployContracts(_token.tokenName, _token.tokenSymbol, _token.tokenDecimals);
+            // (token, minter) = _deployContracts(_token.tokenName, _token.tokenSymbol, _token.tokenDecimals);
+            // The idea of deployContract is moved again with the contract code out of storage
         } else {
             token = GovernToken(tokenBase.clone(abi.encodeWithSelector(
                 token.initialize.selector,
@@ -78,14 +80,11 @@ contract GovernTokenFactory {
         emit CreatedToken(token, minter);
     }
 
-    function setupBases() private {
-        distributorBase = address(new MerkleDistributor(ERC20(tokenBase), bytes32(0)));
+    function setupBases(address _distributorBase, address _minter, address _token) public {
+        distributorBase = _distributorBase;
         
-        (GovernToken token, GovernMinter minter) = _deployContracts(
-            "GovernToken base",
-            "GTB",
-            0
-        );
+        GovernToken token = GovernToken(_token);
+        GovernMinter minter = GovernMinter(_minter);
         token.changeMinter(address(minter));
 
         // test the bases
@@ -97,15 +96,15 @@ contract GovernTokenFactory {
         minterBase = address(minter);
     }
 
-    function _deployContracts(
-        string memory _tokenName,
-        string memory _tokenSymbol,
-        uint8 _tokenDecimals
-    ) internal returns (
-        GovernToken token,
-        GovernMinter minter
-    ) {
-        token = new GovernToken(address(this), _tokenName, _tokenSymbol, _tokenDecimals);
-        minter = new GovernMinter(GovernToken(token), address(this), MerkleDistributor(distributorBase));
-    }
+    // function _deployContracts(
+    //     string memory _tokenName,
+    //     string memory _tokenSymbol,
+    //     uint8 _tokenDecimals
+    // ) internal returns (
+    //     GovernToken token,
+    //     GovernMinter minter
+    // ) {
+    //     token = new GovernToken(address(this), _tokenName, _tokenSymbol, _tokenDecimals);
+    //     minter = new GovernMinter(GovernToken(token), address(this), MerkleDistributor(distributorBase));
+    // }
 }

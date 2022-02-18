@@ -23,8 +23,8 @@ contract MerkleDistributor is Initializable {
 
     event Claimed(uint256 indexed index, address indexed to, uint256 amount);
 
-    constructor(ERC20 _token, bytes32 _merkleRoot) public {
-        initialize(_token, _merkleRoot);
+    constructor() public {
+        initialize(ERC20(address(0)), bytes32(0));
     }
 
     function initialize(ERC20 _token, bytes32 _merkleRoot) public onlyInit("distributor") {

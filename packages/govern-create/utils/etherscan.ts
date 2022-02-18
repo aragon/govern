@@ -2,7 +2,7 @@ import HRE from 'hardhat'
 import fs from 'fs'
 import { file } from 'tmp-promise'
 
-export const SUPPORTED_ETHERSCAN_NETWORKS = ['mainnet', 'rinkeby', 'rinkeby_staging']
+export const SUPPORTED_ETHERSCAN_NETWORKS = ['mainnet', 'rinkeby', 'rinkeby_staging', 'fuji', 'avalanche', 'polygon', 'mumbai']
 
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
