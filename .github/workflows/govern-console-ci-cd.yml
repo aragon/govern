@@ -62,14 +62,14 @@ jobs:
         env:
           COMMIT_SHA: ${{ github.sha }}
         run: |
-          for f in /build/static/**/*.js.map ; do 
+          for f in $(find ./build/static/js/ -name *.js.map) ; do 
             curl -X POST "https://kibana-sourcemaps.aragon.org/api/apm/sourcemaps" \
               -H 'Content-Type: multipart/form-data' \
               -H 'kbn-xsrf: true' \
               -H 'Authorization: ApiKey ${{ secrets.APM_API_KEY }}' \
               -F service_name="govern" \
               -F service_version="$COMMIT_SHA" \
-              -F bundle_filepath="http://localhost/assets/static/js/$(basename $f)" \
+              -F bundle_filepath="http://localhost/static/js/$(basename $f)" \
               -F sourcemap=@$f
           done
 
@@ -117,14 +117,13 @@ jobs:
         env:
           COMMIT_SHA: ${{ github.sha }}
         run: |
-          for f in $(find ./build/ -name "*.js.map") ; do 
-            export filename=${f%.*}
+          for f in $(find ./build/static/js/ -name *.js.map) ; do 
             curl -X POST "https://kibana-sourcemaps.aragon.org/api/apm/sourcemaps" \
               -H 'Content-Type: multipart/form-data' \
               -H 'kbn-xsrf: true' \
               -H 'Authorization: ApiKey ${{ secrets.APM_API_KEY }}' \
               -F service_name="govern" \
               -F service_version="$COMMIT_SHA" \
-              -F bundle_filepath="http://localhost/${filename#./build/}" \
+              -F bundle_filepath="http://localhost/static/js/$(basename $f)" \
               -F sourcemap=@$f
           done
