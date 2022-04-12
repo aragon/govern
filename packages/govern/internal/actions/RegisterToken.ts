@@ -1,4 +1,4 @@
-import { CensusErc20Api } from '@vocdoni/census'
+import { CensusErc20Api } from 'dvote-js'
 import { getPool } from './lib/Gateway'
 import { ContractReceipt, Wallet, Signer } from 'ethers'
 
@@ -13,8 +13,7 @@ export const isTokenRegistered = async (
   tokenAddress: string
 ): Promise<boolean> => {
   const pool = await getPool(signer.provider)
-  return await CensusErc20Api.getTokenInfo(tokenAddress, pool)
-    .then(tokenInfo => tokenInfo.isRegistered)
+  return await CensusErc20Api.isRegistered(tokenAddress, pool)
 }
 
 /**

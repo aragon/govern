@@ -1,4 +1,4 @@
-import { IGatewayDiscoveryParameters } from '@vocdoni/client'
+import { IGatewayDiscoveryParameters } from 'dvote-js'
 
 type BrigeConfig = {
   [key: string]: IGatewayDiscoveryParameters
@@ -14,12 +14,10 @@ export const BRIGE_CONFIG: BrigeConfig = {
     networkId: 'rinkeby',
     bootnodesContentUri: 'https://bootnodes.vocdoni.net/gateways.dev.json',
     environment: 'dev',
-    numberOfGateways: 1
   },
   mainnet: {
     networkId: 'mainnet',
     bootnodesContentUri: 'https://bootnodes.vocdoni.net/gateways.json',
     environment: 'prod',
-    numberOfGateways: 1
   },
 }
