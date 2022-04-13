@@ -3,6 +3,7 @@
   "compilerOptions": {
     "removeComments": true,
     "strictPropertyInitialization": false,
+    "allowSyntheticDefaultImports": true,
     "sourceRoot": "./",
     "outDir": "./dist/cjs",
     "strict": false,
