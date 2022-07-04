@@ -1,6 +1,6 @@
 import { providers } from 'ethers'
 import { BRIGE_CONFIG } from '../../configuration/ConfigDefaults'
-import { GatewayPool } from 'dvote-js'
+import { GatewayPool } from '@vocdoni/client'
 
 export async function getPool(
   provider?: providers.Provider

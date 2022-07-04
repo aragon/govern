@@ -1,6 +1,6 @@
-import { CensusErc20Api } from 'dvote-js'
+import { CensusErc20Api } from './lib/Token'
 import { getPool } from './lib/Gateway'
-import { ContractReceipt, Wallet, Signer } from 'ethers'
+import { ContractReceipt, Signer, Wallet } from 'ethers'
 
 /**
  *
@@ -13,7 +13,8 @@ export const isTokenRegistered = async (
   tokenAddress: string
 ): Promise<boolean> => {
   const pool = await getPool(signer.provider)
-  return await CensusErc20Api.isRegistered(tokenAddress, pool)
+  return CensusErc20Api.getTokenInfo(tokenAddress, pool)
+    .then(tokenInfo => tokenInfo.isRegistered)
 }
 
 /**
@@ -34,7 +35,5 @@ export const registerToken = async (
     return 'ALREADY_REGISTERED'
   }
 
-  const result = CensusErc20Api.registerTokenAuto(tokenAddress, signer, pool)
-
-  return result
+  return CensusErc20Api.registerTokenAuto(tokenAddress, signer, pool)
 }
