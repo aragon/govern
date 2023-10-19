@@ -16,9 +16,9 @@ const MIME_TYPES = ['text/plain'];
 function createIpfs() {
   if (!ipfs) {
     ipfs = create({
-      url: 'https://ipfs-0.aragon.network/api/v0',
+      url: 'https://prod.ipfs.aragon.network/',
       headers: {
-        'X-API-KEY': 'yRERPRwFAb5ZiV94XvJdgvDKoGEeFerfFsAQ65',
+        'X-API-KEY': 'b477RhECf8s8sdM7XrkLBs2wHc4kCMwpbcFC55Kt',
       },
     });
   }
