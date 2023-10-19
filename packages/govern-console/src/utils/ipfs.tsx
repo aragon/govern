@@ -16,7 +16,7 @@ const MIME_TYPES = ['text/plain'];
 function createIpfs() {
   if (!ipfs) {
     ipfs = create({
-      url: 'https://prod.ipfs.aragon.network/',
+      url: 'https://prod.ipfs.aragon.network',
       headers: {
         'X-API-KEY': 'b477RhECf8s8sdM7XrkLBs2wHc4kCMwpbcFC55Kt',
       },
