@@ -32,10 +32,10 @@ describe('AdaptiveErc165', function () {
     signers = await ethers.getSigners()
     const Adaptive = (await ethers.getContractFactory(
       'AdaptiveERC165Mock'
-    )) as AdaptiveERC165Mock__factory
+    )) as unknown as AdaptiveERC165Mock__factory
     const AdaptiveHelper = (await ethers.getContractFactory(
       'AdaptiveERC165MockHelper'
-    )) as AdaptiveERC165MockHelper__factory
+    )) as unknown as AdaptiveERC165MockHelper__factory
 
     adaptive = await Adaptive.deploy()
     adaptiveHelper = await AdaptiveHelper.deploy(adaptive.address)
