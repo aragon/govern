@@ -33,24 +33,24 @@ describe('Govern Base Factory with mocked contracts', function () {
     // Deploy Mocks
     GovernQueueFactoryMock = await ((await ethers.getContractFactory(
       'GovernQueueFactoryMock'
-    )) as GovernQueueFactoryMock__factory).deploy()
+    )) as unknown as GovernQueueFactoryMock__factory).deploy()
 
     GovernTokenFactoryMock = await ((await ethers.getContractFactory(
       'GovernTokenFactoryMock'
-    )) as GovernTokenFactoryMock__factory).deploy()
+    )) as unknown as GovernTokenFactoryMock__factory).deploy()
 
     GovernFactoryMock = await ((await ethers.getContractFactory(
       'GovernFactoryMock'
-    )) as GovernFactoryMock__factory).deploy()
+    )) as unknown as GovernFactoryMock__factory).deploy()
 
     GovernRegistryMock = await ((await ethers.getContractFactory(
       'GovernRegistryMock'
-    )) as GovernRegistryMock__factory).deploy()
+    )) as unknown as GovernRegistryMock__factory).deploy()
 
     // Deploy the GovernBaseFactory
     GovernBaseFactory = await ((await ethers.getContractFactory(
       'GovernBaseFactory'
-    )) as GovernBaseFactory__factory).deploy(
+    )) as unknown as GovernBaseFactory__factory).deploy(
       GovernRegistryMock.address,
       GovernFactoryMock.address,
       GovernQueueFactoryMock.address,

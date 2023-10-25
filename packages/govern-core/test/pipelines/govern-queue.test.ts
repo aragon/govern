@@ -519,7 +519,7 @@ describe('Govern Queue', function () {
       const eventContract = new Contract(
         gq.address,
         unlockedEventAbi,
-        gq.provider
+        // gq.provider
       )
 
       await expect(gq.resolve(container, disputeId))
@@ -579,7 +579,7 @@ describe('Govern Queue', function () {
       const eventContract = new Contract(
         gq.address,
         unlockedEventAbi,
-        gq.provider
+        // gq.provider
       )
 
       await expect(gq.veto(container, '0x02'))
@@ -625,7 +625,7 @@ describe('Govern Queue', function () {
       const eventContract = new Contract(
         gq.address,
         unlockedEventAbi,
-        gq.provider
+        // gq.provider
       )
       await expect(gq.veto(container, '0x02'))
         .to.emit(eventContract, EVENTS.UNLOCK)

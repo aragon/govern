@@ -148,22 +148,22 @@ describe('Govern Base Factory with the real contracts(NO MOCKs)', function () {
     governRegistry = (await ethers.getContractAt(
       'GovernRegistry',
       (await deployments.get('GovernRegistry')).address
-    )) as GovernRegistry
+    )) as unknown as GovernRegistry
 
     governQueueFactory = (await ethers.getContractAt(
       'GovernRegistry',
       (await deployments.get('GovernQueueFactory')).address
-    )) as GovernRegistry
+    )) as unknown as GovernRegistry
 
     governTokenFactory = (await ethers.getContractAt(
       'GovernRegistry',
       (await deployments.get('GovernTokenFactory')).address
-    )) as GovernRegistry
+    )) as unknown as GovernRegistry
 
     governFactory = (await ethers.getContractAt(
       'GovernRegistry',
       (await deployments.get('GovernFactory')).address
-    )) as GovernRegistry
+    )) as unknown as GovernRegistry
 
 
     const { abi, baseFactoryBytecode } = await getMergedABI();
