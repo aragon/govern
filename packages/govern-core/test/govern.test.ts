@@ -28,7 +28,7 @@ describe('Govern', function () {
 
   beforeEach(async () => {
     const Govern = await ethers.getContractFactory('Govern')
-    govern = (await Govern.deploy(owner)) as Govern
+    govern = (await Govern.deploy(owner)) as unknown as Govern
     governNotOwner = await govern.connect(signers[1])
   })
 
