@@ -10,7 +10,7 @@ describe('Initializable', function () {
   beforeEach(async () => {
     const Initializable = (await ethers.getContractFactory(
       'InitializableMock'
-    )) as InitializableMock__factory
+    )) as unknown as InitializableMock__factory
     init = await Initializable.deploy()
   })
 

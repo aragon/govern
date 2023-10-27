@@ -102,7 +102,7 @@ describe('Govern Queue', function () {
   const createArbitratorMock = async () => {
     const ArbitratorMock = (await ethers.getContractFactory(
       'ArbitratorMock'
-    )) as ArbitratorMock__factory
+    )) as unknown as ArbitratorMock__factory
     const arbitratorMock = (await ArbitratorMock.deploy(
       testToken.address
     )) as ArbitratorMock
@@ -121,7 +121,7 @@ describe('Govern Queue', function () {
     // add tokens for schedule, challenge and fee amounts from arbitrator
     const TestToken = (await ethers.getContractFactory(
       'TestToken'
-    )) as TestToken__factory
+    )) as unknown as TestToken__factory
     testToken = (await TestToken.deploy(ownerAddr)) as TestToken
     await testToken.mint(ownerAddr, 1000000)
 
@@ -140,13 +140,13 @@ describe('Govern Queue', function () {
     // add ERC3000 executor
     const ERC3000ExecutorMock = (await ethers.getContractFactory(
       'ERC3000ExecutorMock'
-    )) as ERC3000ExecutorMock__factory
+    )) as unknown as ERC3000ExecutorMock__factory
     executor = await ERC3000ExecutorMock.deploy()
     container.payload.executor = executor.address
 
     const GQ = (await ethers.getContractFactory(
       'GovernQueue'
-    )) as GovernQueue__factory
+    )) as unknown as GovernQueue__factory
 
     gq = (await GQ.deploy(ownerAddr, container.config)) as GovernQueue
 
@@ -437,7 +437,7 @@ describe('Govern Queue', function () {
     it('reverts when arbitrator subject does not match the queue address', async () => {
       const ArbitratorMock = (await ethers.getContractFactory(
         'ArbitratorWrongSubjectMock'
-      )) as ArbitratorWrongSubjectMock__factory
+      )) as unknown as ArbitratorWrongSubjectMock__factory
       const arbitratorMock = await ArbitratorMock.deploy(testToken.address)
       container.config.resolver = arbitratorMock.address
 
@@ -519,7 +519,7 @@ describe('Govern Queue', function () {
       const eventContract = new Contract(
         gq.address,
         unlockedEventAbi,
-        gq.provider
+        // gq.provider
       )
 
       await expect(gq.resolve(container, disputeId))
@@ -579,7 +579,7 @@ describe('Govern Queue', function () {
       const eventContract = new Contract(
         gq.address,
         unlockedEventAbi,
-        gq.provider
+        // gq.provider
       )
 
       await expect(gq.veto(container, '0x02'))
@@ -608,7 +608,7 @@ describe('Govern Queue', function () {
 
       const ArbitratorMock = (await ethers.getContractFactory(
         'ArbitratorMock'
-      )) as ArbitratorMock__factory
+      )) as unknown as ArbitratorMock__factory
       const arbitratorMock = await ArbitratorMock.deploy(testToken.address)
       container.config.resolver = arbitratorMock.address
 
@@ -625,7 +625,7 @@ describe('Govern Queue', function () {
       const eventContract = new Contract(
         gq.address,
         unlockedEventAbi,
-        gq.provider
+        // gq.provider
       )
       await expect(gq.veto(container, '0x02'))
         .to.emit(eventContract, EVENTS.UNLOCK)

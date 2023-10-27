@@ -9,7 +9,7 @@ describe('AddressUtils', function () {
   beforeEach(async () => {
     const AddressUtilsMock = (await ethers.getContractFactory(
       'AddressUtilsMock'
-    )) as AddressUtilsMock__factory
+    )) as unknown as AddressUtilsMock__factory
     addressUtils = await AddressUtilsMock.deploy()
     owner = await (await ethers.getSigners())[0].getAddress()
   })
