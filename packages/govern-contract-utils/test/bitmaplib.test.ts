@@ -8,7 +8,7 @@ describe('Bitmap', function () {
   beforeEach(async () => {
     const BitmapLib = (await ethers.getContractFactory(
       'BitmapLibMock'
-    )) as BitmapLibMock__factory
+    )) as unknown as BitmapLibMock__factory
     lib = await BitmapLib.deploy()
   })
 

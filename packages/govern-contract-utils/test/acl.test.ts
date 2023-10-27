@@ -34,7 +34,7 @@ describe('ACL', function () {
   })
 
   beforeEach(async () => {
-    const ACL = (await ethers.getContractFactory('ACL')) as ACL__factory
+    const ACL = (await ethers.getContractFactory('ACL')) as unknown as ACL__factory
     acl = await ACL.deploy(root)
     aclNotRoot = await acl.connect(signers[1])
   })
