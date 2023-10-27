@@ -35,24 +35,24 @@ describe('SafeERC20', function () {
   beforeEach(async () => {
     const safeERCMock = (await ethers.getContractFactory(
       'SafeERC20Mock'
-    )) as SafeERC20Mock__factory
+    )) as unknown as SafeERC20Mock__factory
     safeERC20 = await safeERCMock.deploy()
 
     const BadToken = (await ethers.getContractFactory(
       'BadToken'
-    )) as BadToken__factory
+    )) as unknown as BadToken__factory
     badToken = await BadToken.deploy()
     badToken.setBalanceTo(safeERC20.address, balanceAmount)
 
     const GoodToken = (await ethers.getContractFactory(
       'GoodToken'
-    )) as GoodToken__factory
+    )) as unknown as GoodToken__factory
     goodToken = await GoodToken.deploy()
     goodToken.setBalanceTo(safeERC20.address, balanceAmount)
 
     const WorstToken = (await ethers.getContractFactory(
       'WorstToken'
-    )) as WorstToken__factory
+    )) as unknown as WorstToken__factory
     worstToken = await WorstToken.deploy()
     worstToken.setBalanceTo(safeERC20.address, balanceAmount)
 

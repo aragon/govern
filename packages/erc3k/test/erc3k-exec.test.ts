@@ -7,7 +7,7 @@ describe('ERC3000 Executor', function () {
   beforeEach(async () => {
     const ERC3000Executor = (await ethers.getContractFactory(
       'ERC3000ExecutorMock'
-    )) as ERC3000ExecutorMock__factory
+    )) as unknown as ERC3000ExecutorMock__factory
     erc3kExec = await ERC3000Executor.deploy()
   })
 })

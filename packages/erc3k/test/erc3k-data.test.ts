@@ -32,7 +32,7 @@ describe('ERC3000Data', function () {
   beforeEach(async () => {
     const ERC3000DataLibTest = (await ethers.getContractFactory(
       'ERC3000DataLibTest'
-    )) as ERC3000DataLibTest__factory
+    )) as unknown as ERC3000DataLibTest__factory
 
     erc3kDataLib = await ERC3000DataLibTest.deploy()
     chainId = (await ethers.provider.getNetwork()).chainId

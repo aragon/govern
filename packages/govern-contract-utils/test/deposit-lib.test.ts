@@ -27,7 +27,7 @@ describe('DepositLib', function () {
   before(async () => {
     const DepositLibMockFactory = (await ethers.getContractFactory(
       'DepositLibMock'
-    )) as DepositLibMock__factory
+    )) as unknown as DepositLibMock__factory
     depositLibMock = await DepositLibMockFactory.deploy()
 
     owner = await (await ethers.getSigners())[0].getAddress()
@@ -37,7 +37,7 @@ describe('DepositLib', function () {
     before(async () => {
       const GoodTokenFactory = (await ethers.getContractFactory(
         'GoodToken'
-      )) as GoodToken__factory
+      )) as unknown as GoodToken__factory
       goodToken = await GoodTokenFactory.deploy()
     })
 
@@ -84,7 +84,7 @@ describe('DepositLib', function () {
     before(async () => {
       const GoodTokenFactory = (await ethers.getContractFactory(
         'GoodToken'
-      )) as GoodToken__factory
+      )) as unknown as GoodToken__factory
       goodToken = await GoodTokenFactory.deploy()
     })
 

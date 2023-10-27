@@ -21,7 +21,7 @@ describe('ERC1167ProxyFactory', () => {
     owner = await signers[0].getAddress()
     const CloneFactoryMock = (await ethers.getContractFactory(
       'CloneFactoryMock'
-    )) as CloneFactoryMock__factory
+    )) as unknown as CloneFactoryMock__factory
     factory = await CloneFactoryMock.deploy()
   })
 
@@ -34,7 +34,7 @@ describe('ERC1167ProxyFactory', () => {
         'ClonedContract',
         clonedContractAddress,
         signers[0]
-      )) as ClonedContract
+      )) as unknown as ClonedContract
 
       expect(await clonedContract.getRandomString()).to.be.equal('NO INIT')
     })
@@ -47,7 +47,7 @@ describe('ERC1167ProxyFactory', () => {
         'ClonedContractWithInit',
         clonedContractAddress,
         signers[0]
-      )) as ClonedContractWithInit
+      )) as unknown as ClonedContractWithInit
 
       expect(await clonedContract.randomString()).to.be.equal('INIT DATA')
     })
@@ -62,7 +62,7 @@ describe('ERC1167ProxyFactory', () => {
         'ClonedContract',
         clonedContractAddress,
         signers[0]
-      )) as ClonedContract
+      )) as unknown as ClonedContract
 
       expect(await clonedContract.getRandomString()).to.be.equal('NO INIT')
     })
@@ -75,7 +75,7 @@ describe('ERC1167ProxyFactory', () => {
         'ClonedContractWithInit',
         clonedContractAddress,
         signers[0]
-      )) as ClonedContractWithInit
+      )) as unknown as ClonedContractWithInit
 
       expect(await clonedContract.randomString()).to.be.equal('INIT DATA')
     })
