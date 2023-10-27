@@ -12,6 +12,7 @@ import {
   SPACING,
   Info,
 } from '@aragon/ui';
+import Switch from '@material-ui/core/Switch';
 import { Controller, useForm } from 'react-hook-form';
 import { validateContract, validateAbi } from 'utils/validations';
 import { useWallet } from 'providers/AugmentedWallet';
@@ -21,6 +22,7 @@ import { constants } from 'ethers';
 
 type FormInput = {
   contractAddress: string;
+  manualAbi: boolean;
   abi: string;
 };
 
@@ -38,6 +40,7 @@ export const AbiForm: React.FC = () => {
 
   const { gotoFunctionSelector } = useActionBuilderState();
   const [showAbi, setShowAbi] = useState(false);
+  const [verified, setVerified] = useState(false);
 
   const gotoNextScreen = useCallback(() => {
     const formData = getValues();
@@ -51,15 +54,22 @@ export const AbiForm: React.FC = () => {
       return;
     }
 
+    const manualAbi = getValues('manualAbi');
     const address = getValues('contractAddress');
     const abiHandler = new AbiHandler(networkName);
     const abi = await abiHandler.get(address);
+
     if (abi) {
-      gotoFunctionSelector(address, abi);
+      setVerified(true);
+      if (manualAbi) {
+        setShowAbi(true);
+      } else {
+        gotoFunctionSelector(address, abi);
+      }
     } else {
       setShowAbi(true);
     }
-  }, [networkName, trigger, getValues, gotoFunctionSelector, setShowAbi]);
+  }, [networkName, trigger, getValues, gotoFunctionSelector, setShowAbi, setVerified]);
 
   return (
     <Grid>
@@ -109,25 +119,43 @@ export const AbiForm: React.FC = () => {
           </div>
         </div>
       </GridItem>
+      <GridItem>
+        <Controller
+          name="manualAbi"
+          control={control}
+          defaultValue={false}
+          render={({ field: { onChange, value } }) => (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'baseline',
+              }}
+            >
+              <div>Specify ABI manually:</div>
+              <Switch checked={value} onChange={onChange} />
+              <Help hint="What is an ABI?">
+                An ABI is the specification used to interact with Ethereum smart contracts
+              </Help>
+            </div>
+          )}
+        />
+      </GridItem>
       {showAbi && (
         <Grid>
-          <GridItem>
-            <Info mode="warning" borderColor={`${theme.warningSurface}`}>
-              <div style={{ display: 'flex', alignItems: 'center', columnGap: '5px' }}>
-                <IconWarning></IconWarning>
-                <span>Contract not verified, please insert the input function ABI</span>
-              </div>
-            </Info>
-          </GridItem>
+          {!verified && (
+            <GridItem>
+              <Info mode="warning" borderColor={`${theme.warningSurface}`}>
+                <div style={{ display: 'flex', alignItems: 'center', columnGap: '5px' }}>
+                  <IconWarning></IconWarning>
+                  <span>Contract not verified, please insert the input function ABI</span>
+                </div>
+              </Info>
+            </GridItem>
+          )}
           <GridItem>
             <StyledText name="title2">
               <div style={{ display: 'flex', columnGap: `${spacing}px`, alignItems: 'center' }}>
                 <div>Input function ABI </div>
-                <div>
-                  <Help hint="What is an ABI?">
-                    An ABI is the specification used to interact with Ethereum smart contracts
-                  </Help>
-                </div>
               </div>
             </StyledText>
             <Controller
