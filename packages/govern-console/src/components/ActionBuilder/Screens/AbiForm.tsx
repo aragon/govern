@@ -21,6 +21,7 @@ import { constants } from 'ethers';
 
 type FormInput = {
   contractAddress: string;
+  implementationAddress: string;
   abi: string;
 };
 
@@ -45,15 +46,17 @@ export const AbiForm: React.FC = () => {
   }, [getValues, gotoFunctionSelector]);
 
   const fetchAbi = useCallback(async () => {
-    const validationResult = await trigger('contractAddress');
+    const validationResult =
+      (await trigger('contractAddress')) && (await trigger('implementationAddress'));
     if (validationResult === false) {
       // address is invalid
       return;
     }
 
     const address = getValues('contractAddress');
+    const implementationAddress = getValues('implementationAddress');
     const abiHandler = new AbiHandler(networkName);
-    const abi = await abiHandler.get(address);
+    const abi = await abiHandler.get(implementationAddress || address);
     if (abi) {
       gotoFunctionSelector(address, abi);
     } else {
@@ -101,7 +104,29 @@ export const AbiForm: React.FC = () => {
               )}
             />
           </div>
-          <div style={{ width: `${compact ? '100%' : 'auto'}` }}>
+          <div style={{ flex: '1', minWidth: '400px' }}>
+            <StyledText name="title3">Implementation address (optional)</StyledText>
+            <Controller
+              name="implementationAddress"
+              control={control}
+              shouldUnregister={true}
+              defaultValue=""
+              rules={{
+                validate: async (value) => !value || (await validateContract(value, provider)),
+              }}
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
+                <TextInput
+                  wide
+                  value={value}
+                  placeholder={constants.AddressZero}
+                  onChange={onChange}
+                  status={error ? 'error' : 'normal'}
+                  error={error ? error.message : null}
+                />
+              )}
+            />
+          </div>
+          <div style={{ flex: '1', minWidth: '400px' }}>
             <Button wide label="Search" onClick={fetchAbi}></Button>
             {!compact && formState.errors.contractAddress && (
               <div style={{ opacity: 0 }}>filler</div>
